@@ -1,0 +1,92 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'idea'
+    id 'application'
+}
+
+group 'com.paradox_challenges'
+version '0.1-SNAPSHOT'
+ext.moduleName = 'com.paradox_challenges.eu4_generator'
+mainClassName = 'com.paradox_challenges.eu4_generator.CommandLine'
+
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileJava {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
+}
+
+def java_home =  System.getProperty("java.home")
+task link(type: Exec) {
+
+    workingDir 'build'
+
+    commandLine "${java_home}/bin/jlink", '--module-path', "libs${File.pathSeparatorChar}${java_home}/jmods",
+            '--add-modules', moduleName, '--launcher', 'cli=' + moduleName + '/' + mainClassName, '--output', 'dist', '--strip-debug',
+            '--compress', '2', '--no-header-files', '--no-man-pages'
+}
+
+jar {
+    inputs.property("moduleName", moduleName)
+    manifest {
+        attributes 'Main-Class': moduleName + '.CommandLine'
+        attributes('Automatic-Module-Name': moduleName)
+    }
+}
+
+run {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        jvmArgs = [
+                '--module-path', classpath.asPath,
+                '--module', mainClassName
+        ]
+        classpath = files()
+    }
+}
+
+import java.util.regex.Matcher
+
+startScripts {
+    dependsOn 'link'
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        classpath = files()
+        defaultJvmOpts = [
+                '--module-path', 'APP_HOME_LIBS',
+                '--module', mainClassName
+        ]
+    }
+    doLast{
+        def bashFile = new File(outputDir, applicationName)
+        String bashContent = bashFile.text
+        bashFile.text = bashContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('$APP_HOME/lib'))
+
+        def batFile = new File(outputDir, applicationName + ".bat")
+        String batContent = batFile.text
+        batFile.text = batContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('%APP_HOME%\\lib'))
+    }
+}
+
+
+
+
+
+
+
+
