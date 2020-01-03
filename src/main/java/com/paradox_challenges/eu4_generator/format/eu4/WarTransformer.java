@@ -5,6 +5,7 @@ import com.paradox_challenges.eu4_generator.savegame.ArrayNode;
 import com.paradox_challenges.eu4_generator.savegame.KeyValueNode;
 import com.paradox_challenges.eu4_generator.savegame.Node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WarTransformer extends NodeTransformer {
@@ -14,12 +15,14 @@ public class WarTransformer extends NodeTransformer {
     @Override
     public Node transformNode(Node node) {
         ArrayNode masterNode = (ArrayNode) node;
-        List<Node> warNodes = getNodesForKey(node, "war");
-        for (Node warNode : warNodes) {
+        List<KeyValueNode> warNodes = Node.getKeyValueNodesForKey(node, "war");
+        List<Node> newWarNodes = new ArrayList<>();
+        for (KeyValueNode warNode : warNodes) {
             masterNode.removeNode(warNode);
-            events.transformNode(getNodeForKey(warNode, "history"));
+            events.transformNode(warNode.getNode());
+            newWarNodes.add(warNode.getNode());
         }
-        masterNode.addNode(new KeyValueNode("wars", new ArrayNode(warNodes)));
+        masterNode.addNode(new KeyValueNode("wars", new ArrayNode(newWarNodes)));
         return masterNode;
     }
 }

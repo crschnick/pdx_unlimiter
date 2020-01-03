@@ -19,6 +19,7 @@
 10484=war_battle
 10485=war_attackers
 10486=war_defenders
+10487=war
 10488=war
 10491=battle_won_by_attacker
 10492=casualties
@@ -72,13 +73,15 @@
 13370=great_powers
 223=great_power_rank
 
-11853=religion
+14121=religion
+11853=religion_stats
 14543=provinces_with_religion
 10379=spawn_date
 
 10306=controller
 11713=invested_papal_influence
 11163=treaty_of_torsedillas
+10695=papacy
 
 10291=provinces
 10296=history
@@ -102,6 +105,7 @@
 
 13668=age
 
+12438=trade_goods
 12440=trade_good_price
 10416=date
 220=event
@@ -111,5 +115,23 @@
 10302=religion
 10342=government_type
 11546=death_date
+
+11570=hre
+10553=emperor
+11165=authority
+11029=reforms_passed
+11553=election
+14045=electors
+13751=mandate_of_heaven
+
+13084=trade_league
+10921=members
+
+11854=countries
+14158=trade_companies
+
+350=trade_node
+14151=trading_policy
+
 
 

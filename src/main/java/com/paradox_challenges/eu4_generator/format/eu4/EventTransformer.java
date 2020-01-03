@@ -9,12 +9,18 @@ import com.paradox_challenges.eu4_generator.savegame.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class EventTransformer extends NodeTransformer {
 
     @Override
     public Node transformNode(Node node) {
-        ArrayNode history = (ArrayNode) node;
+        Optional<Node> historyNode = Node.getNodeForKeyIfExistent(node, "history");
+        if (!historyNode.isPresent()) {
+            return node;
+        }
+
+        ArrayNode history = (ArrayNode) historyNode.get();
         List<Node> newEventList = new ArrayList<>();
         for (Node n : new ArrayList<>(history.getNodes())) {
             KeyValueNode kv = (KeyValueNode) n;

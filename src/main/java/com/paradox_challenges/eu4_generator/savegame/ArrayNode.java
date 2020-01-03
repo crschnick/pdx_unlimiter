@@ -13,8 +13,8 @@ public class ArrayNode extends Node {
 
     public String toString(int indentation) {
         return "{\n" + getNodes().stream().map(
-                (n) -> {return GamestateParser.indent(indentation + 1) + n.toString(indentation + 1);})
-                .collect(Collectors.joining(",\n")) + "\n" + GamestateParser.indent(indentation) + "}";
+                (n) -> {return Node.indent(indentation + 1) + n.toString(indentation + 1);})
+                .collect(Collectors.joining(",\n")) + "\n" + Node.indent(indentation) + "}";
     }
 
     public void addNode(Node node) {

@@ -25,25 +25,6 @@ public class GamestateParser {
     public static final byte[] BOOL_FALSE = new byte[]{0x4c, 0x28};
     public static final byte[] MAGIC = new byte[]{ 0x45, 0x55, 0x34, 0x62, 0x69, 0x6E};
 
-    public static String indent(int amount) {
-        String s = "";
-        for (int i = 0; i < amount; i++) {
-            s = s.concat("  ");
-        }
-        return s;
-    }
-
-    public static void main(String[] args) throws IOException {
-        GameDate.fromInteger(57307272);
-        File f = new File("C:\\Users\\cschn\\Desktop\\gamestate_3");
-        InputStream s = new FileInputStream(f);
-        try {
-            new GamestateParser().run(s);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
     enum TokenType {
         VALUE,
         OPEN_GROUP,
@@ -94,12 +75,18 @@ public class GamestateParser {
         }
     }
 
-    Node hierachiseTokens(List<Token> tokens) {
+    private Namespace namespace;
+
+    public GamestateParser(Namespace namespace) {
+        this.namespace = namespace;
+    }
+
+    private Node hierachiseTokens(List<Token> tokens) {
         Map.Entry<Node,Integer> node = createNode(tokens, 0);
         return node.getKey();
     }
 
-    Map.Entry<Node,Integer> createNode(List<Token> tokens, int index) {
+    private Map.Entry<Node,Integer> createNode(List<Token> tokens, int index) {
         if (tokens.get(index).getType() == TokenType.VALUE) {
             return new AbstractMap.SimpleEntry<>(new ValueNode<Object>(((ValueToken<Object>) tokens.get(index)).value), index + 1);
         }
@@ -115,7 +102,7 @@ public class GamestateParser {
             if (isKeyValue) {
                 String key = ((ValueToken<Object>) tokens.get(currentIndex)).value.toString();
                 Map.Entry<Node,Integer> result = createNode(tokens, currentIndex + 2);
-                childs.add(KeyValueNode.createWithNamespace(key, result.getKey(), Namespace.EU4));
+                childs.add(KeyValueNode.createWithNamespace(key, result.getKey(), namespace));
                 currentIndex = result.getValue();
             } else {
                 Map.Entry<Node,Integer> result = createNode(tokens, currentIndex);
@@ -125,7 +112,7 @@ public class GamestateParser {
         }
     }
 
-    public void run(InputStream stream) throws IOException {
+    public Node parse(InputStream stream) throws IOException {
         byte[] first = new byte[6];
         stream.readNBytes(first, 0, 6);
         if (!Arrays.equals(first, MAGIC)) {
@@ -218,13 +205,7 @@ public class GamestateParser {
         tokens.add(0, new OpenGroupToken());
         tokens.add(new CloseGroupToken());
         Node result = hierachiseTokens(tokens);
-
-        new WarTransformer().transformNode((ArrayNode) result);
-        new ProvincesTransformer().transformNode(result);
-
-        FileOutputStream out = new FileOutputStream("C:\\Users\\cschn\\Desktop\\gamestate_3_new.txt");
-        out.write(result.toString(0).getBytes());
-        out.close();
+        return result;
     }
 
 }

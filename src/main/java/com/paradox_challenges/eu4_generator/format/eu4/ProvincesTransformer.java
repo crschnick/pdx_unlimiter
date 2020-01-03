@@ -18,7 +18,7 @@ public class ProvincesTransformer extends NodeTransformer {
 
     @Override
     public Node transformNode(Node node) {
-        ArrayNode masterNode = (ArrayNode) getNodeForKey(node, "provinces");
+        ArrayNode masterNode = (ArrayNode) Node.getNodeForKey(node, "provinces");
         for (Node sub : new ArrayList<>(masterNode.getNodes())) {
             KeyValueNode kv = (KeyValueNode) sub;
             var m = PROVINCE_ID.matcher(kv.getKeyName());
@@ -27,7 +27,7 @@ public class ProvincesTransformer extends NodeTransformer {
             int id = Integer.parseInt(idString);
             ((ArrayNode) kv.getNode()).addNode(KeyValueNode.create("province_id", new ValueNode<>(id)));
 
-            events.transformNode(getNodeForKey(kv.getNode(), "history"));
+            events.transformNode(kv.getNode());
             masterNode.removeNode(sub);
             masterNode.addNode(kv.getNode());
         }
