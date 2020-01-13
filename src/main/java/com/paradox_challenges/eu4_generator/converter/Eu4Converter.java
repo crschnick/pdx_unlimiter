@@ -1,34 +1,34 @@
-package com.paradox_challenges.eu4_generator.savegame;
+package com.paradox_challenges.eu4_generator.converter;
 
 import com.paradox_challenges.eu4_generator.format.Namespace;
 import com.paradox_challenges.eu4_generator.format.NodeSplitter;
 import com.paradox_challenges.eu4_generator.format.NodeTransformer;
 import com.paradox_challenges.eu4_generator.format.eu4.Eu4Transformer;
+import com.paradox_challenges.eu4_generator.parser.IronmanParser;
+import com.paradox_challenges.eu4_generator.parser.Node;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class SavegameExtractor {
+public class Eu4Converter extends SavegameConverter {
 
-    private GamestateParser parser;
+    private IronmanParser parser;
 
     private NodeTransformer gamestateTransformer;
 
     private NodeSplitter splitter;
 
-    public SavegameExtractor() {
-        parser = new GamestateParser(Namespace.EU4);
+    public Eu4Converter() {
+        super("gamestate", "ongoing_wars", "ended_wars", "provinces", "military", "religion", "countries", "trade_nodes", "rebels", "province_count_over_time", "country_scores_over_time", "yearly_income_over_time", "inflation_over_time", "advisors");
+        parser = new IronmanParser(Namespace.EU4);
         gamestateTransformer = new Eu4Transformer();
-        splitter = new NodeSplitter("wars", "provinces", "military", "religion", "countries");
+        splitter = new NodeSplitter("ongoing_wars", "ended_wars", "provinces", "military", "religion", "countries", "trade_nodes", "rebels", "province_count_over_time", "country_scores_over_time", "yearly_income_over_time", "inflation_over_time", "advisors");
     }
 
     private static ZipEntry getEntryByName(String name, ZipFile zipFile) {
@@ -59,13 +59,14 @@ public class SavegameExtractor {
         ZipEntry gamestate = getEntryByName("gamestate", zipFile);
         Node gamestateNode = parser.parse(zipFile.getInputStream(gamestate));
         gamestateTransformer.transformNode(gamestateNode);
-        Map<String, Node> map = splitter.removeNodes(gamestateNode);
-        for (String key : map.keySet()) {
-            writeNode(outputDir, key, map.get(key));
-        }
-        writeNode(outputDir, "gamestate", gamestateNode);
-
-        ZipEntry meta = getEntryByName("meta", zipFile);
-        Node metaNode = parser.parse(zipFile.getInputStream(meta));
+        writeToFile(gamestateNode, outputDir + ".eu4i");
+//        Map<String, Node> map = splitter.removeNodes(gamestateNode);
+//        for (String key : map.keySet()) {
+//            writeNode(outputDir, key, map.get(key));
+//        }
+//        writeNode(outputDir, "gamestate", gamestateNode);
+//
+//        ZipEntry meta = getEntryByName("meta", zipFile);
+//        Node metaNode = parser.parse(zipFile.getInputStream(meta));
     }
 }

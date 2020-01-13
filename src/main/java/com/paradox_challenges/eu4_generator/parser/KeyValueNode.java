@@ -1,4 +1,4 @@
-package com.paradox_challenges.eu4_generator.savegame;
+package com.paradox_challenges.eu4_generator.parser;
 
 import com.paradox_challenges.eu4_generator.format.Namespace;
 
@@ -24,7 +24,6 @@ public class KeyValueNode extends Node {
     public String toString(int indentation) {
         return getKeyName() + "=" + getNode().toString(indentation);
     }
-
 
     public String getKeyName() {
         return keyName;

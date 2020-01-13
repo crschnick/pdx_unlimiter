@@ -1,8 +1,8 @@
 package com.paradox_challenges.eu4_generator.format;
 
-import com.paradox_challenges.eu4_generator.savegame.ArrayNode;
-import com.paradox_challenges.eu4_generator.savegame.KeyValueNode;
-import com.paradox_challenges.eu4_generator.savegame.Node;
+import com.paradox_challenges.eu4_generator.parser.ArrayNode;
+import com.paradox_challenges.eu4_generator.parser.KeyValueNode;
+import com.paradox_challenges.eu4_generator.parser.Node;
 
 import java.util.HashMap;
 import java.util.List;

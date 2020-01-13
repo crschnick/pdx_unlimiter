@@ -19,8 +19,8 @@
 10484=war_battle
 10485=war_attackers
 10486=war_defenders
-10487=war
-10488=war
+10487=ongoing_war
+10488=ended_war
 10491=battle_won_by_attacker
 10492=casualties
 10549=war_goal_aquired
@@ -132,6 +132,52 @@
 
 350=trade_node
 14151=trading_policy
+14152=trading_policy_set
+10932=additional_trade_power
+12514=trade_power
+12512=transferred_trade_power
+12515=transferring_trade_power_to
+12516=receiving_trade_power_from
+11273=merchant
+12513=base_trade_power
+10310=trade_power_modifier
+109=days_left
+11692=province_trade_power
+11019=ship_trade_power
+11673=from_downstream_trade_power
+10117=light_ships_in_node
+12511=received_trade_power
+11687=steering_trade
+11437=total_trade_value
+10920=outgoing_trade_value
+11685=local_trade_value
+10293=trade_node_id
+10773=total_trade_power
+11688=outgoing_trade_power
+11689=retained_trade_power
+12518=total_province_trade_power
+14256=collectors
+
+11050=country_scores_over_time
+308=entry
+240=yearly_data
+
+312=province_count_over_time
+
+311=yearly_income_over_time
+313=inflation_over_time
+
+10457=advisor
+10458=advisors
+
+10463=alliance
+10551=military_access
+10469=end_date
+12449=war_reparations
+11739=improve_relations
+12248=relations
+11785=transfer_trade_power
+417=trade_power_share_transferred
 
 
 

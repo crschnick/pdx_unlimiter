@@ -1,4 +1,4 @@
-package com.paradox_challenges.eu4_generator.savegame;
+package com.paradox_challenges.eu4_generator.parser;
 
 import java.time.Month;
 import java.util.regex.Pattern;

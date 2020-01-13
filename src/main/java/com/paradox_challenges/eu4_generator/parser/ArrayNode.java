@@ -1,4 +1,4 @@
-package com.paradox_challenges.eu4_generator.savegame;
+package com.paradox_challenges.eu4_generator.parser;
 
 import java.util.List;
 import java.util.stream.Collectors;

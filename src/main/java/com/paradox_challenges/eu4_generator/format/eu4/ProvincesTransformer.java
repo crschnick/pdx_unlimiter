@@ -1,13 +1,12 @@
 package com.paradox_challenges.eu4_generator.format.eu4;
 
 import com.paradox_challenges.eu4_generator.format.NodeTransformer;
-import com.paradox_challenges.eu4_generator.savegame.ArrayNode;
-import com.paradox_challenges.eu4_generator.savegame.KeyValueNode;
-import com.paradox_challenges.eu4_generator.savegame.Node;
-import com.paradox_challenges.eu4_generator.savegame.ValueNode;
+import com.paradox_challenges.eu4_generator.parser.ArrayNode;
+import com.paradox_challenges.eu4_generator.parser.KeyValueNode;
+import com.paradox_challenges.eu4_generator.parser.Node;
+import com.paradox_challenges.eu4_generator.parser.ValueNode;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class ProvincesTransformer extends NodeTransformer {

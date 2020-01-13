@@ -1,15 +1,13 @@
-package com.paradox_challenges.eu4_generator.savegame;
+package com.paradox_challenges.eu4_generator.parser;
 
 import com.paradox_challenges.eu4_generator.format.Namespace;
-import com.paradox_challenges.eu4_generator.format.eu4.ProvincesTransformer;
-import com.paradox_challenges.eu4_generator.format.eu4.WarTransformer;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 
-public class GamestateParser {
+public class IronmanParser {
 
     public static final byte[] EQUALS = new byte[]{1, 0};
     public static final byte[] OPEN_GROUP = new byte[]{3, 0};
@@ -29,8 +27,7 @@ public class GamestateParser {
         VALUE,
         OPEN_GROUP,
         CLOSE_GROUP,
-        EQUALS,
-        MAGIC
+        EQUALS
     }
 
     abstract class Token {
@@ -77,7 +74,7 @@ public class GamestateParser {
 
     private Namespace namespace;
 
-    public GamestateParser(Namespace namespace) {
+    public IronmanParser(Namespace namespace) {
         this.namespace = namespace;
     }
 
@@ -112,11 +109,12 @@ public class GamestateParser {
         }
     }
 
-    public Node parse(InputStream stream) throws IOException {
+    public Optional<Node> parse(InputStream stream) throws IOException {
         byte[] first = new byte[6];
         stream.readNBytes(first, 0, 6);
         if (!Arrays.equals(first, MAGIC)) {
-            throw new IOException("");
+            stream.close();
+            return Optional.empty();
         }
 
         List<Token> tokens = new ArrayList<>();
@@ -202,10 +200,11 @@ public class GamestateParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        stream.close();
         tokens.add(0, new OpenGroupToken());
         tokens.add(new CloseGroupToken());
         Node result = hierachiseTokens(tokens);
-        return result;
+        return Optional.of(result);
     }
 
 }
