@@ -7,17 +7,24 @@ plugins {
 
 group 'com.paradox_challenges'
 version '0.1-SNAPSHOT'
-ext.moduleName = 'com.paradox_challenges.eu4_generator'
-mainClassName = 'com.paradox_challenges.eu4_generator.CommandLine'
+ext.moduleName = 'com.paradox_challenges.eu4_unlimiter'
+mainClassName = 'com.paradox_challenges.eu4_unlimiter.savegame_mgr.SavegameManagerApp'
 
 sourceCompatibility = 1.10
 targetCompatibility = 1.10
 
 repositories {
     mavenCentral()
+    maven {
+        url = 'http://maven.nikr.net/'
+    }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
+    implementation 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
+    runtimeClasspath group: 'net.nikr', name: 'dds', version: '1.0.0'
+    //runtimeClasspath group: 'com.realityinteractive.imageio', name: 'tga', version: '1.0.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -44,8 +51,9 @@ task link(type: Exec) {
 jar {
     inputs.property("moduleName", moduleName)
     manifest {
-        attributes 'Main-Class': moduleName + '.CommandLine'
-        attributes('Automatic-Module-Name': moduleName)
+        attributes 'Main-Class': mainClassName
+        attributes 'Automatic-Module-Name': moduleName
+        attributes 'Class-Path': configurations.runtimeClasspath.files.collect { "$it.name" }.join(' ')
     }
 }
 
@@ -63,7 +71,6 @@ run {
 import java.util.regex.Matcher
 
 startScripts {
-    dependsOn 'link'
     inputs.property("moduleName", moduleName)
     doFirst {
         classpath = files()
@@ -82,6 +89,13 @@ startScripts {
         batFile.text = batContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('%APP_HOME%\\lib'))
     }
 }
+
+task copyToLib(type: Copy) {
+    into "${buildDir}/libs"
+    from configurations.runtimeClasspath
+}
+
+build.dependsOn(copyToLib)
 
 
 
