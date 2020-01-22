@@ -67,6 +67,11 @@ public class GameDate {
         this.year = year;
     }
 
+    @Override
+    public String toString() {
+        return day + "." + month.ordinal() + "." + year;
+    }
+
     public int getDay() {
         return day;
     }

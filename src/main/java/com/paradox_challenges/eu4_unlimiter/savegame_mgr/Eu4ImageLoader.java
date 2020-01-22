@@ -37,6 +37,13 @@ public class Eu4ImageLoader {
         return w;
     }
 
+    public static ImageView loadInterfaceImage(String name) throws IOException {
+        Path p = Eu4Installation.getPath().resolve("gfx/interface/" + name);
+        Image i = loadImage(p);
+        ImageView v = new ImageView(i);
+        return v;
+    }
+
     public static ImageView loadDisasterImage(String name) throws IOException {
         Path p = Eu4Installation.getPath().resolve("gfx/interface/disasters/" + name + ".dds");
         Image i = loadImage(p);
@@ -45,13 +52,13 @@ public class Eu4ImageLoader {
         return v;
     }
 
-    public static ImageView loadFlagImage(String name) throws IOException {
+    public static ImageView loadFlagImage(String name, int size) throws IOException {
         Path p = Eu4Installation.getPath().resolve("gfx/flags/" + name + ".tga");
         Image i = loadImage(p);
         ImageView v = new ImageView(i);
         //v.setViewport(new Rectangle2D(0, 0, 44, 44));
-        v.setFitWidth(35);
-        v.setFitHeight(35);
+        v.setFitWidth(size);
+        v.setFitHeight(size);
         return v;
     }
 }
