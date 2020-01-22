@@ -1,13 +1,17 @@
-package com.paradox_challenges.eu4_unlimiter.parser;
+package com.paradox_challenges.eu4_unlimiter.parser.eu4;
 
 import com.paradox_challenges.eu4_unlimiter.format.Namespace;
+import com.paradox_challenges.eu4_unlimiter.parser.GamedataParser;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class IronmanParser {
+public class Eu4IronmanParser extends GamedataParser {
 
     public static final byte[] EQUALS = new byte[]{1, 0};
     public static final byte[] OPEN_GROUP = new byte[]{3, 0};
@@ -23,100 +27,12 @@ public class IronmanParser {
     public static final byte[] BOOL_FALSE = new byte[]{0x4c, 0x28};
     public static final byte[] MAGIC = new byte[]{ 0x45, 0x55, 0x34, 0x62, 0x69, 0x6E};
 
-    enum TokenType {
-        VALUE,
-        OPEN_GROUP,
-        CLOSE_GROUP,
-        EQUALS
+    public Eu4IronmanParser() {
+        super(MAGIC, Namespace.EU4);
     }
 
-    abstract class Token {
-        abstract TokenType getType();
-    }
-
-    class ValueToken<T> extends Token {
-
-        T value;
-
-        ValueToken(T v) {
-            value = v;
-        }
-
-        @Override
-        TokenType getType() {
-            return TokenType.VALUE;
-        }
-    }
-
-    class EqualsToken extends Token {
-
-        @Override
-        TokenType getType() {
-            return TokenType.EQUALS;
-        }
-    }
-
-    class OpenGroupToken extends Token {
-
-        @Override
-        TokenType getType() {
-            return TokenType.OPEN_GROUP;
-        }
-    }
-
-    class CloseGroupToken extends Token {
-
-        @Override
-        TokenType getType() {
-            return TokenType.CLOSE_GROUP;
-        }
-    }
-
-    private Namespace namespace;
-
-    public IronmanParser(Namespace namespace) {
-        this.namespace = namespace;
-    }
-
-    private Node hierachiseTokens(List<Token> tokens) {
-        Map.Entry<Node,Integer> node = createNode(tokens, 0);
-        return node.getKey();
-    }
-
-    private Map.Entry<Node,Integer> createNode(List<Token> tokens, int index) {
-        if (tokens.get(index).getType() == TokenType.VALUE) {
-            return new AbstractMap.SimpleEntry<>(new ValueNode<Object>(((ValueToken<Object>) tokens.get(index)).value), index + 1);
-        }
-
-        List<Node> childs = new LinkedList<>();
-        int currentIndex = index + 1;
-        while (true) {
-            if (tokens.get(currentIndex).getType() == TokenType.CLOSE_GROUP) {
-                return new AbstractMap.SimpleEntry<>(new ArrayNode(childs), currentIndex + 1);
-            }
-
-            boolean isKeyValue = tokens.get(currentIndex + 1).getType() == TokenType.EQUALS;
-            if (isKeyValue) {
-                String key = ((ValueToken<Object>) tokens.get(currentIndex)).value.toString();
-                Map.Entry<Node,Integer> result = createNode(tokens, currentIndex + 2);
-                childs.add(KeyValueNode.createWithNamespace(key, result.getKey(), namespace));
-                currentIndex = result.getValue();
-            } else {
-                Map.Entry<Node,Integer> result = createNode(tokens, currentIndex);
-                childs.add(result.getKey());
-                currentIndex = result.getValue();
-            }
-        }
-    }
-
-    public Optional<Node> parse(InputStream stream) throws IOException {
-        byte[] first = new byte[6];
-        stream.readNBytes(first, 0, 6);
-        if (!Arrays.equals(first, MAGIC)) {
-            stream.close();
-            return Optional.empty();
-        }
-
+    @Override
+    public List<Token> tokenize(InputStream stream) throws IOException {
         List<Token> tokens = new ArrayList<>();
         try {
             do {
@@ -187,7 +103,7 @@ public class IronmanParser {
                 else if (Arrays.equals(next, CLOSE_GROUP)) {
                     tokens.add(new CloseGroupToken());
                 }
-                 else {
+                else {
                     byte[] number = new byte[4];
                     number[0] = next[0];
                     number[1] = next[1];
@@ -200,11 +116,6 @@ public class IronmanParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        stream.close();
-        tokens.add(0, new OpenGroupToken());
-        tokens.add(new CloseGroupToken());
-        Node result = hierachiseTokens(tokens);
-        return Optional.of(result);
+        return tokens;
     }
-
 }

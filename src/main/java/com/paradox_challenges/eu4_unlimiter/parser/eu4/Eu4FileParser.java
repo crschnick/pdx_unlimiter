@@ -1,4 +1,7 @@
-package com.paradox_challenges.eu4_unlimiter.parser;
+package com.paradox_challenges.eu4_unlimiter.parser.eu4;
+
+import com.paradox_challenges.eu4_unlimiter.parser.Node;
+import com.paradox_challenges.eu4_unlimiter.parser.GamedataParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +14,7 @@ import java.util.zip.ZipInputStream;
 
 public class Eu4FileParser {
 
-    private IronmanParser ironmanParser;
+    private GamedataParser ironmanParser;
 
     private static ZipEntry getEntryByName(String name, ZipFile zipFile) {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -24,7 +27,7 @@ public class Eu4FileParser {
         return null;
     }
 
-    Eu4FileData parse(Path file) throws IOException {
+    Object parse(Path file) throws IOException {
         boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());

@@ -4,8 +4,9 @@ import com.paradox_challenges.eu4_unlimiter.format.Namespace;
 import com.paradox_challenges.eu4_unlimiter.format.NodeSplitter;
 import com.paradox_challenges.eu4_unlimiter.format.NodeTransformer;
 import com.paradox_challenges.eu4_unlimiter.format.eu4.Eu4Transformer;
-import com.paradox_challenges.eu4_unlimiter.parser.IronmanParser;
+import com.paradox_challenges.eu4_unlimiter.parser.GamedataParser;
 import com.paradox_challenges.eu4_unlimiter.parser.Node;
+import com.paradox_challenges.eu4_unlimiter.parser.eu4.Eu4IronmanParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +20,7 @@ import java.util.zip.ZipFile;
 
 public class Eu4Converter extends SavegameConverter {
 
-    private IronmanParser parser;
+    private GamedataParser parser;
 
     private NodeTransformer gamestateTransformer;
 
@@ -27,7 +28,7 @@ public class Eu4Converter extends SavegameConverter {
 
     public Eu4Converter() {
         super("gamestate", "ongoing_wars", "ended_wars", "provinces", "military", "religion", "countries", "trade_nodes", "rebels", "province_count_over_time", "country_scores_over_time", "yearly_income_over_time", "inflation_over_time", "advisors");
-        parser = new IronmanParser(Namespace.EU4);
+        parser = new Eu4IronmanParser();
         gamestateTransformer = new Eu4Transformer();
         splitter = new NodeSplitter("ongoing_wars", "ended_wars", "provinces", "military", "religion", "countries", "trade_nodes", "rebels", "province_count_over_time", "country_scores_over_time", "yearly_income_over_time", "inflation_over_time", "advisors");
     }

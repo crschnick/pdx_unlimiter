@@ -7,32 +7,41 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SavegameManager {
 
     public static class SavegameData {
 
-        private GameTag startTag;
-        private GameTag currentTag;
+        public static class War {
+
+            public List<String> enemies;
+        }
+
+        private String startTag;
+        private String currentTag;
         private GameDate date;
         private String name;
+        private List<String> vassals;
+        private Map<String, GameDate> truces;
+        private List<War> wars;
 
         public static SavegameData parse(Path p) {
             return null;
         }
 
-        public SavegameData(GameTag startTag, GameTag currentTag, GameDate date, String name) {
+        public SavegameData(String startTag, String currentTag, GameDate date, String name) {
             this.startTag = startTag;
             this.currentTag = currentTag;
             this.date = date;
             this.name = name;
         }
 
-        public GameTag getStartTag() {
+        public String getStartTag() {
             return startTag;
         }
 
-        public GameTag getCurrentTag() {
+        public String getCurrentTag() {
             return currentTag;
         }
 
