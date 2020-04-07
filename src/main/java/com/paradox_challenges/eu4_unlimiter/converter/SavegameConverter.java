@@ -1,6 +1,9 @@
 package com.paradox_challenges.eu4_unlimiter.converter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.paradox_challenges.eu4_unlimiter.format.NodeSplitter;
+import com.paradox_challenges.eu4_unlimiter.format.NodeTransformer;
 import com.paradox_challenges.eu4_unlimiter.parser.Node;
 
 import java.io.File;
@@ -14,14 +17,21 @@ public class SavegameConverter {
 
     private String gamestateName;
 
+    private NodeTransformer transformer;
+
     private String[] names;
 
-    public SavegameConverter(String gamestateName, String... names) {
+    public SavegameConverter(NodeTransformer transformer, String gamestateName, String... names) {
+        this.transformer = transformer;
         this.gamestateName = gamestateName;
         this.names = names;
     }
 
-    public void writeToFile(Node node, String fileName) throws IOException {
+    public void extract(Node node, String fileName) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        transformer.transform(node);
         Map<String, Node> map = new NodeSplitter(names).removeNodes(node);
 
         File f = new File(fileName);
@@ -29,14 +39,14 @@ public class SavegameConverter {
         for (String s : names) {
             ZipEntry e = new ZipEntry(s + ".json");
             out.putNextEntry(e);
-            byte[] data = map.get(s).toString(0).getBytes();
+            byte[] data = mapper.writeValueAsBytes(JsonConverter.toJsonObject(map.get(s)));
             out.write(data, 0, data.length);
             out.closeEntry();
         }
 
         ZipEntry e = new ZipEntry(gamestateName + ".json");
         out.putNextEntry(e);
-        byte[] data = node.toString(0).getBytes();
+        byte[] data = mapper.writeValueAsBytes(JsonConverter.toJsonObject(node));
         out.write(data, 0, data.length);
         out.closeEntry();
 

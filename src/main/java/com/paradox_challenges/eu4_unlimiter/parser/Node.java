@@ -14,6 +14,33 @@ public abstract class Node {
         return s;
     }
 
+    public static List<Node> copyOfArrayNode(Node node) {
+        ArrayNode a = (ArrayNode) node;
+        return new ArrayList<>(a.getNodes());
+    }
+
+    public static void addNodeToArray(Node node, Node toAdd) {
+        ArrayNode a = (ArrayNode) node;
+        a.addNode(toAdd);
+    }
+
+    public static void removeNodeFromArray(Node node, Node toRemove) {
+        ArrayNode a = (ArrayNode) node;
+        a.removeNode(toRemove);
+    }
+
+    public static List<Node> getNodesForKeys(Node node, String[] keys) {
+        List<Node> nodes = List.of(node);
+        List<Node> newNodes = new ArrayList<>();
+        for (String s : keys) {
+            for (Node current : nodes) {
+                newNodes.addAll(Node.getKeyValueNodesForKey(current, s));
+            }
+            nodes = newNodes;
+        }
+        return nodes;
+    }
+
     public static Optional<Node> getNodeForKeyIfExistent(Node node, String key) {
         var list = getNodesForKey(node, key);
         return list.size() == 0 ? Optional.empty() : Optional.of(list.get(0));
@@ -30,6 +57,9 @@ public abstract class Node {
     public static KeyValueNode getKeyValueNodeForKey(Node node, String key) {
         var list = getKeyValueNodesForKey(node, key);
         if (list.size() > 1) {
+            throw new IllegalArgumentException("Invalid key: " + key);
+        }
+        if (list.size() == 0) {
             throw new IllegalArgumentException("Invalid key: " + key);
         }
         return list.get(0);

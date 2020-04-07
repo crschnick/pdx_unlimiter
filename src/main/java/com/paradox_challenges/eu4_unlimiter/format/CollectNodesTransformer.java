@@ -19,7 +19,8 @@ public class CollectNodesTransformer extends NodeTransformer {
     }
 
     @Override
-    public Node transformNode(Node node) {
+    public void transform(Node node) {
+
         ArrayNode masterNode = (ArrayNode) node;
         List<KeyValueNode> warNodes = Node.getKeyValueNodesForKey(node, originalKeyName);
         List<Node> newWarNodes = new ArrayList<>();
@@ -28,6 +29,10 @@ public class CollectNodesTransformer extends NodeTransformer {
             newWarNodes.add(warNode.getNode());
         }
         masterNode.addNode(new KeyValueNode(newKeyName, new ArrayNode(newWarNodes)));
-        return masterNode;
+    }
+
+    @Override
+    public void reverse(Node node) {
+
     }
 }

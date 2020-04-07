@@ -1,5 +1,6 @@
 package com.paradox_challenges.eu4_unlimiter.savegame_mgr;
 
+import com.paradox_challenges.eu4_unlimiter.CommandLine;
 import com.paradox_challenges.eu4_unlimiter.parser.GameDate;
 import com.paradox_challenges.eu4_unlimiter.parser.eu4.Eu4NormalParser;
 import javafx.application.Application;
@@ -142,14 +143,6 @@ public class SavegameManagerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        try {
-            Optional<com.paradox_challenges.eu4_unlimiter.parser.Node> node = new Eu4NormalParser().parse(new FileInputStream(new File("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\autosave.eu4")));
-            node.isPresent();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
         List<SavegameManager.SavegameData> data = new ArrayList<>(2);
         data.add(new SavegameManager.SavegameData(null, null, null, "Test"));
         for (int i = 0; i < 30; i++) {
@@ -188,6 +181,12 @@ public class SavegameManagerApp extends Application {
         primaryStage.show();
     }
     public static void main(String[] args) {
+        try {
+            CommandLine.main(args);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
         launch(args);
     }
 }

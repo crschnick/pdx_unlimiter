@@ -21,6 +21,10 @@ public class KeyValueNode extends Node {
         this.node = node;
     }
 
+    public void setNode(Node node) {
+        this.node = node;
+    }
+
     public String toString(int indentation) {
         return getKeyName() + "=" + getNode().toString(indentation);
     }

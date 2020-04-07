@@ -14,10 +14,10 @@ import java.util.Optional;
 public class EventTransformer extends NodeTransformer {
 
     @Override
-    public Node transformNode(Node node) {
+    public void transform(Node node) {
         Optional<Node> historyNode = Node.getNodeForKeyIfExistent(node, "history");
         if (!historyNode.isPresent()) {
-            return node;
+            return;
         }
 
         ArrayNode history = (ArrayNode) historyNode.get();
@@ -27,7 +27,7 @@ public class EventTransformer extends NodeTransformer {
             String date = kv.getKeyName();
             GameDate gd = GameDate.fromString(date);
             if (gd != null) {
-                Node dateNode = DateTransformer.INSTANCE.toNode(gd);
+                Node dateNode = DateTransformer.toNode(gd);
                 ArrayNode an = (ArrayNode) kv.getNode();
                 an.addNode(KeyValueNode.create("date", dateNode));
                 newEventList.add(an);
@@ -35,6 +35,10 @@ public class EventTransformer extends NodeTransformer {
             }
         }
         history.getNodes().add(KeyValueNode.create("events", new ArrayNode(newEventList)));
-        return node;
+    }
+
+    @Override
+    public void reverse(Node node) {
+
     }
 }
