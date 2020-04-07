@@ -66,18 +66,18 @@ public class Eu4IronmanParser extends GamedataParser {
                 }
 
                 else if (Arrays.equals(next, BOOL_TRUE)) {
-                    tokens.add(new ValueToken<Boolean>(true));
+                    tokens.add(new ValueToken<String>("yes"));
                 }
 
                 else if (Arrays.equals(next, BOOL_FALSE)) {
-                    tokens.add(new ValueToken<Boolean>(false));
+                    tokens.add(new ValueToken<String>("no"));
                 }
 
                 else if (Arrays.equals(next, BOOL)) {
                     byte[] number = new byte[1];
                     stream.readNBytes(number, 0, 1);
                     boolean b = ByteBuffer.wrap(number).get() != 0;
-                    tokens.add(new ValueToken<Boolean>(b));
+                    tokens.add(new ValueToken<String>(b ? "yes" : "no"));
                 }
 
                 else if (Arrays.equals(next, FLOAT_1)) {

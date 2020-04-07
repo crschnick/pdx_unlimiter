@@ -4,6 +4,8 @@ import com.paradox_challenges.eu4_unlimiter.parser.Node;
 
 public abstract class NodeTransformer {
 
-    public abstract Node transformNode(Node node);
+    public abstract void transform(Node node);
+
+    public abstract void reverse(Node node);
 
 }

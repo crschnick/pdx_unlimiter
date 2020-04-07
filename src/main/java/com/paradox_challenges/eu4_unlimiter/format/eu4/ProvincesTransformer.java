@@ -7,6 +7,7 @@ import com.paradox_challenges.eu4_unlimiter.parser.Node;
 import com.paradox_challenges.eu4_unlimiter.parser.ValueNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class ProvincesTransformer extends NodeTransformer {
@@ -15,21 +16,30 @@ public class ProvincesTransformer extends NodeTransformer {
 
     private static final Pattern PROVINCE_ID = Pattern.compile("-(\\d+)");
 
+    private static final String ID = "province_id";
+
     @Override
-    public Node transformNode(Node node) {
-        ArrayNode masterNode = (ArrayNode) Node.getNodeForKey(node, "provinces");
-        for (Node sub : new ArrayList<>(masterNode.getNodes())) {
-            KeyValueNode kv = (KeyValueNode) sub;
+    public void transform(Node node) {
+        ArrayNode ar = (ArrayNode) node;
+        for (int i = 0; i < ar.getNodes().size(); i++) {
+            KeyValueNode kv = (KeyValueNode) ar.getNodes().get(i);
             var m = PROVINCE_ID.matcher(kv.getKeyName());
             m.find();
             String idString = m.group(1);
             int id = Integer.parseInt(idString);
-            ((ArrayNode) kv.getNode()).addNode(KeyValueNode.create("province_id", new ValueNode<>(id)));
-
-            events.transformNode(kv.getNode());
-            masterNode.removeNode(sub);
-            masterNode.addNode(kv.getNode());
+            Node.addNodeToArray(kv.getNode(), KeyValueNode.create("province_id", new ValueNode<>(id)));
+            ar.getNodes().set(i, kv.getNode());
+            events.transform(kv.getNode());
         }
-        return masterNode;
+    }
+
+    @Override
+    public void reverse(Node node) {
+        for (Node sub : Node.copyOfArrayNode(Node.getNodeForKey(node, "provinces"))) {
+            ValueNode<Integer> provinceId = (ValueNode<Integer>) Node.getNodeForKey(sub, ID);
+            Node.removeNodeFromArray(sub, provinceId);
+            Node.removeNodeFromArray(node, sub);
+            Node.addNodeToArray(node, KeyValueNode.create("-" + String.valueOf(provinceId.getValue()), sub));
+        }
     }
 }

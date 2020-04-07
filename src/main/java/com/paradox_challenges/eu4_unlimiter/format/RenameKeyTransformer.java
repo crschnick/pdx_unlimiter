@@ -16,11 +16,20 @@ public class RenameKeyTransformer extends NodeTransformer {
     }
 
     @Override
-    public Node transformNode(Node node) {
+    public void transform(Node node) {
         KeyValueNode kv = (KeyValueNode) Node.getKeyValueNodeForKey(node, oldName);
         ArrayNode arrayNode = (ArrayNode) node;
         arrayNode.removeNode(kv);
         arrayNode.addNode(KeyValueNode.create(newName, kv.getNode()));
-        return null;
     }
+
+    @Override
+    public void reverse(Node node) {
+        KeyValueNode kv = (KeyValueNode) Node.getKeyValueNodeForKey(node, newName);
+        ArrayNode arrayNode = (ArrayNode) node;
+        arrayNode.removeNode(kv);
+        arrayNode.addNode(KeyValueNode.create(oldName, kv.getNode()));
+    }
+
+
 }

@@ -15,7 +15,8 @@ public class ArrayNameTransformer extends NodeTransformer {
     }
 
     @Override
-    public Node transformNode(Node node) {
+    public void transform(Node node) {
+
         ArrayNode arrayNode = (ArrayNode) node;
         int counter = 0;
         for (Node sub : new ArrayList<>(arrayNode.getNodes())) {
@@ -25,6 +26,10 @@ public class ArrayNameTransformer extends NodeTransformer {
             }
             counter++;
         }
-        return arrayNode;
+    }
+
+    @Override
+    public void reverse(Node node) {
+
     }
 }
