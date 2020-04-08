@@ -28,7 +28,7 @@ public class Eu4Converter extends SavegameConverter {
         t.add(new RenameKeyTransformer("religion_instance_data", "religion_data"));
         t.add(new SubnodeTransformer(Map.of(new String[] {"trade_nodes"}, new CollectNodesTransformer("node", "trade_nodes")), false));
         t.add(new SubnodeTransformer(Map.of(new String[] {"provinces"}, new ProvincesTransformer()), false));
-        t.add(new SubnodeTransformer(Map.of(new String[] {"multi_player"}, new BooleanTransformer()), true));
+        //t.add(new SubnodeTransformer(Map.of(new String[] {"multi_player"}, new BooleanTransformer()), true));
         return new ChainTransformer(t);
     }
 

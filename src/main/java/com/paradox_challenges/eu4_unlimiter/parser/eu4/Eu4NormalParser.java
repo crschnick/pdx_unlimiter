@@ -6,6 +6,7 @@ import com.paradox_challenges.eu4_unlimiter.parser.GamedataParser;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Eu4NormalParser extends GamedataParser {
 
@@ -47,7 +48,17 @@ public class Eu4NormalParser extends GamedataParser {
                     tokens.add(new ValueToken<Integer>((int) t.nval));
                     break;
                 case StreamTokenizer.TT_WORD:
-                    tokens.add(new ValueToken<String>(t.sval));
+                    if (Pattern.matches("-?[0-9]+", t.sval)) {
+                        tokens.add(new ValueToken<Integer>(Integer.parseInt(t.sval)));
+                    } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", t.sval)) {
+                        tokens.add(new ValueToken<Float>(Float.valueOf(t.sval)));
+                    } else if (t.sval.equals("yes")) {
+                        tokens.add(new ValueToken<Boolean>(true));
+                    } else if (t.sval.equals("no")) {
+                        tokens.add(new ValueToken<Boolean>(false));
+                    } else {
+                        tokens.add(new ValueToken<String>(t.sval));
+                    }
                     break;
                 default:
                     if (token == '=') {

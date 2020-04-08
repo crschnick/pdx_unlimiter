@@ -1,52 +1,78 @@
 package com.paradox_challenges.eu4_unlimiter.converter;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.paradox_challenges.eu4_unlimiter.parser.ArrayNode;
 import com.paradox_challenges.eu4_unlimiter.parser.KeyValueNode;
 import com.paradox_challenges.eu4_unlimiter.parser.Node;
 import com.paradox_challenges.eu4_unlimiter.parser.ValueNode;
 
-import java.util.*;
-
 public class JsonConverter {
 
-    private static Optional<Object> getFlatValue(Node node) {
+    private static boolean getFlatValue(ObjectNode jsonNode, String key, Node node) {
         if (node instanceof ValueNode) {
-            return Optional.of(node);
+            Object value = ((ValueNode) node).getValue();
+            if (value instanceof Boolean) {
+                jsonNode.put(key, (boolean) value);
+            }
+            if (value instanceof Integer) {
+                jsonNode.put(key, (int) value);
+            }
+            if (value instanceof String) {
+                jsonNode.put(key, (String) value);
+            }
+            if (value instanceof Float) {
+                jsonNode.put(key, (Float) value);
+            }
+            return true;
         } else if (node instanceof ArrayNode) {
             ArrayNode a = (ArrayNode) node;
             if (a.getNodes().size() == 0) {
-                return Optional.empty();
+                return false;
             }
 
             if (a.getNodes().get(0) instanceof ValueNode) {
-                List<Object> values = new ArrayList<>();
+                com.fasterxml.jackson.databind.node.ArrayNode array = jsonNode.putArray(key);
                 for (Node n : a.getNodes()) {
-                    values.add(((ValueNode) n).getValue());
+                    Object value = ((ValueNode) n).getValue();
+                    if (value instanceof Boolean) {
+                        array.add((boolean) value);
+                    }
+                    if (value instanceof Integer) {
+                        array.add((Integer) value);
+                    }
+                    if (value instanceof String) {
+                        array.add((String) value);
+                    }
+                    if (value instanceof Float) {
+                        array.add((Float) value);
+                    }
                 }
-                return Optional.of(values);
+                return true;
+            } else if (a.getNodes().get(0) instanceof ArrayNode) {
+                com.fasterxml.jackson.databind.node.ArrayNode array = jsonNode.putArray(key);
+                for (Node n : a.getNodes()) {
+                    toJsonObject(array.addObject(), n);
+                }
+                return true;
             } else {
-                return Optional.empty();
+                return false;
             }
         }
         throw new IllegalArgumentException();
     }
 
-    public static Map<String,Object> toJsonObject(Node node) {
-        Map<String,Object> map = new HashMap<>();
+    public static void toJsonObject(ObjectNode jsonNode, Node node) {
         if (node instanceof ArrayNode) {
             ArrayNode a = (ArrayNode) node;
             for (Node sub : a.getNodes()) {
                 if (sub instanceof KeyValueNode) {
                     String key = ((KeyValueNode) sub).getKeyName();
-                    Optional<Object> toPut = getFlatValue(((KeyValueNode) sub).getNode());
-                    if (toPut.isPresent()) {
-                        map.put(key, toPut.get());
-                    } else {
-                        map.put(key, toJsonObject(((KeyValueNode) sub).getNode()));
+                    boolean isFlat = getFlatValue(jsonNode, key, ((KeyValueNode) sub).getNode());
+                    if (!isFlat) {
+                        toJsonObject(jsonNode.putObject(key), ((KeyValueNode) sub).getNode());
                     }
                 }
             }
         }
-        return map;
     }
 }
