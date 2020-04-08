@@ -13,6 +13,6 @@ public class CommandLine {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         Optional<Node> node = new Eu4NormalParser().parse(new FileInputStream(new File("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\autosave.eu4")));
-        new Eu4Converter().extract(node.get(), "C:\\Users\\cschn\\Desktop\\test_eu4\\out.zip");
+        new Eu4Converter().extract(node.get(), "C:\\Users\\cschn\\Desktop\\test_eu4\\out.zip", false);
     }
 }
