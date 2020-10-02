@@ -1,5 +1,7 @@
 package com.paradox_challenges.eu4_unlimiter.format;
 
+import com.paradox_challenges.eu4_unlimiter.parser.ArrayNode;
+import com.paradox_challenges.eu4_unlimiter.parser.KeyValueNode;
 import com.paradox_challenges.eu4_unlimiter.parser.Node;
 
 import java.util.ArrayList;
@@ -20,11 +22,14 @@ public class SubnodeTransformer extends NodeTransformer {
     @Override
     public void transform(Node node) {
         for (Map.Entry<String[], NodeTransformer> entry : transformers.entrySet()) {
-            List<Node> nodes = List.of(node);
-            List<Node> newNodes = new ArrayList<>();
-            for (String s : entry.getKey()) {
+            List<Node> nodes = new ArrayList<>();
+            nodes.add(node);
+            for (int i = 0; i < entry.getKey().length; i++) {
+                String s = entry.getKey()[i];
+                boolean isLast = i == entry.getKey().length - 1;
+                List<Node> newNodes = new ArrayList<>();
                 for (Node current : nodes) {
-                    newNodes.addAll(includeKey ? Node.getKeyValueNodesForKey(current ,s) : Node.getNodesForKey(current, s));
+                    newNodes.addAll(isLast && includeKey ? Node.getKeyValueNodesForKey(current ,s) : Node.getNodesForKey(current, s));
                 }
                 nodes = newNodes;
             }

@@ -44,7 +44,7 @@ public abstract class Namespace {
                     int id = Integer.parseInt(parts[0]);
                     String key = parts[1];
                     if (keyNames.containsKey(id)) {
-                        throw new RuntimeException("Duplicate entries for id " + id + ": " + keyNames.get(id) + ", " + key);
+                        //throw new RuntimeException("Duplicate entries for id " + id + ": " + keyNames.get(id) + ", " + key);
                     }
 
                     keyNames.put(id, key);
@@ -59,7 +59,7 @@ public abstract class Namespace {
         public String getKeyName(String id) {
             if (Pattern.compile("[0-9]+").matcher(id).matches()) {
                 int idInt = Integer.parseInt(id);
-                return keyNames.containsKey(idInt) ? keyNames.get(idInt) : "ID[" + id + "]";
+                return keyNames.containsKey(idInt) ? keyNames.get(idInt) : id;
             } else {
                 return id;
             }
