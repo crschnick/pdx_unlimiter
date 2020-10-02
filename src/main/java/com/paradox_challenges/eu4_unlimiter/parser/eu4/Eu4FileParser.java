@@ -14,7 +14,8 @@ import java.util.zip.ZipInputStream;
 
 public class Eu4FileParser {
 
-    private GamedataParser ironmanParser;
+    private static final GamedataParser normalParser = new Eu4NormalParser();
+    private static final GamedataParser ironmanParser = new Eu4IronmanParser();
 
     private static ZipEntry getEntryByName(String name, ZipFile zipFile) {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -27,7 +28,7 @@ public class Eu4FileParser {
         return null;
     }
 
-    Object parse(Path file) throws IOException {
+    public static Eu4Savegame parse(Path file) throws IOException {
         boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
@@ -37,8 +38,12 @@ public class Eu4FileParser {
 
             Optional<Node> gamestateNode = ironmanParser.parse(zipFile.getInputStream(gamestate));
             if (gamestateNode.isPresent()) {
-
+                Node metaNode = ironmanParser.parse(zipFile.getInputStream(meta)).get();
+                Node aiNode =ironmanParser.parse(zipFile.getInputStream(ai)).get();
+                return new Eu4Savegame(gamestateNode.get(), metaNode, aiNode);
             }
+        } else {
+
         }
         return null;
     }

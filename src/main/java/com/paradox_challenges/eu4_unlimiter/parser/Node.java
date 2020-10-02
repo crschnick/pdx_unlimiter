@@ -72,7 +72,7 @@ public abstract class Node {
             for (Node sub : array.getNodes()) {
                 if (sub instanceof KeyValueNode) {
                     KeyValueNode kvNode = (KeyValueNode) sub;
-                    if (kvNode.getKeyName().equals(key)) {
+                    if (key.equals("*") || kvNode.getKeyName().equals(key)) {
                         nodes.add(kvNode);
                     }
                 }
@@ -88,7 +88,7 @@ public abstract class Node {
             for (Node sub : array.getNodes()) {
                 if (sub instanceof KeyValueNode) {
                     KeyValueNode kvNode = (KeyValueNode) sub;
-                    if (kvNode.getKeyName().equals(key)) {
+                    if (key.equals("*") || kvNode.getKeyName().equals(key)) {
                         nodes.add(kvNode.getNode());
                     }
                 }

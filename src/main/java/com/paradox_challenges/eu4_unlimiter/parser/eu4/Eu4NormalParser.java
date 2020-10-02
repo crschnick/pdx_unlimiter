@@ -49,7 +49,7 @@ public class Eu4NormalParser extends GamedataParser {
                     break;
                 case StreamTokenizer.TT_WORD:
                     if (Pattern.matches("-?[0-9]+", t.sval)) {
-                        tokens.add(new ValueToken<Integer>(Integer.parseInt(t.sval)));
+                        tokens.add(new ValueToken<Long>(Long.parseLong(t.sval)));
                     } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", t.sval)) {
                         tokens.add(new ValueToken<Float>(Float.valueOf(t.sval)));
                     } else if (t.sval.equals("yes")) {

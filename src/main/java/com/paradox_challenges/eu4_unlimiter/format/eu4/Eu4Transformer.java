@@ -1,25 +1,38 @@
 package com.paradox_challenges.eu4_unlimiter.format.eu4;
 
-import com.paradox_challenges.eu4_unlimiter.format.CollectNodesTransformer;
-import com.paradox_challenges.eu4_unlimiter.format.NodeTransformer;
-import com.paradox_challenges.eu4_unlimiter.format.RenameKeyTransformer;
+import com.paradox_challenges.eu4_unlimiter.format.*;
 import com.paradox_challenges.eu4_unlimiter.parser.Node;
 
-public class Eu4Transformer extends NodeTransformer {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-    @Override
-    public void transform(Node node) {
-//        new CollectNodesTransformer("ongoing_war", "ongoing_wars").transformNode(node);
-//        new CollectNodesTransformer("ended_war", "ended_wars").transformNode(node);
-//        new CollectNodesTransformer("rebels", "rebels").transformNode(node);
-//        new RenameKeyTransformer("trade_node", "trade_nodes").transformNode(node);
-//        //new CollectNodesTransformer("trade_node", "trade_nodes").transformNode(Node.getNodeForKey(node, "trade_nodes"));
-//        new ProvincesTransformer().transformNode(node);
-//        return node;
-    }
+public class Eu4Transformer {
 
-    @Override
-    public void reverse(Node node) {
+    public static final NodeTransformer GAMESTATE_TRANSFORMER = createEu4Transformer();
 
+    private static NodeTransformer createEu4Transformer() {
+        List<NodeTransformer> t = new ArrayList<>();
+        t.add(new CollectNodesTransformer("ongoing_war", "ongoing_wars"));
+        t.add(new CollectNodesTransformer("previous_war", "ended_wars"));
+        t.add(new CollectNodesTransformer("rebel_faction", "rebel_factions"));
+        t.add(new CollectNodesTransformer("trade_league", "trade_leagues"));
+        t.add(new RenameKeyTransformer("trade", "trade_nodes"));
+
+        t.add(new RenameKeyTransformer("religion_instance_data", "religion_data"));
+        t.add(new SubnodeTransformer(Map.of(new String[] {"religion_data", "muslim"}, new CollectNodesTransformer("relation", "relations")), false));
+        t.add(new SubnodeTransformer(Map.of(new String[] {"religion_data", "catholic"}, new CollectNodesTransformer("cardinal", "cardinals")), false));
+
+
+        t.add(new SubnodeTransformer(Map.of(new String[] {"trade_nodes"}, new CollectNodesTransformer("node", "trade_nodes")), false));
+        t.add(new SubnodeTransformer(Map.of(new String[] {"provinces"}, new ProvincesTransformer()), false));
+        t.add(new SubnodeTransformer(Map.of(new String[] {"provinces"},
+                new ArrayTransformer(
+                        new CollectNodesTransformer("unit", "units"))), false));
+        //t.add(new SubnodeTransformer(Map.of(new String[] {"multi_player"}, new BooleanTransformer()), true));
+
+        t.add(new SubnodeTransformer(Map.of(new String[] {"map_area_data", "*", "state"}, new CollectNodesTransformer("country_state", "country_states")), false));
+
+        return new ChainTransformer(t);
     }
 }
