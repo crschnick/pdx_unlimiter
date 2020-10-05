@@ -1,5 +1,6 @@
 package com.paradox_challenges.eu4_unlimiter.parser.eu4;
 
+import com.paradox_challenges.eu4_unlimiter.format.Namespace;
 import com.paradox_challenges.eu4_unlimiter.parser.Node;
 import com.paradox_challenges.eu4_unlimiter.parser.GamedataParser;
 
@@ -15,7 +16,6 @@ import java.util.zip.ZipInputStream;
 public class Eu4FileParser {
 
     private static final GamedataParser normalParser = new Eu4NormalParser();
-    private static final GamedataParser ironmanParser = new Eu4IronmanParser();
 
     private static ZipEntry getEntryByName(String name, ZipFile zipFile) {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -36,10 +36,10 @@ public class Eu4FileParser {
             ZipEntry meta = getEntryByName("meta", zipFile);
             ZipEntry ai = getEntryByName("ai", zipFile);
 
-            Optional<Node> gamestateNode = ironmanParser.parse(zipFile.getInputStream(gamestate));
+            Optional<Node> gamestateNode = new Eu4IronmanParser(Namespace.EU4_GAMESTATE).parse(zipFile.getInputStream(gamestate));
             if (gamestateNode.isPresent()) {
-                Node metaNode = ironmanParser.parse(zipFile.getInputStream(meta)).get();
-                Node aiNode =ironmanParser.parse(zipFile.getInputStream(ai)).get();
+                Node metaNode = new Eu4IronmanParser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
+                Node aiNode = new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
                 return new Eu4Savegame(gamestateNode.get(), metaNode, aiNode);
             }
         } else {

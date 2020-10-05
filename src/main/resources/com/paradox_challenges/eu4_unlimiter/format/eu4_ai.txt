@@ -1,0 +1,7 @@
+14114=ai_data
+13596=focal_point
+13599=king_data
+11203=ai
+10406=unit
+377=checksum
+10397=country

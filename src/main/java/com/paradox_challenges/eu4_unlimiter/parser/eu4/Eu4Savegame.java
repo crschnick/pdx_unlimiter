@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.paradox_challenges.eu4_unlimiter.format.Namespace;
 import com.paradox_challenges.eu4_unlimiter.format.NodeSplitter;
 import com.paradox_challenges.eu4_unlimiter.io.JsonConverter;
 import com.paradox_challenges.eu4_unlimiter.parser.GamedataParser;
@@ -35,9 +36,8 @@ public class Eu4Savegame {
     }
 
     private static final GamedataParser normalParser = new Eu4NormalParser();
-    private static final GamedataParser ironmanParser = new Eu4IronmanParser();
 
-    public static Eu4Savegame fromFile(Path file) throws IOException {
+    public static Eu4Savegame fromFile(Path file, boolean useNs) throws IOException {
         boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
@@ -45,10 +45,10 @@ public class Eu4Savegame {
             ZipEntry meta = zipFile.getEntry("meta");
             ZipEntry ai = zipFile.getEntry("ai");
 
-            Optional<Node> gamestateNode = ironmanParser.parse(zipFile.getInputStream(gamestate));
+            Optional<Node> gamestateNode = new Eu4IronmanParser(useNs ? Namespace.EU4_GAMESTATE : Namespace.EMPTY).parse(zipFile.getInputStream(gamestate));
             if (gamestateNode.isPresent()) {
-                Node metaNode = ironmanParser.parse(zipFile.getInputStream(meta)).get();
-                Node aiNode =ironmanParser.parse(zipFile.getInputStream(ai)).get();
+                Node metaNode = new Eu4IronmanParser(useNs ? Namespace.EU4_META : Namespace.EMPTY).parse(zipFile.getInputStream(meta)).get();
+                Node aiNode =new Eu4IronmanParser(useNs ? Namespace.EU4_AI : Namespace.EMPTY).parse(zipFile.getInputStream(ai)).get();
                 return new Eu4Savegame(gamestateNode.get(), aiNode, metaNode);
             } else {
                 return new Eu4Savegame(normalParser.parse(zipFile.getInputStream(gamestate)).get(),
