@@ -33,6 +33,10 @@ public class Eu4IntermediateSavegame {
         this.nodes = nodes;
     }
 
+    public Map<String, Node> getNodes() {
+        return nodes;
+    }
+
     public static Eu4IntermediateSavegame fromSavegame(Eu4Savegame save) {
         Node gameState = save.getGamestate();
         Eu4Transformer.GAMESTATE_TRANSFORMER.transform(gameState);

@@ -2,6 +2,8 @@ package com.paradox_challenges.eu4_unlimiter.savegame_mgr;
 
 import com.paradox_challenges.eu4_unlimiter.parser.GameDate;
 import com.paradox_challenges.eu4_unlimiter.parser.GameTag;
+import com.paradox_challenges.eu4_unlimiter.parser.eu4.Eu4IntermediateSavegame;
+import com.paradox_challenges.eu4_unlimiter.parser.eu4.Eu4Savegame;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -23,10 +25,13 @@ public class Eu4Campaign {
         private String startTag;
         private String currentTag;
         private GameDate date;
-        private String name;
         private List<String> vassals;
         private Map<String, GameDate> truces;
         private List<SavegameManager.SavegameData.War> wars;
+
+        public static Entry fromSavegame(Eu4IntermediateSavegame save) {
+            return new Entry(null, null, null);
+        }
 
         public static Entry parse(Path p) {
             String last = p.getName(p.getNameCount() - 1).toString();
@@ -34,11 +39,10 @@ public class Eu4Campaign {
             return null;
         }
 
-        public Entry(String startTag, String currentTag, GameDate date, String name) {
+        public Entry(String startTag, String currentTag, GameDate date) {
             this.startTag = startTag;
             this.currentTag = currentTag;
             this.date = date;
-            this.name = name;
         }
 
         public String getStartTag() {
@@ -51,10 +55,6 @@ public class Eu4Campaign {
 
         public GameDate getDate() {
             return date;
-        }
-
-        public String getName() {
-            return name;
         }
 
         //DLCs
@@ -85,5 +85,17 @@ public class Eu4Campaign {
             savegames.add(entry);
         }
         return new Eu4Campaign(id, savegames);
+    }
+
+    public void add(Entry e) {
+        this.savegames.add(e);
+    }
+
+    public UUID getCampaignId() {
+        return campaignId;
+    }
+
+    public List<Entry> getSavegames() {
+        return savegames;
     }
 }
