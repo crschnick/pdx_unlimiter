@@ -27,7 +27,7 @@ public class SavegameCache {
         this.path = path;
     }
 
-    public void init() {
+    public void init() throws IOException {
         File dir = path.toFile();
         if (!dir.exists()) {
             dir.mkdirs();
@@ -38,7 +38,6 @@ public class SavegameCache {
             }
         };
 
-        List<Eu4Campaign.Entry> savegames = new ArrayList<>();
         for (File f : dir.listFiles(fileFilter)) {
             Eu4Campaign c = Eu4Campaign.parse(f.toPath());
             campaigns.add(c);
@@ -58,15 +57,25 @@ public class SavegameCache {
         Eu4IntermediateSavegame is = Eu4IntermediateSavegame.fromSavegame(save);
         UUID saveUuid = UUID.randomUUID();
         String id = ((ValueNode<String>)Node.getNodeForKey(is.getNodes().get("meta"), "campaign_id")).getValue();
-        String file = path.resolve(id).resolve(save.toString() + ".eu4i").toString();
+        Path campaignPath = path.resolve(id);
+        campaignPath.toFile().mkdirs();
+        String file = campaignPath.resolve(saveUuid.toString() + ".eu4i").toString();
         is.write(file, true);
 
         UUID uuid = UUID.fromString(id);
         Optional<Eu4Campaign> c = getCampaign(uuid);
         if (!c.isPresent()) {
-            campaigns.add(new Eu4Campaign(uuid, new ArrayList<>(List.of(Eu4Campaign.Entry.fromSavegame(is)))));
+            campaigns.add(new Eu4Campaign(uuid, new ArrayList<>(List.of(Eu4Campaign.Entry.fromSavegame(is, saveUuid)))));
         } else {
-            c.get().add(Eu4Campaign.Entry.fromSavegame(is));
+            c.get().add(Eu4Campaign.Entry.fromSavegame(is, saveUuid));
         }
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public List<Eu4Campaign> getCampaigns() {
+        return campaigns;
     }
 }

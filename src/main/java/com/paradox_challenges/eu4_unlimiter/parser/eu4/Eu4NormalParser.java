@@ -51,7 +51,7 @@ public class Eu4NormalParser extends GamedataParser {
                     if (Pattern.matches("-?[0-9]+", t.sval)) {
                         tokens.add(new ValueToken<Long>(Long.parseLong(t.sval)));
                     } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", t.sval)) {
-                        tokens.add(new ValueToken<Float>(Float.valueOf(t.sval)));
+                        tokens.add(new ValueToken<Double>(Double.valueOf(t.sval)));
                     } else if (t.sval.equals("yes")) {
                         tokens.add(new ValueToken<Boolean>(true));
                     } else if (t.sval.equals("no")) {

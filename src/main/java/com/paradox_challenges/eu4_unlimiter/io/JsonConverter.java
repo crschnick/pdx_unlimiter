@@ -20,14 +20,14 @@ public class JsonConverter {
             if (value instanceof Boolean) {
                 jsonNode.put(key, (boolean) value);
             }
-            if (value instanceof Integer) {
-                jsonNode.put(key, (int) value);
+            if (value instanceof Long) {
+                jsonNode.put(key, (long) value);
             }
             if (value instanceof String) {
                 jsonNode.put(key, (String) value);
             }
-            if (value instanceof Float) {
-                jsonNode.put(key, (Float) value);
+            if (value instanceof Double) {
+                jsonNode.put(key, (Double) value);
             }
             return true;
         } else if (node instanceof ArrayNode) {
@@ -43,14 +43,14 @@ public class JsonConverter {
                     if (value instanceof Boolean) {
                         array.add((boolean) value);
                     }
-                    if (value instanceof Integer) {
-                        array.add((Integer) value);
+                    if (value instanceof Long) {
+                        array.add((Long) value);
                     }
                     if (value instanceof String) {
                         array.add((String) value);
                     }
-                    if (value instanceof Float) {
-                        array.add((Float) value);
+                    if (value instanceof Double) {
+                        array.add((Double) value);
                     }
                 }
                 return true;
@@ -102,10 +102,10 @@ public class JsonConverter {
             return new ArrayNode(nodeList);
         }
 
-        if (jsonNode.isBoolean()) new ValueNode<Object>(jsonNode.booleanValue());
-        if (jsonNode.isFloat()) new ValueNode<Object>(jsonNode.floatValue());
-        if (jsonNode.isInt()) new ValueNode<Object>(jsonNode.intValue());
-        if (jsonNode.isTextual()) new ValueNode<Object>(jsonNode.textValue());
-        return null;
+        if (jsonNode.isBoolean()) return new ValueNode<Object>(jsonNode.booleanValue());
+        if (jsonNode.isFloat() || jsonNode.isDouble()) return new ValueNode<Object>(jsonNode.doubleValue());
+        if (jsonNode.isInt() || jsonNode.isLong()) return new ValueNode<Object>(jsonNode.longValue());
+        if (jsonNode.isTextual()) return new ValueNode<Object>(jsonNode.textValue());
+        throw new RuntimeException("");
     }
 }
