@@ -52,9 +52,14 @@ public class Eu4ImageLoader {
         return v;
     }
 
-    public static ImageView loadFlagImage(String name, int size) throws IOException {
+    public static ImageView loadFlagImage(String name, int size) {
         Path p = Eu4Installation.getPath().resolve("gfx/flags/" + name + ".tga");
-        Image i = loadImage(p);
+        Image i = null;
+        try {
+            i = loadImage(p);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ImageView v = new ImageView(i);
         //v.setViewport(new Rectangle2D(0, 0, 44, 44));
         v.setFitWidth(size);

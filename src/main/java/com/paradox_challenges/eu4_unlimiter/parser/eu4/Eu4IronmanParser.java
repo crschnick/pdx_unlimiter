@@ -18,8 +18,8 @@ public class Eu4IronmanParser extends GamedataParser {
     public static final byte[] EQUALS = new byte[]{1, 0};
     public static final byte[] OPEN_GROUP = new byte[]{3, 0};
     public static final byte[] CLOSE_GROUP = new byte[]{4, 0};
-    public static final byte[] INTEGER_1 = new byte[]{0x0c, 0};
-    public static final byte[] INTEGER_2 = new byte[]{0x14, 0};
+    public static final byte[] INTEGER = new byte[]{0x0c, 0};
+    public static final byte[] INTEGER_UNSIGNED = new byte[]{0x14, 0};
     public static final byte[] STRING_1 = new byte[]{0x0F, 0};
     public static final byte[] STRING_2 = new byte[]{0x17, 0};
     public static final byte[] FLOAT = new byte[]{0x0D, 0};
@@ -56,7 +56,7 @@ public class Eu4IronmanParser extends GamedataParser {
                 out.write((boolean) v.getValue() ? BOOL_TRUE : BOOL_FALSE);
             }
             if (v.getValue() instanceof Integer) {
-                out.write(INTEGER_1);
+                out.write(INTEGER);
                 out.write(ByteBuffer.allocate(4).putInt((Integer) v.getValue()).order(ByteOrder.LITTLE_ENDIAN).array());
             }
 
@@ -106,11 +106,18 @@ public class Eu4IronmanParser extends GamedataParser {
                     tokens.add(new ValueToken<String>(new String(s, 0, lengthInt)));
                 }
 
-                else if (Arrays.equals(next, INTEGER_1) || Arrays.equals(next, INTEGER_2)) {
+                else if (Arrays.equals(next, INTEGER)) {
                     byte[] number = new byte[4];
                     stream.readNBytes(number, 0, 4);
                     int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                    tokens.add(new ValueToken<Integer>(numberInt));
+                    tokens.add(new ValueToken<Long>((long) numberInt));
+                }
+
+                else if (Arrays.equals(next, INTEGER_UNSIGNED)) {
+                    byte[] number = new byte[8];
+                    stream.readNBytes(number, 0, 4);
+                    long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getLong();
+                    tokens.add(new ValueToken<Long>(numberInt));
                 }
 
                 else if (Arrays.equals(next, BOOL_TRUE)) {

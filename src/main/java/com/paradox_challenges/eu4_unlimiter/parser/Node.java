@@ -46,6 +46,35 @@ public abstract class Node {
         return list.size() == 0 ? Optional.empty() : Optional.of(list.get(0));
     }
 
+    public static String getString(Node node) {
+        return ((ValueNode<String>) node).getValue();
+    }
+
+    public static int getInteger(Node node) {
+        if (((ValueNode) node).getValue() instanceof Long) {
+            long v = (long) ((ValueNode) node).getValue();
+            if (v >= Integer.MIN_VALUE && v <= Integer.MAX_VALUE) {
+                return (int) v;
+            }
+        }
+        return ((ValueNode<Integer>) node).getValue();
+    }
+
+
+
+    public static List<Node> getNodeArray(Node node) {
+        return ((ArrayNode) node).getNodes();
+    }
+
+    public static boolean hasKey(Node node, String key) {
+        if (!(node instanceof ArrayNode)) {
+            return false;
+        }
+
+        var list = getNodesForKey(node, key);
+        return list.size() > 0;
+    }
+
     public static Node getNodeForKey(Node node, String key) {
         var list = getNodesForKey(node, key);
         if (list.size() > 1) {

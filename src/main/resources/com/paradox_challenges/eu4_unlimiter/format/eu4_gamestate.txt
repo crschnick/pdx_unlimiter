@@ -370,3 +370,4 @@
 10867=friend
 11474=independence
 14050=recalc_defection
+10487=ongoing_war

@@ -23,11 +23,14 @@ public class EventTransformer extends NodeTransformer {
         ArrayNode history = (ArrayNode) historyNode.get();
         List<Node> newEventList = new ArrayList<>();
         for (Node n : new ArrayList<>(history.getNodes())) {
+            if (!(n instanceof KeyValueNode)) {
+                continue;
+            }
             KeyValueNode kv = (KeyValueNode) n;
             String date = kv.getKeyName();
             GameDate gd = GameDate.fromString(date);
             if (gd != null) {
-                Node dateNode = DateTransformer.toNode(gd);
+                Node dateNode = GameDate.toNode(gd);
                 ArrayNode an = (ArrayNode) kv.getNode();
                 an.addNode(KeyValueNode.create("date", dateNode));
                 newEventList.add(an);

@@ -102,16 +102,24 @@ public abstract class GamedataParser {
             }
 
             //Special case for missing "="
-            boolean isKeyValueWithoutEquals = tokens.get(currentIndex).getType() == TokenType.VALUE && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP;
+            boolean isKeyValueWithoutEquals = tokens.get(currentIndex).getType() == TokenType.VALUE
+                    && ((ValueToken )tokens.get(currentIndex)).value instanceof String
+                    && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP;
             if (isKeyValueWithoutEquals) {
                 tokens.add(currentIndex + 1, new EqualsToken());
             }
 
             boolean isKeyValue = tokens.get(currentIndex + 1).getType() == TokenType.EQUALS;
             if (isKeyValue) {
-                String key = ((ValueToken<Object>) tokens.get(currentIndex)).value.toString();
+                String realKey = null;
+                if (!(((ValueToken<Object>) tokens.get(currentIndex)).value instanceof String)) {
+                    realKey = ((ValueToken<Object>) tokens.get(currentIndex)).value.toString();
+                } else {
+                    realKey = namespace.getKeyName(((ValueToken<Object>) tokens.get(currentIndex)).value.toString());
+                }
+
                 Map.Entry<Node,Integer> result = createNode(tokens, currentIndex + 2);
-                childs.add(KeyValueNode.createWithNamespace(key, result.getKey(), namespace));
+                childs.add(KeyValueNode.create(realKey, result.getKey()));
                 currentIndex = result.getValue();
             } else {
                 Map.Entry<Node,Integer> result = createNode(tokens, currentIndex);

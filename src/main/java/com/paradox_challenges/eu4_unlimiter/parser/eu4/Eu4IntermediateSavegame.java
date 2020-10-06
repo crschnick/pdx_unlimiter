@@ -40,6 +40,7 @@ public class Eu4IntermediateSavegame {
     public static Eu4IntermediateSavegame fromSavegame(Eu4Savegame save) {
         Node gameState = save.getGamestate();
         Eu4Transformer.GAMESTATE_TRANSFORMER.transform(gameState);
+        Eu4Transformer.META_TRANSFORMER.transform(save.getMeta());
         Map<String, Node> map = new NodeSplitter(GAMESTATE_PARTS).removeNodes(gameState);
         map.put("gamestate", gameState);
         map.put("ai", save.getAi());
@@ -67,6 +68,8 @@ public class Eu4IntermediateSavegame {
 
                 }
             }
+            ZipEntry gamestate = zipFile.getEntry("gamestate" + (txt ? ".txt" : ".json"));
+            nodes.put("gamestate", JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(gamestate))));
             ZipEntry ai = zipFile.getEntry("ai" + (txt ? ".txt" : ".json"));
             nodes.put("ai", JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(ai))));
             ZipEntry meta = zipFile.getEntry("meta" + (txt ? ".txt" : ".json"));

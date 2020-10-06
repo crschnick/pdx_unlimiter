@@ -22,7 +22,7 @@ public class NodeSplitter {
         for (String name : names) {
             KeyValueNode n = Node.getKeyValueNodeForKey(masterNode, name);
             masterNode.removeNode(n);
-            map.put(name, new ArrayNode(List.of(n)));
+            map.put(name, n.getNode());
         }
         return map;
     }

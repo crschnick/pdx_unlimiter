@@ -1,15 +1,19 @@
 package com.paradox_challenges.eu4_unlimiter.parser;
 
 import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class GameDate {
 
-    private static int getDay(Month m, int days) {
+    private static int getDay(Month m, long days) {
         int sum = 0;
         for (Month month : Month.values()) {
             if (month == m) {
-                return days - sum;
+                return (int) ((days - sum) + 1);
             } else {
                 sum += month.length(false);
             }
@@ -17,7 +21,7 @@ public class GameDate {
         return -1;
     }
 
-    private static Month getMonth(int days) {
+    private static Month getMonth(long days) {
         int sum = 0;
         for (Month m : Month.values()) {
             if (days <= sum + m.length(false)) {
@@ -29,11 +33,27 @@ public class GameDate {
         return null;
     }
 
-    private static int getYear(int days) {
+    private static int getYear(long days) {
         return (int) Math.floor(days / 365f);
     }
 
-    public static GameDate fromInteger(int date) {
+
+    public static Node toNode(GameDate date) {
+        List<Node> nodes = new ArrayList<>(3);
+        nodes.add(KeyValueNode.create("day", new ValueNode<Long>((long) date.getDay())));
+        nodes.add(KeyValueNode.create("month", new ValueNode<Long>((long) date.getMonth().getValue())));
+        nodes.add(KeyValueNode.create("year", new ValueNode<Long>((long) date.getYear())));
+        return new ArrayNode(nodes);
+    }
+
+    public static GameDate fromNode(Node node) {
+        int day = Node.getInteger(Node.getNodeForKey(node, "day"));
+        int month = Node.getInteger(Node.getNodeForKey(node, "month"));
+        int year = Node.getInteger(Node.getNodeForKey(node, "year"));
+        return new GameDate(day, Month.of(month), year);
+    }
+
+    public static GameDate fromLong(long date) {
         date /= 24;
         date -= (5000 * 365);
         int year = getYear(date);
@@ -69,7 +89,7 @@ public class GameDate {
 
     @Override
     public String toString() {
-        return day + "." + month.ordinal() + "." + year;
+        return day + " " + month.getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + year;
     }
 
     public int getDay() {
