@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'application'
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
+}
+
+group 'com.crschnick.pdx_unlimiter'
+version '0.1-SNAPSHOT'
+ext.moduleName = 'com.crschnick.pdx_unlimiter.app'
+mainClassName = 'com.crschnick.pdx_unlimiter.app.Main'
+
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'http://maven.nikr.net/'
+    }
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation files("$buildDir/modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
+    implementation group: 'net.nikr', name: 'dds', version: '1.0.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+    implementation project(':eu4')
+}
+
+addDependenciesModuleInfo {
+    jdepsExtraArgs = ['-q']
+    outputDirectory = file("$buildDir/modules")
+    modules {
+        module {
+            artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
+            moduleInfoSource = '''
+                module com.realityinteractive.imageio.tga {
+                    requires java.se;
+                    exports com.realityinteractive.imageio.tga;
+                }
+            '''
+        }
+    }
+}
+
+java {
+    modularity.inferModulePath = true
+}
+
+task copyToLib(type: Copy) {
+    into "${buildDir}/libs"
+    from configurations.runtimeClasspath
+}
+
+build.dependsOn(copyToLib)
+
+createRuntimeImage {
+    jdkHome = '$JAVA_HOME'
+    outputDirectory = file("$buildDir/jlink-image")
+    modulePath = [file("$buildDir/libs")]
+    modules = ['com.crschnick.pdx_unlimiter.app']
+    excludedResources = []
+    launcher {
+        name = 'Main'
+        module = 'com.crschnick.pdx_unlimiter.app'
+    }
+    compression = 2
+    stripDebug = true
+}

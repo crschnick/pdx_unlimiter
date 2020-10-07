@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'application'
+}
+
+group 'com.inspectorC'
+version '0.1-SNAPSHOT'
+ext.moduleName = 'com.inspectorC.pdx_unlimiter.updater'
+mainClassName = 'com.inspectorC.pdx_unlimiter.updater.Updater'
+
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+}
