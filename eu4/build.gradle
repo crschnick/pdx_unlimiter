@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group 'com.crschnick.pdx_unlimiter'
+version '0.1-SNAPSHOT'
+ext.moduleName = 'com.crschnick.pdx_unlimiter.eu4'
+
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.11.3"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+}
+
+compileJava {
+    options.compilerArgs << '-Xlint:unchecked'
+}
+
+java {
+    modularity.inferModulePath = true
+}
