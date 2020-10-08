@@ -87,9 +87,13 @@ public class GameDate {
         this.year = year;
     }
 
+    public String toDisplayString() {
+        return day + " " + month.getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + year;
+    }
+
     @Override
     public String toString() {
-        return day + " " + month.getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + year;
+        return year + "." + month.getValue() + "." + day;
     }
 
     public int getDay() {

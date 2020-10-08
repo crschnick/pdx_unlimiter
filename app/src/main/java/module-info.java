@@ -4,6 +4,10 @@ module com.crschnick.pdx_unlimiter.app {
     requires javafx.swing;
     requires com.crschnick.pdx_unlimiter.eu4;
     requires com.realityinteractive.imageio.tga;
+    requires org.apache.commons.lang3;
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
 
     exports com.crschnick.pdx_unlimiter.app;
+    exports com.crschnick.pdx_unlimiter.app.savegame_mgr;
 }

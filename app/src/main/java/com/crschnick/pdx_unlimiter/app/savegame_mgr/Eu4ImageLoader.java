@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
@@ -37,23 +39,33 @@ public class Eu4ImageLoader {
         return w;
     }
 
-    public static ImageView loadInterfaceImage(String name) throws IOException {
-        Path p = Eu4Installation.getPath().resolve("gfx/interface/" + name);
-        Image i = loadImage(p);
+    public static ImageView loadInterfaceImage(String name)  {
+        Path p = Installation.EU4.get().getPath().resolve("gfx/interface/" + name);
+        Image i = null;
+        try {
+            i = loadImage(p);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ImageView v = new ImageView(i);
         return v;
     }
 
-    public static ImageView loadDisasterImage(String name) throws IOException {
-        Path p = Eu4Installation.getPath().resolve("gfx/interface/disasters/" + name + ".dds");
-        Image i = loadImage(p);
+    public static ImageView loadDisasterImage(String name)  {
+        Path p = Installation.EU4.get().getPath().resolve("gfx/interface/disasters/" + name + ".dds");
+        Image i = null;
+        try {
+            i = loadImage(p);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ImageView v = new ImageView(i);
         v.setViewport(new Rectangle2D(44, 0, 44, 44));
         return v;
     }
 
     public static ImageView loadFlagImage(String name, int size) {
-        Path p = Eu4Installation.getPath().resolve("gfx/flags/" + name + ".tga");
+        Path p = Installation.EU4.get().getPath().resolve("gfx/flags/" + name + ".tga");
         Image i = null;
         try {
             i = loadImage(p);
