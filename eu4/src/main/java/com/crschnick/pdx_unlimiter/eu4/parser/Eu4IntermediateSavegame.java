@@ -24,7 +24,9 @@ import java.util.zip.ZipOutputStream;
 
 public class Eu4IntermediateSavegame {
 
-    private static final String[] GAMESTATE_PARTS = new String[] {"ongoing_wars", "ended_wars", "provinces", "countries", "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy", "inflation_statistics", "religion_data"};
+    private static final String[] PARTS = new String[] {"gamestate", "meta", "ai", "ongoing_wars", "ended_wars", "provinces", "countries", "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy", "inflation_statistics", "religion_data"};
+
+    private static final String[] GAMESTATE_SPLIT_PARTS = new String[] {"ongoing_wars", "ended_wars", "provinces", "countries", "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy", "inflation_statistics", "religion_data"};
 
     private Map<String, Node> nodes;
 
@@ -40,7 +42,7 @@ public class Eu4IntermediateSavegame {
         Node gameState = save.getGamestate();
         Eu4Transformer.GAMESTATE_TRANSFORMER.transform(gameState);
         Eu4Transformer.META_TRANSFORMER.transform(save.getMeta());
-        Map<String, Node> map = new NodeSplitter(GAMESTATE_PARTS).removeNodes(gameState);
+        Map<String, Node> map = new NodeSplitter(GAMESTATE_SPLIT_PARTS).removeNodes(gameState);
         map.put("gamestate", gameState);
         map.put("ai", save.getAi());
         map.put("meta", save.getMeta());
@@ -48,18 +50,21 @@ public class Eu4IntermediateSavegame {
     }
 
     public static Eu4IntermediateSavegame fromFile(Path file) throws IOException {
+        return fromFile(file, GAMESTATE_SPLIT_PARTS);
+    }
+    public static Eu4IntermediateSavegame fromFile(Path file, String... parts) throws IOException {
         Map<String, Node> nodes = new HashMap<>();
         boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
-            String txtTest = GAMESTATE_PARTS[0] + ".txt";
+            String txtTest = parts[0] + ".txt";
             boolean txt = false;
             if (zipFile.getEntry(txtTest) != null) {
                 txt = true;
             }
 
             ObjectMapper mapper = new ObjectMapper();
-            for (String s : GAMESTATE_PARTS) {
+            for (String s : parts) {
                 ZipEntry e = zipFile.getEntry(s + (txt ? ".txt" : ".json"));
                 if (!txt) {
                     nodes.put(s, JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(e))));
@@ -67,12 +72,6 @@ public class Eu4IntermediateSavegame {
 
                 }
             }
-            ZipEntry gamestate = zipFile.getEntry("gamestate" + (txt ? ".txt" : ".json"));
-            nodes.put("gamestate", JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(gamestate))));
-            ZipEntry ai = zipFile.getEntry("ai" + (txt ? ".txt" : ".json"));
-            nodes.put("ai", JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(ai))));
-            ZipEntry meta = zipFile.getEntry("meta" + (txt ? ".txt" : ".json"));
-            nodes.put("meta", JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(meta))));
             return new Eu4IntermediateSavegame(nodes);
         } else {
             return null;

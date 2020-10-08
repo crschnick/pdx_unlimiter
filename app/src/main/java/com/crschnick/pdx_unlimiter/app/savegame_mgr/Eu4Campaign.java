@@ -1,13 +1,25 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Eu4Campaign {
@@ -281,15 +293,24 @@ public class Eu4Campaign {
         }
     }
 
+    private String tag;
+    private String name;
+    private GameDate date;
     private UUID campaignId;
-    private List<Entry> savegames;
+    private List<Entry> savegames = new ArrayList<>();
 
-    public Eu4Campaign(UUID campaignId, List<Entry> savegames) {
+    public Eu4Campaign(String tag, String name, GameDate date, UUID campaignId) {
+        this.tag = tag;
+        this.name = name;
+        this.date = date;
         this.campaignId = campaignId;
-        this.savegames = savegames;
     }
 
-    public static Eu4Campaign parse(Path p) throws IOException {
+    public boolean isLoaded() {
+        return savegames.size() > 0;
+    }
+
+    public void parse(Path p) throws IOException {
         String last = p.getName(p.getNameCount() - 1).toString();
         UUID id = UUID.fromString(last);
 
@@ -300,16 +321,27 @@ public class Eu4Campaign {
             }
         };
 
-        List<Entry> savegames = new ArrayList<>();
         for (File f : dir.listFiles()) {
-            Entry entry = Entry.fromSavegame(Eu4IntermediateSavegame.fromFile(f.toPath()), id);
+            var i = Eu4IntermediateSavegame.fromFile(f.toPath(), "meta", "countries", "diplomacy");
+            Entry entry = Entry.fromSavegame(i, id);
             savegames.add(entry);
         }
-        return new Eu4Campaign(id, savegames);
     }
 
     public void add(Entry e) {
         this.savegames.add(e);
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public GameDate getDate() {
+        return date;
     }
 
     public UUID getCampaignId() {
