@@ -26,13 +26,18 @@ public class Eu4ImageLoader {
 
     private static Map<String, Image> IMAGES = new HashMap<>();
 
-    public static Image loadImage(Path p) throws IOException {
+    public static Image loadImage(Path p) {
         if (IMAGES.containsKey(p.toString())) {
             return IMAGES.get(p.toString());
         }
 
         File file = p.toFile();
-        BufferedImage image = ImageIO.read(file);
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         WritableImage w = new WritableImage(image.getWidth(), image.getHeight());
         w = SwingFXUtils.toFXImage(image, w);
         IMAGES.put(p.toString(), w);
@@ -41,24 +46,14 @@ public class Eu4ImageLoader {
 
     public static ImageView loadInterfaceImage(String name)  {
         Path p = Installation.EU4.get().getPath().resolve("gfx/interface/" + name);
-        Image i = null;
-        try {
-            i = loadImage(p);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Image i = loadImage(p);
         ImageView v = new ImageView(i);
         return v;
     }
 
     public static ImageView loadDisasterImage(String name)  {
         Path p = Installation.EU4.get().getPath().resolve("gfx/interface/disasters/" + name + ".dds");
-        Image i = null;
-        try {
-            i = loadImage(p);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Image i = loadImage(p);
         ImageView v = new ImageView(i);
         v.setViewport(new Rectangle2D(44, 0, 44, 44));
         return v;
@@ -66,12 +61,7 @@ public class Eu4ImageLoader {
 
     public static ImageView loadFlagImage(String name, int size) {
         Path p = Installation.EU4.get().getPath().resolve("gfx/flags/" + name + ".tga");
-        Image i = null;
-        try {
-            i = loadImage(p);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Image i = loadImage(p);
         ImageView v = new ImageView(i);
         //v.setViewport(new Rectangle2D(0, 0, 44, 44));
         v.setFitWidth(size);

@@ -239,7 +239,7 @@ public class SavegameManagerApp extends Application {
             pane.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;");
         }
 
-        Label text = new Label(i.getName(), Eu4ImageLoader.loadInterfaceImage("icon_vassal.dds"));
+        Label text = new Label(i.getName(), new ImageView(Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("launcher-assets").resolve("icon.png"))));
         text.setAlignment(Pos.BOTTOM_CENTER);
         text.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setLeft(text);
@@ -302,6 +302,8 @@ public class SavegameManagerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        primaryStage.getIcons().add(Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("launcher-assets").resolve("icon.png")));
+
         layout = new BorderPane();
 
         createStatusThread(layout);

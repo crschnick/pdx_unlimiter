@@ -23,16 +23,16 @@ repositories {
 
 dependencies {
     implementation group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
-    implementation files("$buildDir/modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
-    implementation group: 'net.nikr', name: 'dds', version: '1.0.0'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
+    implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
+    implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
     implementation project(':eu4')
 }
 
 addDependenciesModuleInfo {
     jdepsExtraArgs = ['-q']
-    outputDirectory = file("$buildDir/modules")
+    outputDirectory = file("$buildDir/generated-modules")
     modules {
         module {
             artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
@@ -40,6 +40,25 @@ addDependenciesModuleInfo {
                 module com.realityinteractive.imageio.tga {
                     requires java.se;
                     exports com.realityinteractive.imageio.tga;
+                }
+            '''
+        }
+        module {
+            artifact 'net.nikr:dds:1.0.0'
+            moduleInfoSource = '''
+                module net.nikr.dds {
+                    requires java.se;
+                    exports net.nikr.dds;
+                }
+            '''
+        }
+        module {
+            artifact 'org.apache.commons:commons-lang3:3.11'
+            moduleInfoSource = '''
+                module org.apache.commons.lang3 {
+                    requires java.se;
+                    exports org.apache.commons.lang3;
+                    exports org.apache.commons.lang3.arch;
                 }
             '''
         }
@@ -51,17 +70,23 @@ java {
     modularity.inferModulePath = true
 }
 
-task copyToLib(type: Copy) {
-    into "${buildDir}/libs"
+task copyModules(type: Copy) {
+    into "${buildDir}/modules"
     from configurations.runtimeClasspath
 }
 
-build.dependsOn(copyToLib)
+task copyOutput(type: Copy) {
+    into "${buildDir}/modules"
+    from "${buildDir}/libs"
+}
+
+build.dependsOn(copyModules)
+build.dependsOn(copyOutput)
 
 createRuntimeImage {
     jdkHome = '$JAVA_HOME'
     outputDirectory = file("$buildDir/jlink-image")
-    modulePath = [file("$buildDir/libs")]
+    modulePath = [file("$buildDir/modules")]
     modules = ['com.crschnick.pdx_unlimiter.app']
     excludedResources = []
     launcher {
@@ -71,3 +96,5 @@ createRuntimeImage {
     compression = 2
     stripDebug = true
 }
+
+createRuntimeImage.dependsOn(build)
