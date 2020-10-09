@@ -2,12 +2,14 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
+    id 'edu.sc.seis.launch4j' version '2.4.8'
+    id "com.github.langmo.gradlensis" version "0.1.0"
 }
 
-group 'com.inspectorC'
+group 'com.crschnick'
 version '0.1-SNAPSHOT'
-ext.moduleName = 'com.inspectorC.pdx_unlimiter.updater'
-mainClassName = 'com.inspectorC.pdx_unlimiter.updater.Updater'
+ext.moduleName = 'com.crschnick.pdx_unlimiter.updater'
+mainClassName = 'com.crschnick.pdx_unlimiter.updater.Updater'
 
 sourceCompatibility = 1.10
 targetCompatibility = 1.10
@@ -19,4 +21,18 @@ repositories {
 dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+}
+
+launch4j {
+    mainClassName = 'com.crschnick.pdx_unlimiter.Updater'
+}
+
+build.dependsOn(createExe)
+
+nsis {
+    // path to the NSIS configuration file
+    configuration = file("${projectDir}/config.nsi")
+    // folder where the NSIS installer generator is run. All paths
+    // in the NSIS configuration file are relative to this folder.
+    runIn =  file("${buildDir}")
 }

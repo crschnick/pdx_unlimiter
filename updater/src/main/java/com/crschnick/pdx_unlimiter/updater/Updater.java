@@ -1,4 +1,4 @@
-package com.inspectorC.pdx_unlimiter.updater;
+package com.crschnick.pdx_unlimiter.updater;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
