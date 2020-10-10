@@ -27,7 +27,7 @@ public class Eu4Savegame {
 
     private static final GamedataParser normalParser = new Eu4NormalParser();
 
-    public static Eu4Savegame fromFile(Path file, boolean useNs) throws IOException {
+    public static Eu4Savegame fromFile(Path file) throws IOException {
         boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
@@ -35,10 +35,10 @@ public class Eu4Savegame {
             ZipEntry meta = zipFile.getEntry("meta");
             ZipEntry ai = zipFile.getEntry("ai");
 
-            Optional<Node> gamestateNode = new Eu4IronmanParser(useNs ? Namespace.EU4_GAMESTATE : Namespace.EMPTY).parse(zipFile.getInputStream(gamestate));
+            Optional<Node> gamestateNode = new Eu4IronmanParser(Namespace.EU4_GAMESTATE).parse(zipFile.getInputStream(gamestate));
             if (gamestateNode.isPresent()) {
-                Node metaNode = new Eu4IronmanParser(useNs ? Namespace.EU4_META : Namespace.EMPTY).parse(zipFile.getInputStream(meta)).get();
-                Node aiNode =new Eu4IronmanParser(useNs ? Namespace.EU4_AI : Namespace.EMPTY).parse(zipFile.getInputStream(ai)).get();
+                Node metaNode = new Eu4IronmanParser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
+                Node aiNode =new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
                 return new Eu4Savegame(gamestateNode.get(), aiNode, metaNode);
             } else {
                 return new Eu4Savegame(normalParser.parse(zipFile.getInputStream(gamestate)).get(),

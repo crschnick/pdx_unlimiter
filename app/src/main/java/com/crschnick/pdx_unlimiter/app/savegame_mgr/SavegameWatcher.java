@@ -2,37 +2,29 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class SavegameWatcher {
 
-    private boolean running = false;
-
-    public void startInDirectory(String directory) throws IOException {
+    public static void startInDirectory(Path directory, Consumer<Path> consumer) throws IOException {
         WatchService watcher = FileSystems.getDefault().newWatchService();
-        Path dir = Paths.get(directory);
-        dir.register(watcher, ENTRY_CREATE);
+        directory.register(watcher, ENTRY_CREATE);
 
-        running = true;
-
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
                     WatchKey key;
                     try {
-                        // wait for a key to be available
                         key = watcher.take();
                     } catch (InterruptedException ex) {
                         return;
                     }
 
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        // get event type
                         WatchEvent.Kind<?> kind = event.kind();
-
-                        // get file name
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path fileName = ev.context();
@@ -42,9 +34,13 @@ public class SavegameWatcher {
                         if (kind == OVERFLOW) {
                             continue;
                         } else if (kind == ENTRY_CREATE) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
 
-                            // process create event
-
+                            consumer.accept(directory.resolve(fileName));
                         }
                     }
 
@@ -53,12 +49,16 @@ public class SavegameWatcher {
                     if (!valid) {
                         break;
                     }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }).start();
-    }
-
-    public void stop() {
-        running = false;
+        });
+        t.setDaemon(true);
+        t.start();
     }
 }

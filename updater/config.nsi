@@ -2,6 +2,7 @@
 !include WinMessages.nsh
 !include FileFunc.nsh
 
+Unicode True
 SilentInstall silent
 RequestExecutionLevel user
 ShowInstDetails hide
@@ -19,10 +20,13 @@ VIAddVersionKey OriginalFilename "TemplateFx.exe"
 Section
   SetOverwrite off
 
-  SetOutPath "$TEMP\pdxu\jre-image"
-  File /r "jre-image\*"
+  ${If} ${FileExists} `$TEMP\pdxu\jre-image`
+  ${Else}
+    SetOutPath "$TEMP\pdxu\jre-image"
+    File /r "jre-image\*"
+  ${EndIf}
 
   SetOutPath $TEMP
   ${GetParameters} $R0
-  nsExec::Exec '"$TEMP\pdxu\jre-image\bin\Main.bat" $R0'
+  nsExec::Exec '"$TEMP\pdxu\jre-image\bin\Updater.bat" $R0'
 SectionEnd

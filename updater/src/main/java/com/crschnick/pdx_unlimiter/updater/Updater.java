@@ -23,6 +23,10 @@ public class Updater {
     public static void main(String[] args) {
         try {
             String response = executeGet("https://api.github.com/repos/crschnick/pdx_unlimiter/releases/latest");
+            System.out.println("got response: " + response);
+            if (response.equals("")) {
+                return;
+            }
             String toDonwload = getDownloadUrl(response);
             String pathToNewest = downloadNewestVersion(toDonwload);
             deleteOldVersion(PATH);
