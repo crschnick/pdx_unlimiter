@@ -5,6 +5,7 @@ module com.crschnick.pdx_unlimiter.app {
     requires com.crschnick.pdx_unlimiter.eu4;
     requires com.realityinteractive.imageio.tga;
     requires org.apache.commons.lang3;
+    requires org.apache.commons.io;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
     requires net.nikr.dds;

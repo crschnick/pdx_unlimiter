@@ -18,16 +18,16 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
         try {
             Installation.loadConfig();
-            SavegameCache.loadConfig();
 
-            Eu4Savegame save = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\h4.eu4"));
+            //Eu4Savegame save = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\h4.eu4"));
             //Eu4Savegame saveN = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\namespace_named.eu4"), true);
             //System.out.println(NamespaceCreator.createNamespace(save, saveN));
 
             //save.write("C:\\Users\\cschn\\Desktop\\test_eu4\\29.raw.zip", true);
 
-            SavegameCache.EU4_CACHE.importSavegame(save);
+            //SavegameCache.EU4_CACHE.importSavegame(save);
 
+            SavegameCache.loadConfig();
             SavegameManagerApp.main(args);
 
             SavegameCache.saveConfig();

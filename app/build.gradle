@@ -28,6 +28,7 @@ dependencies {
     implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
     implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
     implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
+    implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation project(':eu4')
 }
 
@@ -61,6 +62,16 @@ addDependenciesModuleInfo {
                     requires java.se;
                     exports org.apache.commons.lang3;
                     exports org.apache.commons.lang3.arch;
+                }
+            '''
+        }
+        module {
+            artifact 'commons-io:commons-io:2.8.0'
+            moduleInfoSource = '''
+                module org.apache.commons.io {
+                    requires java.se;
+                    exports org.apache.commons.io;
+                    exports org.apache.commons.io.file;
                 }
             '''
         }

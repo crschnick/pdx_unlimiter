@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class GameDate {
+public class GameDate implements Comparable<GameDate> {
 
     private static int getDay(Month m, long days) {
         int sum = 0;
@@ -63,6 +63,21 @@ public class GameDate {
         return new GameDate(day, m, year);
     }
 
+    public static long toLong(GameDate date) {
+        long v = 0;
+        for (Month m : Month.values()) {
+            if (m.equals(date.getMonth())) {
+                break;
+            }
+            v += m.length(false);
+        }
+        v += (date.getDay() - 1);
+        v += date.getYear() * 365;
+        v += (5000 * 365);
+        v *= 24;
+        return v;
+    }
+
     public static GameDate fromString(String s) {
         if (Pattern.matches("\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?", s)) {
             String[] split = s.split("\\.");
@@ -106,5 +121,10 @@ public class GameDate {
 
     public int getYear() {
         return year;
+    }
+
+    @Override
+    public int compareTo(GameDate o) {
+        return (int) (toLong(this) - toLong(o));
     }
 }

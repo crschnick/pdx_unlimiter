@@ -1,30 +1,25 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.*;
 
-public class Eu4Campaign {
+public class Eu4Campaign implements Comparable<Eu4Campaign> {
 
-    public static class Entry {
+    public static class Entry implements Comparable<Entry> {
+
+        @Override
+        public int compareTo(Entry o) {
+            return this.date.compareTo(o.date);
+        }
 
         public static class Ruler {
 
@@ -71,41 +66,6 @@ public class Eu4Campaign {
             }
         }
 
-        public static class Version {
-            private int first;
-            private int second;
-            private int third;
-            private int fourth;
-
-            public Version(int first, int second, int third, int fourth) {
-                this.first = first;
-                this.second = second;
-                this.third = third;
-                this.fourth = fourth;
-            }
-
-            @Override
-            public String toString() {
-                return first + "." + second + "." + third + "." + fourth;
-            }
-
-            public int getFirst() {
-                return first;
-            }
-
-            public int getSecond() {
-                return second;
-            }
-
-            public int getThird() {
-                return third;
-            }
-
-            public int getFourth() {
-                return fourth;
-            }
-        }
-
         public static class War {
 
             private String title;
@@ -125,9 +85,10 @@ public class Eu4Campaign {
             }
         }
 
+        private StringProperty name;
         private String currentTag;
         private GameDate date;
-        private Version version;
+        private GameVersion version;
         private Ruler ruler;
         private Optional<Ruler> heir;
         private Set<String> vassals = new HashSet<>();
@@ -141,13 +102,15 @@ public class Eu4Campaign {
         private Set<String> tributaryJuniors = new HashSet<>();
         private Optional<String> tributarySenior = Optional.empty();
         private Map<String, GameDate> truces = new HashMap<>();
-        private Set<War> wars = new HashSet<>();;
+        private Set<War> wars = new HashSet<>();
+        ;
         private UUID saveId;
 
         public static Entry fromSavegame(Eu4IntermediateSavegame save, UUID saveId) {
             GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
             String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
             Entry e = new Entry();
+            e.name = new SimpleStringProperty(date.toDisplayString());
             e.saveId = saveId;
             e.date = date;
             e.currentTag = tag;
@@ -155,31 +118,31 @@ public class Eu4Campaign {
             e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries"), tag), "heir");
             for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "dependencies"))) {
                 if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
                         e.vassals.add(Node.getString(Node.getNodeForKey(n, "second")));
                     }
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
                         e.vassals.add(Node.getString(Node.getNodeForKey(n, "second")));
                     }
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
                         e.juniorPartners.add(Node.getString(Node.getNodeForKey(n, "second")));
                     }
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
                         e.tributaryJuniors.add(Node.getString(Node.getNodeForKey(n, "second")));
                     }
                 }
 
                 if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
                         e.overlord = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
                     }
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
                         e.overlord = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
                     }
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
                         e.seniorPartner = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
                     }
-                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state"))  {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
                         e.tributarySenior = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
                     }
                 }
@@ -212,12 +175,20 @@ public class Eu4Campaign {
 
 
             Node v = Node.getNodeForKey(save.getNodes().get("meta"), "savegame_version");
-            e.version = new Version(Node.getInteger(Node.getNodeForKey(v, "first")),
+            e.version = new GameVersion(Node.getInteger(Node.getNodeForKey(v, "first")),
                     Node.getInteger(Node.getNodeForKey(v, "second")),
                     Node.getInteger(Node.getNodeForKey(v, "third")),
                     Node.getInteger(Node.getNodeForKey(v, "forth")));
 
             return e;
+        }
+
+        public String getName() {
+            return name.get();
+        }
+
+        public StringProperty nameProperty() {
+            return name;
         }
 
         public Ruler getRuler() {
@@ -228,7 +199,7 @@ public class Eu4Campaign {
             return heir;
         }
 
-        public Version getVersion() {
+        public GameVersion getVersion() {
             return version;
         }
 
@@ -293,17 +264,24 @@ public class Eu4Campaign {
         }
     }
 
-    private String tag;
-    private String name;
-    private GameDate date;
+    private ObjectProperty<Timestamp> lastPlayed;
+    private StringProperty tag;
+    private StringProperty name;
+    private ObjectProperty<GameDate> date;
     private UUID campaignId;
-    private List<Entry> savegames = new ArrayList<>();
+    private ObservableSet<Entry> savegames = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
 
-    public Eu4Campaign(String tag, String name, GameDate date, UUID campaignId) {
+    public Eu4Campaign(ObjectProperty<Timestamp> lastPlayed, StringProperty tag, StringProperty name, ObjectProperty<GameDate> date, UUID campaignId) {
+        this.lastPlayed = lastPlayed;
         this.tag = tag;
         this.name = name;
         this.date = date;
         this.campaignId = campaignId;
+    }
+
+    @Override
+    public int compareTo(Eu4Campaign o) {
+        return this.lastPlayed.get().compareTo(o.lastPlayed.get());
     }
 
     public void add(Entry e) {
@@ -311,14 +289,26 @@ public class Eu4Campaign {
     }
 
     public String getTag() {
+        return tag.get();
+    }
+
+    public StringProperty tagProperty() {
         return tag;
     }
 
     public String getName() {
+        return name.get();
+    }
+
+    public StringProperty nameProperty() {
         return name;
     }
 
     public GameDate getDate() {
+        return date.get();
+    }
+
+    public ObjectProperty<GameDate> dateProperty() {
         return date;
     }
 
@@ -326,7 +316,15 @@ public class Eu4Campaign {
         return campaignId;
     }
 
-    public List<Entry> getSavegames() {
+    public ObservableSet<Entry> getSavegames() {
         return savegames;
+    }
+
+    public Timestamp getLastPlayed() {
+        return lastPlayed.get();
+    }
+
+    public ObjectProperty<Timestamp> lastPlayedProperty() {
+        return lastPlayed;
     }
 }
