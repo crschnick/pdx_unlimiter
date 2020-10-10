@@ -1,44 +1,51 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameWatcher;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4SavegameImporter;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Eu4Installation extends Installation {
 
     private Path userDirectory;
+    private GameVersion version;
     private Map<String,String> countryNames = new HashMap<>();
 
     public Eu4Installation(Path path) {
         super("Europa Universalis IV", path);
-        this.userDirectory = Paths.get(System.getProperty("user.home"), "Documents", "Paradox Interactive", "Europa Universalis IV");
     }
 
-    public void init() {
+    public void init() throws Exception {
         for (File f : getPath().resolve("history").resolve("countries").toFile().listFiles()) {
             String[] s = f.getName().split("-");
             countryNames.put(s[0].trim(), s[1].substring(0, s[1].length() - 4).trim());
         }
 
-        try {
-            SavegameWatcher.startInDirectory(userDirectory.resolve("save games"), (p) -> {
-                try {
-                    SavegameCache.EU4_CACHE.importSavegame(Eu4Savegame.fromFile(p));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadSettings();
+    }
+
+    public void loadSettings() throws IOException {
+        ObjectMapper o = new ObjectMapper();
+        JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
+        this.userDirectory = Paths.get(node.get("gameDataPath").textValue()
+                .replace("%USER_DOCUMENTS%", Paths.get(System.getProperty("user.home"), "Documents").toString()));
+        String v = node.get("version").textValue();
+        Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);
+        m.find();
+        this.version = new GameVersion(Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2)),Integer.parseInt(m.group(3)),Integer.parseInt(m.group(4)));
     }
 
     @Override
@@ -57,5 +64,17 @@ public class Eu4Installation extends Installation {
     @Override
     public boolean isValid() {
         return getPath().resolve("eu4.exe").toFile().exists();
+    }
+
+    public Path getUserDirectory() {
+        return userDirectory;
+    }
+
+    public Path getSaveDirectory() {
+        return userDirectory.resolve("save games");
+    }
+
+    public GameVersion getVersion() {
+        return version;
     }
 }

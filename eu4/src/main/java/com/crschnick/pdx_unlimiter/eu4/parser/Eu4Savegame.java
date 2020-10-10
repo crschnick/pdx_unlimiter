@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
+import com.crschnick.pdx_unlimiter.eu4.format.NodeSplitter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,8 +28,16 @@ public class Eu4Savegame {
 
     private static final GamedataParser normalParser = new Eu4NormalParser();
 
+    private static final String[] META_NODES = new String[] {"date", "save_game", "player",
+            "displayed_country_name", "savegame_version", "savegame_versions", "dlc_enabled",
+            "multi_player", "not_observer", "campaign_id", "campaign_length", "campaign_stats"};
+
+    private static final String[] AI_NODES = new String[] {"ai"};
+
     public static Eu4Savegame fromFile(Path file) throws IOException {
-        boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
+        var in = Files.newInputStream(file);
+        boolean isZipped = new ZipInputStream(in).getNextEntry() != null;
+        in.close();
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
             ZipEntry gamestate = zipFile.getEntry("gamestate");
@@ -39,16 +48,23 @@ public class Eu4Savegame {
             if (gamestateNode.isPresent()) {
                 Node metaNode = new Eu4IronmanParser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
                 Node aiNode =new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
+                zipFile.close();
                 return new Eu4Savegame(gamestateNode.get(), aiNode, metaNode);
             } else {
-                return new Eu4Savegame(normalParser.parse(zipFile.getInputStream(gamestate)).get(),
+                var s = new Eu4Savegame(normalParser.parse(zipFile.getInputStream(gamestate)).get(),
                         normalParser.parse(zipFile.getInputStream(ai)).get(),
                         normalParser.parse(zipFile.getInputStream(meta)).get());
+                zipFile.close();
+                return s;
             }
         } else {
-            throw new IOException();
-            //Optional<Node> node = normalParser.parse(Files.newInputStream(file));
-            //return new Eu4Savegame(node.get(), node.get(), node.get());
+            Optional<Node> node = normalParser.parse(Files.newInputStream(file));
+            if (node.isPresent()) {
+                Node meta = new NodeSplitter(META_NODES).splitFromNode(node.get());
+                Node ai = new NodeSplitter(AI_NODES).splitFromNode(node.get());
+                return new Eu4Savegame(node.get(), ai, meta);
+            }
+            throw new IOException("Invalid savegame: " + file.toString());
         }
             }
 

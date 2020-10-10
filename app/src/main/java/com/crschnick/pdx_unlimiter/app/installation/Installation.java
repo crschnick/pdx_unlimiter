@@ -23,7 +23,7 @@ public abstract class Installation {
 
     public static Optional<Eu4Installation> EU4 = Optional.empty();
 
-    public static void loadConfig() throws IOException {
+    public static void loadConfig() throws Exception {
         if (!FILE.toFile().exists()) {
             initInstallations();
             return;
@@ -57,13 +57,15 @@ public abstract class Installation {
         mapper.writeTree(generator, n);
     }
 
-    private static void initInstallations() throws IOException {
+    private static void initInstallations() throws Exception {
         if (!EU4.isPresent() || !EU4.get().isValid()) {
             var eu4 = getInstallPath("Europa Universalis IV");
             eu4.ifPresent(value -> EU4 = Optional.of(new Eu4Installation(value)));
         }
 
-        EU4.ifPresent(Installation::init);
+        if (EU4.isPresent()) {
+            EU4.get().init();
+        }
     }
 
     public static Optional<Path> getInstallPath(String app) {
@@ -94,7 +96,7 @@ public abstract class Installation {
 
     public abstract void start();
 
-    public abstract void init();
+    public abstract void init() throws Exception;
 
     public abstract boolean isValid();
 
