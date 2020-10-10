@@ -4,6 +4,7 @@ plugins {
     id 'application'
     id 'edu.sc.seis.launch4j' version '2.4.8'
     id "com.github.langmo.gradlensis" version "0.1.0"
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
 group 'com.crschnick'
@@ -20,19 +21,75 @@ repositories {
 
 dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
 }
+
+addDependenciesModuleInfo {
+    jdepsExtraArgs = ['-q']
+    outputDirectory = file("$buildDir/generated-modules")
+    modules {
+        module {
+            artifact 'org.apache.commons:commons-lang3:3.11'
+            moduleInfoSource = '''
+                module org.apache.commons.lang3 {
+                    requires java.se;
+                    exports org.apache.commons.lang3;
+                    exports org.apache.commons.lang3.arch;
+                }
+            '''
+        }
+    }
+}
+
+java {
+    modularity.inferModulePath = true
+}
+
+
 
 launch4j {
     mainClassName = 'com.crschnick.pdx_unlimiter.Updater'
 }
 
-build.dependsOn(createExe)
-
 nsis {
     // path to the NSIS configuration file
-    configuration = file("${projectDir}/config.nsi")
+    configuration = file("config.nsi")
     // folder where the NSIS installer generator is run. All paths
     // in the NSIS configuration file are relative to this folder.
     runIn =  file("${buildDir}")
+
+    destinationFolder = file("${buildDir}/bin")
 }
+
+createInstaller.dependsOn(createRuntimeImage)
+
+
+
+task copyModules(type: Copy) {
+    into "${buildDir}/modules"
+    from configurations.runtimeClasspath
+}
+
+task copyOutput(type: Copy) {
+    into "${buildDir}/modules"
+    from "${buildDir}/libs"
+}
+
+build.dependsOn(copyModules)
+build.dependsOn(copyOutput)
+
+createRuntimeImage {
+    jdkHome = '$JAVA_HOME'
+    outputDirectory = file("$buildDir/jre-image")
+    modulePath = [file("$buildDir/modules")]
+    modules = ['com.crschnick.pdx_unlimiter.updater']
+    excludedResources = []
+    launcher {
+        name = 'Updater'
+        module = 'com.crschnick.pdx_unlimiter.updater'
+    }
+    compression = 2
+    stripDebug = true
+}
+
+createRuntimeImage.dependsOn(build)

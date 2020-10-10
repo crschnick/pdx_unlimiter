@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     implementation group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.11.3"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
     implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
     implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
@@ -49,6 +50,7 @@ addDependenciesModuleInfo {
                 module net.nikr.dds {
                     requires java.se;
                     exports net.nikr.dds;
+                    provides javax.imageio.spi.ImageReaderSpi with net.nikr.dds.DDSImageReaderSpi;
                 }
             '''
         }

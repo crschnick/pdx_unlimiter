@@ -13,6 +13,7 @@ import com.crschnick.pdx_unlimiter.eu4.format.eu4.Eu4Transformer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -52,55 +53,56 @@ public class Eu4IntermediateSavegame {
     public static Eu4IntermediateSavegame fromFile(Path file) throws IOException {
         return fromFile(file, GAMESTATE_SPLIT_PARTS);
     }
+
     public static Eu4IntermediateSavegame fromFile(Path file, String... parts) throws IOException {
         Map<String, Node> nodes = new HashMap<>();
-        boolean isZipped = new ZipInputStream(Files.newInputStream(file)).getNextEntry() != null;
-        if (isZipped) {
+        boolean isDir = file.toFile().isDirectory();
+        if (!isDir) {
             ZipFile zipFile = new ZipFile(file.toFile());
-            String txtTest = parts[0] + ".txt";
-            boolean txt = false;
-            if (zipFile.getEntry(txtTest) != null) {
-                txt = true;
-            }
-
             ObjectMapper mapper = new ObjectMapper();
             for (String s : parts) {
-                ZipEntry e = zipFile.getEntry(s + (txt ? ".txt" : ".json"));
-                if (!txt) {
-                    nodes.put(s, JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(e))));
-                } else {
-
-                }
+                ZipEntry e = zipFile.getEntry(s + ".json");
+                nodes.put(s, JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(e))));
             }
             return new Eu4IntermediateSavegame(nodes);
         } else {
-            return null;
+            ObjectMapper mapper = new ObjectMapper();
+            for (String s : parts) {
+                nodes.put(s, JsonConverter.fromJson(mapper.readTree(Files.newInputStream(file.resolve(s + ".json")))));
+            }
+            return new Eu4IntermediateSavegame(nodes);
         }
     }
 
-    public void write(String fileName, boolean json) throws IOException {
-        File f = new File(fileName);
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
-        for (String s : nodes.keySet()) {
-            ZipEntry e = new ZipEntry(s + (json ? ".json" : ".txt"));
-            out.putNextEntry(e);
+    private void writeEntry(OutputStream out, Node node) throws IOException {
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        JsonGenerator generator = factory.createGenerator(out);
+        generator.setPrettyPrinter(new DefaultPrettyPrinter());
+        ObjectNode n = mapper.createObjectNode();
+        JsonConverter.toJsonObject(n, node);
+        mapper.writeTree(generator, n);
+    }
 
-            if (json) {
-                JsonFactory factory = new JsonFactory();
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.enable(SerializationFeature.INDENT_OUTPUT);
-                JsonGenerator generator = factory.createGenerator(out);
-                generator.setPrettyPrinter(new DefaultPrettyPrinter());
-                ObjectNode n = mapper.createObjectNode();
-                JsonConverter.toJsonObject(n, nodes.get(s));
-                mapper.writeTree(generator, n);
-            } else {
-                byte[] data = nodes.get(s).toString(0).getBytes();
-                out.write(data, 0, data.length);
+    public void write(Path path, boolean zip) throws IOException {
+        if (zip) {
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(path.toFile()));
+            for (String s : nodes.keySet()) {
+                ZipEntry e = new ZipEntry(s + ".json");
+                out.putNextEntry(e);
+                writeEntry(out, nodes.get(s));
+                out.closeEntry();
             }
-
-            out.closeEntry();
+            out.close();
+        } else {
+            path.toFile().mkdir();
+            for (String s : nodes.keySet()) {
+                ZipEntry e = new ZipEntry(s + ".json");
+                OutputStream out = Files.newOutputStream(path.resolve(s + ".json"));
+                writeEntry(out, nodes.get(s));
+                out.close();
+            }
         }
-        out.close();
     }
 }

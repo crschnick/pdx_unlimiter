@@ -306,28 +306,6 @@ public class Eu4Campaign {
         this.campaignId = campaignId;
     }
 
-    public boolean isLoaded() {
-        return savegames.size() > 0;
-    }
-
-    public void parse(Path p) throws IOException {
-        String last = p.getName(p.getNameCount() - 1).toString();
-        UUID id = UUID.fromString(last);
-
-        File dir = p.toFile();
-        FileFilter fileFilter = new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        };
-
-        for (File f : dir.listFiles()) {
-            var i = Eu4IntermediateSavegame.fromFile(f.toPath(), "meta", "countries", "diplomacy");
-            Entry entry = Entry.fromSavegame(i, id);
-            savegames.add(entry);
-        }
-    }
-
     public void add(Entry e) {
         this.savegames.add(e);
     }
