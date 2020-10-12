@@ -79,41 +79,45 @@ public class Eu4IronmanParser extends GamedataParser {
 
     @Override
     public List<Token> tokenize(InputStream stream) throws IOException {
+        String s = new String(stream.readAllBytes());
+        int current = 0;
         List<Token> tokens = new ArrayList<>();
-        try {
             do {
-                byte[] next = new byte[2];
-                int read = stream.readNBytes(next, 0, 2);
-                if (read < 2) {
-                    break;
-                }
+                byte[] next = s.substring(current, current + 2).getBytes();
+                current += 2;
+
                 if (Arrays.equals(next, EQUALS)) {
                     tokens.add(new EqualsToken());
                 }
 
                 else if (Arrays.equals(next, STRING_1) || Arrays.equals(next, STRING_2)) {
                     byte[] length = new byte[4];
-                    stream.readNBytes(length, 0, 2);
+                    System.arraycopy(s.substring(current, current + 2).getBytes(), 0, length, 0,2);
                     int lengthInt = ByteBuffer.wrap(length).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                    current += 2;
 
-                    byte[] s = new byte[lengthInt];
-                    stream.readNBytes(s, 0, lengthInt);
-                    if (lengthInt > 0 && s[lengthInt - 1] == '\n') {
+                    byte[] sb = s.substring(current, current + lengthInt).getBytes();
+                    current += lengthInt;
+
+                    if (lengthInt > 0 && sb[lengthInt - 1] == '\n') {
                         lengthInt--;
                     }
-                    tokens.add(new ValueToken<String>(new String(s, 0, lengthInt)));
+                    tokens.add(new ValueToken<String>(new String(sb, 0, lengthInt)));
                 }
 
                 else if (Arrays.equals(next, INTEGER)) {
-                    byte[] number = new byte[4];
-                    stream.readNBytes(number, 0, 4);
-                    int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                    byte[] number = s.substring(current, current + 4).getBytes();
+                    current += 4;
+
+                    int numberInt = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     tokens.add(new ValueToken<Long>((long) numberInt));
                 }
 
                 else if (Arrays.equals(next, INTEGER_UNSIGNED)) {
                     byte[] number = new byte[8];
-                    stream.readNBytes(number, 0, 4);
+                    System.arraycopy(s.substring(current, current + 4).getBytes(), 0, number, 0, 4);
+                    current += 4;
+
                     long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getLong();
                     tokens.add(new ValueToken<Long>(numberInt));
                 }
@@ -127,27 +131,29 @@ public class Eu4IronmanParser extends GamedataParser {
                 }
 
                 else if (Arrays.equals(next, BOOL)) {
-                    byte[] number = new byte[1];
-                    stream.readNBytes(number, 0, 1);
+                    byte[] number = s.substring(current, current + 1).getBytes();
+                    current += 1;
+
                     boolean b = ByteBuffer.wrap(number).get() != 0;
                     tokens.add(new ValueToken<String>(b ? "yes" : "no"));
                 }
 
                 else if (Arrays.equals(next, DOUBLE)) {
-                    byte[] number = new byte[8];
-                    stream.readNBytes(number, 0, 8);
+                    byte[] number = s.substring(current, current + 8).getBytes();
+                    current += 8;
+
                     long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     double value = (2 * (numberInt * Math.pow(2, -16)));
                     tokens.add(new ValueToken<Double>(value));
                 }
 
                 else if (Arrays.equals(next, FLOAT)) {
-                    byte[] number = new byte[4];
-                    stream.readNBytes(number, 0, 4);
-                    int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                    byte[] number = s.substring(current, current + 4).getBytes();
+                    current += 4;
 
-                    float f  = ((float) numberInt) / 1000.0F;
-                    tokens.add(new ValueToken<Float>(f));
+                    int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
+                    double d  = ((double) numberInt) / 1000.0;
+                    tokens.add(new ValueToken<Double>(d));
                 }
 
                 else if (Arrays.equals(next, OPEN_GROUP)) {
@@ -159,17 +165,14 @@ public class Eu4IronmanParser extends GamedataParser {
                 }
                 else {
                     byte[] number = new byte[4];
-                    number[0] = next[0];
-                    number[1] = next[1];
+                    System.arraycopy(next, 0, number, 0, 2);
+
                     int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     String id = Integer.toString(numberInt);
                     tokens.add(new ValueToken<String>(id));
                 }
 
-            } while (true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            } while (current < s.length());
         return tokens;
     }
 }

@@ -78,7 +78,7 @@ public abstract class Node {
     public static Node getNodeForKey(Node node, String key) {
         var list = getNodesForKey(node, key);
         if (list.size() > 1) {
-            throw new IllegalArgumentException("Invalid key: " + key);
+            throw new IllegalArgumentException("Too many entries for key: " + key);
         }
         return list.get(0);
     }

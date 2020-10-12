@@ -1,12 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4SavegameImporter;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,10 +51,26 @@ public class Eu4Installation extends Installation {
         this.version = new GameVersion(Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2)),Integer.parseInt(m.group(3)),Integer.parseInt(m.group(4)));
     }
 
+    public void writeLaunchConfig(Eu4Campaign.Entry entry, Path path) throws IOException {
+        var out = Files.newOutputStream(getUserDirectory().resolve("continue_game.json"));
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        JsonGenerator generator = factory.createGenerator(out);
+        generator.setPrettyPrinter(new DefaultPrettyPrinter());
+        ObjectNode n = mapper.createObjectNode()
+                .put("title", entry.getCampaign().getName())
+                .put("desc", entry.getName())
+                .put("date", entry.getCampaign().getLastPlayed().toString())
+                .put("filename", path.toString());
+        mapper.writeTree(generator, n);
+        out.close();
+    }
+
     @Override
     public void start() {
         try {
-            Runtime.getRuntime().exec(getPath().resolve("eu4.exe").toString()+ " -load");
+            Runtime.getRuntime().exec(getPath().resolve("eu4.exe").toString()+ " -continuelastsave");
         } catch (IOException e) {
             e.printStackTrace();
         }

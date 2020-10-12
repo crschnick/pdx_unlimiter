@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
-import com.crschnick.pdx_unlimiter.eu4.parser.GamedataParser;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,72 +9,68 @@ import java.util.regex.Pattern;
 
 public class Eu4NormalParser extends GamedataParser {
 
-    public static final byte[] MAGIC = new byte[]{ 0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
+    public static final byte[] MAGIC = new byte[]{0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
 
     public Eu4NormalParser() {
         super(MAGIC, Namespace.EMPTY);
     }
 
-    @Override
-    public List<GamedataParser.Token> tokenize(InputStream stream) throws IOException {
-        StreamTokenizer t = new StreamTokenizer(stream);
-        t.resetSyntax();
-        t.commentChar('#');
-        t.eolIsSignificant(false);
-        t.lowerCaseMode(false);
-        t.wordChars('.', '.');
-        t.wordChars('0', '9');
-        t.wordChars('a', 'z');
-        t.wordChars('A', 'Z');
-        t.wordChars('_', '_');
-        t.wordChars('-', '-');
-        t.wordChars(128, Integer.MAX_VALUE);
-        t.whitespaceChars('\t', '\t');
-        t.whitespaceChars(' ', ' ');
-        t.whitespaceChars('\n', '\n');
-        t.whitespaceChars('\r', '\r');
-        t.quoteChar('"');
+    private List<Token> tokenize(String s) {
+        List<Token> tokens = new ArrayList<>();
+        int prev = 0;
+        boolean isInQuotes = false;
+        for (int i = 0; i < s.length(); i++) {
+            Token t = null;
+            if (s.charAt(i) == '{') {
+                t = new OpenGroupToken();
+            } else if (s.charAt(i) == '}') {
+                t = new CloseGroupToken();
+            } else if (s.charAt(i) == '=') {
+                t = new EqualsToken();
+            } else if (s.charAt(i) == '"') {
+                isInQuotes = !isInQuotes;
+            }
 
-        List<GamedataParser.Token> tokens = new ArrayList<>();
-        out: while (true) {
-            int token = t.nextToken();
-            switch (token) {
-                case StreamTokenizer.TT_EOF:
-                    break out;
-                case StreamTokenizer.TT_EOL:
-                    break;
-                case StreamTokenizer.TT_NUMBER:
-                    tokens.add(new ValueToken<Integer>((int) t.nval));
-                    break;
-                case StreamTokenizer.TT_WORD:
-                    if (Pattern.matches("-?[0-9]+", t.sval)) {
-                        tokens.add(new ValueToken<Long>(Long.parseLong(t.sval)));
-                    } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", t.sval)) {
-                        tokens.add(new ValueToken<Double>(Double.valueOf(t.sval)));
-                    } else if (t.sval.equals("yes")) {
-                        tokens.add(new ValueToken<Boolean>(true));
-                    } else if (t.sval.equals("no")) {
-                        tokens.add(new ValueToken<Boolean>(false));
-                    } else {
-                        tokens.add(new ValueToken<String>(t.sval));
+            boolean isWhitespace = !isInQuotes && (s.charAt(i) == '\n' || s.charAt(i) == '\r' || s.charAt(i) == ' ' || s.charAt(i) == '\t');
+            boolean marksEndOfPreviousToken =
+                    (s.charAt(i) == '\0' && prev < i) // EOF
+                    || (t != null && prev < i)        // New token finishes old token
+                    || (isWhitespace && prev < i);    // Whitespace finishes old token
+            if (marksEndOfPreviousToken) {
+                String sub = s.substring(prev, i);
+                if (sub.equals("yes")) {
+                    tokens.add(new ValueToken<Boolean>(true));
+                } else if (sub.equals("no")) {
+                    tokens.add(new ValueToken<Boolean>(false));
+                } else if (Pattern.matches("-?[0-9]+", sub)) {
+                    tokens.add(new ValueToken<Long>(Long.parseLong(sub)));
+                } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", sub)) {
+                    tokens.add(new ValueToken<Double>(Double.valueOf(sub)));
+                } else if (sub.startsWith("\"") && sub.endsWith("\"")) {
+                    if (sub.length() == 1) {
+                        int a = 0;
                     }
-                    break;
-                default:
-                    if (token == '=') {
-                        tokens.add(new EqualsToken());
-                    }
-                    if (token == '{') {
-                        tokens.add(new OpenGroupToken());
-                    }
-                    if (token == '}') {
-                        tokens.add(new CloseGroupToken());
-                    }
-                    if (token == '"') {
-                        String s = t.sval;
-                        tokens.add(new ValueToken<String>(s));
-                    }
+                    tokens.add(new ValueToken<String>(sub.substring(1, sub.length() - 1)));
+                } else {
+                    tokens.add(new ValueToken<String>(sub));
+                }
+            }
+
+            if (isWhitespace) {
+                prev = i + 1;
+                continue;
+            } else if (t != null) {
+                tokens.add(t);
+                prev = i + 1;
             }
         }
         return tokens;
+    }
+
+    @Override
+    public List<GamedataParser.Token> tokenize(InputStream stream) throws IOException {
+        String s = new String(stream.readAllBytes());
+        s += "\0";
+        return tokenize(s);
     }
 }

@@ -76,13 +76,9 @@ public class Eu4IntermediateSavegame {
 
     private void writeEntry(OutputStream out, Node node) throws IOException {
         JsonFactory factory = new JsonFactory();
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         JsonGenerator generator = factory.createGenerator(out);
         generator.setPrettyPrinter(new DefaultPrettyPrinter());
-        ObjectNode n = mapper.createObjectNode();
-        JsonConverter.toJsonObject(n, node);
-        mapper.writeTree(generator, n);
+        new ObjectMapper().writeTree(generator, JsonConverter.toJsonObject(node));
     }
 
     public void write(Path path, boolean zip) throws IOException {
@@ -98,7 +94,6 @@ public class Eu4IntermediateSavegame {
         } else {
             path.toFile().mkdir();
             for (String s : nodes.keySet()) {
-                ZipEntry e = new ZipEntry(s + ".json");
                 OutputStream out = Files.newOutputStream(path.resolve(s + ".json"));
                 writeEntry(out, nodes.get(s));
                 out.close();

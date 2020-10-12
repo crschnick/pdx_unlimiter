@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.WindowsRegistry;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameManagerApp;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import javafx.application.Application;
 import net.nikr.dds.DDSImageReaderSpi;
@@ -19,13 +20,15 @@ public class Main {
         try {
             Installation.loadConfig();
 
-            //Eu4Savegame save = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\h4.eu4"));
+            Eu4Savegame save = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\backups\\swe1.eu4_79a6c3b2-edbc-404e-950f-c3effbc3c126.eu4"));
             //Eu4Savegame saveN = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\namespace_named.eu4"), true);
             //System.out.println(NamespaceCreator.createNamespace(save, saveN));
 
+            Eu4IntermediateSavegame s = Eu4IntermediateSavegame.fromSavegame(save);
+            s.write(Paths.get("C:\\Users\\cschn\\Desktop\\test_eu4\\rawout"), false);
             //save.write("C:\\Users\\cschn\\Desktop\\test_eu4\\29.raw.zip", true);
 
-            //SavegameCache.EU4_CACHE.importSavegame(save);
+            //SavegameCache.EU4_CACHE.importSavegame(Paths.get("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\backups\\swe1.eu4_79a6c3b2-edbc-404e-950f-c3effbc3c126.eu4"), save);
 
             SavegameCache.loadConfig();
             SavegameManagerApp.main(args);
