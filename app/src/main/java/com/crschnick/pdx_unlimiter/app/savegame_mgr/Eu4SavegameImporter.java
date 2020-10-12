@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -29,12 +30,12 @@ public class Eu4SavegameImporter {
     }
 
     private static void importAllSavegames(Path directory, Consumer<Path> consumer, BooleanProperty running) {
-        for (File f : directory.toFile().listFiles()) {
+        Arrays.stream(directory.toFile().listFiles()).filter(f -> !f.isDirectory()).forEach((f) -> {
             if (!running.get()) {
-                break;
+                return;
             }
             consumer.accept(f.toPath());
-        }
+        });
     }
 
     public static void startWatcher(Path directory, BooleanProperty running) {

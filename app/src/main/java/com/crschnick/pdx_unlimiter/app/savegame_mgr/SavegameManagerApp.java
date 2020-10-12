@@ -1,40 +1,45 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.Main;
-import com.crschnick.pdx_unlimiter.app.installation.Eu4App;
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
+import org.apache.commons.io.FileUtils;
 
+import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Consumer;
 
 public class SavegameManagerApp extends Application {
 
     private void createStatusThread(BorderPane layout) {
+        Consumer<Eu4Campaign.Entry> launch = (e) -> {
+            Path srcPath = SavegameCache.EU4_CACHE.getPath(e).resolve("savegame.eu4");
+            Path destPath = Installation.EU4.get().getSaveDirectory().resolve("savegame.eu4");
+            try {
+                FileUtils.copyFile(srcPath.toFile(), destPath.toFile());
+                Installation.EU4.get().writeLaunchConfig(e, destPath);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            Installation.EU4.get().start();
+            selectedCampaign.get().get().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
+
+        };
+
         Thread t = new Thread(() -> {
-            Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedSave)));
+            Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedCampaign, selectedSave, launch)));
 
             Optional<PdxApp> oldApp = Optional.empty();
             while (true) {
@@ -44,7 +49,7 @@ public class SavegameManagerApp extends Application {
                     if (app.isPresent()) {
                         Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createActiveStatusBar(app.get())));
                     } else {
-                        Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedSave)));
+                        Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedCampaign, selectedSave, launch)));
                     }
                     oldApp = app;
                  }
@@ -74,7 +79,15 @@ public class SavegameManagerApp extends Application {
         createStatusThread(layout);
 
         layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign, (c) -> SavegameCache.EU4_CACHE.delete(c)));
-        layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave, (e) -> SavegameCache.EU4_CACHE.delete(selectedCampaign.get().get(), e)));
+        layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
+                (e) -> {
+                    try {
+                        Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getPath(e).toFile());
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                },
+                (e) -> SavegameCache.EU4_CACHE.delete(e)));
 
         selectedCampaign.addListener((c,o,n) -> {
             if (n.isPresent()) {
@@ -82,8 +95,8 @@ public class SavegameManagerApp extends Application {
             }
         });
 
-        primaryStage.setTitle("Pdx Unlimiter");
-        Scene scene = new Scene(layout, 800, 700);
+        primaryStage.setTitle("EU4 Savegame Manager");
+        Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
         setUserAgentStylesheet(STYLESHEET_CASPIAN);
@@ -95,7 +108,7 @@ public class SavegameManagerApp extends Application {
             }
         });
 
-        //Eu4SavegameImporter.importAllSavegames(running);
+        Eu4SavegameImporter.importAllSavegames(running);
     }
 
     public static void main(String[] args) {

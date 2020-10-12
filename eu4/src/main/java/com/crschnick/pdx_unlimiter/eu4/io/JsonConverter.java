@@ -4,81 +4,70 @@ import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JsonConverter {
 
-    private static boolean getFlatValue(ObjectNode jsonNode, String key, Node node) {
+    private static JsonNode valueToNode(ValueNode node) {
+        Object value = node.getValue();
+        if (value instanceof Boolean) {
+            boolean b = (boolean) value;
+            return JsonNodeFactory.instance.booleanNode(b);
+        }
+        else if (value instanceof Long) {
+            long l = (long) value;
+            return JsonNodeFactory.instance.numberNode(l);
+        }
+        else if (value instanceof String) {
+            String s = (String) value;
+            return JsonNodeFactory.instance.textNode(s);
+        }
+        else if (value instanceof Double) {
+            double d = (double) value;
+            return JsonNodeFactory.instance.numberNode(d);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static JsonNode toJsonObject(Node node) {
         if (node instanceof ValueNode) {
-            Object value = ((ValueNode) node).getValue();
-            if (value instanceof Boolean) {
-                jsonNode.put(key, (boolean) value);
-            }
-            if (value instanceof Long) {
-                jsonNode.put(key, (long) value);
-            }
-            if (value instanceof String) {
-                jsonNode.put(key, (String) value);
-            }
-            if (value instanceof Double) {
-                jsonNode.put(key, (Double) value);
-            }
-            return true;
+            return valueToNode((ValueNode) node);
         } else if (node instanceof ArrayNode) {
             ArrayNode a = (ArrayNode) node;
             if (a.getNodes().size() == 0) {
-                return false;
+                return JsonNodeFactory.instance.arrayNode();
             }
 
-            if (a.getNodes().get(0) instanceof ValueNode) {
-                com.fasterxml.jackson.databind.node.ArrayNode array = jsonNode.putArray(key);
+            boolean isValueArray = a.getNodes().get(0) instanceof ValueNode;
+            boolean isObject = a.getNodes().get(0) instanceof KeyValueNode;
+            if (isValueArray) {
+                com.fasterxml.jackson.databind.node.ArrayNode array = JsonNodeFactory.instance.arrayNode();
                 for (Node n : a.getNodes()) {
-                    Object value = ((ValueNode) n).getValue();
-                    if (value instanceof Boolean) {
-                        array.add((boolean) value);
-                    }
-                    if (value instanceof Long) {
-                        array.add((Long) value);
-                    }
-                    if (value instanceof String) {
-                        array.add((String) value);
-                    }
-                    if (value instanceof Double) {
-                        array.add((Double) value);
-                    }
+                    array.add(valueToNode((ValueNode) n));
                 }
-                return true;
-            } else if (a.getNodes().get(0) instanceof ArrayNode) {
-                com.fasterxml.jackson.databind.node.ArrayNode array = jsonNode.putArray(key);
+                return array;
+            } else if (isObject) {
+                ObjectNode object = JsonNodeFactory.instance.objectNode();
                 for (Node n : a.getNodes()) {
-                    toJsonObject(array.addObject(), n);
+                    KeyValueNode kv = (KeyValueNode) n;
+                    object.set(kv.getKeyName(), toJsonObject(kv.getNode()));
                 }
-                return true;
+                return object;
             } else {
-                return false;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public static void toJsonObject(ObjectNode jsonNode, Node node) {
-        if (node instanceof ArrayNode) {
-            ArrayNode a = (ArrayNode) node;
-            for (Node sub : a.getNodes()) {
-                if (sub instanceof KeyValueNode) {
-                    String key = ((KeyValueNode) sub).getKeyName();
-                    boolean isFlat = getFlatValue(jsonNode, key, ((KeyValueNode) sub).getNode());
-                    if (!isFlat) {
-                        toJsonObject(jsonNode.putObject(key), ((KeyValueNode) sub).getNode());
-                    }
+                com.fasterxml.jackson.databind.node.ArrayNode array = JsonNodeFactory.instance.arrayNode();
+                for (Node n : a.getNodes()) {
+                    array.add(toJsonObject(n));
                 }
+                return array;
             }
+        } else {
+            throw new RuntimeException("");
         }
     }
 
