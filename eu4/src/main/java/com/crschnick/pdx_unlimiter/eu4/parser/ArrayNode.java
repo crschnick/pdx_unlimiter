@@ -1,11 +1,16 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ArrayNode extends Node {
 
     private List<Node> nodes;
+
+    public ArrayNode() {
+        this.nodes = new ArrayList<>();
+    }
 
     public ArrayNode(List<Node> nodes) {
         this.nodes = nodes;

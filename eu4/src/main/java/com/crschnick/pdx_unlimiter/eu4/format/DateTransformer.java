@@ -15,9 +15,12 @@ public class DateTransformer extends NodeTransformer {
         if (v.getValue() instanceof Long) {
             d = GameDate.fromLong((Long) v.getValue());
         }
-        if (v.getValue() instanceof String) {
+        else if (v.getValue() instanceof String) {
             String s = (String) v.getValue();
             d = GameDate.fromString(s);
+        }
+        if (d == null) {
+            throw new IllegalArgumentException("Invalid date node");
         }
         kv.setNode(GameDate.toNode(d));
     }

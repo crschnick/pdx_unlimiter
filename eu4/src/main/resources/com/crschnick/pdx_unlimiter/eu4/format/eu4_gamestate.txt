@@ -371,3 +371,7 @@
 11474=independence
 14050=recalc_defection
 10487=ongoing_war
+
+12252=previous_country_tags
+11453=decision
+11551=changed_tag_from

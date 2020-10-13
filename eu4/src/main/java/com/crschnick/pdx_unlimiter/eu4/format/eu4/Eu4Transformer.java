@@ -1,6 +1,9 @@
 package com.crschnick.pdx_unlimiter.eu4.format.eu4;
 
 import com.crschnick.pdx_unlimiter.eu4.format.*;
+import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,17 @@ public class Eu4Transformer {
 
     private static NodeTransformer createEu4Transformer() {
         List<NodeTransformer> t = new ArrayList<>();
+        t.add(new RecursiveTransformer((n) -> {
+            if(n instanceof KeyValueNode) System.out.println(Node.getKeyValueNode(n).getKeyName());
+            if (n instanceof KeyValueNode && Node.getKeyValueNode(n).getKeyName().endsWith("date")) {
+                Node val = Node.getKeyValueNode(n).getNode();
+                return val instanceof ValueNode &&
+                        (((ValueNode<?>) val).getValue() instanceof String || ((ValueNode<?>) val).getValue() instanceof Long);
+            } else {
+                return false;
+            }
+        }, new DateTransformer()));
+
         t.add(new CollectNodesTransformer("ongoing_war", "ongoing_wars"));
         t.add(new CollectNodesTransformer("previous_war", "ended_wars"));
         t.add(new CollectNodesTransformer("rebel_faction", "rebel_factions"));
@@ -25,6 +39,7 @@ public class Eu4Transformer {
         t.add(new SubnodeTransformer(Map.of(new String[] {"religion_data", "catholic"}, new CollectNodesTransformer("cardinal", "cardinals")), false));
 
         t.add(new SubnodeTransformer(Map.of(new String[] {"countries", "*"}, new EventTransformer()), false));
+        t.add(new CountryTransformer());
 
         // diplomacy
         t.add(new SubnodeTransformer(Map.of(new String[] {"diplomacy"}, new CollectNodesTransformer("casus_belli", "casus_bellis")), false));
@@ -50,6 +65,8 @@ public class Eu4Transformer {
 
         List<NodeTransformer> t = new ArrayList<>();
         t.add(new SubnodeTransformer(Map.of(new String[] {"date"}, new DateTransformer()), true));
+        t.add(new DefaultValueTransformer("is_random_new_world", new ValueNode<Boolean>(false)));
+        t.add(new DefaultValueTransformer("ironman", new ValueNode<Boolean>(false)));
         return new ChainTransformer(t);
     }
 }

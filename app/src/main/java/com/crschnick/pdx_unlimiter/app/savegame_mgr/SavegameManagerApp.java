@@ -29,7 +29,7 @@ public class SavegameManagerApp extends Application {
             Path destPath = Installation.EU4.get().getSaveDirectory().resolve("savegame.eu4");
             try {
                 FileUtils.copyFile(srcPath.toFile(), destPath.toFile());
-                Installation.EU4.get().writeLaunchConfig(e, destPath);
+                Installation.EU4.get().writeLaunchConfig(e, destPath.relativize(Installation.EU4.get().getUserDirectory()));
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

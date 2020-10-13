@@ -102,7 +102,8 @@ public class Eu4IronmanParser extends GamedataParser {
                     if (lengthInt > 0 && sb[lengthInt - 1] == '\n') {
                         lengthInt--;
                     }
-                    tokens.add(new ValueToken<String>(new String(sb, 0, lengthInt)));
+                    String string = new String(sb, 0, lengthInt);
+                    tokens.add(new ValueToken<String>(string));
                 }
 
                 else if (Arrays.equals(next, INTEGER)) {

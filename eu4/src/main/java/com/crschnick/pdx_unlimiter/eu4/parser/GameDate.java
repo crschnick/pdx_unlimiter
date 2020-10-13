@@ -79,7 +79,7 @@ public class GameDate implements Comparable<GameDate> {
     }
 
     public static GameDate fromString(String s) {
-        if (Pattern.matches("\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?", s)) {
+        if (Pattern.matches("-?\\d+\\.\\d+\\.\\d+", s)) {
             String[] split = s.split("\\.");
             int year = Integer.parseInt(split[0]);
             Month m = Month.of(Integer.parseInt(split[1]));

@@ -22,7 +22,9 @@ public class EventTransformer extends NodeTransformer {
         ArrayNode history = (ArrayNode) historyNode.get();
         List<Node> newEventList = new ArrayList<>();
         for (Node n : new ArrayList<>(history.getNodes())) {
+            //Remove empty group nodes (Important!)
             if (!(n instanceof KeyValueNode)) {
+                history.getNodes().remove(n);
                 continue;
             }
             KeyValueNode kv = (KeyValueNode) n;
