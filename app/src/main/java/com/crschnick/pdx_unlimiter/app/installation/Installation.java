@@ -23,6 +23,10 @@ public abstract class Installation {
 
     public static Optional<Eu4Installation> EU4 = Optional.empty();
 
+    public static boolean isConfigured() {
+        return FILE.toFile().exists();
+    }
+
     public static void loadConfig() throws Exception {
         if (!FILE.toFile().exists()) {
             initInstallations();

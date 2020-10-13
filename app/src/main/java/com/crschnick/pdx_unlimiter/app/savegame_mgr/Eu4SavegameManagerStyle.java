@@ -1,10 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -17,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +95,9 @@ public class Eu4SavegameManagerStyle {
 
         Button del = new Button("\u2715");
         del.setOnMouseClicked((m) -> {
-            delete.accept(e);
+            if (DialogHelper.showSavegameDeleteDialog()) {
+                delete.accept(e);
+            }
         });
         del.setAlignment(Pos.CENTER_RIGHT);
         del.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
@@ -239,7 +244,9 @@ public class Eu4SavegameManagerStyle {
     private static Node createCampaignButton(Eu4Campaign c, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
         Button del = new Button("\u2715");
         del.setOnMouseClicked((m) -> {
-            onDelete.accept(c);
+            if (DialogHelper.showCampaignDeleteDialog()) {
+                onDelete.accept(c);
+            }
         });
         del.setAlignment(Pos.CENTER);
         del.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
@@ -392,5 +399,59 @@ public class Eu4SavegameManagerStyle {
         pane.setRight(b);
 
         return pane;
+    }
+
+    public static MenuBar createMenuBar(BooleanProperty running) {
+        Menu menu = new Menu("File");
+
+        MenuItem menuItem0 = new MenuItem("Import savegames...");
+        MenuItem menuItem1 = new MenuItem("Import Pdxu archive...");
+        menuItem1.setOnAction((a) -> {
+            Optional<Path> path = DialogHelper.showImportArchiveDialog();
+        });
+
+        MenuItem menuItem2 = new MenuItem("Export Pdxu archive...");
+
+        menu.getItems().add(menuItem0);
+        menu.getItems().add(menuItem1);
+        menu.getItems().add(menuItem2);
+
+
+        Menu settings = new Menu("Settings");
+        MenuItem c = new MenuItem("Change settings");
+        c.setOnAction((a) -> {
+            DialogHelper.showSettings();
+        });
+        settings.getItems().add(c);
+
+        Menu savegames = new Menu("Savegames");
+        MenuItem l = new MenuItem("Import latest savegame");
+        l.setOnAction((a) -> {
+            Eu4SavegameImporter.importLatestSavegame();
+
+        });
+        savegames.getItems().add(l);
+
+        MenuItem i = new MenuItem("Import all savegames...");
+        i.setOnAction((a) -> {
+            if (DialogHelper.showImportSavegamesDialog()) {
+                Eu4SavegameImporter.importAllSavegames(running);
+            }
+        });
+        savegames.getItems().add(i);
+
+        MenuItem u = new MenuItem("Update all savegames...");
+        u.setOnAction((a) -> {
+            if (DialogHelper.showUpdateAllSavegamesDialog()) {
+                SavegameCache.EU4_CACHE.updateAllData();
+            }
+        });
+        savegames.getItems().add(u);
+
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().add(menu);
+        menuBar.getMenus().add(settings);
+        menuBar.getMenus().add(savegames);
+        return menuBar;
     }
 }

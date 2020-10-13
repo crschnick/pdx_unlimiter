@@ -150,6 +150,36 @@ public class SavegameCache {
         c.add(e);
     }
 
+    public synchronized void updateAllData() {
+        for (Eu4Campaign c : campaigns) {
+            for (File f : getPath().resolve(c.getCampaignId().toString()).toFile().listFiles()) {
+                updateSavegameData(f.toPath());
+            }
+        }
+    }
+
+    public synchronized void updateSavegameData(Path p) {
+        Path s = p.resolve("savegame.eu4");
+        Eu4Savegame save = null;
+        try {
+            save = Eu4Savegame.fromFile(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Eu4IntermediateSavegame is = Eu4IntermediateSavegame.fromSavegame(save);
+
+        for (File f : p.toFile().listFiles((f) -> !f.toPath().equals(s))) {
+            f.delete();
+        }
+
+        try {
+            is.write(p, false);
+            Files.write(p.resolve("version"), String.valueOf(Eu4IntermediateSavegame.VERSION).getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public synchronized void delete(Eu4Campaign.Entry e) {
         Eu4Campaign c = e.getCampaign();
         if (!this.campaigns.contains(c) || !c.getSavegames().contains(e)) {
@@ -172,6 +202,12 @@ public class SavegameCache {
 
     private synchronized void loadEntry(Path p) {
         try {
+            int v = p.resolve("version").toFile().exists() ?
+                    Integer.parseInt(new String(Files.readAllBytes(p.resolve("version")))) : 0;
+            if (v < Eu4IntermediateSavegame.VERSION) {
+                updateSavegameData(p);
+            }
+
             Eu4IntermediateSavegame i = Eu4IntermediateSavegame.fromFile(p, "meta", "countries", "diplomacy");
             UUID id = UUID.fromString(p.getName(p.getNameCount() - 1).toString().split("\\.")[0]);
             this.add(UUID.fromString(p.getName(p.getNameCount() - 2).toString()), id, Eu4SavegameInfo.fromSavegame(i));
@@ -218,16 +254,19 @@ public class SavegameCache {
         return Optional.empty();
     }
 
-    public synchronized void importSavegame(Path file, Eu4Savegame save) throws IOException {
+    public synchronized void importSavegame(Path file) throws IOException {
+        Eu4Savegame save = Eu4Savegame.fromFile(file);
         Eu4IntermediateSavegame is = Eu4IntermediateSavegame.fromSavegame(save);
         UUID saveUuid = UUID.randomUUID();
         String id = Node.getString(Node.getNodeForKey(is.getNodes().get("meta"), "campaign_id"));
         Path campaignPath = path.resolve(id);
         campaignPath.toFile().mkdirs();
-        is.write(campaignPath.resolve(saveUuid.toString()), false);
+        Path entryPath = campaignPath.resolve(saveUuid.toString());
 
+        is.write(entryPath, false);
         FileUtils.copyFile(file.toFile(), BACKUP_DIR.resolve(file.getFileName() + "_" + saveUuid.toString() + ".eu4").toFile());
-        FileUtils.moveFile(file.toFile(), campaignPath.resolve(saveUuid.toString()).resolve("savegame.eu4").toFile());
+        FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
+        Files.write(entryPath.resolve("version"), String.valueOf(Eu4IntermediateSavegame.VERSION).getBytes());
 
         UUID uuid = UUID.fromString(id);
         Eu4SavegameInfo e = Eu4SavegameInfo.fromSavegame(is);
