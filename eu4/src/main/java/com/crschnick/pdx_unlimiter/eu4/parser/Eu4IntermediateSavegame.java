@@ -27,7 +27,7 @@ public class Eu4IntermediateSavegame {
 
     private static final String[] PARTS = new String[] {"gamestate", "meta", "ai", "ongoing_wars", "ended_wars", "provinces", "countries", "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy", "inflation_statistics", "religion_data"};
 
-    private static final String[] GAMESTATE_SPLIT_PARTS = new String[] {"ongoing_wars", "ended_wars", "provinces", "countries", "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy", "inflation_statistics", "religion_data"};
+    private static final String[] GAMESTATE_SPLIT_PARTS = new String[] {"ongoing_wars", "ended_wars", "provinces", "countries", "countries_history", "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy", "inflation_statistics", "religion_data"};
 
     private Map<String, Node> nodes;
 

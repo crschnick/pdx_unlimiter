@@ -75,6 +75,10 @@ public abstract class Node {
         return list.size() > 0;
     }
 
+    public static KeyValueNode getKeyValueNode(Node node) {
+        return (KeyValueNode) node;
+    }
+
     public static Node getNodeForKey(Node node, String key) {
         var list = getNodesForKey(node, key);
         if (list.size() > 1) {
