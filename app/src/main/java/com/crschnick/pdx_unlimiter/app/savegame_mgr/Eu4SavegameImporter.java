@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import javafx.beans.property.BooleanProperty;
@@ -10,17 +11,31 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Eu4SavegameImporter {
 
+    public static void importLatestSavegame() {
+        Arrays.stream(Installation.EU4.get().getSaveDirectory().toFile().listFiles())
+                .sorted(Comparator.comparingLong(f -> f.lastModified()))
+                .findFirst().ifPresent(f -> {
+            try {
+                SavegameCache.EU4_CACHE.importSavegame(f.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
     public static void importAllSavegames(BooleanProperty running) {
         new Thread(() -> {
             Eu4SavegameImporter.importAllSavegames(Installation.EU4.get().getSaveDirectory(), (p) -> {
                 try {
-                    SavegameCache.EU4_CACHE.importSavegame(p, Eu4Savegame.fromFile(p));
+                    SavegameCache.EU4_CACHE.importSavegame(p);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -42,7 +57,7 @@ public class Eu4SavegameImporter {
         try {
             Eu4SavegameImporter.startInDirectory(directory.resolve("save games"), (p) -> {
                 try {
-                    SavegameCache.EU4_CACHE.importSavegame(p, Eu4Savegame.fromFile(p));
+                    SavegameCache.EU4_CACHE.importSavegame(p);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

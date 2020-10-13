@@ -18,7 +18,6 @@ public class Eu4Transformer {
     private static NodeTransformer createEu4Transformer() {
         List<NodeTransformer> t = new ArrayList<>();
         t.add(new RecursiveTransformer((n) -> {
-            if(n instanceof KeyValueNode) System.out.println(Node.getKeyValueNode(n).getKeyName());
             if (n instanceof KeyValueNode && Node.getKeyValueNode(n).getKeyName().endsWith("date")) {
                 Node val = Node.getKeyValueNode(n).getNode();
                 return val instanceof ValueNode &&

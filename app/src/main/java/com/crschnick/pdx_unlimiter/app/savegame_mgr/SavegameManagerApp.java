@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IntermediateSavegame;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -72,12 +72,12 @@ public class SavegameManagerApp extends Application {
 
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
-    @Override
-    public void start(Stage primaryStage) {
+    private void createLayout() {
         layout = new BorderPane();
 
         createStatusThread(layout);
 
+        layout.setTop(Eu4SavegameManagerStyle.createMenuBar(running));
         layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign, (c) -> SavegameCache.EU4_CACHE.delete(c)));
         layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
                 (e) -> {
@@ -94,6 +94,17 @@ public class SavegameManagerApp extends Application {
                 SavegameCache.EU4_CACHE.loadAsync(n.get());
             }
         });
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        try {
+            DialogHelper.startSetup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        createLayout();
 
         primaryStage.setTitle("EU4 Savegame Manager");
         Scene scene = new Scene(layout, 1000, 800);
@@ -107,8 +118,6 @@ public class SavegameManagerApp extends Application {
                 running.setValue(false);
             }
         });
-
-        Eu4SavegameImporter.importAllSavegames(running);
     }
 
     public static void main(String[] args) {

@@ -1,25 +1,15 @@
 package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
-import com.crschnick.pdx_unlimiter.app.installation.WindowsRegistry;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameManagerApp;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IntermediateSavegame;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
-import javafx.application.Application;
-import net.nikr.dds.DDSImageReaderSpi;
 
-import javax.imageio.spi.ImageReaderSpi;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ServiceLoader;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         try {
-            Installation.loadConfig();
-
             //Eu4Savegame save = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\backups\\swe1.eu4_79a6c3b2-edbc-404e-950f-c3effbc3c126.eu4"));
             //Eu4Savegame save = Eu4Savegame.fromFile(Paths.get("C:\\Users\\cschn\\Documents\\Paradox Interactive\\Europa Universalis IV\\save games\\gbr_from_gaeldrom.eu4"));
             //System.out.println(NamespaceCreator.createNamespace(save, saveN));
@@ -30,7 +20,6 @@ public class Main {
 
             //SavegameCache.EU4_CACHE.importSavegame(Paths.get("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\backups\\swe1.eu4_79a6c3b2-edbc-404e-950f-c3effbc3c126.eu4"), save);
 
-            SavegameCache.loadConfig();
             SavegameManagerApp.main(args);
 
             SavegameCache.saveConfig();
