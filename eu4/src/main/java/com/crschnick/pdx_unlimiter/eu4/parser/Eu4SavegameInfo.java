@@ -36,7 +36,7 @@ public class Eu4SavegameInfo{
 
         public static Optional<Ruler> fromCountryNode(Node n, String type) {
             Optional<Ruler> current = Optional.empty();
-            for (Node e : Node.getNodeArray(Node.getNodeForKey(Node.getNodeForKey(n, "history"), "events"))) {
+            for (Node e : Node.getNodeArray(Node.getNodeForKey(n,"events"))) {
                 if (Node.hasKey(e, type)) {
                     // Sometimes there are multiple monarchs in one event Node ... wtf?
                     Node r = Node.getNodesForKey(e, type).get(0);
@@ -53,19 +53,58 @@ public class Eu4SavegameInfo{
     public static class War {
 
         private String title;
-        private int score;
+        private boolean attacker;
+        private Set<String> allies;
         private Set<String> enemies;
+
+        public War(String title, boolean attacker, Set<String> allies, Set<String> enemies) {
+            this.title = title;
+            this.attacker = attacker;
+            this.allies = allies;
+            this.enemies = enemies;
+        }
 
         public String getTitle() {
             return title;
         }
 
-        public int getScore() {
-            return score;
-        }
-
         public Set<String> getEnemies() {
             return enemies;
+        }
+
+        public static Set<War> fromActiveWarsNode(String tag, Node n) {
+            Set<War> wars = new HashSet<>();
+            for (Node war : Node.getNodeArray(n)) {
+                String title = Node.getString(Node.getNodeForKey(war, "name"));
+                boolean isAttacker = false;
+                Set<String> attackers = new HashSet<>();
+                for (Node atk : Node.getNodeArray(Node.getNodeForKey(war, "attackers"))) {
+                    String attacker = Node.getString(atk);
+                    if (attacker.equals(tag)) {
+                        isAttacker = true;
+                    } else {
+                        attackers.add(attacker);
+                    }
+                }
+
+                boolean isDefender = false;
+                Set<String> defenders = new HashSet<>();
+                for (Node def : Node.getNodeArray(Node.getNodeForKey(war, "defenders"))) {
+                    String defender = Node.getString(def);
+                    if (defender.equals(tag)) {
+                        isDefender = true;
+                    } else {
+                        defenders.add(defender);
+                    }
+                }
+                if (isAttacker) {
+                    wars.add(new War(title, true, attackers, defenders));
+                } else if (isDefender) {
+
+                    wars.add(new War(title, false, defenders, attackers));
+                }
+            }
+            return wars;
         }
     }
 
@@ -94,8 +133,9 @@ public class Eu4SavegameInfo{
         Eu4SavegameInfo e = new Eu4SavegameInfo();
         e.date = date;
         e.currentTag = tag;
-        e.ruler = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries"), tag), "monarch").get();
-        e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries"), tag), "heir");
+        e.wars = War.fromActiveWarsNode(tag, save.getNodes().get("active_wars"));
+        e.ruler = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "monarch").get();
+        e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "heir");
         for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "dependencies"))) {
             if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {

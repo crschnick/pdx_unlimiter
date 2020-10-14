@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,6 +20,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,18 +31,43 @@ import java.util.stream.Collectors;
 
 public class SavegameCache {
 
-    public static final SavegameCache EU4_CACHE = new SavegameCache(Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames", "eu4"));
+    public static final Path ROOT_DIR = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames");
+    public static final SavegameCache EU4_CACHE = new SavegameCache(ROOT_DIR.resolve("eu4"));
+
+    public static final Set<SavegameCache> CACHES = Set.of(EU4_CACHE);
+
 
     public static final Path FILE = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames", "eu4", "campaigns.json");
-    public static final Path BACKUP_DIR = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames", "eu4", "backups");
+    public static final Path BACKUP_DIR = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "backups", "eu4");
 
-    public static void loadConfig() throws IOException {
-        if (!FILE.toFile().exists()) {
-            return;
+    public static class Status {
+        public static enum Type {
+            IMPORTING,
+            LOADING,
+            UPDATING,
+            DELETING
         }
 
+        private Type type;
+        private String path;
+
+        public Status(Type type, String path) {
+            this.type = type;
+            this.path = path;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public String getPath() {
+            return path;
+        }
+    }
+
+    public static void importDataFromConfig(InputStream in) throws IOException {
         ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(FILE));
+        JsonNode node = o.readTree(in.readAllBytes());
 
         JsonNode n = node.get("names");
         for (int i = 0; i < n.size(); i++) {
@@ -59,9 +87,7 @@ public class SavegameCache {
         }
     }
 
-    public static void saveConfig() throws IOException {
-        FILE.toFile().getParentFile().mkdirs();
-        var out = Files.newOutputStream(FILE);
+    public static void exportDataToConfig(OutputStream out) throws IOException {
         JsonFactory factory = new JsonFactory();
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -91,6 +117,8 @@ public class SavegameCache {
     private Path path;
 
     private Map<UUID,String> names = new HashMap<>();
+
+    private ObjectProperty<Optional<Status>> status = new SimpleObjectProperty<>(Optional.empty());
 
     private volatile ObservableSet<Eu4Campaign> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
 
@@ -139,7 +167,6 @@ public class SavegameCache {
                     String newTag = change.getSet().stream().min(Comparator.naturalOrder()).get().getInfo().getCurrentTag();
                     c.tagProperty().setValue(newTag);
             });
-            saveConfig();
 
             this.campaigns.add(c);
         }
@@ -159,6 +186,8 @@ public class SavegameCache {
     }
 
     public synchronized void updateSavegameData(Path p) {
+        status.setValue(Optional.of(new Status(Status.Type.UPDATING, getEntryNameForPath(p))));
+
         Path s = p.resolve("savegame.eu4");
         Eu4Savegame save = null;
         try {
@@ -178,6 +207,8 @@ public class SavegameCache {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        status.setValue(Optional.empty());
     }
 
     public synchronized void delete(Eu4Campaign.Entry e) {
@@ -186,6 +217,7 @@ public class SavegameCache {
             return;
         }
 
+        status.setValue(Optional.of(new Status(Status.Type.DELETING, getEntryNameForPath(getPath(e)))));
         c.getSavegames().remove(e);
         Path campaignPath = path.resolve(c.getCampaignId().toString());
         try {
@@ -198,6 +230,8 @@ public class SavegameCache {
         if (c.getSavegames().size() == 0) {
             delete(c);
         }
+
+        status.setValue(Optional.empty());
     }
 
     private synchronized void loadEntry(Path p) {
@@ -208,12 +242,14 @@ public class SavegameCache {
                 updateSavegameData(p);
             }
 
-            Eu4IntermediateSavegame i = Eu4IntermediateSavegame.fromFile(p, "meta", "countries", "diplomacy");
+            status.setValue(Optional.of(new Status(Status.Type.LOADING, getEntryNameForPath(p))));
+            Eu4IntermediateSavegame i = Eu4IntermediateSavegame.fromFile(p, "meta", "countries_history", "diplomacy", "active_wars");
             UUID id = UUID.fromString(p.getName(p.getNameCount() - 1).toString().split("\\.")[0]);
             this.add(UUID.fromString(p.getName(p.getNameCount() - 2).toString()), id, Eu4SavegameInfo.fromSavegame(i));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        status.setValue(Optional.empty());
     }
 
     public synchronized void loadAsync(Eu4Campaign c) {
@@ -255,6 +291,8 @@ public class SavegameCache {
     }
 
     public synchronized void importSavegame(Path file) throws IOException {
+        status.setValue(Optional.of(new Status(Status.Type.LOADING, file.toString())));
+
         Eu4Savegame save = Eu4Savegame.fromFile(file);
         Eu4IntermediateSavegame is = Eu4IntermediateSavegame.fromSavegame(save);
         UUID saveUuid = UUID.randomUUID();
@@ -271,6 +309,26 @@ public class SavegameCache {
         UUID uuid = UUID.fromString(id);
         Eu4SavegameInfo e = Eu4SavegameInfo.fromSavegame(is);
         this.add(uuid, saveUuid, e);
+
+        status.setValue(Optional.empty());
+    }
+
+    public String getEntryName(Eu4Campaign.Entry e) {
+        return getEntryNameForPath(getPath(e));
+    }
+
+    private String getEntryNameForPath(Path p) {
+        String c = names.get(UUID.fromString(p.getName(p.getNameCount() - 2).toString()));
+        String e = names.get(UUID.fromString(p.getName(p.getNameCount() - 1).toString()));
+        return c + " (" + e + ")";
+    }
+
+    public Optional<Status> getStatus() {
+        return status.get();
+    }
+
+    public ObjectProperty<Optional<Status>> statusProperty() {
+        return status;
     }
 
     public Map<UUID, String> getNames() {

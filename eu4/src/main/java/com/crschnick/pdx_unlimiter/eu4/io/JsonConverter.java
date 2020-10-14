@@ -55,6 +55,9 @@ public class JsonConverter {
             } else if (isObject) {
                 ObjectNode object = JsonNodeFactory.instance.objectNode();
                 for (Node n : a.getNodes()) {
+                    if (!(n instanceof KeyValueNode)) {
+                        int b = 0;
+                    }
                     KeyValueNode kv = (KeyValueNode) n;
                     object.set(kv.getKeyName(), toJsonObject(kv.getNode()));
                 }

@@ -3,6 +3,8 @@ package com.crschnick.pdx_unlimiter.eu4.parser;
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -69,7 +71,7 @@ public class Eu4NormalParser extends GamedataParser {
 
     @Override
     public List<GamedataParser.Token> tokenize(InputStream stream) throws IOException {
-        String s = new String(stream.readAllBytes());
+        String s = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         s += "\0";
         return tokenize(s);
     }

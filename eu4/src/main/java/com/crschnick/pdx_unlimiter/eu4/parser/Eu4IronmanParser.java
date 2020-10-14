@@ -79,11 +79,11 @@ public class Eu4IronmanParser extends GamedataParser {
 
     @Override
     public List<Token> tokenize(InputStream stream) throws IOException {
-        String s = new String(stream.readAllBytes());
+        byte[] bytes = stream.readAllBytes();
         int current = 0;
         List<Token> tokens = new ArrayList<>();
             do {
-                byte[] next = s.substring(current, current + 2).getBytes();
+                byte[] next = Arrays.copyOfRange(bytes, current, current + 2);
                 current += 2;
 
                 if (Arrays.equals(next, EQUALS)) {
@@ -92,22 +92,25 @@ public class Eu4IronmanParser extends GamedataParser {
 
                 else if (Arrays.equals(next, STRING_1) || Arrays.equals(next, STRING_2)) {
                     byte[] length = new byte[4];
-                    System.arraycopy(s.substring(current, current + 2).getBytes(), 0, length, 0,2);
+                    System.arraycopy(Arrays.copyOfRange(bytes, current, current + 2), 0, length, 0,2);
                     int lengthInt = ByteBuffer.wrap(length).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     current += 2;
 
-                    byte[] sb = s.substring(current, current + lengthInt).getBytes();
+                    byte[] sb = Arrays.copyOfRange(bytes, current, current + lengthInt);
                     current += lengthInt;
 
                     if (lengthInt > 0 && sb[lengthInt - 1] == '\n') {
                         lengthInt--;
                     }
                     String string = new String(sb, 0, lengthInt);
+                    if (string.contains("Hadim Seha")) {
+                        int b = 0;
+                    }
                     tokens.add(new ValueToken<String>(string));
                 }
 
                 else if (Arrays.equals(next, INTEGER)) {
-                    byte[] number = s.substring(current, current + 4).getBytes();
+                    byte[] number = Arrays.copyOfRange(bytes, current, current + 4);
                     current += 4;
 
                     int numberInt = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -116,7 +119,7 @@ public class Eu4IronmanParser extends GamedataParser {
 
                 else if (Arrays.equals(next, INTEGER_UNSIGNED)) {
                     byte[] number = new byte[8];
-                    System.arraycopy(s.substring(current, current + 4).getBytes(), 0, number, 0, 4);
+                    System.arraycopy(Arrays.copyOfRange(bytes, current, current + 4), 0, number, 0, 4);
                     current += 4;
 
                     long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getLong();
@@ -132,7 +135,7 @@ public class Eu4IronmanParser extends GamedataParser {
                 }
 
                 else if (Arrays.equals(next, BOOL)) {
-                    byte[] number = s.substring(current, current + 1).getBytes();
+                    byte[] number = Arrays.copyOfRange(bytes, current, current + 1);
                     current += 1;
 
                     boolean b = ByteBuffer.wrap(number).get() != 0;
@@ -140,7 +143,7 @@ public class Eu4IronmanParser extends GamedataParser {
                 }
 
                 else if (Arrays.equals(next, DOUBLE)) {
-                    byte[] number = s.substring(current, current + 8).getBytes();
+                    byte[] number = Arrays.copyOfRange(bytes, current, current + 8);
                     current += 8;
 
                     long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -149,7 +152,7 @@ public class Eu4IronmanParser extends GamedataParser {
                 }
 
                 else if (Arrays.equals(next, FLOAT)) {
-                    byte[] number = s.substring(current, current + 4).getBytes();
+                    byte[] number = Arrays.copyOfRange(bytes, current, current + 4);
                     current += 4;
 
                     int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -173,7 +176,7 @@ public class Eu4IronmanParser extends GamedataParser {
                     tokens.add(new ValueToken<String>(id));
                 }
 
-            } while (current < s.length());
+            } while (current < bytes.length);
         return tokens;
     }
 }

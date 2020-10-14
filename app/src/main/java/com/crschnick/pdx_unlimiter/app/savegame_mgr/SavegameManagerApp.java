@@ -77,7 +77,7 @@ public class SavegameManagerApp extends Application {
 
         createStatusThread(layout);
 
-        layout.setTop(Eu4SavegameManagerStyle.createMenuBar(running));
+        layout.setTop(Eu4SavegameManagerStyle.createMenu());
         layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign, (c) -> SavegameCache.EU4_CACHE.delete(c)));
         layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
                 (e) -> {

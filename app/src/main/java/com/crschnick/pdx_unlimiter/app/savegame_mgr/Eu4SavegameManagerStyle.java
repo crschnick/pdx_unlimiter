@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
@@ -19,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -401,7 +403,7 @@ public class Eu4SavegameManagerStyle {
         return pane;
     }
 
-    public static MenuBar createMenuBar(BooleanProperty running) {
+    private static MenuBar createMenuBar() {
         Menu menu = new Menu("File");
 
         MenuItem menuItem0 = new MenuItem("Import savegames...");
@@ -411,6 +413,16 @@ public class Eu4SavegameManagerStyle {
         });
 
         MenuItem menuItem2 = new MenuItem("Export Pdxu archive...");
+        menuItem2.setOnAction((a) -> {
+            Optional<Path> path = DialogHelper.showExportArchiveDialog();
+            if (path.isPresent()) {
+                try {
+                    ArchiveHelper.exportSavegameCache(path.get());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         menu.getItems().add(menuItem0);
         menu.getItems().add(menuItem1);
@@ -435,7 +447,7 @@ public class Eu4SavegameManagerStyle {
         MenuItem i = new MenuItem("Import all savegames...");
         i.setOnAction((a) -> {
             if (DialogHelper.showImportSavegamesDialog()) {
-                Eu4SavegameImporter.importAllSavegames(running);
+                Eu4SavegameImporter.importAllSavegames(new SimpleBooleanProperty(false));
             }
         });
         savegames.getItems().add(i);
@@ -449,9 +461,51 @@ public class Eu4SavegameManagerStyle {
         savegames.getItems().add(u);
 
         MenuBar menuBar = new MenuBar();
+        menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(menu);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
         return menuBar;
+    }
+
+    private static Node createStatusIndicator() {
+        MenuBar rightBar = new MenuBar();
+        Menu m = new Menu("Idle");
+        rightBar.getMenus().addAll(m);
+        rightBar.setDisable(true);
+        SavegameCache.EU4_CACHE.statusProperty().addListener((ch,o,n) -> {
+            Platform.runLater(() -> {
+                if (!n.isPresent()) {
+                    m.setText("Idle");
+                    return;
+                }
+
+                SavegameCache.Status s = n.get();
+                if (s.getType() == SavegameCache.Status.Type.UPDATING) {
+                    m.setText("Updating campaign entry " + s.getPath());
+                }
+                if (s.getType() == SavegameCache.Status.Type.LOADING) {
+                    m.setText("Loading campaign entry " + s.getPath());
+                }
+                if (s.getType() == SavegameCache.Status.Type.IMPORTING) {
+                    m.setText("Importing savegame " + s.getPath());
+                }
+                if (s.getType() == SavegameCache.Status.Type.DELETING) {
+                    m.setText("Deleting campaign entry " + s.getPath());
+                }
+            });
+        });
+        return rightBar;
+    }
+
+    public static Node createMenu() {
+        MenuBar leftBar = createMenuBar();
+
+        Region spacer = new Region();
+        spacer.getStyleClass().add("menu-bar");
+        HBox.setHgrow(spacer, Priority.SOMETIMES);
+
+        HBox menubars = new HBox(leftBar, spacer, createStatusIndicator());
+        return menubars;
     }
 }
