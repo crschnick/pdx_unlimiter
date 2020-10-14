@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameManagerApp;
 
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class Main {
 
@@ -22,7 +23,7 @@ public class Main {
 
             SavegameManagerApp.main(args);
 
-            SavegameCache.saveConfig();
+            SavegameCache.exportDataToConfig(Files.newOutputStream(SavegameCache.FILE));
             Installation.saveConfig();
         } catch (Exception e) {
             e.printStackTrace();

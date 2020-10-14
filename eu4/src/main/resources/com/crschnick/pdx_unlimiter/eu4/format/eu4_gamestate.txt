@@ -328,7 +328,6 @@
 10461=alliance
 10463=royal_marriage
 10522=combat
-10488=previous_war
 11750=war_goal
 10480=add_attacker
 10482=add_defender
@@ -370,8 +369,11 @@
 10867=friend
 11474=independence
 14050=recalc_defection
-10487=ongoing_war
 
 12252=previous_country_tags
 11453=decision
 11551=changed_tag_from
+10485=attackers
+10486=defenders
+10487=active_war
+10488=previous_war

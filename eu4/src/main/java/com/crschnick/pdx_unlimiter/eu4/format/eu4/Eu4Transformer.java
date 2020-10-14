@@ -27,8 +27,8 @@ public class Eu4Transformer {
             }
         }, new DateTransformer()));
 
-        t.add(new CollectNodesTransformer("ongoing_war", "ongoing_wars"));
-        t.add(new CollectNodesTransformer("previous_war", "ended_wars"));
+        t.add(new CollectNodesTransformer("active_war", "active_wars"));
+        t.add(new CollectNodesTransformer("previous_war", "previous_wars"));
         t.add(new CollectNodesTransformer("rebel_faction", "rebel_factions"));
         t.add(new CollectNodesTransformer("trade_league", "trade_leagues"));
         t.add(new RenameKeyTransformer("trade", "trade_nodes"));

@@ -16,8 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
 public class DialogHelper {
@@ -67,9 +69,8 @@ public class DialogHelper {
             }
         });
         textArea.textProperty().addListener((change, o, n) -> {
-            Installation.EU4 = Optional.of(new Eu4Installation(Paths.get(textArea.getText())));
-            if (!Installation.EU4.get().isValid()) {
-                Installation.EU4 = Optional.empty();
+            Eu4Installation i = new Eu4Installation(Paths.get(textArea.getText()));
+            if (!i.isValid()) {
                 textArea.setStyle("-fx-border-color: #aa7777; -fx-border-width: 3px;");
             } else {
                 textArea.setStyle("-fx-border-color: #77aa77; -fx-border-width: 3px;");
@@ -79,7 +80,9 @@ public class DialogHelper {
 
         dialogPaneContent.getChildren().addAll(label, textArea, b);
         alert.getDialogPane().setContent(dialogPaneContent);
-        alert.showAndWait();
+        if (alert.showAndWait().get().getButtonData().isDefaultButton()) {
+            Installation.EU4 = Optional.of(new Eu4Installation(Paths.get(textArea.getText())));
+        }
 
         try {
             Installation.saveConfig();
@@ -115,7 +118,7 @@ public class DialogHelper {
         return result.get().getButtonData().isDefaultButton() ? Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
 
-    public static boolean showExportArchiveDialog() {
+    public static Optional<Path> showExportArchiveDialog() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText("Export all savegames to archive");
         alert.setContentText("Do you want to export all savegames to a pdxu savegame archive? This may take a while.");
@@ -127,9 +130,10 @@ public class DialogHelper {
         textArea.setMinWidth(500);
         Button b = new Button("\uD83D\uDCBE");
         b.setOnMouseClicked((m) -> {
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Select export directory");
-            File file = fileChooser.showDialog(((Node)m.getTarget()).getScene().getWindow());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select export location");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
+            File file = fileChooser.showSaveDialog(((Node)m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
                 textArea.setText(file.toString());
             }
@@ -138,7 +142,7 @@ public class DialogHelper {
         dialogPaneContent.getChildren().addAll(label, textArea, b);
         alert.getDialogPane().setContent(dialogPaneContent);
         Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton();
+        return result.get().getButtonData().isDefaultButton() ? Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
 
     public static boolean showImportSavegamesDialog() {
@@ -189,7 +193,7 @@ public class DialogHelper {
     public static boolean startSetup() {
         try {
             Installation.loadConfig();
-            SavegameCache.loadConfig();
+            SavegameCache.importDataFromConfig(Files.newInputStream(SavegameCache.FILE));
         } catch (Exception e) {
             showException(e);
             return false;
