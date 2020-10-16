@@ -38,7 +38,7 @@ addDependenciesModuleInfo {
     }
 }
 compileJava {
-    options.compilerArgs << '-Xlint:unchecked'
+    options.compilerArgs << '-Xlint:all'
 }
 
 java {

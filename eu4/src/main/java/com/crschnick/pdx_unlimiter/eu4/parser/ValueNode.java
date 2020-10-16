@@ -1,10 +1,10 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
-public class ValueNode<T> extends Node {
+public class ValueNode extends Node {
 
-    private T value;
+    private Object value;
 
-    public ValueNode(T value) {
+    public ValueNode(Object value) {
         this.value = value;
     }
 
@@ -12,7 +12,7 @@ public class ValueNode<T> extends Node {
         return getValue().toString();
     }
 
-    public T getValue() {
+    public Object getValue() {
         return value;
     }
 }

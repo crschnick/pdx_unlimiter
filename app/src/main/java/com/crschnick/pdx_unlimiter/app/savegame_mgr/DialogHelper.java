@@ -24,10 +24,10 @@ import java.util.Optional;
 
 public class DialogHelper {
 
-    public static void showException(Exception e) {
+    public static void showException(Exception e, boolean wait) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error alert");
-        alert.setHeaderText(e.getMessage());
+        alert.setHeaderText("An exception occured");
 
         VBox dialogPaneContent = new VBox();
 
@@ -39,12 +39,16 @@ public class DialogHelper {
         String stackTrace = sw.toString();
         TextArea textArea = new TextArea();
         textArea.setText(stackTrace);
+        textArea.editableProperty().setValue(false);
+        textArea.setMinWidth(1000);
+        textArea.setMinHeight(800);
 
         dialogPaneContent.getChildren().addAll(label, textArea);
 
         alert.getDialogPane().setContent(dialogPaneContent);
 
-        alert.showAndWait();
+        if (wait) alert.showAndWait();
+        else alert.show();
     }
 
     public static void showSettings() {
@@ -80,14 +84,15 @@ public class DialogHelper {
 
         dialogPaneContent.getChildren().addAll(label, textArea, b);
         alert.getDialogPane().setContent(dialogPaneContent);
-        if (alert.showAndWait().get().getButtonData().isDefaultButton()) {
+        Optional<ButtonType> r = alert.showAndWait();
+        if (r.isPresent() && r.get().getButtonData().isDefaultButton()) {
             Installation.EU4 = Optional.of(new Eu4Installation(Paths.get(textArea.getText())));
-        }
-
-        try {
-            Installation.saveConfig();
-        } catch (IOException e) {
-            showException(e);
+            try {
+                Installation.initInstallations();
+                Installation.saveConfig();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e, false);
+            }
         }
     }
 
@@ -118,13 +123,17 @@ public class DialogHelper {
         return result.get().getButtonData().isDefaultButton() ? Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
 
-    public static Optional<Path> showExportArchiveDialog() {
+    public static Optional<Path> showExportDialog(boolean archive) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setHeaderText("Export all savegames to archive");
-        alert.setContentText("Do you want to export all savegames to a pdxu savegame archive? This may take a while.");
+        if (archive) {
+            alert.setHeaderText("Export all savegames to archive");
+            alert.setContentText("Do you want to export all savegames to a pdxu savegame archive? This may take a while.");
+        } else {
+
+        }
 
         HBox dialogPaneContent = new HBox();
-        Label label = new Label("Archive directory: ");
+        Label label = new Label("Export to file: ");
         label.setAlignment(Pos.BOTTOM_CENTER);
         TextField textArea = new TextField();
         textArea.setMinWidth(500);
@@ -134,7 +143,7 @@ public class DialogHelper {
             fileChooser.setTitle("Select export location");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
             File file = fileChooser.showSaveDialog(((Node)m.getTarget()).getScene().getWindow());
-            if (file != null && file.exists()) {
+            if (file != null) {
                 textArea.setText(file.toString());
             }
         });
@@ -188,19 +197,5 @@ public class DialogHelper {
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton();
 
-    }
-
-    public static boolean startSetup() {
-        try {
-            Installation.loadConfig();
-            SavegameCache.importDataFromConfig(Files.newInputStream(SavegameCache.FILE));
-        } catch (Exception e) {
-            showException(e);
-            return false;
-        }
-        if (!Installation.isConfigured()) {
-            showSettings();
-        }
-        return true;
     }
 }

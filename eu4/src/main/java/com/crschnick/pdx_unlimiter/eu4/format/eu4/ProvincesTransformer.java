@@ -25,7 +25,7 @@ public class ProvincesTransformer extends NodeTransformer {
             m.find();
             String idString = m.group(1);
             long id = Long.parseLong(idString);
-            Node.addNodeToArray(kv.getNode(), KeyValueNode.create("province_id", new ValueNode<>(id)));
+            Node.addNodeToArray(kv.getNode(), KeyValueNode.create("province_id", new ValueNode(id)));
             ar.getNodes().set(i, kv.getNode());
             events.transform(kv.getNode());
         }
@@ -34,7 +34,7 @@ public class ProvincesTransformer extends NodeTransformer {
     @Override
     public void reverse(Node node) {
         for (Node sub : Node.copyOfArrayNode(Node.getNodeForKey(node, "provinces"))) {
-            ValueNode<Long> provinceId = (ValueNode<Long>) Node.getNodeForKey(sub, ID);
+            ValueNode provinceId = (ValueNode) Node.getNodeForKey(sub, ID);
             Node.removeNodeFromArray(sub, provinceId);
             Node.removeNodeFromArray(node, sub);
             Node.addNodeToArray(node, KeyValueNode.create("-" + String.valueOf(provinceId.getValue()), sub));

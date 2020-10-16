@@ -1,6 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.TransformException;
 import com.crschnick.pdx_unlimiter.eu4.parser.*;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -17,35 +20,52 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class SavegameCache {
 
     public static final Path ROOT_DIR = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames");
-    public static final SavegameCache EU4_CACHE = new SavegameCache(ROOT_DIR.resolve("eu4"));
+    public static final SavegameCache EU4_CACHE = new SavegameCache("eu4");
 
     public static final Set<SavegameCache> CACHES = Set.of(EU4_CACHE);
 
+    public static void loadData() throws IOException {
+        for (SavegameCache cache : CACHES) {
+            if (cache.getDataFilePath().toFile().exists()) {
+                InputStream in = Files.newInputStream(cache.getDataFilePath());
+                cache.importDataFromConfig(in);
+                in.close();
+            }
+        }
+    }
 
-    public static final Path FILE = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames", "eu4", "campaigns.json");
-    public static final Path BACKUP_DIR = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "backups", "eu4");
+    public static void saveData() throws IOException {
+        for (SavegameCache cache : CACHES) {
+            OutputStream out = Files.newOutputStream(cache.getDataFilePath());
+            cache.exportDataToConfig(out);
+            out.close();
+        }
+    }
 
     public static class Status {
         public static enum Type {
             IMPORTING,
             LOADING,
             UPDATING,
-            DELETING
+            DELETING,
+            IMPORTING_ARCHIVE,
+            EXPORTING_ARCHIVE
         }
 
         private Type type;
@@ -65,29 +85,75 @@ public class SavegameCache {
         }
     }
 
-    public static void importDataFromConfig(InputStream in) throws IOException {
+    private String name;
+
+    private Path path;
+
+    private ObjectProperty<Optional<Status>> status = new SimpleObjectProperty<>(Optional.empty());
+
+    private volatile ObservableSet<Eu4Campaign> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
+
+    public SavegameCache(String name) {
+        this.name = name;
+        this.path = ROOT_DIR.resolve(name);
+        addChangeListeners();
+    }
+
+    private void addChangeListeners() {
+        this.campaigns.addListener((SetChangeListener<? super Eu4Campaign>) cc -> {
+            if (cc.wasRemoved()) {
+                return;
+            }
+
+            Eu4Campaign c = cc.getElementAdded();
+            c.getSavegames().addListener((SetChangeListener<? super Eu4Campaign.Entry>) (change) -> {
+                boolean isNewEntry = change.wasAdded() && change.getElementAdded().getInfo().isPresent();
+                boolean wasRemoved = change.wasRemoved();
+                if (isNewEntry || wasRemoved) updateCampaignProperties(c);
+            });
+        });
+    }
+
+    private void updateCampaignProperties(Eu4Campaign c) {
+        c.getSavegames().stream()
+                .filter(s -> s.getInfo().isPresent())
+                .map(s -> s.getInfo().get().getDate()).min(Comparator.naturalOrder())
+                .ifPresent(d -> c.dateProperty().setValue(d));
+
+        c.getSavegames().stream()
+                .filter(s -> s.getInfo().isPresent())
+                .min(Comparator.comparingLong(ca -> GameDate.toLong(c.getDate())))
+                .ifPresent(e -> e.getInfo().ifPresent(i -> c.tagProperty().setValue(i.getCurrentTag().getTag())));
+    }
+
+    public void importDataFromConfig(InputStream in) throws IOException {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(in.readAllBytes());
 
+        Map<UUID,String> names = new HashMap<>();
         JsonNode n = node.get("names");
         for (int i = 0; i < n.size(); i++) {
             String name = n.get(i).get("name").textValue();
             String id = n.get(i).get("uuid").textValue();
-            EU4_CACHE.addCustomName(UUID.fromString(id), name);
+            names.put(UUID.fromString(id), name);
         }
 
         JsonNode c = node.get("campaigns");
         for (int i = 0; i < c.size(); i++) {
             String id = c.get(i).get("uuid").textValue();
             String tag = c.get(i).get("tag").textValue();
-            String name = EU4_CACHE.getNames().getOrDefault(UUID.fromString(id), Installation.EU4.get().getCountryName(tag));
+            String name = names.get(UUID.fromString(id));
             String lastDate = c.get(i).get("date").textValue();
             String lastPlayed = c.get(i).get("lastPlayed").textValue();
-            EU4_CACHE.addFromConfig(tag, name, id, GameDate.fromString(lastDate), Timestamp.valueOf(lastPlayed));
+            Eu4Campaign campaign = addFromConfig(tag, name, id, GameDate.fromString(lastDate), Timestamp.valueOf(lastPlayed));
+            for (File entry : getPath().resolve(id).toFile().listFiles()) {
+                UUID eId = UUID.fromString(entry.getName());
+                campaign.add(new Eu4Campaign.Entry(new SimpleStringProperty(names.get(eId)), eId, campaign));
+            }
         }
     }
 
-    public static void exportDataToConfig(OutputStream out) throws IOException {
+    public void exportDataToConfig(OutputStream out) throws IOException {
         JsonFactory factory = new JsonFactory();
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -106,36 +172,120 @@ public class SavegameCache {
 
 
         ArrayNode names = mapper.createArrayNode();
-        for (var e : EU4_CACHE.getNames().entrySet()) {
-            names.add(mapper.createObjectNode().put("uuid", e.getKey().toString()).put("name", e.getValue()));
+        for (Eu4Campaign campaign : campaigns) {
+            names.add(mapper.createObjectNode().put("uuid", campaign.getCampaignId().toString()).put("name", campaign.getName()));
+            for (Eu4Campaign.Entry entry : campaign.getSavegames()) {
+                names.add(mapper.createObjectNode().put("uuid", entry.getUuid().toString()).put("name", entry.getName()));
+            }
         }
         n.set("names", names);
         mapper.writeTree(generator, n);
         out.close();
     }
 
-    private Path path;
-
-    private Map<UUID,String> names = new HashMap<>();
-
-    private ObjectProperty<Optional<Status>> status = new SimpleObjectProperty<>(Optional.empty());
-
-    private volatile ObservableSet<Eu4Campaign> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
-
-    public SavegameCache(Path path) {
-        this.path = path;
-    }
-
-    public void addCustomName(UUID id, String name) {
-        names.put(id, name);
-    }
-
-    public synchronized void addFromConfig(String tag, String name, String uuid, GameDate date, Timestamp lastPlayed) {
+    private synchronized Eu4Campaign addFromConfig(String tag, String name, String uuid, GameDate date, Timestamp lastPlayed) {
         Eu4Campaign c = new Eu4Campaign(new SimpleObjectProperty<>(lastPlayed), new SimpleStringProperty(tag), new SimpleStringProperty(name),
                 new SimpleObjectProperty<>(date), UUID.fromString(uuid));
-        c.nameProperty().addListener((x, o, n) -> names.put(c.getCampaignId(), n));
         this.campaigns.add(c);
+        return c;
     }
+
+
+
+    public static void importSavegameCache(Path in) throws IOException {
+        ZipFile zipFile = new ZipFile(in.toFile());
+        for (SavegameCache cache : SavegameCache.CACHES) {
+            cache.importSavegameCache(zipFile);
+        }
+        zipFile.close();
+    }
+
+    public static void exportSavegameCache(Path out) throws IOException {
+        ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+        for (SavegameCache cache : SavegameCache.CACHES) {
+            cache.exportSavegameCache(zipFile);
+        }
+        zipFile.close();
+    }
+
+    public static void exportSavegameDirectory(Path out) throws IOException {
+        ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+        for (SavegameCache cache : SavegameCache.CACHES) {
+            cache.exportSavegameDirectory(zipFile);
+        }
+        zipFile.close();
+    }
+
+    public void importSavegameCache(ZipFile zipFile) throws IOException {
+        statusProperty().setValue(Optional.of(new Status(Status.Type.IMPORTING_ARCHIVE, zipFile.toString())));
+        String config = SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString();
+        ZipEntry e = zipFile.getEntry(config);
+        importDataFromConfig(zipFile.getInputStream(e));
+
+        zipFile.stream().filter(en -> !en.getName().equals(config)).forEach(en -> {
+            try {
+                Path p = SavegameCache.ROOT_DIR.resolve(Paths.get(en.getName()));
+                if (p.toFile().exists()) {
+                    return;
+                }
+                FileUtils.copyToFile(zipFile.getInputStream(en), p.toFile());
+            } catch (IOException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            }
+        });
+        statusProperty().setValue(Optional.empty());
+    }
+
+    private void exportSavegameDirectory(ZipOutputStream out) throws IOException {
+        Set<String> names = new HashSet<>();
+        for (Eu4Campaign c : getCampaigns()) {
+            for (Eu4Campaign.Entry e : c.getSavegames()) {
+                statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, getEntryName(e))));
+                String name = getEntryName(e);
+                if (names.contains(name)) {
+                    name += "_" + UUID.randomUUID().toString();
+                }
+                names.add(name);
+                compressFileToZipfile(
+                        getPath(e).resolve("savegame.eu4").toFile(),
+                        SavegameCache.ROOT_DIR.relativize(getPath()).resolve(name + ".eu4").toString(),
+                        out);
+            }
+        }
+        statusProperty().setValue(Optional.empty());
+    }
+
+    private void exportSavegameCache(ZipOutputStream out) throws IOException {
+            ZipEntry entry = new ZipEntry(SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString());
+            out.putNextEntry(entry);
+            exportDataToConfig(out);
+            for (Eu4Campaign c : getCampaigns()) {
+                for (Eu4Campaign.Entry e : c.getSavegames()) {
+                    statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, getEntryName(e))));
+                    Path file = getPath(e).resolve("savegame.eu4");
+                    String name = SavegameCache.ROOT_DIR.relativize(file).toString();
+                    compressFileToZipfile(file.toFile(), name, out);
+                }
+            }
+        statusProperty().setValue(Optional.empty());
+    }
+
+    private void compressFileToZipfile(File file, String name, ZipOutputStream out) throws IOException {
+        ZipEntry entry = new ZipEntry(name);
+        out.putNextEntry(entry);
+
+        FileInputStream in = new FileInputStream(file);
+        IOUtils.copy(in, out);
+        in.close();
+    }
+
+
+
+
+
+
+
+
 
     public synchronized void delete(Eu4Campaign c) {
         if (!this.campaigns.contains(c)) {
@@ -148,64 +298,72 @@ public class SavegameCache {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.names.remove(c.getCampaignId());
         this.campaigns.remove(c);
     }
 
-    public synchronized void add(UUID campainUuid, UUID entryUuid, Eu4SavegameInfo i) throws IOException {
+    public synchronized void addNewEntry(UUID campainUuid, UUID entryUuid, Eu4SavegameInfo i) {
         if (!this.getCampaign(campainUuid).isPresent()) {
             Eu4Campaign c = new Eu4Campaign(new SimpleObjectProperty<>(new Timestamp(System.currentTimeMillis())),
-                    new SimpleStringProperty(i.getCurrentTag()),
+                    new SimpleStringProperty(i.getCurrentTag().getTag()),
                     new SimpleStringProperty(Installation.EU4.get().getCountryName(i.getCurrentTag())),
                     new SimpleObjectProperty<>(i.getDate()), campainUuid);
-            c.nameProperty().addListener((x, o, n) -> names.put(c.getCampaignId(), n));
-            c.getSavegames().addListener((SetChangeListener<? super Eu4Campaign.Entry>) (change) -> {
-
-                    GameDate newValue = change.getSet().stream().map(s -> s.getInfo().getDate()).min(Comparator.naturalOrder()).get();
-                    c.dateProperty().setValue(newValue);
-
-                    String newTag = change.getSet().stream().min(Comparator.naturalOrder()).get().getInfo().getCurrentTag();
-                    c.tagProperty().setValue(newTag);
-            });
-
             this.campaigns.add(c);
         }
 
         Eu4Campaign c = this.getCampaign(campainUuid).get();
         Eu4Campaign.Entry e = new Eu4Campaign.Entry(new SimpleStringProperty(i.getDate().toDisplayString()), entryUuid, c, i);
-        e.nameProperty().addListener((ch, o, n) -> names.put(e.getUuid(), n));
         c.add(e);
     }
 
     public synchronized void updateAllData() {
         for (Eu4Campaign c : campaigns) {
-            for (File f : getPath().resolve(c.getCampaignId().toString()).toFile().listFiles()) {
-                updateSavegameData(f.toPath());
+            for (Eu4Campaign.Entry e : c.getSavegames()) {
+                updateSavegameData(e);
             }
         }
     }
 
-    public synchronized void updateSavegameData(Path p) {
-        status.setValue(Optional.of(new Status(Status.Type.UPDATING, getEntryNameForPath(p))));
+    public synchronized void updateSavegameData(Eu4Campaign.Entry e) {
+        status.setValue(Optional.of(new Status(Status.Type.UPDATING, getEntryName(e))));
 
+        Path p = getPath(e);
         Path s = p.resolve("savegame.eu4");
         Eu4Savegame save = null;
         try {
             save = Eu4Savegame.fromFile(s);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex, false);
+            status.setValue(Optional.empty());
+            return;
         }
-        Eu4IntermediateSavegame is = Eu4IntermediateSavegame.fromSavegame(save);
+
+        Eu4IntermediateSavegame is = null;
+        try {
+            is = Eu4IntermediateSavegame.fromSavegame(save);
+        } catch (TransformException ex) {
+            ErrorHandler.handleException(ex, false);
+            status.setValue(Optional.empty());
+            return;
+        }
 
         for (File f : p.toFile().listFiles((f) -> !f.toPath().equals(s))) {
-            f.delete();
+            if (!f.delete()) {
+                try {
+                    throw new IOException("Couldn't delete file " + f.toString());
+                } catch (IOException ioException) {
+                    ErrorHandler.handleException(ioException, false);
+                    status.setValue(Optional.empty());
+                    return;
+                }
+            }
         }
 
         try {
-            is.write(p, false);
-            Files.write(p.resolve("version"), String.valueOf(Eu4IntermediateSavegame.VERSION).getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
+            is.write(p.resolve("data.zip"), true);
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex, false);
+            status.setValue(Optional.empty());
+            return;
         }
 
         status.setValue(Optional.empty());
@@ -217,16 +375,16 @@ public class SavegameCache {
             return;
         }
 
-        status.setValue(Optional.of(new Status(Status.Type.DELETING, getEntryNameForPath(getPath(e)))));
-        c.getSavegames().remove(e);
+        status.setValue(Optional.of(new Status(Status.Type.DELETING, getEntryName(e))));
+
         Path campaignPath = path.resolve(c.getCampaignId().toString());
         try {
             FileUtils.deleteDirectory(campaignPath.resolve(e.getUuid().toString()).toFile());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ErrorHandler.handleException(ex, false);
         }
-        this.names.remove(e.getUuid());
 
+        c.getSavegames().remove(e);
         if (c.getSavegames().size() == 0) {
             delete(c);
         }
@@ -234,21 +392,35 @@ public class SavegameCache {
         status.setValue(Optional.empty());
     }
 
-    private synchronized void loadEntry(Path p) {
+    private synchronized void loadEntry(Eu4Campaign.Entry e) {
+        Path p = getPath(e);
+        int v = 0;
         try {
-            int v = p.resolve("version").toFile().exists() ?
-                    Integer.parseInt(new String(Files.readAllBytes(p.resolve("version")))) : 0;
-            if (v < Eu4IntermediateSavegame.VERSION) {
-                updateSavegameData(p);
-            }
-
-            status.setValue(Optional.of(new Status(Status.Type.LOADING, getEntryNameForPath(p))));
-            Eu4IntermediateSavegame i = Eu4IntermediateSavegame.fromFile(p, "meta", "countries_history", "diplomacy", "active_wars");
-            UUID id = UUID.fromString(p.getName(p.getNameCount() - 1).toString().split("\\.")[0]);
-            this.add(UUID.fromString(p.getName(p.getNameCount() - 2).toString()), id, Eu4SavegameInfo.fromSavegame(i));
-        } catch (IOException e) {
-            e.printStackTrace();
+            v = Eu4IntermediateSavegame.fromFile(p.resolve("data.zip")).getVersion();
+        } catch (IOException ioException) {
+            ErrorHandler.handleException(ioException, false);
+            return;
         }
+
+        if (v < Eu4IntermediateSavegame.VERSION) {
+            updateSavegameData(e);
+        }
+
+        status.setValue(Optional.of(new Status(Status.Type.LOADING, getEntryName(e))));
+        Eu4IntermediateSavegame i = null;
+        try {
+            i = Eu4IntermediateSavegame.fromFile(
+                    p.resolve("data.zip"),
+                    "countries","meta", "countries_history", "diplomacy", "active_wars");
+        } catch (IOException ioException) {
+            ErrorHandler.handleException(ioException, false);
+            status.setValue(Optional.empty());
+            return;
+        }
+
+        Eu4SavegameInfo info = Eu4SavegameInfo.fromSavegame(i);
+        e.infoProperty().setValue(Optional.of(info));
+
         status.setValue(Optional.empty());
     }
 
@@ -263,14 +435,8 @@ public class SavegameCache {
                 .collect(Collectors.toList());
 
         new Thread(() -> {
-            for (File f : files) {
-                loadEntry(f.toPath());
-
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            for (Eu4Campaign.Entry e : c.getSavegames()) {
+                loadEntry(e);
             }
             c.isLoadedProperty().setValue(true);
         }).start();
@@ -290,37 +456,48 @@ public class SavegameCache {
         return Optional.empty();
     }
 
-    public synchronized void importSavegame(Path file) throws IOException {
+    public synchronized void importSavegame(Path file) {
         status.setValue(Optional.of(new Status(Status.Type.LOADING, file.toString())));
 
-        Eu4Savegame save = Eu4Savegame.fromFile(file);
-        Eu4IntermediateSavegame is = Eu4IntermediateSavegame.fromSavegame(save);
+        Eu4IntermediateSavegame is = null;
+        try {
+            Eu4Savegame save = Eu4Savegame.fromFile(file);
+            is = Eu4IntermediateSavegame.fromSavegame(save);
+        } catch (Exception e) {
+            ErrorHandler.handleException(e, false);
+            status.setValue(Optional.empty());
+            return;
+        }
+
         UUID saveUuid = UUID.randomUUID();
         String id = Node.getString(Node.getNodeForKey(is.getNodes().get("meta"), "campaign_id"));
         Path campaignPath = path.resolve(id);
-        campaignPath.toFile().mkdirs();
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
-        is.write(entryPath, false);
-        FileUtils.copyFile(file.toFile(), BACKUP_DIR.resolve(file.getFileName() + "_" + saveUuid.toString() + ".eu4").toFile());
-        FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
-        Files.write(entryPath.resolve("version"), String.valueOf(Eu4IntermediateSavegame.VERSION).getBytes());
+        try {
+            if (!entryPath.toFile().mkdirs()) {
+                throw new IOException("Couldn't create savegame directory");
+            }
+            is.write(entryPath.resolve("data.zip"), true);
+            FileUtils.copyFile(file.toFile(), getBackupDir().resolve(file.getFileName() + "_" + saveUuid.toString() + ".eu4").toFile());
+            FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+            status.setValue(Optional.empty());
+            return;
+        }
 
         UUID uuid = UUID.fromString(id);
         Eu4SavegameInfo e = Eu4SavegameInfo.fromSavegame(is);
-        this.add(uuid, saveUuid, e);
+        this.addNewEntry(uuid, saveUuid, e);
 
         status.setValue(Optional.empty());
     }
 
     public String getEntryName(Eu4Campaign.Entry e) {
-        return getEntryNameForPath(getPath(e));
-    }
-
-    private String getEntryNameForPath(Path p) {
-        String c = names.get(UUID.fromString(p.getName(p.getNameCount() - 2).toString()));
-        String e = names.get(UUID.fromString(p.getName(p.getNameCount() - 1).toString()));
-        return c + " (" + e + ")";
+        String cn = e.getCampaign().getName();
+        String en = e.getName();
+        return cn + " (" + en + ")";
     }
 
     public Optional<Status> getStatus() {
@@ -331,12 +508,16 @@ public class SavegameCache {
         return status;
     }
 
-    public Map<UUID, String> getNames() {
-        return names;
-    }
-
     public Path getPath() {
         return path;
+    }
+
+    public Path getDataFilePath() {
+        return getPath().resolve("campaign.json");
+    }
+
+    public Path getBackupDir() {
+        return ROOT_DIR.resolve("backups");
     }
 
     public ObservableSet<Eu4Campaign> getCampaigns() {

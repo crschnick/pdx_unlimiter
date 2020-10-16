@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IntermediateSavegame;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
@@ -22,6 +21,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SavegameManagerApp extends Application {
+
+    private static SavegameManagerApp APP;
+
+    public static SavegameManagerApp getAPP() {
+        return APP;
+    }
 
     private void createStatusThread(BorderPane layout) {
         Consumer<Eu4Campaign.Entry> launch = (e) -> {
@@ -52,7 +57,7 @@ public class SavegameManagerApp extends Application {
                         Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedCampaign, selectedSave, launch)));
                     }
                     oldApp = app;
-                 }
+                }
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -78,7 +83,20 @@ public class SavegameManagerApp extends Application {
         createStatusThread(layout);
 
         layout.setTop(Eu4SavegameManagerStyle.createMenu());
-        layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign, (c) -> SavegameCache.EU4_CACHE.delete(c)));
+        layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign,
+                (c) -> {
+                    if (selectedCampaign.get().isPresent() && selectedCampaign.get().get().equals(c)) {
+                        selectedCampaign.set(Optional.empty());
+
+                        if (selectedSave.get().isPresent()&&
+                                selectedCampaign.get().get().getSavegames().contains(selectedSave.get().get())) {
+                            selectedSave.set(Optional.empty());
+                        }
+                    }
+
+
+                    SavegameCache.EU4_CACHE.delete(c);
+                }));
         layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
                 (e) -> {
                     try {
@@ -87,22 +105,55 @@ public class SavegameManagerApp extends Application {
                         ioException.printStackTrace();
                     }
                 },
-                (e) -> SavegameCache.EU4_CACHE.delete(e)));
+                (e) -> {
+                    if (selectedSave.get().isPresent() && selectedSave.get().get().equals(e)) {
+                        selectedSave.set(Optional.empty());
+                    }
+                    SavegameCache.EU4_CACHE.delete(e);
+                }));
 
-        selectedCampaign.addListener((c,o,n) -> {
+        selectedCampaign.addListener((c, o, n) -> {
             if (n.isPresent()) {
                 SavegameCache.EU4_CACHE.loadAsync(n.get());
             }
         });
     }
 
+    public void save() {
+        try {
+            SavegameCache.saveData();
+            Installation.saveConfig();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+        }
+    }
+
+    private void startSetup() {
+        try {
+            Installation.loadConfig();
+            SavegameCache.loadData();
+        } catch (Exception e) {
+            ErrorHandler.handleException(e, true);
+        }
+
+        if (!Installation.isConfigured()) {
+            DialogHelper.showSettings();
+        }
+    }
+
+    public void close(boolean save) {
+        if (save) {
+            save();
+        }
+        running.setValue(false);
+        Platform.exit();
+    }
+
     @Override
     public void start(Stage primaryStage) {
-        try {
-            DialogHelper.startSetup();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        APP = this;
+
+        startSetup();
 
         createLayout();
 
@@ -111,16 +162,23 @@ public class SavegameManagerApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         setUserAgentStylesheet(STYLESHEET_CASPIAN);
-
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                running.setValue(false);
+                close(true);
             }
         });
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public boolean isRunning() {
+        return running.get();
+    }
+
+    public BooleanProperty runningProperty() {
+        return running;
     }
 }

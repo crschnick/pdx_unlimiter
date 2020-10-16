@@ -8,10 +8,6 @@ public class KeyValueNode extends Node {
         return new KeyValueNode(keyName, node);
     }
 
-    public static KeyValueNode createWithNamespace(String keyName, Node node, Namespace ns) {
-        return new KeyValueNode(ns.getKeyName(keyName), node);
-    }
-
     private String keyName;
 
     private Node node;

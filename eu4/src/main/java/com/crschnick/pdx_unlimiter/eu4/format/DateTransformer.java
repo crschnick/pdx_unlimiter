@@ -10,7 +10,7 @@ public class DateTransformer extends NodeTransformer {
     @Override
     public void transform(Node node) {
         KeyValueNode kv = (KeyValueNode) node;
-        ValueNode<Object> v = (ValueNode<Object>) kv.getNode();
+        ValueNode v = (ValueNode) kv.getNode();
         GameDate d = null;
         if (v.getValue() instanceof Long) {
             d = GameDate.fromLong((Long) v.getValue());
@@ -28,6 +28,6 @@ public class DateTransformer extends NodeTransformer {
     @Override
     public void reverse(Node node) {
         KeyValueNode kv = (KeyValueNode) node;
-        kv.setNode(new ValueNode<String>(GameDate.fromNode(kv.getNode()).toString()));
+        kv.setNode(new ValueNode(GameDate.fromNode(kv.getNode()).toString()));
     }
 }

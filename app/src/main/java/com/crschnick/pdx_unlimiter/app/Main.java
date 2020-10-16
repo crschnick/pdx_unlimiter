@@ -22,9 +22,6 @@ public class Main {
             //SavegameCache.EU4_CACHE.importSavegame(Paths.get("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\backups\\swe1.eu4_79a6c3b2-edbc-404e-950f-c3effbc3c126.eu4"), save);
 
             SavegameManagerApp.main(args);
-
-            SavegameCache.exportDataToConfig(Files.newOutputStream(SavegameCache.FILE));
-            Installation.saveConfig();
         } catch (Exception e) {
             e.printStackTrace();
         }

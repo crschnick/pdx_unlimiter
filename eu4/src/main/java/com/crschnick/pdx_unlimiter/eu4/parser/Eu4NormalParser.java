@@ -41,20 +41,20 @@ public class Eu4NormalParser extends GamedataParser {
             if (marksEndOfPreviousToken) {
                 String sub = s.substring(prev, i);
                 if (sub.equals("yes")) {
-                    tokens.add(new ValueToken<Boolean>(true));
+                    tokens.add(new ValueToken(true));
                 } else if (sub.equals("no")) {
-                    tokens.add(new ValueToken<Boolean>(false));
+                    tokens.add(new ValueToken(false));
                 } else if (Pattern.matches("-?[0-9]+", sub)) {
-                    tokens.add(new ValueToken<Long>(Long.parseLong(sub)));
+                    tokens.add(new ValueToken(Long.parseLong(sub)));
                 } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", sub)) {
-                    tokens.add(new ValueToken<Double>(Double.valueOf(sub)));
+                    tokens.add(new ValueToken(Double.valueOf(sub)));
                 } else if (sub.startsWith("\"") && sub.endsWith("\"")) {
                     if (sub.length() == 1) {
                         int a = 0;
                     }
-                    tokens.add(new ValueToken<String>(sub.substring(1, sub.length() - 1)));
+                    tokens.add(new ValueToken(sub.substring(1, sub.length() - 1)));
                 } else {
-                    tokens.add(new ValueToken<String>(sub));
+                    tokens.add(new ValueToken(sub));
                 }
             }
 

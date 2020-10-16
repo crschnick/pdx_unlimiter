@@ -22,24 +22,16 @@ public class Eu4SavegameImporter {
         Arrays.stream(Installation.EU4.get().getSaveDirectory().toFile().listFiles())
                 .sorted(Comparator.comparingLong(f -> f.lastModified()))
                 .findFirst().ifPresent(f -> {
-            try {
                 SavegameCache.EU4_CACHE.importSavegame(f.toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         });
 
     }
 
-    public static void importAllSavegames(BooleanProperty running) {
+    public static void importAllSavegames() {
         new Thread(() -> {
             Eu4SavegameImporter.importAllSavegames(Installation.EU4.get().getSaveDirectory(), (p) -> {
-                try {
                     SavegameCache.EU4_CACHE.importSavegame(p);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }, running);
+            }, SavegameManagerApp.getAPP().runningProperty());
         }).start();
 
     }
@@ -56,11 +48,7 @@ public class Eu4SavegameImporter {
     public static void startWatcher(Path directory, BooleanProperty running) {
         try {
             Eu4SavegameImporter.startInDirectory(directory.resolve("save games"), (p) -> {
-                try {
                     SavegameCache.EU4_CACHE.importSavegame(p);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }, running);
         } catch (IOException e) {
             e.printStackTrace();
