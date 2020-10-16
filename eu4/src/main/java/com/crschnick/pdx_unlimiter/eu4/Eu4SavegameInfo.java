@@ -1,4 +1,9 @@
-package com.crschnick.pdx_unlimiter.eu4.parser;
+package com.crschnick.pdx_unlimiter.eu4;
+
+import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
 import java.util.*;
 
@@ -54,10 +59,10 @@ public class Eu4SavegameInfo{
 
         private String title;
         private boolean attacker;
-        private Set<String> allies;
-        private Set<String> enemies;
+        private Set<GameTag> allies;
+        private Set<GameTag> enemies;
 
-        public War(String title, boolean attacker, Set<String> allies, Set<String> enemies) {
+        public War(String title, boolean attacker, Set<GameTag> allies, Set<GameTag> enemies) {
             this.title = title;
             this.attacker = attacker;
             this.allies = allies;
@@ -68,33 +73,37 @@ public class Eu4SavegameInfo{
             return title;
         }
 
-        public Set<String> getEnemies() {
+        public Set<GameTag> getEnemies() {
             return enemies;
         }
 
-        public static Set<War> fromActiveWarsNode(String tag, Node n) {
+        public static Set<War> fromActiveWarsNode(Set<GameTag> tags, String tag, Node n) {
             Set<War> wars = new HashSet<>();
             for (Node war : Node.getNodeArray(n)) {
                 String title = Node.getString(Node.getNodeForKey(war, "name"));
                 boolean isAttacker = false;
-                Set<String> attackers = new HashSet<>();
-                for (Node atk : Node.getNodeArray(Node.getNodeForKey(war, "attackers"))) {
-                    String attacker = Node.getString(atk);
-                    if (attacker.equals(tag)) {
-                        isAttacker = true;
-                    } else {
-                        attackers.add(attacker);
+                Set<GameTag> attackers = new HashSet<>();
+                if (Node.hasKey(war, "attackers")) {
+                    for (Node atk : Node.getNodeArray(Node.getNodeForKey(war, "attackers"))) {
+                        String attacker = Node.getString(atk);
+                        if (attacker.equals(tag)) {
+                            isAttacker = true;
+                        } else {
+                            attackers.add(GameTag.getTag(tags, attacker));
+                        }
                     }
                 }
 
                 boolean isDefender = false;
-                Set<String> defenders = new HashSet<>();
-                for (Node def : Node.getNodeArray(Node.getNodeForKey(war, "defenders"))) {
-                    String defender = Node.getString(def);
-                    if (defender.equals(tag)) {
-                        isDefender = true;
-                    } else {
-                        defenders.add(defender);
+                Set<GameTag> defenders = new HashSet<>();
+                if (Node.hasKey(war, "defenders")) {
+                    for (Node def : Node.getNodeArray(Node.getNodeForKey(war, "defenders"))) {
+                        String defender = Node.getString(def);
+                        if (defender.equals(tag)) {
+                            isDefender = true;
+                        } else {
+                            defenders.add(GameTag.getTag(tags, defender));
+                        }
                     }
                 }
                 if (isAttacker) {
@@ -108,22 +117,28 @@ public class Eu4SavegameInfo{
         }
     }
 
-    private String currentTag;
+    private boolean ironman;
+    private boolean randomNewWorld;
+    private boolean customNationInWorld;
+    private boolean releasedVassal;
+
+    private Set<GameTag> allTags = new HashSet<>();
+    private GameTag currentTag;
     private GameDate date;
     private GameVersion version;
     private Ruler ruler;
     private Optional<Ruler> heir;
-    private Set<String> vassals = new HashSet<>();
-    private Set<String> allies = new HashSet<>();
-    private Set<String> marches = new HashSet<>();
-    private Set<String> marriages = new HashSet<>();
-    private Set<String> guarantees = new HashSet<>();
-    private Optional<String> overlord = Optional.empty();
-    private Set<String> juniorPartners = new HashSet<>();
-    private Optional<String> seniorPartner = Optional.empty();
-    private Set<String> tributaryJuniors = new HashSet<>();
-    private Optional<String> tributarySenior = Optional.empty();
-    private Map<String, GameDate> truces = new HashMap<>();
+    private Set<GameTag> vassals = new HashSet<>();
+    private Set<GameTag> allies = new HashSet<>();
+    private Set<GameTag> marches = new HashSet<>();
+    private Set<GameTag> marriages = new HashSet<>();
+    private Set<GameTag> guarantees = new HashSet<>();
+    private Optional<GameTag> overlord = Optional.empty();
+    private Set<GameTag> juniorPartners = new HashSet<>();
+    private Optional<GameTag> seniorPartner = Optional.empty();
+    private Set<GameTag> tributaryJuniors = new HashSet<>();
+    private Optional<GameTag> tributarySenior = Optional.empty();
+    private Map<GameTag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
 
@@ -131,39 +146,43 @@ public class Eu4SavegameInfo{
         GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
         String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
         Eu4SavegameInfo e = new Eu4SavegameInfo();
+
+        for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {
+            e.allTags.add(GameTag.fromNode(n));
+        }
         e.date = date;
-        e.currentTag = tag;
-        e.wars = War.fromActiveWarsNode(tag, save.getNodes().get("active_wars"));
+        e.currentTag = GameTag.getTag(e.allTags, tag);
+        e.wars = War.fromActiveWarsNode(e.allTags, tag, save.getNodes().get("active_wars"));
         e.ruler = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "monarch").get();
         e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "heir");
         for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "dependencies"))) {
             if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
-                    e.vassals.add(Node.getString(Node.getNodeForKey(n, "second")));
+                    e.vassals.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
                 }
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
-                    e.vassals.add(Node.getString(Node.getNodeForKey(n, "second")));
+                    e.vassals.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
                 }
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
-                    e.juniorPartners.add(Node.getString(Node.getNodeForKey(n, "second")));
+                    e.juniorPartners.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
                 }
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
-                    e.tributaryJuniors.add(Node.getString(Node.getNodeForKey(n, "second")));
+                    e.tributaryJuniors.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
                 }
             }
 
             if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
-                    e.overlord = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
+                    e.overlord = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
                 }
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
-                    e.overlord = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
+                    e.overlord = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
                 }
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
-                    e.seniorPartner = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
+                    e.seniorPartner = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
                 }
                 if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
-                    e.tributarySenior = Optional.of(Node.getString(Node.getNodeForKey(n, "first")));
+                    e.tributarySenior = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
                 }
             }
 
@@ -171,25 +190,25 @@ public class Eu4SavegameInfo{
 
         for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "alliances"))) {
             if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                e.allies.add(Node.getString(Node.getNodeForKey(n, "second")));
+                e.allies.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
             }
             if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
-                e.allies.add(Node.getString(Node.getNodeForKey(n, "first")));
+                e.allies.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
             }
         }
 
         for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "royal_marriages"))) {
             if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                e.marriages.add(Node.getString(Node.getNodeForKey(n, "second")));
+                e.marriages.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
             }
             if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
-                e.marriages.add(Node.getString(Node.getNodeForKey(n, "first")));
+                e.marriages.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
             }
         }
 
         for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "guarantees"))) {
             if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                e.guarantees.add(Node.getString(Node.getNodeForKey(n, "second")));
+                e.guarantees.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
             }
         }
 
@@ -201,6 +220,22 @@ public class Eu4SavegameInfo{
                 Node.getInteger(Node.getNodeForKey(v, "forth")));
 
         return e;
+    }
+
+    public boolean isIronman() {
+        return ironman;
+    }
+
+    public boolean isRandomNewWorld() {
+        return randomNewWorld;
+    }
+
+    public boolean isCustomNationInWorld() {
+        return customNationInWorld;
+    }
+
+    public boolean isReleasedVassal() {
+        return releasedVassal;
     }
 
     public Ruler getRuler() {
@@ -215,55 +250,59 @@ public class Eu4SavegameInfo{
         return version;
     }
 
-    public String getCurrentTag() {
-        return currentTag;
-    }
-
     public GameDate getDate() {
         return date;
     }
 
-    public Set<String> getVassals() {
+    public Set<GameTag> getAllTags() {
+        return allTags;
+    }
+
+    public GameTag getCurrentTag() {
+        return currentTag;
+    }
+
+    public Set<GameTag> getVassals() {
         return vassals;
     }
 
-    public Set<String> getAllies() {
+    public Set<GameTag> getAllies() {
         return allies;
     }
 
-    public Set<String> getMarches() {
+    public Set<GameTag> getMarches() {
         return marches;
     }
 
-    public Set<String> getMarriages() {
+    public Set<GameTag> getMarriages() {
         return marriages;
     }
 
-    public Set<String> getGuarantees() {
+    public Set<GameTag> getGuarantees() {
         return guarantees;
     }
 
-    public Optional<String> getOverlord() {
+    public Optional<GameTag> getOverlord() {
         return overlord;
     }
 
-    public Set<String> getJuniorPartners() {
+    public Set<GameTag> getJuniorPartners() {
         return juniorPartners;
     }
 
-    public Optional<String> getSeniorPartner() {
+    public Optional<GameTag> getSeniorPartner() {
         return seniorPartner;
     }
 
-    public Set<String> getTributaryJuniors() {
+    public Set<GameTag> getTributaryJuniors() {
         return tributaryJuniors;
     }
 
-    public Optional<String> getTributarySenior() {
+    public Optional<GameTag> getTributarySenior() {
         return tributarySenior;
     }
 
-    public Map<String, GameDate> getTruces() {
+    public Map<GameTag, GameDate> getTruces() {
         return truces;
     }
 

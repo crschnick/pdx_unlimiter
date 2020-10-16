@@ -106,7 +106,7 @@ public class Eu4IronmanParser extends GamedataParser {
                     if (string.contains("Hadim Seha")) {
                         int b = 0;
                     }
-                    tokens.add(new ValueToken<String>(string));
+                    tokens.add(new ValueToken(string));
                 }
 
                 else if (Arrays.equals(next, INTEGER)) {
@@ -114,7 +114,7 @@ public class Eu4IronmanParser extends GamedataParser {
                     current += 4;
 
                     int numberInt = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
-                    tokens.add(new ValueToken<Long>((long) numberInt));
+                    tokens.add(new ValueToken((long) numberInt));
                 }
 
                 else if (Arrays.equals(next, INTEGER_UNSIGNED)) {
@@ -123,15 +123,15 @@ public class Eu4IronmanParser extends GamedataParser {
                     current += 4;
 
                     long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getLong();
-                    tokens.add(new ValueToken<Long>(numberInt));
+                    tokens.add(new ValueToken(numberInt));
                 }
 
                 else if (Arrays.equals(next, BOOL_TRUE)) {
-                    tokens.add(new ValueToken<String>("yes"));
+                    tokens.add(new ValueToken("yes"));
                 }
 
                 else if (Arrays.equals(next, BOOL_FALSE)) {
-                    tokens.add(new ValueToken<String>("no"));
+                    tokens.add(new ValueToken("no"));
                 }
 
                 else if (Arrays.equals(next, BOOL)) {
@@ -139,7 +139,7 @@ public class Eu4IronmanParser extends GamedataParser {
                     current += 1;
 
                     boolean b = ByteBuffer.wrap(number).get() != 0;
-                    tokens.add(new ValueToken<String>(b ? "yes" : "no"));
+                    tokens.add(new ValueToken(b ? "yes" : "no"));
                 }
 
                 else if (Arrays.equals(next, DOUBLE)) {
@@ -148,7 +148,7 @@ public class Eu4IronmanParser extends GamedataParser {
 
                     long numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     double value = (2 * (numberInt * Math.pow(2, -16)));
-                    tokens.add(new ValueToken<Double>(value));
+                    tokens.add(new ValueToken(value));
                 }
 
                 else if (Arrays.equals(next, FLOAT)) {
@@ -157,7 +157,7 @@ public class Eu4IronmanParser extends GamedataParser {
 
                     int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     double d  = ((double) numberInt) / 1000.0;
-                    tokens.add(new ValueToken<Double>(d));
+                    tokens.add(new ValueToken(d));
                 }
 
                 else if (Arrays.equals(next, OPEN_GROUP)) {
@@ -173,7 +173,7 @@ public class Eu4IronmanParser extends GamedataParser {
 
                     int numberInt  = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     String id = Integer.toString(numberInt);
-                    tokens.add(new ValueToken<String>(id));
+                    tokens.add(new ValueToken(id));
                 }
 
             } while (current < bytes.length);

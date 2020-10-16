@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -76,8 +76,18 @@ public class Eu4Installation extends Installation {
         }
     }
 
-    public String getCountryName(String tag) {
-        return countryNames.get(tag);
+    public boolean isPreexistingCoutry(String tag) {
+        return countryNames.containsKey(tag);
+    }
+
+    public String getCountryName(GameTag tag) {
+        if (tag.isCustom()) {
+            return tag.getName();
+        }
+        if (!countryNames.containsKey(tag.getTag())) {
+            throw new IllegalArgumentException("Invalid country tag " + tag.getTag());
+        }
+        return countryNames.get(tag.getTag());
     }
 
     @Override

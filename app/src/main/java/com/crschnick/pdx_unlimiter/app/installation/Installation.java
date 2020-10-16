@@ -61,7 +61,7 @@ public abstract class Installation {
         mapper.writeTree(generator, n);
     }
 
-    private static void initInstallations() throws Exception {
+    public static void initInstallations() throws Exception {
         if (!EU4.isPresent() || !EU4.get().isValid()) {
             var eu4 = getInstallPath("Europa Universalis IV");
             eu4.ifPresent(value -> EU4 = Optional.of(new Eu4Installation(value)));

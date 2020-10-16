@@ -9,8 +9,8 @@ public class BooleanTransformer extends NodeTransformer {
     @Override
     public void transform(Node node) {
         KeyValueNode kv = (KeyValueNode) node;
-        ValueNode<String> v = (ValueNode<String>) kv.getNode();
-        kv.setNode(new ValueNode<Boolean>(v.getValue().equals("yes")));
+        ValueNode v = (ValueNode) kv.getNode();
+        kv.setNode(new ValueNode(v.getValue().equals("yes")));
     }
 
     @Override

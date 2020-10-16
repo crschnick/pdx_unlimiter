@@ -61,6 +61,7 @@ addDependenciesModuleInfo {
                 module org.apache.commons.lang3 {
                     requires java.se;
                     exports org.apache.commons.lang3;
+                    exports org.apache.commons.lang3.function;
                     exports org.apache.commons.lang3.arch;
                 }
             '''

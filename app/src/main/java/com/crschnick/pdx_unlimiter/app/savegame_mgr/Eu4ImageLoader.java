@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class Eu4ImageLoader {
 
@@ -27,6 +29,10 @@ public class Eu4ImageLoader {
     private static Map<String, Image> IMAGES = new HashMap<>();
 
     public static Image loadImage(Path p) {
+        return loadImage(p, null);
+    }
+
+    public static Image loadImage(Path p, Predicate<Integer> pixelSelector) {
         if (IMAGES.containsKey(p.toString())) {
             return IMAGES.get(p.toString());
         }
@@ -38,16 +44,33 @@ public class Eu4ImageLoader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (pixelSelector != null) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    int rgb = image.getRGB(x, y);
+                    if (!pixelSelector.test(rgb)) {
+                        image.setRGB(x, y, 0x00FFFFFF);
+                    }
+                }
+            }
+        }
+
         WritableImage w = new WritableImage(image.getWidth(), image.getHeight());
         w = SwingFXUtils.toFXImage(image, w);
         IMAGES.put(p.toString(), w);
         return w;
     }
 
-    public static ImageView loadInterfaceImage(String name)  {
+    public static ImageView loadInterfaceImage(String name) {
+        return loadInterfaceImage(name, null);
+    }
+
+    public static ImageView loadInterfaceImage(String name, Rectangle2D viewport)  {
         Path p = Installation.EU4.get().getPath().resolve("gfx/interface/" + name);
         Image i = loadImage(p);
         ImageView v = new ImageView(i);
+        if (viewport != null) v.setViewport(viewport);
         return v;
     }
 

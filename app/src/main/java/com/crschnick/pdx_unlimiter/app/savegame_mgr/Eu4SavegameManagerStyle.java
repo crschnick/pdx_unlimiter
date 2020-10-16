@@ -1,25 +1,32 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.geometry.*;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -27,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Eu4SavegameManagerStyle {
@@ -36,6 +44,32 @@ public class Eu4SavegameManagerStyle {
         Tooltip t = new Tooltip(text);
         t.setShowDelay(Duration.ZERO);
         return t;
+    }
+
+    private static Node getImageForTagName(String tagName, int size) {
+        if (Installation.EU4.get().isPreexistingCoutry(tagName)) {
+            return Eu4ImageLoader.loadFlagImage(tagName, size);
+        } else {
+            Label l = new Label("?");
+            l.setStyle("-fx-text-fill: white; -fx-font-size: 30px;");
+            l.minWidthProperty().setValue(60);
+            l.prefHeightProperty().setValue(60);
+            l.alignmentProperty().set(Pos.CENTER);
+            return l;
+        }
+    }
+
+    private static Node getTagImage(GameTag tag, int size) {
+        if (!tag.isCustom()) {
+            return Eu4ImageLoader.loadFlagImage(tag.getTag(), size);
+        } else {
+            java.awt.Color c = tag.getCountryColor();
+            Label p = new Label();
+            p.minWidthProperty().setValue(size);
+            p.minHeightProperty().setValue(size);
+            p.setBackground(new Background(new BackgroundFill(Color.rgb(c.getRed(), c.getGreen(), c.getBlue(), 1), CornerRadii.EMPTY, Insets.EMPTY)));
+            return p;
+        }
     }
 
     public static HBox createRulerLabel(Eu4SavegameInfo.Ruler ruler, boolean isRuler) {
@@ -71,22 +105,138 @@ public class Eu4SavegameManagerStyle {
         return box;
     }
 
-    public static GridPane createCampaignEntryNode(Eu4Campaign.Entry e,
-                                                   ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
-                                                   Consumer<Eu4Campaign.Entry> onOpen,
-                                                   Consumer<Eu4Campaign.Entry> delete) {
+    private static Node createSavegameInfoNode(Eu4SavegameInfo info) {
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
+        grid.alignmentProperty().set(Pos.CENTER);
         grid.setHgap(5);
         grid.setVgap(5);
         grid.setMaxHeight(120);
-        grid.setStyle("-fx-background-color: #555555; -fx-border-color: #666666; -fx-border-width: 3px;");
+
+        Label date = new Label(info.getDate().toDisplayString());
+        date.setMinWidth(150);
+        date.setStyle("-fx-border-color: #666666; -fx-border-width: 3px; -fx-background-color: #777777;-fx-text-fill: white; -fx-font-size: 16px;");
+
+        grid.add(date, 1, 1);
+        grid.add(createRulerLabel(info.getRuler(), true), 0, 2);
+        if (info.getHeir().isPresent()) {
+            grid.add(createRulerLabel(info.getHeir().get(), false), 0, 3);
+        }
+
+        HBox status = new HBox();
+        status.setStyle("-fx-border-width: 3px;");
+        status.setSpacing(4);
+        Node n = getTagImage(info.getCurrentTag(), 25);
+        n.setTranslateX(3);
+        n.setTranslateY(3);
+        status.getChildren().add(n);
+        status.getChildren().add(new Pane());
+        if (!info.isIronman()) {
+            ImageView v = Eu4ImageLoader.loadInterfaceImage("ironman_icon.dds");
+            status.getChildren().add(v);
+            v.setFitWidth(22);
+            v.setFitHeight(32);
+        }
+        if (!info.isRandomNewWorld()) {
+            Predicate<Integer> s = (Integer rgb) -> {
+                int r = (rgb >> 16) & 0xFF;
+                int g = (rgb >> 8) & 0xFF;
+                int b = rgb & 0xFF;
+                boolean gold = (r > 100 && g > 87 && b < 100 && Math.max(r, Math.max(g,b) - 2) == r);
+                boolean blue = Math.max(r, Math.max(g,b)) < 135;
+                if (blue || gold) {
+                    return false;
+                }
+                return true;
+            };
+            Image i = Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("gfx/interface/").resolve("frontend_random_world.dds"), s);
+            ImageView v = new ImageView(i);
+            v.setTranslateY(2);
+            v.setViewport(new Rectangle2D(14, 0, 33, 30));
+            status.getChildren().add(v);
+
+        }
+        if (!info.isCustomNationInWorld()) {
+            Predicate<Integer> s = (Integer rgb) -> {
+                int r = (rgb >> 16) & 0xFF;
+                int g = (rgb >> 8) & 0xFF;
+                int b = rgb & 0xFF;
+                boolean blue = Math.max(r, Math.max(g,b)) < 142;
+                if (blue) {
+                    return false;
+                }
+                return true;
+            };
+            Image i = Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("gfx/interface/").resolve("frontend_custom_nation.dds"), s);
+            ImageView v = new ImageView(i);
+            v.setViewport(new Rectangle2D(20, 5, 21, 21));
+            v.setTranslateY(4);
+            v.setFitWidth(22);
+            v.setFitHeight(24);
+            status.getChildren().add(v);
+        }
+        if (!info.isReleasedVassal()) {
+            ImageView v = Eu4ImageLoader.loadInterfaceImage("release_nation_icon.dds");
+            v.setViewport(new Rectangle2D(37, 0, 36, 30));
+            v.prefWidth(32);
+            v.prefHeight(32);
+            status.getChildren().add(v);
+        }
+        grid.add(status, 0, 1);
+
+        Label version;
+        if (GameVersion.areCompatible(Installation.EU4.get().getVersion(), info.getVersion())) {
+            version = new Label("v" + info.getVersion().toString());
+        } else {
+            version = new Label("v" + info.getVersion().toString(), Eu4ImageLoader.loadInterfaceImage("incompatible_warning_icon.dds"));
+        }
+        version.setStyle("-fx-text-fill: white; -fx-font-size: 15px;");
+        grid.add(version, 0, 4);
+        GridPane.setHalignment(version, HPos.CENTER);
+        GridPane.setValignment(version, VPos.CENTER);
+
+        int wars = 0;
+        for (Eu4SavegameInfo.War war : info.getWars()) {
+            if (wars >= 2) {
+                break;
+            }
+            grid.add(createDiplomacyRow("icon_diplomacy_war.dds", war.getEnemies(), "Fighting in the " + war.getTitle() + " against ", ""), 2 + wars, 1);
+            wars++;
+        }
+        grid.add(createDiplomacyRow("icon_alliance.dds", info.getAllies(), "Allies: ", "None"), 1, 2);
+        grid.add(createDiplomacyRow("icon_diplomacy_royalmarriage.dds", info.getMarriages(), "Royal marriages: ", "None"), 2, 2);
+        grid.add(createDiplomacyRow("icon_diplomacy_guaranting.dds", info.getGuarantees(), "Guarantees: ", "None"), 3, 2);
+        grid.add(createDiplomacyRow("icon_vassal.dds", info.getVassals(), "Vassals: ", "None"), 1, 3);
+        grid.add(createDiplomacyRow("icon_vassal.dds", info.getJuniorPartners(), "Personal union junior partners: ", "none"), 2, 3);
+        grid.add(createDiplomacyRow("subject_tributary_icon.dds", info.getTributaryJuniors(), "Tributaries: ", "None"), 3, 3);
+        grid.add(createDiplomacyRow("icon_march.dds", info.getMarches(), "Marches: ", "None"), 1, 4);
+        grid.add(createDiplomacyRow("icon_truce.dds", info.getTruces().keySet(), "Truces: ", "None"), 2, 4);
+        if (info.getSeniorPartner().isPresent()) {
+            grid.add(createDiplomacyRow("icon_alliance.dds", Set.of(info.getSeniorPartner().get()), "Under personal union with ", "no country"), 4, 4);
+        }
+        return grid;
+    }
+
+    public static Node createCampaignEntryNode(Eu4Campaign.Entry e,
+                                                   ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
+                                                   Consumer<Eu4Campaign.Entry> onOpen,
+                                                   Consumer<Eu4Campaign.Entry> delete) {
+        VBox main = new VBox();
+        main.setStyle("-fx-background-color: #555555; -fx-border-color: #666666; -fx-border-width: 3px;");
+        main.getProperties().put("entry", e);
+        selectedEntry.addListener((c, o, n) -> {
+            if (!n.isPresent() || !n.get().equals(e)) {
+                main.setStyle("-fx-background-color: #555555; -fx-border-color: #666666; -fx-border-width: 3px;");
+            } else {
+                main.setStyle("-fx-background-color: #666666; -fx-border-color: #44bb44; -fx-border-width: 3px;");
+            }
+        });
+        main.setOnMouseClicked((m) -> {
+            selectedEntry.setValue(Optional.of((Eu4Campaign.Entry) main.getProperties().get("entry")));
+        });
 
         TextField name = new TextField();
         name.setStyle("-fx-background-color: #444444; -fx-font-size: 18px; -fx-text-fill: white;");
         name.textProperty().bindBidirectional(e.nameProperty());
-        grid.add(name, 0, 0, 3, 1);
-
 
         Button open = new Button("\uD83D\uDCBE");
         open.setOnMouseClicked((m) -> {
@@ -102,78 +252,41 @@ public class Eu4SavegameManagerStyle {
             }
         });
         del.setAlignment(Pos.CENTER_RIGHT);
-        del.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
+        del.setStyle("-fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
 
-        HBox h = new HBox(open, del);
-        grid.add(h, 3, 0);
-
-        Label date = new Label(e.getInfo().getDate().toDisplayString());
-        date.setMinWidth(150);
-        date.setStyle("-fx-border-color: #666666; -fx-border-width: 3px; -fx-background-color: #777777;-fx-text-fill: white; -fx-font-size: 16px;");
-
-        grid.add(date, 0, 1);
-        grid.add(createRulerLabel(e.getInfo().getRuler(), true), 0, 2);
-        if (e.getInfo().getHeir().isPresent()) {
-            grid.add(createRulerLabel(e.getInfo().getHeir().get(), false), 0, 3);
+        HBox bar = new HBox(name, open, del);
+        bar.setSpacing(5);
+        HBox.setHgrow(name, Priority.SOMETIMES);
+        main.getChildren().add(bar);
+        if (e.getInfo().isPresent()) {
+            Node content = createSavegameInfoNode(e.getInfo().get());
+            main.getChildren().add(content);
+        } else {
+            e.infoProperty().addListener(change -> {
+                Platform.runLater(() -> main.getChildren().add(createSavegameInfoNode(e.getInfo().get())));
+            });
         }
-
-
-        Label version = new Label("v" + e.getInfo().getVersion().toString());
-        version.setStyle("-fx-text-fill: white; -fx-font-size: 15px;");
-        grid.add(version, 0, 4);
-
-        int wars = 0;
-        for (Eu4SavegameInfo.War war : e.getInfo().getWars()) {
-            if (wars >= 3) {
-                break;
-            }
-            grid.add(createDiplomacyRow("icon_diplomacy_war.dds", war.getEnemies(), "Fighting in the " + war.getTitle() + " against ", ""), 1 + wars, 1);
-            wars++;
-        }
-        grid.add(createDiplomacyRow("icon_alliance.dds", e.getInfo().getAllies(), "Allies: ", "None"), 1, 2);
-        grid.add(createDiplomacyRow("icon_diplomacy_royalmarriage.dds", e.getInfo().getMarriages(), "Royal marriages: ", "None"), 2, 2);
-        grid.add(createDiplomacyRow("icon_diplomacy_guaranting.dds", e.getInfo().getGuarantees(), "Guarantees: ", "None"), 3, 2);
-        grid.add(createDiplomacyRow("icon_vassal.dds", e.getInfo().getVassals(), "Vassals: ", "None"), 1, 3);
-        grid.add(createDiplomacyRow("icon_vassal.dds", e.getInfo().getJuniorPartners(), "Personal union junior partners: ", "none"), 2, 3);
-        grid.add(createDiplomacyRow("subject_tributary_icon.dds", e.getInfo().getTributaryJuniors(), "Tributaries: ", "None"), 3, 3);
-        grid.add(createDiplomacyRow("icon_march.dds", e.getInfo().getMarches(), "Marches: ", "None"), 1, 4);
-        grid.add(createDiplomacyRow("icon_truce.dds", e.getInfo().getTruces().keySet(), "Truces: ", "None"), 2, 4);
-        if (e.getInfo().getSeniorPartner().isPresent()) {
-            grid.add(createDiplomacyRow("icon_alliance.dds", Set.of(e.getInfo().getSeniorPartner().get()), "Under personal union with ", "no country"), 4, 4);
-        }
-
-        grid.getProperties().put("entry", e);
-        selectedEntry.addListener((c, o, n) -> {
-            if (!n.isPresent() || !n.get().equals(e)) {
-                grid.setStyle("-fx-background-color: #555555; -fx-border-color: #666666; -fx-border-width: 3px;");
-            } else {
-                grid.setStyle("-fx-background-color: #666666; -fx-border-color: #44bb44; -fx-border-width: 3px;");
-            }
-        });
-        grid.setOnMouseClicked((m) -> {
-            selectedEntry.setValue(Optional.of((Eu4Campaign.Entry) grid.getProperties().get("entry")));
-        });
-        return grid;
+        return main;
     }
 
-    private static String getCountryTooltip(Set<String> tags) {
+    private static String getCountryTooltip(Set<GameTag> tags) {
         StringBuilder b = new StringBuilder();
-        for (String s : tags) {
-            b.append(Installation.EU4.get().getCountryName(s));
+        for (GameTag t : tags) {
+            b.append(Installation.EU4.get().getCountryName(t));
             b.append(", ");
         }
         b.delete(b.length() - 2, b.length());
         return b.toString();
     }
 
-    private static Node createDiplomacyRow(String icon, Set<String> tags, String tooltipStart, String none) {
+    private static Node createDiplomacyRow(String icon, Set<GameTag> tags, String tooltipStart, String none) {
         HBox box = new HBox();
         box.setSpacing(3);
         box.setAlignment(Pos.CENTER_LEFT);
         //flag_smallest_overlay.dds, shield_fancy_mask.tga
         box.getChildren().add(Eu4ImageLoader.loadInterfaceImage(icon));
-        for (String tag : tags) {
-            ImageView n = Eu4ImageLoader.loadFlagImage(tag, 20);
+        for (GameTag tag : tags) {
+            Node n = getTagImage(tag, 20);
             box.getChildren().add(n);
         }
         box.setStyle("-fx-background-color: #777777; -fx-border-color: #666666; -fx-border-width: 3px;");
@@ -254,7 +367,7 @@ public class Eu4SavegameManagerStyle {
         del.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
 
 
-        TextField name = new TextField(SavegameCache.EU4_CACHE.getNames().getOrDefault(c.getCampaignId(), Installation.EU4.get().getCountryName(c.getTag())));
+        TextField name = new TextField(c.getName());
         name.setStyle("-fx-background-color: #444444; -fx-font-size: 16px; -fx-text-fill: white;-fx-border-radius: 0px;");
         name.textProperty().bindBidirectional(c.nameProperty());
 
@@ -276,14 +389,14 @@ public class Eu4SavegameManagerStyle {
         b.getChildren().add(top);
         b.getChildren().add(date);
 
-        ImageView w = Eu4ImageLoader.loadFlagImage(c.getTag(), 60);
+        Node w = getImageForTagName(c.getTag(), 60);
         HBox btn = new HBox();
         btn.setSpacing(5);
         btn.getChildren().add(w);
         btn.getChildren().add(b);
         c.tagProperty().addListener((change, o, n) -> {
             Platform.runLater(() -> {
-                btn.getChildren().set(0, Eu4ImageLoader.loadFlagImage(n, 60));
+                btn.getChildren().set(0, getImageForTagName(n, 60));
             });
         });
 
@@ -389,7 +502,7 @@ public class Eu4SavegameManagerStyle {
             }
         });
         save.addListener((val, old , n) -> {
-            if (n.isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(), n.get().getInfo().getVersion())) {
+            if (n.isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(), n.get().getInfo().get().getVersion())) {
                 b.disableProperty().setValue(false);
                 b.setStyle("-fx-opacity: 1; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
             } else {
@@ -406,24 +519,52 @@ public class Eu4SavegameManagerStyle {
     private static MenuBar createMenuBar() {
         Menu menu = new Menu("File");
 
-        MenuItem menuItem0 = new MenuItem("Import savegames...");
-        MenuItem menuItem1 = new MenuItem("Import Pdxu archive...");
-        menuItem1.setOnAction((a) -> {
-            Optional<Path> path = DialogHelper.showImportArchiveDialog();
+        MenuItem sd = new MenuItem("Open pdxu savegame directory");
+        sd.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().open(SavegameCache.ROOT_DIR.toFile());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
-        MenuItem menuItem2 = new MenuItem("Export Pdxu archive...");
-        menuItem2.setOnAction((a) -> {
-            Optional<Path> path = DialogHelper.showExportArchiveDialog();
+        MenuItem menuItem0 = new MenuItem("Export savegames...");
+        menuItem0.setOnAction((a) -> {
+            Optional<Path> path = DialogHelper.showExportDialog(false);
             if (path.isPresent()) {
                 try {
-                    ArchiveHelper.exportSavegameCache(path.get());
+                    SavegameCache.exportSavegameDirectory(path.get());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         });
 
+        MenuItem menuItem1 = new MenuItem("Import from pdxu archive...");
+        menuItem1.setOnAction((a) -> {
+            Optional<Path> path = DialogHelper.showImportArchiveDialog();
+            if (path.isPresent()) {
+                try {
+                    SavegameCache.importSavegameCache(path.get());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        MenuItem menuItem2 = new MenuItem("Export to pdxu archive...");
+        menuItem2.setOnAction((a) -> {
+            Optional<Path> path = DialogHelper.showExportDialog(true);
+            if (path.isPresent()) {
+                try {
+                    SavegameCache.exportSavegameCache(path.get());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        menu.getItems().add(sd);
         menu.getItems().add(menuItem0);
         menu.getItems().add(menuItem1);
         menu.getItems().add(menuItem2);
@@ -447,7 +588,7 @@ public class Eu4SavegameManagerStyle {
         MenuItem i = new MenuItem("Import all savegames...");
         i.setOnAction((a) -> {
             if (DialogHelper.showImportSavegamesDialog()) {
-                Eu4SavegameImporter.importAllSavegames(new SimpleBooleanProperty(false));
+                Eu4SavegameImporter.importAllSavegames();
             }
         });
         savegames.getItems().add(i);
@@ -472,7 +613,6 @@ public class Eu4SavegameManagerStyle {
         MenuBar rightBar = new MenuBar();
         Menu m = new Menu("Idle");
         rightBar.getMenus().addAll(m);
-        rightBar.setDisable(true);
         SavegameCache.EU4_CACHE.statusProperty().addListener((ch,o,n) -> {
             Platform.runLater(() -> {
                 if (!n.isPresent()) {

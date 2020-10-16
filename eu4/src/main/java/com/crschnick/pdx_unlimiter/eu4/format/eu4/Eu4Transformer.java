@@ -21,7 +21,7 @@ public class Eu4Transformer {
             if (n instanceof KeyValueNode && Node.getKeyValueNode(n).getKeyName().endsWith("date")) {
                 Node val = Node.getKeyValueNode(n).getNode();
                 return val instanceof ValueNode &&
-                        (((ValueNode<?>) val).getValue() instanceof String || ((ValueNode<?>) val).getValue() instanceof Long);
+                        (((ValueNode) val).getValue() instanceof String || ((ValueNode) val).getValue() instanceof Long);
             } else {
                 return false;
             }
@@ -64,8 +64,8 @@ public class Eu4Transformer {
 
         List<NodeTransformer> t = new ArrayList<>();
         t.add(new SubnodeTransformer(Map.of(new String[] {"date"}, new DateTransformer()), true));
-        t.add(new DefaultValueTransformer("is_random_new_world", new ValueNode<Boolean>(false)));
-        t.add(new DefaultValueTransformer("ironman", new ValueNode<Boolean>(false)));
+        t.add(new DefaultValueTransformer("is_random_new_world", new ValueNode(false)));
+        t.add(new DefaultValueTransformer("ironman", new ValueNode(false)));
         return new ChainTransformer(t);
     }
 }

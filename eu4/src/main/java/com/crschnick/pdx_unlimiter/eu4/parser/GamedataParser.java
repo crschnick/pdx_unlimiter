@@ -18,11 +18,11 @@ public abstract class GamedataParser {
         abstract TokenType getType();
     }
 
-    public class ValueToken<T> extends Token {
+    public class ValueToken extends Token {
 
-        T value;
+        Object value;
 
-        public ValueToken(T v) {
+        public ValueToken(Object v) {
             value = v;
         }
 
@@ -91,7 +91,8 @@ public abstract class GamedataParser {
 
     private Map.Entry<Node,Integer> createNode(List<Token> tokens, int index) {
         if (tokens.get(index).getType() == TokenType.VALUE) {
-            return new AbstractMap.SimpleEntry<>(new ValueNode<Object>(((ValueToken<Object>) tokens.get(index)).value), index + 1);
+            Object obj = ((ValueToken) tokens.get(index)).value;
+            return new AbstractMap.SimpleEntry<>(new ValueNode(obj), index + 1);
         }
 
         List<Node> childs = new LinkedList<>();
@@ -112,10 +113,10 @@ public abstract class GamedataParser {
             boolean isKeyValue = tokens.get(currentIndex + 1).getType() == TokenType.EQUALS;
             if (isKeyValue) {
                 String realKey = null;
-                if (!(((ValueToken<Object>) tokens.get(currentIndex)).value instanceof String)) {
-                    realKey = ((ValueToken<Object>) tokens.get(currentIndex)).value.toString();
+                if (!(((ValueToken) tokens.get(currentIndex)).value instanceof String)) {
+                    realKey = ((ValueToken) tokens.get(currentIndex)).value.toString();
                 } else {
-                    realKey = namespace.getKeyName(((ValueToken<Object>) tokens.get(currentIndex)).value.toString());
+                    realKey = namespace.getKeyName(((ValueToken) tokens.get(currentIndex)).value.toString());
                 }
 
                 Map.Entry<Node,Integer> result = createNode(tokens, currentIndex + 2);

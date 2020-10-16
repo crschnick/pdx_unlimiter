@@ -94,10 +94,10 @@ public class JsonConverter {
             return new ArrayNode(nodeList);
         }
 
-        if (jsonNode.isBoolean()) return new ValueNode<Object>(jsonNode.booleanValue());
-        if (jsonNode.isFloat() || jsonNode.isDouble()) return new ValueNode<Object>(jsonNode.doubleValue());
-        if (jsonNode.isInt() || jsonNode.isLong()) return new ValueNode<Object>(jsonNode.longValue());
-        if (jsonNode.isTextual()) return new ValueNode<Object>(jsonNode.textValue());
+        if (jsonNode.isBoolean()) return new ValueNode(jsonNode.booleanValue());
+        if (jsonNode.isFloat() || jsonNode.isDouble()) return new ValueNode(jsonNode.doubleValue());
+        if (jsonNode.isInt() || jsonNode.isLong()) return new ValueNode(jsonNode.longValue());
+        if (jsonNode.isTextual()) return new ValueNode(jsonNode.textValue());
         throw new RuntimeException("");
     }
 }

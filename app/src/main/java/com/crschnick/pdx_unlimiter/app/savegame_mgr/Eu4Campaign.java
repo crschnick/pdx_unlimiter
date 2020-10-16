@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -11,17 +11,24 @@ import java.util.*;
 
 public class Eu4Campaign implements Comparable<Eu4Campaign> {
 
-    public static class Entry implements Comparable<Entry> {
+    public static class Entry {
         private StringProperty name;
         private UUID uuid;
         private Eu4Campaign campaign;
-        private Eu4SavegameInfo info;
+        private ObjectProperty<Optional<Eu4SavegameInfo>> info;
+
+        public Entry(StringProperty name, UUID uuid, Eu4Campaign campaign) {
+            this.name = name;
+            this.uuid = uuid;
+            this.campaign = campaign;
+            this.info = new SimpleObjectProperty<>(Optional.empty());
+        }
 
         public Entry(StringProperty name, UUID uuid, Eu4Campaign campaign, Eu4SavegameInfo info) {
             this.name = name;
             this.uuid = uuid;
             this.campaign = campaign;
-            this.info = info;
+            this.info = new SimpleObjectProperty<>(Optional.of(info));
         }
 
         public String getName() {
@@ -40,13 +47,12 @@ public class Eu4Campaign implements Comparable<Eu4Campaign> {
             return campaign;
         }
 
-        public Eu4SavegameInfo getInfo() {
-            return info;
+        public Optional<Eu4SavegameInfo> getInfo() {
+            return info.get();
         }
 
-        @Override
-        public int compareTo(Entry o) {
-            return info.getDate().compareTo(o.info.getDate());
+        public ObjectProperty<Optional<Eu4SavegameInfo>> infoProperty() {
+            return info;
         }
     }
 
@@ -56,7 +62,8 @@ public class Eu4Campaign implements Comparable<Eu4Campaign> {
     private ObjectProperty<GameDate> date;
     private UUID campaignId;
     private BooleanProperty isLoaded = new SimpleBooleanProperty(false);
-    private volatile ObservableSet<Entry> savegames = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
+    private volatile ObservableSet<Entry> savegames =
+            FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
 
     public Eu4Campaign(ObjectProperty<Timestamp> lastPlayed, StringProperty tag, StringProperty name, ObjectProperty<GameDate> date, UUID campaignId) {
         this.lastPlayed = lastPlayed;

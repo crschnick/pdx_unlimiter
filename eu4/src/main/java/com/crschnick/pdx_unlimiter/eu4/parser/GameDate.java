@@ -40,9 +40,9 @@ public class GameDate implements Comparable<GameDate> {
 
     public static Node toNode(GameDate date) {
         List<Node> nodes = new ArrayList<>(3);
-        nodes.add(KeyValueNode.create("day", new ValueNode<Long>((long) date.getDay())));
-        nodes.add(KeyValueNode.create("month", new ValueNode<Long>((long) date.getMonth().getValue())));
-        nodes.add(KeyValueNode.create("year", new ValueNode<Long>((long) date.getYear())));
+        nodes.add(KeyValueNode.create("day", new ValueNode((long) date.getDay())));
+        nodes.add(KeyValueNode.create("month", new ValueNode((long) date.getMonth().getValue())));
+        nodes.add(KeyValueNode.create("year", new ValueNode((long) date.getYear())));
         return new ArrayNode(nodes);
     }
 
