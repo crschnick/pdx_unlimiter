@@ -62,7 +62,7 @@ public class Eu4Installation extends Installation {
                 .put("title", entry.getCampaign().getName())
                 .put("desc", entry.getName())
                 .put("date", entry.getCampaign().getLastPlayed().toString())
-                .put("filename", path.toString());
+                .put("filename", path.toString().replace('\\', '/'));
         mapper.writeTree(generator, n);
         out.close();
     }

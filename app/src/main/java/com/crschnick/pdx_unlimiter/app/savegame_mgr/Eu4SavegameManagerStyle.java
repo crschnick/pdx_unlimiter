@@ -3,10 +3,12 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.*;
@@ -29,10 +31,8 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -42,7 +42,8 @@ public class Eu4SavegameManagerStyle {
     private static Tooltip tooltip(String text) {
 
         Tooltip t = new Tooltip(text);
-        t.setShowDelay(Duration.ZERO);
+        t.setShowDelay(Duration.millis(100));
+        t.setStyle("-fx-font-size: 14px;");
         return t;
     }
 
@@ -128,15 +129,17 @@ public class Eu4SavegameManagerStyle {
         Node n = getTagImage(info.getCurrentTag(), 25);
         n.setTranslateX(3);
         n.setTranslateY(3);
+        Tooltip.install(n, tooltip("Playing as " + Installation.EU4.get().getCountryName(info.getCurrentTag())));
         status.getChildren().add(n);
         status.getChildren().add(new Pane());
-        if (!info.isIronman()) {
+        if (info.isIronman()) {
             ImageView v = Eu4ImageLoader.loadInterfaceImage("ironman_icon.dds");
             status.getChildren().add(v);
             v.setFitWidth(22);
             v.setFitHeight(32);
+            Tooltip.install(v, tooltip("Ironman savegame"));
         }
-        if (!info.isRandomNewWorld()) {
+        if (info.isRandomNewWorld()) {
             Predicate<Integer> s = (Integer rgb) -> {
                 int r = (rgb >> 16) & 0xFF;
                 int g = (rgb >> 8) & 0xFF;
@@ -152,10 +155,11 @@ public class Eu4SavegameManagerStyle {
             ImageView v = new ImageView(i);
             v.setTranslateY(2);
             v.setViewport(new Rectangle2D(14, 0, 33, 30));
+            Tooltip.install(v, tooltip("Random new world enabled"));
             status.getChildren().add(v);
 
         }
-        if (!info.isCustomNationInWorld()) {
+        if (info.isCustomNationInWorld()) {
             Predicate<Integer> s = (Integer rgb) -> {
                 int r = (rgb >> 16) & 0xFF;
                 int g = (rgb >> 8) & 0xFF;
@@ -172,13 +176,15 @@ public class Eu4SavegameManagerStyle {
             v.setTranslateY(4);
             v.setFitWidth(22);
             v.setFitHeight(24);
+            Tooltip.install(v, tooltip("A custom nation exists in the world"));
             status.getChildren().add(v);
         }
-        if (!info.isReleasedVassal()) {
+        if (info.isReleasedVassal()) {
             ImageView v = Eu4ImageLoader.loadInterfaceImage("release_nation_icon.dds");
             v.setViewport(new Rectangle2D(37, 0, 36, 30));
             v.prefWidth(32);
             v.prefHeight(32);
+            Tooltip.install(v, tooltip("Is playing as a released vassal"));
             status.getChildren().add(v);
         }
         grid.add(status, 0, 1);
@@ -186,8 +192,10 @@ public class Eu4SavegameManagerStyle {
         Label version;
         if (GameVersion.areCompatible(Installation.EU4.get().getVersion(), info.getVersion())) {
             version = new Label("v" + info.getVersion().toString());
+            Tooltip.install(version, tooltip("Compatible version"));
         } else {
             version = new Label("v" + info.getVersion().toString(), Eu4ImageLoader.loadInterfaceImage("incompatible_warning_icon.dds"));
+            Tooltip.install(version, tooltip("Incompatible savegame version"));
         }
         version.setStyle("-fx-text-fill: white; -fx-font-size: 15px;");
         grid.add(version, 0, 4);
@@ -244,6 +252,7 @@ public class Eu4SavegameManagerStyle {
         });
         open.setAlignment(Pos.CENTER_LEFT);
         open.setStyle("-fx-background-color: #aaaa66;-fx-text-fill: white; -fx-font-size: 18px;");
+        Tooltip.install(open, tooltip("Open savegame location"));
 
         Button del = new Button("\u2715");
         del.setOnMouseClicked((m) -> {
@@ -253,6 +262,7 @@ public class Eu4SavegameManagerStyle {
         });
         del.setAlignment(Pos.CENTER_RIGHT);
         del.setStyle("-fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
+        Tooltip.install(del, tooltip("Delete savegame"));
 
         HBox bar = new HBox(name, open, del);
         bar.setSpacing(5);
@@ -297,9 +307,14 @@ public class Eu4SavegameManagerStyle {
         return box;
     }
 
-    private static void sortSavegames(VBox list, Eu4Campaign c) {
-        List<Node> newOrder = c.getSavegames().stream().map(e -> (list.getChildren().stream()
-                .filter(x -> x.getProperties().get("entry").equals(e))).findAny().get()).collect(Collectors.toList());
+    private static void updateSavegames(VBox list, Eu4Campaign c,
+                                          ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
+                                        Consumer<Eu4Campaign.Entry> open,
+                                        Consumer<Eu4Campaign.Entry> delete) {
+        List<Node> newOrder = c.getSavegames().stream()
+                .sorted(Comparator.comparingLong(e -> GameDate.toLong(e.getDate().or(() -> Optional.of(GameDate.fromLong(0))).get())))
+                .map(e -> createCampaignEntryNode(e, selectedEntry, open, delete))
+                .collect(Collectors.toList());
         Collections.reverse(newOrder);
         list.getChildren().setAll(newOrder);
     }
@@ -323,21 +338,18 @@ public class Eu4SavegameManagerStyle {
         }
 
         for (Eu4Campaign.Entry e : c.get().getSavegames()) {
-            grid.getChildren().add(createCampaignEntryNode(e, selectedEntry, open, delete));
+            e.infoProperty().addListener((change, o, n) -> {
+                Platform.runLater(() -> {
+                    updateSavegames(grid, c.get(), selectedEntry, open, delete);
+                });
+            });
         }
-        sortSavegames(grid, c.get());
-
         c.get().getSavegames().addListener((SetChangeListener<? super Eu4Campaign.Entry>) (change) -> {
             Platform.runLater(() -> {
-                if (change.wasAdded()) {
-                        grid.getChildren().add(createCampaignEntryNode(change.getElementAdded(), selectedEntry, open, delete));
-                } else {
-                    grid.getChildren().removeIf((x) -> change.getElementRemoved().equals(x.getProperties().get("entry")));
-                }
-
-               sortSavegames(grid, c.get());
+                updateSavegames(grid, c.get(), selectedEntry, open, delete);
             });
         });
+        updateSavegames(grid, c.get(), selectedEntry, open, delete);
 
         return grid;
     }
@@ -365,6 +377,7 @@ public class Eu4SavegameManagerStyle {
         });
         del.setAlignment(Pos.CENTER);
         del.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
+        Tooltip.install(del, tooltip("Delete campaign"));
 
 
         TextField name = new TextField(c.getName());
@@ -411,9 +424,11 @@ public class Eu4SavegameManagerStyle {
         return btn;
     }
 
-    private static void sortCampaignList(VBox list, ObservableSet<Eu4Campaign> campaigns) {
-        List<Node> newOrder = campaigns.stream().map(c -> (list.getChildren().stream()
-                .filter(x -> x.getProperties().get("campaign").equals(c))).findAny().get()).collect(Collectors.toList());
+    private static void sortCampaignList(VBox list, ObservableSet<Eu4Campaign> campaigns, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
+        List<Node> newOrder = campaigns.stream()
+                .sorted(Comparator.comparing(Eu4Campaign::getLastPlayed))
+                .map(c -> createCampaignButton(c, selectedCampaign, onDelete))
+                .collect(Collectors.toList());
         Collections.reverse(newOrder);
         list.getChildren().setAll(newOrder);
     }
@@ -425,25 +440,18 @@ public class Eu4SavegameManagerStyle {
         grid.setSpacing(3);
 
         for (Eu4Campaign d : campaigns) {
-            grid.getChildren().add(createCampaignButton(d, selectedCampaign, onDelete));
             d.lastPlayedProperty().addListener((change, o, n) -> {
                 Platform.runLater(() -> {
-                    sortCampaignList(grid, campaigns);
+                    sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
                 });
             });
         }
-        sortCampaignList(grid, campaigns);
-
         campaigns.addListener((SetChangeListener<? super Eu4Campaign>) (change) -> {
             Platform.runLater(() -> {
-                if (change.wasAdded()) {
-                    grid.getChildren().add(createCampaignButton(change.getElementAdded(), selectedCampaign, onDelete));
-                } else {
-                    grid.getChildren().removeIf((x) -> change.getElementRemoved().equals(x.getProperties().get("campaign")));
-                }
-                sortCampaignList(grid, campaigns);
+                sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
             });
         });
+        sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
 
         ScrollPane pane = new ScrollPane(grid);
         pane.setMinViewportWidth(200);
@@ -453,12 +461,12 @@ public class Eu4SavegameManagerStyle {
 
     public static Node createActiveStatusBar(PdxApp app) {
         BorderPane pane = new BorderPane();
-        pane.setStyle("-fx-border-color: #339933; -fx-background-color: #33aa33;");
+        pane.setStyle("-fx-border-width: 0; -fx-background-color: #337733;");
 
         ImageView icon = new ImageView(Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("launcher-assets").resolve("icon.png")));
         icon.setFitWidth(32);
         icon.setFitHeight(32);
-        Label text = new Label("Eu4", icon);
+        Label text = new Label("Europa Universalis 4", icon);
         text.setAlignment(Pos.BOTTOM_CENTER);
         text.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setLeft(text);
@@ -473,19 +481,21 @@ public class Eu4SavegameManagerStyle {
         });
         b.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setRight(b);
+        Tooltip.install(b, tooltip("Kill the game. This will prevent it from saving your current game!"));
+
         return pane;
     }
 
     public static Node createInactiveStatusBar(ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, ObjectProperty<Optional<Eu4Campaign.Entry>> save, Consumer<Eu4Campaign.Entry> onLaunch) {
 
         BorderPane pane = new BorderPane();
-            pane.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;");
+        pane.setStyle("-fx-border-width: 0; -fx-background-color: #555555;");
 
 
         ImageView icon = new ImageView(Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("launcher-assets").resolve("icon.png")));
         icon.setFitWidth(32);
         icon.setFitHeight(32);
-        Label text = new Label("eu4", icon);
+        Label text = new Label("Europa Universalis 4", icon);
         text.setAlignment(Pos.BOTTOM_CENTER);
         text.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setLeft(text);
@@ -495,22 +505,24 @@ public class Eu4SavegameManagerStyle {
         pane.setCenter(status);
 
         Button b = new Button("Launch");
-        b.disableProperty().setValue(true);
         b.setOnMouseClicked((m) -> {
-            if (!b.disableProperty().get()) {
+            if (save.get().isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(),
+                    save.get().get().getInfo().get().getVersion())) {
                 onLaunch.accept(save.get().get());
             }
         });
-        save.addListener((val, old , n) -> {
+
+        ChangeListener<Optional<Eu4Campaign.Entry>> l = (val, old , n) -> {
             if (n.isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(), n.get().getInfo().get().getVersion())) {
-                b.disableProperty().setValue(false);
                 b.setStyle("-fx-opacity: 1; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
+                Tooltip.install(b, tooltip("Launch savegame " + n.get().getName()));
             } else {
-                b.disableProperty().setValue(true);
                 b.setStyle("-fx-opacity: 0.5; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
+                Tooltip.install(b, tooltip("Selected savegame version is not compatible to the game version."));
             }
-        });
-        b.setStyle("-fx-opacity: 0.5; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
+        };
+        save.addListener(l);
+        l.changed(save, save.get(), save.get());
         pane.setRight(b);
 
         return pane;
@@ -518,15 +530,6 @@ public class Eu4SavegameManagerStyle {
 
     private static MenuBar createMenuBar() {
         Menu menu = new Menu("File");
-
-        MenuItem sd = new MenuItem("Open pdxu savegame directory");
-        sd.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().open(SavegameCache.ROOT_DIR.toFile());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
 
         MenuItem menuItem0 = new MenuItem("Export savegames...");
         menuItem0.setOnAction((a) -> {
@@ -540,7 +543,37 @@ public class Eu4SavegameManagerStyle {
             }
         });
 
-        MenuItem menuItem1 = new MenuItem("Import from pdxu archive...");
+
+        MenuItem l = new MenuItem("Import latest savegame");
+        l.setOnAction((a) -> {
+            Eu4SavegameImporter.importLatestSavegame();
+
+        });
+        menu.getItems().add(l);
+
+        MenuItem i = new MenuItem("Import all savegames...");
+        i.setOnAction((a) -> {
+            if (DialogHelper.showImportSavegamesDialog()) {
+                Eu4SavegameImporter.importAllSavegames();
+            }
+        });
+        menu.getItems().add(i);
+
+        menu.getItems().add(menuItem0);
+
+
+        Menu settings = new Menu("Settings");
+        MenuItem c = new MenuItem("Change settings");
+        c.setOnAction((a) -> {
+            DialogHelper.showSettings();
+        });
+        settings.getItems().add(c);
+
+
+
+        Menu savegames = new Menu("Storage");
+
+        MenuItem menuItem1 = new MenuItem("Import storage...");
         menuItem1.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showImportArchiveDialog();
             if (path.isPresent()) {
@@ -551,8 +584,9 @@ public class Eu4SavegameManagerStyle {
                 }
             }
         });
+        savegames.getItems().add(menuItem1);
 
-        MenuItem menuItem2 = new MenuItem("Export to pdxu archive...");
+        MenuItem menuItem2 = new MenuItem("Export storage...");
         menuItem2.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showExportDialog(true);
             if (path.isPresent()) {
@@ -563,35 +597,7 @@ public class Eu4SavegameManagerStyle {
                 }
             }
         });
-
-        menu.getItems().add(sd);
-        menu.getItems().add(menuItem0);
-        menu.getItems().add(menuItem1);
-        menu.getItems().add(menuItem2);
-
-
-        Menu settings = new Menu("Settings");
-        MenuItem c = new MenuItem("Change settings");
-        c.setOnAction((a) -> {
-            DialogHelper.showSettings();
-        });
-        settings.getItems().add(c);
-
-        Menu savegames = new Menu("Savegames");
-        MenuItem l = new MenuItem("Import latest savegame");
-        l.setOnAction((a) -> {
-            Eu4SavegameImporter.importLatestSavegame();
-
-        });
-        savegames.getItems().add(l);
-
-        MenuItem i = new MenuItem("Import all savegames...");
-        i.setOnAction((a) -> {
-            if (DialogHelper.showImportSavegamesDialog()) {
-                Eu4SavegameImporter.importAllSavegames();
-            }
-        });
-        savegames.getItems().add(i);
+        savegames.getItems().add(menuItem2);
 
         MenuItem u = new MenuItem("Update all savegames...");
         u.setOnAction((a) -> {
@@ -600,6 +606,17 @@ public class Eu4SavegameManagerStyle {
             }
         });
         savegames.getItems().add(u);
+
+
+        MenuItem sd = new MenuItem("Open storage directory");
+        sd.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().open(SavegameCache.ROOT_DIR.toFile());
+            } catch (IOException e) {
+                ErrorHandler.handleException(e, false);
+            }
+        });
+        savegames.getItems().add(sd);
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);

@@ -9,7 +9,7 @@ import javafx.collections.ObservableSet;
 import java.sql.Timestamp;
 import java.util.*;
 
-public class Eu4Campaign implements Comparable<Eu4Campaign> {
+public class Eu4Campaign {
 
     public static class Entry {
         private StringProperty name;
@@ -51,17 +51,25 @@ public class Eu4Campaign implements Comparable<Eu4Campaign> {
             return info.get();
         }
 
+        public Optional<GameDate> getDate() {
+            if (info.get().isPresent()) {
+                return Optional.ofNullable(info.get().get().getDate());
+            } else {
+                return Optional.empty();
+            }
+        }
+
         public ObjectProperty<Optional<Eu4SavegameInfo>> infoProperty() {
             return info;
         }
     }
 
-    private ObjectProperty<Timestamp> lastPlayed;
-    private StringProperty tag;
-    private StringProperty name;
-    private ObjectProperty<GameDate> date;
+    private volatile ObjectProperty<Timestamp> lastPlayed;
+    private volatile StringProperty tag;
+    private volatile StringProperty name;
+    private volatile ObjectProperty<GameDate> date;
     private UUID campaignId;
-    private BooleanProperty isLoaded = new SimpleBooleanProperty(false);
+    private volatile BooleanProperty isLoaded = new SimpleBooleanProperty(false);
     private volatile ObservableSet<Entry> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
 
@@ -71,11 +79,6 @@ public class Eu4Campaign implements Comparable<Eu4Campaign> {
         this.name = name;
         this.date = date;
         this.campaignId = campaignId;
-    }
-
-    @Override
-    public int compareTo(Eu4Campaign o) {
-        return this.lastPlayed.get().compareTo(o.lastPlayed.get());
     }
 
     public void add(Entry e) {

@@ -27,6 +27,16 @@ public class Eu4Transformer {
             }
         }, new DateTransformer()));
 
+        t.add(new RecursiveTransformer((n) -> {
+            if (n instanceof KeyValueNode) {
+                Node val = Node.getKeyValueNode(n).getNode();
+                return val instanceof ValueNode &&
+                        (((ValueNode) val).getValue() instanceof String && (Node.getString(val).equals("yes") || Node.getString(val).equals("no")));
+            } else {
+                return false;
+            }
+        }, new BooleanTransformer()));
+
         t.add(new CollectNodesTransformer("active_war", "active_wars"));
         t.add(new CollectNodesTransformer("previous_war", "previous_wars"));
         t.add(new CollectNodesTransformer("rebel_faction", "rebel_factions"));
@@ -63,6 +73,16 @@ public class Eu4Transformer {
     private static final NodeTransformer createMetaTransformer() {
 
         List<NodeTransformer> t = new ArrayList<>();
+        t.add(new RecursiveTransformer((n) -> {
+            if (n instanceof KeyValueNode) {
+                Node val = Node.getKeyValueNode(n).getNode();
+                return val instanceof ValueNode &&
+                        (((ValueNode) val).getValue() instanceof String && (Node.getString(val).equals("yes") || Node.getString(val).equals("no")));
+            } else {
+                return false;
+            }
+        }, new BooleanTransformer()));
+
         t.add(new SubnodeTransformer(Map.of(new String[] {"date"}, new DateTransformer()), true));
         t.add(new DefaultValueTransformer("is_random_new_world", new ValueNode(false)));
         t.add(new DefaultValueTransformer("ironman", new ValueNode(false)));

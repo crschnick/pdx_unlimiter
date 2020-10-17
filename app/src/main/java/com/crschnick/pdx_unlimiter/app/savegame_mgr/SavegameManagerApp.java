@@ -11,6 +11,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.commons.io.FileUtils;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
 
 import java.awt.*;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SavegameManagerApp extends Application {
 
@@ -33,8 +37,9 @@ public class SavegameManagerApp extends Application {
             Path srcPath = SavegameCache.EU4_CACHE.getPath(e).resolve("savegame.eu4");
             Path destPath = Installation.EU4.get().getSaveDirectory().resolve("savegame.eu4");
             try {
-                FileUtils.copyFile(srcPath.toFile(), destPath.toFile());
-                Installation.EU4.get().writeLaunchConfig(e, destPath.relativize(Installation.EU4.get().getUserDirectory()));
+                FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
+                destPath.toFile().setLastModified(System.currentTimeMillis());
+                Installation.EU4.get().writeLaunchConfig(e, Installation.EU4.get().getUserDirectory().relativize(destPath));
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -136,6 +141,15 @@ public class SavegameManagerApp extends Application {
             ErrorHandler.handleException(e, true);
         }
 
+        try {
+            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+            logger.setLevel(Level.SEVERE);
+            logger.setUseParentHandlers(false);
+            GlobalScreen.registerNativeHook();
+        } catch (NativeHookException e) {
+            ErrorHandler.handleException(e, false);
+        }
+
         if (!Installation.isConfigured()) {
             DialogHelper.showSettings();
         }
@@ -147,6 +161,11 @@ public class SavegameManagerApp extends Application {
         }
         running.setValue(false);
         Platform.exit();
+        try {
+            GlobalScreen.unregisterNativeHook();
+        } catch (NativeHookException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -171,7 +190,12 @@ public class SavegameManagerApp extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        ErrorHandler.init();
+        try {
+            launch(args);
+        } catch (Exception e) {
+            ErrorHandler.handleException(e, true);
+        }
     }
 
     public boolean isRunning() {

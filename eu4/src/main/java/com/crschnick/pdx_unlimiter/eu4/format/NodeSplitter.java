@@ -21,6 +21,10 @@ public class NodeSplitter {
         List<Node> split = new ArrayList<>();
         ArrayNode masterNode = (ArrayNode) node;
         for (String name : names) {
+            if (!Node.hasKey(masterNode, name)) {
+                continue;
+            }
+
             KeyValueNode n = Node.getKeyValueNodeForKey(masterNode, name);
             masterNode.removeNode(n);
             split.add(n);
