@@ -21,6 +21,7 @@ public class Eu4SavegameImporter {
     public static void importLatestSavegame() {
         Arrays.stream(Installation.EU4.get().getSaveDirectory().toFile().listFiles())
                 .sorted(Comparator.comparingLong(f -> f.lastModified()))
+                .sorted(Comparator.reverseOrder())
                 .findFirst().ifPresent(f -> {
                 SavegameCache.EU4_CACHE.importSavegame(f.toPath());
         });

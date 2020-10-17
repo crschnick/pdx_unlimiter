@@ -50,6 +50,14 @@ public abstract class Node {
         return list.size() == 0 ? Optional.empty() : Optional.of(list.get(0));
     }
 
+    public static boolean getBoolean(Node node) {
+        if (!(node instanceof ValueNode)) {
+            throw new NodeFormatException("Not a value node:\n" + node.toString(2));
+        }
+
+        return (Boolean) ((ValueNode) node).getValue();
+    }
+
     public static String getString(Node node) {
         if (!(node instanceof ValueNode)) {
             throw new NodeFormatException("Not a value node:\n" + node.toString(2));

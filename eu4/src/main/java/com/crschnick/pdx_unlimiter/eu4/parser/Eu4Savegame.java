@@ -30,7 +30,8 @@ public class Eu4Savegame {
 
     private static final String[] META_NODES = new String[] {"date", "save_game", "player",
             "displayed_country_name", "savegame_version", "savegame_versions", "dlc_enabled",
-            "multi_player", "not_observer", "campaign_id", "campaign_length", "campaign_stats"};
+            "multi_player", "not_observer", "campaign_id", "campaign_length", "campaign_stats",
+            "is_random_new_world", "ironman"};
 
     private static final String[] AI_NODES = new String[] {"ai"};
 

@@ -1,9 +1,6 @@
 package com.crschnick.pdx_unlimiter.eu4;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
-import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.*;
 
 import java.util.*;
 
@@ -142,84 +139,94 @@ public class Eu4SavegameInfo{
     private Set<War> wars = new HashSet<>();
 
 
-    public static Eu4SavegameInfo fromSavegame(Eu4IntermediateSavegame save) {
-        GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
-        String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
-        Eu4SavegameInfo e = new Eu4SavegameInfo();
+    public static Eu4SavegameInfo fromSavegame(Eu4IntermediateSavegame save) throws SavegameParseException {
+        try {
+            GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
+            String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
+            Eu4SavegameInfo e = new Eu4SavegameInfo();
 
-        for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {
-            e.allTags.add(GameTag.fromNode(n));
+            for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {
+                e.allTags.add(GameTag.fromNode(n));
+                if (Node.hasKey(Node.getKeyValueNode(n).getNode(), "custom_nation_points")) {
+                    e.customNationInWorld = true;
+                }
+            }
+            e.randomNewWorld = Node.getBoolean(Node.getNodeForKey(save.getNodes().get("meta"), "is_random_new_world"));
+            e.ironman = Node.getBoolean(Node.getNodeForKey(save.getNodes().get("meta"), "ironman"));
+            e.releasedVassal = Node.hasKey(Node.getNodeForKey(save.getNodes().get("countries"), tag), "has_switched_nation");
+            e.date = date;
+            e.currentTag = GameTag.getTag(e.allTags, tag);
+            e.wars = War.fromActiveWarsNode(e.allTags, tag, save.getNodes().get("active_wars"));
+            e.ruler = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "monarch").get();
+            e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "heir");
+            for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "dependencies"))) {
+                if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
+                        e.vassals.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                    }
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
+                        e.vassals.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                    }
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
+                        e.juniorPartners.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                    }
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
+                        e.tributaryJuniors.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                    }
+                }
+
+                if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
+                        e.overlord = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
+                    }
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
+                        e.overlord = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
+                    }
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
+                        e.seniorPartner = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
+                    }
+                    if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
+                        e.tributarySenior = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
+                    }
+                }
+
+            }
+
+            for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "alliances"))) {
+                if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
+                    e.allies.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                }
+                if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
+                    e.allies.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
+                }
+            }
+
+            for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "royal_marriages"))) {
+                if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
+                    e.marriages.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                }
+                if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
+                    e.marriages.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
+                }
+            }
+
+            for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "guarantees"))) {
+                if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
+                    e.guarantees.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
+                }
+            }
+
+
+            Node v = Node.getNodeForKey(save.getNodes().get("meta"), "savegame_version");
+            e.version = new GameVersion(Node.getInteger(Node.getNodeForKey(v, "first")),
+                    Node.getInteger(Node.getNodeForKey(v, "second")),
+                    Node.getInteger(Node.getNodeForKey(v, "third")),
+                    Node.getInteger(Node.getNodeForKey(v, "forth")));
+
+            return e;
+        } catch (NodeFormatException ex) {
+            throw new SavegameParseException("Error while creating savegame info", ex);
         }
-        e.date = date;
-        e.currentTag = GameTag.getTag(e.allTags, tag);
-        e.wars = War.fromActiveWarsNode(e.allTags, tag, save.getNodes().get("active_wars"));
-        e.ruler = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "monarch").get();
-        e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "heir");
-        for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "dependencies"))) {
-            if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
-                    e.vassals.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-                }
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
-                    e.vassals.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-                }
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
-                    e.juniorPartners.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-                }
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
-                    e.tributaryJuniors.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-                }
-            }
-
-            if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("vassal")) {
-                    e.overlord = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
-                }
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("daimyo_vassal")) {
-                    e.overlord = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
-                }
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("personal_union")) {
-                    e.seniorPartner = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
-                }
-                if (Node.getString(Node.getNodeForKey(n, "subject_type")).equals("tributary_state")) {
-                    e.tributarySenior = Optional.of(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
-                }
-            }
-
-        }
-
-        for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "alliances"))) {
-            if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                e.allies.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-            }
-            if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
-                e.allies.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
-            }
-        }
-
-        for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "royal_marriages"))) {
-            if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                e.marriages.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-            }
-            if (Node.getString(Node.getNodeForKey(n, "second")).equals(tag)) {
-                e.marriages.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "first"))));
-            }
-        }
-
-        for (Node n : Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("diplomacy"), "guarantees"))) {
-            if (Node.getString(Node.getNodeForKey(n, "first")).equals(tag)) {
-                e.guarantees.add(GameTag.getTag(e.allTags, Node.getString(Node.getNodeForKey(n, "second"))));
-            }
-        }
-
-
-        Node v = Node.getNodeForKey(save.getNodes().get("meta"), "savegame_version");
-        e.version = new GameVersion(Node.getInteger(Node.getNodeForKey(v, "first")),
-                Node.getInteger(Node.getNodeForKey(v, "second")),
-                Node.getInteger(Node.getNodeForKey(v, "third")),
-                Node.getInteger(Node.getNodeForKey(v, "forth")));
-
-        return e;
     }
 
     public boolean isIronman() {

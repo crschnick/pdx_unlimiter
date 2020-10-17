@@ -1,17 +1,27 @@
 plugins {
-    id 'java'
-    id 'idea'
     id 'application'
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
+    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
 group 'com.crschnick.pdx_unlimiter'
 version '0.1-SNAPSHOT'
-ext.moduleName = 'com.crschnick.pdx_unlimiter.app'
-mainClassName = 'com.crschnick.pdx_unlimiter.app.Main'
 
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
+java {
+    modularity.inferModulePath = true
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
+}
+
+application {
+    mainModule = 'com.crschnick.pdx_unlimiter.app'
+    mainClass = 'com.crschnick.pdx_unlimiter.app.Main'
+}
+
+javafx {
+    version = '15'
+    modules = [ 'javafx.controls', 'javafx.base', 'javafx.graphics', 'javafx.swing' ]
+}
 
 repositories {
     mavenCentral()
@@ -22,13 +32,15 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.11.3"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
     implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
     implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
     implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
+    implementation files("$buildDir/generated-modules/slf4j-api-1.7.30.jar")
+    implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
+    implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
     implementation project(':eu4')
 }
 
@@ -36,6 +48,36 @@ addDependenciesModuleInfo {
     jdepsExtraArgs = ['-q']
     outputDirectory = file("$buildDir/generated-modules")
     modules {
+        module {
+            artifact group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
+            moduleInfoSource = '''
+                module org.jnativehook {
+                    exports org.jnativehook;
+                    exports org.jnativehook.keyboard;
+                   requires java.logging;
+                   requires java.desktop;
+                }
+            '''
+        }
+        module {
+            artifact 'io.sentry:sentry:1.7.30'
+            moduleInfoSource = '''
+                module io.sentry {
+                    exports io.sentry;
+                    requires org.slf4j;
+                    requires java.naming;
+                    requires com.fasterxml.jackson.core;
+                }
+            '''
+        }
+        module {
+            artifact 'org.slf4j:slf4j-api:1.7.30'
+            moduleInfoSource = '''
+                module org.slf4j {
+                    exports org.slf4j;
+                }
+            '''
+        }
         module {
             artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
             moduleInfoSource = '''
@@ -79,11 +121,6 @@ addDependenciesModuleInfo {
     }
 }
 
-
-java {
-    modularity.inferModulePath = true
-}
-
 task copyModules(type: Copy) {
     into "${buildDir}/modules"
     from configurations.runtimeClasspath
@@ -94,8 +131,8 @@ task copyOutput(type: Copy) {
     from "${buildDir}/libs"
 }
 
-build.dependsOn(copyModules)
-build.dependsOn(copyOutput)
+addDependenciesModuleInfo.finalizedBy(copyModules)
+build.finalizedBy(copyOutput)
 
 createRuntimeImage {
     jdkHome = '$JAVA_HOME'
@@ -112,3 +149,4 @@ createRuntimeImage {
 }
 
 createRuntimeImage.dependsOn(build)
+

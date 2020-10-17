@@ -40,7 +40,7 @@ public class Eu4IntermediateSavegame {
         return nodes;
     }
 
-    public static Eu4IntermediateSavegame fromSavegame(Eu4Savegame save) throws TransformException {
+    public static Eu4IntermediateSavegame fromSavegame(Eu4Savegame save) throws SavegameParseException {
         Node gameState = save.getGamestate();
         Map<String, Node> map;
         try {
@@ -48,12 +48,24 @@ public class Eu4IntermediateSavegame {
             Eu4Transformer.META_TRANSFORMER.transform(save.getMeta());
             map = new NodeSplitter(GAMESTATE_SPLIT_PARTS).removeNodes(gameState);
         } catch (RuntimeException e) {
-            throw new TransformException("Can't transform savegame", e);
+            throw new SavegameParseException("Can't transform savegame", e);
         }
         map.put("gamestate", gameState);
         map.put("ai", save.getAi());
         map.put("meta", save.getMeta());
         return new Eu4IntermediateSavegame(map, VERSION);
+    }
+
+    public static int getVersion(Path file) throws IOException {
+        int v = 0;
+        boolean isDir = file.toFile().isDirectory();
+        if (!isDir) {
+            ZipFile zipFile = new ZipFile(file.toFile());
+            v = Integer.parseInt(new String(zipFile.getInputStream(zipFile.getEntry("version")).readAllBytes()));
+        } else {
+            v = Integer.parseInt(new String(Files.readAllBytes(file.resolve("version"))));
+        }
+        return v;
     }
 
     public static Eu4IntermediateSavegame fromFile(Path file) throws IOException {

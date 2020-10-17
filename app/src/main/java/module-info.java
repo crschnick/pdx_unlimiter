@@ -1,7 +1,5 @@
 module com.crschnick.pdx_unlimiter.app {
     requires java.se;
-    requires javafx.controls;
-    requires javafx.swing;
     requires com.crschnick.pdx_unlimiter.eu4;
     requires com.realityinteractive.imageio.tga;
     requires org.apache.commons.lang3;
@@ -9,6 +7,12 @@ module com.crschnick.pdx_unlimiter.app {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
     requires net.nikr.dds;
+    requires javafx.base;
+    requires javafx.graphics;
+    requires javafx.controls;
+    requires javafx.swing;
+    requires io.sentry;
+    requires org.jnativehook;
 
     uses javax.imageio.spi.ImageReaderSpi;
     uses net.nikr.dds.DDSImageReaderSpi;

@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import io.sentry.Sentry;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -24,8 +25,10 @@ import java.util.Optional;
 
 public class DialogHelper {
 
-    public static void showException(Exception e, boolean wait) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    public static boolean showException(Exception e) {
+        ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
+        ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert alert = new Alert(Alert.AlertType.ERROR, "", foo, bar);
         alert.setTitle("Error alert");
         alert.setHeaderText("An exception occured");
 
@@ -47,8 +50,8 @@ public class DialogHelper {
 
         alert.getDialogPane().setContent(dialogPaneContent);
 
-        if (wait) alert.showAndWait();
-        else alert.show();
+        Optional<ButtonType> r = alert.showAndWait();
+        return r.isPresent() && r.get().getButtonData().isDefaultButton();
     }
 
     public static void showSettings() {
@@ -182,8 +185,8 @@ public class DialogHelper {
     public static boolean showUpdateAllSavegamesDialog() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm deletion");
-        alert.setHeaderText("Do you want to delete the selected savegame?");
+        alert.setTitle("Confirm update");
+        alert.setHeaderText("Do you want to update all savegames? This may take a while.");
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton();
 

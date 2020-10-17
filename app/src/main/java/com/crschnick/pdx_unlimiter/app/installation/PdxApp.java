@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import org.jnativehook.GlobalScreen;
+
 import java.util.Optional;
 
 public class PdxApp {
@@ -28,9 +30,11 @@ public class PdxApp {
                             .findFirst();
                     if (h.isPresent()) {
                         ACTIVE_APP = Optional.of(new Eu4App(h.get()));
+                        ACTIVE_APP.get().onStart();
                     }
                 } else {
                     if (!ACTIVE_APP.get().isAlive()) {
+                        ACTIVE_APP.get().onShutdown();
                         ACTIVE_APP = Optional.empty();
                     }
                 }
@@ -57,6 +61,10 @@ public class PdxApp {
         this.process = process;
         this.type = type;
     }
+
+    public void onStart() {}
+
+    public void onShutdown() {}
 
     public Type getType() {
         return type;

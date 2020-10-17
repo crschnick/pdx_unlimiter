@@ -50,7 +50,7 @@ public class Eu4ImageLoader {
                 for (int y = 0; y < image.getHeight(); y++) {
                     int rgb = image.getRGB(x, y);
                     if (!pixelSelector.test(rgb)) {
-                        image.setRGB(x, y, 0x00FFFFFF);
+                        image.setRGB(x, y, 0x01FFFFFF);
                     }
                 }
             }
