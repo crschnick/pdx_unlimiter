@@ -13,6 +13,7 @@ module com.crschnick.pdx_unlimiter.app {
     requires javafx.swing;
     requires io.sentry;
     requires org.jnativehook;
+    requires org.slf4j;
 
     uses javax.imageio.spi.ImageReaderSpi;
     uses net.nikr.dds.DDSImageReaderSpi;
