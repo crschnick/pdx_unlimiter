@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.apache.commons.lang3.SystemUtils;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -21,6 +23,10 @@ public class Updater {
     public static final String PATH = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "app").toString();
 
     public static void main(String[] args) {
+        JFrame frame = new UpdaterGui();
+
+        frame.setVisible(true);
+
         try {
             String response = executeGet("https://api.github.com/repos/crschnick/pdx_unlimiter/releases/latest");
             System.out.println("got response: " + response);

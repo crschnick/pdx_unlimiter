@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;

@@ -1,21 +1,26 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -171,6 +176,8 @@ public class SavegameManagerApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         APP = this;
+        var icon = SavegameManagerApp.class.getResourceAsStream("icon.png");
+        primaryStage.getIcons().add(new Image(icon));
 
         startSetup();
 

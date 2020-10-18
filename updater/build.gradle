@@ -1,19 +1,24 @@
+import com.github.langmo.gradlensis.GradleNsisTask
+
 plugins {
-    id 'java'
     id 'idea'
     id 'application'
-    id 'edu.sc.seis.launch4j' version '2.4.8'
     id "com.github.langmo.gradlensis" version "0.1.0"
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
-group 'com.crschnick'
 version '0.1-SNAPSHOT'
-ext.moduleName = 'com.crschnick.pdx_unlimiter.updater'
-mainClassName = 'com.crschnick.pdx_unlimiter.updater.Updater'
 
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
+java {
+    modularity.inferModulePath = true
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
+}
+
+application {
+    mainModule = 'com.crschnick.pdx_unlimiter.updater'
+    mainClass = 'com.crschnick.pdx_unlimiter.updater.Updater'
+}
 
 repositories {
     mavenCentral()
@@ -41,30 +46,6 @@ addDependenciesModuleInfo {
     }
 }
 
-java {
-    modularity.inferModulePath = true
-}
-
-
-
-launch4j {
-    mainClassName = 'com.crschnick.pdx_unlimiter.Updater'
-}
-
-nsis {
-    // path to the NSIS configuration file
-    configuration = file("config.nsi")
-    // folder where the NSIS installer generator is run. All paths
-    // in the NSIS configuration file are relative to this folder.
-    runIn =  file("${buildDir}")
-
-    destinationFolder = file("${buildDir}/bin")
-}
-
-createInstaller.dependsOn(createRuntimeImage)
-
-
-
 task copyModules(type: Copy) {
     into "${buildDir}/modules"
     from configurations.runtimeClasspath
@@ -80,7 +61,7 @@ build.dependsOn(copyOutput)
 
 createRuntimeImage {
     jdkHome = '$JAVA_HOME'
-    outputDirectory = file("$buildDir/jre-image")
+    outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
     modules = ['com.crschnick.pdx_unlimiter.updater']
     excludedResources = []
@@ -93,3 +74,22 @@ createRuntimeImage {
 }
 
 createRuntimeImage.dependsOn(build)
+
+
+task createLauncherExe(type: GradleNsisTask) {
+    configuration = file("launcher.nsi")
+    runIn =  file("${projectDir}")
+    destinationFolder = file("${buildDir}/bin")
+}
+createLauncherExe.dependsOn(createRuntimeImage)
+
+
+task createInstallerExe(type: GradleNsisTask) {
+    configuration = file("installer.nsi")
+    runIn =  file("${projectDir}")
+    destinationFolder = file("${buildDir}/bin")
+}
+createInstallerExe.dependsOn(createLauncherExe)
+
+task createDist(type: DefaultTask)
+createDist.dependsOn(createInstallerExe)

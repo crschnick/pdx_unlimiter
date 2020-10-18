@@ -1,14 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import javafx.beans.property.BooleanProperty;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Comparator;
