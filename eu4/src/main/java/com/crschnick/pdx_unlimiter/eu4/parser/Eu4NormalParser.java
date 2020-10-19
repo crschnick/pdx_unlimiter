@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.eu4.parser;
 
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
 
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,8 @@ public class Eu4NormalParser extends GamedataParser {
             boolean isWhitespace = !isInQuotes && (s.charAt(i) == '\n' || s.charAt(i) == '\r' || s.charAt(i) == ' ' || s.charAt(i) == '\t');
             boolean marksEndOfPreviousToken =
                     (s.charAt(i) == '\0' && prev < i) // EOF
-                    || (t != null && prev < i)        // New token finishes old token
-                    || (isWhitespace && prev < i);    // Whitespace finishes old token
+                            || (t != null && prev < i)        // New token finishes old token
+                            || (isWhitespace && prev < i);    // Whitespace finishes old token
             if (marksEndOfPreviousToken) {
                 String sub = s.substring(prev, i);
                 if (sub.equals("yes")) {

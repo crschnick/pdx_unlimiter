@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
@@ -16,17 +15,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class Eu4ImageLoader {
+
+    private static Map<String, Image> IMAGES = new HashMap<>();
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
         registry.registerServiceProvider(new com.realityinteractive.imageio.tga.TGAImageReaderSpi());
     }
-
-    private static Map<String, Image> IMAGES = new HashMap<>();
 
     public static Image loadImage(Path p) {
         return loadImage(p, null);
@@ -66,7 +64,7 @@ public class Eu4ImageLoader {
         return loadInterfaceImage(name, null);
     }
 
-    public static ImageView loadInterfaceImage(String name, Rectangle2D viewport)  {
+    public static ImageView loadInterfaceImage(String name, Rectangle2D viewport) {
         Path p = Installation.EU4.get().getPath().resolve("gfx/interface/" + name);
         Image i = loadImage(p);
         ImageView v = new ImageView(i);
@@ -74,7 +72,7 @@ public class Eu4ImageLoader {
         return v;
     }
 
-    public static ImageView loadDisasterImage(String name)  {
+    public static ImageView loadDisasterImage(String name) {
         Path p = Installation.EU4.get().getPath().resolve("gfx/interface/disasters/" + name + ".dds");
         Image i = loadImage(p);
         ImageView v = new ImageView(i);

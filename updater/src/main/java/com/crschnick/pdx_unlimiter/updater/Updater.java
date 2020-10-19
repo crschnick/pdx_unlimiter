@@ -8,7 +8,9 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -110,15 +112,6 @@ public class Updater {
         return i.compareTo(info.timestamp) < 0;
     }
 
-    public static class Info {
-        public URL url;
-        public int size;
-        public Instant timestamp;
-        public String body;
-        public String version;
-    }
-
-
     public static void deleteOldVersion(Path path) throws Exception {
         File f = path.toFile();
         FileUtils.deleteDirectory(f);
@@ -207,5 +200,13 @@ public class Updater {
                 connection.disconnect();
             }
         }
+    }
+
+    public static class Info {
+        public URL url;
+        public int size;
+        public Instant timestamp;
+        public String body;
+        public String version;
     }
 }

@@ -4,9 +4,6 @@ import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class RecursiveTransformer extends NodeTransformer {
@@ -28,8 +25,7 @@ public class RecursiveTransformer extends NodeTransformer {
 
         if (node instanceof KeyValueNode) {
             transform(Node.getKeyValueNode(node).getNode());
-        }
-        else if (node instanceof ArrayNode) {
+        } else if (node instanceof ArrayNode) {
             for (Node n : Node.getNodeArray(node)) {
                 transform(n);
             }

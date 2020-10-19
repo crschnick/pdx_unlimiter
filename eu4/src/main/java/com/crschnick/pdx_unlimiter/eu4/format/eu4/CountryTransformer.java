@@ -1,7 +1,9 @@
 package com.crschnick.pdx_unlimiter.eu4.format.eu4;
 
 import com.crschnick.pdx_unlimiter.eu4.format.NodeTransformer;
-import com.crschnick.pdx_unlimiter.eu4.parser.*;
+import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
 import java.util.List;
 import java.util.Optional;

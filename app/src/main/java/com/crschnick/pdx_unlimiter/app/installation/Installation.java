@@ -22,6 +22,13 @@ public abstract class Installation {
     public static final Path FILE = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "settings", "installations.json");
 
     public static Optional<Eu4Installation> EU4 = Optional.empty();
+    private String name;
+    private Path path;
+
+    public Installation(String name, Path path) {
+        this.name = name;
+        this.path = path;
+    }
 
     public static boolean isConfigured() {
         return FILE.toFile().exists();
@@ -87,15 +94,6 @@ public abstract class Installation {
         }
         Path p = Paths.get(steamDir.get(), "steamapps", "common", app);
         return p.toFile().exists() ? Optional.of(p) : Optional.empty();
-    }
-
-    private String name;
-
-    private Path path;
-
-    public Installation(String name, Path path) {
-        this.name = name;
-        this.path = path;
     }
 
     public abstract void start();

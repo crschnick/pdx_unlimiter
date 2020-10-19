@@ -16,6 +16,12 @@ import java.util.zip.ZipOutputStream;
 
 public class Eu4Savegame {
 
+    private static final GamedataParser normalParser = new Eu4NormalParser();
+    private static final String[] META_NODES = new String[]{"date", "save_game", "player",
+            "displayed_country_name", "savegame_version", "savegame_versions", "dlc_enabled",
+            "multi_player", "not_observer", "campaign_id", "campaign_length", "campaign_stats",
+            "is_random_new_world", "ironman"};
+    private static final String[] AI_NODES = new String[]{"ai"};
     private Node gamestate;
     private Node ai;
     private Node meta;
@@ -25,15 +31,6 @@ public class Eu4Savegame {
         this.ai = ai;
         this.meta = meta;
     }
-
-    private static final GamedataParser normalParser = new Eu4NormalParser();
-
-    private static final String[] META_NODES = new String[] {"date", "save_game", "player",
-            "displayed_country_name", "savegame_version", "savegame_versions", "dlc_enabled",
-            "multi_player", "not_observer", "campaign_id", "campaign_length", "campaign_stats",
-            "is_random_new_world", "ironman"};
-
-    private static final String[] AI_NODES = new String[] {"ai"};
 
     public static Eu4Savegame fromFile(Path file) throws IOException {
         var in = Files.newInputStream(file);
@@ -48,7 +45,7 @@ public class Eu4Savegame {
             Optional<Node> gamestateNode = new Eu4IronmanParser(Namespace.EU4_GAMESTATE).parse(zipFile.getInputStream(gamestate));
             if (gamestateNode.isPresent()) {
                 Node metaNode = new Eu4IronmanParser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
-                Node aiNode =new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
+                Node aiNode = new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
                 zipFile.close();
                 return new Eu4Savegame(gamestateNode.get(), aiNode, metaNode);
             } else {
@@ -67,7 +64,7 @@ public class Eu4Savegame {
             }
             throw new IOException("Invalid savegame: " + file.toString());
         }
-            }
+    }
 
     public void write(String fileName, boolean txtSuffix) throws IOException {
         File f = new File(fileName);

@@ -5,7 +5,9 @@ import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.SavegameParseException;
-import com.crschnick.pdx_unlimiter.eu4.parser.*;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -39,6 +41,16 @@ public class SavegameCache {
     public static final SavegameCache EU4_CACHE = new SavegameCache("eu4");
 
     public static final Set<SavegameCache> CACHES = Set.of(EU4_CACHE);
+    private String name;
+    private Path path;
+    private ObjectProperty<Optional<Status>> status = new SimpleObjectProperty<>(Optional.empty());
+    private volatile ObservableSet<Eu4Campaign> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
+
+    public SavegameCache(String name) {
+        this.name = name;
+        this.path = ROOT_DIR.resolve(name);
+        addChangeListeners();
+    }
 
     public static void loadData() throws IOException {
         for (SavegameCache cache : CACHES) {
@@ -58,45 +70,64 @@ public class SavegameCache {
         }
     }
 
-    public static class Status {
-        public static enum Type {
-            IMPORTING,
-            LOADING,
-            UPDATING,
-            DELETING,
-            IMPORTING_ARCHIVE,
-            EXPORTING_ARCHIVE
+    public static void importSavegameCache(Path in) {
+        ZipFile zipFile = null;
+        try {
+            zipFile = new ZipFile(in.toFile());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+            return;
         }
 
-        private Type type;
-        private String path;
-
-        public Status(Type type, String path) {
-            this.type = type;
-            this.path = path;
+        for (SavegameCache cache : SavegameCache.CACHES) {
+            cache.importSavegameCache(zipFile);
         }
 
-        public Type getType() {
-            return type;
-        }
-
-        public String getPath() {
-            return path;
+        try {
+            zipFile.close();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
         }
     }
 
-    private String name;
+    public static void exportSavegameCache(Path out) {
+        ZipOutputStream zipFile = null;
+        try {
+            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+        } catch (FileNotFoundException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
 
-    private Path path;
+        for (SavegameCache cache : SavegameCache.CACHES) {
+            cache.exportSavegameCache(zipFile);
+        }
 
-    private ObjectProperty<Optional<Status>> status = new SimpleObjectProperty<>(Optional.empty());
+        try {
+            zipFile.close();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+        }
+    }
 
-    private volatile ObservableSet<Eu4Campaign> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
+    public static void exportSavegameDirectory(Path out) {
+        ZipOutputStream zipFile = null;
+        try {
+            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+        } catch (FileNotFoundException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
 
-    public SavegameCache(String name) {
-        this.name = name;
-        this.path = ROOT_DIR.resolve(name);
-        addChangeListeners();
+        for (SavegameCache cache : SavegameCache.CACHES) {
+            cache.exportSavegameDirectory(zipFile);
+        }
+
+        try {
+            zipFile.close();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+        }
     }
 
     private void addChangeListeners() {
@@ -190,67 +221,6 @@ public class SavegameCache {
         return c;
     }
 
-
-    public static void importSavegameCache(Path in) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(in.toFile());
-        } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
-            return;
-        }
-
-        for (SavegameCache cache : SavegameCache.CACHES) {
-            cache.importSavegameCache(zipFile);
-        }
-
-        try {
-            zipFile.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
-        }
-    }
-
-    public static void exportSavegameCache(Path out)  {
-        ZipOutputStream zipFile = null;
-        try {
-            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
-        } catch (FileNotFoundException e) {
-            ErrorHandler.handleException(e, false);
-            return;
-        }
-
-        for (SavegameCache cache : SavegameCache.CACHES) {
-            cache.exportSavegameCache(zipFile);
-        }
-
-        try {
-            zipFile.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
-        }
-    }
-
-    public static void exportSavegameDirectory(Path out) {
-        ZipOutputStream zipFile = null;
-        try {
-            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
-        } catch (FileNotFoundException e) {
-            ErrorHandler.handleException(e, false);
-            return;
-        }
-
-        for (SavegameCache cache : SavegameCache.CACHES) {
-            cache.exportSavegameDirectory(zipFile);
-        }
-
-        try {
-            zipFile.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
-        }
-    }
-
     public void importSavegameCache(ZipFile zipFile) {
         String config = SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString();
         ZipEntry e = zipFile.getEntry(config);
@@ -332,7 +302,6 @@ public class SavegameCache {
         IOUtils.copy(in, out);
         in.close();
     }
-
 
     public synchronized void delete(Eu4Campaign c) {
         if (!this.campaigns.contains(c)) {
@@ -578,5 +547,31 @@ public class SavegameCache {
 
     public ObservableSet<Eu4Campaign> getCampaigns() {
         return campaigns;
+    }
+
+    public static class Status {
+        private Type type;
+        private String path;
+        public Status(Type type, String path) {
+            this.type = type;
+            this.path = path;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public static enum Type {
+            IMPORTING,
+            LOADING,
+            UPDATING,
+            DELETING,
+            IMPORTING_ARCHIVE,
+            EXPORTING_ARCHIVE
+        }
     }
 }

@@ -1,20 +1,18 @@
 package com.crschnick.pdx_unlimiter.eu4.format.eu4;
 
 import com.crschnick.pdx_unlimiter.eu4.format.NodeTransformer;
-import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.regex.Pattern;
 
 public class ProvincesTransformer extends NodeTransformer {
 
-    private NodeTransformer events = new EventTransformer();
-
     private static final Pattern PROVINCE_ID = Pattern.compile("-(\\d+)");
-
     private static final String ID = "province_id";
+    private NodeTransformer events = new EventTransformer();
 
     @Override
     public void transform(Node node) {

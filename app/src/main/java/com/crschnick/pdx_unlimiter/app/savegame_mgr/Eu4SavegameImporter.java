@@ -4,14 +4,10 @@ import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import javafx.beans.property.BooleanProperty;
 
-import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.file.*;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Consumer;
-
-import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Eu4SavegameImporter {
 
@@ -20,7 +16,7 @@ public class Eu4SavegameImporter {
                 .sorted(Comparator.comparingLong(f -> f.lastModified()))
                 .sorted(Comparator.reverseOrder())
                 .findFirst().ifPresent(f -> {
-                SavegameCache.EU4_CACHE.importSavegame(f.toPath());
+            SavegameCache.EU4_CACHE.importSavegame(f.toPath());
         });
 
     }
@@ -28,7 +24,7 @@ public class Eu4SavegameImporter {
     public static void importAllSavegames() {
         new Thread(() -> {
             Eu4SavegameImporter.importAllSavegames(Installation.EU4.get().getSaveDirectory(), (p) -> {
-                    SavegameCache.EU4_CACHE.importSavegame(p);
+                SavegameCache.EU4_CACHE.importSavegame(p);
             }, SavegameManagerApp.getAPP().runningProperty());
         }).start();
 

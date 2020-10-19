@@ -27,7 +27,7 @@ public class SubnodeTransformer extends NodeTransformer {
                 boolean isLast = i == entry.getKey().length - 1;
                 List<Node> newNodes = new ArrayList<>();
                 for (Node current : nodes) {
-                    newNodes.addAll(isLast && includeKey ? Node.getKeyValueNodesForKey(current ,s) : Node.getNodesForKey(current, s));
+                    newNodes.addAll(isLast && includeKey ? Node.getKeyValueNodesForKey(current, s) : Node.getNodesForKey(current, s));
                 }
                 nodes = newNodes;
             }

@@ -8,16 +8,15 @@ import java.util.Optional;
 public class WindowsRegistry {
 
     /**
-     *
      * @param location path in the registry
-     * @param key registry key
+     * @param key      registry key
      * @return registry value or null if not found
      */
-    public static final Optional<String> readRegistry(String location, String key){
+    public static final Optional<String> readRegistry(String location, String key) {
         try {
             // Run reg query, then read output with StreamReader (internal class)
             Process process = Runtime.getRuntime().exec("reg query " +
-                    '"'+ location + "\" /v " + key);
+                    '"' + location + "\" /v " + key);
 
             StreamReader reader = new StreamReader(process.getInputStream());
             reader.start();
@@ -27,19 +26,18 @@ public class WindowsRegistry {
 
             // Output has the following format:
             // \n<Version information>\n\n<key>\t<registry type>\t<value>
-            if(output.contains("\t")){
+            if (output.contains("\t")) {
                 String[] parsed = output.split("\t");
-                return Optional.of(parsed[parsed.length-1]);
+                return Optional.of(parsed[parsed.length - 1]);
             }
 
             if (output.contains("    ")) {
                 String[] parsed = output.split("    ");
-                return Optional.of(parsed[parsed.length-1].substring(0, parsed[parsed.length-1].length() - 4));
+                return Optional.of(parsed[parsed.length - 1].substring(0, parsed[parsed.length - 1].length() - 4));
             }
 
             return Optional.empty();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
 
@@ -47,7 +45,7 @@ public class WindowsRegistry {
 
     static class StreamReader extends Thread {
         private InputStream is;
-        private StringWriter sw= new StringWriter();
+        private StringWriter sw = new StringWriter();
 
         public StreamReader(InputStream is) {
             this.is = is;
@@ -58,8 +56,7 @@ public class WindowsRegistry {
                 int c;
                 while ((c = is.read()) != -1)
                     sw.write(c);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.err.println(e.toString());
             }
         }
