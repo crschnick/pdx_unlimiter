@@ -14,7 +14,7 @@ a campaign.
 This works for both Ironman and Non-Ironman savegames.
 All savegames can be also launched directly from within the Pdx-Unlimiter without needing to vist the EU4 main menu.
 
-(Image)
+![Example](docs/screenshot.png)
 
 ### Reverting savegames
 
