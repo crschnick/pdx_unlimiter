@@ -1,11 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
 import io.sentry.Sentry;
 import javafx.application.Platform;
 import org.apache.commons.lang3.function.FailableRunnable;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ErrorHandler {
 
@@ -16,7 +22,24 @@ public class ErrorHandler {
             e.printStackTrace();
         }
 
-        Sentry.init("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
+        try {
+            InputStream in = Files.newInputStream(Path.of("sentry.properties"));
+            System.getProperties().load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Path p = Path.of(System.getProperty("user.dir")).getParent().resolve("version");
+            if (Files.exists(p)) {
+                String v = Files.readString(p);
+                System.setProperty("sentry.release", v);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Sentry.init();
     }
 
     public static void handleException(Exception ex, boolean isTerminal) {

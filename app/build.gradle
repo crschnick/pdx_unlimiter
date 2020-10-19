@@ -14,7 +14,7 @@ java {
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
-    mainClass = 'com.crschnick.pdx_unlimiter.app.Main'
+    mainClass = 'com.crschnick.pdx_unlimiter.app.SavegameManagerApp'
 }
 
 javafx {
@@ -143,7 +143,7 @@ createRuntimeImage {
     modules = ['com.crschnick.pdx_unlimiter.app']
     excludedResources = []
     launcher {
-        name = 'Main'
+        name = 'pdxu'
         module = 'com.crschnick.pdx_unlimiter.app'
     }
     compression = 2
@@ -153,6 +153,13 @@ createRuntimeImage {
 }
 
 createRuntimeImage.dependsOn(build)
+
+task copyProperties(type: Copy) {
+    into file("${buildDir}/image/bin/")
+    from file("${projectDir}/sentry_prod.properties")
+    rename { f -> return "sentry.properties"}
+}
+createRuntimeImage.finalizedBy(copyProperties)
 
 task zipImage(type: Zip) {
     from "${buildDir}/image"

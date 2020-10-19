@@ -130,7 +130,7 @@ public class SavegameCache {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(in.readAllBytes());
 
-        Map<UUID,String> names = new HashMap<>();
+        Map<UUID, String> names = new HashMap<>();
         JsonNode n = node.get("names");
         for (int i = 0; i < n.size(); i++) {
             String name = n.get(i).get("name").textValue();
@@ -191,37 +191,77 @@ public class SavegameCache {
     }
 
 
+    public static void importSavegameCache(Path in) {
+        ZipFile zipFile = null;
+        try {
+            zipFile = new ZipFile(in.toFile());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
 
-    public static void importSavegameCache(Path in) throws IOException {
-        ZipFile zipFile = new ZipFile(in.toFile());
         for (SavegameCache cache : SavegameCache.CACHES) {
             cache.importSavegameCache(zipFile);
         }
-        zipFile.close();
+
+        try {
+            zipFile.close();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+        }
     }
 
-    public static void exportSavegameCache(Path out) throws IOException {
-        ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+    public static void exportSavegameCache(Path out)  {
+        ZipOutputStream zipFile = null;
+        try {
+            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+        } catch (FileNotFoundException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
+
         for (SavegameCache cache : SavegameCache.CACHES) {
             cache.exportSavegameCache(zipFile);
         }
-        zipFile.close();
+
+        try {
+            zipFile.close();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+        }
     }
 
-    public static void exportSavegameDirectory(Path out) throws IOException {
-        ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+    public static void exportSavegameDirectory(Path out) {
+        ZipOutputStream zipFile = null;
+        try {
+            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
+        } catch (FileNotFoundException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
+
         for (SavegameCache cache : SavegameCache.CACHES) {
             cache.exportSavegameDirectory(zipFile);
         }
-        zipFile.close();
+
+        try {
+            zipFile.close();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+        }
     }
 
-    public void importSavegameCache(ZipFile zipFile) throws IOException {
-        statusProperty().setValue(Optional.of(new Status(Status.Type.IMPORTING_ARCHIVE, zipFile.toString())));
+    public void importSavegameCache(ZipFile zipFile) {
         String config = SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString();
         ZipEntry e = zipFile.getEntry(config);
-        importDataFromConfig(zipFile.getInputStream(e));
+        try {
+            importDataFromConfig(zipFile.getInputStream(e));
+        } catch (IOException ioException) {
+            ErrorHandler.handleException(ioException, false);
+            return;
+        }
 
+        statusProperty().setValue(Optional.of(new Status(Status.Type.IMPORTING_ARCHIVE, zipFile.toString())));
         zipFile.stream().filter(en -> !en.getName().equals(config)).forEach(en -> {
             try {
                 Path p = SavegameCache.ROOT_DIR.resolve(Paths.get(en.getName()));
@@ -230,43 +270,57 @@ public class SavegameCache {
                 }
                 FileUtils.copyToFile(zipFile.getInputStream(en), p.toFile());
             } catch (IOException fileNotFoundException) {
-                fileNotFoundException.printStackTrace();
+                ErrorHandler.handleException(fileNotFoundException, false);
             }
         });
         statusProperty().setValue(Optional.empty());
     }
 
-    private void exportSavegameDirectory(ZipOutputStream out) throws IOException {
+    private void exportSavegameDirectory(ZipOutputStream out) {
+        statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, out.toString())));
         Set<String> names = new HashSet<>();
         for (Eu4Campaign c : getCampaigns()) {
             for (Eu4Campaign.Entry e : c.getSavegames()) {
-                statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, getEntryName(e))));
                 String name = getEntryName(e);
                 if (names.contains(name)) {
                     name += "_" + UUID.randomUUID().toString();
                 }
                 names.add(name);
-                compressFileToZipfile(
-                        getPath(e).resolve("savegame.eu4").toFile(),
-                        SavegameCache.ROOT_DIR.relativize(getPath()).resolve(name + ".eu4").toString(),
-                        out);
+                try {
+                    compressFileToZipfile(
+                            getPath(e).resolve("savegame.eu4").toFile(),
+                            SavegameCache.ROOT_DIR.relativize(getPath()).resolve(name + ".eu4").toString(),
+                            out);
+                } catch (IOException ioException) {
+                    ErrorHandler.handleException(ioException, false);
+                }
             }
         }
         statusProperty().setValue(Optional.empty());
     }
 
-    private void exportSavegameCache(ZipOutputStream out) throws IOException {
-            ZipEntry entry = new ZipEntry(SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString());
+    private void exportSavegameCache(ZipOutputStream out) {
+        ZipEntry entry = new ZipEntry(SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString());
+        try {
             out.putNextEntry(entry);
             exportDataToConfig(out);
-            for (Eu4Campaign c : getCampaigns()) {
-                for (Eu4Campaign.Entry e : c.getSavegames()) {
-                    statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, getEntryName(e))));
-                    Path file = getPath(e).resolve("savegame.eu4");
-                    String name = SavegameCache.ROOT_DIR.relativize(file).toString();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
+
+        statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, out.toString())));
+        for (Eu4Campaign c : getCampaigns()) {
+            for (Eu4Campaign.Entry e : c.getSavegames()) {
+                Path file = getPath(e).resolve("savegame.eu4");
+                String name = SavegameCache.ROOT_DIR.relativize(file).toString();
+                try {
                     compressFileToZipfile(file.toFile(), name, out);
+                } catch (IOException ioException) {
+                    ErrorHandler.handleException(ioException, false);
                 }
             }
+        }
         statusProperty().setValue(Optional.empty());
     }
 
@@ -278,13 +332,6 @@ public class SavegameCache {
         IOUtils.copy(in, out);
         in.close();
     }
-
-
-
-
-
-
-
 
 
     public synchronized void delete(Eu4Campaign c) {
@@ -423,7 +470,7 @@ public class SavegameCache {
         try {
             i = Eu4IntermediateSavegame.fromFile(
                     p.resolve("data.zip"),
-                    "countries","meta", "countries_history", "diplomacy", "active_wars");
+                    "countries", "meta", "countries_history", "diplomacy", "active_wars");
 
             Eu4SavegameInfo info = Eu4SavegameInfo.fromSavegame(i);
             e.infoProperty().setValue(Optional.of(info));

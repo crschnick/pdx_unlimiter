@@ -7,6 +7,8 @@ module com.crschnick.pdx_unlimiter.updater {
     requires io.sentry;
     requires org.slf4j;
 
+    requires jdk.crypto.ec;
+
 
     exports com.crschnick.pdx_unlimiter.updater;
 }

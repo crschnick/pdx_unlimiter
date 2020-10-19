@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
+import com.crschnick.pdx_unlimiter.app.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
@@ -30,6 +31,8 @@ import javafx.util.Duration;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
@@ -534,13 +537,7 @@ public class Eu4SavegameManagerStyle {
         MenuItem menuItem0 = new MenuItem("Export savegames...");
         menuItem0.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showExportDialog(false);
-            if (path.isPresent()) {
-                try {
-                    SavegameCache.exportSavegameDirectory(path.get());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            path.ifPresent(SavegameCache::exportSavegameDirectory);
         });
 
 
@@ -576,26 +573,14 @@ public class Eu4SavegameManagerStyle {
         MenuItem menuItem1 = new MenuItem("Import storage...");
         menuItem1.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showImportArchiveDialog();
-            if (path.isPresent()) {
-                try {
-                    SavegameCache.importSavegameCache(path.get());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            path.ifPresent(SavegameCache::importSavegameCache);
         });
         savegames.getItems().add(menuItem1);
 
         MenuItem menuItem2 = new MenuItem("Export storage...");
         menuItem2.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showExportDialog(true);
-            if (path.isPresent()) {
-                try {
-                    SavegameCache.exportSavegameCache(path.get());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            path.ifPresent(SavegameCache::exportSavegameCache);
         });
         savegames.getItems().add(menuItem2);
 
@@ -607,7 +592,6 @@ public class Eu4SavegameManagerStyle {
         });
         savegames.getItems().add(u);
 
-
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
             try {
@@ -618,11 +602,44 @@ public class Eu4SavegameManagerStyle {
         });
         savegames.getItems().add(sd);
 
+
+        Menu about = new Menu("About");
+        MenuItem src = new MenuItem("Contribute");
+        src.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e, false);
+            }
+        });
+        MenuItem is = new MenuItem("Report an issue");
+        is.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e, false);
+            }
+        });
+        MenuItem lc = new MenuItem("License");
+        lc.setOnAction((a) -> {
+            DialogHelper.showText("License", "license.txt");
+        });
+        MenuItem tc = new MenuItem("Third party software");
+        tc.setOnAction((a) -> {
+            DialogHelper.showText("Third party information", "third_party.txt");
+        });
+        about.getItems().add(src);
+        about.getItems().add(is);
+        about.getItems().add(lc);
+        about.getItems().add(tc);
+
+
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(menu);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
+        menuBar.getMenus().add(about);
         return menuBar;
     }
 

@@ -1,7 +1,8 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
 import io.sentry.Sentry;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -24,6 +25,33 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
 public class DialogHelper {
+
+    public static void showText(String title, String file) {
+        String text = null;
+        try {
+            text = new String(DialogHelper.class.getResourceAsStream(file).readAllBytes());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, false);
+            return;
+        }
+
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+
+        TextArea textArea = new TextArea();
+        textArea.setText(text);
+        textArea.editableProperty().setValue(false);
+
+        ScrollPane p = new ScrollPane(textArea);
+        p.setFitToWidth(true);
+        p.setFitToHeight(true);
+        p.setMinWidth(700);
+        p.setMinHeight(500);
+        alert.getDialogPane().setContent(p);
+
+        alert.showAndWait();
+    }
 
     public static boolean showException(Exception e) {
         ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
