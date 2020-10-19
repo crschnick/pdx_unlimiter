@@ -138,7 +138,6 @@ addDependenciesModuleInfo.finalizedBy(copyModules)
 build.finalizedBy(copyOutput)
 
 createRuntimeImage {
-    jdkHome = '$JAVA_HOME'
     outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
     modules = ['com.crschnick.pdx_unlimiter.app']
@@ -149,6 +148,8 @@ createRuntimeImage {
     }
     compression = 2
     stripDebug = true
+    noHeaderFiles = true
+    noManPages = true
 }
 
 createRuntimeImage.dependsOn(build)

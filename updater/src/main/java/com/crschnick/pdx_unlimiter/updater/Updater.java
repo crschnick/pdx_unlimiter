@@ -1,115 +1,186 @@
 package com.crschnick.pdx_unlimiter.updater;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import io.sentry.Sentry;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 public class Updater {
 
-    public static final String PATH = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "app").toString();
+    public static final Path PATH = Paths.get(System.getProperty("user.home"), "pdx_unlimiter");
 
     public static void main(String[] args) {
-        JFrame frame = new UpdaterGui();
+        initErrorHandler();
+        UpdaterGui frame = new UpdaterGui();
+        try {
+            update(frame,
+                    new URL("https://api.github.com/repos/crschnick/pdx_unlimiter/releases/latest"),
+                    PATH.resolve("app"));
+        } catch (Throwable t) {
+            Sentry.capture(t);
+            t.printStackTrace();
+        }
 
-        frame.setVisible(true);
 
         try {
-            String response = executeGet("https://api.github.com/repos/crschnick/pdx_unlimiter/releases/latest");
-            System.out.println("got response: " + response);
-            if (response.equals("")) {
-                return;
-            }
-            String toDonwload = getDownloadUrl(response);
-            String pathToNewest = downloadNewestVersion(toDonwload);
-            deleteOldVersion(PATH);
-            unzip(pathToNewest, PATH);
-        } catch (Exception e) {
+            update(frame,
+                    new URL("https://api.github.com/repos/crschnick/pdxu_achievements/releases/latest"),
+                    PATH.resolve("achievements"));
+        } catch (Throwable t) {
+            Sentry.capture(t);
+            t.printStackTrace();
+        }
+
+        try {
+            run();
+        } catch (IOException e) {
+            Sentry.capture(e);
             e.printStackTrace();
         }
+
+        frame.dispose();
+
     }
 
-
-    public static void deleteOldVersion(String path) throws Exception {
-        File f = new File(path);
-        f.delete();
-        f.mkdir();
+    private static void run() throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                List.of("cmd.exe", "/C", PATH.resolve("app").resolve("bin").resolve("Main.bat").toString()));
+        builder.redirectErrorStream(true);
+        builder.start();
     }
 
-    private static void unzip(String zipFilePath, String destDir) throws Exception {
-        File dir = new File(destDir);
-        // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
-        FileInputStream fis;
-        //buffer for read and write data to file
-        byte[] buffer = new byte[1024];
-        fis = new FileInputStream(zipFilePath);
-        ZipInputStream zis = new ZipInputStream(fis);
-        ZipEntry ze = zis.getNextEntry();
-        while(ze != null){
-            String fileName = ze.getName();
-            File newFile = new File(destDir + File.separator + fileName);
-            System.out.println("Unzipping to "+newFile.getAbsolutePath());
-            //create directories for sub directories in zip
-            new File(newFile.getParent()).mkdirs();
-            FileOutputStream fos = new FileOutputStream(newFile);
-            int len;
-            while ((len = zis.read(buffer)) > 0) {
-                fos.write(buffer, 0, len);
-            }
-            fos.close();
-            //close this ZipEntry
-            zis.closeEntry();
-            ze = zis.getNextEntry();
+    private static void initErrorHandler() {
+        try {
+            FieldUtils.writeStaticField(LoggerFactory.class, "INITIALIZATION_STATE", 4, true);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
-        //close last ZipEntry
-        zis.closeEntry();
-        zis.close();
-        fis.close();
+
+        try {
+            InputStream in = Files.newInputStream(Path.of("sentry.properties"));
+            System.getProperties().load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Sentry.init();
     }
 
-    public static String downloadNewestVersion(String url) throws Exception {
-        String file = executeGet(url);
+    private static void update(UpdaterGui frame, URL url, Path out) throws Exception {
+        byte[] response = executeGet(url, 0, null);
+
+        Info info = getDownloadInfo(new String(response));
+        if (!requiresUpdate(info, out)) {
+            return;
+        }
+
+        frame.setVisible(true);
+        Path pathToNewest = downloadNewestVersion(info.url, info.size, frame::setProgress);
+        deleteOldVersion(out);
+        unzip(pathToNewest, out);
+        Files.write(out.resolve("update"), info.timestamp.toString().getBytes());
+        Files.write(out.resolve("version"), info.version.getBytes());
+        frame.setVisible(false);
+    }
+
+    private static boolean requiresUpdate(Info info, Path p) {
+        Instant i = Instant.MIN;
+        try {
+            i = Instant.parse(Files.readString(p.resolve("update")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return i.compareTo(info.timestamp) < 0;
+    }
+
+    public static class Info {
+        public URL url;
+        public int size;
+        public Instant timestamp;
+        public String body;
+        public String version;
+    }
+
+
+    public static void deleteOldVersion(Path path) throws Exception {
+        File f = path.toFile();
+        FileUtils.deleteDirectory(f);
+        FileUtils.forceMkdir(f);
+    }
+
+    private static void unzip(Path zipFilePath, Path destDir) throws Exception {
+        File dir = destDir.toFile();
+        if (dir.exists()) {
+            FileUtils.deleteDirectory(dir);
+        } else {
+            FileUtils.forceMkdir(dir);
+        }
+
+        ZipFile f = new ZipFile(zipFilePath.toString());
+        for (Iterator<? extends ZipEntry> it = f.stream().iterator(); it.hasNext(); ) {
+            ZipEntry e = it.next();
+            String fileName = e.getName();
+            Path p = destDir.resolve(fileName);
+            if (e.isDirectory()) {
+                FileUtils.forceMkdir(p.toFile());
+            } else {
+                Files.write(p, f.getInputStream(e).readAllBytes());
+            }
+        }
+        f.close();
+    }
+
+    public static Path downloadNewestVersion(URL url, int size, Consumer<Float> c) throws Exception {
+        byte[] file = executeGet(url, size, c);
         String tempDir = System.getProperty("java.io.tmpdir");
-        Path path = Paths.get(tempDir, Paths.get(url).getFileName().toString());
-        Files.write(path, file.getBytes());
-        return path.toString();
+        Path path = Paths.get(tempDir, url.getFile());
+        FileUtils.forceMkdirParent(path.toFile());
+        Files.write(path, file);
+        return path;
     }
 
-    public static String getDownloadUrl(String response) throws Exception {
+    public static Info getDownloadInfo(String response) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(response);
         for (JsonNode n : node.get("assets")) {
             if ((SystemUtils.IS_OS_WINDOWS && n.get("name").textValue().contains("windows"))
                     || (SystemUtils.IS_OS_MAC && n.get("name").textValue().contains("mac"))
                     || (SystemUtils.IS_OS_LINUX && n.get("name").textValue().contains("linux"))) {
-                return n.get("browser_download_url").textValue();
+                Info i = new Info();
+                i.url = new URL(n.get("browser_download_url").textValue());
+                i.size = n.get("size").intValue();
+                i.timestamp = Instant.parse(n.get("updated_at").textValue());
+                i.body = node.get("body").asText();
+                i.version = node.get("tag_name").textValue();
+                return i;
             }
         }
-        throw new FileNotFoundException("Couldn't find download url");
+        throw new IOException("Couldn't find download url");
     }
 
-
-    public static String executeGet(String targetURL) throws Exception {
+    public static byte[] executeGet(URL targetURL, int size, Consumer<Float> progress) throws Exception {
         HttpURLConnection connection = null;
 
         try {
             //Create connection
-            URL url = new URL(targetURL);
-            connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) targetURL.openConnection();
             connection.setRequestMethod("GET");
 
             int responseCode = connection.getResponseCode();
@@ -118,17 +189,19 @@ public class Updater {
             }
 
             InputStream is = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = rd.readLine()) != null) {
-                response.append(line);
-                response.append('\r');
+            if (size == 0) {
+                return is.readAllBytes();
             }
-            rd.close();
-            return response.toString();
-        } catch (Exception e) {
-            throw e;
+
+            byte[] line;
+            int bytes;
+            ByteBuffer b = ByteBuffer.allocate(size);
+            while ((line = is.readNBytes(1000000)).length > 0) {
+                b.put(line);
+                bytes = line.length;
+                if (progress != null) progress.accept((float) bytes / (float) size);
+            }
+            return b.array();
         } finally {
             if (connection != null) {
                 connection.disconnect();

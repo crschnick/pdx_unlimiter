@@ -26,7 +26,10 @@ repositories {
 
 dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+    implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
+    implementation files("$buildDir/generated-modules/slf4j-api-1.7.30.jar")
+    implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
 }
 
 addDependenciesModuleInfo {
@@ -40,6 +43,40 @@ addDependenciesModuleInfo {
                     requires java.se;
                     exports org.apache.commons.lang3;
                     exports org.apache.commons.lang3.arch;
+                    exports org.apache.commons.lang3.reflect;
+                }
+            '''
+        }
+        module {
+            artifact 'commons-io:commons-io:2.8.0'
+            moduleInfoSource = '''
+                module org.apache.commons.io {
+                    requires java.se;
+                    exports org.apache.commons.io;
+                    exports org.apache.commons.io.file;
+                }
+            '''
+        }
+        module {
+            artifact 'io.sentry:sentry:1.7.30'
+            moduleInfoSource = '''
+                module io.sentry {
+                    exports io.sentry;
+                    requires org.slf4j;
+                    requires java.naming;
+                    requires com.fasterxml.jackson.core;
+                }
+            '''
+        }
+        module {
+            artifact 'org.slf4j:slf4j-api:1.7.30'
+            moduleInfoSource = '''
+                module org.slf4j {
+                    exports org.slf4j;
+                    opens org.slf4j;
+                exports org.slf4j.event;
+                exports org.slf4j.helpers;
+                exports org.slf4j.spi;
                 }
             '''
         }
@@ -60,17 +97,18 @@ build.dependsOn(copyModules)
 build.dependsOn(copyOutput)
 
 createRuntimeImage {
-    jdkHome = '$JAVA_HOME'
     outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
     modules = ['com.crschnick.pdx_unlimiter.updater']
     excludedResources = []
     launcher {
-        name = 'Updater'
+        name = 'updater'
         module = 'com.crschnick.pdx_unlimiter.updater'
     }
     compression = 2
     stripDebug = true
+    noHeaderFiles = true
+    noManPages = true
 }
 
 createRuntimeImage.dependsOn(build)
@@ -78,7 +116,7 @@ createRuntimeImage.dependsOn(build)
 
 task createLauncherExe(type: GradleNsisTask) {
     configuration = file("launcher.nsi")
-    runIn =  file("${projectDir}")
+    runIn = file("${projectDir}")
     destinationFolder = file("${buildDir}/bin")
 }
 createLauncherExe.dependsOn(createRuntimeImage)
@@ -86,7 +124,7 @@ createLauncherExe.dependsOn(createRuntimeImage)
 
 task createInstallerExe(type: GradleNsisTask) {
     configuration = file("installer.nsi")
-    runIn =  file("${projectDir}")
+    runIn = file("${projectDir}")
     destinationFolder = file("${buildDir}/bin")
 }
 createInstallerExe.dependsOn(createLauncherExe)

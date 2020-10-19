@@ -9,6 +9,8 @@ public class UpdaterGui extends JFrame {
 
     private Image image;
 
+    private float progress;
+
     public UpdaterGui() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -23,16 +25,18 @@ public class UpdaterGui extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private void renderSplashFrame(Graphics g, int frame) {
-        final String[] comps = {"foo", "bar", "baz"};
-        g.fillRect(120,140,200,40);
-        g.setPaintMode();
-        g.setColor(Color.BLACK);
-        g.drawString("Loading "+comps[(frame/5)%3]+"...", 120, 150);
+    public void setProgress(float progress) {
+        this.progress = progress;
+        repaint();
+    }
+
+    private void renderSplashFrame(Graphics g) {
+        g.drawImage(image, 0, 0, this);
+        g.setColor(Color.WHITE);
+        g.fillRect(50,150,(int) (520 * progress),40);
     }
 
     public void paint(Graphics g) {
-        g.drawImage(image, 0, 0, this);
-        renderSplashFrame(g, 10);
+        renderSplashFrame(g);
     }
 }
