@@ -4,121 +4,12 @@ import com.crschnick.pdx_unlimiter.eu4.parser.*;
 
 import java.util.*;
 
-public class Eu4SavegameInfo{
-
-    public static class Ruler {
-
-        private String name;
-        private int adm;
-        private int dip;
-        private int mil;
-
-        public Ruler(String name, int adm, int dip, int mil) {
-            this.name = name;
-            this.adm = adm;
-            this.dip = dip;
-            this.mil = mil;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getAdm() {
-            return adm;
-        }
-
-        public int getDip() {
-            return dip;
-        }
-
-        public int getMil() {
-            return mil;
-        }
-
-        public static Optional<Ruler> fromCountryNode(Node n, String type) {
-            Optional<Ruler> current = Optional.empty();
-            for (Node e : Node.getNodeArray(Node.getNodeForKey(n,"events"))) {
-                if (Node.hasKey(e, type)) {
-                    // Sometimes there are multiple monarchs in one event Node ... wtf?
-                    Node r = Node.getNodesForKey(e, type).get(0);
-                    current = Optional.of(new Ruler(Node.getString(Node.getNodeForKey(r, "name")),
-                            Node.getInteger(Node.getNodeForKey(r, "ADM")),
-                            Node.getInteger(Node.getNodeForKey(r, "DIP")),
-                            Node.getInteger(Node.getNodeForKey(r, "MIL"))));
-                }
-            }
-            return current;
-        }
-    }
-
-    public static class War {
-
-        private String title;
-        private boolean attacker;
-        private Set<GameTag> allies;
-        private Set<GameTag> enemies;
-
-        public War(String title, boolean attacker, Set<GameTag> allies, Set<GameTag> enemies) {
-            this.title = title;
-            this.attacker = attacker;
-            this.allies = allies;
-            this.enemies = enemies;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Set<GameTag> getEnemies() {
-            return enemies;
-        }
-
-        public static Set<War> fromActiveWarsNode(Set<GameTag> tags, String tag, Node n) {
-            Set<War> wars = new HashSet<>();
-            for (Node war : Node.getNodeArray(n)) {
-                String title = Node.getString(Node.getNodeForKey(war, "name"));
-                boolean isAttacker = false;
-                Set<GameTag> attackers = new HashSet<>();
-                if (Node.hasKey(war, "attackers")) {
-                    for (Node atk : Node.getNodeArray(Node.getNodeForKey(war, "attackers"))) {
-                        String attacker = Node.getString(atk);
-                        if (attacker.equals(tag)) {
-                            isAttacker = true;
-                        } else {
-                            attackers.add(GameTag.getTag(tags, attacker));
-                        }
-                    }
-                }
-
-                boolean isDefender = false;
-                Set<GameTag> defenders = new HashSet<>();
-                if (Node.hasKey(war, "defenders")) {
-                    for (Node def : Node.getNodeArray(Node.getNodeForKey(war, "defenders"))) {
-                        String defender = Node.getString(def);
-                        if (defender.equals(tag)) {
-                            isDefender = true;
-                        } else {
-                            defenders.add(GameTag.getTag(tags, defender));
-                        }
-                    }
-                }
-                if (isAttacker) {
-                    wars.add(new War(title, true, attackers, defenders));
-                } else if (isDefender) {
-
-                    wars.add(new War(title, false, defenders, attackers));
-                }
-            }
-            return wars;
-        }
-    }
+public class Eu4SavegameInfo {
 
     private boolean ironman;
     private boolean randomNewWorld;
     private boolean customNationInWorld;
     private boolean releasedVassal;
-
     private Set<GameTag> allTags = new HashSet<>();
     private GameTag currentTag;
     private GameDate date;
@@ -137,7 +28,6 @@ public class Eu4SavegameInfo{
     private Optional<GameTag> tributarySenior = Optional.empty();
     private Map<GameTag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
-
 
     public static Eu4SavegameInfo fromSavegame(Eu4IntermediateSavegame save) throws SavegameParseException {
         try {
@@ -315,5 +205,113 @@ public class Eu4SavegameInfo{
 
     public Set<War> getWars() {
         return wars;
+    }
+
+    public static class Ruler {
+
+        private String name;
+        private int adm;
+        private int dip;
+        private int mil;
+
+        public Ruler(String name, int adm, int dip, int mil) {
+            this.name = name;
+            this.adm = adm;
+            this.dip = dip;
+            this.mil = mil;
+        }
+
+        public static Optional<Ruler> fromCountryNode(Node n, String type) {
+            Optional<Ruler> current = Optional.empty();
+            for (Node e : Node.getNodeArray(Node.getNodeForKey(n, "events"))) {
+                if (Node.hasKey(e, type)) {
+                    // Sometimes there are multiple monarchs in one event Node ... wtf?
+                    Node r = Node.getNodesForKey(e, type).get(0);
+                    current = Optional.of(new Ruler(Node.getString(Node.getNodeForKey(r, "name")),
+                            Node.getInteger(Node.getNodeForKey(r, "ADM")),
+                            Node.getInteger(Node.getNodeForKey(r, "DIP")),
+                            Node.getInteger(Node.getNodeForKey(r, "MIL"))));
+                }
+            }
+            return current;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAdm() {
+            return adm;
+        }
+
+        public int getDip() {
+            return dip;
+        }
+
+        public int getMil() {
+            return mil;
+        }
+    }
+
+    public static class War {
+
+        private String title;
+        private boolean attacker;
+        private Set<GameTag> allies;
+        private Set<GameTag> enemies;
+
+        public War(String title, boolean attacker, Set<GameTag> allies, Set<GameTag> enemies) {
+            this.title = title;
+            this.attacker = attacker;
+            this.allies = allies;
+            this.enemies = enemies;
+        }
+
+        public static Set<War> fromActiveWarsNode(Set<GameTag> tags, String tag, Node n) {
+            Set<War> wars = new HashSet<>();
+            for (Node war : Node.getNodeArray(n)) {
+                String title = Node.getString(Node.getNodeForKey(war, "name"));
+                boolean isAttacker = false;
+                Set<GameTag> attackers = new HashSet<>();
+                if (Node.hasKey(war, "attackers")) {
+                    for (Node atk : Node.getNodeArray(Node.getNodeForKey(war, "attackers"))) {
+                        String attacker = Node.getString(atk);
+                        if (attacker.equals(tag)) {
+                            isAttacker = true;
+                        } else {
+                            attackers.add(GameTag.getTag(tags, attacker));
+                        }
+                    }
+                }
+
+                boolean isDefender = false;
+                Set<GameTag> defenders = new HashSet<>();
+                if (Node.hasKey(war, "defenders")) {
+                    for (Node def : Node.getNodeArray(Node.getNodeForKey(war, "defenders"))) {
+                        String defender = Node.getString(def);
+                        if (defender.equals(tag)) {
+                            isDefender = true;
+                        } else {
+                            defenders.add(GameTag.getTag(tags, defender));
+                        }
+                    }
+                }
+                if (isAttacker) {
+                    wars.add(new War(title, true, attackers, defenders));
+                } else if (isDefender) {
+
+                    wars.add(new War(title, false, defenders, attackers));
+                }
+            }
+            return wars;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public Set<GameTag> getEnemies() {
+            return enemies;
+        }
     }
 }

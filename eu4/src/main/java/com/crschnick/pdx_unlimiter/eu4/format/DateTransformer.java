@@ -14,8 +14,7 @@ public class DateTransformer extends NodeTransformer {
         GameDate d = null;
         if (v.getValue() instanceof Long) {
             d = GameDate.fromLong((Long) v.getValue());
-        }
-        else if (v.getValue() instanceof String) {
+        } else if (v.getValue() instanceof String) {
             String s = (String) v.getValue();
             d = GameDate.fromString(s);
         }

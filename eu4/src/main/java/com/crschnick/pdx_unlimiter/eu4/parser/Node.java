@@ -83,7 +83,6 @@ public abstract class Node {
     }
 
 
-
     public static List<Node> getNodeArray(Node node) {
         if (!(node instanceof ArrayNode)) {
             throw new NodeFormatException("Not an array node:\n" + node.toString(2));

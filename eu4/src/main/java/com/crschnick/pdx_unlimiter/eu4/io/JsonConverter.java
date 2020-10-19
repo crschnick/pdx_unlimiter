@@ -1,15 +1,17 @@
 package com.crschnick.pdx_unlimiter.eu4.io;
 
+import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class JsonConverter {
 
@@ -18,16 +20,13 @@ public class JsonConverter {
         if (value instanceof Boolean) {
             boolean b = (boolean) value;
             return JsonNodeFactory.instance.booleanNode(b);
-        }
-        else if (value instanceof Long) {
+        } else if (value instanceof Long) {
             long l = (long) value;
             return JsonNodeFactory.instance.numberNode(l);
-        }
-        else if (value instanceof String) {
+        } else if (value instanceof String) {
             String s = (String) value;
             return JsonNodeFactory.instance.textNode(s);
-        }
-        else if (value instanceof Double) {
+        } else if (value instanceof Double) {
             double d = (double) value;
             return JsonNodeFactory.instance.numberNode(d);
         } else {

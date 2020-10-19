@@ -3,8 +3,6 @@ package com.crschnick.pdx_unlimiter.app;
 import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
-import io.sentry.Sentry;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -12,16 +10,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
 public class DialogHelper {
@@ -98,7 +93,7 @@ public class DialogHelper {
         b.setOnMouseClicked((m) -> {
             DirectoryChooser fileChooser = new DirectoryChooser();
             fileChooser.setTitle("Select EU4 installation directory");
-            File file = fileChooser.showDialog(((Node)m.getTarget()).getScene().getWindow());
+            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
                 textArea.setText(file.toString());
             }
@@ -142,7 +137,7 @@ public class DialogHelper {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select archive to import");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
-            File file = fileChooser.showOpenDialog(((Node)m.getTarget()).getScene().getWindow());
+            File file = fileChooser.showOpenDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
                 textArea.setText(file.toString());
             }
@@ -173,7 +168,7 @@ public class DialogHelper {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select export location");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip archive", "*.zip"));
-            File file = fileChooser.showSaveDialog(((Node)m.getTarget()).getScene().getWindow());
+            File file = fileChooser.showSaveDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null) {
                 textArea.setText(file.toString());
             }

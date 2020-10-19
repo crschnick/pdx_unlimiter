@@ -2,15 +2,20 @@ package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.installation.Installation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.*;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4SavegameManagerStyle;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.commons.io.FileUtils;
@@ -18,7 +23,7 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
 import java.awt.*;
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -30,9 +35,22 @@ import java.util.logging.Logger;
 public class SavegameManagerApp extends Application {
 
     private static SavegameManagerApp APP;
+    private BorderPane layout = new BorderPane();
+    private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
+    private SimpleObjectProperty<Optional<Eu4Campaign.Entry>> selectedSave = new SimpleObjectProperty<>(Optional.empty());
+    private BooleanProperty running = new SimpleBooleanProperty(true);
 
     public static SavegameManagerApp getAPP() {
         return APP;
+    }
+
+    public static void main(String[] args) {
+        ErrorHandler.init();
+        try {
+            launch(args);
+        } catch (Exception e) {
+            ErrorHandler.handleException(e, true);
+        }
     }
 
     private void createStatusThread(BorderPane layout) {
@@ -77,21 +95,13 @@ public class SavegameManagerApp extends Application {
         t.start();
     }
 
-    private BorderPane layout = new BorderPane();
-
-    private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
-
-    private SimpleObjectProperty<Optional<Eu4Campaign.Entry>> selectedSave = new SimpleObjectProperty<>(Optional.empty());
-
-    private BooleanProperty running = new SimpleBooleanProperty(true);
-
     private void setCampainList(BorderPane layout) {
         layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign,
                 (c) -> {
                     if (selectedCampaign.get().isPresent() && selectedCampaign.get().get().equals(c)) {
                         selectedCampaign.set(Optional.empty());
 
-                        if (selectedSave.get().isPresent()&&
+                        if (selectedSave.get().isPresent() &&
                                 selectedCampaign.get().get().getSavegames().contains(selectedSave.get().get())) {
                             selectedSave.set(Optional.empty());
                         }
@@ -204,15 +214,6 @@ public class SavegameManagerApp extends Application {
                 close(true);
             }
         });
-    }
-
-    public static void main(String[] args) {
-        ErrorHandler.init();
-        try {
-            launch(args);
-        } catch (Exception e) {
-            ErrorHandler.handleException(e, true);
-        }
     }
 
     public boolean isRunning() {

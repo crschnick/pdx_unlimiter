@@ -7,6 +7,17 @@ import java.util.Set;
 
 public class GameTag {
 
+    private String tag;
+    private Color mapColor;
+    private Color countryColor;
+    private Optional<String> name;
+    public GameTag(String tag, Color mapColor, Color countryColor, Optional<String> name) {
+        this.tag = tag;
+        this.mapColor = mapColor;
+        this.countryColor = countryColor;
+        this.name = name;
+    }
+
     public static GameTag fromNode(Node n) {
         KeyValueNode kv = Node.getKeyValueNode(n);
         List<Node> mc = Node.getNodeArray(Node.getNodeForKey(Node.getNodeForKey(kv.getNode(), "colors"), "map_color"));
@@ -19,18 +30,6 @@ public class GameTag {
 
     public static GameTag getTag(Set<GameTag> tags, String name) {
         return tags.stream().filter(t -> t.tag.equals(name)).findFirst().get();
-    }
-
-    private String tag;
-    private Color mapColor;
-    private Color countryColor;
-    private Optional<String> name;
-
-    public GameTag(String tag, Color mapColor, Color countryColor, Optional<String> name) {
-        this.tag = tag;
-        this.mapColor = mapColor;
-        this.countryColor = countryColor;
-        this.name = name;
     }
 
     public String getTag() {

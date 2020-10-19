@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.eu4.format;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
 import java.util.ArrayList;

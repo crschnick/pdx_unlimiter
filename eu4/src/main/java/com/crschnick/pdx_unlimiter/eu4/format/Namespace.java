@@ -13,6 +13,7 @@ public abstract class Namespace {
     public static final Namespace EU4_META = new FileNamespace("eu4_meta.txt");
 
     public abstract String getKeyName(String id);
+
     public abstract int getKeyOfValue(String value);
 
     private static class EmptyNamespace extends Namespace {

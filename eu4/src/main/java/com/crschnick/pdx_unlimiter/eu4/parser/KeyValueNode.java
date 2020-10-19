@@ -1,15 +1,8 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
-import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
-
 public class KeyValueNode extends Node {
 
-    public static KeyValueNode create(String keyName, Node node) {
-        return new KeyValueNode(keyName, node);
-    }
-
     private String keyName;
-
     private Node node;
 
     public KeyValueNode(String keyName, Node node) {
@@ -17,8 +10,8 @@ public class KeyValueNode extends Node {
         this.node = node;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
+    public static KeyValueNode create(String keyName, Node node) {
+        return new KeyValueNode(keyName, node);
     }
 
     public String toString(int indentation) {
@@ -31,5 +24,9 @@ public class KeyValueNode extends Node {
 
     public Node getNode() {
         return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
     }
 }

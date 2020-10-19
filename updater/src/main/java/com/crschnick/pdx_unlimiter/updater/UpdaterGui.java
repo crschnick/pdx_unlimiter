@@ -33,7 +33,7 @@ public class UpdaterGui extends JFrame {
     private void renderSplashFrame(Graphics g) {
         g.drawImage(image, 0, 0, this);
         g.setColor(Color.WHITE);
-        g.fillRect(50,150,(int) (520 * progress),40);
+        g.fillRect(50, 150, (int) (520 * progress), 40);
     }
 
     public void paint(Graphics g) {

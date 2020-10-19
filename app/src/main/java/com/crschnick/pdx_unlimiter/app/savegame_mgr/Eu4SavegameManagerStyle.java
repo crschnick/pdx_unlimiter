@@ -12,10 +12,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.geometry.*;
 import javafx.geometry.Insets;
+import javafx.geometry.*;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -23,6 +22,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -32,10 +32,9 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -147,8 +146,8 @@ public class Eu4SavegameManagerStyle {
                 int r = (rgb >> 16) & 0xFF;
                 int g = (rgb >> 8) & 0xFF;
                 int b = rgb & 0xFF;
-                boolean gold = (r > 100 && g > 87 && b < 100 && Math.max(r, Math.max(g,b) - 2) == r);
-                boolean blue = Math.max(r, Math.max(g,b)) < 135;
+                boolean gold = (r > 100 && g > 87 && b < 100 && Math.max(r, Math.max(g, b) - 2) == r);
+                boolean blue = Math.max(r, Math.max(g, b)) < 135;
                 if (blue || gold) {
                     return false;
                 }
@@ -167,7 +166,7 @@ public class Eu4SavegameManagerStyle {
                 int r = (rgb >> 16) & 0xFF;
                 int g = (rgb >> 8) & 0xFF;
                 int b = rgb & 0xFF;
-                boolean blue = Math.max(r, Math.max(g,b)) < 142;
+                boolean blue = Math.max(r, Math.max(g, b)) < 142;
                 if (blue) {
                     return false;
                 }
@@ -228,9 +227,9 @@ public class Eu4SavegameManagerStyle {
     }
 
     public static Node createCampaignEntryNode(Eu4Campaign.Entry e,
-                                                   ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
-                                                   Consumer<Eu4Campaign.Entry> onOpen,
-                                                   Consumer<Eu4Campaign.Entry> delete) {
+                                               ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
+                                               Consumer<Eu4Campaign.Entry> onOpen,
+                                               Consumer<Eu4Campaign.Entry> delete) {
         VBox main = new VBox();
         main.setStyle("-fx-background-color: #555555; -fx-border-color: #666666; -fx-border-width: 3px;");
         main.getProperties().put("entry", e);
@@ -311,7 +310,7 @@ public class Eu4SavegameManagerStyle {
     }
 
     private static void updateSavegames(VBox list, Eu4Campaign c,
-                                          ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
+                                        ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
                                         Consumer<Eu4Campaign.Entry> open,
                                         Consumer<Eu4Campaign.Entry> delete) {
         List<Node> newOrder = c.getSavegames().stream()
@@ -323,9 +322,9 @@ public class Eu4SavegameManagerStyle {
     }
 
     private static VBox createSavegameList(Optional<Eu4Campaign> c,
-                                          ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
+                                           ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry,
                                            Consumer<Eu4Campaign.Entry> open,
-                                          Consumer<Eu4Campaign.Entry> delete) {
+                                           Consumer<Eu4Campaign.Entry> delete) {
         VBox grid = new VBox();
         grid.setFillWidth(true);
         grid.setFillWidth(true);
@@ -366,7 +365,7 @@ public class Eu4SavegameManagerStyle {
         pane.setStyle("-fx-focus-color: transparent;");
         pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
-        selectedCampaign.addListener((ch,o,n) -> pane.setContent(createSavegameList(n, selectedEntry, open, delete)));
+        selectedCampaign.addListener((ch, o, n) -> pane.setContent(createSavegameList(n, selectedEntry, open, delete)));
 
         return pane;
     }
@@ -389,7 +388,7 @@ public class Eu4SavegameManagerStyle {
 
         Label date = new Label(c.getDate().toString());
         date.setStyle("-fx-text-fill: white;");
-        c.dateProperty().addListener((change,o,n) -> {
+        c.dateProperty().addListener((change, o, n) -> {
             Platform.runLater(() -> {
                 date.setText(n.toString());
             });
@@ -531,7 +530,7 @@ public class Eu4SavegameManagerStyle {
             }
         });
 
-        ChangeListener<Optional<Eu4Campaign.Entry>> l = (val, old , n) -> {
+        ChangeListener<Optional<Eu4Campaign.Entry>> l = (val, old, n) -> {
             if (n.isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(), n.get().getInfo().get().getVersion())) {
                 b.setStyle("-fx-opacity: 1; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
                 Tooltip.install(b, tooltip("Launch savegame " + n.get().getName()));
@@ -583,7 +582,6 @@ public class Eu4SavegameManagerStyle {
         settings.getItems().add(c);
 
 
-
         Menu savegames = new Menu("Storage");
 
         MenuItem menuItem1 = new MenuItem("Import storage...");
@@ -629,8 +627,15 @@ public class Eu4SavegameManagerStyle {
         savegames.getItems().add(backups);
 
 
-
-        Menu about = new Menu("About");
+        Menu about = new Menu("Help");
+        MenuItem wiki = new MenuItem("EU4 Wiki");
+        wiki.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://eu4.paradoxwikis.com/Europa_Universalis_4_Wiki"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e, false);
+            }
+        });
         MenuItem src = new MenuItem("Contribute");
         src.setOnAction((a) -> {
             try {
@@ -655,6 +660,7 @@ public class Eu4SavegameManagerStyle {
         tc.setOnAction((a) -> {
             DialogHelper.showText("Third party information", "third_party.txt");
         });
+        about.getItems().add(wiki);
         about.getItems().add(src);
         about.getItems().add(is);
         about.getItems().add(lc);
@@ -674,7 +680,7 @@ public class Eu4SavegameManagerStyle {
         MenuBar rightBar = new MenuBar();
         Menu m = new Menu("Idle");
         rightBar.getMenus().addAll(m);
-        SavegameCache.EU4_CACHE.statusProperty().addListener((ch,o,n) -> {
+        SavegameCache.EU4_CACHE.statusProperty().addListener((ch, o, n) -> {
             Platform.runLater(() -> {
                 if (!n.isPresent()) {
                     m.setText("Idle");

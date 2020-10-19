@@ -9,6 +9,17 @@ import java.util.regex.Pattern;
 
 public class GameDate implements Comparable<GameDate> {
 
+    private int day;
+    private Month month;
+    private int year;
+
+
+    public GameDate(int day, Month month, int year) {
+        this.day = day;
+        this.month = month;
+        this.year = year;
+    }
+
     private static int getDay(Month m, long days) {
         int sum = 0;
         for (Month month : Month.values()) {
@@ -36,7 +47,6 @@ public class GameDate implements Comparable<GameDate> {
     private static int getYear(long days) {
         return (int) Math.floor(days / 365f);
     }
-
 
     public static Node toNode(GameDate date) {
         List<Node> nodes = new ArrayList<>(3);
@@ -88,18 +98,6 @@ public class GameDate implements Comparable<GameDate> {
         } else {
             return null;
         }
-    }
-
-    private int day;
-
-    private Month month;
-
-    private int year;
-
-    public GameDate(int day, Month month, int year) {
-        this.day = day;
-        this.month = month;
-        this.year = year;
     }
 
     public String toDisplayString() {

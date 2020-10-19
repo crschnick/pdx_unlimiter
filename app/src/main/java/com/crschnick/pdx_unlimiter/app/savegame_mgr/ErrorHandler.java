@@ -43,7 +43,8 @@ public class ErrorHandler {
     }
 
     public static void handleException(Exception ex, boolean isTerminal) {
-        handleException(ex, isTerminal, () -> {});
+        handleException(ex, isTerminal, () -> {
+        });
     }
 
     public static void handleException(Exception ex, boolean isTerminal, FailableRunnable<Exception> handler) {
@@ -54,14 +55,14 @@ public class ErrorHandler {
             t = tt;
         }
         Platform.runLater(() -> {
-            if(DialogHelper.showException(ex)) {
+            if (DialogHelper.showException(ex)) {
                 Sentry.capture(ex);
             }
         });
         if (t != null) {
             Exception finalT = t;
             Platform.runLater(() -> {
-                if(DialogHelper.showException(finalT)) {
+                if (DialogHelper.showException(finalT)) {
                     Sentry.capture(finalT);
                 }
             });
@@ -71,7 +72,7 @@ public class ErrorHandler {
                 SavegameManagerApp.getAPP().close(false);
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    if(DialogHelper.showException(e)) {
+                    if (DialogHelper.showException(e)) {
                         Sentry.capture(e);
                     }
                 });

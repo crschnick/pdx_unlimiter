@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.eu4.format;
 
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -21,7 +21,7 @@ public class NamespaceCreator {
 
     public static String createNamespace(Node unnamed, Node named) {
         StringBuilder b = new StringBuilder();
-        Map<Integer,String> map = new LinkedHashMap<>();
+        Map<Integer, String> map = new LinkedHashMap<>();
         createNamespace(map, unnamed, named);
         for (var e : map.entrySet()) {
             b.append(e.getKey()).append("=").append(e.getValue()).append("\n");
@@ -47,7 +47,7 @@ public class NamespaceCreator {
         return nodes;
     }
 
-    private static void createNamespace(Map<Integer,String> map, Node unnamed, Node named) {
+    private static void createNamespace(Map<Integer, String> map, Node unnamed, Node named) {
         if (named instanceof ArrayNode && unnamed instanceof ArrayNode) {
             ArrayNode a = (ArrayNode) named;
             ArrayNode ua = (ArrayNode) unnamed;

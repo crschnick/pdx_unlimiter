@@ -25,7 +25,7 @@ public class Eu4Installation extends Installation {
 
     private Path userDirectory;
     private GameVersion version;
-    private Map<String,String> countryNames = new HashMap<>();
+    private Map<String, String> countryNames = new HashMap<>();
 
     public Eu4Installation(Path path) {
         super("Europa Universalis IV", path);
@@ -48,7 +48,7 @@ public class Eu4Installation extends Installation {
         String v = node.get("version").textValue();
         Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);
         m.find();
-        this.version = new GameVersion(Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2)),Integer.parseInt(m.group(3)),Integer.parseInt(m.group(4)));
+        this.version = new GameVersion(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
     }
 
     public void writeLaunchConfig(Eu4Campaign.Entry entry, Path path) throws IOException {
@@ -70,7 +70,7 @@ public class Eu4Installation extends Installation {
     @Override
     public void start() {
         try {
-            Runtime.getRuntime().exec(getPath().resolve("eu4.exe").toString()+ " -continuelastsave");
+            Runtime.getRuntime().exec(getPath().resolve("eu4.exe").toString() + " -continuelastsave");
         } catch (IOException e) {
             e.printStackTrace();
         }
