@@ -451,6 +451,9 @@ public class Eu4SavegameManagerStyle {
         }
         campaigns.addListener((SetChangeListener<? super Eu4Campaign>) (change) -> {
             Platform.runLater(() -> {
+                if (campaigns.size() == 0) {
+
+                }
                 sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
             });
         });
@@ -460,6 +463,19 @@ public class Eu4SavegameManagerStyle {
         pane.setMinViewportWidth(200);
         pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         return pane;
+    }
+
+    public static Node createNoCampaignNode() {
+        StackPane p = new StackPane();
+        Button b = new Button("Import EU4 savegames");
+        b.setOnMouseClicked(e -> {
+            if (DialogHelper.showImportSavegamesDialog()) {
+                Eu4SavegameImporter.importAllSavegames();
+            }
+        });
+        p.getChildren().add(b);
+        StackPane.setAlignment(b, Pos.CENTER);
+        return p;
     }
 
     public static Node createActiveStatusBar(PdxApp app) {
@@ -601,6 +617,17 @@ public class Eu4SavegameManagerStyle {
             }
         });
         savegames.getItems().add(sd);
+
+        MenuItem backups = new MenuItem("Open backup location");
+        backups.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().open(SavegameCache.ROOT_DIR.getParent().resolve("backups").resolve("eu4").toFile());
+            } catch (IOException e) {
+                ErrorHandler.handleException(e, false);
+            }
+        });
+        savegames.getItems().add(backups);
+
 
 
         Menu about = new Menu("About");
