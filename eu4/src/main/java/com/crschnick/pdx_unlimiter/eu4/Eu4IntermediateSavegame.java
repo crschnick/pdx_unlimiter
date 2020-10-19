@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -61,7 +62,9 @@ public class Eu4IntermediateSavegame {
         boolean isDir = file.toFile().isDirectory();
         if (!isDir) {
             ZipFile zipFile = new ZipFile(file.toFile());
-            v = Integer.parseInt(new String(zipFile.getInputStream(zipFile.getEntry("version")).readAllBytes()));
+            var in = zipFile.getInputStream(zipFile.getEntry("version"));
+            v = Integer.parseInt(new String(in.readAllBytes()));
+            in.close();
         } else {
             v = Integer.parseInt(new String(Files.readAllBytes(file.resolve("version"))));
         }
@@ -81,13 +84,15 @@ public class Eu4IntermediateSavegame {
             ObjectMapper mapper = new ObjectMapper();
             for (String s : parts) {
                 ZipEntry e = zipFile.getEntry(s + ".json");
-                nodes.put(s, JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(e))));
+                nodes.put(s, JsonConverter.fromJson(mapper.readTree(zipFile.getInputStream(e).readAllBytes())));
             }
-            v = Integer.parseInt(new String(zipFile.getInputStream(zipFile.getEntry("version")).readAllBytes()));
+            var in = zipFile.getInputStream(zipFile.getEntry("version"));
+            v = Integer.parseInt(new String(in.readAllBytes()));
+            zipFile.close();
         } else {
             ObjectMapper mapper = new ObjectMapper();
             for (String s : parts) {
-                nodes.put(s, JsonConverter.fromJson(mapper.readTree(Files.newInputStream(file.resolve(s + ".json")))));
+                nodes.put(s, JsonConverter.fromJson(mapper.readTree(Files.readAllBytes(file.resolve(s + ".json")))));
             }
             v = Integer.parseInt(new String(Files.readAllBytes(file.resolve("version"))));
         }

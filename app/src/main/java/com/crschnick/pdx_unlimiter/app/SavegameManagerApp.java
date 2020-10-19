@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.savegame_mgr.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.*;
+import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -76,7 +77,7 @@ public class SavegameManagerApp extends Application {
         t.start();
     }
 
-    private BorderPane layout;
+    private BorderPane layout = new BorderPane();
 
     private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
 
@@ -84,12 +85,7 @@ public class SavegameManagerApp extends Application {
 
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
-    private void createLayout() {
-        layout = new BorderPane();
-
-        createStatusThread(layout);
-
-        layout.setTop(Eu4SavegameManagerStyle.createMenu());
+    private void setCampainList(BorderPane layout) {
         layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign,
                 (c) -> {
                     if (selectedCampaign.get().isPresent() && selectedCampaign.get().get().equals(c)) {
@@ -104,26 +100,44 @@ public class SavegameManagerApp extends Application {
 
                     SavegameCache.EU4_CACHE.delete(c);
                 }));
-        layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
-                (e) -> {
-                    try {
-                        Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getPath(e).toFile());
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                },
-                (e) -> {
-                    if (selectedSave.get().isPresent() && selectedSave.get().get().equals(e)) {
-                        selectedSave.set(Optional.empty());
-                    }
-                    SavegameCache.EU4_CACHE.delete(e);
-                }));
+    }
 
-        selectedCampaign.addListener((c, o, n) -> {
-            if (n.isPresent()) {
-                SavegameCache.EU4_CACHE.loadAsync(n.get());
-            }
+    private void createLayout() {
+        SavegameCache.EU4_CACHE.getCampaigns().addListener((SetChangeListener<? super Eu4Campaign>) (change) -> {
+            Platform.runLater(() -> {
+                if (change.getSet().size() == 1 && change.wasAdded()) {
+                    createLayout();
+                }
+            });
         });
+
+        layout.setTop(Eu4SavegameManagerStyle.createMenu());
+        createStatusThread(layout);
+        if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
+            layout.setCenter(Eu4SavegameManagerStyle.createNoCampaignNode());
+        } else {
+            layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
+                    (e) -> {
+                        try {
+                            Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getPath(e).toFile());
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    },
+                    (e) -> {
+                        if (selectedSave.get().isPresent() && selectedSave.get().get().equals(e)) {
+                            selectedSave.set(Optional.empty());
+                        }
+                        SavegameCache.EU4_CACHE.delete(e);
+                    }));
+
+            selectedCampaign.addListener((c, o, n) -> {
+                if (n.isPresent()) {
+                    SavegameCache.EU4_CACHE.loadAsync(n.get());
+                }
+            });
+            setCampainList(layout);
+        }
     }
 
     public void save() {
@@ -177,7 +191,6 @@ public class SavegameManagerApp extends Application {
         primaryStage.getIcons().add(new Image(icon));
 
         startSetup();
-
         createLayout();
 
         primaryStage.setTitle("EU4 Savegame Manager");
