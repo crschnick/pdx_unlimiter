@@ -1,46 +1,20 @@
 plugins {
     id 'java'
     id 'idea'
-    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
-group 'com.crschnick.pdx_unlimiter'
 version '0.1-SNAPSHOT'
-ext.moduleName = 'com.crschnick.pdx_unlimiter.eu4'
 
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
+java {
+    modularity.inferModulePath = true
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.11.3"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-    implementation files("$buildDir/generated-modules/commons-text-1.9.jar")
-}
-
-addDependenciesModuleInfo {
-    jdepsExtraArgs = ['-q']
-    outputDirectory = file("$buildDir/generated-modules")
-    modules {
-        module {
-            artifact 'org.apache.commons:commons-text:1.9'
-            moduleInfoSource = '''
-                module org.apache.commons.text {
-                    requires java.se;
-                    exports org.apache.commons.text;
-                    exports org.apache.commons.text.matcher;
-                }
-            '''
-        }
-    }
-}
-compileJava {
-    options.compilerArgs << '-Xlint:all'
-}
-
-java {
-    modularity.inferModulePath = true
 }
