@@ -194,11 +194,11 @@ public class Updater {
             }
 
             byte[] line;
-            int bytes;
+            int bytes = 0;
             ByteBuffer b = ByteBuffer.allocate(size);
             while ((line = is.readNBytes(1000000)).length > 0) {
                 b.put(line);
-                bytes = line.length;
+                bytes += line.length;
                 if (progress != null) progress.accept((float) bytes / (float) size);
             }
             return b.array();

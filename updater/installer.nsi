@@ -2,24 +2,32 @@
 !include WinMessages.nsh
 !include FileFunc.nsh
 
+Name "Pdx-Unlimiter"
 Icon "logo.ico"
 Unicode True
 RequestExecutionLevel user
-
 OutFile "pdxu_installer.exe"
 
  Function .onInit
   StrCpy $INSTDIR `$PROFILE\pdx_unlimiter\launcher`
   ${If} ${FileExists} $INSTDIR
-     MessageBox MB_YESNO "Do you want to reinstall Pdx-Unlimiter?" IDYES NoReinstall
+     MessageBox MB_YESNO "Do you want to reinstall Pdx-Unlimiter?" IDYES Reinstall
+       Abort
+     Reinstall:
        RMDir /r $INSTDIR
-     NoReinstall:
-  ${Else}
-   MessageBox MB_YESNO "Do you want to start the installation?" IDYES NoAbort
-     Abort ; causes installer to quit.
-   NoAbort:
   ${EndIf}
+
+   MessageBox MB_YESNO "Do you want to start the installation?" IDYES Install
+     Abort
+   Install:
  FunctionEnd
+
+PageEx license
+  LicenseText "GNU General Public License" "Ok"
+  LicenseData "license_file.txt"
+PageExEnd
+
+Page instfiles
 
 Section
   SetOverwrite off
@@ -32,13 +40,12 @@ Section
     File /oname=bin\sentry.properties sentry_prod.properties
     File build\bin\launcher.exe
 
-MessageBox MB_YESNO "Create desktop shortcut?" IDNO No
-  CreateShortCut "$DESKTOP\Pdx-Unlimiter.lnk" "$INSTDIR\launcher.exe" "" `$INSTDIR\logo.ico` 0
-No:
+    MessageBox MB_YESNO "Create desktop shortcut?" IDNO No
+      CreateShortCut "$DESKTOP\Pdx-Unlimiter.lnk" "$INSTDIR\launcher.exe" "" `$INSTDIR\logo.ico` 0
+    No:
   ${EndIf}
 SectionEnd
 
 Function .onInstSuccess
-  ${GetParameters} $R0
   nsExec::Exec "$INSTDIR\launcher.exe -installed"
 FunctionEnd
