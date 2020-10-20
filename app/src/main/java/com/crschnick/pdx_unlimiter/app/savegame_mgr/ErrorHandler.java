@@ -5,30 +5,14 @@ import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
 import io.sentry.Sentry;
 import javafx.application.Platform;
 import org.apache.commons.lang3.function.FailableRunnable;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ErrorHandler {
 
     public static void init() {
-        try {
-            FieldUtils.writeStaticField(LoggerFactory.class, "INITIALIZATION_STATE", 4, true);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            InputStream in = Files.newInputStream(Path.of("sentry.properties"));
-            System.getProperties().load(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         try {
             Path p = Path.of(System.getProperty("user.dir")).getParent().resolve("version");
             if (Files.exists(p)) {

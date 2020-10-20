@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,25 +61,12 @@ public class Updater {
 
     private static void run() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                List.of("cmd.exe", "/C", PATH.resolve("app").resolve("bin").resolve("Main.bat").toString()));
+                List.of("cmd.exe", "/C", PATH.resolve("app").resolve("bin").resolve("pdxu.bat").toString()));
         builder.redirectErrorStream(true);
         builder.start();
     }
 
     private static void initErrorHandler() {
-        try {
-            FieldUtils.writeStaticField(LoggerFactory.class, "INITIALIZATION_STATE", 4, true);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            InputStream in = Files.newInputStream(Path.of("sentry.properties"));
-            System.getProperties().load(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         Sentry.init();
     }
 

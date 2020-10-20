@@ -556,7 +556,7 @@ public class Eu4SavegameManagerStyle {
         });
 
 
-        MenuItem l = new MenuItem("Import latest savegame");
+        MenuItem l = new MenuItem("Import latest savegame (CTRL+SHIFT+I)");
         l.setOnAction((a) -> {
             Eu4SavegameImporter.importLatestSavegame();
 
