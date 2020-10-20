@@ -26,13 +26,15 @@ repositories {
 
 dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
-    implementation files("$buildDir/generated-modules/slf4j-api-1.7.30.jar")
     implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
 }
 
 addDependenciesModuleInfo {
+    overwriteExistingFiles = true
     jdepsExtraArgs = ['-q']
     outputDirectory = file("$buildDir/generated-modules")
     modules {
@@ -61,7 +63,9 @@ addDependenciesModuleInfo {
             artifact 'io.sentry:sentry:1.7.30'
             moduleInfoSource = '''
                 module io.sentry {
-                    exports io.sentry;
+                    exports io.sentry;        
+                    exports io.sentry.context;    
+                    exports io.sentry.event;
                     requires org.slf4j;
                     requires java.naming;
                     requires com.fasterxml.jackson.core;

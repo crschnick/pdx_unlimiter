@@ -61,8 +61,14 @@ Status: Planned
 
 ## Contributing
 
-You can help the porject by reporting issues, fixing bugs and making the planned issues a reality.
+You can help the project by reporting issues, fixing bugs and making the planned issues a reality.
 Contributing guidelines coming soon. 
 This project is only in its infancy and only a handful of features are currently included,
 however the solid foundation needed for more planned features already exists.
 The current focus primarily lies on perfecting already existing features.
+
+## Building and running
+
+You can build the project with `gradle build`.
+To create jlink images, use `gradle createDist`.
+For running, you can use `gradle app:run` and `gradle updater:run`.
