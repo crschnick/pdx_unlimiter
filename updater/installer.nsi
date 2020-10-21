@@ -9,13 +9,7 @@ RequestExecutionLevel user
 OutFile "pdxu_installer.exe"
 
  Function .onInit
-  StrCpy $INSTDIR `$PROFILE\pdx_unlimiter\launcher`
-  ${If} ${FileExists} $INSTDIR
-     MessageBox MB_YESNO "Do you want to reinstall Pdx-Unlimiter?" IDYES Reinstall
-       Abort
-     Reinstall:
-       RMDir /r $INSTDIR
-  ${EndIf}
+  StrCpy $INSTDIR `$PROFILE\pdx_unlimiter`
  FunctionEnd
 
 PageEx license
@@ -23,34 +17,37 @@ PageEx license
   LicenseData "license_file.txt"
 PageExEnd
 
+Page directory
+Page instfiles checkReinstall
 
 
+Var LAUNCHERDIR
 
- Function askForStart
-   MessageBox MB_YESNO "Do you want to start the installation?" IDYES Install
-     Abort
-   Install:
- FunctionEnd
-
-Page instfiles askForStart
+Function checkReinstall
+  StrCpy $LAUNCHERDIR `$INSTDIR\launcher`
+  ${If} ${FileExists} $LAUNCHERDIR
+     MessageBox MB_YESNO "Do you want to reinstall the Pdx-Unlimiter launcher?" IDYES Reinstall
+       Abort
+     Reinstall:
+       RMDir /r $LAUNCHERDIR
+  ${EndIf}
+FunctionEnd
 
 Section
-  SetOverwrite off
-
-  ${If} ${FileExists} $INSTDIR
-  ${Else}
-    SetOutPath $INSTDIR
+    SetOverwrite off
+    SetOutPath $LAUNCHERDIR
     File /r "build\image\*"
     File "logo.ico"
     File /oname=bin\sentry.properties sentry_prod.properties
     File build\bin\launcher.exe
 
+    CreateShortCut "$INSTDIR\Pdx-Unlimiter.lnk" "$LAUNCHERDIR\launcher.exe" "" `$LAUNCHERDIR\logo.ico` 0
+
     MessageBox MB_YESNO "Create desktop shortcut?" IDNO No
-      CreateShortCut "$DESKTOP\Pdx-Unlimiter.lnk" "$INSTDIR\launcher.exe" "" `$INSTDIR\logo.ico` 0
+      CreateShortCut "$DESKTOP\Pdx-Unlimiter.lnk" "$LAUNCHERDIR\launcher.exe" "" `$LAUNCHERDIR\logo.ico` 0
     No:
-  ${EndIf}
 SectionEnd
 
 Function .onInstSuccess
-  nsExec::Exec "$INSTDIR\launcher.exe -installed"
+  nsExec::Exec "$LAUNCHERDIR\launcher.exe -installed"
 FunctionEnd

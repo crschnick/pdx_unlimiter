@@ -9,10 +9,6 @@ import org.apache.commons.lang3.function.FailableRunnable;
 
 public class ErrorHandler {
 
-    public static void init() {
-        Sentry.init();
-    }
-
     public static void handleStartupExcetion(Exception ex) {
         ex.printStackTrace();
         Sentry.capture(ex);

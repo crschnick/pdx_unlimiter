@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -20,22 +20,32 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class Updater {
 
-    public static final Path PATH = Paths.get(System.getProperty("user.home"), "pdx_unlimiter");
-    private static Logger LOGGER = LoggerFactory.getLogger(Updater.class);
     public static void main(String[] args) {
-        LOGGER.error("test");
-        initErrorHandler();
+        Path dir = null;
+        try {
+            dir = Optional.ofNullable(System.getProperty("pdxu.installDir"))
+                    .map(Path::of)
+                    .orElse(Path.of(Updater.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent().getParent());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        initErrorHandler(dir);
         UpdaterGui frame = new UpdaterGui();
         try {
             update(frame,
                     new URL("https://api.github.com/repos/crschnick/pdx_unlimiter/releases/latest"),
-                    PATH.resolve("app"),
+                    dir.resolve("app"),
+                    dir.resolve("app"),
                     true);
         } catch (Throwable t) {
             Sentry.capture(t);
@@ -46,15 +56,28 @@ public class Updater {
         try {
             update(frame,
                     new URL("https://api.github.com/repos/crschnick/pdxu_achievements/releases/latest"),
-                    PATH.resolve("achievements"),
+                    dir.resolve("achievements"),
+                    dir.resolve("achievements"),
                     false);
         } catch (Throwable t) {
             Sentry.capture(t);
             t.printStackTrace();
         }
 
+
         try {
-            run();
+            update(frame,
+                    new URL("https://api.github.com/repos/crschnick/pdxu_launcher/releases/latest"),
+                    dir.resolve("launcher_new"),
+                    dir.resolve("launcher"),
+                    true);
+        } catch (Throwable t) {
+            Sentry.capture(t);
+            t.printStackTrace();
+        }
+
+        try {
+            run(dir);
         } catch (IOException e) {
             Sentry.capture(e);
             e.printStackTrace();
@@ -64,22 +87,27 @@ public class Updater {
 
     }
 
-    private static void run() throws IOException {
+    private static void run(Path dir) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                List.of("cmd.exe", "/C", PATH.resolve("app").resolve("bin").resolve("pdxu.bat").toString()));
+                List.of("cmd.exe", "/C", dir.resolve("app").resolve("bin").resolve("pdxu.bat").toString()));
         builder.redirectErrorStream(true);
         builder.start();
     }
 
-    private static void initErrorHandler() {
+    private static void initErrorHandler(Path p)  {
+        p.resolve("logs").toFile().mkdirs();
+        System.setProperty("org.slf4j.simpleLogger.logFile", p.resolve("logs").resolve("updater.log").toString());
+        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
+        System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
         Sentry.init();
+        LoggerFactory.getLogger(Updater.class).info("Initializing updater at " + p.toString());
     }
 
-    private static void update(UpdaterGui frame, URL url, Path out, boolean platformSpecific) throws Exception {
+    private static void update(UpdaterGui frame, URL url, Path out, Path checkDir, boolean platformSpecific) throws Exception {
         byte[] response = executeGet(url, 0, null);
 
         Info info = getDownloadInfo(platformSpecific, new String(response));
-        if (!requiresUpdate(info, out)) {
+        if (!requiresUpdate(info, checkDir)) {
             return;
         }
 
@@ -94,8 +122,9 @@ public class Updater {
 
     private static boolean requiresUpdate(Info info, Path p) {
         Instant i = Instant.MIN;
+        Path f = p.resolve("update");
         try {
-            i = Instant.parse(Files.readString(p.resolve("update")));
+            i = Instant.parse(Files.readString(f));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -142,6 +171,10 @@ public class Updater {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(response);
         for (JsonNode n : node.get("assets")) {
+            if (!n.get("name").textValue().endsWith(".zip")) {
+                continue;
+            }
+
             if (!platformSpecific || (SystemUtils.IS_OS_WINDOWS && n.get("name").textValue().contains("windows"))
                     || (SystemUtils.IS_OS_MAC && n.get("name").textValue().contains("mac"))
                     || (SystemUtils.IS_OS_LINUX && n.get("name").textValue().contains("linux"))) {

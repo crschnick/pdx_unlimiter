@@ -1,20 +1,24 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class PdxuInstallation {
 
     private static PdxuInstallation INSTANCE;
 
     public static boolean init() throws Exception {
-        // Start from bin directory
+        // Start from lib directory
         Path p = Path.of(PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
         Path appV = p.getParent().resolve("version");
         String v;
         Path installDir;
@@ -29,6 +33,13 @@ public class PdxuInstallation {
             installDir = Path.of(dir);
         }
         INSTANCE = new PdxuInstallation(installDir, v);
+
+        FileUtils.forceMkdir(INSTANCE.getLogsLocation().toFile());
+        System.setProperty("org.slf4j.simpleLogger.logFile", INSTANCE.getLogsLocation().resolve("pdxu.log").toString());
+        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
+        System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
+        LoggerFactory.getLogger(PdxuInstallation.class).info("Initializing installation at " + installDir.toString());
+        Sentry.init();
 
         if (INSTANCE.getNewLauncherLocation().toFile().exists()) {
             FileUtils.deleteDirectory(INSTANCE.getLauncherLocation().toFile());
