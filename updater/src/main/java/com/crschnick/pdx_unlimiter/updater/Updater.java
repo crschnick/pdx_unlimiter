@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,14 +27,16 @@ import java.util.zip.ZipFile;
 public class Updater {
 
     public static final Path PATH = Paths.get(System.getProperty("user.home"), "pdx_unlimiter");
-
+    private static Logger LOGGER = LoggerFactory.getLogger(Updater.class);
     public static void main(String[] args) {
+        LOGGER.error("test");
         initErrorHandler();
         UpdaterGui frame = new UpdaterGui();
         try {
             update(frame,
                     new URL("https://api.github.com/repos/crschnick/pdx_unlimiter/releases/latest"),
-                    PATH.resolve("app"));
+                    PATH.resolve("app"),
+                    true);
         } catch (Throwable t) {
             Sentry.capture(t);
             t.printStackTrace();
@@ -42,7 +46,8 @@ public class Updater {
         try {
             update(frame,
                     new URL("https://api.github.com/repos/crschnick/pdxu_achievements/releases/latest"),
-                    PATH.resolve("achievements"));
+                    PATH.resolve("achievements"),
+                    false);
         } catch (Throwable t) {
             Sentry.capture(t);
             t.printStackTrace();
@@ -70,10 +75,10 @@ public class Updater {
         Sentry.init();
     }
 
-    private static void update(UpdaterGui frame, URL url, Path out) throws Exception {
+    private static void update(UpdaterGui frame, URL url, Path out, boolean platformSpecific) throws Exception {
         byte[] response = executeGet(url, 0, null);
 
-        Info info = getDownloadInfo(new String(response));
+        Info info = getDownloadInfo(platformSpecific, new String(response));
         if (!requiresUpdate(info, out)) {
             return;
         }
@@ -107,9 +112,8 @@ public class Updater {
         File dir = destDir.toFile();
         if (dir.exists()) {
             FileUtils.deleteDirectory(dir);
-        } else {
-            FileUtils.forceMkdir(dir);
         }
+        FileUtils.forceMkdir(dir);
 
         ZipFile f = new ZipFile(zipFilePath.toString());
         for (Iterator<? extends ZipEntry> it = f.stream().iterator(); it.hasNext(); ) {
@@ -134,11 +138,11 @@ public class Updater {
         return path;
     }
 
-    public static Info getDownloadInfo(String response) throws Exception {
+    public static Info getDownloadInfo(boolean platformSpecific, String response) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(response);
         for (JsonNode n : node.get("assets")) {
-            if ((SystemUtils.IS_OS_WINDOWS && n.get("name").textValue().contains("windows"))
+            if (!platformSpecific || (SystemUtils.IS_OS_WINDOWS && n.get("name").textValue().contains("windows"))
                     || (SystemUtils.IS_OS_MAC && n.get("name").textValue().contains("mac"))
                     || (SystemUtils.IS_OS_LINUX && n.get("name").textValue().contains("linux"))) {
                 Info i = new Info();

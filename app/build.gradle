@@ -15,7 +15,9 @@ java {
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
     mainClass = 'com.crschnick.pdx_unlimiter.app.SavegameManagerApp'
+    applicationDefaultJvmArgs = ['-Dpdxu.installDir=' + System.getProperty("pdxu.installDir")]
 }
+
 
 javafx {
     version = '15'
@@ -130,7 +132,7 @@ build.finalizedBy(copyOutput)
 createRuntimeImage {
     outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
-    modules = ['com.crschnick.pdx_unlimiter.app']
+    modules = ['com.crschnick.pdx_unlimiter.app', 'org.slf4j', 'org.slf4j.simple', 'jdk.crypto.ec']
     excludedResources = []
     launcher {
         name = 'pdxu'

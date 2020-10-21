@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
@@ -50,7 +50,7 @@ public class Eu4SavegameManagerStyle {
     }
 
     private static Node getImageForTagName(String tagName, int size) {
-        if (Installation.EU4.get().isPreexistingCoutry(tagName)) {
+        if (GameInstallation.EU4.isPreexistingCoutry(tagName)) {
             return Eu4ImageLoader.loadFlagImage(tagName, size);
         } else {
             Label l = new Label("?");
@@ -120,6 +120,11 @@ public class Eu4SavegameManagerStyle {
         date.setStyle("-fx-border-color: #666666; -fx-border-width: 3px; -fx-background-color: #777777;-fx-text-fill: white; -fx-font-size: 16px;");
 
         grid.add(date, 1, 1);
+
+        if (info.isObserver()) {
+            return grid;
+        }
+
         grid.add(createRulerLabel(info.getRuler(), true), 0, 2);
         if (info.getHeir().isPresent()) {
             grid.add(createRulerLabel(info.getHeir().get(), false), 0, 3);
@@ -131,7 +136,7 @@ public class Eu4SavegameManagerStyle {
         Node n = getTagImage(info.getCurrentTag(), 25);
         n.setTranslateX(3);
         n.setTranslateY(3);
-        Tooltip.install(n, tooltip("Playing as " + Installation.EU4.get().getCountryName(info.getCurrentTag())));
+        Tooltip.install(n, tooltip("Playing as " + GameInstallation.EU4.getCountryName(info.getCurrentTag())));
         status.getChildren().add(n);
         status.getChildren().add(new Pane());
         if (info.isIronman()) {
@@ -153,7 +158,7 @@ public class Eu4SavegameManagerStyle {
                 }
                 return true;
             };
-            Image i = Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("gfx/interface/").resolve("frontend_random_world.dds"), s);
+            Image i = Eu4ImageLoader.loadImage(GameInstallation.EU4.getPath().resolve("gfx/interface/").resolve("frontend_random_world.dds"), s);
             ImageView v = new ImageView(i);
             v.setTranslateY(2);
             v.setViewport(new Rectangle2D(14, 0, 33, 30));
@@ -172,7 +177,7 @@ public class Eu4SavegameManagerStyle {
                 }
                 return true;
             };
-            Image i = Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("gfx/interface/").resolve("frontend_custom_nation.dds"), s);
+            Image i = Eu4ImageLoader.loadImage(GameInstallation.EU4.getPath().resolve("gfx/interface/").resolve("frontend_custom_nation.dds"), s);
             ImageView v = new ImageView(i);
             v.setViewport(new Rectangle2D(20, 5, 21, 21));
             v.setTranslateY(4);
@@ -192,7 +197,7 @@ public class Eu4SavegameManagerStyle {
         grid.add(status, 0, 1);
 
         Label version;
-        if (GameVersion.areCompatible(Installation.EU4.get().getVersion(), info.getVersion())) {
+        if (GameVersion.areCompatible(GameInstallation.EU4.getVersion(), info.getVersion())) {
             version = new Label("v" + info.getVersion().toString());
             Tooltip.install(version, tooltip("Compatible version"));
         } else {
@@ -212,6 +217,7 @@ public class Eu4SavegameManagerStyle {
             grid.add(createDiplomacyRow("icon_diplomacy_war.dds", war.getEnemies(), "Fighting in the " + war.getTitle() + " against ", ""), 2 + wars, 1);
             wars++;
         }
+        // save_game_dir_icon
         grid.add(createDiplomacyRow("icon_alliance.dds", info.getAllies(), "Allies: ", "None"), 1, 2);
         grid.add(createDiplomacyRow("icon_diplomacy_royalmarriage.dds", info.getMarriages(), "Royal marriages: ", "None"), 2, 2);
         grid.add(createDiplomacyRow("icon_diplomacy_guaranting.dds", info.getGuarantees(), "Guarantees: ", "None"), 3, 2);
@@ -221,7 +227,7 @@ public class Eu4SavegameManagerStyle {
         grid.add(createDiplomacyRow("icon_march.dds", info.getMarches(), "Marches: ", "None"), 1, 4);
         grid.add(createDiplomacyRow("icon_truce.dds", info.getTruces().keySet(), "Truces: ", "None"), 2, 4);
         if (info.getSeniorPartner().isPresent()) {
-            grid.add(createDiplomacyRow("icon_alliance.dds", Set.of(info.getSeniorPartner().get()), "Under personal union with ", "no country"), 4, 4);
+            grid.add(createDiplomacyRow("icon_vassal.dds.dds", Set.of(info.getSeniorPartner().get()), "Under personal union with ", "no country"), 4, 4);
         }
         return grid;
     }
@@ -284,7 +290,7 @@ public class Eu4SavegameManagerStyle {
     private static String getCountryTooltip(Set<GameTag> tags) {
         StringBuilder b = new StringBuilder();
         for (GameTag t : tags) {
-            b.append(Installation.EU4.get().getCountryName(t));
+            b.append(GameInstallation.EU4.getCountryName(t));
             b.append(", ");
         }
         b.delete(b.length() - 2, b.length());
@@ -481,7 +487,7 @@ public class Eu4SavegameManagerStyle {
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-border-width: 0; -fx-background-color: #337733;");
 
-        ImageView icon = new ImageView(Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("launcher-assets").resolve("icon.png")));
+        ImageView icon = new ImageView(Eu4ImageLoader.loadImage(GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("icon.png")));
         icon.setFitWidth(32);
         icon.setFitHeight(32);
         Label text = new Label("Europa Universalis 4", icon);
@@ -510,7 +516,7 @@ public class Eu4SavegameManagerStyle {
         pane.setStyle("-fx-border-width: 0; -fx-background-color: #555555;");
 
 
-        ImageView icon = new ImageView(Eu4ImageLoader.loadImage(Installation.EU4.get().getPath().resolve("launcher-assets").resolve("icon.png")));
+        ImageView icon = new ImageView(Eu4ImageLoader.loadImage(GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("icon.png")));
         icon.setFitWidth(32);
         icon.setFitHeight(32);
         Label text = new Label("Europa Universalis 4", icon);
@@ -524,14 +530,14 @@ public class Eu4SavegameManagerStyle {
 
         Button b = new Button("Launch");
         b.setOnMouseClicked((m) -> {
-            if (save.get().isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(),
+            if (save.get().isPresent() && GameVersion.areCompatible(GameInstallation.EU4.getVersion(),
                     save.get().get().getInfo().get().getVersion())) {
                 onLaunch.accept(save.get().get());
             }
         });
 
         ChangeListener<Optional<Eu4Campaign.Entry>> l = (val, old, n) -> {
-            if (n.isPresent() && GameVersion.areCompatible(Installation.EU4.get().getVersion(), n.get().getInfo().get().getVersion())) {
+            if (n.isPresent() && GameVersion.areCompatible(GameInstallation.EU4.getVersion(), n.get().getInfo().get().getVersion())) {
                 b.setStyle("-fx-opacity: 1; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
                 Tooltip.install(b, tooltip("Launch savegame " + n.get().getName()));
             } else {

@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
-import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.SavegameParseException;
@@ -321,7 +321,7 @@ public class SavegameCache {
         if (!this.getCampaign(campainUuid).isPresent()) {
             Eu4Campaign c = new Eu4Campaign(new SimpleObjectProperty<>(new Timestamp(System.currentTimeMillis())),
                     new SimpleStringProperty(i.getCurrentTag().getTag()),
-                    new SimpleStringProperty(Installation.EU4.get().getCountryName(i.getCurrentTag())),
+                    new SimpleStringProperty(GameInstallation.EU4.getCountryName(i.getCurrentTag())),
                     new SimpleObjectProperty<>(i.getDate()), campainUuid);
             this.campaigns.add(c);
         }
@@ -480,15 +480,17 @@ public class SavegameCache {
     }
 
     public synchronized void importSavegame(Path file) {
-        status.setValue(Optional.of(new Status(Status.Type.LOADING,
-                Installation.EU4.get().getUserDirectory().relativize(file).toString())));
+        status.setValue(Optional.of(new Status(Status.Type.IMPORTING,
+                GameInstallation.EU4.getUserDirectory().relativize(file).toString())));
 
         Eu4IntermediateSavegame is = null;
+        Eu4SavegameInfo e = null;
         try {
             Eu4Savegame save = Eu4Savegame.fromFile(file);
             is = Eu4IntermediateSavegame.fromSavegame(save);
-        } catch (Exception e) {
-            ErrorHandler.handleException(e, false);
+            e = Eu4SavegameInfo.fromSavegame(is);
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex, false);
             status.setValue(Optional.empty());
             return;
         }
@@ -508,10 +510,9 @@ public class SavegameCache {
 
 
             UUID uuid = UUID.fromString(id);
-            Eu4SavegameInfo e = Eu4SavegameInfo.fromSavegame(is);
             this.addNewEntry(uuid, saveUuid, e);
-        } catch (Exception e) {
-            ErrorHandler.handleException(e, false);
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex, false);
             status.setValue(Optional.empty());
             return;
         }

@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
@@ -65,7 +65,7 @@ public class Eu4ImageLoader {
     }
 
     public static ImageView loadInterfaceImage(String name, Rectangle2D viewport) {
-        Path p = Installation.EU4.get().getPath().resolve("gfx/interface/" + name);
+        Path p = GameInstallation.EU4.getPath().resolve("gfx/interface/" + name);
         Image i = loadImage(p);
         ImageView v = new ImageView(i);
         if (viewport != null) v.setViewport(viewport);
@@ -73,7 +73,7 @@ public class Eu4ImageLoader {
     }
 
     public static ImageView loadDisasterImage(String name) {
-        Path p = Installation.EU4.get().getPath().resolve("gfx/interface/disasters/" + name + ".dds");
+        Path p = GameInstallation.EU4.getPath().resolve("gfx/interface/disasters/" + name + ".dds");
         Image i = loadImage(p);
         ImageView v = new ImageView(i);
         v.setViewport(new Rectangle2D(44, 0, 44, 44));
@@ -81,7 +81,7 @@ public class Eu4ImageLoader {
     }
 
     public static ImageView loadFlagImage(String name, int size) {
-        Path p = Installation.EU4.get().getPath().resolve("gfx/flags/" + name + ".tga");
+        Path p = GameInstallation.EU4.getPath().resolve("gfx/flags/" + name + ".tga");
         Image i = loadImage(p);
         ImageView v = new ImageView(i);
         //v.setViewport(new Rectangle2D(0, 0, 44, 44));

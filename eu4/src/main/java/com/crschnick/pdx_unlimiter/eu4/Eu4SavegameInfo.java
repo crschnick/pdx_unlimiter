@@ -10,6 +10,7 @@ public class Eu4SavegameInfo {
     private boolean randomNewWorld;
     private boolean customNationInWorld;
     private boolean releasedVassal;
+    private boolean observer;
     private Set<GameTag> allTags = new HashSet<>();
     private GameTag currentTag;
     private GameDate date;
@@ -41,11 +42,24 @@ public class Eu4SavegameInfo {
                     e.customNationInWorld = true;
                 }
             }
+            e.observer = !Node.getBoolean(Node.getNodeForKey(save.getNodes().get("meta"), "not_observer"));
             e.randomNewWorld = Node.getBoolean(Node.getNodeForKey(save.getNodes().get("meta"), "is_random_new_world"));
             e.ironman = Node.getBoolean(Node.getNodeForKey(save.getNodes().get("meta"), "ironman"));
             e.releasedVassal = Node.hasKey(Node.getNodeForKey(save.getNodes().get("countries"), tag), "has_switched_nation");
             e.date = date;
+
+            Node v = Node.getNodeForKey(save.getNodes().get("meta"), "savegame_version");
+            e.version = new GameVersion(Node.getInteger(Node.getNodeForKey(v, "first")),
+                    Node.getInteger(Node.getNodeForKey(v, "second")),
+                    Node.getInteger(Node.getNodeForKey(v, "third")),
+                    Node.getInteger(Node.getNodeForKey(v, "forth")));
+
             e.currentTag = GameTag.getTag(e.allTags, tag);
+
+            if (e.observer) {
+                return e;
+            }
+
             e.wars = War.fromActiveWarsNode(e.allTags, tag, save.getNodes().get("active_wars"));
             e.ruler = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "monarch").get();
             e.heir = Ruler.fromCountryNode(Node.getNodeForKey(save.getNodes().get("countries_history"), tag), "heir");
@@ -106,17 +120,14 @@ public class Eu4SavegameInfo {
                 }
             }
 
-
-            Node v = Node.getNodeForKey(save.getNodes().get("meta"), "savegame_version");
-            e.version = new GameVersion(Node.getInteger(Node.getNodeForKey(v, "first")),
-                    Node.getInteger(Node.getNodeForKey(v, "second")),
-                    Node.getInteger(Node.getNodeForKey(v, "third")),
-                    Node.getInteger(Node.getNodeForKey(v, "forth")));
-
             return e;
         } catch (NodeFormatException ex) {
             throw new SavegameParseException("Error while creating savegame info", ex);
         }
+    }
+
+    public boolean isObserver() {
+        return observer;
     }
 
     public boolean isIronman() {
