@@ -6,11 +6,13 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import io.sentry.Sentry;
 import javafx.application.Platform;
 import org.apache.commons.lang3.function.FailableRunnable;
+import org.slf4j.LoggerFactory;
 
 public class ErrorHandler {
 
     public static void handleStartupExcetion(Exception ex) {
         ex.printStackTrace();
+        LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
         Sentry.capture(ex);
         System.exit(1);
     }
@@ -29,7 +31,7 @@ public class ErrorHandler {
         }
         Platform.runLater(() -> {
             if (DialogHelper.showException(ex)) {
-                ex.printStackTrace();
+                LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
                 Sentry.capture(ex);
             }
         });
@@ -37,7 +39,7 @@ public class ErrorHandler {
             Exception finalT = t;
             Platform.runLater(() -> {
                 if (DialogHelper.showException(finalT)) {
-                    finalT.printStackTrace();
+                    LoggerFactory.getLogger(ErrorHandler.class).error("Error", finalT);
                     Sentry.capture(finalT);
                 }
             });
@@ -48,7 +50,7 @@ public class ErrorHandler {
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     if (DialogHelper.showException(e)) {
-                        e.printStackTrace();
+                        LoggerFactory.getLogger(ErrorHandler.class).error("Error", e);
                         Sentry.capture(e);
                     }
                 });

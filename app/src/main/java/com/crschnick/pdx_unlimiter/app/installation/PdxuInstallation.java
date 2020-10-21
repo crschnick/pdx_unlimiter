@@ -16,18 +16,15 @@ public class PdxuInstallation {
     private static PdxuInstallation INSTANCE;
 
     public static boolean init() throws Exception {
-        // Start from lib directory
-        Path p = Path.of(PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        Path appPath = Path.of(System.getProperty("java.home"));
 
-        Path appV = p.getParent().resolve("version");
         String v;
         Path installDir;
-        if (Files.exists(appV)) {
-            v = Files.readString(p);
-            installDir = p.getParent().getParent();
+        if (appPath.toFile().getName().equals("app")) {
+            v = Files.readString(appPath.resolve("version"));
+            installDir = appPath.getParent();
         } else {
             v = "dev";
-            var pa = System.getProperties();
             String dir = Optional.ofNullable(System.getProperty("pdxu.installDir"))
                     .orElseThrow(() -> new NoSuchElementException("Property pdxu.installDir missing for dev build"));
             installDir = Path.of(dir);
