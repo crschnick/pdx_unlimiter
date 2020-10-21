@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
     id 'application'
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
@@ -143,8 +145,12 @@ createRuntimeImage {
     noHeaderFiles = true
     noManPages = true
 }
-
 createRuntimeImage.dependsOn(build)
+
+task writeVersion(type: DefaultTask) {
+    Files.write(java.nio.file.Path.of("${buildDir}/image/version"), String.valueOf(version).getBytes())
+}
+createRuntimeImage.finalizedBy(writeVersion)
 
 task copyProperties(type: Copy) {
     into file("${buildDir}/image/bin/")
