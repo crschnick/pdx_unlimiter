@@ -1,4 +1,3 @@
 rootProject.name = 'pdx_unlimiter'
-include 'updater'
 include 'eu4'
 include 'app'
