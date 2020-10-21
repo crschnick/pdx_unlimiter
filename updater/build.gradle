@@ -27,7 +27,9 @@ repositories {
 dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
+    //implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '2.0.0-alpha1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '2.13.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
     implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
@@ -103,7 +105,7 @@ build.dependsOn(copyOutput)
 createRuntimeImage {
     outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
-    modules = ['com.crschnick.pdx_unlimiter.updater']
+    modules = ['com.crschnick.pdx_unlimiter.updater', 'org.slf4j', 'org.slf4j.simple', 'jdk.crypto.ec']
     excludedResources = []
     launcher {
         name = 'updater'

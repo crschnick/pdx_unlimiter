@@ -1,11 +1,9 @@
 package com.crschnick.pdx_unlimiter.app;
 
-import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4SavegameManagerStyle;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -28,12 +26,14 @@ import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SavegameManagerApp extends Application {
 
+    private Image icon;
     private static SavegameManagerApp APP;
     private BorderPane layout = new BorderPane();
     private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
@@ -45,26 +45,38 @@ public class SavegameManagerApp extends Application {
     }
 
     public static void main(String[] args) {
-        ErrorHandler.init();
         try {
+            ErrorHandler.init();
+            if (!PdxuInstallation.init()) {
+                return;
+            }
+            Settings.init();
+            GameInstallation.initInstallations();
+            SavegameCache.loadData();
+
+            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+            logger.setLevel(Level.SEVERE);
+            logger.setUseParentHandlers(false);
+            GlobalScreen.registerNativeHook();
+
             launch(args);
         } catch (Exception e) {
-            ErrorHandler.handleException(e, true);
+            ErrorHandler.handleStartupExcetion(e);
         }
     }
 
     private void createStatusThread(BorderPane layout) {
         Consumer<Eu4Campaign.Entry> launch = (e) -> {
             Path srcPath = SavegameCache.EU4_CACHE.getPath(e).resolve("savegame.eu4");
-            Path destPath = Installation.EU4.get().getSaveDirectory().resolve("savegame.eu4");
+            Path destPath = GameInstallation.EU4.getSaveDirectory().resolve("savegame.eu4");
             try {
                 FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
                 destPath.toFile().setLastModified(System.currentTimeMillis());
-                Installation.EU4.get().writeLaunchConfig(e, Installation.EU4.get().getUserDirectory().relativize(destPath));
+                GameInstallation.EU4.writeLaunchConfig(e, GameInstallation.EU4.getUserDirectory().relativize(destPath));
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
-            Installation.EU4.get().start();
+            GameInstallation.EU4.start();
             selectedCampaign.get().get().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
 
         };
@@ -153,31 +165,9 @@ public class SavegameManagerApp extends Application {
     public void save() {
         try {
             SavegameCache.saveData();
-            Installation.saveConfig();
+            Settings.saveConfig();
         } catch (IOException e) {
             ErrorHandler.handleException(e, false);
-        }
-    }
-
-    private void startSetup() {
-        try {
-            Installation.loadConfig();
-            SavegameCache.loadData();
-        } catch (Exception e) {
-            ErrorHandler.handleException(e, true);
-        }
-
-        try {
-            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.SEVERE);
-            logger.setUseParentHandlers(false);
-            GlobalScreen.registerNativeHook();
-        } catch (NativeHookException e) {
-            ErrorHandler.handleException(e, false);
-        }
-
-        if (!Installation.isConfigured()) {
-            DialogHelper.showSettings();
         }
     }
 
@@ -197,10 +187,21 @@ public class SavegameManagerApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         APP = this;
-        var icon = SavegameManagerApp.class.getResourceAsStream("logo.png");
-        primaryStage.getIcons().add(new Image(icon));
+        icon = new Image(SavegameManagerApp.class.getResourceAsStream("logo.png"));
+        primaryStage.getIcons().add(icon);
 
-        startSetup();
+        if (Settings.getInstance().getEu4().isEmpty()) {
+            if (!DialogHelper.showInitialSettings()) {
+                System.exit(0);
+            } else {
+                try {
+                    GameInstallation.initInstallations();
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e, true);
+                }
+            }
+        }
+
         createLayout();
 
         primaryStage.setTitle("EU4 Savegame Manager");
@@ -214,6 +215,10 @@ public class SavegameManagerApp extends Application {
                 close(true);
             }
         });
+    }
+
+    public Image getIcon() {
+        return icon;
     }
 
     public boolean isRunning() {

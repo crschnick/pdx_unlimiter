@@ -16,10 +16,6 @@ OutFile "pdxu_installer.exe"
      Reinstall:
        RMDir /r $INSTDIR
   ${EndIf}
-
-   MessageBox MB_YESNO "Do you want to start the installation?" IDYES Install
-     Abort
-   Install:
  FunctionEnd
 
 PageEx license
@@ -27,7 +23,16 @@ PageEx license
   LicenseData "license_file.txt"
 PageExEnd
 
-Page instfiles
+
+
+
+ Function askForStart
+   MessageBox MB_YESNO "Do you want to start the installation?" IDYES Install
+     Abort
+   Install:
+ FunctionEnd
+
+Page instfiles askForStart
 
 Section
   SetOverwrite off

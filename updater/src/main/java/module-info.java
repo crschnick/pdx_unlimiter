@@ -6,9 +6,9 @@ module com.crschnick.pdx_unlimiter.updater {
     requires java.desktop;
     requires io.sentry;
     requires org.slf4j;
-
-    requires jdk.crypto.ec;
-
+    requires org.apache.logging.log4j;
+    requires org.apache.logging.log4j.core;
+    requires org.apache.logging.log4j.slf4j;
 
     exports com.crschnick.pdx_unlimiter.updater;
 }

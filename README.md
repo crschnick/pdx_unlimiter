@@ -70,5 +70,7 @@ The current focus primarily lies on perfecting already existing features.
 ## Building and running
 
 You can build the project with `gradle build`.
-To create jlink images, use `gradle createDist`.
-For running, you can use `gradle app:run` and `gradle updater:run`.
+To create jlink images and installers, use `gradle createDist`.
+For running, you can use `gradle app:run  -Dpdxu.installDir=<installation directory>` and `gradle updater:run`.
+The `-Dpdxu.installDir=<installation directory>` property is needed for a dev build to simulate the program operating
+in a real installation directory and not the build directory.

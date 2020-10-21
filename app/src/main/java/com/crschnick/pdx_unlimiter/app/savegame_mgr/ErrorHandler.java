@@ -2,28 +2,21 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import io.sentry.Sentry;
 import javafx.application.Platform;
 import org.apache.commons.lang3.function.FailableRunnable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public class ErrorHandler {
 
     public static void init() {
-        try {
-            Path p = Path.of(System.getProperty("user.dir")).getParent().resolve("version");
-            if (Files.exists(p)) {
-                String v = Files.readString(p);
-                System.setProperty("sentry.release", v);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         Sentry.init();
+    }
+
+    public static void handleStartupExcetion(Exception ex) {
+        ex.printStackTrace();
+        Sentry.capture(ex);
+        System.exit(1);
     }
 
     public static void handleException(Exception ex, boolean isTerminal) {
@@ -40,6 +33,7 @@ public class ErrorHandler {
         }
         Platform.runLater(() -> {
             if (DialogHelper.showException(ex)) {
+                ex.printStackTrace();
                 Sentry.capture(ex);
             }
         });
@@ -47,6 +41,7 @@ public class ErrorHandler {
             Exception finalT = t;
             Platform.runLater(() -> {
                 if (DialogHelper.showException(finalT)) {
+                    finalT.printStackTrace();
                     Sentry.capture(finalT);
                 }
             });
@@ -57,6 +52,7 @@ public class ErrorHandler {
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     if (DialogHelper.showException(e)) {
+                        e.printStackTrace();
                         Sentry.capture(e);
                     }
                 });

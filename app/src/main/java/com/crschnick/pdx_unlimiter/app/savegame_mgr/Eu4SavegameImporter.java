@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
-import com.crschnick.pdx_unlimiter.app.installation.Installation;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import javafx.beans.property.BooleanProperty;
 
 import java.nio.file.Path;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class Eu4SavegameImporter {
 
     public static void importLatestSavegame() {
-        Arrays.stream(Installation.EU4.get().getSaveDirectory().toFile().listFiles())
+        Arrays.stream(GameInstallation.EU4.getSaveDirectory().toFile().listFiles())
                 .sorted(Comparator.comparingLong(f -> f.lastModified()))
                 .sorted(Comparator.reverseOrder())
                 .findFirst().ifPresent(f -> {
@@ -23,7 +23,7 @@ public class Eu4SavegameImporter {
 
     public static void importAllSavegames() {
         new Thread(() -> {
-            Eu4SavegameImporter.importAllSavegames(Installation.EU4.get().getSaveDirectory(), (p) -> {
+            Eu4SavegameImporter.importAllSavegames(GameInstallation.EU4.getSaveDirectory(), (p) -> {
                 SavegameCache.EU4_CACHE.importSavegame(p);
             }, SavegameManagerApp.getAPP().runningProperty());
         }).start();
