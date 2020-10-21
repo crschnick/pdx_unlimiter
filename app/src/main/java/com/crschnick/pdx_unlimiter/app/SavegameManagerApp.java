@@ -46,7 +46,6 @@ public class SavegameManagerApp extends Application {
 
     public static void main(String[] args) {
         try {
-            ErrorHandler.init();
             if (!PdxuInstallation.init()) {
                 return;
             }
