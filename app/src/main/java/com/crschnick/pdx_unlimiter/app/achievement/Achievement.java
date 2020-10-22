@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
 
 public class Achievement {
 
-    private static class Condition {
+    public static class Condition {
         private String description;
         private String node;
         private Filter filter;
@@ -26,6 +26,18 @@ public class Achievement {
             this.description = description;
             this.node = node;
             this.filter = Filter.parse("[?(" + filter + ")]");
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getNode() {
+            return node;
+        }
+
+        public Filter getFilter() {
+            return filter;
         }
     }
 
@@ -36,6 +48,39 @@ public class Achievement {
         public Variable(String name, String value) {
             this.name = name;
             this.value = value;
+        }
+    }
+
+    public static class ConditionStatus {
+        private Map<Condition,Boolean> conditions = new LinkedHashMap<>();
+
+        private void add(Condition c, boolean b) {
+            conditions.put(c, b);
+        }
+
+        public Map<Condition, Boolean> getConditions() {
+            return conditions;
+        }
+
+        public boolean isFullfilled() {
+            return !conditions.containsValue(false);
+        }
+    }
+    public static class ScoreStatus {
+        private double score;
+        private Map<String,Double> values;
+
+        public ScoreStatus(double score, Map<String, Double> values) {
+            this.score = score;
+            this.values = values;
+        }
+
+        public double getScore() {
+            return score;
+        }
+
+        public Map<String, Double> getValues() {
+            return values;
         }
     }
 
@@ -89,30 +134,65 @@ public class Achievement {
         return r;
     }
 
-    public boolean isEligible(Eu4IntermediateSavegame s) {
+    public ConditionStatus checkEligible(Eu4IntermediateSavegame s) {
         return check(s, eligibilityConditions);
     }
 
-    public boolean isAchieved(Eu4IntermediateSavegame s) {
+    public ConditionStatus checkAchieved(Eu4IntermediateSavegame s) {
         return check(s, achievementConditions);
     }
 
-    public double score(Eu4IntermediateSavegame s) {
-        return scorer.score(s, 0);
+    public ScoreStatus score(Eu4IntermediateSavegame s) {
+        return new ScoreStatus(scorer.score(s, 0), scorer.getValues(s));
     }
 
-    private boolean check(Eu4IntermediateSavegame s, List<Condition> conditions) {
+    private ConditionStatus check(Eu4IntermediateSavegame s, List<Condition> conditions) {
+        ConditionStatus status = new ConditionStatus();
         for (var e : s.getNodes().entrySet()) {
             for (var condition : conditions) {
                 if (condition.node.equals(e.getKey())) {
                     ArrayNode r = JsonPath.read(e.getValue(), "[?]", condition.filter);
                     if (r.getNodes().size() == 0) {
-                        return false;
+                        status.add(condition, false);
+                    } else {
+                        status.add(condition, true);
                     }
                 }
             }
         }
-        return true;
+        return status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public Optional<String> getIcon() {
+        return icon;
+    }
+
+    public List<Variable> getVariables() {
+        return variables;
+    }
+
+    public List<Condition> getEligibilityConditions() {
+        return eligibilityConditions;
+    }
+
+    public List<Condition> getAchievementConditions() {
+        return achievementConditions;
+    }
+
+    public Scorer getScorer() {
+        return scorer;
     }
 
     public String getReadableScore() {
