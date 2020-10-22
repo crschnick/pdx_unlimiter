@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.achievement.Scorer;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
@@ -262,6 +263,15 @@ public class Eu4SavegameManagerStyle {
         open.setStyle("-fx-background-color: #aaaa66;-fx-text-fill: white; -fx-font-size: 18px;");
         Tooltip.install(open, tooltip("Open savegame location"));
 
+
+        Button achievements = new Button("\uD83C\uDFC6");
+        achievements.setOnMouseClicked((m) -> {
+        });
+        achievements.setAlignment(Pos.CENTER_LEFT);
+        achievements.setStyle("-fx-background-color: #88aa88;-fx-text-fill: white; -fx-font-size: 18px;");
+        Tooltip.install(open, tooltip("Achievements"));
+
+
         Button del = new Button("\u2715");
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showSavegameDeleteDialog()) {
@@ -272,7 +282,7 @@ public class Eu4SavegameManagerStyle {
         del.setStyle("-fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 16px;");
         Tooltip.install(del, tooltip("Delete savegame"));
 
-        HBox bar = new HBox(name, open, del);
+        HBox bar = new HBox(name, achievements, open, del);
         bar.setSpacing(5);
         HBox.setHgrow(name, Priority.SOMETIMES);
         main.getChildren().add(bar);

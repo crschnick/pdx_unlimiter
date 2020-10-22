@@ -16,6 +16,7 @@ module com.crschnick.pdx_unlimiter.app {
 
     requires org.slf4j;
     requires org.slf4j.simple;
+    requires com.jayway.jsonpath;
 
     uses javax.imageio.spi.ImageReaderSpi;
     uses net.nikr.dds.DDSImageReaderSpi;

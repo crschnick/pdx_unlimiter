@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app;
 
+import com.crschnick.pdx_unlimiter.app.achievement.JsonPathConfiguration;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -18,7 +19,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.commons.io.FileUtils;
 import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 
 import java.awt.*;
 import java.io.IOException;
@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +48,7 @@ public class SavegameManagerApp extends Application {
             if (!PdxuInstallation.init()) {
                 return;
             }
+            JsonPathConfiguration.init();
             Settings.init();
             GameInstallation.initInstallations();
             SavegameCache.loadData();
@@ -60,7 +60,7 @@ public class SavegameManagerApp extends Application {
 
             launch(args);
         } catch (Exception e) {
-            ErrorHandler.handleStartupExcetion(e);
+            ErrorHandler.handleExcetionWithoutPlatform(e);
         }
     }
 
@@ -177,9 +177,10 @@ public class SavegameManagerApp extends Application {
         running.setValue(false);
         Platform.exit();
         try {
+            PdxuInstallation.shutdown();
             GlobalScreen.unregisterNativeHook();
-        } catch (NativeHookException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            ErrorHandler.handleExcetionWithoutPlatform(e);
         }
     }
 

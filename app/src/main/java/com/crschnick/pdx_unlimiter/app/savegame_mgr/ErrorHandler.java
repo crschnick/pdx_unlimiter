@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class ErrorHandler {
 
-    public static void handleStartupExcetion(Exception ex) {
+    public static void handleExcetionWithoutPlatform(Exception ex) {
         ex.printStackTrace();
         LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
         Sentry.capture(ex);
