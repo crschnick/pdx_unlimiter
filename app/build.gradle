@@ -44,6 +44,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
     implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
+    implementation files("$buildDir/generated-modules/json-path-2.4.0.jar")
     implementation project(':eu4')
 }
 
@@ -52,6 +53,18 @@ addDependenciesModuleInfo {
     jdepsExtraArgs = ['-q']
     outputDirectory = file("$buildDir/generated-modules")
     modules {
+        module {
+            artifact group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+            moduleInfoSource = '''
+                module com.jayway.jsonpath {
+                    exports com.jayway.jsonpath;
+                    exports com.jayway.jsonpath.spi.json;
+                    exports com.jayway.jsonpath.spi.mapper;
+                    requires com.fasterxml.jackson.databind;
+                    requires org.slf4j;
+                }
+            '''
+        }
         module {
             artifact group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
             moduleInfoSource = '''

@@ -4,7 +4,11 @@ import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
@@ -18,18 +22,20 @@ public class PdxuInstallation {
     public static boolean init() throws Exception {
         Path appPath = Path.of(System.getProperty("java.home"));
 
+        boolean prod = false;
         String v;
         Path installDir;
         if (appPath.toFile().getName().equals("app")) {
             v = Files.readString(appPath.resolve("version"));
             installDir = appPath.getParent();
+            prod = true;
         } else {
             v = "dev";
             String dir = Optional.ofNullable(System.getProperty("pdxu.installDir"))
                     .orElseThrow(() -> new NoSuchElementException("Property pdxu.installDir missing for dev build"));
             installDir = Path.of(dir);
         }
-        INSTANCE = new PdxuInstallation(installDir, v);
+        INSTANCE = new PdxuInstallation(installDir, v, prod);
 
         FileUtils.forceMkdir(INSTANCE.getLogsLocation().toFile());
         System.setProperty("org.slf4j.simpleLogger.logFile", INSTANCE.getLogsLocation().resolve("pdxu.log").toString());
@@ -38,16 +44,25 @@ public class PdxuInstallation {
         LoggerFactory.getLogger(PdxuInstallation.class).info("Initializing installation at " + installDir.toString());
         Sentry.init();
 
-        if (INSTANCE.getNewLauncherLocation().toFile().exists()) {
-            FileUtils.deleteDirectory(INSTANCE.getLauncherLocation().toFile());
-            FileUtils.moveDirectory(INSTANCE.getNewLauncherLocation().toFile(), INSTANCE.getLauncherLocation().toFile());
-        }
-
         if (INSTANCE.isAlreadyRunning()) {
             return false;
         }
 
         return true;
+    }
+
+    public static void shutdown() throws Exception {
+        INSTANCE.updateLauncher();
+    }
+
+    private void updateLauncher() throws Exception {
+        if (!INSTANCE.getNewLauncherLocation().toFile().exists()) {
+            return;
+        }
+
+        FileUtils.deleteDirectory(INSTANCE.getOldLauncherLocation().toFile());
+        FileUtils.moveDirectory(INSTANCE.getLauncherLocation().toFile(), INSTANCE.getOldLauncherLocation().toFile());
+        FileUtils.moveDirectory(INSTANCE.getNewLauncherLocation().toFile(), INSTANCE.getLauncherLocation().toFile());
     }
 
     private boolean isAlreadyRunning() {
@@ -59,10 +74,12 @@ public class PdxuInstallation {
 
     private Path location;
     private String version;
+    private boolean production;
 
-    private PdxuInstallation(Path location, String version) {
+    private PdxuInstallation(Path location, String version, boolean production) {
         this.location = location;
         this.version = version;
+        this.production = production;
     }
 
     public Path getLocation() {
@@ -75,6 +92,10 @@ public class PdxuInstallation {
 
     public Path getLauncherLocation() {
         return location.resolve("launcher");
+    }
+
+    public Path getOldLauncherLocation() {
+        return location.resolve("launcher_old");
     }
 
     public Path getNewLauncherLocation() {
@@ -107,5 +128,9 @@ public class PdxuInstallation {
 
     public static PdxuInstallation getInstance() {
         return INSTANCE;
+    }
+
+    public boolean isProduction() {
+        return production;
     }
 }
