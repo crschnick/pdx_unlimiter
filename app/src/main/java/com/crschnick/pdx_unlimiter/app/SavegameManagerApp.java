@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app;
 
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.JsonPathConfiguration;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
@@ -48,7 +49,6 @@ public class SavegameManagerApp extends Application {
             if (!PdxuInstallation.init()) {
                 return;
             }
-            JsonPathConfiguration.init();
             Settings.init();
             GameInstallation.initInstallations();
             SavegameCache.loadData();
@@ -56,7 +56,10 @@ public class SavegameManagerApp extends Application {
             Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
             logger.setLevel(Level.SEVERE);
             logger.setUseParentHandlers(false);
-            GlobalScreen.registerNativeHook();
+
+            if (PdxuInstallation.getInstance().isProduction()) {
+                GlobalScreen.registerNativeHook();
+            }
 
             launch(args);
         } catch (Exception e) {
@@ -189,6 +192,8 @@ public class SavegameManagerApp extends Application {
         APP = this;
         icon = new Image(SavegameManagerApp.class.getResourceAsStream("logo.png"));
         primaryStage.getIcons().add(icon);
+
+        AchievementManager.init();
 
         if (Settings.getInstance().getEu4().isEmpty()) {
             if (!DialogHelper.showInitialSettings()) {

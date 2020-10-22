@@ -9,10 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public interface Scorer {
@@ -37,7 +34,7 @@ public interface Scorer {
                         e.getValue().get("name").textValue()));
             }
             else if (e.getKey().equals("filterCount")) {
-                scorers.add(new PathValueScorer(
+                scorers.add(new FilterCountScorer(
                         e.getValue().get("node").textValue(),
                         func.apply(e.getValue().get("filter").textValue()),
                         e.getValue().get("name").textValue()));
@@ -60,6 +57,8 @@ public interface Scorer {
 
     String getDelimiter();
 
+    Map<String, Double> getValues(Eu4IntermediateSavegame sg);
+
     class AddScorer implements Scorer {
 
         private double value;
@@ -81,6 +80,11 @@ public interface Scorer {
         @Override
         public String getDelimiter() {
             return value >= 0 ? "+" : "-";
+        }
+
+        @Override
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+            return Map.of();
         }
     }
 
@@ -106,6 +110,11 @@ public interface Scorer {
         public String getDelimiter() {
             return "*";
         }
+
+        @Override
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+            return Map.of();
+        }
     }
 
     class PathValueScorer implements Scorer {
@@ -120,16 +129,11 @@ public interface Scorer {
             this.name = name;
         }
 
+
+
         @Override
         public double score(Eu4IntermediateSavegame sg, double current) {
-            ArrayNode r = JsonPath.read(sg.getNodes().get(node), path);
-            if (r.getNodes().size() > 1) {
-                throw new JsonPathException();
-            }
-
-            Object value = ((ValueNode) r.getNodes().get(0)).getValue();
-
-            return current + (value instanceof Long ? ((Long)value).doubleValue() : (double) value);
+            return current + getValues(sg).get(name);
         }
 
         @Override
@@ -140,6 +144,17 @@ public interface Scorer {
         @Override
         public String getDelimiter() {
             return "+";
+        }
+
+        @Override
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+            ArrayNode r = JsonPath.read(sg.getNodes().get(node), path);
+            if (r.getNodes().size() > 1) {
+                throw new JsonPathException();
+            }
+
+            Object value = ((ValueNode) r.getNodes().get(0)).getValue();
+            return Map.of(name, (value instanceof Long ? ((Long)value).doubleValue() : (double) value));
         }
     }
 
@@ -157,18 +172,23 @@ public interface Scorer {
 
         @Override
         public double score(Eu4IntermediateSavegame sg, double current) {
-            ArrayNode r = JsonPath.read(sg.getNodes().get(node), filter);
-            return current + (double) r.getNodes().size();
+            return current + getValues(sg).get(name);
         }
 
         @Override
         public String toReadableString() {
-            return "count <" + name + ">";
+            return "<" + name + ">";
         }
 
         @Override
         public String getDelimiter() {
             return "+";
+        }
+
+        @Override
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+            ArrayNode r = JsonPath.read(sg.getNodes().get(node), filter);
+            return Map.of(name, (double) r.getNodes().size());
         }
     }
 
@@ -210,6 +230,13 @@ public interface Scorer {
         @Override
         public String getDelimiter() {
             return "+";
+        }
+
+        @Override
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+            Map<String, Double> values = new LinkedHashMap<>();
+            scorers.stream().forEach(s -> values.putAll(s.getValues(sg)));
+            return values;
         }
     }
 }

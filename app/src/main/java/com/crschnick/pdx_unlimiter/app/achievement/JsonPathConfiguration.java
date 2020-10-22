@@ -217,19 +217,6 @@ public class JsonPathConfiguration {
             }
         });
 
-
-        Eu4IntermediateSavegame i = null;
-        try {
-            i = Eu4IntermediateSavegame.fromFile(
-                    Path.of("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\5b4e1af0-27f0-4fe2-b78b-233c782ba7f0\\262b7401-1a8c-4255-88b5-089739bb8211\\data.zip"));
-
-            Achievement a = Achievement.fromFile(PdxuInstallation.getInstance().getAchievementsLocation().resolve("ach.json"));
-            a.isEligible(i);
-            String s = a.getReadableScore();
-            a.score(i);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }

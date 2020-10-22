@@ -23,6 +23,13 @@ import java.util.Optional;
 
 public class DialogHelper {
 
+    public static Alert createAlertForNode(Node node) {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        setIcon(alert);
+        alert.getDialogPane().setContent(node);
+        return alert;
+    }
+
     private static void setIcon(Alert a) {
         ((Stage)a.getDialogPane().getScene().getWindow()).getIcons().add(SavegameManagerApp.getAPP().getIcon());
     }
