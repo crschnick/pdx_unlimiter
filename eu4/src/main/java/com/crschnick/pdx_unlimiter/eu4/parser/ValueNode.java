@@ -8,6 +8,10 @@ public class ValueNode extends Node {
         this.value = value;
     }
 
+    public String toString() {
+        return "ValueNode(" + getValue().toString() + ")";
+    }
+
     public String toString(int indentation) {
         return getValue().toString();
     }

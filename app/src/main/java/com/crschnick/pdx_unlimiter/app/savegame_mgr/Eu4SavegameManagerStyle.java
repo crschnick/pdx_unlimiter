@@ -1,6 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
 import com.crschnick.pdx_unlimiter.app.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementWindow;
 import com.crschnick.pdx_unlimiter.app.achievement.Scorer;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
@@ -266,6 +268,7 @@ public class Eu4SavegameManagerStyle {
 
         Button achievements = new Button("\uD83C\uDFC6");
         achievements.setOnMouseClicked((m) -> {
+            AchievementWindow.showAchievementDialog(AchievementManager.getInstance().getAchievements().get(0), e);
         });
         achievements.setAlignment(Pos.CENTER_LEFT);
         achievements.setStyle("-fx-background-color: #88aa88;-fx-text-fill: white; -fx-font-size: 18px;");

@@ -16,6 +16,10 @@ public class ArrayNode extends Node {
         this.nodes = nodes;
     }
 
+    public String toString() {
+        return "ArrayNode(" + nodes.toString() + ")";
+    }
+
     public String toString(int indentation) {
         return "{\n" + getNodes().stream().map(
                 (n) -> {

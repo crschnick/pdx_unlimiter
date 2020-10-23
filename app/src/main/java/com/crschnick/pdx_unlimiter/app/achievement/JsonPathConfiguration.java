@@ -72,10 +72,10 @@ public class JsonPathConfiguration {
 
             ArrayNode a = (ArrayNode) o;
             if (a.getNodes().size() == 0) {
-                return false;
+                return true;
             }
 
-            return a.getNodes().get(0) instanceof ValueNode;
+            return !(a.getNodes().get(0) instanceof KeyValueNode);
         }
 
         @Override
@@ -176,21 +176,7 @@ public class JsonPathConfiguration {
 
             ValueNode node = (ValueNode) o;
             Object value = node.getValue();
-            if (value instanceof Boolean) {
-                boolean b = (boolean) value;
-                return b;
-            } else if (value instanceof Long) {
-                long l = (long) value;
-                return l;
-            } else if (value instanceof String) {
-                String s = (String) value;
-                return s;
-            } else if (value instanceof Double) {
-                double d = (double) value;
-                return d;
-            } else {
-                return o;
-            }
+            return value;
         }
     };
 
@@ -213,7 +199,7 @@ public class JsonPathConfiguration {
 
             @Override
             public Set<Option> options() {
-                return EnumSet.of(Option.DEFAULT_PATH_LEAF_TO_NULL, Option.ALWAYS_RETURN_LIST);
+                return EnumSet.of(Option.ALWAYS_RETURN_LIST);
             }
         });
 

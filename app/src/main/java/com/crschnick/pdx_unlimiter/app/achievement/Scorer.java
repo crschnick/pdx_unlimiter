@@ -2,9 +2,7 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
@@ -14,29 +12,38 @@ import java.util.function.Function;
 
 public interface Scorer {
 
-    static Scorer fromJsonNode(JsonNode node, Function<String,String> func) {
+    static Scorer fromJsonNode(JsonNode node) {
+        List<Scorer> scorers = scorersFromJsonNode(node);
+        if (scorers.size() == 1) {
+            return new ChainedScorer(false, scorers);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private static List<Scorer> scorersFromJsonNode(JsonNode node) {
         List<Scorer> scorers = new ArrayList<>();
         for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext(); ) {
             Map.Entry<String, JsonNode> e = it.next();
-            if (e.getKey().equals("add")) {
-                scorers.add(new AddScorer(e.getValue().doubleValue()));
+            if (e.getKey().equals("value")) {
+                scorers.add(new ValueScorer(e.getValue().doubleValue()));
             }
-            else if (e.getKey().equals("multiply")) {
-                scorers.add(new MultScorer(e.getValue().doubleValue()));
+            else if (e.getKey().equals("add")) {
+                scorers.add(new ChainedScorer(false, scorersFromJsonNode(e.getValue())));
             }
-            else if (e.getKey().equals("chain")) {
-                scorers.add(fromJsonNode(e.getValue(), func));
+            else if (e.getKey().equals("mult")) {
+                scorers.add(new ChainedScorer(true, scorersFromJsonNode(e.getValue())));
             }
             else if (e.getKey().equals("pathValue")) {
                 scorers.add(new PathValueScorer(
                         e.getValue().get("node").textValue(),
-                        func.apply(e.getValue().get("path").textValue()),
+                        e.getValue().get("path").textValue(),
                         e.getValue().get("name").textValue()));
             }
             else if (e.getKey().equals("filterCount")) {
                 scorers.add(new FilterCountScorer(
                         e.getValue().get("node").textValue(),
-                        func.apply(e.getValue().get("filter").textValue()),
+                        e.getValue().get("filter").textValue(),
                         e.getValue().get("name").textValue()));
             } else {
 
@@ -44,61 +51,26 @@ public interface Scorer {
             }
 
         }
-        if (scorers.size() > 1) {
-            return new ChainedScorer(scorers);
-        } else {
-            return scorers.get(0);
-        }
+        return scorers;
     }
 
-    double score(Eu4IntermediateSavegame sg, double current);
+    double score(Eu4IntermediateSavegame sg, Function<String,String> func);
 
     String toReadableString();
 
-    String getDelimiter();
+    Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func);
 
-    Map<String, Double> getValues(Eu4IntermediateSavegame sg);
-
-    class AddScorer implements Scorer {
+    class ValueScorer implements Scorer {
 
         private double value;
 
-        public AddScorer(double value) {
+        public ValueScorer(double value) {
             this.value = value;
         }
 
         @Override
-        public double score(Eu4IntermediateSavegame sg, double current) {
-            return current + value;
-        }
-
-        @Override
-        public String toReadableString() {
-            return String.valueOf(value >= 0 ? value : -value);
-        }
-
-        @Override
-        public String getDelimiter() {
-            return value >= 0 ? "+" : "-";
-        }
-
-        @Override
-        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
-            return Map.of();
-        }
-    }
-
-    class MultScorer implements Scorer {
-
-        private double value;
-
-        public MultScorer(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public double score(Eu4IntermediateSavegame sg, double current) {
-            return current * value;
+        public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
+            return value;
         }
 
         @Override
@@ -107,12 +79,7 @@ public interface Scorer {
         }
 
         @Override
-        public String getDelimiter() {
-            return "*";
-        }
-
-        @Override
-        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
             return Map.of();
         }
     }
@@ -129,11 +96,9 @@ public interface Scorer {
             this.name = name;
         }
 
-
-
         @Override
-        public double score(Eu4IntermediateSavegame sg, double current) {
-            return current + getValues(sg).get(name);
+        public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
+            return getValues(sg, func).get(name);
         }
 
         @Override
@@ -142,13 +107,8 @@ public interface Scorer {
         }
 
         @Override
-        public String getDelimiter() {
-            return "+";
-        }
-
-        @Override
-        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
-            ArrayNode r = JsonPath.read(sg.getNodes().get(node), path);
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
+            ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(path));
             if (r.getNodes().size() > 1) {
                 throw new JsonPathException();
             }
@@ -171,8 +131,8 @@ public interface Scorer {
         }
 
         @Override
-        public double score(Eu4IntermediateSavegame sg, double current) {
-            return current + getValues(sg).get(name);
+        public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
+            return getValues(sg, func).get(name);
         }
 
         @Override
@@ -181,61 +141,48 @@ public interface Scorer {
         }
 
         @Override
-        public String getDelimiter() {
-            return "+";
-        }
-
-        @Override
-        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
-            ArrayNode r = JsonPath.read(sg.getNodes().get(node), filter);
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
+            ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(filter));
             return Map.of(name, (double) r.getNodes().size());
         }
     }
 
     class ChainedScorer implements Scorer {
 
+        private boolean mult;
         private List<Scorer> scorers;
 
-        public ChainedScorer(List<Scorer> scorers) {
+        public ChainedScorer(boolean mult, List<Scorer> scorers) {
+            this.mult = mult;
             this.scorers = scorers;
         }
 
         @Override
-        public double score(Eu4IntermediateSavegame sg, double current) {
-            double s = 0;
+        public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
+            double s = mult ? 1 : 0;
             for (Scorer sc : scorers) {
-                s = sc.score(sg, s);
+                if (mult) {
+                    s *= sc.score(sg, func);
+                } else {
+                    s += sc.score(sg, func);
+                }
             }
             return s;
         }
 
         @Override
         public String toReadableString() {
-            if (scorers.size() == 1) {
-                return scorers.get(0).toReadableString();
+            String s = scorers.get(0).toReadableString();
+            for (int i = 1; i < scorers.size(); i++) {
+                s = s + (mult ? " * " : " + ") + scorers.get(i).toReadableString();
             }
-
-            String start = scorers.get(0).toReadableString() + scorers.get(1).getDelimiter() + scorers.get(1).toReadableString();
-            if (scorers.size() == 2) {
-                return start;
-            }
-
-            String s = "(" + start + ")";
-            for (int i = 2; i < scorers.size(); i++) {
-                s = "(" + s + " " + scorers.get(i).getDelimiter() + " " + scorers.get(i).toReadableString() + ")";
-            }
-            return s;
+            return scorers.size() > 1 ? "(" + s + ")" : s;
         }
 
         @Override
-        public String getDelimiter() {
-            return "+";
-        }
-
-        @Override
-        public Map<String, Double> getValues(Eu4IntermediateSavegame sg) {
+        public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
             Map<String, Double> values = new LinkedHashMap<>();
-            scorers.stream().forEach(s -> values.putAll(s.getValues(sg)));
+            scorers.stream().forEach(s -> values.putAll(s.getValues(sg, func)));
             return values;
         }
     }

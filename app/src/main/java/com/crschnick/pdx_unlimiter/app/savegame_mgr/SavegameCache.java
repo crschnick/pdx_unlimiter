@@ -496,8 +496,8 @@ public class SavegameCache {
         }
 
         UUID saveUuid = UUID.randomUUID();
-        String id = Node.getString(Node.getNodeForKey(is.getNodes().get("meta"), "campaign_id"));
-        Path campaignPath = path.resolve(id);
+        UUID uuid = e.getCampaignUuid();
+        Path campaignPath = path.resolve(uuid.toString());
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
         try {
@@ -509,7 +509,6 @@ public class SavegameCache {
             FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
 
 
-            UUID uuid = UUID.fromString(id);
             this.addNewEntry(uuid, saveUuid, e);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex, false);

@@ -3,14 +3,18 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 import com.crschnick.pdx_unlimiter.app.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import javafx.application.Platform;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +23,14 @@ import java.util.stream.Collectors;
 public class AchievementManager {
 
     private static AchievementManager INSTANCE;
+
+    public static AchievementManager getInstance() {
+        return INSTANCE;
+    }
+
+    public List<Achievement> getAchievements() {
+        return achievements;
+    }
 
     private static String calculateChecksum() {
         MessageDigest d = null;
@@ -37,48 +49,51 @@ public class AchievementManager {
                         ErrorHandler.handleException(e, false);
                     }
                 });
-        return d.toString();
+        StringBuilder c = new StringBuilder();
+        ByteBuffer b = ByteBuffer.wrap(d.digest());
+        for (int i = 0; i < 16; i++) {
+            var hex = String.format("%02x", b.get());
+            c.append(hex);
+        }
+        return c.toString();
     }
 
     public static void init() throws IOException {
-        var list = new ArrayList<Achievement>();
+        INSTANCE = new AchievementManager();
+        INSTANCE.loadData();
+        JsonPathConfiguration.init();
+    }
+
+    private String checksum;
+    private List<Achievement> achievements = new ArrayList<>();
+
+    private void loadData() throws IOException {
+        achievements.clear();
         Arrays.stream(PdxuInstallation.getInstance().getAchievementsLocation().toFile().listFiles())
                 .filter(f -> f.getName().endsWith("json"))
                 .forEach(f -> {
                     try {
-                        list.add(Achievement.fromFile(f.toPath()));
+                        achievements.add(Achievement.fromFile(f.toPath()));
                     } catch (IOException e) {
                         ErrorHandler.handleException(e, false);
                     }
                 });
-        
-        String c = Files.readString(PdxuInstallation.getInstance().getAchievementsLocation().resolve("checksum"));
-        INSTANCE = new AchievementManager(c, list);
-        JsonPathConfiguration.init();
 
+        String s = calculateChecksum();
+        checksum = Files.readString(PdxuInstallation.getInstance().getAchievementsLocation().resolve("checksum"));
 
-        Eu4IntermediateSavegame i = null;
-        try {
-            i = Eu4IntermediateSavegame.fromFile(
-                    Path.of("C:\\Users\\cschn\\pdx_unlimiter\\savegames\\eu4\\5b4e1af0-27f0-4fe2-b78b-233c782ba7f0\\262b7401-1a8c-4255-88b5-089739bb8211\\data.zip"));
-
-            Achievement a = Achievement.fromFile(PdxuInstallation.getInstance().getAchievementsLocation().resolve("ach.json"));
-            String s = a.getReadableScore();
-            a.score(i);
-            Eu4IntermediateSavegame finalI = i;
-            Eu4IntermediateSavegame finalI1 = i;
-            AchievementWindow.showAchievementDialog(a, i);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
-    private String checksum;
-    private List<Achievement> achievements;
+    public Achievement.Matcher validateSavegame(Achievement a, Eu4Campaign.Entry entry) throws IOException {
+        INSTANCE.loadData();
+        Eu4IntermediateSavegame loaded = Eu4IntermediateSavegame.fromFile(
+                SavegameCache.EU4_CACHE.getPath(entry).resolve("data.zip"));
 
-    public AchievementManager(String checksum, List<Achievement> achievements) {
-        this.checksum = checksum;
-        this.achievements = achievements;
+        if (!validateChecksum()) {
+            throw new IOException("Wrong achievement checksum");
+        }
+
+        return a.match(loaded);
     }
 
     public boolean validateChecksum() {
@@ -87,7 +102,7 @@ public class AchievementManager {
 
     public List<Achievement> getEligibleAchievements(Eu4IntermediateSavegame s) {
         return achievements.stream()
-                .filter(a -> a.checkAchieved(s).isFullfilled())
+                .filter(a -> a.match(s).getEligibleStatus().isFullfilled())
                 .collect(Collectors.toList());
     }
 }

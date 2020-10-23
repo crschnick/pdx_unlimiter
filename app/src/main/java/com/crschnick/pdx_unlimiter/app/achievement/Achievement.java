@@ -1,7 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
+import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Filter;
@@ -17,15 +20,40 @@ import java.util.stream.StreamSupport;
 
 public class Achievement {
 
+    public static class Matcher {
+
+        private ConditionStatus eligibleStatus;
+        private ConditionStatus achievementStatus;
+        private ScoreStatus status;
+
+        private Matcher(ConditionStatus eligibleStatus, ConditionStatus achievementStatus, ScoreStatus status) {
+            this.eligibleStatus = eligibleStatus;
+            this.achievementStatus = achievementStatus;
+            this.status = status;
+        }
+
+        public ConditionStatus getEligibleStatus() {
+            return eligibleStatus;
+        }
+
+        public ConditionStatus getAchievementStatus() {
+            return achievementStatus;
+        }
+
+        public ScoreStatus getScoreStatus() {
+            return status;
+        }
+    }
+
     public static class Condition {
         private String description;
         private String node;
-        private Filter filter;
+        private String filter;
 
         public Condition(String description, String node, String filter) {
             this.description = description;
             this.node = node;
-            this.filter = Filter.parse("[?(" + filter + ")]");
+            this.filter = "[?(" + filter + ")]";
         }
 
         public String getDescription() {
@@ -36,18 +64,8 @@ public class Achievement {
             return node;
         }
 
-        public Filter getFilter() {
+        public String  getFilter() {
             return filter;
-        }
-    }
-
-    private static class Variable {
-        private String name;
-        private String value;
-
-        public Variable(String name, String value) {
-            this.name = name;
-            this.value = value;
         }
     }
 
@@ -66,6 +84,7 @@ public class Achievement {
             return !conditions.containsValue(false);
         }
     }
+
     public static class ScoreStatus {
         private double score;
         private Map<String,Double> values;
@@ -87,14 +106,16 @@ public class Achievement {
     private String name;
     private String description;
     private UUID uuid;
-    private Optional<String> icon;
+    private Optional<Path> icon;
     private List<Variable> variables;
     private List<Condition> eligibilityConditions;
     private List<Condition> achievementConditions;
     private Scorer scorer;
 
     public static Achievement fromFile(Path file) throws IOException {
-        ObjectMapper o = new ObjectMapper();
+        JsonFactory f = new JsonFactory();
+        f.enable(JsonParser.Feature.ALLOW_COMMENTS);
+        ObjectMapper o = new ObjectMapper(f);
         JsonNode node = o.readTree(Files.readAllBytes(file));
 
         Achievement a = new Achievement();
@@ -102,15 +123,25 @@ public class Achievement {
         a.name = n.get("name").textValue();
         a.description = n.get("description").textValue();
         a.uuid = UUID.fromString(n.get("uuid").textValue());
-        a.icon = Optional.ofNullable(n.get("icon")).map(JsonNode::textValue);
-        a.variables = new ArrayList<>();
+
+        a.variables = Variable.defaultVariables();
+
+        a.icon = Optional.ofNullable(n.get("icon"))
+                .map(JsonNode::textValue)
+                .map(s -> applyVariables(null, a.variables, s))
+                .map(Path::of);
+
+        Iterable<Map.Entry<String,JsonNode>> v = () -> n.get("variables").fields();
+        a.variables.addAll(StreamSupport.stream(v.spliterator(), false)
+                .map(vn -> Variable.fromNode(vn.getKey(), vn.getValue()))
+                .collect(Collectors.toList()));
 
         Iterable<JsonNode> ec = () -> n.get("eligibilityConditions").elements();
         a.eligibilityConditions = StreamSupport.stream(ec.spliterator(), false)
                 .map(ecn -> new Condition(
                         ecn.get("description").textValue(),
                         ecn.get("node").textValue(),
-                        applyVariables(a.variables, ecn.get("filter").textValue())))
+                        ecn.get("filter").textValue()))
                 .collect(Collectors.toList());
 
         Iterable<JsonNode> ac = () -> n.get("achievementConditions").elements();
@@ -118,32 +149,38 @@ public class Achievement {
                 .map(acn -> new Condition(
                         acn.get("description").textValue(),
                         acn.get("node").textValue(),
-                        applyVariables(a.variables, acn.get("filter").textValue())))
+                        acn.get("filter").textValue()))
                 .collect(Collectors.toList());
 
 
-        a.scorer = Scorer.fromJsonNode(n.get("score"), s -> applyVariables(a.variables, s));
+        a.scorer = Scorer.fromJsonNode(n.get("score"));
         return a;
     }
 
-    private static String applyVariables(List<Variable> variables, String s) {
+    private static String applyVariables(Eu4IntermediateSavegame sg, List<Variable> variables, String s) {
         String r = s;
         for (Variable v : variables) {
-            r = r.replace("${" + v.name + "}", v.value);
+            r = r.replace("${" + v.getName() + "}", v.evaluate(sg));
         }
         return r;
     }
 
-    public ConditionStatus checkEligible(Eu4IntermediateSavegame s) {
+    public Matcher match(Eu4IntermediateSavegame sg) {
+        return new Matcher(checkEligible(sg), checkAchieved(sg), score(sg));
+    }
+
+    private ConditionStatus checkEligible(Eu4IntermediateSavegame s) {
         return check(s, eligibilityConditions);
     }
 
-    public ConditionStatus checkAchieved(Eu4IntermediateSavegame s) {
+    private ConditionStatus checkAchieved(Eu4IntermediateSavegame s) {
         return check(s, achievementConditions);
     }
 
-    public ScoreStatus score(Eu4IntermediateSavegame s) {
-        return new ScoreStatus(scorer.score(s, 0), scorer.getValues(s));
+    private ScoreStatus score(Eu4IntermediateSavegame s) {
+        return new ScoreStatus(
+                scorer.score(s, string -> applyVariables(s, variables, string)),
+                scorer.getValues(s, string -> applyVariables(s, variables, string)));
     }
 
     private ConditionStatus check(Eu4IntermediateSavegame s, List<Condition> conditions) {
@@ -151,7 +188,7 @@ public class Achievement {
         for (var e : s.getNodes().entrySet()) {
             for (var condition : conditions) {
                 if (condition.node.equals(e.getKey())) {
-                    ArrayNode r = JsonPath.read(e.getValue(), "[?]", condition.filter);
+                    ArrayNode r = JsonPath.read(e.getValue(), applyVariables(s,variables, condition.filter));
                     if (r.getNodes().size() == 0) {
                         status.add(condition, false);
                     } else {
@@ -175,7 +212,7 @@ public class Achievement {
         return uuid;
     }
 
-    public Optional<String> getIcon() {
+    public Optional<Path> getIcon() {
         return icon;
     }
 

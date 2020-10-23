@@ -23,10 +23,11 @@ import java.util.Optional;
 
 public class DialogHelper {
 
-    public static Alert createAlertForNode(Node node) {
+    public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
         setIcon(alert);
-        alert.getDialogPane().setContent(node);
+        alert.getDialogPane().getScene().getStylesheets().clear();
+        alert.getDialogPane().getScene().getStylesheets().add(DialogHelper.class.getResource("style.css").toExternalForm());
         return alert;
     }
 
