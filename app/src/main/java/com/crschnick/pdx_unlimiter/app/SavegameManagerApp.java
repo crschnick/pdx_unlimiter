@@ -193,7 +193,11 @@ public class SavegameManagerApp extends Application {
         icon = new Image(SavegameManagerApp.class.getResourceAsStream("logo.png"));
         primaryStage.getIcons().add(icon);
 
-        AchievementManager.init();
+        try {
+            AchievementManager.init();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if (Settings.getInstance().getEu4().isEmpty()) {
             if (!DialogHelper.showInitialSettings()) {
@@ -220,6 +224,10 @@ public class SavegameManagerApp extends Application {
                 close(true);
             }
         });
+
+        String css = SavegameManagerApp.class.getResource("style.css").toExternalForm();
+        primaryStage.getScene().getStylesheets().clear();
+        primaryStage.getScene().getStylesheets().add(css);
     }
 
     public Image getIcon() {

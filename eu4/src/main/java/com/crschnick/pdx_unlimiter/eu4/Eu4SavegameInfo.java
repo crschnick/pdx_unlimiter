@@ -6,6 +6,7 @@ import java.util.*;
 
 public class Eu4SavegameInfo {
 
+    private UUID campaignUuid;
     private boolean ironman;
     private boolean randomNewWorld;
     private boolean customNationInWorld;
@@ -30,11 +31,15 @@ public class Eu4SavegameInfo {
     private Map<GameTag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
+    private Eu4IntermediateSavegame savegame;
+
     public static Eu4SavegameInfo fromSavegame(Eu4IntermediateSavegame save) throws SavegameParseException {
         try {
             GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
             String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
             Eu4SavegameInfo e = new Eu4SavegameInfo();
+            e.savegame = save;
+            e.campaignUuid = UUID.fromString(Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "campaign_id")));
 
             for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {
                 e.allTags.add(GameTag.fromNode(n));
@@ -216,6 +221,14 @@ public class Eu4SavegameInfo {
 
     public Set<War> getWars() {
         return wars;
+    }
+
+    public UUID getCampaignUuid() {
+        return campaignUuid;
+    }
+
+    public Eu4IntermediateSavegame getSavegame() {
+        return savegame;
     }
 
     public static class Ruler {

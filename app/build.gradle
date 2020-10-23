@@ -45,6 +45,8 @@ dependencies {
     implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
     implementation files("$buildDir/generated-modules/json-path-2.4.0.jar")
+    implementation files("$buildDir/generated-modules/json-smart-2.3.jar")
+    implementation files("$buildDir/generated-modules/accessors-smart-1.2.jar")
     implementation project(':eu4')
 }
 
@@ -54,6 +56,24 @@ addDependenciesModuleInfo {
     outputDirectory = file("$buildDir/generated-modules")
     modules {
         module {
+            artifact group: 'net.minidev', name: 'json-smart', version: '2.3'
+            moduleInfoSource = '''
+                module net.minidev.json {
+                    exports net.minidev.json;
+                    exports net.minidev.json.parser;
+                    requires net.minidev.asm;
+                }
+            '''
+        }
+        module {
+            artifact group: 'net.minidev', name: 'accessors-smart', version: '1.2'
+            moduleInfoSource = '''
+                module net.minidev.asm {
+                    exports net.minidev.asm;
+                }
+            '''
+        }
+        module {
             artifact group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
             moduleInfoSource = '''
                 module com.jayway.jsonpath {
@@ -62,6 +82,7 @@ addDependenciesModuleInfo {
                     exports com.jayway.jsonpath.spi.mapper;
                     requires com.fasterxml.jackson.databind;
                     requires org.slf4j;
+                    requires net.minidev.json;
                 }
             '''
         }
