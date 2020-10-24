@@ -128,7 +128,7 @@ public class JsonPathConfiguration {
             }
 
             ArrayNode a = (ArrayNode) o;
-            if (a.getNodes().size() == 0) {
+            if (a.getNodes().size() == i) {
                 a.getNodes().add(new ValueNode(o1));
             } else {
                 a.getNodes().set(i, new ValueNode(o1));

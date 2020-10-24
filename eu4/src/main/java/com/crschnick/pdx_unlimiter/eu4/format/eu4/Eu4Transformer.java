@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,39 @@ public class Eu4Transformer {
     public static final NodeTransformer GAMESTATE_TRANSFORMER = createEu4Transformer();
     public static final NodeTransformer META_TRANSFORMER = createMetaTransformer();
 
+    private static NodeTransformer createSettingsTransformer() {
+        List<NodeTransformer> t = new ArrayList<>();
+
+        Map<Integer,String> names = new HashMap<>();
+        names.put(0, "difficulty");
+        names.put(2, "province_values");
+        names.put(31, "limited_country_forming");
+        names.put(22, "fantasy_nations");
+        names.put(14, "lucky_nations");
+        t.add(new ArrayNameTransformer(names));
+
+        t.add(new SubnodeTransformer(Map.of(new String[]{"difficulty"}, new EnumNameTransformer(
+                Map.of(-1, "very_easy", 0, "easy", 1, "normal", 2, "hard", 3, "very_hard"))),
+                true));
+
+        t.add(new SubnodeTransformer(Map.of(new String[]{"limited_country_forming"}, new EnumNameTransformer(
+                Map.of(0, "no", 1, "yes"))),
+                true));
+
+        t.add(new SubnodeTransformer(Map.of(new String[]{"fantasy_nations"}, new EnumNameTransformer(
+                Map.of(0, "never", 1, "rare", 2, "uncommon", 3, "frequent"))),
+                true));
+
+        t.add(new SubnodeTransformer(Map.of(new String[]{"lucky_nations"}, new EnumNameTransformer(
+                Map.of(0, "random", 1, "none", 2, "historical"))),
+                true));
+
+        t.add(new SubnodeTransformer(Map.of(new String[]{"province_values"}, new EnumNameTransformer(
+                Map.of(0, "flat", 1, "normal", 2, "random"))),
+                true));
+
+        return new SubnodeTransformer(Map.of(new String[]{"gameplaysettings", "setgameplayoptions"}, new ChainTransformer(t)), false);
+    }
 
     private static NodeTransformer createEu4Transformer() {
         List<NodeTransformer> t = new ArrayList<>();
@@ -36,6 +70,9 @@ public class Eu4Transformer {
                 return false;
             }
         }, new BooleanTransformer()));
+
+        t.add(new SubnodeTransformer(Map.of(new String[]{"flags", "*"}, new DateTransformer()), true));
+        t.add(createSettingsTransformer());
 
         t.add(new CollectNodesTransformer("active_war", "active_wars"));
         t.add(new CollectNodesTransformer("previous_war", "previous_wars"));

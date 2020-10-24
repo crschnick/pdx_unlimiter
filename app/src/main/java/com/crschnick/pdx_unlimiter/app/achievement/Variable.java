@@ -18,6 +18,15 @@ public abstract class Variable {
     public static List<Variable> defaultVariables() {
         var list = new ArrayList<Variable>();
         list.add(new ValueVariable("eu4.installDir", GameInstallation.EU4.getPath().toString()));
+
+        list.add(new ValueVariable("condition.no_custom_nation", "$[*][?(@.is_custom == true)]"));
+        list.add(new ValueVariable("condition.normal_start_date", "$.start_date.days_since_beginning == 2352374"));
+        list.add(new ValueVariable("condition.normal_province_values", "$.gameplaysettings.setgameplayoptions.province_values == 'normal'"));
+        list.add(new ValueVariable("condition.historical_lucky_nations", "$.gameplaysettings.setgameplayoptions.lucky_nations == 'historical'"));
+        list.add(new ValueVariable("condition.ironman", "$.ironman == true"));
+
+        list.add(new ValueVariable("path.player", "$.player"));
+        list.add(new ValueVariable("path.difficulty", "$.gameplaysettings.setgameplayoptions.difficulty"));
         return list;
     }
 

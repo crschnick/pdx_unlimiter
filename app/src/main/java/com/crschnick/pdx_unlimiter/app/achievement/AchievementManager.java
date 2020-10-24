@@ -1,20 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.app.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
-import javafx.application.Platform;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +80,7 @@ public class AchievementManager {
 
     }
 
-    public Achievement.Matcher validateSavegame(Achievement a, Eu4Campaign.Entry entry) throws IOException {
+    public AchievementMatcher validateSavegame(Achievement a, Eu4Campaign.Entry entry) throws IOException {
         INSTANCE.loadData();
         Eu4IntermediateSavegame loaded = Eu4IntermediateSavegame.fromFile(
                 SavegameCache.EU4_CACHE.getPath(entry).resolve("data.zip"));

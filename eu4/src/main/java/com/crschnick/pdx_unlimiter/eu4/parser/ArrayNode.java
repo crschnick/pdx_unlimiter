@@ -22,9 +22,7 @@ public class ArrayNode extends Node {
 
     public String toString(int indentation) {
         return "{\n" + getNodes().stream().map(
-                (n) -> {
-                    return indent(indentation + 1) + n.toString(indentation + 1);
-                })
+                (n) -> indent(indentation + 1) + n.toString(indentation + 1))
                 .collect(Collectors.joining(",\n")) + "\n" + indent(indentation) + "}";
     }
 

@@ -38,7 +38,9 @@ public class PdxuInstallation {
         INSTANCE = new PdxuInstallation(installDir, v, prod);
 
         FileUtils.forceMkdir(INSTANCE.getLogsLocation().toFile());
-        System.setProperty("org.slf4j.simpleLogger.logFile", INSTANCE.getLogsLocation().resolve("pdxu.log").toString());
+        if (prod) {
+            System.setProperty("org.slf4j.simpleLogger.logFile", INSTANCE.getLogsLocation().resolve("pdxu.log").toString());
+        }
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
         LoggerFactory.getLogger(PdxuInstallation.class).info("Initializing installation at " + installDir.toString());

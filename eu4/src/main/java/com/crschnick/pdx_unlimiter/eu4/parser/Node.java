@@ -14,13 +14,9 @@ public abstract class Node {
         return s;
     }
 
-    public static String stringRepresentation(Node n) {
-        return n.toString(0);
-    }
-
     public static List<Node> copyOfArrayNode(Node node) {
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         ArrayNode a = (ArrayNode) node;
@@ -29,7 +25,7 @@ public abstract class Node {
 
     public static void addNodeToArray(Node node, Node toAdd) {
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         ArrayNode a = (ArrayNode) node;
@@ -38,7 +34,7 @@ public abstract class Node {
 
     public static void removeNodeFromArray(Node node, Node toRemove) {
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         ArrayNode a = (ArrayNode) node;
@@ -52,7 +48,7 @@ public abstract class Node {
 
     public static boolean getBoolean(Node node) {
         if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString(2));
+            throw new NodeFormatException("Not a value node:\n" + node.toString());
         }
 
         return (Boolean) ((ValueNode) node).getValue();
@@ -60,7 +56,7 @@ public abstract class Node {
 
     public static String getString(Node node) {
         if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString(2));
+            throw new NodeFormatException("Not a value node:\n" + node.toString());
         }
 
         return (String) ((ValueNode) node).getValue();
@@ -68,7 +64,7 @@ public abstract class Node {
 
     public static int getInteger(Node node) {
         if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString(2));
+            throw new NodeFormatException("Not a value node:\n" + node.toString());
         }
 
         if (((ValueNode) node).getValue() instanceof Long) {
@@ -85,7 +81,7 @@ public abstract class Node {
 
     public static List<Node> getNodeArray(Node node) {
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         return ((ArrayNode) node).getNodes();
@@ -93,7 +89,7 @@ public abstract class Node {
 
     public static boolean hasKey(Node node, String key) {
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         var list = getNodesForKey(node, key);
@@ -102,7 +98,7 @@ public abstract class Node {
 
     public static KeyValueNode getKeyValueNode(Node node) {
         if (!(node instanceof KeyValueNode)) {
-            throw new NodeFormatException("Not a key-value node:\n" + node.toString(2));
+            throw new NodeFormatException("Not a key-value node:\n" + node.toString());
         }
 
         return (KeyValueNode) node;
@@ -111,10 +107,10 @@ public abstract class Node {
     public static Node getNodeForKey(Node node, String key) {
         var list = getNodesForKey(node, key);
         if (list.size() > 1) {
-            throw new NodeFormatException("Too many entries for key " + key + " for node:\n" + node.toString(2));
+            throw new NodeFormatException("Too many entries for key " + key + " for node:\n" + node.toString());
         }
         if (list.size() == 0) {
-            throw new NodeFormatException("Invalid key " + key + " for node:\n" + node.toString(2));
+            throw new NodeFormatException("Invalid key " + key + " for node:\n" + node.toString());
         }
         return list.get(0);
     }
@@ -122,17 +118,17 @@ public abstract class Node {
     public static KeyValueNode getKeyValueNodeForKey(Node node, String key) {
         var list = getKeyValueNodesForKey(node, key);
         if (list.size() > 1) {
-            throw new NodeFormatException("Too many entries for key " + key + " for node:\n" + node.toString(2));
+            throw new NodeFormatException("Too many entries for key " + key + " for node:\n" + node.toString());
         }
         if (list.size() == 0) {
-            throw new NodeFormatException("Invalid key " + key + " for node:\n" + node.toString(2));
+            throw new NodeFormatException("Invalid key " + key + " for node:\n" + node.toString());
         }
         return list.get(0);
     }
 
     public static List<KeyValueNode> getKeyValueNodesForKey(Node node, String key) {
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         List<KeyValueNode> nodes = new ArrayList<>();
@@ -152,7 +148,7 @@ public abstract class Node {
     public static List<Node> getNodesForKey(Node node, String key) {
         List<Node> nodes = new ArrayList<>();
         if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString(2));
+            throw new NodeFormatException("Not an array node:\n" + node.toString());
         }
 
         ArrayNode array = (ArrayNode) node;

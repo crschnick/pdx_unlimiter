@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 
@@ -29,22 +30,24 @@ public interface Scorer {
                 scorers.add(new ValueScorer(e.getValue().doubleValue()));
             }
             else if (e.getKey().equals("add")) {
-                scorers.add(new ChainedScorer(false, scorersFromJsonNode(e.getValue())));
+                scorers.add(new ChainedScorer(false, scorersFromJsonNode(e.getValue()),
+                        Optional.ofNullable(e.getValue().get("name").textValue())));
             }
             else if (e.getKey().equals("mult")) {
-                scorers.add(new ChainedScorer(true, scorersFromJsonNode(e.getValue())));
+                scorers.add(new ChainedScorer(true, scorersFromJsonNode(e.getValue()),
+                        Optional.ofNullable(e.getValue().get("name").textValue())));
             }
             else if (e.getKey().equals("pathValue")) {
                 scorers.add(new PathValueScorer(
                         e.getValue().get("node").textValue(),
                         e.getValue().get("path").textValue(),
-                        e.getValue().get("name").textValue()));
+                        Optional.ofNullable(e.getValue().get("name").textValue())));
             }
             else if (e.getKey().equals("filterCount")) {
                 scorers.add(new FilterCountScorer(
                         e.getValue().get("node").textValue(),
                         e.getValue().get("filter").textValue(),
-                        e.getValue().get("name").textValue()));
+                        Optional.ofNullable(e.getValue().get("name").textValue())));
             } else {
 
                 throw new IllegalArgumentException("Invalid scorer " + e.getKey());
@@ -88,9 +91,9 @@ public interface Scorer {
 
         private String node;
         private String path;
-        private String name;
+        private Optional<String> name;
 
-        public PathValueScorer(String node, String path, String name) {
+        public PathValueScorer(String node, String path, Optional<String> name) {
             this.node = node;
             this.path = path;
             this.name = name;
@@ -114,7 +117,8 @@ public interface Scorer {
             }
 
             Object value = ((ValueNode) r.getNodes().get(0)).getValue();
-            return Map.of(name, (value instanceof Long ? ((Long)value).doubleValue() : (double) value));
+            return name.map(s -> Map.of(s, (value instanceof Long ? ((Long) value).doubleValue() : (double) value)))
+                    .orElseGet(Map::of);
         }
     }
 
@@ -122,9 +126,9 @@ public interface Scorer {
 
         private String node;
         private String filter;
-        private String name;
+        private Optional<String> name;
 
-        public FilterCountScorer(String node, String filter, String name) {
+        public FilterCountScorer(String node, String filter, Optional<String> name) {
             this.node = node;
             this.filter = filter;
             this.name = name;
@@ -143,16 +147,18 @@ public interface Scorer {
         @Override
         public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
             ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(filter));
-            return Map.of(name, (double) r.getNodes().size());
+            return name.map(s -> Map.of(s, (double) r.getNodes().size())).orElseGet(Map::of);
         }
     }
 
     class ChainedScorer implements Scorer {
 
+        private Optional<String> name;
         private boolean mult;
         private List<Scorer> scorers;
 
-        public ChainedScorer(boolean mult, List<Scorer> scorers) {
+        public ChainedScorer(boolean mult, List<Scorer> scorers, Optional<String> name) {
+            this.name = name;
             this.mult = mult;
             this.scorers = scorers;
         }
@@ -182,7 +188,11 @@ public interface Scorer {
         @Override
         public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
             Map<String, Double> values = new LinkedHashMap<>();
-            scorers.stream().forEach(s -> values.putAll(s.getValues(sg, func)));
+            if (name.isPresent()) {
+                values.put(name.get(), score(sg, func));
+            } else {
+                scorers.stream().forEach(s -> values.putAll(s.getValues(sg, func)));
+            }
             return values;
         }
     }
