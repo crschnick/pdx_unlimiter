@@ -29,7 +29,7 @@ public class AchievementWindow {
 
         ButtonType foo = new ButtonType("Validate", ButtonBar.ButtonData.OK_DONE);
         ButtonType bar = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Achievement.Matcher matcher = a.match(entry.getInfo().get().getSavegame());
+        AchievementMatcher matcher = a.match(entry.getInfo().get().getSavegame());
         Alert alert = DialogHelper.createAlert();
         alert.setTitle("Achievement Information");
         var node = AchievementWindow.createAchievementInfoNode(a, matcher, false);
@@ -41,7 +41,7 @@ public class AchievementWindow {
                 ActionEvent.ACTION,
                 e -> {
                     try {
-                        Achievement.Matcher m = AchievementManager.getInstance().validateSavegame(a, entry);
+                        AchievementMatcher m = AchievementManager.getInstance().validateSavegame(a, entry);
                         alert.getDialogPane().setContent(AchievementWindow.createAchievementInfoNode(a, m, true));
                         val.setDisable(true);
                         alert.hide();
@@ -76,7 +76,7 @@ public class AchievementWindow {
         return box;
     }
 
-    public static Node createConditionNode(String type, Achievement.ConditionStatus status) {
+    public static Node createConditionNode(String type, AchievementMatcher.ConditionStatus status) {
         VBox box = new VBox();
         box.setFillWidth(true);
         box.setStyle("-fx-border-color: #666666; -fx-background-radius: 0; -fx-border-radius: 0; -fx-border-insets: 3 0 3 0; -fx-background-color: #777777;");
@@ -84,7 +84,7 @@ public class AchievementWindow {
         box.setPadding(new Insets(0, 8, 8, 8));
 
         box.getChildren().add(new Region());
-        Label name = new Label(type + ": ");
+        Label name = new Label(type);
         name.setStyle("-fx-font-size: 18px; -fx-text-fill: white;");
         box.getChildren().add(name);
 
@@ -104,7 +104,7 @@ public class AchievementWindow {
         return box;
     }
 
-    public static Node createScoreNode(Achievement a, Achievement.ScoreStatus status) {
+    public static Node createScoreNode(Achievement a, AchievementMatcher.ScoreStatus status) {
         VBox box = new VBox();
         box.setFillWidth(true);
         box.setSpacing(5);
@@ -159,14 +159,22 @@ public class AchievementWindow {
         return hb;
     }
 
-    public static VBox createAchievementInfoNode(Achievement a, Achievement.Matcher m, boolean validated) {
+    public static VBox createAchievementInfoNode(Achievement a, AchievementMatcher m, boolean validated) {
         VBox box = new VBox();
         box.setPadding(Insets.EMPTY);
         box.setSpacing(4);
         box.setFillWidth(true);
         box.getChildren().add(createAchievementInfoNode(a));
-        box.getChildren().add(createConditionNode("Eligibility conditions", m.getEligibleStatus()));
-        box.getChildren().add(createConditionNode("Achievement conditions", m.getAchievementStatus()));
+        if (m.getValidType().isPresent()) {
+            box.getChildren().add(createConditionNode(
+                    "Type: " + m.getValidType().get().getName(),
+                    m.getTypeStatus().get(m.getValidType().get())));
+        } else {
+            m.getTypeStatus().forEach(
+                    (t,s) -> box.getChildren().add(createConditionNode("Type: " + t.getName(), s)));
+        }
+        box.getChildren().add(createConditionNode("Eligibility conditions:", m.getEligibleStatus()));
+        box.getChildren().add(createConditionNode("Achievement conditions:", m.getAchievementStatus()));
 
         box.getChildren().add(createScoreNode(a, m.getScoreStatus()));
 

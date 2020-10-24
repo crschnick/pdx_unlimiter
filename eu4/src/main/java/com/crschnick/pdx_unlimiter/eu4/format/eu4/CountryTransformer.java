@@ -4,11 +4,17 @@ import com.crschnick.pdx_unlimiter.eu4.format.NodeTransformer;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.List;
 import java.util.Optional;
 
 public class CountryTransformer extends NodeTransformer {
+
+    private void setCustomNationInfo(Node n) {
+        Node.addNodeToArray(n, KeyValueNode.create("is_custom",
+                new ValueNode(Node.hasKey(n, "custom_nation_points"))));
+    }
 
     @Override
     public void transform(Node rootNode) {
@@ -18,6 +24,9 @@ public class CountryTransformer extends NodeTransformer {
         for (int i = 0; i < ar.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) ar.getNodes().get(i);
             String tag = kv.getKeyName();
+
+            setCustomNationInfo(kv.getNode());
+
             Optional<Node> historyContent = Node.getNodeForKeyIfExistent(kv.getNode(), "history");
             if (historyContent.isPresent()) {
                 Node.removeNodeFromArray(kv.getNode(), Node.getKeyValueNodeForKey(kv.getNode(), "history"));

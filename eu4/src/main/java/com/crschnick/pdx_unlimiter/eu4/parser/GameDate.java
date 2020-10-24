@@ -53,6 +53,7 @@ public class GameDate implements Comparable<GameDate> {
         nodes.add(KeyValueNode.create("day", new ValueNode((long) date.getDay())));
         nodes.add(KeyValueNode.create("month", new ValueNode((long) date.getMonth().getValue())));
         nodes.add(KeyValueNode.create("year", new ValueNode((long) date.getYear())));
+        nodes.add(KeyValueNode.create("days_since_beginning", new ValueNode(toDaysSinceBeginning(date))));
         return new ArrayNode(nodes);
     }
 
@@ -73,7 +74,7 @@ public class GameDate implements Comparable<GameDate> {
         return new GameDate(day, m, year);
     }
 
-    public static long toLong(GameDate date) {
+    private static long toDaysSinceBeginning(GameDate date) {
         long v = 0;
         for (Month m : Month.values()) {
             if (m.equals(date.getMonth())) {
@@ -84,6 +85,11 @@ public class GameDate implements Comparable<GameDate> {
         v += (date.getDay() - 1);
         v += date.getYear() * 365;
         v += (5000 * 365);
+        return v;
+    }
+
+    public static long toLong(GameDate date) {
+        long v = toDaysSinceBeginning(date);
         v *= 24;
         return v;
     }

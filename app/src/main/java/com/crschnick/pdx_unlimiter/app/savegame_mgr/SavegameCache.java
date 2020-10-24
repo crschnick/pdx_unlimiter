@@ -438,8 +438,9 @@ public class SavegameCache {
         Eu4IntermediateSavegame i = null;
         try {
             i = Eu4IntermediateSavegame.fromFile(
-                    p.resolve("data.zip"),
-                    "countries", "meta", "countries_history", "diplomacy", "active_wars");
+                    p.resolve("data.zip")
+                    //,"countries", "meta", "countries_history", "diplomacy", "active_wars"
+                    );
 
             Eu4SavegameInfo info = Eu4SavegameInfo.fromSavegame(i);
             e.infoProperty().setValue(Optional.of(info));

@@ -15,20 +15,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Eu4IntermediateSavegame {
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 9;
+
+    private static final String[] SAVEGAME_PARTS = new String[]{"ai", "meta", "gamestate"};
 
     private static final String[] GAMESTATE_SPLIT_PARTS = new String[]{
-            "ai", "meta", "gamestate", "active_wars", "previous_wars", "provinces", "countries", "countries_history",
+            "active_wars", "previous_wars", "provinces", "countries", "countries_history",
             "trade_nodes", "rebel_factions", "active_advisors", "map_area_data", "religions", "diplomacy",
             "inflation_statistics", "religion_data"};
+
+    private static final String[] INTERMEDIATE_PARTS = Stream
+            .concat(Arrays.stream(SAVEGAME_PARTS), Arrays.stream(GAMESTATE_SPLIT_PARTS))
+            .toArray(String[]::new);
 
     private int version;
 
@@ -70,7 +78,7 @@ public class Eu4IntermediateSavegame {
     }
 
     public static Eu4IntermediateSavegame fromFile(Path file) throws IOException {
-        return fromFile(file, GAMESTATE_SPLIT_PARTS);
+        return fromFile(file, INTERMEDIATE_PARTS);
     }
 
     public static Eu4IntermediateSavegame fromFile(Path file, String... parts) throws IOException {
