@@ -9,6 +9,7 @@ import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -28,7 +29,45 @@ public class AchievementManager {
         return achievements;
     }
 
-    private static String calculateChecksum() {
+    public static void init() throws IOException {
+        INSTANCE = new AchievementManager(PdxuInstallation.getInstance().getAchievementsLocation().resolve("eu4"),
+                AchievementContent.EU4);
+        INSTANCE.loadData();
+        JsonPathConfiguration.init();
+    }
+
+    private Path path;
+    private AchievementContent content;
+    private String checksum;
+    private List<Achievement> achievements = new ArrayList<>();
+
+    public AchievementManager(Path path, AchievementContent content) {
+        this.path = path;
+        this.content = content;
+    }
+
+    public void showAchievementList(Eu4IntermediateSavegame sg) {
+
+    }
+
+    private void loadData() throws IOException {
+        achievements.clear();
+        Files.list(path.resolve("official"))
+                .filter(p -> p.getFileName().endsWith("json"))
+                .forEach(p -> {
+                    try {
+                        achievements.add(Achievement.fromFile(p, content));
+                    } catch (IOException e) {
+                        ErrorHandler.handleException(e, false);
+                    }
+                });
+
+        String s = calculateChecksum();
+        checksum = Files.readString(path.resolve("official").resolve("checksum"));
+
+    }
+
+    private String calculateChecksum() {
         MessageDigest d = null;
         try {
             d = MessageDigest.getInstance("MD5");
@@ -36,7 +75,7 @@ public class AchievementManager {
             e.printStackTrace();
         }
         MessageDigest finalD = d;
-        Arrays.stream(PdxuInstallation.getInstance().getAchievementsLocation().toFile().listFiles())
+        Arrays.stream(path.resolve("official").toFile().listFiles())
                 .filter(f -> f.getName().endsWith("json"))
                 .forEach(f -> {
                     try {
@@ -52,32 +91,6 @@ public class AchievementManager {
             c.append(hex);
         }
         return c.toString();
-    }
-
-    public static void init() throws IOException {
-        INSTANCE = new AchievementManager();
-        INSTANCE.loadData();
-        JsonPathConfiguration.init();
-    }
-
-    private String checksum;
-    private List<Achievement> achievements = new ArrayList<>();
-
-    private void loadData() throws IOException {
-        achievements.clear();
-        Arrays.stream(PdxuInstallation.getInstance().getAchievementsLocation().toFile().listFiles())
-                .filter(f -> f.getName().endsWith("json"))
-                .forEach(f -> {
-                    try {
-                        achievements.add(Achievement.fromFile(f.toPath()));
-                    } catch (IOException e) {
-                        ErrorHandler.handleException(e, false);
-                    }
-                });
-
-        String s = calculateChecksum();
-        checksum = Files.readString(PdxuInstallation.getInstance().getAchievementsLocation().resolve("checksum"));
-
     }
 
     public AchievementMatcher validateSavegame(Achievement a, Eu4Campaign.Entry entry) throws IOException {
@@ -96,9 +109,22 @@ public class AchievementManager {
         return checksum.equals(calculateChecksum());
     }
 
-    public List<Achievement> getEligibleAchievements(Eu4IntermediateSavegame s) {
+    public List<Achievement> getSuitableAchievements(Eu4IntermediateSavegame s, boolean onlyOfficial, boolean onlyElgible) {
         return achievements.stream()
-                .filter(a -> a.match(s).getEligibleStatus().isFullfilled())
+                .filter(a -> !onlyOfficial || a.isOfficial())
+                .filter(a -> {
+                    if (!onlyElgible) {
+                        return true;
+                    }
+
+                    try {
+                        AchievementMatcher m = a.match(s);
+                        return m.getValidType().isPresent() && m.getEligibleStatus().isFullfilled();
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e, false);
+                        return false;
+                    }
+                })
                 .collect(Collectors.toList());
     }
 }

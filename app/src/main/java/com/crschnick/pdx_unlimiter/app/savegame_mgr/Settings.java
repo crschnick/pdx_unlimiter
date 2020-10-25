@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 
-import com.crschnick.pdx_unlimiter.app.achievement.Scorer;
 import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -9,11 +8,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

@@ -39,11 +39,11 @@ public class Eu4Transformer {
                 true));
 
         t.add(new SubnodeTransformer(Map.of(new String[]{"lucky_nations"}, new EnumNameTransformer(
-                Map.of(0, "random", 1, "none", 2, "historical"))),
+                Map.of(0, "historical", 1, "none", 2, "random"))),
                 true));
 
         t.add(new SubnodeTransformer(Map.of(new String[]{"province_values"}, new EnumNameTransformer(
-                Map.of(0, "flat", 1, "normal", 2, "random"))),
+                Map.of(0, "normal", 1, "flat", 2, "random"))),
                 true));
 
         return new SubnodeTransformer(Map.of(new String[]{"gameplaysettings", "setgameplayoptions"}, new ChainTransformer(t)), false);

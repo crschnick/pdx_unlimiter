@@ -40,9 +40,14 @@ public class PdxuInstallation {
         FileUtils.forceMkdir(INSTANCE.getLogsLocation().toFile());
         if (prod) {
             System.setProperty("org.slf4j.simpleLogger.logFile", INSTANCE.getLogsLocation().resolve("pdxu.log").toString());
+        } else {
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
+        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.CompiledPath", "warn");
+        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.PredicateContextImpl", "warn");
+
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
-        System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
+        //System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
         LoggerFactory.getLogger(PdxuInstallation.class).info("Initializing installation at " + installDir.toString());
         Sentry.init();
 

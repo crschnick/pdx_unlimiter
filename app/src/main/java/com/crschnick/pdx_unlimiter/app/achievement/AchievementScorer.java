@@ -7,53 +7,53 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 
-public interface Scorer {
+public interface AchievementScorer {
 
-    static Scorer fromJsonNode(JsonNode node) {
-        List<Scorer> scorers = scorersFromJsonNode(node);
+    static AchievementScorer fromJsonNode(JsonNode node,  AchievementContent content) {
+        List<AchievementScorer> scorers = scorersFromJsonNode(node, content);
         if (scorers.size() == 1) {
-            return new ChainedScorer(false, scorers);
+            return scorers.get(0);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    private static List<Scorer> scorersFromJsonNode(JsonNode node) {
-        List<Scorer> scorers = new ArrayList<>();
-        for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext(); ) {
-            Map.Entry<String, JsonNode> e = it.next();
-            if (e.getKey().equals("value")) {
-                scorers.add(new ValueScorer(e.getValue().doubleValue()));
+    private static List<AchievementScorer> scorersFromJsonNode(JsonNode node,  AchievementContent content) {
+        List<AchievementScorer> scorers = new ArrayList<>();
+        node.elements().forEachRemaining(n -> {
+            if (n.isTextual()) {
+                scorers.add(content.getScorers().get(n.textValue()));
+                return;
             }
-            else if (e.getKey().equals("add")) {
-                scorers.add(new ChainedScorer(false, scorersFromJsonNode(e.getValue()),
-                        Optional.ofNullable(e.getValue().get("name").textValue())));
+
+            String type = n.get("type").textValue();
+            if (type.equals("value")) {
+                scorers.add(new ValueScorer(n.get("value").doubleValue()));
             }
-            else if (e.getKey().equals("mult")) {
-                scorers.add(new ChainedScorer(true, scorersFromJsonNode(e.getValue()),
-                        Optional.ofNullable(e.getValue().get("name").textValue())));
+            else if (type.equals("add") || type.equals("subtract") || type.equals("mult") || type.equals("divide")) {
+                var name = Optional.ofNullable(n.get("name")).map(JsonNode::textValue);
+                scorers.add(new ChainedScorer(type, scorersFromJsonNode(n.get("scorers"), content),
+                        name));
             }
-            else if (e.getKey().equals("pathValue")) {
+            else if (type.equals("pathValue")) {
                 scorers.add(new PathValueScorer(
-                        e.getValue().get("node").textValue(),
-                        e.getValue().get("path").textValue(),
-                        Optional.ofNullable(e.getValue().get("name").textValue())));
+                        n.get("node").textValue(),
+                        n.get("path").textValue(),
+                        Optional.ofNullable(n.get("name")).map(JsonNode::textValue)));
             }
-            else if (e.getKey().equals("filterCount")) {
+            else if (type.equals("filterCount")) {
                 scorers.add(new FilterCountScorer(
-                        e.getValue().get("node").textValue(),
-                        e.getValue().get("filter").textValue(),
-                        Optional.ofNullable(e.getValue().get("name").textValue())));
+                        n.get("node").textValue(),
+                        n.get("filter").textValue(),
+                        Optional.ofNullable(n.get("name")).map(JsonNode::textValue)));
             } else {
-
-                throw new IllegalArgumentException("Invalid scorer " + e.getKey());
+                throw new IllegalArgumentException("Invalid scorer type: " + type);
             }
 
-        }
+        });
         return scorers;
     }
 
@@ -63,7 +63,7 @@ public interface Scorer {
 
     Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func);
 
-    class ValueScorer implements Scorer {
+    class ValueScorer implements AchievementScorer {
 
         private double value;
 
@@ -87,7 +87,7 @@ public interface Scorer {
         }
     }
 
-    class PathValueScorer implements Scorer {
+    class PathValueScorer implements AchievementScorer {
 
         private String node;
         private String path;
@@ -101,12 +101,19 @@ public interface Scorer {
 
         @Override
         public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
-            return getValues(sg, func).get(name);
+            ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(path));
+            if (r.getNodes().size() > 1) {
+                throw new JsonPathException();
+            }
+
+            Object value = ((ValueNode) r.getNodes().get(0)).getValue();
+
+            return (value instanceof Long ? ((Long) value).doubleValue() : (double) value);
         }
 
         @Override
         public String toReadableString() {
-            return "<" + name + ">";
+            return "<" + name.orElseThrow(IllegalArgumentException::new) + ">";
         }
 
         @Override
@@ -122,7 +129,7 @@ public interface Scorer {
         }
     }
 
-    class FilterCountScorer implements Scorer {
+    class FilterCountScorer implements AchievementScorer {
 
         private String node;
         private String filter;
@@ -136,7 +143,8 @@ public interface Scorer {
 
         @Override
         public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
-            return getValues(sg, func).get(name);
+            ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(filter));
+            return (double) r.getNodes().size();
         }
 
         @Override
@@ -151,26 +159,29 @@ public interface Scorer {
         }
     }
 
-    class ChainedScorer implements Scorer {
+    class ChainedScorer implements AchievementScorer {
 
         private Optional<String> name;
-        private boolean mult;
-        private List<Scorer> scorers;
+        private String type;
+        private List<AchievementScorer> scorers;
 
-        public ChainedScorer(boolean mult, List<Scorer> scorers, Optional<String> name) {
+        public ChainedScorer(String type, List<AchievementScorer> scorers, Optional<String> name) {
             this.name = name;
-            this.mult = mult;
+            this.type = type;
             this.scorers = scorers;
         }
 
         @Override
         public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
-            double s = mult ? 1 : 0;
-            for (Scorer sc : scorers) {
-                if (mult) {
-                    s *= sc.score(sg, func);
-                } else {
-                    s += sc.score(sg, func);
+            double s = scorers.get(0).score(sg, func);
+            boolean mult = type.equals("multiply") || type.equals("divide");
+            if (mult) {
+                for (int i = 1; i < scorers.size(); i++) {
+                    s = type.equals("multiply") ? s * scorers.get(i).score(sg, func) : s / scorers.get(i).score(sg, func);
+                }
+            } else {
+                for (int i = 1; i < scorers.size(); i++) {
+                    s = type.equals("add") ? s + scorers.get(i).score(sg, func) : s - scorers.get(i).score(sg, func);
                 }
             }
             return s;
@@ -178,9 +189,17 @@ public interface Scorer {
 
         @Override
         public String toReadableString() {
+            if (name.isPresent()) {
+                return "<" + name.get() + ">";
+            }
+
             String s = scorers.get(0).toReadableString();
             for (int i = 1; i < scorers.size(); i++) {
-                s = s + (mult ? " * " : " + ") + scorers.get(i).toReadableString();
+                s = s + (type.equals("multiply") ?
+                        " * " : (type.equals("divide") ?
+                        " / " : (type.equals("add") ?
+                        " + " : " - ")))
+                        + scorers.get(i).toReadableString();
             }
             return scorers.size() > 1 ? "(" + s + ")" : s;
         }
