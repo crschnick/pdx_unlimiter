@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.jayway.jsonpath.JsonPath;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,33 +19,30 @@ public class AchievementMatcher {
     private ScoreStatus status;
 
     AchievementMatcher(Eu4IntermediateSavegame s, Achievement a) {
+        Map<AchievementVariable, String> vars = a.evaluateVariables(s);
+        vars.entrySet().stream().forEach(e -> LoggerFactory.getLogger(AchievementMatcher.class).debug(
+                "variable: " + e.getKey().getName()
+                        + ", expression: " + e.getKey().getExpression()
+                        + ", result: " + e.getValue()));
         this.typeStatus = a.getTypes().stream()
-                .collect(Collectors.toMap(t -> t, t -> check(s, t.getConditions(), a)));
-        this.eligibleStatus = checkEligible(s, a);
-        this.achievementStatus = checkAchieved(s, a);
-        this.status = score(s, a);
+                .collect(Collectors.toMap(t -> t, t -> check(s, t.getConditions(), a, vars)));
+        this.eligibleStatus = check(s, a.getEligibilityConditions(), a, vars);
+        this.achievementStatus = check(s, a.getAchievementConditions(), a, vars);
+        this.status = score(s, a, vars);
     }
 
-    private AchievementMatcher.ConditionStatus checkEligible(Eu4IntermediateSavegame s, Achievement a) {
-        return check(s, a.getEligibilityConditions(), a);
-    }
-
-    private AchievementMatcher.ConditionStatus checkAchieved(Eu4IntermediateSavegame s, Achievement a) {
-        return check(s, a.getAchievementConditions(), a);
-    }
-
-    private AchievementMatcher.ScoreStatus score(Eu4IntermediateSavegame s, Achievement a) {
+    private AchievementMatcher.ScoreStatus score(Eu4IntermediateSavegame s, Achievement a, Map<AchievementVariable, String> vars) {
         return new AchievementMatcher.ScoreStatus(
-                a.getScorer().score(s, string -> a.applyVariables(s, string)),
-                a.getScorer().getValues(s, string -> a.applyVariables(s, string)));
+                a.getScorer().score(s, string -> a.applyVariables(vars, string)),
+                a.getScorer().getValues(s, string -> a.applyVariables(vars, string)));
     }
 
-    private AchievementMatcher.ConditionStatus check(Eu4IntermediateSavegame s, List<AchievementCondition> conditions, Achievement a) {
+    private AchievementMatcher.ConditionStatus check(Eu4IntermediateSavegame s, List<AchievementCondition> conditions, Achievement a, Map<AchievementVariable, String> vars) {
         AchievementMatcher.ConditionStatus status = new AchievementMatcher.ConditionStatus();
         for (var e : s.getNodes().entrySet()) {
             for (var condition : conditions) {
                 if (condition.getNode().equals(e.getKey())) {
-                    String p = a.applyVariables(s, condition.getFilter());
+                    String p = a.applyVariables(vars, condition.getFilter());
                     try {
                         ArrayNode r = JsonPath.read(e.getValue(), p);
                         if (r.getNodes().size() == 0) {
@@ -84,7 +82,7 @@ public class AchievementMatcher {
     }
 
     public static class ConditionStatus {
-        private Map<AchievementCondition,Boolean> conditions = new LinkedHashMap<>();
+        private Map<AchievementCondition, Boolean> conditions = new LinkedHashMap<>();
 
         private void add(AchievementCondition c, boolean b) {
             conditions.put(c, b);
@@ -101,7 +99,7 @@ public class AchievementMatcher {
 
     public static class ScoreStatus {
         private double score;
-        private Map<String,Double> values;
+        private Map<String, Double> values;
 
         public ScoreStatus(double score, Map<String, Double> values) {
             this.score = score;

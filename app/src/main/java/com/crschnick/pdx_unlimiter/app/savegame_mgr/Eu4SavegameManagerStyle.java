@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.savegame_mgr;
 import com.crschnick.pdx_unlimiter.app.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementWindow;
-import com.crschnick.pdx_unlimiter.app.achievement.Scorer;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;

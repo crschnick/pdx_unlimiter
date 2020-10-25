@@ -16,6 +16,11 @@ public class CountryTransformer extends NodeTransformer {
                 new ValueNode(Node.hasKey(n, "custom_nation_points"))));
     }
 
+    private void setTag(KeyValueNode kv) {
+        Node.addNodeToArray(kv.getNode(), KeyValueNode.create("tag",
+                new ValueNode(kv.getKeyName())));
+    }
+
     @Override
     public void transform(Node rootNode) {
         ArrayNode newHistory = new ArrayNode();
@@ -25,6 +30,7 @@ public class CountryTransformer extends NodeTransformer {
             KeyValueNode kv = (KeyValueNode) ar.getNodes().get(i);
             String tag = kv.getKeyName();
 
+            setTag(kv);
             setCustomNationInfo(kv.getNode());
 
             Optional<Node> historyContent = Node.getNodeForKeyIfExistent(kv.getNode(), "history");

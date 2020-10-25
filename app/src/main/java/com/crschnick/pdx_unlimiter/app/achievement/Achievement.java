@@ -15,17 +15,18 @@ import java.util.stream.StreamSupport;
 
 public class Achievement {
 
+    private boolean official;
     private String name;
     private String description;
     private UUID uuid;
     private Optional<Path> icon;
-    private List<Variable> variables;
+    private List<AchievementVariable> variables;
     private List<Type> types;
     private List<AchievementCondition> eligibilityConditions;
     private List<AchievementCondition> achievementConditions;
-    private Scorer scorer;
+    private AchievementScorer scorer;
 
-    public static Achievement fromFile(Path file) throws IOException {
+    public static Achievement fromFile(Path file, AchievementContent content) throws IOException {
         JsonFactory f = new JsonFactory();
         f.enable(JsonParser.Feature.ALLOW_COMMENTS);
         ObjectMapper o = new ObjectMapper(f);
@@ -37,34 +38,46 @@ public class Achievement {
         a.description = n.get("description").textValue();
         a.uuid = UUID.fromString(n.get("uuid").textValue());
 
-        a.variables = Variable.defaultVariables();
+        a.variables = new ArrayList<>(content.getVariables());
 
         a.icon = Optional.ofNullable(n.get("icon"))
                 .map(JsonNode::textValue)
-                .map(s -> a.applyVariables(null, s))
                 .map(Path::of);
 
         Iterable<Map.Entry<String,JsonNode>> v = () -> n.get("variables").fields();
         a.variables.addAll(StreamSupport.stream(v.spliterator(), false)
-                .map(vn -> Variable.fromNode(vn.getKey(), vn.getValue()))
+                .map(vn -> AchievementVariable.fromNode(vn.getKey(), vn.getValue()))
                 .collect(Collectors.toList()));
 
-        a.eligibilityConditions = AchievementCondition.parseConditionNode(n.get("eligibilityConditions"));
-        a.achievementConditions = AchievementCondition.parseConditionNode(n.get("achievementConditions"));
+        a.eligibilityConditions = AchievementCondition.parseConditionNode(n.get("eligibilityConditions"), content);
+        a.achievementConditions = AchievementCondition.parseConditionNode(n.get("achievementConditions"), content);
         a.types = StreamSupport.stream(n.get("types").spliterator(), false)
-                .map(tn -> new Type(tn.get("name").textValue(), AchievementCondition.parseConditionNode(tn.get("conditions"))))
+                .map(tn -> new Type(tn.get("name").textValue(), AchievementCondition.parseConditionNode(tn.get("conditions"), content)))
                 .collect(Collectors.toList());
 
-        a.scorer = Scorer.fromJsonNode(n.get("score"));
+        a.scorer = AchievementScorer.fromJsonNode(n.get("score"), content);
         return a;
     }
 
-    public String applyVariables(Eu4IntermediateSavegame sg, String s) {
-        String r = s;
-        for (Variable v : variables) {
-            r = r.replace("${" + v.getName() + "}", v.evaluate(sg));
+    public Map<AchievementVariable,String> evaluateVariables(Eu4IntermediateSavegame sg) {
+        Map<AchievementVariable,String> expr = new HashMap<>();
+        for (int i = 0; i < variables.size(); i++) {
+            AchievementVariable v = variables.get(i);
+            String currentVar = v.getExpression();
+            for (var e : expr.entrySet()) {
+                currentVar = currentVar.replace("${" + e.getKey().getName() + "}", e.getValue());
+            }
+            expr.put(v, v.evaluate(sg, currentVar));
         }
-        return r;
+        return expr;
+    }
+
+    public String applyVariables(Map<AchievementVariable,String> expr, String input) {
+        String s = input;
+        for (var e : expr.entrySet()) {
+            s = s.replace("${" + e.getKey().getName() + "}", e.getValue());
+        }
+        return s;
     }
 
     public AchievementMatcher match(Eu4IntermediateSavegame sg) {
@@ -87,7 +100,7 @@ public class Achievement {
         return icon;
     }
 
-    public List<Variable> getVariables() {
+    public List<AchievementVariable> getVariables() {
         return variables;
     }
 
@@ -99,7 +112,7 @@ public class Achievement {
         return achievementConditions;
     }
 
-    public Scorer getScorer() {
+    public AchievementScorer getScorer() {
         return scorer;
     }
 
@@ -129,4 +142,7 @@ public class Achievement {
         }
     }
 
+    public boolean isOfficial() {
+        return official;
+    }
 }
