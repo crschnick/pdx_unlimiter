@@ -40,7 +40,7 @@ public class Eu4ImageLoader {
         try {
             image = ImageIO.read(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorHandler.handleException(new IOException("Can't read image " + p.toString(), e));
         }
 
         if (pixelSelector != null) {

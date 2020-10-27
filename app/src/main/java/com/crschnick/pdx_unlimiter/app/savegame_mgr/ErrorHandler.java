@@ -10,41 +10,43 @@ import org.slf4j.LoggerFactory;
 
 public class ErrorHandler {
 
-    public static void handleExcetionWithoutPlatform(Exception ex) {
+    private static boolean startupCompleted = false;
+
+    public static void setStartupCompleted() {
+        startupCompleted = true;
+    }
+
+    private static void handleExcetionWithoutPlatform(Exception ex) {
         ex.printStackTrace();
         LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
         Sentry.capture(ex);
         System.exit(1);
     }
 
-    public static void handleException(Exception ex, boolean isTerminal) {
-        handleException(ex, isTerminal, () -> {
-        });
-    }
-
-    public static void handleException(Exception ex, boolean isTerminal, FailableRunnable<Exception> handler) {
-        Exception t = null;
-        try {
-            handler.run();
-        } catch (Exception tt) {
-            t = tt;
+    public static void handleException(Exception ex) {
+        if (!startupCompleted) {
+            handleExcetionWithoutPlatform(ex);
         }
+
         Platform.runLater(() -> {
             if (DialogHelper.showException(ex)) {
                 LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
                 Sentry.capture(ex);
             }
         });
-        if (t != null) {
-            Exception finalT = t;
-            Platform.runLater(() -> {
-                if (DialogHelper.showException(finalT)) {
-                    LoggerFactory.getLogger(ErrorHandler.class).error("Error", finalT);
-                    Sentry.capture(finalT);
-                }
-            });
+    }
+
+    public static void handleTerminalException(Exception ex) {
+        if (!startupCompleted) {
+            handleExcetionWithoutPlatform(ex);
         }
-        if (isTerminal) {
+
+        Platform.runLater(() -> {
+            if (DialogHelper.showException(ex)) {
+                LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
+                Sentry.capture(ex);
+            }
+
             try {
                 SavegameManagerApp.getAPP().close(false);
             } catch (Exception e) {
@@ -56,6 +58,6 @@ public class ErrorHandler {
                 });
                 System.exit(1);
             }
-        }
+        });
     }
 }

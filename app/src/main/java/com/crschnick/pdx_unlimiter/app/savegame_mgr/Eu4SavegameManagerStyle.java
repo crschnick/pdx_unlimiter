@@ -267,7 +267,7 @@ public class Eu4SavegameManagerStyle {
 
         Button achievements = new Button("\uD83C\uDFC6");
         achievements.setOnMouseClicked((m) -> {
-            AchievementWindow.showAchievementDialog(AchievementManager.getInstance().getAchievements().get(0), e);
+            e.getInfo().ifPresent(s -> AchievementWindow.showAchievementList(e));
         });
         achievements.setAlignment(Pos.CENTER_LEFT);
         achievements.setStyle("-fx-background-color: #88aa88;-fx-text-fill: white; -fx-font-size: 18px;");
@@ -629,7 +629,7 @@ public class Eu4SavegameManagerStyle {
             try {
                 Desktop.getDesktop().open(SavegameCache.ROOT_DIR.toFile());
             } catch (IOException e) {
-                ErrorHandler.handleException(e, false);
+                ErrorHandler.handleException(e);
             }
         });
         savegames.getItems().add(sd);
@@ -639,7 +639,7 @@ public class Eu4SavegameManagerStyle {
             try {
                 Desktop.getDesktop().open(SavegameCache.ROOT_DIR.getParent().resolve("backups").resolve("eu4").toFile());
             } catch (IOException e) {
-                ErrorHandler.handleException(e, false);
+                ErrorHandler.handleException(e);
             }
         });
         savegames.getItems().add(backups);
@@ -651,7 +651,7 @@ public class Eu4SavegameManagerStyle {
             try {
                 Desktop.getDesktop().browse(new URI("https://eu4.paradoxwikis.com/Europa_Universalis_4_Wiki"));
             } catch (Exception e) {
-                ErrorHandler.handleException(e, false);
+                ErrorHandler.handleException(e);
             }
         });
         MenuItem src = new MenuItem("Contribute");
@@ -659,7 +659,7 @@ public class Eu4SavegameManagerStyle {
             try {
                 Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/"));
             } catch (Exception e) {
-                ErrorHandler.handleException(e, false);
+                ErrorHandler.handleException(e);
             }
         });
         MenuItem is = new MenuItem("Report an issue");
@@ -667,7 +667,7 @@ public class Eu4SavegameManagerStyle {
             try {
                 Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues"));
             } catch (Exception e) {
-                ErrorHandler.handleException(e, false);
+                ErrorHandler.handleException(e);
             }
         });
         MenuItem lc = new MenuItem("License");

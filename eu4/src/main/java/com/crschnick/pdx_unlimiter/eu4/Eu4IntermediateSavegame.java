@@ -25,7 +25,7 @@ import java.util.zip.ZipOutputStream;
 
 public class Eu4IntermediateSavegame {
 
-    public static final int VERSION = 10;
+    public static final int VERSION = 11;
 
     private static final String[] SAVEGAME_PARTS = new String[]{"ai", "meta", "gamestate"};
 

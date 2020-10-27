@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,56 +28,70 @@ public class Achievement {
     private List<AchievementCondition> achievementConditions;
     private AchievementScorer scorer;
 
-    public static Achievement fromFile(Path file, AchievementContent content) throws IOException {
+    public static Achievement fromFile(Path file, AchievementContent content, boolean official) throws IOException {
         JsonFactory f = new JsonFactory();
         f.enable(JsonParser.Feature.ALLOW_COMMENTS);
         ObjectMapper o = new ObjectMapper(f);
         JsonNode node = o.readTree(Files.readAllBytes(file));
 
         Achievement a = new Achievement();
-        JsonNode n = node.get("achievement");
-        a.name = n.get("name").textValue();
-        a.description = n.get("description").textValue();
-        a.uuid = UUID.fromString(n.get("uuid").textValue());
+        JsonNode n = node.required("achievement");
+        a.name = n.required("name").textValue();
+        a.description = n.required("description").textValue();
+        a.uuid = UUID.fromString(n.required("uuid").textValue());
 
-        a.variables = new ArrayList<>(content.getVariables());
+        a.variables = new ArrayList<>(content.getPathVariables());
 
         a.icon = Optional.ofNullable(n.get("icon"))
                 .map(JsonNode::textValue)
+                .map(s -> a.applyVariables(a.evaluateVariables(null), s))
                 .map(Path::of);
 
-        Iterable<Map.Entry<String,JsonNode>> v = () -> n.get("variables").fields();
+        a.icon.ifPresent(i -> {
+            if (!Files.exists(i)) {
+                throw new IllegalArgumentException("Achievement image " + i.toString() + " does not exist");
+            }
+        });
+
+        a.variables = new ArrayList<>(content.getVariables());
+
+        Iterable<Map.Entry<String,JsonNode>> v = () -> n.required("variables").fields();
         a.variables.addAll(StreamSupport.stream(v.spliterator(), false)
                 .map(vn -> AchievementVariable.fromNode(vn.getKey(), vn.getValue()))
                 .collect(Collectors.toList()));
 
-        a.eligibilityConditions = AchievementCondition.parseConditionNode(n.get("eligibilityConditions"), content);
-        a.achievementConditions = AchievementCondition.parseConditionNode(n.get("achievementConditions"), content);
-        a.types = StreamSupport.stream(n.get("types").spliterator(), false)
-                .map(tn -> new Type(tn.get("name").textValue(), AchievementCondition.parseConditionNode(tn.get("conditions"), content)))
+        a.eligibilityConditions = AchievementCondition.parseConditionNode(n.required("eligibilityConditions"), content);
+        a.achievementConditions = AchievementCondition.parseConditionNode(n.required("achievementConditions"), content);
+        a.types = StreamSupport.stream(n.required("types").spliterator(), false)
+                .map(tn -> new Type(tn.required("name").textValue(), AchievementCondition.parseConditionNode(tn.required("conditions"), content)))
                 .collect(Collectors.toList());
 
-        a.scorer = AchievementScorer.fromJsonNode(n.get("score"), content);
+        a.scorer = AchievementScorer.fromJsonNode(n.required("score"), content);
+        a.official = true;
+
         return a;
     }
 
-    public Map<AchievementVariable,String> evaluateVariables(Eu4IntermediateSavegame sg) {
-        Map<AchievementVariable,String> expr = new HashMap<>();
-        for (int i = 0; i < variables.size(); i++) {
-            AchievementVariable v = variables.get(i);
-            String currentVar = v.getExpression();
-            for (var e : expr.entrySet()) {
-                currentVar = currentVar.replace("${" + e.getKey().getName() + "}", e.getValue());
-            }
-            expr.put(v, v.evaluate(sg, currentVar));
+    public Map<String,String> evaluateVariables(Eu4IntermediateSavegame sg) {
+        LoggerFactory.getLogger(Achievement.class).debug("Evaluating variables for achievement " + name);
+        Map<String,String> expr = new HashMap<>();
+        for (AchievementVariable v : variables) {
+            String currentVar = applyVariables(expr, v.getExpression());
+            String eval = v.evaluate(sg, currentVar);
+            expr.put("%{" + v.getName() + "}", eval);
+            LoggerFactory.getLogger(Achievement.class).debug(
+                    "Evaluating variable"
+                            + "\n    name: " + v.getName()
+                            + "\n    expression:  " + currentVar
+                            + "\n    evaluation: " + eval);
         }
         return expr;
     }
 
-    public String applyVariables(Map<AchievementVariable,String> expr, String input) {
+    public String applyVariables(Map<String,String> expr, String input) {
         String s = input;
         for (var e : expr.entrySet()) {
-            s = s.replace("${" + e.getKey().getName() + "}", e.getValue());
+            s = s.replace(e.getKey(), e.getValue());
         }
         return s;
     }
