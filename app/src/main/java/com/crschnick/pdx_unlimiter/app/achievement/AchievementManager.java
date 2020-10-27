@@ -46,23 +46,36 @@ public class AchievementManager {
         this.content = content;
     }
 
-    public void showAchievementList(Eu4IntermediateSavegame sg) {
-
+    public void refresh() {
+        try {
+            loadData();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     private void loadData() throws IOException {
         achievements.clear();
         Files.list(path.resolve("official"))
-                .filter(p -> p.getFileName().endsWith("json"))
+                .filter(p -> p.getFileName().toString().endsWith("json"))
                 .forEach(p -> {
                     try {
-                        achievements.add(Achievement.fromFile(p, content));
-                    } catch (IOException e) {
-                        ErrorHandler.handleException(e, false);
+                        achievements.add(Achievement.fromFile(p, content, true));
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e);
                     }
                 });
 
-        String s = calculateChecksum();
+        Files.list(path.resolve("custom"))
+                .filter(p -> p.getFileName().toString().endsWith("json"))
+                .forEach(p -> {
+                    try {
+                        achievements.add(Achievement.fromFile(p, content, false));
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e);
+                    }
+                });
+
         checksum = Files.readString(path.resolve("official").resolve("checksum"));
 
     }
@@ -81,7 +94,7 @@ public class AchievementManager {
                     try {
                         finalD.update(Files.readAllBytes(f.toPath()));
                     } catch (IOException e) {
-                        ErrorHandler.handleException(e, false);
+                        ErrorHandler.handleException(e);
                     }
                 });
         StringBuilder c = new StringBuilder();
@@ -121,7 +134,7 @@ public class AchievementManager {
                         AchievementMatcher m = a.match(s);
                         return m.getValidType().isPresent() && m.getEligibleStatus().isFullfilled();
                     } catch (Exception e) {
-                        ErrorHandler.handleException(e, false);
+                        ErrorHandler.handleException(e);
                         return false;
                     }
                 })

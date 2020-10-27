@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -25,29 +26,33 @@ public interface AchievementScorer {
         List<AchievementScorer> scorers = new ArrayList<>();
         node.elements().forEachRemaining(n -> {
             if (n.isTextual()) {
+                if (!content.getScorers().containsKey(n.textValue())) {
+                    throw new IllegalArgumentException("Invalid scorer name " + n.textValue());
+                }
+
                 scorers.add(content.getScorers().get(n.textValue()));
                 return;
             }
 
-            String type = n.get("type").textValue();
+            String type = n.required("type").textValue();
             if (type.equals("value")) {
-                scorers.add(new ValueScorer(n.get("value").doubleValue()));
+                scorers.add(new ValueScorer(n.required("value").doubleValue()));
             }
             else if (type.equals("add") || type.equals("subtract") || type.equals("mult") || type.equals("divide")) {
-                var name = Optional.ofNullable(n.get("name")).map(JsonNode::textValue);
-                scorers.add(new ChainedScorer(type, scorersFromJsonNode(n.get("scorers"), content),
+                var name = Optional.ofNullable(n.required("name")).map(JsonNode::textValue);
+                scorers.add(new ChainedScorer(type, scorersFromJsonNode(n.required("scorers"), content),
                         name));
             }
             else if (type.equals("pathValue")) {
                 scorers.add(new PathValueScorer(
-                        n.get("node").textValue(),
-                        n.get("path").textValue(),
+                        n.required("node").textValue(),
+                        n.required("path").textValue(),
                         Optional.ofNullable(n.get("name")).map(JsonNode::textValue)));
             }
             else if (type.equals("filterCount")) {
                 scorers.add(new FilterCountScorer(
-                        n.get("node").textValue(),
-                        n.get("filter").textValue(),
+                        n.required("node").textValue(),
+                        n.required("filter").textValue(),
                         Optional.ofNullable(n.get("name")).map(JsonNode::textValue)));
             } else {
                 throw new IllegalArgumentException("Invalid scorer type: " + type);
@@ -107,8 +112,8 @@ public interface AchievementScorer {
             }
 
             Object value = ((ValueNode) r.getNodes().get(0)).getValue();
-
-            return (value instanceof Long ? ((Long) value).doubleValue() : (double) value);
+            double toReturn = (value instanceof Long ? ((Long) value).doubleValue() : (double) value);
+            return toReturn;
         }
 
         @Override
@@ -118,13 +123,15 @@ public interface AchievementScorer {
 
         @Override
         public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
-            ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(path));
-            if (r.getNodes().size() > 1) {
-                throw new JsonPathException();
-            }
+            double score = score(sg, func);
 
-            Object value = ((ValueNode) r.getNodes().get(0)).getValue();
-            return name.map(s -> Map.of(s, (value instanceof Long ? ((Long) value).doubleValue() : (double) value)))
+            LoggerFactory.getLogger(AchievementScorer.class).debug("Scoring filter count"
+                    + "\n    name: " + name.orElse("none")
+                    + "\n    node: " + node
+                    + "\n    filter: " + path
+                    + "\n    result: " + score);
+
+            return name.map(s -> Map.of(s, score))
                     .orElseGet(Map::of);
         }
     }
@@ -144,7 +151,7 @@ public interface AchievementScorer {
         @Override
         public double score(Eu4IntermediateSavegame sg, Function<String,String> func) {
             ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(filter));
-            return (double) r.getNodes().size();
+            return r.getNodes().size();
         }
 
         @Override
@@ -154,8 +161,13 @@ public interface AchievementScorer {
 
         @Override
         public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
-            ArrayNode r = JsonPath.read(sg.getNodes().get(node), func.apply(filter));
-            return name.map(s -> Map.of(s, (double) r.getNodes().size())).orElseGet(Map::of);
+            double score = score(sg, func);
+            LoggerFactory.getLogger(AchievementScorer.class).debug("Scoring filter count"
+                    + "\n    name: " + name.orElse("none")
+                    + "\n    node: " + node
+                    + "\n    filter: " + filter
+                    + "\n    result: " + score);
+            return name.map(s -> Map.of(s, score)).orElseGet(Map::of);
         }
     }
 
@@ -207,11 +219,15 @@ public interface AchievementScorer {
         @Override
         public Map<String, Double> getValues(Eu4IntermediateSavegame sg, Function<String,String> func) {
             Map<String, Double> values = new LinkedHashMap<>();
-            if (name.isPresent()) {
-                values.put(name.get(), score(sg, func));
-            } else {
-                scorers.stream().forEach(s -> values.putAll(s.getValues(sg, func)));
-            }
+            name.ifPresent(s -> {
+                double score = score(sg, func);
+                values.put(s, score);
+                LoggerFactory.getLogger(AchievementScorer.class).debug("Scoring chain"
+                        + "\n    name: " + name.orElse("none")
+                        + "\n    type: " + type
+                        + "\n    result: " + score);
+            });
+            scorers.stream().forEach(s -> values.putAll(s.getValues(sg, func)));
             return values;
         }
     }

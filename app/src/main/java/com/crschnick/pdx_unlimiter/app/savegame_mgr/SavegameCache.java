@@ -75,7 +75,7 @@ public class SavegameCache {
         try {
             zipFile = new ZipFile(in.toFile());
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
             return;
         }
 
@@ -86,7 +86,7 @@ public class SavegameCache {
         try {
             zipFile.close();
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -95,7 +95,7 @@ public class SavegameCache {
         try {
             zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
         } catch (FileNotFoundException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
             return;
         }
 
@@ -106,7 +106,7 @@ public class SavegameCache {
         try {
             zipFile.close();
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -115,7 +115,7 @@ public class SavegameCache {
         try {
             zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
         } catch (FileNotFoundException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
             return;
         }
 
@@ -126,7 +126,7 @@ public class SavegameCache {
         try {
             zipFile.close();
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -227,7 +227,7 @@ public class SavegameCache {
         try {
             importDataFromConfig(zipFile.getInputStream(e));
         } catch (IOException ioException) {
-            ErrorHandler.handleException(ioException, false);
+            ErrorHandler.handleException(ioException);
             return;
         }
 
@@ -240,7 +240,7 @@ public class SavegameCache {
                 }
                 FileUtils.copyToFile(zipFile.getInputStream(en), p.toFile());
             } catch (IOException fileNotFoundException) {
-                ErrorHandler.handleException(fileNotFoundException, false);
+                ErrorHandler.handleException(fileNotFoundException);
             }
         });
         statusProperty().setValue(Optional.empty());
@@ -262,7 +262,7 @@ public class SavegameCache {
                             SavegameCache.ROOT_DIR.relativize(getPath()).resolve(name + ".eu4").toString(),
                             out);
                 } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException, false);
+                    ErrorHandler.handleException(ioException);
                 }
             }
         }
@@ -275,7 +275,7 @@ public class SavegameCache {
             out.putNextEntry(entry);
             exportDataToConfig(out);
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
             return;
         }
 
@@ -287,7 +287,7 @@ public class SavegameCache {
                 try {
                     compressFileToZipfile(file.toFile(), name, out);
                 } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException, false);
+                    ErrorHandler.handleException(ioException);
                 }
             }
         }
@@ -356,7 +356,7 @@ public class SavegameCache {
         try {
             save = Eu4Savegame.fromFile(s);
         } catch (IOException ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
             return;
         }
@@ -365,7 +365,7 @@ public class SavegameCache {
         try {
             is = Eu4IntermediateSavegame.fromSavegame(save);
         } catch (SavegameParseException ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
             return;
         }
@@ -375,7 +375,7 @@ public class SavegameCache {
                 try {
                     throw new IOException("Couldn't delete file " + f.toString());
                 } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException, false);
+                    ErrorHandler.handleException(ioException);
                     status.setValue(Optional.empty());
                     return;
                 }
@@ -385,7 +385,7 @@ public class SavegameCache {
         try {
             is.write(p.resolve("data.zip"), true);
         } catch (IOException ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
             return;
         }
@@ -405,7 +405,7 @@ public class SavegameCache {
         try {
             FileUtils.deleteDirectory(campaignPath.resolve(e.getUuid().toString()).toFile());
         } catch (IOException ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
         }
 
         c.getSavegames().remove(e);
@@ -426,7 +426,7 @@ public class SavegameCache {
         try {
             v = p.toFile().exists() ? Eu4IntermediateSavegame.getVersion(p.resolve("data.zip")) : 0;
         } catch (IOException ioException) {
-            ErrorHandler.handleException(ioException, false);
+            ErrorHandler.handleException(ioException);
             return;
         }
 
@@ -445,7 +445,7 @@ public class SavegameCache {
             Eu4SavegameInfo info = Eu4SavegameInfo.fromSavegame(i);
             e.infoProperty().setValue(Optional.of(info));
         } catch (Exception ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
             return;
         }
@@ -491,7 +491,7 @@ public class SavegameCache {
             is = Eu4IntermediateSavegame.fromSavegame(save);
             e = Eu4SavegameInfo.fromSavegame(is);
         } catch (Exception ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
             return;
         }
@@ -512,7 +512,7 @@ public class SavegameCache {
 
             this.addNewEntry(uuid, saveUuid, e);
         } catch (Exception ex) {
-            ErrorHandler.handleException(ex, false);
+            ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
             return;
         }

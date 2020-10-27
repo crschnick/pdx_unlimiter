@@ -13,9 +13,16 @@ import java.util.List;
 public abstract class AchievementVariable {
 
     public static AchievementVariable fromNode(String name, JsonNode json) {
-        String type = json.get("type").textValue();
-        if (type.equals("pathValue")) {
-            return new PathVariable(name, json.get("node").textValue(), json.get("path").textValue(), json.get("list").asBoolean());
+        String type = json.required("type").textValue();
+        if (type.equals("path")) {
+            return new PathVariable(name,
+                    json.required("node").textValue(),
+                    json.required("path").textValue(),
+                    json.required("list").asBoolean());
+        } else if (type.equals("value")) {
+            return new ValueVariable(name, json.required("value").textValue());
+        } else if (type.equals("count")) {
+            return new FilterCountVariable(name, json.required("node").textValue(), json.required("path").textValue());
         } else {
             throw new IllegalArgumentException("Invalid variable type: " + type);
         }

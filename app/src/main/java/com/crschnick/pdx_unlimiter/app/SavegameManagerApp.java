@@ -52,6 +52,7 @@ public class SavegameManagerApp extends Application {
             Settings.init();
             GameInstallation.initInstallations();
             SavegameCache.loadData();
+            AchievementManager.init();
 
             Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
             logger.setLevel(Level.SEVERE);
@@ -63,7 +64,7 @@ public class SavegameManagerApp extends Application {
 
             launch(args);
         } catch (Exception e) {
-            ErrorHandler.handleExcetionWithoutPlatform(e);
+            ErrorHandler.handleTerminalException(e);
         }
     }
 
@@ -169,7 +170,7 @@ public class SavegameManagerApp extends Application {
             SavegameCache.saveData();
             Settings.saveConfig();
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -183,7 +184,7 @@ public class SavegameManagerApp extends Application {
             PdxuInstallation.shutdown();
             GlobalScreen.unregisterNativeHook();
         } catch (Exception e) {
-            ErrorHandler.handleExcetionWithoutPlatform(e);
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -193,11 +194,7 @@ public class SavegameManagerApp extends Application {
         icon = new Image(SavegameManagerApp.class.getResourceAsStream("logo.png"));
         primaryStage.getIcons().add(icon);
 
-        try {
-            AchievementManager.init();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ErrorHandler.setStartupCompleted();
 
         if (Settings.getInstance().getEu4().isEmpty()) {
             if (!DialogHelper.showInitialSettings()) {
@@ -206,7 +203,7 @@ public class SavegameManagerApp extends Application {
                 try {
                     GameInstallation.initInstallations();
                 } catch (Exception e) {
-                    ErrorHandler.handleException(e, true);
+                    ErrorHandler.handleTerminalException(e);
                 }
             }
         }

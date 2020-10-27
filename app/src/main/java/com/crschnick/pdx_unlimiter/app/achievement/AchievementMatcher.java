@@ -2,6 +2,9 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import org.slf4j.LoggerFactory;
 
@@ -19,37 +22,48 @@ public class AchievementMatcher {
     private ScoreStatus status;
 
     AchievementMatcher(Eu4IntermediateSavegame s, Achievement a) {
-        Map<AchievementVariable, String> vars = a.evaluateVariables(s);
-        vars.entrySet().stream().forEach(e -> LoggerFactory.getLogger(AchievementMatcher.class).debug(
-                "variable: " + e.getKey().getName()
-                        + ", expression: " + e.getKey().getExpression()
-                        + ", result: " + e.getValue()));
+        Map<String, String> vars = a.evaluateVariables(s);
         this.typeStatus = a.getTypes().stream()
-                .collect(Collectors.toMap(t -> t, t -> check(s, t.getConditions(), a, vars)));
+                .collect(Collectors.toMap(t -> t, t -> {
+                    LoggerFactory.getLogger(Achievement.class).debug(
+                            "Checking type " + t.getName() + " for achievement " + a.getName());
+                    return check(s, t.getConditions(), a, vars);
+                }));
+
+        LoggerFactory.getLogger(Achievement.class).debug("Checking eligibility for achievement " + a.getName());
         this.eligibleStatus = check(s, a.getEligibilityConditions(), a, vars);
+        LoggerFactory.getLogger(Achievement.class).debug("Checking achievement for achievement " + a.getName());
         this.achievementStatus = check(s, a.getAchievementConditions(), a, vars);
+        LoggerFactory.getLogger(Achievement.class).debug("Calculating score for achievement " + a.getName());
         this.status = score(s, a, vars);
     }
 
-    private AchievementMatcher.ScoreStatus score(Eu4IntermediateSavegame s, Achievement a, Map<AchievementVariable, String> vars) {
+    private AchievementMatcher.ScoreStatus score(Eu4IntermediateSavegame s, Achievement a, Map<String, String> vars) {
         return new AchievementMatcher.ScoreStatus(
                 a.getScorer().score(s, string -> a.applyVariables(vars, string)),
                 a.getScorer().getValues(s, string -> a.applyVariables(vars, string)));
     }
 
-    private AchievementMatcher.ConditionStatus check(Eu4IntermediateSavegame s, List<AchievementCondition> conditions, Achievement a, Map<AchievementVariable, String> vars) {
+    private AchievementMatcher.ConditionStatus check(
+            Eu4IntermediateSavegame s,
+            List<AchievementCondition> conditions,
+            Achievement a,
+            Map<String, String> vars) {
         AchievementMatcher.ConditionStatus status = new AchievementMatcher.ConditionStatus();
-        for (var e : s.getNodes().entrySet()) {
-            for (var condition : conditions) {
-                if (condition.getNode().equals(e.getKey())) {
-                    String p = a.applyVariables(vars, condition.getFilter());
+        for (var condition : conditions) {
+            String p = a.applyVariables(vars, condition.getFilter());
+
+            if (condition.getNode().isEmpty()) {
+                ArrayNode dummy = new ArrayNode();
+                dummy.getNodes().add(KeyValueNode.create("value", new ValueNode(true)));
+                status.add(condition, match(dummy, condition, p));
+                continue;
+            }
+
+            for (var e : s.getNodes().entrySet()) {
+                if (condition.getNode().get().equals(e.getKey())) {
                     try {
-                        ArrayNode r = JsonPath.read(e.getValue(), p);
-                        if (r.getNodes().size() == 0) {
-                            status.add(condition, false);
-                        } else {
-                            status.add(condition, true);
-                        }
+                        status.add(condition, match(e.getValue(), condition, p));
                     } catch (Exception ex) {
                         throw new IllegalArgumentException("Exception while applying filter " + p, ex);
                     }
@@ -57,6 +71,18 @@ public class AchievementMatcher {
             }
         }
         return status;
+    }
+
+    private boolean match(Node input, AchievementCondition condition, String p) {
+        ArrayNode r = JsonPath.read(input, p);
+        LoggerFactory.getLogger(AchievementMatcher.class).debug(
+                "Applying achievement condition"
+                        + "\n    condition: " + condition.getDescription()
+                        + "\n    node: " + condition.getNode().orElse("none")
+                        + "\n    expression: " + condition.getFilter()
+                        + "\n    filter: " + p
+                        + "\n    result: " + (r.getNodes().size() > 0));
+        return r.getNodes().size() > 0;
     }
 
     public Map<Achievement.Type, ConditionStatus> getTypeStatus() {

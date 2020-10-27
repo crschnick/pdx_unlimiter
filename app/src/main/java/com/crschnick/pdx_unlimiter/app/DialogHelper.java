@@ -40,7 +40,7 @@ public class DialogHelper {
         try {
             text = new String(DialogHelper.class.getResourceAsStream(file).readAllBytes());
         } catch (IOException e) {
-            ErrorHandler.handleException(e, false);
+            ErrorHandler.handleException(e);
             return;
         }
 

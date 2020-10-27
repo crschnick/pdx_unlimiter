@@ -6,7 +6,9 @@ import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CountryTransformer extends NodeTransformer {
@@ -21,18 +23,14 @@ public class CountryTransformer extends NodeTransformer {
                 new ValueNode(kv.getKeyName())));
     }
 
-    @Override
-    public void transform(Node rootNode) {
+    private void createNewHistory(Node rootNode) {
         ArrayNode newHistory = new ArrayNode();
         Node.addNodeToArray(rootNode, KeyValueNode.create("countries_history", newHistory));
         ArrayNode ar = (ArrayNode) Node.getNodeForKey(rootNode, "countries");
+
         for (int i = 0; i < ar.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) ar.getNodes().get(i);
             String tag = kv.getKeyName();
-
-            setTag(kv);
-            setCustomNationInfo(kv.getNode());
-
             Optional<Node> historyContent = Node.getNodeForKeyIfExistent(kv.getNode(), "history");
             if (historyContent.isPresent()) {
                 Node.removeNodeFromArray(kv.getNode(), Node.getKeyValueNodeForKey(kv.getNode(), "history"));
@@ -40,6 +38,12 @@ public class CountryTransformer extends NodeTransformer {
             }
         }
 
+        formatNewHistory(newHistory);
+        removeEmptyHistoryNodes(newHistory);
+        createTagHistory(newHistory);
+    }
+
+    private void formatNewHistory(ArrayNode newHistory) {
         // Collect initial values
         for (int i = 0; i < newHistory.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) newHistory.getNodes().get(i);
@@ -56,7 +60,9 @@ public class CountryTransformer extends NodeTransformer {
             }
             content.add(0, KeyValueNode.create("initial", initial));
         }
+    }
 
+    private void removeEmptyHistoryNodes(ArrayNode newHistory) {
         // Remove empty event nodes
         for (int i = 0; i < newHistory.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) newHistory.getNodes().get(i);
@@ -69,11 +75,15 @@ public class CountryTransformer extends NodeTransformer {
                 }
             }
         }
+    }
 
+    private void createTagHistory(ArrayNode newHistory) {
+        Map<String,Boolean> resolved = new HashMap<>();
         for (int i = 0; i < newHistory.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) newHistory.getNodes().get(i);
+
             Node events = Node.getNodeForKey(kv.getNode(), "events");
-            Node tagHistory = new ArrayNode();
+            ArrayNode tagHistory = new ArrayNode();
             List<Node> content = Node.getNodeArray(events);
             for (int j = 0; j < content.size(); j++) {
                 if (Node.hasKey(content.get(j), "changed_tag_from")) {
@@ -89,23 +99,47 @@ public class CountryTransformer extends NodeTransformer {
                 }
             }
             Node.addNodeToArray(kv.getNode(), KeyValueNode.create("tag_history", tagHistory));
+
+            resolved.put(kv.getKeyName(), tagHistory.getNodes().size() == 0);
         }
 
-//
-//        Node first = tagHistory.get(0);
-//        String tag = Node.getString(Node.getNodeForKey(first, "changed_tag_from"));
-//        GameDate date = GameDate.fromNode(Node.getNodeForKey(first, "changed_tag_from"));
-//        List<Node> otherTagHis = Node.getNodeArray(Node.getNodeForKey(kv.getNode(), "tag_history"));
-//        if (otherTagHis.size() == 0) {
-//            continue;
-//        }
-//
-//        for (int tagIndex = 0; tagIndex < otherTagHis.size(); tagIndex++) {
-//            GameDate otherDate = GameDate.fromNode(Node.getNodeForKey(otherTagHis.get(tagIndex), "changed_tag_from"));
-//            if (date.compareTo(otherDate) > 0) {
-//
-//            }
-//        }
+        while (resolved.containsValue(false)) {
+            iterativeTagHistoryStep(resolved, newHistory);
+        }
+    }
+
+    private void iterativeTagHistoryStep(Map<String,Boolean> resolved, ArrayNode newHistory) {
+        for (int i = 0; i < newHistory.getNodes().size(); i++) {
+            KeyValueNode kv = (KeyValueNode) newHistory.getNodes().get(i);
+            var tagHistory = Node.getNodeArray(Node.getNodeForKey(kv.getNode(), "tag_history"));
+            String firstKnownTag = tagHistory.size() > 0 ?
+                    Node.getString(Node.getNodeForKey(tagHistory.get(0), "changed_tag_from")) : kv.getKeyName();
+
+            boolean isFirstTagResolved = resolved.get(firstKnownTag);
+            if (!isFirstTagResolved) {
+                continue;
+            }
+
+            Node firstTagHistory = Node.getNodeForKey(Node.getNodeForKey(newHistory, firstKnownTag), "tag_history");
+            List<Node> content = Node.getNodeArray(firstTagHistory);
+
+            for (int j = content.size() - 1; j >= 0; j--) {
+                tagHistory.add(0, content.get(j));
+            }
+
+            resolved.put(kv.getKeyName(), true);
+        }
+    }
+
+    @Override
+    public void transform(Node rootNode) {
+        createNewHistory(rootNode);
+        ArrayNode ar = (ArrayNode) Node.getNodeForKey(rootNode, "countries");
+        for (int i = 0; i < ar.getNodes().size(); i++) {
+            KeyValueNode kv = (KeyValueNode) ar.getNodes().get(i);
+            setTag(kv);
+            setCustomNationInfo(kv.getNode());
+        }
     }
 
     @Override
