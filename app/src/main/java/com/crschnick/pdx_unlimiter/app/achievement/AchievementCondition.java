@@ -11,10 +11,18 @@ public class AchievementCondition {
 
     public static List<AchievementCondition> parseConditionNode(JsonNode node, AchievementContent content) {
         return StreamSupport.stream(node.spliterator(), false)
-                .map(acn -> acn.isTextual() ? content.getConditions().get(acn.textValue()) : new AchievementCondition(
-                        acn.required("description").textValue(),
-                        Optional.ofNullable(acn.get("node")).map(JsonNode::textValue),
-                        acn.required("filter").textValue()))
+                .map(acn -> {
+                    if (acn.isTextual()) {
+                        if (!content.getConditions().containsKey(acn.textValue())) {
+                            throw new IllegalArgumentException("Invalid condition name " + acn.textValue());
+                        }
+                        return content.getConditions().get(acn.textValue());
+                    }
+                    return new AchievementCondition(
+                            acn.required("description").textValue(),
+                            Optional.ofNullable(acn.get("node")).map(JsonNode::textValue),
+                            acn.required("condition").textValue());
+                })
                 .collect(Collectors.toList());
     }
 
@@ -22,16 +30,16 @@ public class AchievementCondition {
     private Optional<String> node;
     private String filter;
 
-    public AchievementCondition(String description, String node, String filter) {
+    public AchievementCondition(String description, String node, String condition) {
         this.description = description;
         this.node = Optional.of(node);
-        this.filter = filter;
+        this.filter = "[?(" + condition + ")]";
     }
 
-    public AchievementCondition(String description, Optional<String> node, String filter) {
+    public AchievementCondition(String description, Optional<String> node, String condition) {
         this.description = description;
         this.node = node;
-        this.filter = filter;
+        this.filter = "[?(" + condition + ")]";
     }
 
     public String getDescription() {

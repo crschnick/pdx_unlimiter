@@ -21,37 +21,36 @@ public class AchievementMatcher {
     private ConditionStatus achievementStatus;
     private ScoreStatus status;
 
-    AchievementMatcher(Eu4IntermediateSavegame s, Achievement a) {
-        Map<String, String> vars = a.evaluateVariables(s);
+    AchievementMatcher(Map<String,Node> nodes, Achievement a) {
+        LoggerFactory.getLogger(Achievement.class).debug("Evaluating variables for achievement " + a.getName());
+        Map<AchievementVariable, String> vars = AchievementVariable.evaluateVariables(a.getVariables(), nodes);
         this.typeStatus = a.getTypes().stream()
                 .collect(Collectors.toMap(t -> t, t -> {
                     LoggerFactory.getLogger(Achievement.class).debug(
                             "Checking type " + t.getName() + " for achievement " + a.getName());
-                    return check(s, t.getConditions(), a, vars);
+                    return checkConditions(nodes, vars, t.getConditions());
                 }));
 
         LoggerFactory.getLogger(Achievement.class).debug("Checking eligibility for achievement " + a.getName());
-        this.eligibleStatus = check(s, a.getEligibilityConditions(), a, vars);
+        this.eligibleStatus = checkConditions(nodes, vars, a.getEligibilityConditions());
         LoggerFactory.getLogger(Achievement.class).debug("Checking achievement for achievement " + a.getName());
-        this.achievementStatus = check(s, a.getAchievementConditions(), a, vars);
+        this.achievementStatus = checkConditions(nodes, vars, a.getAchievementConditions());
         LoggerFactory.getLogger(Achievement.class).debug("Calculating score for achievement " + a.getName());
-        this.status = score(s, a, vars);
+        this.status = score(nodes, a, vars);
     }
 
-    private AchievementMatcher.ScoreStatus score(Eu4IntermediateSavegame s, Achievement a, Map<String, String> vars) {
+    private AchievementMatcher.ScoreStatus score(Map<String, Node> nodes, Achievement a, Map<AchievementVariable, String> vars) {
         return new AchievementMatcher.ScoreStatus(
-                a.getScorer().score(s, string -> a.applyVariables(vars, string)),
-                a.getScorer().getValues(s, string -> a.applyVariables(vars, string)));
+                a.getScorer().score(nodes, vars),
+                a.getScorer().getValues(nodes, vars));
     }
 
-    private AchievementMatcher.ConditionStatus check(
-            Eu4IntermediateSavegame s,
-            List<AchievementCondition> conditions,
-            Achievement a,
-            Map<String, String> vars) {
+    public static AchievementMatcher.ConditionStatus checkConditions(Map<String,Node> nodes,
+                                                                     Map<AchievementVariable, String> vars,
+                                                                     List<AchievementCondition> conditions) {
         AchievementMatcher.ConditionStatus status = new AchievementMatcher.ConditionStatus();
         for (var condition : conditions) {
-            String p = a.applyVariables(vars, condition.getFilter());
+            String p = AchievementVariable.applyVariables(vars, condition.getFilter());
 
             if (condition.getNode().isEmpty()) {
                 ArrayNode dummy = new ArrayNode();
@@ -60,7 +59,7 @@ public class AchievementMatcher {
                 continue;
             }
 
-            for (var e : s.getNodes().entrySet()) {
+            for (var e : nodes.entrySet()) {
                 if (condition.getNode().get().equals(e.getKey())) {
                     try {
                         status.add(condition, match(e.getValue(), condition, p));
@@ -73,14 +72,14 @@ public class AchievementMatcher {
         return status;
     }
 
-    private boolean match(Node input, AchievementCondition condition, String p) {
+    private static boolean match(Node input, AchievementCondition condition, String p) {
         ArrayNode r = JsonPath.read(input, p);
         LoggerFactory.getLogger(AchievementMatcher.class).debug(
                 "Applying achievement condition"
                         + "\n    condition: " + condition.getDescription()
                         + "\n    node: " + condition.getNode().orElse("none")
                         + "\n    expression: " + condition.getFilter()
-                        + "\n    filter: " + p
+                        + "\n    evaluation: " + p
                         + "\n    result: " + (r.getNodes().size() > 0));
         return r.getNodes().size() > 0;
     }

@@ -29,6 +29,10 @@ public class JsonPathConfiguration {
 
         @Override
         public <T> T map(Object o, Class<T> aClass, Configuration configuration) {
+            if (aClass == List.class) {
+                return (T) ((ArrayNode) o).getNodes().stream().map(v -> PROVIDER.unwrap(v)).collect(Collectors.toList());
+            }
+
             throw new UnsupportedOperationException();
         }
 
