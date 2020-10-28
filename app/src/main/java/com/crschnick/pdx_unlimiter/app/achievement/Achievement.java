@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,6 +28,7 @@ public class Achievement {
     private List<AchievementCondition> eligibilityConditions;
     private List<AchievementCondition> achievementConditions;
     private AchievementScorer scorer;
+    private AchievementContent content;
 
     public static Achievement fromFile(Path file, AchievementContent content, boolean official) throws IOException {
         JsonFactory f = new JsonFactory();
@@ -39,12 +41,13 @@ public class Achievement {
         a.name = n.required("name").textValue();
         a.description = n.required("description").textValue();
         a.uuid = UUID.fromString(n.required("uuid").textValue());
+        a.content = content;
 
         a.variables = new ArrayList<>(content.getPathVariables());
 
         a.icon = Optional.ofNullable(n.get("icon"))
                 .map(JsonNode::textValue)
-                .map(s -> a.applyVariables(a.evaluateVariables(null), s))
+                .map(s -> AchievementVariable.applyVariables(AchievementVariable.evaluateVariables(a.variables, null), s))
                 .map(Path::of);
 
         a.icon.ifPresent(i -> {
@@ -72,32 +75,11 @@ public class Achievement {
         return a;
     }
 
-    public Map<String,String> evaluateVariables(Eu4IntermediateSavegame sg) {
-        LoggerFactory.getLogger(Achievement.class).debug("Evaluating variables for achievement " + name);
-        Map<String,String> expr = new HashMap<>();
-        for (AchievementVariable v : variables) {
-            String currentVar = applyVariables(expr, v.getExpression());
-            String eval = v.evaluate(sg, currentVar);
-            expr.put("%{" + v.getName() + "}", eval);
-            LoggerFactory.getLogger(Achievement.class).debug(
-                    "Evaluating variable"
-                            + "\n    name: " + v.getName()
-                            + "\n    expression:  " + currentVar
-                            + "\n    evaluation: " + eval);
-        }
-        return expr;
-    }
-
-    public String applyVariables(Map<String,String> expr, String input) {
-        String s = input;
-        for (var e : expr.entrySet()) {
-            s = s.replace(e.getKey(), e.getValue());
-        }
-        return s;
-    }
-
     public AchievementMatcher match(Eu4IntermediateSavegame sg) {
-        return new AchievementMatcher(sg, this);
+        Map<String, Node> nodes = new HashMap<>();
+        nodes.putAll(sg.getNodes());
+        nodes.putAll(content.getNodes());
+        return new AchievementMatcher(nodes, this);
     }
 
     public String getName() {

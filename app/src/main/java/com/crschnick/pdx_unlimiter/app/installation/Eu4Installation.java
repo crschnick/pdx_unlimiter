@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4NormalParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +30,7 @@ public class Eu4Installation extends GameInstallation {
     private Path userDirectory;
     private GameVersion version;
     private Map<String, String> countryNames = new HashMap<>();
+
 
     public Eu4Installation(Path path) {
         super("Europa Universalis IV", path);

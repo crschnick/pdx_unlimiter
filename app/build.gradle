@@ -44,7 +44,8 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
     implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
-    implementation files("$buildDir/generated-modules/json-path-2.4.0.jar")
+    implementation files("$buildDir/generated-modules/json-path-master-SNAPSHOT.jar")
+    //implementation 'com.github.json-path:JsonPath:master-SNAPSHOT'
     implementation files("$buildDir/generated-modules/json-smart-2.3.jar")
     implementation files("$buildDir/generated-modules/accessors-smart-1.2.jar")
     implementation project(':eu4')
@@ -74,7 +75,7 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+            artifact 'com.github.json-path.JsonPath:json-path:master-SNAPSHOT'
             moduleInfoSource = '''
                 module com.jayway.jsonpath {
                     exports com.jayway.jsonpath;
@@ -182,7 +183,10 @@ createRuntimeImage {
 createRuntimeImage.dependsOn(build)
 
 task writeVersion(type: DefaultTask) {
-    Files.write(java.nio.file.Path.of("${buildDir}/image/version"), String.valueOf(version).getBytes())
+    java.nio.file.Path p = java.nio.file.Path.of("${buildDir}/image/")
+    if (Files.exists(p)) {
+        Files.write(p.resolve("version"), String.valueOf(version).getBytes())
+    }
 }
 createRuntimeImage.finalizedBy(writeVersion)
 

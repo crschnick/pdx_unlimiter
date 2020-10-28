@@ -17,10 +17,19 @@ public class Eu4NormalParser extends GamedataParser {
         super(MAGIC, Namespace.EMPTY);
     }
 
+    public Eu4NormalParser(byte[] magic) {
+        super(magic, Namespace.EMPTY);
+    }
+
+    public static Eu4NormalParser textFileParser() {
+        return new Eu4NormalParser(new byte[0]);
+    }
+
     private List<Token> tokenize(String s) {
         List<Token> tokens = new ArrayList<>();
         int prev = 0;
         boolean isInQuotes = false;
+        boolean isInComment = false;
         for (int i = 0; i < s.length(); i++) {
             Token t = null;
             if (s.charAt(i) == '{') {
@@ -31,9 +40,21 @@ public class Eu4NormalParser extends GamedataParser {
                 t = new EqualsToken();
             } else if (s.charAt(i) == '"') {
                 isInQuotes = !isInQuotes;
+            } else if (s.charAt(i) == '#') {
+                isInComment = true;
+                continue;
             }
 
-            boolean isWhitespace = !isInQuotes && (s.charAt(i) == '\n' || s.charAt(i) == '\r' || s.charAt(i) == ' ' || s.charAt(i) == '\t');
+            boolean isNewLine = s.charAt(i) == '\n';
+            if (isInComment) {
+                if (isNewLine) {
+                    isInComment = false;
+                }
+                prev = i + 1;
+                continue;
+            }
+
+            boolean isWhitespace = !isInQuotes && (isNewLine || s.charAt(i) == '\r' || s.charAt(i) == ' ' || s.charAt(i) == '\t');
             boolean marksEndOfPreviousToken =
                     (s.charAt(i) == '\0' && prev < i) // EOF
                             || (t != null && prev < i)        // New token finishes old token
@@ -49,9 +70,6 @@ public class Eu4NormalParser extends GamedataParser {
                 } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", sub)) {
                     tokens.add(new ValueToken(Double.valueOf(sub)));
                 } else if (sub.startsWith("\"") && sub.endsWith("\"")) {
-                    if (sub.length() == 1) {
-                        int a = 0;
-                    }
                     tokens.add(new ValueToken(sub.substring(1, sub.length() - 1)));
                 } else {
                     tokens.add(new ValueToken(sub));
@@ -60,7 +78,6 @@ public class Eu4NormalParser extends GamedataParser {
 
             if (isWhitespace) {
                 prev = i + 1;
-                continue;
             } else if (t != null) {
                 tokens.add(t);
                 prev = i + 1;
