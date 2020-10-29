@@ -97,6 +97,9 @@ public class AchievementContent {
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("region.txt"))).get());
             nodes.put("eu4.superregion", Eu4NormalParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("superregion.txt"))).get());
+            nodes.put("eu4.cultures", Eu4NormalParser.textFileParser().parse(
+                    Files.newInputStream(GameInstallation.EU4.getPath()
+                            .resolve("common").resolve("cultures").resolve("00_cultures.txt"))).get());
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }

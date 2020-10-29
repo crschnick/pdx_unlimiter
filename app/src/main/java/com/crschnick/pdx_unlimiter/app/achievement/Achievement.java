@@ -38,6 +38,7 @@ public class Achievement {
 
         Achievement a = new Achievement();
         JsonNode n = node.required("achievement");
+        a.official = official;
         a.name = n.required("name").textValue();
         a.description = n.required("description").textValue();
         a.uuid = UUID.fromString(n.required("uuid").textValue());

@@ -685,12 +685,21 @@ public class Eu4SavegameManagerStyle {
         about.getItems().add(tc);
 
 
+        Menu dev = new Menu("Developer");
+        MenuItem ns = new MenuItem("Namespace creator");
+        ns.setOnAction((a) -> {
+            DialogHelper.createNamespaceDialog();
+        });
+        dev.getItems().add(ns);
+
+
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(menu);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
         menuBar.getMenus().add(about);
+        menuBar.getMenus().add(dev);
         return menuBar;
     }
 

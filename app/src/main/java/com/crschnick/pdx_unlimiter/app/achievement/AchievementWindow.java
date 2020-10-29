@@ -111,6 +111,7 @@ public class AchievementWindow {
         Alert alert = DialogHelper.createAlert();
         alert.setTitle("Achievement Information");
         var node = AchievementWindow.createAchievementInfoNode(a, matcher, false);
+        alert.getDialogPane().setMaxWidth(500);
         alert.getDialogPane().setContent(node);
         alert.getButtonTypes().add(foo);
         alert.getButtonTypes().add(bar);
@@ -140,14 +141,14 @@ public class AchievementWindow {
         box.setSpacing(5);
         box.setPadding(new Insets(0, 5, 5, 5));
 
-        box.getChildren().add(new Region());
         Label name = new Label(a.getName());
         name.setStyle("-fx-font-size: 18px; -fx-text-fill: white;");
         box.getChildren().add(name);
 
-        box.getChildren().add(new Region());
         Label desc = new Label(a.getDescription());
         desc.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        desc.setWrapText(true);
+        desc.setMaxWidth(400);
         box.getChildren().add(desc);
 
         HBox b = new HBox();
@@ -232,12 +233,14 @@ public class AchievementWindow {
         box.getChildren().add(line);
 
         Label scoreCalc = new Label(a.getReadableScore());
+        scoreCalc.setWrapText(true);
         scoreCalc.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
         Label scoreVal = new Label("= " + new DecimalFormat("#0.00").format(status.getScore()));
         scoreVal.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
         Region r = new Region();
         HBox hb = new HBox(scoreCalc, r, scoreVal);
-        HBox.setHgrow(r, Priority.ALWAYS);
+        HBox.setHgrow(r, Priority.SOMETIMES);
+        scoreVal.setMinWidth(Region.USE_PREF_SIZE);
         box.getChildren().add(hb);
 
         return box;
@@ -274,13 +277,17 @@ public class AchievementWindow {
                     (t,s) -> box.getChildren().add(createConditionNode("Type: " + t.getName(), s)));
         }
         box.getChildren().add(createConditionNode("Eligibility conditions:", m.getEligibleStatus()));
-        box.getChildren().add(createConditionNode("Achievement conditions:", m.getAchievementStatus()));
+
+        if (m.getAchievementStatus().getConditions().size() > 0) {
+            box.getChildren().add(createConditionNode("Achievement conditions:", m.getAchievementStatus()));
+        }
 
         box.getChildren().add(createScoreNode(a, m.getScoreStatus()));
 
         if (validated) {
             box.getChildren().add(createValidatedNode());
         }
+        box.maxWidthProperty().setValue(500);
         return box;
     }
 }

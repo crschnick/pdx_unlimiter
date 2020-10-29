@@ -126,7 +126,7 @@ public interface AchievementScorer {
 
         @Override
         public String toReadableString() {
-            return "<" + name.orElseThrow(IllegalArgumentException::new) + ">";
+            return "<" + name.orElseThrow(() -> new IllegalArgumentException("No name provided")) + ">";
         }
 
         @Override
@@ -164,7 +164,7 @@ public interface AchievementScorer {
 
         @Override
         public String toReadableString() {
-            return "<" + name + ">";
+            return "<" + name.orElseThrow(() -> new IllegalArgumentException("No name provided")) + ">";
         }
 
         @Override
@@ -210,7 +210,7 @@ public interface AchievementScorer {
         @Override
         public String toReadableString() {
             if (name.isPresent()) {
-                return "<" + name.get() + ">";
+                return "<" + name.orElseThrow(() -> new IllegalArgumentException("No name provided")) + ">";
             }
 
             String s = scorers.get(0).toReadableString();
@@ -263,7 +263,7 @@ public interface AchievementScorer {
 
         @Override
         public String toReadableString() {
-            return "<" + name + ">";
+            return "<" + name.orElseThrow(() -> new IllegalArgumentException("No name provided")) + ">";
         }
 
         @Override

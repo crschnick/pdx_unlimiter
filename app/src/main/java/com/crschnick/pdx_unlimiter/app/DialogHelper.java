@@ -4,6 +4,9 @@ import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.Settings;
+import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -22,6 +25,33 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 public class DialogHelper {
+
+    public static void createNamespaceDialog() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select non-ironman save");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 save game", "*.eu4"));
+        File named = fileChooser.showOpenDialog(SavegameManagerApp.getAPP().getScene().getWindow());
+        if (named == null) {
+            return;
+        }
+
+        fileChooser = new FileChooser();
+        fileChooser.setTitle("Select ironman save");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 save game", "*.eu4"));
+        File unnamed = fileChooser.showOpenDialog(SavegameManagerApp.getAPP().getScene().getWindow());
+        if (unnamed == null) {
+            return;
+        }
+
+        try {
+            Eu4Savegame un = Eu4Savegame.fromFile(unnamed.toPath());
+            Eu4Savegame n = Eu4Savegame.fromFile(named.toPath());
+            System.out.println(NamespaceCreator.createNamespace(
+                    Eu4IntermediateSavegame.fromSavegame(un), Eu4IntermediateSavegame.fromSavegame(n)));
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+    }
 
     public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
