@@ -85,7 +85,7 @@ public abstract class Namespace {
             if (Pattern.compile("[0-9]+").matcher(id).matches()) {
                 int idInt = Integer.parseInt(id);
                 if (!keyNames.containsKey(idInt)) {
-                    //System.err.println("Unable to find name for key " + idInt);
+                    System.err.println("Unable to find name for key " + idInt);
                 }
                 return keyNames.containsKey(idInt) ? keyNames.get(idInt) : id;
             } else {

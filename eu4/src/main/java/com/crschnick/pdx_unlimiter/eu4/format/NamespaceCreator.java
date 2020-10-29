@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.eu4.format;
 
+import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
@@ -9,14 +10,15 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class NamespaceCreator {
-    public static String createNamespace(Eu4Savegame unnamed, Eu4Savegame named) {
-        String s = "";
-        s += createNamespace(unnamed.getGamestate(), named.getGamestate());
-        s += "\n";
-        s += createNamespace(unnamed.getAi(), named.getAi());
-        s += "\n";
-        s += createNamespace(unnamed.getMeta(), named.getMeta());
-        return s;
+    public static String createNamespace(Eu4IntermediateSavegame unnamed, Eu4IntermediateSavegame named) {
+        StringBuilder s = new StringBuilder();
+        var set = unnamed.getNodes().keySet();
+        set.retainAll(named.getNodes().keySet());
+        for (String node : set) {
+            s.append(createNamespace(unnamed.getNodes().get(node), named.getNodes().get(node)));
+            s.append("\n");
+        }
+        return s.toString();
     }
 
     public static String createNamespace(Node unnamed, Node named) {
@@ -29,35 +31,15 @@ public class NamespaceCreator {
         return b.toString();
     }
 
-    private static List<Node> compress(ArrayNode a) {
-        Set<String> keys = new HashSet<>();
-        List<Node> nodes = new ArrayList<>();
-        for (int i = 0; i < a.getNodes().size(); i++) {
-            Node n = a.getNodes().get(i);
-            if (n instanceof KeyValueNode) {
-                KeyValueNode kv = (KeyValueNode) n;
-                if (keys.contains(kv.getKeyName())) {
-                    //continue;
-                } else {
-                    keys.add(kv.getKeyName());
-                }
-                nodes.add(kv);
-            }
-        }
-        return nodes;
-    }
-
     private static void createNamespace(Map<Integer, String> map, Node unnamed, Node named) {
         if (named instanceof ArrayNode && unnamed instanceof ArrayNode) {
             ArrayNode a = (ArrayNode) named;
             ArrayNode ua = (ArrayNode) unnamed;
-            var namedNodes = compress(a);
-            var unnamedNodes = compress(ua);
-            if (namedNodes.size() < 50 && namedNodes.size() != unnamedNodes.size()) {
+            if (ua.getNodes().size() != a.getNodes().size()) {
                 return;
             }
-            for (int i = 0; i < Math.min(namedNodes.size(), 50); i++) {
-                createNamespace(map, unnamedNodes.get(i), namedNodes.get(i));
+            for (int i = 0; i < a.getNodes().size(); i++) {
+                createNamespace(map, ua.getNodes().get(i), a.getNodes().get(i));
             }
         }
 
@@ -73,12 +55,9 @@ public class NamespaceCreator {
 
             if (Pattern.compile("[0-9]+").matcher(((KeyValueNode) unnamed).getKeyName()).matches()) {
                 int i = Integer.parseInt(((KeyValueNode) unnamed).getKeyName());
-                //System.err.println("Ambigous keys: " + map.get(i) + ", " + kv.getKeyName());
-                //System.err.println("Ambigous values: " + ((KeyValueNode) unnamed).getNode() + ", " + kv.getNode().toString(0));
-                if (!map.getOrDefault(i, kv.getKeyName()).equals(kv.getKeyName())) {
+                if (map.containsKey(i) && !map.get(i).equals(kv.getKeyName())) {
                     System.err.println("Ambigous keys: " + map.get(i) + ", " + kv.getKeyName());
                 } else {
-
                     map.put(i, kv.getKeyName());
                 }
             }

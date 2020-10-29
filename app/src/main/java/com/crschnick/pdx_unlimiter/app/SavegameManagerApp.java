@@ -43,6 +43,9 @@ public class SavegameManagerApp extends Application {
     public static SavegameManagerApp getAPP() {
         return APP;
     }
+    public Scene getScene() {
+        return layout.getScene();
+    }
 
     public static void main(String[] args) {
         try {

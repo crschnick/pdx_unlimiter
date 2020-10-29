@@ -19,7 +19,7 @@ public class DateTransformer extends NodeTransformer {
             d = GameDate.fromString(s);
         }
         if (d == null) {
-            throw new IllegalArgumentException("Invalid date node");
+            throw new IllegalArgumentException("Invalid date value " + v.getValue());
         }
         kv.setNode(GameDate.toNode(d));
     }

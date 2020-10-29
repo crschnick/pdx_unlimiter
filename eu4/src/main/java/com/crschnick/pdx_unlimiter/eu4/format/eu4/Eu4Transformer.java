@@ -49,10 +49,18 @@ public class Eu4Transformer {
         return new SubnodeTransformer(Map.of(new String[]{"gameplaysettings", "setgameplayoptions"}, new ChainTransformer(t)), false);
     }
 
+    private static boolean isDateEntry(String key) {
+        if (key.equals("expiry_date")) {
+            return false;
+        }
+
+        return key.endsWith("date");
+    }
+
     private static NodeTransformer createEu4Transformer() {
         List<NodeTransformer> t = new ArrayList<>();
         t.add(new RecursiveTransformer((n) -> {
-            if (n instanceof KeyValueNode && Node.getKeyValueNode(n).getKeyName().endsWith("date")) {
+            if (n instanceof KeyValueNode && isDateEntry(Node.getKeyValueNode(n).getKeyName())) {
                 Node val = Node.getKeyValueNode(n).getNode();
                 return val instanceof ValueNode &&
                         (((ValueNode) val).getValue() instanceof String || ((ValueNode) val).getValue() instanceof Long);
