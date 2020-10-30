@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementWindow;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
@@ -692,6 +693,12 @@ public class Eu4SavegameManagerStyle {
         });
         dev.getItems().add(ns);
 
+        MenuItem log = new MenuItem("Show log");
+        log.setOnAction((a) -> {
+            DialogHelper.showLogDialog();
+        });
+        dev.getItems().add(log);
+
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
@@ -699,7 +706,9 @@ public class Eu4SavegameManagerStyle {
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
         menuBar.getMenus().add(about);
-        menuBar.getMenus().add(dev);
+        if (PdxuInstallation.getInstance().isDeveloperMode()) {
+            menuBar.getMenus().add(dev);
+        }
         return menuBar;
     }
 

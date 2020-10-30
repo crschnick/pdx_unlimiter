@@ -1,12 +1,17 @@
 package com.crschnick.pdx_unlimiter.app;
 
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementMatcher;
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementWindow;
 import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.Settings;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -14,17 +19,56 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 public class DialogHelper {
+
+    public static void showLogDialog() {
+        var refresh = new ButtonType("Refresh");
+        Alert alert = createAlert();
+        alert.getButtonTypes().add(ButtonType.CLOSE);
+        alert.getButtonTypes().add(refresh);
+        alert.initModality(Modality.WINDOW_MODAL);
+        alert.setTitle("Log");
+
+
+        TextArea textArea = new TextArea();
+        textArea.editableProperty().setValue(false);
+
+        Button val = (Button) alert.getDialogPane().lookupButton(refresh);
+        val.addEventFilter(
+                ActionEvent.ACTION,
+                e -> {
+                    try {
+                        textArea.setText(Files.readString(
+                                PdxuInstallation.getInstance().getLogsLocation().resolve("pdxu.log")));
+                        e.consume();
+                    } catch (IOException ex) {
+                        ErrorHandler.handleException(ex);
+                    }
+                }
+        );
+        val.fireEvent(new ActionEvent());
+
+        ScrollPane p = new ScrollPane(textArea);
+        p.setFitToWidth(true);
+        p.setFitToHeight(true);
+        p.setMinWidth(700);
+        p.setMinHeight(500);
+        alert.getDialogPane().setContent(p);
+
+        alert.showAndWait();
+    }
 
     public static void createNamespaceDialog() {
         FileChooser fileChooser = new FileChooser();

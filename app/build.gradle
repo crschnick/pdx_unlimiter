@@ -1,12 +1,14 @@
-import java.nio.file.Files
-
 plugins {
     id 'application'
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
     id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
-version '1.0-rc2'
+setVersion '1.0-rc2'
+
+if (!file("${projectDir}/pdxu.properties").exists()) {
+    file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
+}
 
 java {
     modularity.inferModulePath = true
@@ -17,9 +19,7 @@ java {
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
     mainClass = 'com.crschnick.pdx_unlimiter.app.SavegameManagerApp'
-    applicationDefaultJvmArgs = ['-Dpdxu.installDir=' + System.getProperty("pdxu.installDir")]
 }
-
 
 javafx {
     version = '15'
@@ -163,9 +163,7 @@ task copyOutput(type: Copy) {
     from "${buildDir}/libs"
 }
 
-addDependenciesModuleInfo.finalizedBy(copyModules)
-build.finalizedBy(copyOutput)
-
+createRuntimeImage.dependsOn([copyModules, copyOutput])
 createRuntimeImage {
     outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
@@ -180,31 +178,32 @@ createRuntimeImage {
     noHeaderFiles = true
     noManPages = true
 }
-createRuntimeImage.dependsOn(build)
 
 task writeVersion(type: DefaultTask) {
-    java.nio.file.Path p = java.nio.file.Path.of("${buildDir}/image/")
-    if (Files.exists(p)) {
-        Files.write(p.resolve("version"), String.valueOf(version).getBytes())
+    doLast {
+        mkdir "${buildDir}/image/"
+        file("${buildDir}/image/version").write(String.valueOf(version))
     }
 }
-createRuntimeImage.finalizedBy(writeVersion)
 
-task copyProperties(type: Copy) {
+task copySentryProperties(type: Copy) {
     into file("${buildDir}/image/bin/")
     from file("${projectDir}/sentry_prod.properties")
     rename { f -> return "sentry.properties"}
 }
-createRuntimeImage.finalizedBy(copyProperties)
 
-task zipImage(type: Zip) {
+task copyPdxuProperties(type: Copy) {
+    into file("${buildDir}/image/")
+    from file("${projectDir}/pdxu_prod.properties")
+    rename { f -> return "pdxu.properties"}
+}
+
+createRuntimeImage.finalizedBy([writeVersion, copySentryProperties, copyPdxuProperties])
+
+task createDist(type: Zip, dependsOn: createRuntimeImage) {
     destinationDirectory = buildDir
     archivesBaseName = "pdx_unlimiter"
     archiveAppendix = "windows"
     from "${buildDir}/image"
 }
-zipImage.dependsOn(createRuntimeImage)
-
-task createDist(type: DefaultTask)
-createDist.dependsOn(zipImage)
 

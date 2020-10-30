@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.JsonPathConfiguration;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame_mgr.*;
@@ -30,6 +31,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class SavegameManagerApp extends Application {
 
@@ -52,16 +54,12 @@ public class SavegameManagerApp extends Application {
             if (!PdxuInstallation.init()) {
                 return;
             }
+            LogManager.init();
             Settings.init();
             GameInstallation.initInstallations();
             SavegameCache.loadData();
             AchievementManager.init();
-
-            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.SEVERE);
-            logger.setUseParentHandlers(false);
-
-            if (PdxuInstallation.getInstance().isProduction()) {
+            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }
 
@@ -185,7 +183,9 @@ public class SavegameManagerApp extends Application {
         Platform.exit();
         try {
             PdxuInstallation.shutdown();
-            GlobalScreen.unregisterNativeHook();
+            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+                GlobalScreen.unregisterNativeHook();
+            }
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }
@@ -221,6 +221,11 @@ public class SavegameManagerApp extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
+                Stage.getWindows().stream()
+                        .filter(w -> !w.equals(getScene().getWindow()))
+                        .collect(Collectors.toList()).stream()
+                        .forEach(w -> w.fireEvent(event));
+
                 close(true);
             }
         });
