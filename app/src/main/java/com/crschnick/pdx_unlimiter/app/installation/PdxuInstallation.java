@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 public class PdxuInstallation {
@@ -21,35 +22,39 @@ public class PdxuInstallation {
 
     public static boolean init() throws Exception {
         Path appPath = Path.of(System.getProperty("java.home"));
-
-        boolean prod = false;
+        boolean prod = appPath.toFile().getName().equals("app")
+                || appPath.toFile().getName().equals("image");
         String v;
         Path installDir;
-        if (appPath.toFile().getName().equals("app")) {
+        Optional<Path> achievementsLocation = Optional.empty();
+        boolean developerMode = false;
+        boolean nativeHook = true;
+
+        Properties props = new Properties();
+        if (prod) {
             v = Files.readString(appPath.resolve("version"));
             installDir = appPath.getParent();
-            prod = true;
+            props.load(Files.newInputStream(appPath.resolve("pdxu.properties")));
         } else {
+            props.load(Files.newInputStream(Path.of("pdxu.properties")));
+
             v = "dev";
-            String dir = Optional.ofNullable(System.getProperty("pdxu.installDir"))
-                    .orElseThrow(() -> new NoSuchElementException("Property pdxu.installDir missing for dev build"));
-            installDir = Path.of(dir);
+            installDir = Optional.ofNullable(props.get("installDir"))
+                    .map(val -> Path.of(val.toString()))
+                    .filter(val -> val.isAbsolute() && Files.exists(val))
+                    .orElseThrow(() -> new NoSuchElementException("Invalid installDir for dev build"));
         }
-        INSTANCE = new PdxuInstallation(installDir, v, prod);
+        achievementsLocation = Optional.ofNullable(props.get("achievementDir"))
+                .map(val -> Path.of(val.toString()))
+                .filter(val -> val.isAbsolute() && Files.exists(val));
+        developerMode = Optional.ofNullable(props.get("developerMode"))
+                .map(val -> Boolean.parseBoolean(val.toString()))
+                .orElse(false);
+        nativeHook = Optional.ofNullable(props.get("enableJNativeHook"))
+                .map(val -> Boolean.parseBoolean(val.toString()))
+                .orElse(true);
 
-        FileUtils.forceMkdir(INSTANCE.getLogsLocation().toFile());
-        if (prod) {
-            System.setProperty("org.slf4j.simpleLogger.logFile", INSTANCE.getLogsLocation().resolve("pdxu.log").toString());
-        } else {
-            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-        }
-        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.CompiledPath", "warn");
-        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.PredicateContextImpl", "warn");
-
-        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
-        //System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
-        LoggerFactory.getLogger(PdxuInstallation.class).info("Initializing installation at " + installDir.toString());
-        Sentry.init();
+        INSTANCE = new PdxuInstallation(installDir, v, prod, achievementsLocation, developerMode, nativeHook);
 
         if (INSTANCE.isAlreadyRunning()) {
             return false;
@@ -82,11 +87,21 @@ public class PdxuInstallation {
     private Path location;
     private String version;
     private boolean production;
+    private Optional<Path> achievementsLocation;
+    private boolean developerMode;
+    private boolean nativeHookEnabled;
 
-    private PdxuInstallation(Path location, String version, boolean production) {
+    public PdxuInstallation(Path location, String version, boolean production, Optional<Path> achievementsLocation, boolean developerMode, boolean nativeHookEnabled) {
         this.location = location;
         this.version = version;
         this.production = production;
+        this.achievementsLocation = achievementsLocation;
+        this.developerMode = developerMode;
+        this.nativeHookEnabled = nativeHookEnabled;
+    }
+
+    public boolean isNativeHookEnabled() {
+        return nativeHookEnabled;
     }
 
     public Path getLocation() {
@@ -118,7 +133,7 @@ public class PdxuInstallation {
     }
 
     public Path getAchievementsLocation() {
-        return location.resolve("achievements");
+        return achievementsLocation.orElse(location.resolve("achievements"));
     }
 
     public Path getSettingsLocation() {
@@ -139,5 +154,9 @@ public class PdxuInstallation {
 
     public boolean isProduction() {
         return production;
+    }
+
+    public boolean isDeveloperMode() {
+        return developerMode;
     }
 }

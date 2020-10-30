@@ -17,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.util.Duration;
 
 import javax.swing.event.ChangeListener;
@@ -95,6 +96,7 @@ public class AchievementWindow {
         VBox content = new VBox(top, pane);
         content.setPadding(new Insets(0, 0, 0, 0));
         content.setFillWidth(true);
+        alert.initModality(Modality.WINDOW_MODAL);
         alert.getDialogPane().setContent(content);
         alert.getButtonTypes().add(ButtonType.CLOSE);
         Platform.runLater(alert::showAndWait);
@@ -109,6 +111,7 @@ public class AchievementWindow {
         ButtonType bar = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
         AchievementMatcher matcher = a.match(entry.getInfo().get().getSavegame());
         Alert alert = DialogHelper.createAlert();
+        alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Achievement Information");
         var node = AchievementWindow.createAchievementInfoNode(a, matcher, false);
         alert.getDialogPane().setMaxWidth(500);

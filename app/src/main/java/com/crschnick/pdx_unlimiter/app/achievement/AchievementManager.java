@@ -76,7 +76,8 @@ public class AchievementManager {
                     }
                 });
 
-        checksum = Files.readString(path.resolve("official").resolve("checksum"));
+        Path c = path.resolve("official").resolve("checksum");
+        checksum = Files.exists(c) ? Files.readString(c) : "none";
 
     }
 
