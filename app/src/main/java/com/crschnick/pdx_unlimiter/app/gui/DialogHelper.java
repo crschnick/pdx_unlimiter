@@ -288,7 +288,8 @@ public class DialogHelper {
     }
 
     public static boolean showImportSavegamesDialog() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText("Import all savegames");
         alert.setContentText("Do you want to import all savegames from " + GameInstallation.EU4.getSaveDirectory().toString() + "? This may take a while.");
         Optional<ButtonType> result = alert.showAndWait();

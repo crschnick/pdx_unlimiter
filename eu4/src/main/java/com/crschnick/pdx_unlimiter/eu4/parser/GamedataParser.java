@@ -16,6 +16,17 @@ public abstract class GamedataParser {
         this.namespace = namespace;
     }
 
+    public boolean validateHeader(InputStream stream) throws IOException {
+        byte[] first = new byte[header.length];
+        stream.readNBytes(first, 0, header.length);
+        if (!Arrays.equals(first, header)) {
+            stream.close();
+            return false;
+        }
+
+        return true;
+    }
+
     public abstract List<Token> tokenize(InputStream stream) throws IOException;
 
     public final Optional<Node> parse(InputStream stream) throws IOException {

@@ -30,6 +30,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -320,11 +321,11 @@ public class SavegameCache {
         this.campaigns.remove(c);
     }
 
-    public synchronized void addNewEntry(UUID campainUuid, UUID entryUuid, Eu4SavegameInfo i) {
+    public synchronized void addNewEntry(Optional<String> name, UUID campainUuid, UUID entryUuid, Eu4SavegameInfo i) {
         if (!this.getCampaign(campainUuid).isPresent()) {
             Eu4Campaign c = new Eu4Campaign(new SimpleObjectProperty<>(new Timestamp(System.currentTimeMillis())),
                     new SimpleStringProperty(i.getCurrentTag().getTag()),
-                    new SimpleStringProperty(GameInstallation.EU4.getCountryName(i.getCurrentTag())),
+                    new SimpleStringProperty(name.orElse(GameInstallation.EU4.getCountryName(i.getCurrentTag()))),
                     new SimpleObjectProperty<>(i.getDate()), campainUuid);
             this.campaigns.add(c);
         }
@@ -483,7 +484,7 @@ public class SavegameCache {
         return Optional.empty();
     }
 
-    public synchronized void importSavegame(Path file) {
+    public synchronized void importSavegame(Optional<String> name, Path file) {
         status.setValue(Optional.of(new Status(Status.Type.IMPORTING,
                 GameInstallation.EU4.getUserDirectory().relativize(file).toString())));
 
@@ -505,15 +506,12 @@ public class SavegameCache {
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
         try {
-            if (!entryPath.toFile().mkdirs()) {
-                throw new IOException("Couldn't create savegame directory");
-            }
+            FileUtils.forceMkdir(entryPath.toFile());
             is.write(entryPath.resolve("data.zip"), true);
-            FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName() + "_" + saveUuid.toString() + ".eu4").toFile());
+            FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
             FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
 
-
-            this.addNewEntry(uuid, saveUuid, e);
+            this.addNewEntry(name, uuid, saveUuid, e);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             status.setValue(Optional.empty());
