@@ -1,8 +1,3 @@
-# Pdx-Unlimiter
-
-The Pdx-Unlimiter is a project aimed at improving the gaming experience of various Paradox games (Right now only EU4).
-Its currently under heavy development.
-
 ## Features
 
 ### Savegame management for EU4
@@ -19,20 +14,19 @@ All savegames can be also launched directly from within the Pdx-Unlimiter withou
 ### Reverting savegames
 
 If you are ingame and the Pdx-Unlimiter is running, you can press (CTRL+SHIFT+I) at any time to import the latest saved savegame.
-If you want to revert to an previously imported savegame, you can press (CTRL+SHIFT+K) to quickly close EU4.
+If you want to revert to a previously imported savegame, you can press (CTRL+SHIFT+K) to quickly close EU4.
 This kind of manual savegame management for ironman games allows you to easily revert to previous saves, i.e. to savescum, which is kinda necessary for hard achievements.
-
-
-
-## Planned features
-
 
 ### Custom achievements and challenges
 
-Every imported savegame date is parsed and converted into a more readable and usable json format internally.
+Every imported save game is parsed and converted into a more readable and usable json format internally.
 This allows for operations on these savegames such as custom achievement creation and validation.
+If you are interested in creating and sharing your own achievements,
+visit [https://github.com/crschnick/pdxu_achievements]() for a documentation.
 
-Status: Planned
+![Example](docs/achievements.png)
+
+## Planned features
 
 ### Savegame management for other Paradox games
 
@@ -71,6 +65,7 @@ The current focus primarily lies on perfecting already existing features.
 
 You can build the project with `gradle build`.
 To create jlink images and installers, use `gradle createDist`.
-For running, you can use `gradle app:run  -Dpdxu.installDir=<installation directory>` and `gradle updater:run`.
-The `-Dpdxu.installDir=<installation directory>` property is needed for a dev build to simulate the program operating
-in a real installation directory and not the build directory.
+For running, you can use `gradle run`.
+To correctly run the Pdx-Unlimiter in a development environment, you need to set the property `installDir=<installation directory>`
+in the `pdxu.properties` file. This is needed for a dev build to simulate the program operating
+in a real installation directory and not in the build directory.

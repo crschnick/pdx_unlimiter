@@ -84,9 +84,10 @@ public class AchievementWindow {
         ScrollPane pane = new ScrollPane(grid);
         pane.setPadding(Insets.EMPTY);
         pane.setMinViewportWidth(350);
-        pane.setMinViewportHeight(500);
+        pane.setMinViewportHeight(450);
         pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         pane.setFitToWidth(true);
+        pane.setMaxHeight(600);
 
         VBox content = new VBox(top, pane);
         content.setPadding(new Insets(0, 0, 0, 0));
