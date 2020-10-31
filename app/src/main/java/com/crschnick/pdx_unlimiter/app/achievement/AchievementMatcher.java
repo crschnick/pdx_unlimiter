@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
@@ -21,7 +20,7 @@ public class AchievementMatcher {
     private ConditionStatus achievementStatus;
     private ScoreStatus status;
 
-    AchievementMatcher(Map<String,Node> nodes, Achievement a) {
+    AchievementMatcher(Map<String, Node> nodes, Achievement a) {
         LoggerFactory.getLogger(Achievement.class).debug("Evaluating variables for achievement " + a.getName());
         Map<AchievementVariable, String> vars = AchievementVariable.evaluateVariables(a.getVariables(), nodes);
         this.typeStatus = a.getTypes().stream()
@@ -39,13 +38,7 @@ public class AchievementMatcher {
         this.status = score(nodes, a, vars);
     }
 
-    private AchievementMatcher.ScoreStatus score(Map<String, Node> nodes, Achievement a, Map<AchievementVariable, String> vars) {
-        return new AchievementMatcher.ScoreStatus(
-                a.getScorer().score(nodes, vars),
-                a.getScorer().getValues(nodes, vars));
-    }
-
-    public static AchievementMatcher.ConditionStatus checkConditions(Map<String,Node> nodes,
+    public static AchievementMatcher.ConditionStatus checkConditions(Map<String, Node> nodes,
                                                                      Map<AchievementVariable, String> vars,
                                                                      List<AchievementCondition> conditions) {
         AchievementMatcher.ConditionStatus status = new AchievementMatcher.ConditionStatus();
@@ -82,6 +75,12 @@ public class AchievementMatcher {
                         + "\n    evaluation: " + p
                         + "\n    result: " + (r.getNodes().size() > 0));
         return r.getNodes().size() > 0;
+    }
+
+    private AchievementMatcher.ScoreStatus score(Map<String, Node> nodes, Achievement a, Map<AchievementVariable, String> vars) {
+        return new AchievementMatcher.ScoreStatus(
+                a.getScorer().score(nodes, vars),
+                a.getScorer().getValues(nodes, vars));
     }
 
     public Map<Achievement.Type, ConditionStatus> getTypeStatus() {

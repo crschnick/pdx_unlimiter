@@ -6,14 +6,12 @@ import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ArrayNameTransformer extends NodeTransformer {
 
-    protected Map<Integer,String> names;
-
     private static final String UNKNOWN = "unknown_";
+    protected Map<Integer, String> names;
 
     public ArrayNameTransformer(Map<Integer, String> names) {
         this.names = names;

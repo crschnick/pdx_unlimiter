@@ -7,6 +7,7 @@ public class GameVersion {
     private int second;
     private int third;
     private int fourth;
+
     public GameVersion(int first, int second, int third, int fourth) {
         this.first = first;
         this.second = second;

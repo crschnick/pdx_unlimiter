@@ -18,7 +18,7 @@ java {
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
-    mainClass = 'com.crschnick.pdx_unlimiter.app.SavegameManagerApp'
+    mainClass = 'com.crschnick.pdx_unlimiter.app.PdxuApp'
 }
 
 javafx {

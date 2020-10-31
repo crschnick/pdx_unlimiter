@@ -11,6 +11,7 @@ public class GameTag {
     private Color mapColor;
     private Color countryColor;
     private Optional<String> name;
+
     public GameTag(String tag, Color mapColor, Color countryColor, Optional<String> name) {
         this.tag = tag;
         this.mapColor = mapColor;

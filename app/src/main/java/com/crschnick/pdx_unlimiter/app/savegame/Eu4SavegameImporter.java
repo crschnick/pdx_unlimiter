@@ -1,7 +1,7 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import javafx.beans.property.BooleanProperty;
 
 import java.nio.file.Path;
@@ -25,7 +25,7 @@ public class Eu4SavegameImporter {
         new Thread(() -> {
             Eu4SavegameImporter.importAllSavegames(GameInstallation.EU4.getSaveDirectory(), (p) -> {
                 SavegameCache.EU4_CACHE.importSavegame(p);
-            }, SavegameManagerApp.getAPP().runningProperty());
+            }, PdxuApp.getApp().runningProperty());
         }).start();
 
     }

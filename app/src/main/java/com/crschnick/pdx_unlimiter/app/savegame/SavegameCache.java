@@ -1,13 +1,14 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.SavegameManagerApp;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.SavegameParseException;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -37,7 +38,6 @@ import java.util.zip.ZipOutputStream;
 
 public class SavegameCache {
 
-    public static final Path ROOT_DIR = Paths.get(System.getProperty("user.home"), "pdx_unlimiter", "savegames");
     public static final SavegameCache EU4_CACHE = new SavegameCache("eu4");
 
     public static final Set<SavegameCache> CACHES = Set.of(EU4_CACHE);
@@ -48,7 +48,7 @@ public class SavegameCache {
 
     public SavegameCache(String name) {
         this.name = name;
-        this.path = ROOT_DIR.resolve(name);
+        this.path = PdxuInstallation.getInstance().getSavegameLocation().resolve(name);
         addChangeListeners();
     }
 
@@ -64,6 +64,7 @@ public class SavegameCache {
 
     public static void saveData() throws IOException {
         for (SavegameCache cache : CACHES) {
+            FileUtils.forceMkdirParent(cache.getDataFilePath().toFile());
             OutputStream out = Files.newOutputStream(cache.getDataFilePath());
             cache.exportDataToConfig(out);
             out.close();
@@ -222,7 +223,7 @@ public class SavegameCache {
     }
 
     public void importSavegameCache(ZipFile zipFile) {
-        String config = SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString();
+        String config = PdxuInstallation.getInstance().getSavegameLocation().relativize(getDataFilePath()).toString();
         ZipEntry e = zipFile.getEntry(config);
         try {
             importDataFromConfig(zipFile.getInputStream(e));
@@ -234,7 +235,7 @@ public class SavegameCache {
         statusProperty().setValue(Optional.of(new Status(Status.Type.IMPORTING_ARCHIVE, zipFile.toString())));
         zipFile.stream().filter(en -> !en.getName().equals(config)).forEach(en -> {
             try {
-                Path p = SavegameCache.ROOT_DIR.resolve(Paths.get(en.getName()));
+                Path p = PdxuInstallation.getInstance().getSavegameLocation().resolve(Paths.get(en.getName()));
                 if (p.toFile().exists()) {
                     return;
                 }
@@ -259,7 +260,8 @@ public class SavegameCache {
                 try {
                     compressFileToZipfile(
                             getPath(e).resolve("savegame.eu4").toFile(),
-                            SavegameCache.ROOT_DIR.relativize(getPath()).resolve(name + ".eu4").toString(),
+                            PdxuInstallation.getInstance().getSavegameLocation()
+                                    .relativize(getPath()).resolve(name + ".eu4").toString(),
                             out);
                 } catch (IOException ioException) {
                     ErrorHandler.handleException(ioException);
@@ -270,7 +272,8 @@ public class SavegameCache {
     }
 
     private void exportSavegameCache(ZipOutputStream out) {
-        ZipEntry entry = new ZipEntry(SavegameCache.ROOT_DIR.relativize(getDataFilePath()).toString());
+        ZipEntry entry = new ZipEntry(PdxuInstallation.getInstance().getSavegameLocation()
+                .relativize(getDataFilePath()).toString());
         try {
             out.putNextEntry(entry);
             exportDataToConfig(out);
@@ -283,7 +286,7 @@ public class SavegameCache {
         for (Eu4Campaign c : getCampaigns()) {
             for (Eu4Campaign.Entry e : c.getSavegames()) {
                 Path file = getPath(e).resolve("savegame.eu4");
-                String name = SavegameCache.ROOT_DIR.relativize(file).toString();
+                String name = PdxuInstallation.getInstance().getSavegameLocation().relativize(file).toString();
                 try {
                     compressFileToZipfile(file.toFile(), name, out);
                 } catch (IOException ioException) {
@@ -335,7 +338,7 @@ public class SavegameCache {
         Thread t = new Thread(() -> {
             for (Eu4Campaign c : campaigns) {
                 for (Eu4Campaign.Entry e : c.getSavegames()) {
-                    if (!SavegameManagerApp.getAPP().isRunning()) {
+                    if (!PdxuApp.getApp().isRunning()) {
                         return;
                     }
 
@@ -425,8 +428,8 @@ public class SavegameCache {
         int v = 0;
         try {
             v = p.toFile().exists() ? Eu4IntermediateSavegame.getVersion(p.resolve("data.zip")) : 0;
-        } catch (IOException ioException) {
-            ErrorHandler.handleException(ioException);
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
             return;
         }
 
@@ -440,7 +443,7 @@ public class SavegameCache {
             i = Eu4IntermediateSavegame.fromFile(
                     p.resolve("data.zip")
                     //,"countries", "meta", "countries_history", "diplomacy", "active_wars"
-                    );
+            );
 
             Eu4SavegameInfo info = Eu4SavegameInfo.fromSavegame(i);
             e.infoProperty().setValue(Optional.of(info));
@@ -506,7 +509,7 @@ public class SavegameCache {
                 throw new IOException("Couldn't create savegame directory");
             }
             is.write(entryPath.resolve("data.zip"), true);
-            FileUtils.copyFile(file.toFile(), getBackupDir().resolve(file.getFileName() + "_" + saveUuid.toString() + ".eu4").toFile());
+            FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName() + "_" + saveUuid.toString() + ".eu4").toFile());
             FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
 
 
@@ -542,8 +545,8 @@ public class SavegameCache {
         return getPath().resolve("campaign.json");
     }
 
-    public Path getBackupDir() {
-        return ROOT_DIR.resolve("backups");
+    public Path getBackupPath() {
+        return PdxuInstallation.getInstance().getSavegameBackupLocation().resolve(name);
     }
 
     public ObservableSet<Eu4Campaign> getCampaigns() {
@@ -553,6 +556,7 @@ public class SavegameCache {
     public static class Status {
         private Type type;
         private String path;
+
         public Status(Type type, String path) {
             this.type = type;
             this.path = path;

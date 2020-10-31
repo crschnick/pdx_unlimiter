@@ -78,7 +78,7 @@ public class CountryTransformer extends NodeTransformer {
     }
 
     private void createTagHistory(ArrayNode newHistory) {
-        Map<String,Boolean> resolved = new HashMap<>();
+        Map<String, Boolean> resolved = new HashMap<>();
         for (int i = 0; i < newHistory.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) newHistory.getNodes().get(i);
 
@@ -108,7 +108,7 @@ public class CountryTransformer extends NodeTransformer {
         }
     }
 
-    private void iterativeTagHistoryStep(Map<String,Boolean> resolved, ArrayNode newHistory) {
+    private void iterativeTagHistoryStep(Map<String, Boolean> resolved, ArrayNode newHistory) {
         for (int i = 0; i < newHistory.getNodes().size(); i++) {
             KeyValueNode kv = (KeyValueNode) newHistory.getNodes().get(i);
             var tagHistory = Node.getNodeArray(Node.getNodeForKey(kv.getNode(), "tag_history"));

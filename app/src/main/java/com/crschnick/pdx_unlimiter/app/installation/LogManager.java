@@ -3,8 +3,6 @@ package com.crschnick.pdx_unlimiter.app.installation;
 import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
 import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;

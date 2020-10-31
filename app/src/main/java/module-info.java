@@ -22,5 +22,5 @@ module com.crschnick.pdx_unlimiter.app {
     uses net.nikr.dds.DDSImageReaderSpi;
 
     exports com.crschnick.pdx_unlimiter.app;
-    exports com.crschnick.pdx_unlimiter.app.savegame_mgr;
+    exports com.crschnick.pdx_unlimiter.app.savegame;
 }
