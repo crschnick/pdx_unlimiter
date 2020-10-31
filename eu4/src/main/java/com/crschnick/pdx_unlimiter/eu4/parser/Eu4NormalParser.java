@@ -25,6 +25,10 @@ public class Eu4NormalParser extends GamedataParser {
         return new Eu4NormalParser(new byte[0]);
     }
 
+    public static Eu4NormalParser savegameParser() {
+        return new Eu4NormalParser(MAGIC);
+    }
+
     private List<Token> tokenize(String s) {
         List<Token> tokens = new ArrayList<>();
         int prev = 0;

@@ -25,6 +25,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -485,16 +486,21 @@ public class Eu4SavegameManagerStyle {
     }
 
     public static Node createNoCampaignNode() {
-        StackPane p = new StackPane();
-        Button b = new Button("Import EU4 savegames");
+        Label text = new Label("Welcome to the Pdx-Unlimiter!" +
+                " To get started, import your latest EU4 savegame.");
+        StackPane textPane = new StackPane(text);
+        StackPane.setAlignment(textPane, Pos.CENTER);
+
+        Button b = new Button("Import latest EU4 savegame");
         b.setOnMouseClicked(e -> {
-            if (DialogHelper.showImportSavegamesDialog()) {
-                Eu4SavegameImporter.importAllSavegames();
-            }
+            Eu4SavegameImporter.importLatestSavegame();
         });
+        StackPane p = new StackPane();
         p.getChildren().add(b);
         StackPane.setAlignment(b, Pos.CENTER);
-        return p;
+        VBox v = new VBox(textPane, new Label(), p);
+        v.setAlignment(Pos.CENTER);
+        return v;
     }
 
     public static Node createActiveStatusBar(PdxApp app) {

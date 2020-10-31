@@ -32,6 +32,22 @@ public class Eu4Savegame {
         this.meta = meta;
     }
 
+    public static boolean isIronman(Path file) throws IOException {
+        var in = Files.newInputStream(file);
+        boolean isZipped = new ZipInputStream(in).getNextEntry() != null;
+        in.close();
+        if (isZipped) {
+            ZipFile zipFile = new ZipFile(file.toFile());
+            ZipEntry gamestate = zipFile.getEntry("gamestate");
+            var stream = zipFile.getInputStream(gamestate);
+            boolean b = new Eu4IronmanParser(Namespace.EMPTY).validateHeader(stream);
+            stream.close();
+            return b;
+        } else {
+            return false;
+        }
+    }
+
     public static Eu4Savegame fromFile(Path file) throws IOException {
         var in = Files.newInputStream(file);
         boolean isZipped = new ZipInputStream(in).getNextEntry() != null;
