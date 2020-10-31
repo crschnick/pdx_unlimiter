@@ -1,24 +1,30 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import io.sentry.Sentry;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class PdxuInstallation {
 
     private static PdxuInstallation INSTANCE;
+    private Path location;
+    private String version;
+    private boolean production;
+    private Optional<Path> officialAchievementsLocation;
+    private boolean developerMode;
+    private boolean nativeHookEnabled;
+    public PdxuInstallation(Path location, String version, boolean production, Optional<Path> officialAchievementsLocation, boolean developerMode, boolean nativeHookEnabled) {
+        this.location = location;
+        this.version = version;
+        this.production = production;
+        this.officialAchievementsLocation = officialAchievementsLocation;
+        this.developerMode = developerMode;
+        this.nativeHookEnabled = nativeHookEnabled;
+    }
 
     public static boolean init() throws Exception {
         Path appPath = Path.of(System.getProperty("java.home"));
@@ -67,6 +73,10 @@ public class PdxuInstallation {
         INSTANCE.updateLauncher();
     }
 
+    public static PdxuInstallation getInstance() {
+        return INSTANCE;
+    }
+
     private void updateLauncher() throws Exception {
         if (!INSTANCE.getNewLauncherLocation().toFile().exists()) {
             return;
@@ -82,22 +92,6 @@ public class PdxuInstallation {
                 .map(h -> h.info().command().orElse(""))
                 .filter(s -> s.equals(getExecutableLocation().toString()))
                 .count() >= 2;
-    }
-
-    private Path location;
-    private String version;
-    private boolean production;
-    private Optional<Path> achievementsLocation;
-    private boolean developerMode;
-    private boolean nativeHookEnabled;
-
-    public PdxuInstallation(Path location, String version, boolean production, Optional<Path> achievementsLocation, boolean developerMode, boolean nativeHookEnabled) {
-        this.location = location;
-        this.version = version;
-        this.production = production;
-        this.achievementsLocation = achievementsLocation;
-        this.developerMode = developerMode;
-        this.nativeHookEnabled = nativeHookEnabled;
     }
 
     public boolean isNativeHookEnabled() {
@@ -132,8 +126,12 @@ public class PdxuInstallation {
         return location.resolve("app");
     }
 
-    public Path getAchievementsLocation() {
-        return achievementsLocation.orElse(location.resolve("achievements"));
+    public Path getOfficialAchievementsLocation() {
+        return officialAchievementsLocation.orElse(location.resolve("achievements"));
+    }
+
+    public Path getUserAchievementsLocation() {
+        return location.resolve("user_achievements");
     }
 
     public Path getSettingsLocation() {
@@ -144,12 +142,12 @@ public class PdxuInstallation {
         return location.resolve("savegames");
     }
 
-    public String getVersion() {
-        return version;
+    public Path getSavegameBackupLocation() {
+        return location.resolve("savegames_backup");
     }
 
-    public static PdxuInstallation getInstance() {
-        return INSTANCE;
+    public String getVersion() {
+        return version;
     }
 
     public boolean isProduction() {

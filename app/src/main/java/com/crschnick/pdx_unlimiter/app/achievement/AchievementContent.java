@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4NormalParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
@@ -47,7 +47,7 @@ public class AchievementContent {
                 "tributaries", "diplomacy",
                 "$['dependencies'][?(@.subject_type == 'tributary_state' && @.first == %{player})].second", true));
 
-        Map<String,AchievementCondition> eu4Conditions = new HashMap<>();
+        Map<String, AchievementCondition> eu4Conditions = new HashMap<>();
 
         eu4Conditions.put("no_custom_nation", new AchievementCondition(
                 "No custom nation", "countries", "%{custom_nation_count} == 0"));
@@ -76,18 +76,17 @@ public class AchievementContent {
                 "Very hard difficulty", "gamestate", "$.gameplaysettings.setgameplayoptions.difficulty == 'very_hard'"));
 
 
-
         eu4Conditions.put("not_released_vassal", new AchievementCondition(
                 "Not playing as a released vassal", "countries", "$[%{player}]['has_switched_nation'] != true"));
 
-        Map<String,AchievementScorer> eu4Scorers = new HashMap<>();
+        Map<String, AchievementScorer> eu4Scorers = new HashMap<>();
         eu4Scorers.put("years_since_start", new AchievementScorer.ChainedScorer("divide",
                 List.of(new AchievementScorer.ChainedScorer("subtract", List.of(
                         new AchievementScorer.PathValueScorer("meta", "$.date.days_since_beginning", Optional.empty()),
                         new AchievementScorer.PathValueScorer("gamestate", "$.start_date.days_since_beginning", Optional.empty())),
                         Optional.empty()), new AchievementScorer.ValueScorer(365.0)), Optional.of("Years since start date")));
 
-        Map<String,Node> nodes = new HashMap<>();
+        Map<String, Node> nodes = new HashMap<>();
         try {
             nodes.put("eu4.area", Eu4NormalParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("area.txt"))).get());
@@ -117,7 +116,7 @@ public class AchievementContent {
 
     private Map<String, Node> nodes;
 
-    public AchievementContent(List<AchievementVariable.ValueVariable> pathVariables, List<AchievementVariable> variables, Map<String, AchievementCondition> conditions, Map<String, AchievementScorer> scorers, Map<String,Node> nodes) {
+    public AchievementContent(List<AchievementVariable.ValueVariable> pathVariables, List<AchievementVariable> variables, Map<String, AchievementCondition> conditions, Map<String, AchievementScorer> scorers, Map<String, Node> nodes) {
         this.pathVariables = pathVariables;
         this.variables = variables;
         this.conditions = conditions;

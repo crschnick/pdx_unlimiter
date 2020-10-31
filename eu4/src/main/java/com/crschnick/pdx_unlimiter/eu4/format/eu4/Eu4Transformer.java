@@ -18,7 +18,7 @@ public class Eu4Transformer {
     private static NodeTransformer createSettingsTransformer() {
         List<NodeTransformer> t = new ArrayList<>();
 
-        Map<Integer,String> names = new HashMap<>();
+        Map<Integer, String> names = new HashMap<>();
         names.put(0, "difficulty");
         names.put(2, "province_values");
         names.put(31, "limited_country_forming");

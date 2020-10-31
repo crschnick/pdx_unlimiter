@@ -1,8 +1,7 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -21,6 +20,9 @@ import java.util.Optional;
 
 public class Settings {
 
+    private static Settings INSTANCE;
+    private Optional<Path> eu4;
+
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
         if (!file.toFile().exists()) {
@@ -32,24 +34,8 @@ public class Settings {
         INSTANCE.apply();
     }
 
-    private static Settings INSTANCE;
-
     public static Settings getInstance() {
         return INSTANCE;
-    }
-
-    public void setEu4(Optional<Path> eu4) {
-        this.eu4 = eu4;
-    }
-
-    public Settings copy() {
-        Settings c = new Settings();
-        c.eu4 = eu4;
-        return c;
-    }
-
-    public Optional<Path> getEu4() {
-        return eu4;
     }
 
     public static void updateSettings(Settings newS) {
@@ -91,7 +77,19 @@ public class Settings {
         out.close();
     }
 
-    private Optional<Path> eu4;
+    public Settings copy() {
+        Settings c = new Settings();
+        c.eu4 = eu4;
+        return c;
+    }
+
+    public Optional<Path> getEu4() {
+        return eu4;
+    }
+
+    public void setEu4(Optional<Path> eu4) {
+        this.eu4 = eu4;
+    }
 
     public void validate() {
         if (eu4.isPresent() && !new Eu4Installation(eu4.get()).isValid()) {

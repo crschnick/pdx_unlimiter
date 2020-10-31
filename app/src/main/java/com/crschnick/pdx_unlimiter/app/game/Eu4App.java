@@ -1,5 +1,6 @@
-package com.crschnick.pdx_unlimiter.app.installation;
+package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyListener;
 

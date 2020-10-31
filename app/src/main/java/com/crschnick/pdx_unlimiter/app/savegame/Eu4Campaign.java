@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
@@ -21,6 +21,7 @@ public class Eu4Campaign {
     private volatile BooleanProperty isLoaded = new SimpleBooleanProperty(false);
     private volatile ObservableSet<Entry> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
+
     public Eu4Campaign(ObjectProperty<Timestamp> lastPlayed, StringProperty tag, StringProperty name, ObjectProperty<GameDate> date, UUID campaignId) {
         this.lastPlayed = lastPlayed;
         this.tag = tag;

@@ -1,34 +1,29 @@
-package com.crschnick.pdx_unlimiter.app.achievement;
+package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4ImageLoader;
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.app.achievement.Achievement;
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementMatcher;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.util.Duration;
 
-import javax.swing.event.ChangeListener;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class AchievementWindow {
@@ -78,7 +73,7 @@ public class AchievementWindow {
         top.setSpacing(10);
         top.setPadding(new Insets(5, 5, 5, 5));
 
-        javafx.beans.value.ChangeListener<? super Boolean> l = (c,o,n) -> {
+        javafx.beans.value.ChangeListener<? super Boolean> l = (c, o, n) -> {
             sortAchievementList(grid, AchievementManager.getInstance().getSuitableAchievements(
                     entry.getInfo().get().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
         };
@@ -198,7 +193,7 @@ public class AchievementWindow {
             HBox hb = new HBox(text, r, b);
             text.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
             b.setStyle(e.getValue() ?
-                    "-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: #7b7; -fx-border-color: #666666;":
+                    "-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: #7b7; -fx-border-color: #666666;" :
                     "-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: #b77; -fx-border-color: #666666;");
             HBox.setHgrow(r, Priority.ALWAYS);
             box.getChildren().add(hb);
@@ -277,7 +272,7 @@ public class AchievementWindow {
                     m.getTypeStatus().get(m.getValidType().get())));
         } else {
             m.getTypeStatus().forEach(
-                    (t,s) -> box.getChildren().add(createConditionNode("Type: " + t.getName(), s)));
+                    (t, s) -> box.getChildren().add(createConditionNode("Type: " + t.getName(), s)));
         }
         box.getChildren().add(createConditionNode("Eligibility conditions:", m.getEligibleStatus()));
 

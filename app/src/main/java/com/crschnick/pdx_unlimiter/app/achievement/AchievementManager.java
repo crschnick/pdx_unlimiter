@@ -1,10 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4Campaign;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,37 +15,30 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AchievementManager {
 
     private static AchievementManager INSTANCE;
+    private String game;
+    private AchievementContent content;
+    private String checksum;
+    private List<Achievement> achievements = new ArrayList<>();
+    public AchievementManager(String game, AchievementContent content) {
+        this.game = game;
+        this.content = content;
+    }
 
     public static AchievementManager getInstance() {
         return INSTANCE;
     }
 
-    public List<Achievement> getAchievements() {
-        return achievements;
-    }
-
     public static void init() throws IOException {
-        INSTANCE = new AchievementManager(PdxuInstallation.getInstance().getAchievementsLocation().resolve("eu4"),
+        INSTANCE = new AchievementManager("eu4",
                 AchievementContent.EU4);
         INSTANCE.loadData();
         JsonPathConfiguration.init();
-    }
-
-    private Path path;
-    private AchievementContent content;
-    private String checksum;
-    private List<Achievement> achievements = new ArrayList<>();
-
-    public AchievementManager(Path path, AchievementContent content) {
-        this.path = path;
-        this.content = content;
     }
 
     public void refresh() {
@@ -56,7 +51,8 @@ public class AchievementManager {
 
     private void loadData() throws IOException {
         achievements.clear();
-        Files.list(path.resolve("official"))
+        Path official = PdxuInstallation.getInstance().getOfficialAchievementsLocation().resolve(game);
+        Files.list(official)
                 .filter(p -> p.getFileName().toString().endsWith("json"))
                 .forEach(p -> {
                     try {
@@ -65,8 +61,11 @@ public class AchievementManager {
                         ErrorHandler.handleException(e);
                     }
                 });
+        Path c = official.resolve("checksum");
+        checksum = Files.exists(c) ? Files.readString(c) : "none";
 
-        Files.list(path.resolve("custom"))
+        FileUtils.forceMkdir(PdxuInstallation.getInstance().getUserAchievementsLocation().resolve(game).toFile());
+        Files.list(PdxuInstallation.getInstance().getUserAchievementsLocation().resolve(game))
                 .filter(p -> p.getFileName().toString().endsWith("json"))
                 .forEach(p -> {
                     try {
@@ -75,13 +74,9 @@ public class AchievementManager {
                         ErrorHandler.handleException(e);
                     }
                 });
-
-        Path c = path.resolve("official").resolve("checksum");
-        checksum = Files.exists(c) ? Files.readString(c) : "none";
-
     }
 
-    private String calculateChecksum() {
+    private String calculateChecksum() throws IOException {
         MessageDigest d = null;
         try {
             d = MessageDigest.getInstance("MD5");
@@ -89,11 +84,12 @@ public class AchievementManager {
             e.printStackTrace();
         }
         MessageDigest finalD = d;
-        Arrays.stream(path.resolve("official").toFile().listFiles())
-                .filter(f -> f.getName().endsWith("json"))
+        Path official = PdxuInstallation.getInstance().getOfficialAchievementsLocation().resolve(game);
+        Files.list(official)
+                .filter(p -> p.getFileName().toString().endsWith("json"))
                 .forEach(f -> {
                     try {
-                        finalD.update(Files.readAllBytes(f.toPath()));
+                        finalD.update(Files.readAllBytes(f));
                     } catch (IOException e) {
                         ErrorHandler.handleException(e);
                     }
@@ -119,7 +115,7 @@ public class AchievementManager {
         return a.match(loaded);
     }
 
-    public boolean validateChecksum() {
+    public boolean validateChecksum() throws IOException {
         return checksum.equals(calculateChecksum());
     }
 

@@ -4,12 +4,11 @@ import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class EnumNameTransformer extends NodeTransformer {
 
-    private Map<Integer,String> names;
+    private Map<Integer, String> names;
 
     public EnumNameTransformer(Map<Integer, String> names) {
         this.names = names;

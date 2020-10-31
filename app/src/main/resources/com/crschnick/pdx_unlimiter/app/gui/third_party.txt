@@ -2,6 +2,8 @@ Apache Commons IO (https://commons.apache.org/proper/commons-io/) (Apache Licens
 
 Apache Commons Lang3 (https://commons.apache.org/proper/commons-lang/) (Apache License v2.0)
 
+Json-Path (https://github.com/json-path/JsonPath/) (Apache License v2.0)
+
 JNativeHook (https://github.com/kwhat/jnativehook) (GPL v3)
 
 ImageIO.tga (https://github.com/tmyroadctfig/com.realityinteractive.imageio.tga) (LGPL v2.1)
@@ -15,6 +17,10 @@ Sentry (https://github.com/getsentry/sentry-java/) (MIT License)
 SLF4J (http://www.slf4j.org) (MIT License)
   Copyright (c) 2004-2017 QOS.ch
   All rights reserved.
+
+jackson-databind (https://github.com/FasterXML/jackson-databind) (Apache License v2.0)
+
+json-smart-v2 (https://github.com/netplex/json-smart-v2) (Apache License v2.0)
 
 
 

@@ -1,12 +1,12 @@
 package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
-import com.crschnick.pdx_unlimiter.app.achievement.JsonPathConfiguration;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.LogManager;
-import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.*;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.Eu4SavegameManagerStyle;
+import com.crschnick.pdx_unlimiter.app.installation.*;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -29,44 +29,31 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class SavegameManagerApp extends Application {
+public class PdxuApp extends Application {
 
+    private static PdxuApp APP;
     private Image icon;
-    private static SavegameManagerApp APP;
     private BorderPane layout = new BorderPane();
     private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
     private SimpleObjectProperty<Optional<Eu4Campaign.Entry>> selectedSave = new SimpleObjectProperty<>(Optional.empty());
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
-    public static SavegameManagerApp getAPP() {
+    public static PdxuApp getApp() {
         return APP;
-    }
-    public Scene getScene() {
-        return layout.getScene();
     }
 
     public static void main(String[] args) {
         try {
-            if (!PdxuInstallation.init()) {
-                return;
-            }
-            LogManager.init();
-            Settings.init();
-            GameInstallation.initInstallations();
-            SavegameCache.loadData();
-            AchievementManager.init();
-            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-                GlobalScreen.registerNativeHook();
-            }
-
             launch(args);
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
+    }
+
+    public Scene getScene() {
+        return layout.getScene();
     }
 
     private void createStatusThread(BorderPane layout) {
@@ -191,24 +178,40 @@ public class SavegameManagerApp extends Application {
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        APP = this;
-        icon = new Image(SavegameManagerApp.class.getResourceAsStream("logo.png"));
-        primaryStage.getIcons().add(icon);
-
+    private void setup() throws Exception {
+        if (!PdxuInstallation.init()) {
+            return;
+        }
+        LogManager.init();
         ErrorHandler.setStartupCompleted();
 
+        Settings.init();
         if (Settings.getInstance().getEu4().isEmpty()) {
             if (!DialogHelper.showInitialSettings()) {
                 System.exit(0);
             } else {
-                try {
-                    GameInstallation.initInstallations();
-                } catch (Exception e) {
-                    ErrorHandler.handleTerminalException(e);
-                }
+                GameInstallation.initInstallations();
             }
+        }
+
+        GameInstallation.initInstallations();
+        SavegameCache.loadData();
+        AchievementManager.init();
+        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+            GlobalScreen.registerNativeHook();
+        }
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        APP = this;
+        icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
+        primaryStage.getIcons().add(icon);
+
+        try {
+            setup();
+        } catch (Exception e) {
+            ErrorHandler.handleTerminalException(e);
         }
 
         createLayout();
@@ -223,16 +226,12 @@ public class SavegameManagerApp extends Application {
             public void handle(WindowEvent event) {
                 Stage.getWindows().stream()
                         .filter(w -> !w.equals(getScene().getWindow()))
-                        .collect(Collectors.toList()).stream()
+                        .collect(Collectors.toList())
                         .forEach(w -> w.fireEvent(event));
 
                 close(true);
             }
         });
-
-        String css = SavegameManagerApp.class.getResource("style.css").toExternalForm();
-        primaryStage.getScene().getStylesheets().clear();
-        primaryStage.getScene().getStylesheets().add(css);
     }
 
     public Image getIcon() {

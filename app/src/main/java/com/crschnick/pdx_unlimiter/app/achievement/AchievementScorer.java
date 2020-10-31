@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
@@ -14,11 +13,11 @@ import java.util.stream.Collectors;
 
 public interface AchievementScorer {
 
-    static AchievementScorer fromJsonNode(JsonNode node,  AchievementContent content) {
+    static AchievementScorer fromJsonNode(JsonNode node, AchievementContent content) {
         return scorerFromJsonNode(node, content);
     }
 
-    private static List<AchievementScorer> scorersFromJsonNode(JsonNode node,  AchievementContent content) {
+    private static List<AchievementScorer> scorersFromJsonNode(JsonNode node, AchievementContent content) {
         List<AchievementScorer> scorers = new ArrayList<>();
         node.elements().forEachRemaining(n -> {
             scorers.add(scorerFromJsonNode(n, content));
@@ -27,7 +26,7 @@ public interface AchievementScorer {
     }
 
 
-    private static AchievementScorer scorerFromJsonNode(JsonNode n,  AchievementContent content) {
+    private static AchievementScorer scorerFromJsonNode(JsonNode n, AchievementContent content) {
         if (n.isTextual()) {
             if (!content.getScorers().containsKey(n.textValue())) {
                 throw new IllegalArgumentException("Invalid scorer name " + n.textValue());
@@ -39,8 +38,7 @@ public interface AchievementScorer {
         String type = n.required("type").textValue();
         if (type.equals("value")) {
             return new ValueScorer(n.required("value").doubleValue());
-        }
-        else if (type.equals("chain")) {
+        } else if (type.equals("chain")) {
             var operator = n.required("operator").textValue();
             if (!operator.equals("add") && !operator.equals("multiply") && !operator.equals("divide") && !operator.equals("subtract")) {
                 throw new IllegalArgumentException("Invalid operator: " + operator);
@@ -48,20 +46,17 @@ public interface AchievementScorer {
             var name = Optional.ofNullable(n.get("name")).map(JsonNode::textValue);
             return new ChainedScorer(operator, scorersFromJsonNode(n.required("scorers"), content),
                     name);
-        }
-        else if (type.equals("pathValue")) {
+        } else if (type.equals("pathValue")) {
             return new PathValueScorer(
                     n.required("node").textValue(),
                     n.required("path").textValue(),
                     Optional.ofNullable(n.get("name")).map(JsonNode::textValue));
-        }
-        else if (type.equals("pathCount")) {
+        } else if (type.equals("pathCount")) {
             return new PathCountScorer(
                     n.required("node").textValue(),
                     n.required("path").textValue(),
                     Optional.ofNullable(n.get("name")).map(JsonNode::textValue));
-        }
-        else if (type.equals("conditions")) {
+        } else if (type.equals("conditions")) {
             return new ConditionScorer(
                     n.required("value").doubleValue(),
                     AchievementCondition.parseConditionNode(n.required("conditions"), content),

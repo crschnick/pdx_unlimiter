@@ -9,6 +9,21 @@ import java.util.stream.StreamSupport;
 
 public class AchievementCondition {
 
+    private String description;
+    private Optional<String> node;
+    private String filter;
+    public AchievementCondition(String description, String node, String condition) {
+        this.description = description;
+        this.node = Optional.of(node);
+        this.filter = "[?(" + condition + ")]";
+    }
+
+    public AchievementCondition(String description, Optional<String> node, String condition) {
+        this.description = description;
+        this.node = node;
+        this.filter = "[?(" + condition + ")]";
+    }
+
     public static List<AchievementCondition> parseConditionNode(JsonNode node, AchievementContent content) {
         return StreamSupport.stream(node.spliterator(), false)
                 .map(acn -> {
@@ -24,22 +39,6 @@ public class AchievementCondition {
                             acn.required("condition").textValue());
                 })
                 .collect(Collectors.toList());
-    }
-
-    private String description;
-    private Optional<String> node;
-    private String filter;
-
-    public AchievementCondition(String description, String node, String condition) {
-        this.description = description;
-        this.node = Optional.of(node);
-        this.filter = "[?(" + condition + ")]";
-    }
-
-    public AchievementCondition(String description, Optional<String> node, String condition) {
-        this.description = description;
-        this.node = node;
-        this.filter = "[?(" + condition + ")]";
     }
 
     public String getDescription() {

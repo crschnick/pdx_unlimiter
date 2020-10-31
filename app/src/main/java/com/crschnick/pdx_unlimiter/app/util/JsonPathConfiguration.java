@@ -1,7 +1,5 @@
-package com.crschnick.pdx_unlimiter.app.achievement;
+package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
@@ -12,11 +10,8 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -24,23 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JsonPathConfiguration {
-
-    private static final MappingProvider MAPPER = new MappingProvider() {
-
-        @Override
-        public <T> T map(Object o, Class<T> aClass, Configuration configuration) {
-            if (aClass == List.class) {
-                return (T) ((ArrayNode) o).getNodes().stream().map(v -> PROVIDER.unwrap(v)).collect(Collectors.toList());
-            }
-
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T> T map(Object o, TypeRef<T> typeRef, Configuration configuration) {
-            throw new UnsupportedOperationException();
-        }
-    };
 
     private static final JsonProvider PROVIDER = new JsonProvider() {
 
@@ -87,8 +65,7 @@ public class JsonPathConfiguration {
         public int length(Object o) {
             if (o instanceof ValueNode) {
                 return Node.getString((Node) o).length();
-            }
-            else if (!(o instanceof ArrayNode)) {
+            } else if (!(o instanceof ArrayNode)) {
                 throw new IllegalArgumentException();
             }
 
@@ -110,7 +87,7 @@ public class JsonPathConfiguration {
         public Collection<String> getPropertyKeys(Object o) {
             if (isMap(o)) {
                 return Node.getNodeArray((Node) o).stream()
-                        .map(kv -> ((KeyValueNode)kv).getKeyName())
+                        .map(kv -> ((KeyValueNode) kv).getKeyName())
                         .collect(Collectors.toList());
             }
             return List.of();
@@ -184,7 +161,22 @@ public class JsonPathConfiguration {
             return value;
         }
     };
+    private static final MappingProvider MAPPER = new MappingProvider() {
 
+        @Override
+        public <T> T map(Object o, Class<T> aClass, Configuration configuration) {
+            if (aClass == List.class) {
+                return (T) ((ArrayNode) o).getNodes().stream().map(v -> PROVIDER.unwrap(v)).collect(Collectors.toList());
+            }
+
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> T map(Object o, TypeRef<T> typeRef, Configuration configuration) {
+            throw new UnsupportedOperationException();
+        }
+    };
 
     public static void init() {
         Configuration.setDefaults(new Configuration.Defaults() {

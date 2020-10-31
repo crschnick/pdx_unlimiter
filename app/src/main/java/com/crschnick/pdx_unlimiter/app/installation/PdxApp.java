@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.game.Eu4App;
+
 import java.util.Optional;
 
 public class PdxApp {

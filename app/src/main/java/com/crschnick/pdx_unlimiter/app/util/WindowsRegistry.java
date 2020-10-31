@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.installation;
+package com.crschnick.pdx_unlimiter.app.util;
 
 import java.io.IOException;
 import java.io.InputStream;

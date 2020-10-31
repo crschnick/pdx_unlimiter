@@ -1,11 +1,12 @@
-package com.crschnick.pdx_unlimiter.app.savegame_mgr;
+package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementWindow;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
@@ -628,7 +629,7 @@ public class Eu4SavegameManagerStyle {
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
             try {
-                Desktop.getDesktop().open(SavegameCache.ROOT_DIR.toFile());
+                Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getPath().toFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -638,7 +639,7 @@ public class Eu4SavegameManagerStyle {
         MenuItem backups = new MenuItem("Open backup location");
         backups.setOnAction((a) -> {
             try {
-                Desktop.getDesktop().open(SavegameCache.ROOT_DIR.getParent().resolve("backups").resolve("eu4").toFile());
+                Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getBackupPath().toFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -673,11 +674,11 @@ public class Eu4SavegameManagerStyle {
         });
         MenuItem lc = new MenuItem("License");
         lc.setOnAction((a) -> {
-            DialogHelper.showText("License", "license.txt");
+            DialogHelper.showText("License", "License", "license.txt");
         });
         MenuItem tc = new MenuItem("Third party software");
         tc.setOnAction((a) -> {
-            DialogHelper.showText("Third party information", "third_party.txt");
+            DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
         });
         about.getItems().add(wiki);
         about.getItems().add(src);

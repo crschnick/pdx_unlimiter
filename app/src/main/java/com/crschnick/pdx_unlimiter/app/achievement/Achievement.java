@@ -6,8 +6,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +57,7 @@ public class Achievement {
 
         a.variables = new ArrayList<>(content.getVariables());
 
-        Iterable<Map.Entry<String,JsonNode>> v = () -> n.required("variables").fields();
+        Iterable<Map.Entry<String, JsonNode>> v = () -> n.required("variables").fields();
         a.variables.addAll(StreamSupport.stream(v.spliterator(), false)
                 .map(vn -> AchievementVariable.fromNode(vn.getKey(), vn.getValue()))
                 .collect(Collectors.toList()));
@@ -123,6 +121,10 @@ public class Achievement {
         return types;
     }
 
+    public boolean isOfficial() {
+        return official;
+    }
+
     public static class Type {
         private String name;
         private List<AchievementCondition> conditions;
@@ -139,9 +141,5 @@ public class Achievement {
         public List<AchievementCondition> getConditions() {
             return conditions;
         }
-    }
-
-    public boolean isOfficial() {
-        return official;
     }
 }

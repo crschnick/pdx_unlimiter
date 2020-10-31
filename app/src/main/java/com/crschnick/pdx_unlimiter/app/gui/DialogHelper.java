@@ -1,13 +1,10 @@
-package com.crschnick.pdx_unlimiter.app;
+package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementMatcher;
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementWindow;
-import com.crschnick.pdx_unlimiter.app.installation.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Settings;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
@@ -74,7 +71,7 @@ public class DialogHelper {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select non-ironman save");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 save game", "*.eu4"));
-        File named = fileChooser.showOpenDialog(SavegameManagerApp.getAPP().getScene().getWindow());
+        File named = fileChooser.showOpenDialog(PdxuApp.getApp().getScene().getWindow());
         if (named == null) {
             return;
         }
@@ -82,7 +79,7 @@ public class DialogHelper {
         fileChooser = new FileChooser();
         fileChooser.setTitle("Select ironman save");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 save game", "*.eu4"));
-        File unnamed = fileChooser.showOpenDialog(SavegameManagerApp.getAPP().getScene().getWindow());
+        File unnamed = fileChooser.showOpenDialog(PdxuApp.getApp().getScene().getWindow());
         if (unnamed == null) {
             return;
         }
@@ -106,10 +103,10 @@ public class DialogHelper {
     }
 
     private static void setIcon(Alert a) {
-        ((Stage)a.getDialogPane().getScene().getWindow()).getIcons().add(SavegameManagerApp.getAPP().getIcon());
+        ((Stage) a.getDialogPane().getScene().getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
     }
 
-    public static void showText(String title, String file) {
+    public static void showText(String title, String header, String file) {
         String text = null;
         try {
             text = new String(DialogHelper.class.getResourceAsStream(file).readAllBytes());
@@ -119,8 +116,10 @@ public class DialogHelper {
         }
 
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
+        alert.setHeaderText(header);
 
         TextArea textArea = new TextArea();
         textArea.setText(text);
@@ -139,9 +138,11 @@ public class DialogHelper {
     public static boolean showException(Exception e) {
         ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
         ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert alert = new Alert(Alert.AlertType.ERROR, "", foo, bar);
-        alert.setTitle("Error alert");
-        alert.setHeaderText("An exception occured");
+        Alert alert = createAlert();
+        alert.getButtonTypes().addAll(foo, bar);
+        alert.setAlertType(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("An exception occured. If you want to notify the developers of this error, click the 'send error' button. ");
 
         VBox dialogPaneContent = new VBox();
 

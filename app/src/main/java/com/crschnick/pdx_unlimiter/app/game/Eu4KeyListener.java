@@ -1,6 +1,6 @@
-package com.crschnick.pdx_unlimiter.app.installation;
+package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.app.savegame_mgr.Eu4SavegameImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
