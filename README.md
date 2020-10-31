@@ -1,3 +1,7 @@
+## Download
+
+To install the latest release, download the installer from the [releases page](https://github.com/crschnick/pdx_unlimiter/releases/latest).
+
 ## Features
 
 ### Savegame management for EU4
