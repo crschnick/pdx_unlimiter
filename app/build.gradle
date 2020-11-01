@@ -4,7 +4,12 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
-setVersion '1.0-rc3'
+setVersion '1.0-rc4'
+
+if (!System.getProperty("java.runtime.name").contains("OpenJDK")) {
+    println "OpenJDK is required!"
+    return
+}
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
@@ -186,24 +191,19 @@ task writeVersion(type: DefaultTask) {
     }
 }
 
-task copySentryProperties(type: Copy) {
-    into file("${buildDir}/image/bin/")
-    from file("${projectDir}/sentry_prod.properties")
-    rename { f -> return "sentry.properties"}
-}
-
 task copyPdxuProperties(type: Copy) {
     into file("${buildDir}/image/")
     from file("${projectDir}/pdxu_prod.properties")
     rename { f -> return "pdxu.properties"}
 }
 
-createRuntimeImage.finalizedBy([writeVersion, copySentryProperties, copyPdxuProperties])
+createRuntimeImage.finalizedBy([writeVersion, copyPdxuProperties])
 
 task createDist(type: Zip, dependsOn: createRuntimeImage) {
     destinationDirectory = buildDir
     archivesBaseName = "pdx_unlimiter"
     archiveAppendix = "windows"
+    archiveVersion = ""
     from "${buildDir}/image"
 }
 

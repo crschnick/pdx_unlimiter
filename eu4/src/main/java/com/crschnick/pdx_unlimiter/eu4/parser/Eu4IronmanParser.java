@@ -77,10 +77,13 @@ public class Eu4IronmanParser extends GamedataParser {
         }
     }
 
+
     @Override
     public List<Token> tokenize(InputStream stream) throws IOException {
         byte[] bytes = stream.readAllBytes();
         int current = 0;
+        int lastSleep = 0;
+        int currentToken = 0;
         List<Token> tokens = new ArrayList<>();
         do {
             byte[] next = Arrays.copyOfRange(bytes, current, current + 2);
@@ -153,6 +156,15 @@ public class Eu4IronmanParser extends GamedataParser {
                 int numberInt = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 String id = Integer.toString(numberInt);
                 tokens.add(new ValueToken(id));
+            }
+
+            currentToken++;
+            if (currentToken - lastSleep > TOKEN_SLEEP_INTERVAL) {
+                try {
+                    Thread.sleep(SLEEP_TIME);
+                } catch (InterruptedException e) {
+                }
+                lastSleep = currentToken;
             }
 
         } while (current < bytes.length);
