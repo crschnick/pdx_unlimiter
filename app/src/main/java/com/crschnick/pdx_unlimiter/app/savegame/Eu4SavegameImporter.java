@@ -1,17 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
-import javafx.beans.property.BooleanProperty;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class Eu4SavegameImporter {
 
@@ -34,7 +31,7 @@ public class Eu4SavegameImporter {
                     .sorted(Comparator.reverseOrder())
                     .findFirst();
             latest.ifPresent(p -> {
-                SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p);
+                new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p)).start();
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,20 +40,14 @@ public class Eu4SavegameImporter {
     }
 
     public static void importAllSavegames() {
-        new Thread(() -> {
-            Eu4SavegameImporter.importAllSavegames(GameInstallation.EU4.getSaveDirectory(), (p) -> {
-                SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p);
-            }, PdxuApp.getApp().runningProperty());
-        }).start();
-
-    }
-
-    private static void importAllSavegames(Path directory, Consumer<Path> consumer, BooleanProperty running) {
-        Arrays.stream(directory.toFile().listFiles()).filter(f -> !f.isDirectory()).forEach((f) -> {
-            if (!running.get()) {
-                return;
-            }
-            consumer.accept(f.toPath());
-        });
+        try {
+            Files.list(GameInstallation.EU4.getSaveDirectory())
+                    .filter(p -> !Files.isDirectory(p))
+                    .forEach(p -> {
+                        new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p)).start();
+                    });
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 }
