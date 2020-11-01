@@ -52,9 +52,9 @@ public class Settings {
 
     private static Settings loadConfig(Path file) throws Exception {
         JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
-        JsonNode i = node.get("installations");
+        JsonNode i = node.required("installations");
         Settings s = new Settings();
-        s.eu4 = Optional.ofNullable(i.get("eu4")).map(n -> Paths.get(n.textValue()));
+        s.eu4 = Optional.ofNullable(i.required("eu4")).map(n -> Paths.get(n.textValue()));
         return s;
     }
 

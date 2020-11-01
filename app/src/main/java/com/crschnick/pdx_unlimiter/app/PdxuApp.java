@@ -180,15 +180,14 @@ public class PdxuApp extends Application {
 
     private void setup() throws Exception {
         if (!PdxuInstallation.init()) {
-            return;
+            System.exit(1);
         }
         LogManager.init();
-        ErrorHandler.setStartupCompleted();
-
+        ErrorHandler.init();
         Settings.init();
         if (Settings.getInstance().getEu4().isEmpty()) {
             if (!DialogHelper.showInitialSettings()) {
-                System.exit(0);
+                System.exit(1);
             } else {
                 GameInstallation.initInstallations();
             }
@@ -207,20 +206,6 @@ public class PdxuApp extends Application {
         APP = this;
         icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
         primaryStage.getIcons().add(icon);
-
-        try {
-            setup();
-        } catch (Exception e) {
-            ErrorHandler.handleTerminalException(e);
-        }
-
-        createLayout();
-
-        primaryStage.setTitle("EU4 Savegame Manager");
-        Scene scene = new Scene(layout, 1000, 800);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        setUserAgentStylesheet(STYLESHEET_CASPIAN);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
@@ -232,6 +217,20 @@ public class PdxuApp extends Application {
                 close(true);
             }
         });
+        primaryStage.setTitle("EU4 Savegame Manager");
+
+        try {
+            setup();
+        } catch (Exception e) {
+            ErrorHandler.handleTerminalException(e);
+        }
+
+        createLayout();
+
+        Scene scene = new Scene(layout, 1000, 800);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        setUserAgentStylesheet(STYLESHEET_CASPIAN);
     }
 
     public Image getIcon() {

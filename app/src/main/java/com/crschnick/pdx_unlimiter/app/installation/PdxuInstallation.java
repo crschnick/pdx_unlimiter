@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,6 +64,7 @@ public class PdxuInstallation {
         INSTANCE = new PdxuInstallation(installDir, v, prod, achievementsLocation, developerMode, nativeHook);
 
         if (INSTANCE.isAlreadyRunning()) {
+            LoggerFactory.getLogger(PdxuInstallation.class).info("A Pdxu instance is already running. Closing ...");
             return false;
         }
 

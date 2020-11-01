@@ -485,6 +485,10 @@ public class SavegameCache {
     }
 
     public synchronized void importSavegame(Optional<String> name, Path file) {
+        new Thread(() -> importSingleSavegame(name, file)).start();
+    }
+
+    private void importSingleSavegame(Optional<String> name, Path file) {
         status.setValue(Optional.of(new Status(Status.Type.IMPORTING,
                 GameInstallation.EU4.getUserDirectory().relativize(file).toString())));
 

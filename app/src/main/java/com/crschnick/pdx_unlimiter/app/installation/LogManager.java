@@ -48,8 +48,6 @@ public class LogManager {
         l.info("Initializing LogManager");
         l.info("Working directory: " + System.getProperty("user.dir"));
 
-        Sentry.init();
-
         INSTANCE = new LogManager();
     }
 }
