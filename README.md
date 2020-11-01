@@ -1,6 +1,8 @@
 ## Download
 
 To install the latest release, download the installer from the [releases page](https://github.com/crschnick/pdx_unlimiter/releases/latest).
+Note that there might be some issues with Windows SmartScreen, since the installer is not digitally signed.
+If you are facing these issues, click on "More info" and then "Run anyway".
 
 ## Features
 
@@ -19,7 +21,8 @@ All savegames can be also launched directly from within the Pdx-Unlimiter withou
 
 If you are ingame and the Pdx-Unlimiter is running, you can press (CTRL+SHIFT+I) at any time to import the latest saved savegame.
 If you want to revert to a previously imported savegame, you can press (CTRL+SHIFT+K) to quickly close EU4.
-This kind of manual savegame management for ironman games allows you to easily revert to previous saves, i.e. to savescum, which is kinda necessary for hard achievements.
+This kind of manual savegame management for ironman games allows you to easily revert to previous saves,
+i.e. to savescum, which is kinda necessary for hard achievements.
 
 ### Custom achievements and challenges
 
