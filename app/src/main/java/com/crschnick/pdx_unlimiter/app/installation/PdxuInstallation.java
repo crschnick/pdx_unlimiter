@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
@@ -12,14 +13,14 @@ import java.util.Properties;
 public class PdxuInstallation {
 
     private static PdxuInstallation INSTANCE;
-    private Path location;
+    private Path installLocation;
     private String version;
     private boolean production;
     private Optional<Path> officialAchievementsLocation;
     private boolean developerMode;
     private boolean nativeHookEnabled;
-    public PdxuInstallation(Path location, String version, boolean production, Optional<Path> officialAchievementsLocation, boolean developerMode, boolean nativeHookEnabled) {
-        this.location = location;
+    public PdxuInstallation(Path installLocation, String version, boolean production, Optional<Path> officialAchievementsLocation, boolean developerMode, boolean nativeHookEnabled) {
+        this.installLocation = installLocation;
         this.version = version;
         this.production = production;
         this.officialAchievementsLocation = officialAchievementsLocation;
@@ -106,52 +107,84 @@ public class PdxuInstallation {
         return nativeHookEnabled;
     }
 
-    public Path getLocation() {
-        return location;
-    }
-
     public Path getExecutableLocation() {
-        return getAppLocation().resolve("bin").resolve("java.exe");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return getAppLocation().resolve("bin").resolve("java.exe");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return getAppLocation().resolve("bin").resolve("java");
+        } else {
+            return getAppLocation().resolve("bin").resolve("java.exe");
+        }
     }
 
     public Path getLauncherLocation() {
-        return location.resolve("launcher");
+        return installLocation.resolve("launcher");
     }
 
     public Path getOldLauncherLocation() {
-        return location.resolve("launcher_old");
+        return installLocation.resolve("launcher_old");
     }
 
     public Path getNewLauncherLocation() {
-        return location.resolve("launcher_new");
+        return installLocation.resolve("launcher_new");
     }
 
     public Path getLogsLocation() {
-        return location.resolve("logs");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return installLocation.resolve("logs");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return Path.of("var", "logs", "pdx-unlimiter");
+        } else {
+            return installLocation.resolve("logs");
+        }
     }
 
     public Path getAppLocation() {
-        return location.resolve("app");
+        return installLocation.resolve("app");
     }
 
     public Path getOfficialAchievementsLocation() {
-        return officialAchievementsLocation.orElse(location.resolve("achievements"));
+        return officialAchievementsLocation.orElse(installLocation.resolve("achievements"));
     }
 
     public Path getUserAchievementsLocation() {
-        return location.resolve("user_achievements");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return installLocation.resolve("user_achievements");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return Path.of(System.getProperty("user.home"),"pdx-unlimiter", "user_achievements");
+        } else {
+            return installLocation.resolve("user_achievements");
+        }
     }
 
     public Path getSettingsLocation() {
-        return location.resolve("settings");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return installLocation.resolve("settings");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return Path.of(System.getProperty("user.home"), ".config", "pdx-unlimiter");
+        } else {
+            return installLocation.resolve("settings");
+        }
     }
 
     public Path getSavegameLocation() {
-        return location.resolve("savegames");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return installLocation.resolve("savegames");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return Path.of(System.getProperty("user.home"), "pdx-unlimiter", "savegames");
+        } else {
+            return installLocation.resolve("savegames");
+        }
     }
 
     public Path getSavegameBackupLocation() {
-        return location.resolve("savegames_backup");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return installLocation.resolve("savegames_backup");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return Path.of(System.getProperty("user.home"), "pdx-unlimiter", "savegames_backup");
+        } else {
+            return installLocation.resolve("savegames_backup");
+        }
     }
 
     public String getVersion() {
