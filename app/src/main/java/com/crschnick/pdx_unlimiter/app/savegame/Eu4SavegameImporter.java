@@ -25,6 +25,10 @@ public class Eu4SavegameImporter {
     }
 
     public static void importLatestSavegame() {
+        if (!Files.exists(GameInstallation.EU4.getSaveDirectory())) {
+            return;
+        }
+
         try {
             Optional<Path> latest = Files.list(GameInstallation.EU4.getSaveDirectory())
                     .sorted(Comparator.comparingLong(p -> p.toFile().lastModified()))

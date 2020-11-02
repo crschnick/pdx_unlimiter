@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 public class Eu4Installation extends GameInstallation {
 
+    private Path executable;
     private Path userDirectory;
     private GameVersion version;
     private Map<String, String> countryNames = new HashMap<>();
@@ -33,6 +34,16 @@ public class Eu4Installation extends GameInstallation {
 
     public Eu4Installation(Path path) {
         super("Europa Universalis IV", path);
+        if (SystemUtils.IS_OS_WINDOWS) {
+            executable = getPath().resolve("eu4.exe");
+        }
+        else if (SystemUtils.IS_OS_LINUX) {
+            executable = getPath().resolve("eu4");
+        }
+    }
+
+    public Path getExecutable() {
+        return executable;
     }
 
     public void init() throws Exception {
@@ -98,9 +109,9 @@ public class Eu4Installation extends GameInstallation {
     @Override
     public void start() {
         try {
-            Runtime.getRuntime().exec(getPath().resolve("eu4.exe").toString() + " -continuelastsave");
+            new ProcessBuilder().command(executable.toString(), "-continuelastsave").start();
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -120,7 +131,7 @@ public class Eu4Installation extends GameInstallation {
 
     @Override
     public boolean isValid() {
-        return getPath().resolve("eu4.exe").toFile().exists();
+        return Files.isRegularFile(executable);
     }
 
     public Path getUserDirectory() {

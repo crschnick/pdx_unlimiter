@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.Eu4App;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 
 import java.util.Optional;
 
@@ -14,7 +15,9 @@ public class PdxApp {
                 if (!ACTIVE_APP.isPresent()) {
                     Optional<ProcessHandle> h = ProcessHandle
                             .allProcesses()
-                            .filter(p -> p.info().command().map(c -> c.equals("eu4.exe")).orElse(false))
+                            .filter(p -> p.info().command()
+                                    .map(c -> c.contains(GameInstallation.EU4.getExecutable().toString()))
+                                    .orElse(false))
                             .findFirst();
                     if (h.isPresent()) {
                         ACTIVE_APP = Optional.of(new Eu4App(h.get()));

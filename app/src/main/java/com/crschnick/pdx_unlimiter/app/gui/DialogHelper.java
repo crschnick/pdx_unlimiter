@@ -155,8 +155,6 @@ public class DialogHelper {
         TextArea textArea = new TextArea();
         textArea.setText(stackTrace);
         textArea.editableProperty().setValue(false);
-        textArea.setMinWidth(1000);
-        textArea.setMinHeight(800);
 
         dialogPaneContent.getChildren().addAll(label, textArea);
 
