@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,8 +57,13 @@ public class Eu4Installation extends GameInstallation {
         String value = Optional.ofNullable(node.get("gameDataPath"))
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in EU4 launcher config file"))
                 .textValue();
-        if (value.contains("%USER_DOCUMENTS%")) {
-             value = value.replace("%USER_DOCUMENTS%", Paths.get(System.getProperty("user.home"), "Documents").toString());
+        if (SystemUtils.IS_OS_WINDOWS) {
+             value = value.replace("%USER_DOCUMENTS%",
+                     Paths.get(System.getProperty("user.home"), "Documents").toString());
+        }
+        else if (SystemUtils.IS_OS_LINUX) {
+            value = value.replace("$LINUX_DATA_HOME",
+                    Paths.get(System.getProperty("user.home"), ".local", "share").toString());
         }
 
         return Path.of(value);
