@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import io.sentry.Sentry;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 public class ErrorHandler {
@@ -19,7 +20,8 @@ public class ErrorHandler {
         System.setProperty("sentry.uncaught.handler.enabled", "true");
         if (PdxuInstallation.getInstance().isProduction()) {
             System.setProperty("sentry.environment", "production");
-            System.setProperty("sentry.version", PdxuInstallation.getInstance().getVersion());
+            System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion()
+                    + ", " + System.getProperty("os.name"));
         } else {
             System.setProperty("sentry.environment", "dev");
         }
