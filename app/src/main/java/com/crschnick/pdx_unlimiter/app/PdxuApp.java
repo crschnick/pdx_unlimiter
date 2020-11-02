@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4SavegameManagerStyle;
 import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,6 +17,9 @@ import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -23,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.jnativehook.GlobalScreen;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -151,6 +156,28 @@ public class PdxuApp extends Application {
             });
             setCampainList(layout);
         }
+
+
+        layout.setOnDragOver(event -> {
+                if (event.getGestureSource() != layout
+                        && event.getDragboard().hasFiles()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+
+        layout.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            for (File f : db.getFiles()) {
+                if (FileImporter.importFile(f.toPath())) {
+                    success = true;
+                }
+            }
+
+            event.setDropCompleted(success);
+            event.consume();
+        });
     }
 
     public void save() {
