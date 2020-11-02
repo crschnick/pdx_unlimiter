@@ -4,6 +4,8 @@ import com.crschnick.pdx_unlimiter.app.util.WindowsRegistry;
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -32,6 +34,9 @@ public abstract class GameInstallation {
             } else {
                 steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
             }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toString();
+            steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
         }
 
         if (!steamDir.isPresent()) {
