@@ -39,6 +39,10 @@ public class Eu4Savegame {
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
             ZipEntry gamestate = zipFile.getEntry("gamestate");
+            if (gamestate == null) {
+                return false;
+            }
+
             var stream = zipFile.getInputStream(gamestate);
             boolean b = new Eu4IronmanParser(Namespace.EMPTY).validateHeader(stream);
             stream.close();
