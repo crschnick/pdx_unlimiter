@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
@@ -46,12 +47,13 @@ public class DialogHelper {
         val.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-                    try {
-                        textArea.setText(Files.readString(
-                                PdxuInstallation.getInstance().getLogsLocation().resolve("pdxu.log")));
-                        e.consume();
-                    } catch (IOException ex) {
-                        ErrorHandler.handleException(ex);
+                    if (LogManager.getInstance().getLogFile().isPresent()) {
+                        try {
+                            textArea.setText(Files.readString(LogManager.getInstance().getLogFile().get()));
+                            e.consume();
+                        } catch (IOException ex) {
+                            ErrorHandler.handleException(ex);
+                        }
                     }
                 }
         );

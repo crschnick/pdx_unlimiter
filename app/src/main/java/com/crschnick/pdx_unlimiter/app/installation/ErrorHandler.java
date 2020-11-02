@@ -28,15 +28,16 @@ public class ErrorHandler {
         Sentry.init();
     }
 
-    private static void handleExcetionWithoutPlatform(Exception ex) {
+    private static void handleExcetionWithoutInit(Exception ex) {
         ex.printStackTrace();
         LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
+        Sentry.init("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
         Sentry.capture(ex);
     }
 
     public static void handleException(Exception ex) {
         if (!startupCompleted) {
-            handleExcetionWithoutPlatform(ex);
+            handleExcetionWithoutInit(ex);
         }
 
         Runnable run = () -> {
@@ -54,7 +55,7 @@ public class ErrorHandler {
 
     public static void handleTerminalException(Exception ex) {
         if (!startupCompleted) {
-            handleExcetionWithoutPlatform(ex);
+            handleExcetionWithoutInit(ex);
         }
 
         Runnable run = () -> {

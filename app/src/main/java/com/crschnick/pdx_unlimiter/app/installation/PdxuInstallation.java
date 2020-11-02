@@ -31,7 +31,7 @@ public class PdxuInstallation {
         Path appPath = Path.of(System.getProperty("java.home"));
         boolean prod = appPath.toFile().getName().equals("app")
                 || appPath.toFile().getName().equals("image");
-        String v;
+        String v = "unknown";
         Path installDir;
         Optional<Path> achievementsLocation = Optional.empty();
         boolean developerMode = false;
@@ -50,6 +50,12 @@ public class PdxuInstallation {
                     .map(val -> Path.of(val.toString()))
                     .filter(val -> val.isAbsolute() && Files.exists(val))
                     .orElseThrow(() -> new NoSuchElementException("Invalid installDir for dev build"));
+
+
+            boolean simulateProd = Optional.ofNullable(props.get("simulateProduction"))
+                    .map(val -> Boolean.parseBoolean(val.toString()))
+                    .orElse(false);
+            prod = simulateProd;
         }
         achievementsLocation = Optional.ofNullable(props.get("achievementDir"))
                 .map(val -> Path.of(val.toString()))

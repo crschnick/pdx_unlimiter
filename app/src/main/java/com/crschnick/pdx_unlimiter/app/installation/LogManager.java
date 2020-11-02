@@ -1,18 +1,25 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import io.sentry.Sentry;
-import io.sentry.SentryOptions;
 import org.apache.commons.io.FileUtils;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class LogManager {
 
     private static LogManager INSTANCE;
+
+    public LogManager(Optional<Path> logFile) {
+        this.logFile = logFile;
+    }
 
     private static void setLogLevels(boolean debug) {
         if (debug) {
@@ -35,8 +42,12 @@ public class LogManager {
 
         FileUtils.forceMkdir(i.getLogsLocation().toFile());
 
+        Optional<Path> logFile = Optional.empty();
         if (i.isProduction()) {
-            System.setProperty("org.slf4j.simpleLogger.logFile", i.getLogsLocation().resolve("pdxu.log").toString());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
+                    .withZone(ZoneId.systemDefault());
+            logFile = Optional.of(i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log"));
+            System.setProperty("org.slf4j.simpleLogger.logFile", logFile.get().toString());
         }
         setLogLevels(i.isDeveloperMode());
 
@@ -46,8 +57,17 @@ public class LogManager {
 
         Logger l = LoggerFactory.getLogger(LogManager.class);
         l.info("Initializing LogManager");
-        l.info("Working directory: " + System.getProperty("user.dir"));
 
-        INSTANCE = new LogManager();
+        INSTANCE = new LogManager(logFile);
+    }
+
+    private Optional<Path> logFile;
+
+    public Optional<Path> getLogFile() {
+        return logFile;
+    }
+
+    public static LogManager getInstance() {
+        return INSTANCE;
     }
 }
