@@ -24,6 +24,7 @@ java {
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
     mainClass = 'com.crschnick.pdx_unlimiter.app.PdxuApp'
+    applicationDefaultJvmArgs = ["-Djdk.gtk.version=2" ]
 }
 
 javafx {
