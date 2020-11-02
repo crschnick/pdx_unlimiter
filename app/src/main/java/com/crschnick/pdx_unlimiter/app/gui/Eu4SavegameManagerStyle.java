@@ -530,7 +530,11 @@ public class Eu4SavegameManagerStyle {
         return pane;
     }
 
-    public static Node createInactiveStatusBar(ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, ObjectProperty<Optional<Eu4Campaign.Entry>> save, Consumer<Eu4Campaign.Entry> onLaunch) {
+    public static Node createInactiveStatusBar(
+            ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
+            ObjectProperty<Optional<Eu4Campaign.Entry>> save,
+            Consumer<Eu4Campaign.Entry> onExport,
+            Consumer<Eu4Campaign.Entry> onLaunch) {
 
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-border-width: 0; -fx-background-color: #555555;");
@@ -547,6 +551,11 @@ public class Eu4SavegameManagerStyle {
         Label status = new Label("Status: Stopped");
         status.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setCenter(status);
+
+        Button e = new Button("Export");
+        e.setOnMouseClicked((m) -> {
+            onExport.accept(save.get().get());
+        });
 
         Button b = new Button("Launch");
         b.setOnMouseClicked((m) -> {
@@ -567,7 +576,9 @@ public class Eu4SavegameManagerStyle {
         };
         save.addListener(l);
         l.changed(save, save.get(), save.get());
-        pane.setRight(b);
+        HBox buttons = new HBox(e, b);
+        buttons.setSpacing(10);
+        pane.setRight(buttons);
 
         return pane;
     }

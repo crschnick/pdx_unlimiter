@@ -15,12 +15,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.commons.io.FileUtils;
@@ -62,23 +64,35 @@ public class PdxuApp extends Application {
     }
 
     private void createStatusThread(BorderPane layout) {
+        Consumer<Eu4Campaign.Entry> export = (e) -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialFileName(SavegameCache.EU4_CACHE.getFileName(e));
+            fileChooser.setInitialDirectory(GameInstallation.EU4.getSaveDirectory().toFile());
+            fileChooser.setTitle("Select export location");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 savegame", "*.eu4"));
+            File file = fileChooser.showSaveDialog(getScene().getWindow());
+            if (file != null) {
+                SavegameCache.EU4_CACHE.exportSavegame(e, file.toPath());
+            }
+        };
+
         Consumer<Eu4Campaign.Entry> launch = (e) -> {
-            Path srcPath = SavegameCache.EU4_CACHE.getPath(e).resolve("savegame.eu4");
-            Path destPath = GameInstallation.EU4.getSaveDirectory().resolve("savegame.eu4");
-            try {
-                FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
-                destPath.toFile().setLastModified(System.currentTimeMillis());
-                GameInstallation.EU4.writeLaunchConfig(e, GameInstallation.EU4.getUserDirectory().relativize(destPath));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            Optional<Path> p = SavegameCache.EU4_CACHE.exportSavegame(e,
+                    GameInstallation.EU4.getSaveDirectory().resolve(SavegameCache.EU4_CACHE.getFileName(e)));
+            if (p.isPresent()) {
+                try {
+                    GameInstallation.EU4.writeLaunchConfig(e, GameInstallation.EU4.getUserDirectory().relativize(p.get()));
+                } catch (IOException ioException) {
+                    ErrorHandler.handleException(ioException);
+                }
             }
             GameInstallation.EU4.start();
             selectedCampaign.get().get().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
-
         };
 
         Thread t = new Thread(() -> {
-            Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedCampaign, selectedSave, launch)));
+            Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(
+                    selectedCampaign, selectedSave, export, launch)));
 
             Optional<PdxApp> oldApp = Optional.empty();
             while (true) {
@@ -88,7 +102,8 @@ public class PdxuApp extends Application {
                     if (app.isPresent()) {
                         Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createActiveStatusBar(app.get())));
                     } else {
-                        Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(selectedCampaign, selectedSave, launch)));
+                        Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(
+                                selectedCampaign, selectedSave, export, launch)));
                     }
                     oldApp = app;
                 }
@@ -215,8 +230,6 @@ public class PdxuApp extends Application {
         if (Settings.getInstance().getEu4().isEmpty()) {
             if (!DialogHelper.showInitialSettings()) {
                 System.exit(1);
-            } else {
-                GameInstallation.initInstallations();
             }
         }
 
