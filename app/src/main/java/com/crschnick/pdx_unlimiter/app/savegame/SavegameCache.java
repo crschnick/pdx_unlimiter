@@ -53,13 +53,19 @@ public class SavegameCache {
         addChangeListeners();
     }
 
+    private void init() throws IOException {
+        FileUtils.forceMkdir(getPath().toFile());
+        FileUtils.forceMkdir(getBackupPath().toFile());
+        if (getDataFilePath().toFile().exists()) {
+            InputStream in = Files.newInputStream(getDataFilePath());
+            importDataFromConfig(in);
+            in.close();
+        }
+    }
+
     public static void loadData() throws IOException {
         for (SavegameCache cache : CACHES) {
-            if (cache.getDataFilePath().toFile().exists()) {
-                InputStream in = Files.newInputStream(cache.getDataFilePath());
-                cache.importDataFromConfig(in);
-                in.close();
-            }
+            cache.init();
         }
     }
 
