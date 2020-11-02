@@ -490,6 +490,21 @@ public class SavegameCache {
         return Optional.empty();
     }
 
+    public synchronized String getFileName(Eu4Campaign.Entry e) {
+        return e.getCampaign().getName() + " " + e.getName() + ".eu4";
+    }
+
+    public synchronized Optional<Path> exportSavegame(Eu4Campaign.Entry e, Path destPath) {
+        Path srcPath = getPath(e).resolve("savegame.eu4");
+        try {
+            FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
+            return Optional.of(destPath);
+        } catch (IOException ioException) {
+            ErrorHandler.handleException(ioException);
+        }
+        return Optional.empty();
+    }
+
     public synchronized void importSavegame(Optional<String> name, Path file) {
         status.setValue(Optional.of(new Status(Status.Type.IMPORTING,
                 GameInstallation.EU4.getUserDirectory().relativize(file).toString())));
