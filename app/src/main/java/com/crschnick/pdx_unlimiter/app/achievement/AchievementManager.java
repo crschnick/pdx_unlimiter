@@ -52,6 +52,8 @@ public class AchievementManager {
     private void loadData() throws IOException {
         achievements.clear();
         Path official = PdxuInstallation.getInstance().getOfficialAchievementsLocation().resolve(game);
+        FileUtils.forceMkdir(official.toFile());
+
         Files.list(official)
                 .filter(p -> p.getFileName().toString().endsWith("json"))
                 .forEach(p -> {
