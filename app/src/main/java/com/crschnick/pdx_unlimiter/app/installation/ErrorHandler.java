@@ -14,24 +14,26 @@ public class ErrorHandler {
     public static void init() {
         startupCompleted = true;
 
+        if (!PdxuInstallation.getInstance().isProduction()) {
+            return;
+        }
+
         System.setProperty("sentry.dsn", "https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
         System.setProperty("sentry.stacktrace.hidecommon", "false");
         System.setProperty("sentry.stacktrace.app.packages", "");
         System.setProperty("sentry.uncaught.handler.enabled", "true");
-        if (PdxuInstallation.getInstance().isProduction()) {
-            System.setProperty("sentry.environment", "production");
-            System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion()
-                    + ", " + System.getProperty("os.name"));
-        } else {
-            System.setProperty("sentry.environment", "dev");
-        }
+        System.setProperty("sentry.environment", "production");
+        System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion()
+                + ", " + System.getProperty("os.name"));
         Sentry.init();
     }
 
     private static void handleExcetionWithoutInit(Exception ex) {
         ex.printStackTrace();
         LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
-        Sentry.init("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
+        if (PdxuInstallation.getInstance().isProduction()) {
+            Sentry.init("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
+        }
         Sentry.capture(ex);
     }
 
@@ -42,8 +44,10 @@ public class ErrorHandler {
 
         Runnable run = () -> {
             LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
-            if (DialogHelper.showException(ex)) {
-                Sentry.capture(ex);
+            if (PdxuInstallation.getInstance().isProduction()) {
+                if (DialogHelper.showException(ex)) {
+                    Sentry.capture(ex);
+                }
             }
         };
         if (Platform.isFxApplicationThread()) {

@@ -19,13 +19,18 @@ public class PdxuInstallation {
     private Optional<Path> officialAchievementsLocation;
     private boolean developerMode;
     private boolean nativeHookEnabled;
-    public PdxuInstallation(Path installLocation, String version, boolean production, Optional<Path> officialAchievementsLocation, boolean developerMode, boolean nativeHookEnabled) {
+    private Optional<Path> dataDir;
+
+    public PdxuInstallation(Path installLocation, String version, boolean production,
+                            Optional<Path> officialAchievementsLocation, boolean developerMode,
+                            boolean nativeHookEnabled, Optional<Path> dataDir) {
         this.installLocation = installLocation;
         this.version = version;
         this.production = production;
         this.officialAchievementsLocation = officialAchievementsLocation;
         this.developerMode = developerMode;
         this.nativeHookEnabled = nativeHookEnabled;
+        this.dataDir = dataDir;
     }
 
     public static boolean init() throws Exception {
@@ -37,6 +42,7 @@ public class PdxuInstallation {
         Optional<Path> achievementsLocation = Optional.empty();
         boolean developerMode = false;
         boolean nativeHook = true;
+        Optional<Path> dataDir;
 
         Properties props = new Properties();
         if (prod) {
@@ -67,8 +73,12 @@ public class PdxuInstallation {
         nativeHook = Optional.ofNullable(props.get("enableJNativeHook"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
+        dataDir = Optional.ofNullable(props.get("dataDir"))
+                .map(val -> Path.of(val.toString()))
+                .filter(Path::isAbsolute);
 
-        INSTANCE = new PdxuInstallation(installDir, v, prod, achievementsLocation, developerMode, nativeHook);
+
+        INSTANCE = new PdxuInstallation(installDir, v, prod, achievementsLocation, developerMode, nativeHook, dataDir);
 
         if (INSTANCE.isAlreadyRunning()) {
             LoggerFactory.getLogger(PdxuInstallation.class).info("A Pdxu instance is already running. Closing ...");
@@ -76,6 +86,20 @@ public class PdxuInstallation {
         }
 
         return true;
+    }
+
+    private Path getDataLocation() {
+        if (dataDir.isPresent()) {
+            return dataDir.get();
+        }
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return Path.of(System.getProperty("user.home"),"Pdx-Unlimiter");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return Path.of(System.getProperty("user.home"),"pdx-unlimiter");
+        } else {
+            return installLocation;
+        }
     }
 
     public static void shutdown() throws Exception {
@@ -148,43 +172,19 @@ public class PdxuInstallation {
     }
 
     public Path getUserAchievementsLocation() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return installLocation.resolve("user_achievements");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return Path.of(System.getProperty("user.home"),"pdx-unlimiter", "user_achievements");
-        } else {
-            return installLocation.resolve("user_achievements");
-        }
+        return getDataLocation().resolve("user_achievements");
     }
 
     public Path getSettingsLocation() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return installLocation.resolve("settings");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return Path.of(System.getProperty("user.home"), ".config", "pdx-unlimiter");
-        } else {
-            return installLocation.resolve("settings");
-        }
+        return getDataLocation().resolve("settings");
     }
 
     public Path getSavegameLocation() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return installLocation.resolve("savegames");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return Path.of(System.getProperty("user.home"), "pdx-unlimiter", "savegames");
-        } else {
-            return installLocation.resolve("savegames");
-        }
+        return getDataLocation().resolve("savegames");
     }
 
     public Path getSavegameBackupLocation() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return installLocation.resolve("savegames_backup");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return Path.of(System.getProperty("user.home"), "pdx-unlimiter", "savegames_backup");
-        } else {
-            return installLocation.resolve("savegames_backup");
-        }
+        return getDataLocation().resolve("savegames_backup");
     }
 
     public String getVersion() {
