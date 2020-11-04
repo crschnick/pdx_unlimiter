@@ -1,12 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
 
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
@@ -31,11 +32,7 @@ public class Eu4ImageLoader {
         return loadImage(p, null);
     }
 
-    public static Image loadImage(Path p, Predicate<Integer> pixelSelector) {
-        if (IMAGES.containsKey(p.toString())) {
-            return IMAGES.get(p.toString());
-        }
-
+    static Image loadImage(Path p, Predicate<Integer> pixelSelector) {
         File file = p.toFile();
         BufferedImage image = null;
         try {
@@ -57,37 +54,25 @@ public class Eu4ImageLoader {
 
         WritableImage w = new WritableImage(image.getWidth(), image.getHeight());
         w = SwingFXUtils.toFXImage(image, w);
-        IMAGES.put(p.toString(), w);
         return w;
     }
 
-    public static ImageView loadInterfaceImage(String name) {
-        return loadInterfaceImage(name, null);
+    public static Node createImageNode(Path p, String styleClass) {
+        return createImageNode(p, styleClass, null, null);
     }
 
-    public static ImageView loadInterfaceImage(String name, Rectangle2D viewport) {
-        Path p = GameInstallation.EU4.getPath().resolve("gfx/interface/" + name);
-        Image i = loadImage(p);
-        ImageView v = new ImageView(i);
+    public static Node createImageNode(Path p, String styleClass, Rectangle2D viewport) {
+        return createImageNode(p, styleClass, viewport, null);
+    }
+
+    public static Node createImageNode(Path p, String styleClass, Rectangle2D viewport, Predicate<Integer> pixelSelector) {
+        Image w = loadImage(p, pixelSelector);
+        ImageView v = new ImageView(w);
+        Pane pane = new Pane(v);
         if (viewport != null) v.setViewport(viewport);
-        return v;
-    }
-
-    public static ImageView loadDisasterImage(String name) {
-        Path p = GameInstallation.EU4.getPath().resolve("gfx/interface/disasters/" + name + ".dds");
-        Image i = loadImage(p);
-        ImageView v = new ImageView(i);
-        v.setViewport(new Rectangle2D(44, 0, 44, 44));
-        return v;
-    }
-
-    public static ImageView loadFlagImage(String name, int size) {
-        Path p = GameInstallation.EU4.getPath().resolve("gfx/flags/" + name + ".tga");
-        Image i = loadImage(p);
-        ImageView v = new ImageView(i);
-        //v.setViewport(new Rectangle2D(0, 0, 44, 44));
-        v.setFitWidth(size);
-        v.setFitHeight(size);
-        return v;
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        pane.getStyleClass().add(styleClass);
+        return pane;
     }
 }
