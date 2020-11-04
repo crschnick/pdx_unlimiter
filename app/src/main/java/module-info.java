@@ -13,6 +13,9 @@ module com.crschnick.pdx_unlimiter.app {
     requires javafx.swing;
     requires io.sentry;
     requires org.jnativehook;
+    requires org.kordamp.iconli.core;
+    requires org.kordamp.ikonli.javafx;
+    requires com.jfoenix;
 
     requires org.slf4j;
     requires org.slf4j.simple;

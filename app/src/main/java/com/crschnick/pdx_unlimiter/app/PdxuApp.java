@@ -4,10 +4,12 @@ import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4SavegameManagerStyle;
+import com.crschnick.pdx_unlimiter.app.gui.GameImage;
 import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.jfoenix.controls.JFXSpinner;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -149,20 +151,7 @@ public class PdxuApp extends Application {
         if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
             layout.setCenter(Eu4SavegameManagerStyle.createNoCampaignNode());
         } else {
-            layout.setCenter(Eu4SavegameManagerStyle.createSavegameScrollPane(selectedCampaign, selectedSave,
-                    (e) -> {
-                        try {
-                            Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getPath(e).toFile());
-                        } catch (IOException ioException) {
-                            ioException.printStackTrace();
-                        }
-                    },
-                    (e) -> {
-                        if (selectedSave.get().isPresent() && selectedSave.get().get().equals(e)) {
-                            selectedSave.set(Optional.empty());
-                        }
-                        SavegameCache.EU4_CACHE.delete(e);
-                    }));
+            layout.setCenter(Eu4SavegameManagerStyle.createSavegameList(selectedCampaign, selectedSave));
 
             selectedCampaign.addListener((c, o, n) -> {
                 if (n.isPresent()) {
@@ -239,6 +228,8 @@ public class PdxuApp extends Application {
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
             GlobalScreen.registerNativeHook();
         }
+
+        GameImage.loadImages();
     }
 
     @Override
@@ -258,7 +249,6 @@ public class PdxuApp extends Application {
             }
         });
         primaryStage.setTitle("EU4 Savegame Manager");
-
         try {
             setup();
         } catch (Exception e) {
@@ -266,11 +256,19 @@ public class PdxuApp extends Application {
         }
 
         createLayout();
+        layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
 
         Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
-        setUserAgentStylesheet(STYLESHEET_CASPIAN);
+        //setUserAgentStylesheet(STYLESHEET_CASPIAN);
+        //primaryStage.getScene().getStylesheets().clear();
+        primaryStage.getScene().getStylesheets().add(
+                PdxuApp.class.getResource("style.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(
+                PdxuApp.class.getResource("scrollbar.css").toExternalForm());
+
+
     }
 
     public Image getIcon() {

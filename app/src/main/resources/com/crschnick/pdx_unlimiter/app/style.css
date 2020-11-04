@@ -1,0 +1,176 @@
+.open-button {
+-fx-background-color: #aaaa66;
+}
+
+.open-button .ikonli-font-icon {
+                 -fx-icon-code: "mdi-content-save";
+                 -fx-icon-color: white;
+             }
+
+.entry-bar {
+-fx-padding: 0.4em 0.4em 0.4em 0.4em;
+-fx-background-color: #777777;
+-fx-spacing: 0.5em;
+}
+
+.list-cell {
+-fx-padding: 0;
+}
+
+.entry-loading {
+-fx-max-width: 2.15em;
+-fx-max-height: 2.15em;
+}
+
+.entry-bar .tag-icon {
+-fx-min-width: 2.15em;
+-fx-max-width: 2.15em;
+-fx-min-height: 2.15em;
+-fx-max-height: 2.15em;
+-fx-border-radius: 0.15em;
+}
+
+.entry-bar .text-field {
+-fx-font-size: 1.15em;
+-fx-background-color: #444444;
+ -fx-text-fill: white;
+-fx-background-radius: 0.15em;
+-fx-padding: 0.3em 0.3em 0.3em 0.3em;
+}
+
+.entry-bar .date {
+-fx-font-size: 1.15em;
+-fx-padding: 0.3em 0.3em 0.3em 0.3em;
+-fx-background-color: #888888;
+ -fx-text-fill: white;
+-fx-background-radius: 0.15em;
+}
+
+.delete-button {
+-fx-background-color: #aa3333;
+}
+
+.delete-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-delete";
+    -fx-icon-color: white;
+}
+
+.achievement-button {
+-fx-background-color: #88aa88;
+}
+
+.achievement-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-trophy";
+    -fx-icon-color: white;
+}
+
+.ruler-info {
+-fx-background-color: #777777;
+-fx-padding: 0.4em;
+-fx-background-radius: 0.2em;
+ -fx-text-fill: white;
+}
+
+.ruler-icon{
+-fx-pref-width: 1em;
+-fx-pref-height: 1em;
+}
+
+.power-icon {
+-fx-pref-width: 1em;
+-fx-pref-height: 1em;
+}
+
+
+
+
+.node-container {
+-fx-padding: 0.6em 0.4em 0.4em 0.4em;
+}
+
+
+.node-container .tag-icon {
+-fx-min-width: 2em;
+-fx-max-width: 2em;
+-fx-min-height: 2em;
+-fx-max-height: 2em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.node-container .image-icon {
+-fx-min-width: 2em;
+-fx-max-width: 2em;
+-fx-min-height: 2em;
+-fx-max-height: 2em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.node-container .node {
+-fx-padding: 0.2em;
+-fx-background-radius: 0.1em;
+}
+
+.node-container .war {
+   -fx-background-color: #bf4540;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
+
+.node-container .diplomacy-row {
+-fx-padding: 0.2em;
+-fx-spacing: 0.5em;
+}
+
+
+
+.campaign .tag-icon {
+-fx-min-width: 3.5em;
+-fx-max-width: 3.5em;
+-fx-min-height: 3.5em;
+-fx-max-height: 3.5em;
+-fx-border-radius: 0.15em;
+}
+
+.campaign .date {
+
+}
+
+.campaign .text {
+
+-fx-background-color: #444444;
+ -fx-text-fill: white;
+-fx-background-radius: 0.15em;
+-fx-padding: 0.3em 0.3em 0.3em 0.3em;
+}
+
+.jfx-button {
+     -jfx-button-type: FLAT;
+}
+
+.campaign-entry {
+-fx-background-color: #77777711;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.campaign-list {
+-fx-focus-color: transparent;
+}
+
+.version-incompatible {
+     -fx-background-color: #ff000055;
+}
+
+.alliance {
+     -fx-background-color: #3d71a0;
+}
+
+.ruler {
+     -fx-background-color: #ffffff55;
+}
+
+.guarantee {
+      -fx-background-color: #6f3b73;
+}
+
+.marriage {
+      -fx-background-color: #6f3b73;
+}
