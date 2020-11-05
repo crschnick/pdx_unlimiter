@@ -1,0 +1,51 @@
+.open-button {
+-fx-background-color: #aaaa66;
+}
+
+.open-button .ikonli-font-icon {
+                 -fx-icon-code: "mdi-content-save";
+                 -fx-icon-color: white;
+             }
+
+
+.delete-button {
+-fx-background-color: #aa3333;
+}
+
+.delete-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-delete";
+    -fx-icon-color: white;
+}
+
+.achievement-button {
+-fx-background-color: #88aa88;
+}
+
+.achievement-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-trophy";
+    -fx-icon-color: white;
+}
+
+.launch-button {
+-fx-background-color: #88aa88;
+}
+
+.launch-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-play";
+    -fx-icon-color: white;
+}
+
+
+.export-button {
+-fx-background-color: #88aa88;
+}
+
+.export-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-content-duplicate";
+    -fx-icon-color: white;
+}
+
+.jfx-button {
+     -jfx-button-type: RAISED;
+}
+

@@ -1,27 +1,21 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -29,13 +23,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -46,37 +36,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiEu4CampaignEntry.createCampaignEntryNode;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class Eu4SavegameManagerStyle {
-
-    private static String CLASS_CAMPAIGN_ENTRY = "campaign-entry";
-    private static String CLASS_DIPLOMACY_ROW = "diplomacy-row";
-    private static String CLASS_CAMPAIGN_ENTRY_NODE = "node";
-    private static String CLASS_DATE = "date";
-    private static String CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER = "node-container";
-    private static String CLASS_VERSION_OK = "version-ok";
-    private static String CLASS_VERSION_INCOMPATIBLE = "version-incompatible";
-    private static String CLASS_RULER = "ruler";
-    private static String CLASS_WAR = "war";
-    private static String CLASS_ALLIANCE = "alliance";
-    private static String CLASS_MARRIAGE = "marriage";
-    private static String CLASS_GUARANTEE = "guarantee";
-    private static String CLASS_VASSAL = "vassal";
-    private static String CLASS_TRUCE = "vassal";
-    private static String CLASS_CAMPAIGN = "campaign";
-    private static String CLASS_IMAGE_ICON = "image-icon";
-    private static String CLASS_POWER_ICON = "power-icon";
-    private static String CLASS_RULER_ICON = "ruler-icon";
-    private static String CLASS_TAG_ICON = "tag-icon";
-    private static String CLASS_TEXT = "text";;
-    private static String CLASS_ENTRY_BAR = "entry-bar";
-    private static String CLASS_ENTRY_LIST = "entry-list";
-    private static String CLASS_ENTRY_LOADING = "entry-loading";
-
     private static Tooltip tooltip(String text) {
 
         Tooltip t = new Tooltip(text);
@@ -96,10 +61,10 @@ public class Eu4SavegameManagerStyle {
         }
     }
 
-    private static void updateSavegames(JFXListView<Node> list, Eu4Campaign c,
-                                        ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry) {
-        List<Node> newOrder = c.getSavegames().stream()
-                .sorted(Comparator.comparingLong(e -> GameDate.toLong(e.getDate().or(() -> Optional.of(GameDate.fromLong(0))).get())))
+    private static void updateSavegames(JFXListView<Node> list, Set<? extends Eu4CampaignEntry> entries,
+                                        ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry) {
+        List<Node> newOrder = entries.stream()
+                .sorted(Comparator.comparingLong(e -> GameDate.toLong(e.getDate())))
                 .map(e -> createCampaignEntryNode(e, selectedEntry))
                 .collect(Collectors.toList());
         Collections.reverse(newOrder);
@@ -107,16 +72,24 @@ public class Eu4SavegameManagerStyle {
     }
 
     public static Node createSavegameList(ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
-                                           ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry) {
+                                           ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry) {
         JFXListView<Node> grid = new JFXListView<>();
         grid.getStyleClass().add(CLASS_ENTRY_LIST);
 
+        SetChangeListener<Eu4CampaignEntry> l = (c) -> {
+            Platform.runLater(() -> {
+                updateSavegames(grid, c.getSet(), selectedEntry);
+            });
+        };
+
         selectedCampaign.addListener((c, o, n) -> {
             if (n.isPresent()) {
+                n.get().getSavegames().addListener(l);
                 Platform.runLater(() -> {
-                    updateSavegames(grid, n.get(), selectedEntry);
+                    updateSavegames(grid, n.get().getSavegames(), selectedEntry);
                 });
             } else {
+                o.get().getSavegames().removeListener(l);
                 Platform.runLater(() -> {
                     grid.setItems(FXCollections.observableArrayList());
                 });
@@ -126,7 +99,7 @@ public class Eu4SavegameManagerStyle {
         return grid;
     }
 
-    private static Node createCampaignButton(Eu4Campaign c, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
+    private static HBox createCampaignButton(Eu4Campaign c, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());
         del.getStyleClass().add("delete-button");
@@ -176,22 +149,26 @@ public class Eu4SavegameManagerStyle {
         btn.getStyleClass().add(CLASS_CAMPAIGN);
 
         HBox.setHgrow(name, Priority.NEVER);
+        btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         return btn;
     }
 
     private static void sortCampaignList(JFXListView<Node> list, ObservableSet<Eu4Campaign> campaigns, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
-        List<Node> newOrder = campaigns.stream()
+        List<Region> newOrder = campaigns.stream()
                 .sorted(Comparator.comparing(Eu4Campaign::getLastPlayed))
                 .map(c -> createCampaignButton(c, selectedCampaign, onDelete))
                 .collect(Collectors.toList());
         Collections.reverse(newOrder);
+        newOrder.forEach(n -> {
+            n.prefWidthProperty().bind(list.widthProperty());
+        });
         list.getItems().setAll(newOrder);
-        list.prefWidthProperty().setValue(400);
     }
 
     public static Node createCampaignList(ObservableSet<Eu4Campaign> campaigns, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
         JFXListView<Node> grid = new JFXListView<Node>();
+        grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
         for (Eu4Campaign d : campaigns) {
             d.lastPlayedProperty().addListener((change, o, n) -> {
                 Platform.runLater(() -> {
@@ -256,51 +233,47 @@ public class Eu4SavegameManagerStyle {
 
     public static Node createInactiveStatusBar(
             ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
-            ObjectProperty<Optional<Eu4Campaign.Entry>> save,
-            Consumer<Eu4Campaign.Entry> onExport,
-            Consumer<Eu4Campaign.Entry> onLaunch) {
+            ObjectProperty<Optional<Eu4CampaignEntry>> save) {
 
         BorderPane pane = new BorderPane();
-        pane.setStyle("-fx-border-width: 0; -fx-background-color: #555555;");
+        pane.getStyleClass().add( CLASS_STATUS_BAR);
 
         Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
         text.setAlignment(Pos.BOTTOM_CENTER);
-        text.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setLeft(text);
 
         Label status = new Label("Status: Stopped");
-        status.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
         pane.setCenter(status);
 
         Button e = new Button("Export");
+        e.setGraphic(new FontIcon());
+        e.getStyleClass().add( CLASS_EXPORT);
         e.setOnMouseClicked((m) -> {
-            onExport.accept(save.get().get());
+            //onExport.accept(save.get().get());
         });
 
         Button b = new Button("Launch");
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add( CLASS_LAUNCH);
         b.setOnMouseClicked((m) -> {
             if (save.get().isPresent() && GameVersion.areCompatible(GameInstallation.EU4.getVersion(),
                     save.get().get().getInfo().get().getVersion())) {
-                onLaunch.accept(save.get().get());
+                //onLaunch.accept(save.get().get());
             }
         });
 
-        ChangeListener<Optional<Eu4Campaign.Entry>> l = (val, old, n) -> {
-            if (n.isPresent() && GameVersion.areCompatible(GameInstallation.EU4.getVersion(), n.get().getInfo().get().getVersion())) {
-                b.setStyle("-fx-opacity: 1; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
-                Tooltip.install(b, tooltip("Launch savegame " + n.get().getName()));
-            } else {
-                b.setStyle("-fx-opacity: 0.5; -fx-border-color: #339933FF; -fx-background-radius: 0; -fx-border-radius: 0; -fx-background-color: #33aa33FF;-fx-text-fill: white; -fx-font-size: 18px;");
-                Tooltip.install(b, tooltip("Selected savegame version is not compatible to the game version."));
-            }
-        };
-        save.addListener(l);
-        l.changed(save, save.get(), save.get());
         HBox buttons = new HBox(e, b);
         buttons.setSpacing(10);
         pane.setRight(buttons);
 
-        return pane;
+        Pane top = new Pane();
+        top.setPrefHeight(100);
+        JFXSnackbar s = new JFXSnackbar(top);
+        s.setPrefWidth(1000);
+        selectedCampaign.addListener(c -> {
+            s.enqueue(new JFXSnackbar.SnackbarEvent(pane, Duration.seconds(1)));
+        });
+        return top;
     }
 
     private static MenuBar createMenuBar() {

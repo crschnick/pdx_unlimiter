@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -89,23 +88,6 @@ public class Eu4Installation extends GameInstallation {
         m.find();
         this.version = new GameVersion(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
     }
-
-    public void writeLaunchConfig(Eu4Campaign.Entry entry, Path path) throws IOException {
-        var out = Files.newOutputStream(getUserDirectory().resolve("continue_game.json"));
-        JsonFactory factory = new JsonFactory();
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        JsonGenerator generator = factory.createGenerator(out);
-        generator.setPrettyPrinter(new DefaultPrettyPrinter());
-        ObjectNode n = mapper.createObjectNode()
-                .put("title", entry.getCampaign().getName())
-                .put("desc", entry.getName())
-                .put("date", entry.getCampaign().getLastPlayed().toString())
-                .put("filename", path.toString().replace('\\', '/'));
-        mapper.writeTree(generator, n);
-        out.close();
-    }
-
     @Override
     public void start() {
         try {
