@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.eu4.parser.*;
 
 import java.util.*;
 
-public class Eu4SavegameInfo {
+public class Eu4SavegameInfo extends SavegameInfo {
 
     private UUID campaignUuid;
     private boolean ironman;

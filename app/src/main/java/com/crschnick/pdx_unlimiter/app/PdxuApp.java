@@ -1,15 +1,17 @@
 package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4SavegameManagerStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GameImage;
+import com.crschnick.pdx_unlimiter.app.gui.GuiStatusBar;
 import com.crschnick.pdx_unlimiter.app.installation.*;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.jfoenix.controls.JFXSpinner;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -17,27 +19,18 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.apache.commons.io.FileUtils;
 import org.jnativehook.GlobalScreen;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -46,7 +39,7 @@ public class PdxuApp extends Application {
     private Image icon;
     private BorderPane layout = new BorderPane();
     private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
-    private SimpleObjectProperty<Optional<Eu4Campaign.Entry>> selectedSave = new SimpleObjectProperty<>(Optional.empty());
+    private SimpleObjectProperty<Optional<Eu4CampaignEntry>> selectedSave = new SimpleObjectProperty<>(Optional.empty());
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
     public static PdxuApp getApp() {
@@ -65,60 +58,6 @@ public class PdxuApp extends Application {
         return layout.getScene();
     }
 
-    private void createStatusThread(BorderPane layout) {
-        Consumer<Eu4Campaign.Entry> export = (e) -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialFileName(SavegameCache.EU4_CACHE.getFileName(e));
-            fileChooser.setInitialDirectory(GameInstallation.EU4.getSaveDirectory().toFile());
-            fileChooser.setTitle("Select export location");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 savegame", "*.eu4"));
-            File file = fileChooser.showSaveDialog(getScene().getWindow());
-            if (file != null) {
-                SavegameCache.EU4_CACHE.exportSavegame(e, file.toPath());
-            }
-        };
-
-        Consumer<Eu4Campaign.Entry> launch = (e) -> {
-            Optional<Path> p = SavegameCache.EU4_CACHE.exportSavegame(e,
-                    GameInstallation.EU4.getSaveDirectory().resolve(SavegameCache.EU4_CACHE.getFileName(e)));
-            if (p.isPresent()) {
-                try {
-                    GameInstallation.EU4.writeLaunchConfig(e, GameInstallation.EU4.getUserDirectory().relativize(p.get()));
-                } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException);
-                }
-            }
-            GameInstallation.EU4.start();
-            selectedCampaign.get().get().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
-        };
-
-        Thread t = new Thread(() -> {
-            Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(
-                    selectedCampaign, selectedSave, export, launch)));
-
-            Optional<PdxApp> oldApp = Optional.empty();
-            while (true) {
-
-                if (!oldApp.equals(PdxApp.getActiveApp())) {
-                    var app = PdxApp.getActiveApp();
-                    if (app.isPresent()) {
-                        Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createActiveStatusBar(app.get())));
-                    } else {
-                        Platform.runLater(() -> layout.setBottom(Eu4SavegameManagerStyle.createInactiveStatusBar(
-                                selectedCampaign, selectedSave, export, launch)));
-                    }
-                    oldApp = app;
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t.setDaemon(true);
-        t.start();
-    }
 
     private void setCampainList(BorderPane layout) {
         layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign,
@@ -147,17 +86,11 @@ public class PdxuApp extends Application {
         });
 
         layout.setTop(Eu4SavegameManagerStyle.createMenu());
-        createStatusThread(layout);
+        GuiStatusBar.createStatusBar(selectedCampaign, selectedSave, layout);
         if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
             layout.setCenter(Eu4SavegameManagerStyle.createNoCampaignNode());
         } else {
             layout.setCenter(Eu4SavegameManagerStyle.createSavegameList(selectedCampaign, selectedSave));
-
-            selectedCampaign.addListener((c, o, n) -> {
-                if (n.isPresent()) {
-                    SavegameCache.EU4_CACHE.loadAsync(n.get());
-                }
-            });
             setCampainList(layout);
         }
 
@@ -223,6 +156,8 @@ public class PdxuApp extends Application {
         }
 
         GameInstallation.initInstallations();
+        GameManager.init();
+        GameIntegration.init();
         SavegameCache.loadData();
         AchievementManager.init();
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
@@ -267,6 +202,8 @@ public class PdxuApp extends Application {
                 PdxuApp.class.getResource("style.css").toExternalForm());
         primaryStage.getScene().getStylesheets().add(
                 PdxuApp.class.getResource("scrollbar.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(
+                PdxuApp.class.getResource("buttons.css").toExternalForm());
 
 
     }

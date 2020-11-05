@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
@@ -105,7 +105,7 @@ public class AchievementManager {
         return c.toString();
     }
 
-    public AchievementMatcher validateSavegame(Achievement a, Eu4Campaign.Entry entry) throws IOException {
+    public AchievementMatcher validateSavegame(Achievement a, Eu4CampaignEntry entry) throws IOException {
         INSTANCE.loadData();
         Eu4IntermediateSavegame loaded = Eu4IntermediateSavegame.fromFile(
                 SavegameCache.EU4_CACHE.getPath(entry).resolve("data.zip"));

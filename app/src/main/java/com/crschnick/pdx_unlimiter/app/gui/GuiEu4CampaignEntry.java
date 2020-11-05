@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
@@ -114,7 +114,7 @@ public class GuiEu4CampaignEntry {
         return box;
     }
 
-    private static Node createSavegameInfoNode(Eu4Campaign.Entry entry) {
+    private static Node createSavegameInfoNode(Eu4CampaignEntry entry) {
         StackPane stack = new StackPane();
         JFXMasonryPane grid =
                 new JFXMasonryPane();
@@ -143,7 +143,7 @@ public class GuiEu4CampaignEntry {
 
             if (stack.localToScreen(0, 0).getY() < PdxuApp.getApp().getScene().getWindow().getHeight() && !load.get()) {
                 load.set(true);
-                System.out.println("load");
+                SavegameCache.EU4_CACHE.loadEntryAsync(entry);
             }
         });
 
@@ -218,12 +218,12 @@ public class GuiEu4CampaignEntry {
         grid.getChildren().add(version);
     }
 
-    public static Node createCampaignEntryNode(Eu4Campaign.Entry e, ObjectProperty<Optional<Eu4Campaign.Entry>> selectedEntry) {
+    public static Node createCampaignEntryNode(Eu4CampaignEntry e, ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry) {
         VBox main = new VBox();
         main.setAlignment(Pos.CENTER);
         main.setFillWidth(true);
         main.getProperties().put("entry", e);
-        Node n = getImageForTagName(e.getCampaign().getTag(), CLASS_TAG_ICON);
+        Node n = getImageForTagName(e.getTag(), CLASS_TAG_ICON);
         Label l = new Label(e.getName());
         l.getStyleClass().add(CLASS_DATE);
 
@@ -270,6 +270,9 @@ public class GuiEu4CampaignEntry {
         Node content = createSavegameInfoNode(e);
         main.getChildren().add(content);
         main.getStyleClass().add(CLASS_CAMPAIGN_ENTRY);
+        main.setOnMouseClicked(event -> {
+            selectedEntry.set(Optional.of(e));
+        });
         return main;
     }
 

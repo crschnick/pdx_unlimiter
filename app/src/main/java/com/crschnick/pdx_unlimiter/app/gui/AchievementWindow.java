@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.achievement.Achievement;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementMatcher;
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4Campaign;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -35,7 +35,7 @@ public class AchievementWindow {
         return t;
     }
 
-    private static void sortAchievementList(VBox list, List<Achievement> as, Eu4Campaign.Entry entry) {
+    private static void sortAchievementList(VBox list, List<Achievement> as, Eu4CampaignEntry entry) {
         List<Node> newOrder = as.stream()
                 .map(a -> {
                     Node n = AchievementWindow.createAchievementInfoNode(a);
@@ -48,7 +48,7 @@ public class AchievementWindow {
         list.getChildren().setAll(newOrder);
     }
 
-    public static void showAchievementList(Eu4Campaign.Entry entry) {
+    public static void showAchievementList(Eu4CampaignEntry entry) {
         Alert alert = DialogHelper.createAlert();
         alert.setTitle("Achievement List");
 
@@ -98,7 +98,7 @@ public class AchievementWindow {
         Platform.runLater(alert::showAndWait);
     }
 
-    public static void showAchievementDialog(Achievement a, Eu4Campaign.Entry entry) {
+    public static void showAchievementDialog(Achievement a, Eu4CampaignEntry entry) {
         if (entry.getInfo().isEmpty()) {
             return;
         }

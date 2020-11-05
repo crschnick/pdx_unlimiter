@@ -1,16 +1,43 @@
-.open-button {
--fx-background-color: #aaaa66;
+
+.status-bar {
+-fx-background-color: #777777;
+-fx-padding: 1em;
 }
 
-.open-button .ikonli-font-icon {
-                 -fx-icon-code: "mdi-content-save";
-                 -fx-icon-color: white;
-             }
+.status-bar .image-icon {
+-fx-min-width: 2.15em;
+-fx-max-width: 2.15em;
+-fx-min-height: 2.15em;
+-fx-max-height: 2.15em;
+}
+
+.campaign-list-entry {
+-fx-padding: 0.5em;
+-fx-spacing: 0.5em;
+}
+
+.campaign-list-entry .tag-icon {
+-fx-min-width: 4em;
+-fx-max-width: 4em;
+-fx-min-height: 4em;
+-fx-max-height: 4em;
+}
+
 
 .entry-bar {
 -fx-padding: 0.4em 0.4em 0.4em 0.4em;
 -fx-background-color: #777777;
 -fx-spacing: 0.5em;
+}
+
+.campaign-list {
+-fx-pref-width: 16em;
+-fx-focus-color: transparent;
+}
+
+.entry-list {
+-fx-pref-width: 16em;
+-fx-focus-color: transparent;
 }
 
 .list-cell {
@@ -44,24 +71,6 @@
 -fx-background-color: #888888;
  -fx-text-fill: white;
 -fx-background-radius: 0.15em;
-}
-
-.delete-button {
--fx-background-color: #aa3333;
-}
-
-.delete-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-delete";
-    -fx-icon-color: white;
-}
-
-.achievement-button {
--fx-background-color: #88aa88;
-}
-
-.achievement-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-trophy";
-    -fx-icon-color: white;
 }
 
 .ruler-info {
@@ -120,20 +129,6 @@
 -fx-spacing: 0.5em;
 }
 
-
-
-.campaign .tag-icon {
--fx-min-width: 3.5em;
--fx-max-width: 3.5em;
--fx-min-height: 3.5em;
--fx-max-height: 3.5em;
--fx-border-radius: 0.15em;
-}
-
-.campaign .date {
-
-}
-
 .campaign .text {
 
 -fx-background-color: #444444;
@@ -142,17 +137,9 @@
 -fx-padding: 0.3em 0.3em 0.3em 0.3em;
 }
 
-.jfx-button {
-     -jfx-button-type: FLAT;
-}
-
 .campaign-entry {
 -fx-background-color: #77777711;
 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
-}
-
-.campaign-list {
--fx-focus-color: transparent;
 }
 
 .version-incompatible {
