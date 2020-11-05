@@ -1,4 +1,8 @@
 
+.menu .ikonli-font-icon {
+   -fx-icon-code: "mdi-vector-arrange-below";
+}
+
 .status-bar {
 -fx-background-color: #777777;
 -fx-padding: 1em;
@@ -31,7 +35,7 @@
 }
 
 .campaign-list {
--fx-pref-width: 16em;
+-fx-pref-width: 19em;
 -fx-focus-color: transparent;
 }
 

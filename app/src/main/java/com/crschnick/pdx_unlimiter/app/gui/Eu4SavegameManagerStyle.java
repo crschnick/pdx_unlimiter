@@ -425,7 +425,7 @@ public class Eu4SavegameManagerStyle {
 
     private static Node createStatusIndicator() {
         MenuBar rightBar = new MenuBar();
-        Menu m = new Menu("Idle");
+        Menu m = new Menu("Europa Universalis IV", new FontIcon());
         rightBar.getMenus().addAll(m);
         SavegameCache.EU4_CACHE.statusProperty().addListener((ch, o, n) -> {
             Platform.runLater(() -> {
