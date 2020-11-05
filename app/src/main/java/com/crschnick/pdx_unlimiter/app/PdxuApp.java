@@ -12,6 +12,7 @@ import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.jfoenix.controls.JFXSnackbar;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -24,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
@@ -86,7 +88,9 @@ public class PdxuApp extends Application {
         });
 
         layout.setTop(Eu4SavegameManagerStyle.createMenu());
-        GuiStatusBar.createStatusBar(selectedCampaign, selectedSave, layout);
+        Pane p = new Pane();
+        layout.setBottom(p);
+        GuiStatusBar.createStatusBar(selectedCampaign, selectedSave, p);
         if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
             layout.setCenter(Eu4SavegameManagerStyle.createNoCampaignNode());
         } else {

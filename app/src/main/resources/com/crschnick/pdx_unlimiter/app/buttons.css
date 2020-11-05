@@ -27,7 +27,6 @@
 }
 
 .launch-button {
--fx-background-color: #88aa88;
 }
 
 .launch-button .ikonli-font-icon {
@@ -37,7 +36,6 @@
 
 
 .export-button {
--fx-background-color: #88aa88;
 }
 
 .export-button .ikonli-font-icon {
@@ -46,6 +44,6 @@
 }
 
 .jfx-button {
-     -jfx-button-type: RAISED;
+     -jfx-button-type: FLAT;
 }
 

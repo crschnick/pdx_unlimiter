@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -39,45 +40,59 @@ public class GuiStatusBar {
             Pane layout) {
 
         JFXSnackbar s = new JFXSnackbar(layout);
-        s.setPrefWidth(600);
+        layout.widthProperty().addListener((c,o,n) -> {
+            s.setPrefWidth((Double) n);
+        });
+        s.setPrefWidth(2000);
         selectedEntry.addListener((c,o,n) -> {
             if (o.isEmpty() && n.isPresent()) {
-                Platform.runLater(() -> s.enqueue(
-                        new JFXSnackbar.SnackbarEvent(createEntryStatusBar(selectedCampaign, selectedEntry, s), Duration.INDEFINITE)));
+                Platform.runLater(() -> {
+                    var bar = createEntryStatusBar(layout, s);
+                    showBar(layout, bar, s);
+                });
             } else if (o.isPresent() && n.isEmpty()){
-                s.close();
+                hideBar(layout, s);
             }
         });
 
         GameManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
             if (n.isPresent()) {
-                s.enqueue(new JFXSnackbar.SnackbarEvent(createEntryStatusBar(selectedCampaign, selectedEntry, s), Duration.INDEFINITE));
+                s.enqueue(new JFXSnackbar.SnackbarEvent(createEntryStatusBar(layout, s), Duration.INDEFINITE));
             } else {
                 s.close();
                 if (selectedEntry.get().isPresent()) {
-                    s.enqueue(new JFXSnackbar.SnackbarEvent(createEntryStatusBar(selectedCampaign, selectedEntry, s), Duration.INDEFINITE));
+                    s.enqueue(new JFXSnackbar.SnackbarEvent(createEntryStatusBar(layout, s), Duration.INDEFINITE));
                 }
             }
         });
     }
 
-    private static Node createEntryStatusBar(ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
-                                             ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry,
-                                             JFXSnackbar s) {
+    public static void showBar(Pane pane, Region bar, JFXSnackbar s) {
+        s.enqueue(new JFXSnackbar.SnackbarEvent(bar, Duration.INDEFINITE));
+        pane.prefHeightProperty().bind(bar.heightProperty());
+        s.setPrefWidth(pane.getWidth());
+    }
 
-        BorderPane pane = new BorderPane();
-        pane.getStyleClass().add( CLASS_STATUS_BAR);
+    private static void hideBar(Pane pane, JFXSnackbar s) {
+        s.close();
+        pane.maxHeightProperty().setValue(0);
+    }
+
+    private static Region createEntryStatusBar(Pane pane, JFXSnackbar s) {
+
+        BorderPane barPane = new BorderPane();
+        barPane.getStyleClass().add( CLASS_STATUS_BAR);
 
         Label text = new Label("Europa Universalis 4 savegame", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
-        text.setAlignment(Pos.BOTTOM_CENTER);
-        pane.setLeft(text);
         text.getStyleClass().add( CLASS_TEXT);
+        barPane.setLeft(text);
 
         Button e = new JFXButton("Export");
         e.setGraphic(new FontIcon());
         e.getStyleClass().add( CLASS_EXPORT);
-        e.setOnMouseClicked((m) -> {
-            s.close();
+        e.setOnAction(event -> {
+            event.consume();
+            hideBar(pane, s);
         });
 
         Button b = new JFXButton("Launch");
@@ -95,7 +110,7 @@ public class GuiStatusBar {
         buttons.setSpacing(10);
         buttons.setFillHeight(true);
         buttons.setAlignment(Pos.CENTER);
-        pane.setRight(buttons);
-        return pane;
+        barPane.setRight(buttons);
+        return barPane;
     }
 }
