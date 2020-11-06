@@ -1,8 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
+import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -20,24 +23,38 @@ import java.util.Optional;
 
 public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign> {
 
+    private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
+        return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
+    }
+
+    @Override
+    public boolean isVersionCompatibe(Eu4CampaignEntry entry) {
+        return areCompatible(GameInstallation.EU4.getVersion(), entry.getInfo().get().getVersion());
+    }
+
+    @Override
+    public GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> getGuiFactory() {
+        return new Eu4GuiFactory();
+    }
+
     @Override
     public void launchCampaignEntry() {
-        if (getSelectedCampaign().isEmpty() || getSelectedEntry().isEmpty()) {
+        if (getSelectedCampaign() == null || getSelectedEntry() == null) {
             return;
         }
 
-        Optional<Path> p = SavegameCache.EU4_CACHE.exportSavegame(getSelectedEntry().get(),
-                GameInstallation.EU4.getSaveDirectory().resolve(SavegameCache.EU4_CACHE.getFileName(getSelectedEntry().get())));
+        Optional<Path> p = SavegameCache.EU4_CACHE.exportSavegame(getSelectedEntry(),
+                GameInstallation.EU4.getSaveDirectory().resolve(SavegameCache.EU4_CACHE.getFileName(getSelectedEntry())));
         if (p.isPresent()) {
             try {
-                writeLaunchConfig(getSelectedEntry().get(), p.get());
+                writeLaunchConfig(this.getSelectedEntry(), p.get());
             } catch (IOException ioException) {
                 ErrorHandler.handleException(ioException);
                 return;
             }
         }
         GameInstallation.EU4.start();
-        getSelectedCampaign().get().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
+        getSelectedCampaign().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
     }
 
 

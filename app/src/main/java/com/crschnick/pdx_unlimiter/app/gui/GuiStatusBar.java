@@ -1,18 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.GameManager;
 import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.effects.JFXDepthManager;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -22,10 +19,6 @@ import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.EU4_ICON;
@@ -34,41 +27,94 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiStatusBar {
 
+    private static class StatusBar {
+        private enum Status {
+            NONE,
+            SELECTED,
+            INCOMPATIBLE,
+            RUNNING
+        }
+
+        private Status status;
+        private JFXSnackbar snackbar;
+        private Pane pane;
+
+        public StatusBar(Pane pane) {
+            this.pane = pane;
+            this.snackbar = new JFXSnackbar(pane);
+            this.status = Status.NONE;
+
+            pane.widthProperty().addListener((c,o,n) -> {
+                snackbar.setPrefWidth((Double) n);
+            });
+        }
+
+        private void setRunning() {
+            Region bar = createRunningBar(pane, snackbar);
+            if (status == Status.NONE) {
+                showBar(pane, bar ,snackbar);
+            }
+            snackbar.enqueue(new JFXSnackbar.SnackbarEvent(bar, Duration.INDEFINITE));
+            status = Status.RUNNING;
+        }
+
+        private void select() {
+            if (status == Status.RUNNING) {
+                return;
+            }
+
+            Status oldStatus = status;
+            Region bar;
+            if (GameIntegration.current().isVersionCompatibe(GameIntegration.getGlobalSelectedEntry())) {
+                status = Status.SELECTED;
+                bar = createEntryStatusBar(pane, snackbar);
+            } else {
+                status = Status.INCOMPATIBLE;
+                bar = createInvalidVersionStatusBar(pane, snackbar);
+            }
+
+            if (oldStatus == Status.NONE) {
+                showBar(pane, bar, snackbar);
+            }
+            snackbar.enqueue(new JFXSnackbar.SnackbarEvent(bar, Duration.INDEFINITE));
+        }
+
+        private void unselect() {
+            if (status == Status.RUNNING) {
+                return;
+            }
+
+            hideBar(pane, snackbar);
+            snackbar.close();
+            status = Status.NONE;
+        }
+    }
+
     public static void createStatusBar(
             ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
             ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry,
             Pane layout) {
 
-        JFXSnackbar s = new JFXSnackbar(layout);
-        layout.widthProperty().addListener((c,o,n) -> {
-            s.setPrefWidth((Double) n);
-        });
-        s.setPrefWidth(2000);
+        StatusBar bar = new StatusBar(layout);
         selectedEntry.addListener((c,o,n) -> {
-            if (o.isEmpty() && n.isPresent()) {
+            if (n.isPresent()) {
                 Platform.runLater(() -> {
-                    var bar = createEntryStatusBar(layout, s);
-                    showBar(layout, bar, s);
+                    bar.select();
                 });
-            } else if (o.isPresent() && n.isEmpty()){
-                hideBar(layout, s);
+            } else if (n.isEmpty()){
+                bar.unselect();
             }
         });
 
         GameManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
             if (n.isPresent()) {
-                s.enqueue(new JFXSnackbar.SnackbarEvent(createEntryStatusBar(layout, s), Duration.INDEFINITE));
+                bar.setRunning();
             } else {
-                s.close();
-                if (selectedEntry.get().isPresent()) {
-                    s.enqueue(new JFXSnackbar.SnackbarEvent(createEntryStatusBar(layout, s), Duration.INDEFINITE));
-                }
             }
         });
     }
 
     public static void showBar(Pane pane, Region bar, JFXSnackbar s) {
-        s.enqueue(new JFXSnackbar.SnackbarEvent(bar, Duration.INDEFINITE));
         pane.prefHeightProperty().bind(bar.heightProperty());
         s.setPrefWidth(pane.getWidth());
     }
@@ -78,14 +124,44 @@ public class GuiStatusBar {
         pane.maxHeightProperty().setValue(0);
     }
 
+    private static Region createRunningBar(Pane pane, JFXSnackbar s) {
+
+        BorderPane barPane = new BorderPane();
+        barPane.getStyleClass().add( CLASS_STATUS_BAR);
+
+        Label text = new Label("Europa Universalis 4 Running", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
+        text.getStyleClass().add( CLASS_TEXT);
+        barPane.setLeft(text);
+
+        Button b = new JFXButton("Kill");
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add( CLASS_KILL);
+        b.setOnAction(event -> {
+            event.consume();
+
+            hideBar(pane, s);
+        });
+
+
+        b.setAlignment(Pos.CENTER);
+        barPane.setRight(b);
+        return barPane;
+    }
+
     private static Region createEntryStatusBar(Pane pane, JFXSnackbar s) {
 
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add( CLASS_STATUS_BAR);
 
-        Label text = new Label("Europa Universalis 4 savegame", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
+        Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
         text.getStyleClass().add( CLASS_TEXT);
         barPane.setLeft(text);
+
+        Label name = new Label("entry");
+        name.setGraphic(new FontIcon());
+        name.getStyleClass().add( CLASS_TEXT);
+        name.getStyleClass().add( CLASS_SAVEGAME);
+        barPane.setCenter(name);
 
         Button e = new JFXButton("Export");
         e.setGraphic(new FontIcon());
@@ -102,7 +178,7 @@ public class GuiStatusBar {
             GameIntegration.current().launchCampaignEntry();
 
             event.consume();
-            s.close();
+            hideBar(pane, s);
         });
 
 
@@ -111,6 +187,32 @@ public class GuiStatusBar {
         buttons.setFillHeight(true);
         buttons.setAlignment(Pos.CENTER);
         barPane.setRight(buttons);
+        return barPane;
+    }
+
+    private static Region createInvalidVersionStatusBar(Pane pane, JFXSnackbar s) {
+        BorderPane barPane = new BorderPane();
+        barPane.getStyleClass().add(CLASS_STATUS_BAR);
+        barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+
+        Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
+        text.getStyleClass().add( CLASS_TEXT);
+        barPane.setLeft(text);
+
+        Label name = new Label("Incompatible version");
+        name.setGraphic(new FontIcon());
+        name.getStyleClass().add( CLASS_TEXT);
+        name.getStyleClass().add(CLASS_ALERT);
+        barPane.setCenter(name);
+
+        Button b = new JFXButton("Close");
+        b.setGraphic(new FontIcon());
+        b.setOnAction(event -> {
+            event.consume();
+            hideBar(pane, s);
+        });
+
+        barPane.setRight(b);
         return barPane;
     }
 }

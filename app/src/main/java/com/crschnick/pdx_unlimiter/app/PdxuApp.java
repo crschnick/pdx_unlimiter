@@ -194,8 +194,8 @@ public class PdxuApp extends Application {
             ErrorHandler.handleTerminalException(e);
         }
 
-        createLayout();
         layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
+        createLayout();
 
         Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);
@@ -208,6 +208,10 @@ public class PdxuApp extends Application {
                 PdxuApp.class.getResource("scrollbar.css").toExternalForm());
         primaryStage.getScene().getStylesheets().add(
                 PdxuApp.class.getResource("buttons.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(
+                PdxuApp.class.getResource("campaign.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(
+                PdxuApp.class.getResource("status-bar.css").toExternalForm());
 
 
     }

@@ -15,10 +15,6 @@ public class GameVersion {
         this.fourth = fourth;
     }
 
-    public static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
-        return gameVersion.first == saveVersion.first && gameVersion.second == saveVersion.second;
-    }
-
     @Override
     public String toString() {
         return first + "." + second + "." + third + "." + fourth;
