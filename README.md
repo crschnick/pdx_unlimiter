@@ -1,9 +1,3 @@
-## Download
-
-To install the latest release, download the installer from the [releases page](https://github.com/crschnick/pdx_unlimiter/releases/latest).
-Note that there might be some issues with Windows SmartScreen, since the installer is not digitally signed.
-If you are facing these issues, click on "More info" and then "Run anyway".
-
 ## Features
 
 ### Savegame management for EU4
