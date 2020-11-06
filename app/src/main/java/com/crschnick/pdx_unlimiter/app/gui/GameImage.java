@@ -40,7 +40,7 @@ public class GameImage {
     private static Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     private static Map<String, Image> COUNTRY_IMAGES = new HashMap<>();
 
-    public static Node tagNode(String tag, String styleClass) {
+    public static Pane tagNode(String tag, String styleClass) {
         if (!COUNTRY_IMAGES.containsKey(tag)) {
             COUNTRY_IMAGES.put(tag, Eu4ImageLoader.loadImage(
                     GameInstallation.EU4.getPath().resolve("gfx/flags/" + tag + ".tga")));
@@ -54,11 +54,15 @@ public class GameImage {
         return pane;
     }
 
-    public static Node imageNode(Image i, String styleClass) {
+    public static Pane imageNode(Image i) {
+        return imageNode(i, null, null);
+    }
+
+    public static Pane imageNode(Image i, String styleClass) {
         return imageNode(i, styleClass, null);
     }
 
-    public static Node imageNode(Image i, String styleClass, String tt) {
+    public static Pane imageNode(Image i, String styleClass, String tt) {
         ImageView v = new ImageView(i);
         Pane pane = new Pane(v);
         Rectangle2D viewport = VIEWPORTS.get(i);
@@ -66,7 +70,7 @@ public class GameImage {
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         v.preserveRatioProperty().setValue(true);
-        pane.getStyleClass().add(styleClass);
+        if (styleClass != null) pane.getStyleClass().add(styleClass);
 
         var t = new Tooltip(tt);
         t.getStyleClass().add("tooltip");

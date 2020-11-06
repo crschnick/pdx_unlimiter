@@ -8,11 +8,11 @@ import java.util.Set;
 public class GameTag {
 
     private String tag;
-    private Color mapColor;
-    private Color countryColor;
+    private int mapColor;
+    private int countryColor;
     private Optional<String> name;
 
-    public GameTag(String tag, Color mapColor, Color countryColor, Optional<String> name) {
+    public GameTag(String tag, int mapColor, int countryColor, Optional<String> name) {
         this.tag = tag;
         this.mapColor = mapColor;
         this.countryColor = countryColor;
@@ -22,9 +22,9 @@ public class GameTag {
     public static GameTag fromNode(Node n) {
         KeyValueNode kv = Node.getKeyValueNode(n);
         List<Node> mc = Node.getNodeArray(Node.getNodeForKey(Node.getNodeForKey(kv.getNode(), "colors"), "map_color"));
-        Color mColor = new Color(Node.getInteger(mc.get(0)), Node.getInteger(mc.get(1)), Node.getInteger(mc.get(2)));
+        int mColor = (Node.getInteger(mc.get(0)) << 24) + (Node.getInteger(mc.get(1)) << 16) + (Node.getInteger(mc.get(2)) << 8);
         List<Node> cc = Node.getNodeArray(Node.getNodeForKey(Node.getNodeForKey(kv.getNode(), "colors"), "country_color"));
-        Color cColor = new Color(Node.getInteger(cc.get(0)), Node.getInteger(cc.get(1)), Node.getInteger(cc.get(2)));
+        int cColor = (Node.getInteger(mc.get(0)) << 24) + (Node.getInteger(cc.get(1)) << 16) + (Node.getInteger(cc.get(2)) << 8);
         Optional<String> name = Node.hasKey(kv.getNode(), "name") ? Optional.of(Node.getString(Node.getNodeForKey(kv.getNode(), "name"))) : Optional.empty();
         return new GameTag(kv.getKeyName(), mColor, cColor, name);
     }
@@ -37,11 +37,11 @@ public class GameTag {
         return tag;
     }
 
-    public Color getMapColor() {
+    public int getMapColor() {
         return mapColor;
     }
 
-    public Color getCountryColor() {
+    public int getCountryColor() {
         return countryColor;
     }
 

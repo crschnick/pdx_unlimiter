@@ -3,49 +3,36 @@
    -fx-icon-code: "mdi-vector-arrange-below";
 }
 
-.status-bar {
--fx-background-color: #777777;
--fx-padding: 1em;
+.entry {
+-fx-background-color: #77777711;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
-
-.status-bar .image-icon {
--fx-min-width: 2.15em;
--fx-max-width: 2.15em;
--fx-min-height: 2.15em;
--fx-max-height: 2.15em;
-}
-
-.campaign-list-entry {
--fx-padding: 0.5em;
--fx-spacing: 0.5em;
-}
-
-.campaign-list-entry .tag-icon {
--fx-min-width: 4em;
--fx-max-width: 4em;
--fx-min-height: 4em;
--fx-max-height: 4em;
-}
-
 
 .entry-bar {
 -fx-padding: 0.4em 0.4em 0.4em 0.4em;
--fx-background-color: #777777;
 -fx-spacing: 0.5em;
 }
 
-.campaign-list {
--fx-pref-width: 19em;
--fx-focus-color: transparent;
+.entry-bar .tag-bar {
+-fx-spacing: 0.5em;
+}
+
+.entry-bar .text-field {
+-fx-max-width: 20em;
+-fx-font-size: 1.15em;
+ -fx-text-fill: white;
+ -jfx-label-float: true;
+-fx-padding: 0.4em 0.4em 0.4em 0.4em;
+-jfx-unfocus-color: #00000000;
+}
+
+.entry-bar .button-bar {
+-fx-spacing: 0.5em;
+-fx-font-size: 1.35em;
 }
 
 .entry-list {
--fx-pref-width: 16em;
 -fx-focus-color: transparent;
-}
-
-.list-cell {
--fx-padding: 0;
 }
 
 .entry-loading {
@@ -61,18 +48,9 @@
 -fx-border-radius: 0.15em;
 }
 
-.entry-bar .text-field {
--fx-font-size: 1.15em;
--fx-background-color: #444444;
- -fx-text-fill: white;
--fx-background-radius: 0.15em;
--fx-padding: 0.3em 0.3em 0.3em 0.3em;
-}
-
 .entry-bar .date {
 -fx-font-size: 1.15em;
 -fx-padding: 0.3em 0.3em 0.3em 0.3em;
--fx-background-color: #888888;
  -fx-text-fill: white;
 -fx-background-radius: 0.15em;
 }
@@ -131,19 +109,6 @@
 .node-container .diplomacy-row {
 -fx-padding: 0.2em;
 -fx-spacing: 0.5em;
-}
-
-.campaign .text {
-
--fx-background-color: #444444;
- -fx-text-fill: white;
--fx-background-radius: 0.15em;
--fx-padding: 0.3em 0.3em 0.3em 0.3em;
-}
-
-.campaign-entry {
--fx-background-color: #77777711;
--fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
 
 .version-incompatible {

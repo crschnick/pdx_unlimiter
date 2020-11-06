@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import javafx.beans.property.*;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 
 public class Eu4Campaign extends GameCampaign<Eu4CampaignEntry> {
@@ -11,10 +12,10 @@ public class Eu4Campaign extends GameCampaign<Eu4CampaignEntry> {
     private volatile StringProperty tag;
     private volatile SimpleObjectProperty<GameDate> date;
 
-    public Eu4Campaign(ObjectProperty<Timestamp> lastPlayed, StringProperty name, UUID campaignId, StringProperty tag, SimpleObjectProperty<GameDate> date) {
+    public Eu4Campaign(Instant lastPlayed, String name, UUID campaignId, String tag, GameDate date) {
         super(lastPlayed, name, campaignId);
-        this.tag = tag;
-        this.date = date;
+        this.tag = new SimpleStringProperty(tag);
+        this.date = new SimpleObjectProperty<>(date);
     }
 
     public GameDate getDate() {

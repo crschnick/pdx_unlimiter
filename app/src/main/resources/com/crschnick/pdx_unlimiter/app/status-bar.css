@@ -1,0 +1,17 @@
+
+.status-bar {
+-fx-font-size: 1.15em;
+-fx-background-color: #ffffff55;
+-fx-padding: 0.7em 3em 0.7em 3em;
+}
+
+.status-incompatible {
+-fx-background-color: #99445599;
+}
+
+.status-bar .image-icon {
+-fx-min-width: 2.15em;
+-fx-max-width: 2.15em;
+-fx-min-height: 2.15em;
+-fx-max-height: 2.15em;
+}

@@ -3,13 +3,11 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.PdxApp;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -23,7 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
@@ -37,8 +34,7 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiEu4CampaignEntry.createCampaignEntryNode;
+
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class Eu4SavegameManagerStyle {
@@ -46,7 +42,6 @@ public class Eu4SavegameManagerStyle {
 
         Tooltip t = new Tooltip(text);
         t.setShowDelay(Duration.millis(100));
-        t.setStyle("-fx-font-size: 14px;");
         return t;
     }
 
@@ -61,11 +56,10 @@ public class Eu4SavegameManagerStyle {
         }
     }
 
-    private static void updateSavegames(JFXListView<Node> list, Set<? extends Eu4CampaignEntry> entries,
-                                        ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry) {
+    private static void updateSavegames(JFXListView<Node> list, Set<? extends Eu4CampaignEntry> entries) {
         List<Node> newOrder = entries.stream()
                 .sorted(Comparator.comparingLong(e -> GameDate.toLong(e.getDate())))
-                .map(e -> createCampaignEntryNode(e, selectedEntry))
+                .map(GuiGameCampaignEntry::createCampaignEntryNode)
                 .collect(Collectors.toList());
         Collections.reverse(newOrder);
         list.getItems().setAll(newOrder);
@@ -78,7 +72,7 @@ public class Eu4SavegameManagerStyle {
 
         SetChangeListener<Eu4CampaignEntry> l = (c) -> {
             Platform.runLater(() -> {
-                updateSavegames(grid, c.getSet(), selectedEntry);
+                updateSavegames(grid, c.getSet());
             });
         };
 
@@ -86,7 +80,7 @@ public class Eu4SavegameManagerStyle {
             if (n.isPresent()) {
                 n.get().getSavegames().addListener(l);
                 Platform.runLater(() -> {
-                    updateSavegames(grid, n.get().getSavegames(), selectedEntry);
+                    updateSavegames(grid, n.get().getSavegames());
                 });
             } else {
                 o.get().getSavegames().removeListener(l);
@@ -112,27 +106,26 @@ public class Eu4SavegameManagerStyle {
         Tooltip.install(del, tooltip("Delete campaign"));
 
 
-        TextField name = new TextField(c.getName());
-        name.setMinWidth(0);
+        JFXTextField name = new JFXTextField(c.getName());
+        name.getStyleClass().add(CLASS_TEXT_FIELD);
         name.textProperty().bindBidirectional(c.nameProperty());
 
-        Label date = new Label(c.getDate().toString());
+        Label date = new Label(c.getDate().toDisplayString());
         c.dateProperty().addListener((change, o, n) -> {
             Platform.runLater(() -> {
                 date.setText(n.toString());
             });
         });
         date.getStyleClass().add(CLASS_DATE);
-
         HBox top = new HBox();
-        top.setSpacing(3);
         top.getChildren().add(name);
         top.getChildren().add(del);
+        top.setAlignment(Pos.CENTER);
 
         VBox b = new VBox();
-        b.setSpacing(3);
         b.getChildren().add(top);
         b.getChildren().add(date);
+        b.setAlignment(Pos.CENTER_LEFT);
 
         Node w = getImageForTagName(c.getTag(), CLASS_TAG_ICON);
         HBox btn = new HBox();
@@ -146,9 +139,6 @@ public class Eu4SavegameManagerStyle {
 
         btn.setOnMouseClicked((m) -> selectedCampaign.setValue(Optional.of(c)));
         btn.setAlignment(Pos.CENTER);
-        btn.getStyleClass().add(CLASS_CAMPAIGN);
-
-        HBox.setHgrow(name, Priority.NEVER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         return btn;
@@ -160,9 +150,6 @@ public class Eu4SavegameManagerStyle {
                 .map(c -> createCampaignButton(c, selectedCampaign, onDelete))
                 .collect(Collectors.toList());
         Collections.reverse(newOrder);
-        newOrder.forEach(n -> {
-            n.prefWidthProperty().bind(list.widthProperty());
-        });
         list.getItems().setAll(newOrder);
     }
 
@@ -204,76 +191,6 @@ public class Eu4SavegameManagerStyle {
         VBox v = new VBox(textPane, new Label(), p);
         v.setAlignment(Pos.CENTER);
         return v;
-    }
-
-    public static Node createActiveStatusBar(PdxApp app) {
-        BorderPane pane = new BorderPane();
-        pane.setStyle("-fx-border-width: 0; -fx-background-color: #337733;");
-
-        Node icon = imageNode(EU4_ICON, CLASS_IMAGE_ICON);
-        Label text = new Label("Europa Universalis 4", icon);
-        text.setAlignment(Pos.BOTTOM_CENTER);
-        text.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
-        pane.setLeft(text);
-
-        Label status = new Label("Status: Running");
-        status.setStyle("-fx-text-fill: white; -fx-font-size: 18px;");
-        pane.setCenter(status);
-
-        Button b = new Button("Kill");
-        b.setOnMouseClicked((m) -> {
-            app.kill();
-        });
-        b.setStyle("-fx-border-color: #993333; -fx-background-color: #aa3333;-fx-text-fill: white; -fx-font-size: 18px;");
-        pane.setRight(b);
-        Tooltip.install(b, tooltip("Kill the game. This will prevent it from saving your current game!"));
-
-        return pane;
-    }
-
-    public static Node createInactiveStatusBar(
-            ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
-            ObjectProperty<Optional<Eu4CampaignEntry>> save) {
-
-        BorderPane pane = new BorderPane();
-        pane.getStyleClass().add( CLASS_STATUS_BAR);
-
-        Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
-        text.setAlignment(Pos.BOTTOM_CENTER);
-        pane.setLeft(text);
-
-        Label status = new Label("Status: Stopped");
-        pane.setCenter(status);
-
-        Button e = new Button("Export");
-        e.setGraphic(new FontIcon());
-        e.getStyleClass().add( CLASS_EXPORT);
-        e.setOnMouseClicked((m) -> {
-            //onExport.accept(save.get().get());
-        });
-
-        Button b = new Button("Launch");
-        b.setGraphic(new FontIcon());
-        b.getStyleClass().add( CLASS_LAUNCH);
-        b.setOnMouseClicked((m) -> {
-            if (save.get().isPresent() && GameVersion.areCompatible(GameInstallation.EU4.getVersion(),
-                    save.get().get().getInfo().get().getVersion())) {
-                //onLaunch.accept(save.get().get());
-            }
-        });
-
-        HBox buttons = new HBox(e, b);
-        buttons.setSpacing(10);
-        pane.setRight(buttons);
-
-        Pane top = new Pane();
-        top.setPrefHeight(100);
-        JFXSnackbar s = new JFXSnackbar(top);
-        s.setPrefWidth(1000);
-        selectedCampaign.addListener(c -> {
-            s.enqueue(new JFXSnackbar.SnackbarEvent(pane, Duration.seconds(1)));
-        });
-        return top;
     }
 
     private static MenuBar createMenuBar() {
