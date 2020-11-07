@@ -35,7 +35,7 @@ public class Eu4SavegameImporter {
                     .sorted(Comparator.reverseOrder())
                     .findFirst();
             latest.ifPresent(p -> {
-                new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p)).start();
+                new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(p)).start();
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class Eu4SavegameImporter {
             Files.list(GameInstallation.EU4.getSaveDirectory())
                     .filter(p -> !Files.isDirectory(p))
                     .forEach(p -> {
-                        new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p)).start();
+                        new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(p)).start();
                     });
         } catch (IOException e) {
             ErrorHandler.handleException(e);

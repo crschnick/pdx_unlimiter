@@ -92,14 +92,16 @@ public class GuiGameCampaignEntry {
             });
         };
         e.infoProperty().addListener(lis);
-        if (e.getInfo().isPresent()) {
+        if (e.infoProperty().isNotNull().get()) {
             lis.invalidated(null);
         }
 
         main.getChildren().add(content);
         main.getStyleClass().add(CLASS_ENTRY);
         main.setOnMouseClicked(event -> {
-            e.getInfo().ifPresent(i -> GameIntegration.globalSelectedEntryProperty().set(e));
+            if (e.infoProperty().isNotNull().get()) {
+                GameIntegration.globalSelectedEntryProperty().set(e);
+            }
         });
         return main;
     }
@@ -119,7 +121,7 @@ public class GuiGameCampaignEntry {
         JFXSpinner loading = new JFXSpinner();
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(grid);
-        if (entry.getInfo().isPresent()) {
+        if (entry.infoProperty().isNotNull().get()) {
             GameIntegration.current().getGuiFactory().fillNodeContainer(entry, grid);
         } else {
             stack.getChildren().add(loading);

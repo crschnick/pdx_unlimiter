@@ -67,7 +67,7 @@ public class AchievementWindow {
         refresh.setOnMouseClicked(e -> {
             AchievementManager.getInstance().refresh();
             sortAchievementList(grid, AchievementManager.getInstance().getSuitableAchievements(
-                    entry.getInfo().get().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
+                    entry.getInfo().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
         });
 
         top.setSpacing(10);
@@ -75,7 +75,7 @@ public class AchievementWindow {
 
         javafx.beans.value.ChangeListener<? super Boolean> l = (c, o, n) -> {
             sortAchievementList(grid, AchievementManager.getInstance().getSuitableAchievements(
-                    entry.getInfo().get().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
+                    entry.getInfo().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
         };
         onlyEligible.selectedProperty().addListener(l);
         onlyOfficial.selectedProperty().addListener(l);
@@ -99,13 +99,13 @@ public class AchievementWindow {
     }
 
     public static void showAchievementDialog(Achievement a, Eu4CampaignEntry entry) {
-        if (entry.getInfo().isEmpty()) {
+        if (entry.infoProperty().isNull().get()) {
             return;
         }
 
         ButtonType foo = new ButtonType("Validate", ButtonBar.ButtonData.OK_DONE);
         ButtonType bar = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-        AchievementMatcher matcher = a.match(entry.getInfo().get().getSavegame());
+        AchievementMatcher matcher = a.match(entry.getInfo().getSavegame());
         Alert alert = DialogHelper.createAlert();
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Achievement Information");

@@ -26,7 +26,7 @@ public class FileImporter {
     public static boolean importFile(Path p) {
         String name = p.getFileName().toString();
         if (name.endsWith(".eu4")) {
-            new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(getCampaignName(p), p)).start();
+            new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(p)).start();
             return true;
         }
 

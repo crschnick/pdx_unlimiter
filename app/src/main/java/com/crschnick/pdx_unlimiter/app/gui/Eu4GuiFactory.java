@@ -35,7 +35,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     @Override
     public Background createEntryInfoBackground(Eu4CampaignEntry entry) {
         return new Background(new BackgroundFill(
-                colorFromInt(entry.getInfo().get().getCurrentTag().getMapColor(), 100),
+                colorFromInt(entry.getInfo().getCurrentTag().getMapColor(), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
@@ -56,7 +56,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
 
     @Override
     public String createInfoString(Eu4CampaignEntry entry) {
-        return entry.getInfo().get().getDate().toDisplayString();
+        return entry.getDate().toDisplayString();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
 
     @Override
     public void fillNodeContainer(Eu4CampaignEntry entry, JFXMasonryPane grid) {
-        Eu4SavegameInfo info = entry.getInfo().get();
+        Eu4SavegameInfo info = entry.getInfo();
         if (info.isObserver()) {
             return;
         }
