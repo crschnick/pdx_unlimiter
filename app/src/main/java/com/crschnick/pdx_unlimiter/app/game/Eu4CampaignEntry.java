@@ -13,8 +13,8 @@ public class Eu4CampaignEntry extends GameCampaignEntry<Eu4SavegameInfo> {
     private String tag;
     private GameDate date;
 
-    public Eu4CampaignEntry(String name, UUID uuid, Eu4SavegameInfo info, String tag, GameDate date) {
-        super(name, uuid, info);
+    public Eu4CampaignEntry(String name, UUID uuid, Eu4SavegameInfo info, String checksum, String tag, GameDate date) {
+        super(name, uuid, info, checksum);
         this.tag = tag;
         this.date = date;
     }

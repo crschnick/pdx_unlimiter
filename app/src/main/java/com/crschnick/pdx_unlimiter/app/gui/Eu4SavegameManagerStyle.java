@@ -344,28 +344,6 @@ public class Eu4SavegameManagerStyle {
         MenuBar rightBar = new MenuBar();
         Menu m = new Menu("Europa Universalis IV", new FontIcon());
         rightBar.getMenus().addAll(m);
-        SavegameCache.EU4_CACHE.statusProperty().addListener((ch, o, n) -> {
-            Platform.runLater(() -> {
-                if (!n.isPresent()) {
-                    m.setText("Idle");
-                    return;
-                }
-
-                SavegameCache.Status s = n.get();
-                if (s.getType() == SavegameCache.Status.Type.UPDATING) {
-                    m.setText("Updating campaign entry " + s.getPath());
-                }
-                if (s.getType() == SavegameCache.Status.Type.LOADING) {
-                    m.setText("Loading campaign entry " + s.getPath());
-                }
-                if (s.getType() == SavegameCache.Status.Type.IMPORTING) {
-                    m.setText("Importing savegame " + s.getPath());
-                }
-                if (s.getType() == SavegameCache.Status.Type.DELETING) {
-                    m.setText("Deleting campaign entry " + s.getPath());
-                }
-            });
-        });
         return rightBar;
     }
 

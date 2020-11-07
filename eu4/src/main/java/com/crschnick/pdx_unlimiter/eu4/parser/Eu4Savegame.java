@@ -1,20 +1,24 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
+import com.crschnick.pdx_unlimiter.eu4.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
 import com.crschnick.pdx_unlimiter.eu4.format.NodeSplitter;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class Eu4Savegame {
+public class Eu4Savegame extends Savegame {
 
     private static final GamedataParser normalParser = new Eu4NormalParser();
     private static final String[] META_NODES = new String[]{"date", "save_game", "player",
@@ -26,7 +30,8 @@ public class Eu4Savegame {
     private Node ai;
     private Node meta;
 
-    public Eu4Savegame(Node gamestate, Node ai, Node meta) {
+    public Eu4Savegame(String checksum, Node gamestate, Node ai, Node meta) {
+        super(checksum);
         this.gamestate = gamestate;
         this.ai = ai;
         this.meta = meta;
@@ -52,10 +57,21 @@ public class Eu4Savegame {
         }
     }
 
-    public static Eu4Savegame fromFile(Path file) throws IOException {
+    public static Eu4Savegame fromFile(Path file) throws Exception {
         var in = Files.newInputStream(file);
         boolean isZipped = new ZipInputStream(in).getNextEntry() != null;
         in.close();
+
+        MessageDigest d = MessageDigest.getInstance("MD5");
+        d.update(Files.readAllBytes(file));
+        StringBuilder c = new StringBuilder();
+        ByteBuffer b = ByteBuffer.wrap(d.digest());
+        for (int i = 0; i < 16; i++) {
+            var hex = String.format("%02x", b.get());
+            c.append(hex);
+        }
+        String checksum = c.toString();
+
         if (isZipped) {
             ZipFile zipFile = new ZipFile(file.toFile());
             ZipEntry gamestate = zipFile.getEntry("gamestate");
@@ -67,9 +83,9 @@ public class Eu4Savegame {
                 Node metaNode = new Eu4IronmanParser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
                 Node aiNode = new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
                 zipFile.close();
-                return new Eu4Savegame(gamestateNode.get(), aiNode, metaNode);
+                return new Eu4Savegame(checksum, gamestateNode.get(), aiNode, metaNode);
             } else {
-                var s = new Eu4Savegame(normalParser.parse(zipFile.getInputStream(gamestate)).get(),
+                var s = new Eu4Savegame(checksum, normalParser.parse(zipFile.getInputStream(gamestate)).get(),
                         normalParser.parse(zipFile.getInputStream(ai)).get(),
                         normalParser.parse(zipFile.getInputStream(meta)).get());
                 zipFile.close();
@@ -80,7 +96,7 @@ public class Eu4Savegame {
             if (node.isPresent()) {
                 Node meta = new NodeSplitter(META_NODES).splitFromNode(node.get());
                 Node ai = new NodeSplitter(AI_NODES).splitFromNode(node.get());
-                return new Eu4Savegame(node.get(), ai, meta);
+                return new Eu4Savegame(checksum, node.get(), ai, meta);
             }
             throw new IOException("Invalid savegame: " + file.toString());
         }

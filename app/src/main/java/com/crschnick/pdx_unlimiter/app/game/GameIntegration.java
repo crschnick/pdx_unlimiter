@@ -5,19 +5,17 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import javafx.beans.property.SimpleObjectProperty;
 
-import javax.swing.event.ChangeListener;
-import java.util.Optional;
 import java.util.Set;
 
 public abstract class GameIntegration<E extends GameCampaignEntry<? extends SavegameInfo>,C extends GameCampaign<E>> {
 
     public static Eu4Integration EU4;
     private static SimpleObjectProperty<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
-            ? extends GameCampaign<? extends GameCampaignEntry<? extends  SavegameInfo>>>> current = new SimpleObjectProperty<>();
+            ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> current = new SimpleObjectProperty<>();
 
 
     private static Set<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
-                ? extends GameCampaign<? extends GameCampaignEntry<? extends  SavegameInfo>>>> ALL;
+                ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> ALL;
 
     private static SimpleObjectProperty<? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>> globalSelectedCampaign =
             new SimpleObjectProperty<>();

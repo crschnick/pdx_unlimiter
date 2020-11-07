@@ -1,10 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.eu4.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -23,8 +22,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.awt.*;
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;

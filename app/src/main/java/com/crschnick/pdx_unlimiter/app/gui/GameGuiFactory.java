@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.eu4.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.scene.layout.Background;
