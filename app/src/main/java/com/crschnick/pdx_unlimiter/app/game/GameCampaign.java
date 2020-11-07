@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.eu4.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -8,7 +9,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.UUID;

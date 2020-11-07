@@ -4,23 +4,17 @@ import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
 import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4CampaignEntry, Eu4Campaign> {
 
@@ -42,18 +36,20 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
     }
 
     @Override
-    protected Eu4Campaign createCampaign(String name, Eu4SavegameInfo info) {
+    protected Eu4Campaign createCampaign(Eu4SavegameInfo info) {
         return new Eu4Campaign(Instant.now(),
-                info.getCurrentTag().getTag()
-                , info.getCampaignUuid(), name,
+                info.getCurrentTag().isCustom() ?
+                        info.getCurrentTag().getName() : GameInstallation.EU4.getCountryName(info.getCurrentTag())
+                , info.getCampaignUuid(),
+                info.getCurrentTag().getTag(),
                 info.getDate());
     }
 
     @Override
-    protected Eu4CampaignEntry createEntry(UUID uuid, Eu4SavegameInfo info) {
+    protected Eu4CampaignEntry createEntry(UUID uuid, String checksum, Eu4SavegameInfo info) {
         return new Eu4CampaignEntry(
                 null, uuid,
-                info, info.getCurrentTag().getTag(), info.getDate());
+                info, checksum, info.getCurrentTag().getTag(), info.getDate());
     }
 
     @Override
@@ -79,8 +75,20 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
         is = Eu4IntermediateSavegame.fromSavegame(save);
         e = Eu4SavegameInfo.fromSavegame(is);
 
-        UUID saveUuid = UUID.randomUUID();
         UUID uuid = e.getCampaignUuid();
+
+        AtomicBoolean exists = new AtomicBoolean(false);
+        getCampaigns().stream()
+                .filter(c -> c.getCampaignId().equals(uuid))
+                .findAny().ifPresent(c -> exists.set(c.getSavegames().stream()
+                .map(GameCampaignEntry::getChecksum).anyMatch(ch -> ch.equals(save.getFileChecksum()))));
+        if (exists.get()) {
+            FileUtils.forceDelete(file.toFile());
+            return;
+        }
+
+
+        UUID saveUuid = UUID.randomUUID();
         Path campaignPath = getPath().resolve(uuid.toString());
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
@@ -88,7 +96,7 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
         is.write(entryPath.resolve("data.zip"), true);
         FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
         FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
-        this.addNewEntry(null, uuid, saveUuid, e);
+        this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
     }
 
     @Override
@@ -101,10 +109,10 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
     }
 
     @Override
-    protected Eu4CampaignEntry readEntry(JsonNode node, String name, UUID uuid) {
+    protected Eu4CampaignEntry readEntry(JsonNode node, String name, UUID uuid, String checksum) {
         String tag = node.required("tag").textValue();
         String date = node.required("date").textValue();
-        return new Eu4CampaignEntry(name, uuid, null, tag, GameDate.fromString(date));
+        return new Eu4CampaignEntry(name, uuid, null, checksum, tag, GameDate.fromString(date));
     }
 
     @Override

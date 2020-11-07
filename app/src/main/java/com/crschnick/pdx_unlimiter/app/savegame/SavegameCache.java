@@ -1,16 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
-import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.SavegameParseException;
 import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -18,7 +16,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -29,7 +26,6 @@ import org.apache.commons.lang3.function.FailableFunction;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -46,7 +42,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     private volatile Queue<E> toLoad = new ConcurrentLinkedQueue<>();
     private String name;
     private Path path;
-    private ObjectProperty<Optional<Status>> status = new SimpleObjectProperty<>(Optional.empty());
     private volatile ObservableSet<C> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
 
     public SavegameCache(String name) {
@@ -190,12 +185,13 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
             StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
                 UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
                 String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
-                campaign.add(readEntry(entryNode, name, eId));
+                String checksum = entryNode.required("checksum").textValue();
+                campaign.add(readEntry(entryNode, name, eId, checksum));
             });
         }
     }
 
-    protected abstract E readEntry(JsonNode node, String name, UUID uuid);
+    protected abstract E readEntry(JsonNode node, String name, UUID uuid, String checksum);
     protected abstract C readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed);
 
     public void exportDataToConfig(FailableFunction<Path,OutputStream,IOException> out) throws IOException {
@@ -208,6 +204,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
                     .map(entry -> {
                         ObjectNode node = JsonNodeFactory.instance.objectNode()
                                 .put("name", entry.getName())
+                                .put("checksum", entry.getChecksum())
                                 .put("uuid", entry.getUuid().toString());
                         writeEntry(node, entry);
                         return node;
@@ -234,7 +231,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     }
 
     private void exportSavegameDirectory(ZipOutputStream out) {
-        statusProperty().setValue(Optional.of(new Status(Status.Type.EXPORTING_ARCHIVE, out.toString())));
         Set<String> names = new HashSet<>();
         for (C c : getCampaigns()) {
             for (E e : c.getSavegames()) {
@@ -254,7 +250,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
                 }
             }
         }
-        statusProperty().setValue(Optional.empty());
     }
 
     private void exportSavegameCache(ZipOutputStream out) {
@@ -283,30 +278,27 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         this.campaigns.remove(c);
     }
 
-    public synchronized void addNewEntry(String campaignName, UUID campainUuid, UUID entryUuid, I i) {
+    public synchronized void addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i) {
         if (this.getCampaign(campainUuid).isEmpty()) {
-            this.campaigns.add(createCampaign(campaignName, i));
+            this.campaigns.add(createCampaign(i));
         }
 
         C c = this.getCampaign(campainUuid).get();
-        E e = createEntry(entryUuid, i);
+        E e = createEntry(entryUuid, checksum, i);
         c.add(e);
     }
 
-    protected abstract C createCampaign(String name, I info);
-    protected abstract E createEntry(UUID uuid, I info);
+    protected abstract C createCampaign(I info);
+    protected abstract E createEntry(UUID uuid, String checksum, I info);
 
     public synchronized void updateSavegameData(E e) {
-        status.setValue(Optional.of(new Status(Status.Type.UPDATING, getEntryName(e))));
-
         Path p = getPath(e);
         Path s = p.resolve("savegame.eu4");
         Eu4Savegame save = null;
         try {
             save = Eu4Savegame.fromFile(s);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ErrorHandler.handleException(ex);
-            status.setValue(Optional.empty());
             return;
         }
 
@@ -315,7 +307,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
             is = Eu4IntermediateSavegame.fromSavegame(save);
         } catch (SavegameParseException ex) {
             ErrorHandler.handleException(ex);
-            status.setValue(Optional.empty());
             return;
         }
 
@@ -325,7 +316,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
                     throw new IOException("Couldn't delete file " + f.toString());
                 } catch (IOException ioException) {
                     ErrorHandler.handleException(ioException);
-                    status.setValue(Optional.empty());
                     return;
                 }
             }
@@ -335,11 +325,8 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
             is.write(p.resolve("data.zip"), true);
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
-            status.setValue(Optional.empty());
             return;
         }
-
-        status.setValue(Optional.empty());
     }
 
     public synchronized C getCampaign(E e) {
@@ -352,8 +339,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
             return;
         }
 
-        status.setValue(Optional.of(new Status(Status.Type.DELETING, getEntryName(e))));
-
         Path campaignPath = path.resolve(c.getCampaignId().toString());
         try {
             FileUtils.deleteDirectory(campaignPath.resolve(e.getUuid().toString()).toFile());
@@ -365,8 +350,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         if (c.getSavegames().size() == 0) {
             delete(c);
         }
-
-        status.setValue(Optional.empty());
     }
 
     public void loadEntryAsync(E e) {
@@ -438,14 +421,6 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         String cn = getCampaign(e).getName();
         String en = e.getName();
         return cn + " (" + en + ")";
-    }
-
-    public Optional<Status> getStatus() {
-        return status.get();
-    }
-
-    public ObjectProperty<Optional<Status>> statusProperty() {
-        return status;
     }
 
     public Path getPath() {
