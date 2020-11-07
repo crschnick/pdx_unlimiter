@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -29,12 +30,17 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
 
     @Override
     public boolean isVersionCompatibe(Eu4CampaignEntry entry) {
-        return areCompatible(GameInstallation.EU4.getVersion(), entry.getInfo().get().getVersion());
+        return areCompatible(GameInstallation.EU4.getVersion(), entry.getInfo().getVersion());
     }
 
     @Override
     public GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> getGuiFactory() {
         return new Eu4GuiFactory();
+    }
+
+    @Override
+    public SavegameCache<? extends SavegameInfo, Eu4CampaignEntry, Eu4Campaign> getSavegameCache() {
+        return SavegameCache.EU4_CACHE;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
             }
         }
         GameInstallation.EU4.start();
-        getSelectedCampaign().lastPlayedProperty().setValue(Timestamp.from(Instant.now()));
+        getSelectedCampaign().lastPlayedProperty().setValue(Instant.now());
     }
 
 

@@ -72,7 +72,7 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     public abstract GameGuiFactory<E,C> getGuiFactory();
 
-    public abstract SavegameCache<E,C> getSavegameCache();
+    public abstract SavegameCache<? extends SavegameInfo,E,C> getSavegameCache();
 
     public void openCampaignEntry(E entry) {
 

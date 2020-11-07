@@ -248,7 +248,7 @@ public class Eu4SavegameManagerStyle {
         MenuItem u = new MenuItem("Update all savegames...");
         u.setOnAction((a) -> {
             if (DialogHelper.showUpdateAllSavegamesDialog()) {
-                SavegameCache.EU4_CACHE.updateAllData();
+                //SavegameCache.EU4_CACHE.updateAllData();
             }
         });
         savegames.getItems().add(u);

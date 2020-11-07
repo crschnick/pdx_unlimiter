@@ -32,7 +32,7 @@ public class GameCampaignEntry<I extends SavegameInfo> {
         return uuid;
     }
 
-    public SavegameInfo getInfo() {
+    public I getInfo() {
         return info.get();
     }
 
