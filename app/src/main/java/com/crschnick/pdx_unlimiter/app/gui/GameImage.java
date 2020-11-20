@@ -1,10 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,7 +39,7 @@ public class GameImage {
 
     public static Pane tagNode(String tag, String styleClass) {
         if (!COUNTRY_IMAGES.containsKey(tag)) {
-            COUNTRY_IMAGES.put(tag, Eu4ImageLoader.loadImage(
+            COUNTRY_IMAGES.put(tag, ImageLoader.loadImage(
                     GameInstallation.EU4.getPath().resolve("gfx/flags/" + tag + ".tga")));
         }
 
@@ -84,26 +81,26 @@ public class GameImage {
         Path i = p.resolve("gfx").resolve("interface");
         String s = "image-icon";
 
-        EU4_ICON = Eu4ImageLoader.loadImage(
+        EU4_ICON = ImageLoader.loadImage(
                 GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("icon.png"));
 
-        EU4_ICON_VASSAL = Eu4ImageLoader.loadImage(i.resolve("icon_vassal.dds"));
-        EU4_ICON_ALLIANCE= Eu4ImageLoader.loadImage(i.resolve("icon_alliance.dds"));
-        EU4_ICON_TRIBUTARY = Eu4ImageLoader.loadImage(i.resolve("subject_tributary_icon.dds"));
-        EU4_ICON_MARCH = Eu4ImageLoader.loadImage(i.resolve("icon_march.dds"));
-        EU4_ICON_TRUCE = Eu4ImageLoader.loadImage(i.resolve("icon_truce.dds"));
-        EU4_ICON_ROYAL_MARRIAGE = Eu4ImageLoader.loadImage(i.resolve("icon_diplomacy_royalmarriage.dds"));
-        EU4_ICON_GUARANTEE = Eu4ImageLoader.loadImage(i.resolve("icon_diplomacy_guaranting.dds"));
-        EU4_ICON_WAR = Eu4ImageLoader.loadImage(i.resolve("icon_diplomacy_war.dds"));
-        EU4_ICON_VERSION_WARNING = Eu4ImageLoader.loadImage(i.resolve("incompatible_warning_icon.dds"));
-        EU4_ICON_IRONMAN = Eu4ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
-        EU4_ICON_RULER = Eu4ImageLoader.loadImage(
+        EU4_ICON_VASSAL = ImageLoader.loadImage(i.resolve("icon_vassal.dds"));
+        EU4_ICON_ALLIANCE= ImageLoader.loadImage(i.resolve("icon_alliance.dds"));
+        EU4_ICON_TRIBUTARY = ImageLoader.loadImage(i.resolve("subject_tributary_icon.dds"));
+        EU4_ICON_MARCH = ImageLoader.loadImage(i.resolve("icon_march.dds"));
+        EU4_ICON_TRUCE = ImageLoader.loadImage(i.resolve("icon_truce.dds"));
+        EU4_ICON_ROYAL_MARRIAGE = ImageLoader.loadImage(i.resolve("icon_diplomacy_royalmarriage.dds"));
+        EU4_ICON_GUARANTEE = ImageLoader.loadImage(i.resolve("icon_diplomacy_guaranting.dds"));
+        EU4_ICON_WAR = ImageLoader.loadImage(i.resolve("icon_diplomacy_war.dds"));
+        EU4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("incompatible_warning_icon.dds"));
+        EU4_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+        EU4_ICON_RULER = ImageLoader.loadImage(
                 i.resolve("tab_domestic_court.dds"));
         VIEWPORTS.put(EU4_ICON_RULER, new Rectangle2D(8, 10, 30, 30));
-        EU4_ICON_HEIR = Eu4ImageLoader.loadImage(i.resolve("monarch_heir_crown_icon.dds"));
-        EU4_ICON_ADM = Eu4ImageLoader.loadImage(i.resolve("icon_powers_administrative_in_text.dds"));
-        EU4_ICON_DIP = Eu4ImageLoader.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
-        EU4_ICON_MIL = Eu4ImageLoader.loadImage(i.resolve("icon_powers_military_in_text.dds"));
+        EU4_ICON_HEIR = ImageLoader.loadImage(i.resolve("monarch_heir_crown_icon.dds"));
+        EU4_ICON_ADM = ImageLoader.loadImage(i.resolve("icon_powers_administrative_in_text.dds"));
+        EU4_ICON_DIP = ImageLoader.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
+        EU4_ICON_MIL = ImageLoader.loadImage(i.resolve("icon_powers_military_in_text.dds"));
 
         Predicate<Integer> rnwFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
@@ -116,7 +113,7 @@ public class GameImage {
             }
             return true;
         };
-        EU4_ICON_RANDOM_NEW_WORLD = Eu4ImageLoader.loadImage(
+        EU4_ICON_RANDOM_NEW_WORLD = ImageLoader.loadImage(
                 i.resolve("frontend_random_world.dds"),
                 rnwFilter);
         VIEWPORTS.put(EU4_ICON_RANDOM_NEW_WORLD, new Rectangle2D(14, 0, 33, 30));
@@ -131,12 +128,12 @@ public class GameImage {
             }
             return true;
         };
-        EU4_ICON_CUSTOM_NATION = Eu4ImageLoader.loadImage(
+        EU4_ICON_CUSTOM_NATION = ImageLoader.loadImage(
                 i.resolve("frontend_custom_nation.dds"),
                 customFilter);
         VIEWPORTS.put(EU4_ICON_CUSTOM_NATION, new Rectangle2D(20, 5, 21, 21));
 
-        EU4_ICON_RELEASED_VASSAL = Eu4ImageLoader.loadImage(
+        EU4_ICON_RELEASED_VASSAL = ImageLoader.loadImage(
                 i.resolve("release_nation_icon.dds"));
         VIEWPORTS.put(EU4_ICON_RELEASED_VASSAL, new Rectangle2D(37, 0, 36, 30));
     }

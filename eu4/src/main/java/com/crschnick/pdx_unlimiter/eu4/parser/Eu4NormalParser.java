@@ -13,6 +13,9 @@ public class Eu4NormalParser extends GamedataParser {
 
     public static final byte[] MAGIC = new byte[]{0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
 
+
+    public static final byte[] HOI_MAGIC = new byte[]{0x48, 0x4F, 0x49, 0x34, 0x74, 0x78, 0x74};
+
     public Eu4NormalParser() {
         super(MAGIC, Namespace.EMPTY);
     }
@@ -27,6 +30,11 @@ public class Eu4NormalParser extends GamedataParser {
 
     public static Eu4NormalParser savegameParser() {
         return new Eu4NormalParser(MAGIC);
+    }
+
+
+    public static Eu4NormalParser hoi4SavegameParser() {
+        return new Eu4NormalParser(HOI_MAGIC);
     }
 
     private List<Token> tokenize(String s) {

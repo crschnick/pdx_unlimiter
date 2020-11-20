@@ -19,9 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class Eu4ImageLoader {
-
-    private static Map<String, Image> IMAGES = new HashMap<>();
+public class ImageLoader {
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();

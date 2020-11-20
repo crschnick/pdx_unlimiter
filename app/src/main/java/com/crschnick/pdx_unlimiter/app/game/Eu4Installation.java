@@ -32,7 +32,7 @@ public class Eu4Installation extends GameInstallation {
 
 
     public Eu4Installation(Path path) {
-        super("Europa Universalis IV", path);
+        super(path);
         if (SystemUtils.IS_OS_WINDOWS) {
             executable = getPath().resolve("eu4.exe");
         }

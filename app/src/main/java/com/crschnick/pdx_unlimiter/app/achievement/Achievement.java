@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -74,7 +74,7 @@ public class Achievement {
         return a;
     }
 
-    public AchievementMatcher match(Eu4IntermediateSavegame sg) {
+    public AchievementMatcher match(Eu4Savegame sg) {
         Map<String, Node> nodes = new HashMap<>();
         nodes.putAll(sg.getNodes());
         nodes.putAll(content.getNodes());

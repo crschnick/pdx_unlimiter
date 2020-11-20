@@ -4,11 +4,9 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.*;
 import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -71,29 +69,44 @@ public class DialogHelper {
 
     public static void createNamespaceDialog() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select non-ironman save");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 save game", "*.eu4"));
+        fileChooser.setTitle("Select non-binary save file");
         File named = fileChooser.showOpenDialog(PdxuApp.getApp().getScene().getWindow());
         if (named == null) {
             return;
         }
 
         fileChooser = new FileChooser();
-        fileChooser.setTitle("Select ironman save");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EU4 save game", "*.eu4"));
+        fileChooser.setTitle("Select binary save file");
         File unnamed = fileChooser.showOpenDialog(PdxuApp.getApp().getScene().getWindow());
         if (unnamed == null) {
             return;
         }
 
-        try {
-            Eu4Savegame un = Eu4Savegame.fromFile(unnamed.toPath());
-            Eu4Savegame n = Eu4Savegame.fromFile(named.toPath());
-            System.out.println(NamespaceCreator.createNamespace(
-                    Eu4IntermediateSavegame.fromSavegame(un), Eu4IntermediateSavegame.fromSavegame(n)));
-        } catch (Exception e) {
-            ErrorHandler.handleException(e);
-        }
+        RawSavegameVisitor.vist(unnamed.toPath(), new RawSavegameVisitor() {
+            @Override
+            public void visitEu4(Path file) {
+                try {
+                    Eu4RawSavegame un = Eu4RawSavegame.fromFile(unnamed.toPath());
+                    Eu4RawSavegame n = Eu4RawSavegame.fromFile(named.toPath());
+                    System.out.println(NamespaceCreator.createNamespace(
+                            Eu4Savegame.fromSavegame(un).getNodes(), Eu4Savegame.fromSavegame(n).getNodes()));
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            }
+
+            @Override
+            public void visitHoi4(Path file) {
+                try {
+                    Hoi4RawSavegame un = Hoi4RawSavegame.fromFile(unnamed.toPath());
+                    Hoi4RawSavegame n = Hoi4RawSavegame.fromFile(named.toPath());
+                    System.out.println(NamespaceCreator.createNamespace(
+                            Hoi4Savegame.fromSavegame(un).getNodes(), Hoi4Savegame.fromSavegame(n).getNodes()));
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            }
+        });
     }
 
     public static Alert createAlert() {
@@ -213,7 +226,7 @@ public class DialogHelper {
         });
 
         textArea.textProperty().addListener((change, o, n) -> {
-            s.setEu4(Optional.ofNullable(n.equals("") ? null : Path.of(n)));
+            s.setEu4(n.equals("") ? null : Path.of(n));
         });
         textArea.setText(s.getEu4().map(Path::toString).orElse(""));
 

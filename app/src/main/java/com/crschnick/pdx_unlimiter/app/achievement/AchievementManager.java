@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -107,7 +107,7 @@ public class AchievementManager {
 
     public AchievementMatcher validateSavegame(Achievement a, Eu4CampaignEntry entry) throws IOException {
         INSTANCE.loadData();
-        Eu4IntermediateSavegame loaded = Eu4IntermediateSavegame.fromFile(
+        Eu4Savegame loaded = Eu4Savegame.fromFile(
                 SavegameCache.EU4_CACHE.getPath(entry).resolve("data.zip"));
 
         if (!validateChecksum()) {
@@ -121,7 +121,7 @@ public class AchievementManager {
         return checksum.equals(calculateChecksum());
     }
 
-    public List<Achievement> getSuitableAchievements(Eu4IntermediateSavegame s, boolean onlyOfficial, boolean onlyElgible) {
+    public List<Achievement> getSuitableAchievements(Eu4Savegame s, boolean onlyOfficial, boolean onlyElgible) {
         return achievements.stream()
                 .filter(a -> !onlyOfficial || a.isOfficial())
                 .filter(a -> {

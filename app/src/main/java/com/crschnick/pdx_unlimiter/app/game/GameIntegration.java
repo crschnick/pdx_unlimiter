@@ -2,11 +2,9 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.crschnick.pdx_unlimiter.eu4.Savegame;
-import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;

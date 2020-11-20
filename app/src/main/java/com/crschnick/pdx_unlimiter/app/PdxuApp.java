@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IronmanParser;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -26,6 +27,8 @@ import org.jnativehook.GlobalScreen;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -40,6 +43,10 @@ public class PdxuApp extends Application {
     }
 
     public static void main(String[] args) {
+
+        String file = "C:\\Users\\cschn\\Documents\\Paradox Interactive\\Hearts of Iron IV\\save games\\ENG_1936_01_12_16.hoi4";
+
+
         try {
             launch(args);
         } catch (Exception e) {
@@ -131,11 +138,6 @@ public class PdxuApp extends Application {
         LogManager.init();
         ErrorHandler.init();
         Settings.init();
-        if (Settings.getInstance().getEu4().isEmpty()) {
-            if (!DialogHelper.showInitialSettings()) {
-                System.exit(1);
-            }
-        }
 
         GameInstallation.initInstallations();
         GameManager.init();

@@ -38,12 +38,16 @@ public class ErrorHandler {
     }
 
     public static void handleException(Exception ex) {
+        handleException(ex, "Error occured");
+    }
+
+    public static void handleException(Exception ex, String msg) {
         if (!startupCompleted) {
             handleExcetionWithoutInit(ex);
         }
 
         Runnable run = () -> {
-            LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
+            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
             if (PdxuInstallation.getInstance().isProduction()) {
                 if (DialogHelper.showException(ex)) {
                     Sentry.capture(ex);

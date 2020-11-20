@@ -164,5 +164,5 @@ public abstract class Node {
         return nodes;
     }
 
-    protected abstract String toString(int indentation);
+    public abstract String toString(int indentation);
 }

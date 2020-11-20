@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.eu4;
+package com.crschnick.pdx_unlimiter.eu4.savegame;
 
 public class SavegameParseException extends Exception {
 

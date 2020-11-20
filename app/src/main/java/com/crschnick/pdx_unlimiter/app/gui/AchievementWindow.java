@@ -161,7 +161,7 @@ public class AchievementWindow {
 
     private static Node getImageForIcon(Optional<Path> p, int size) {
         if (p.isPresent()) {
-            ImageView img = new ImageView(Eu4ImageLoader.loadImage(p.get()));
+            ImageView img = new ImageView();
             img.setFitWidth(size);
             img.setFitHeight(size);
             return img;

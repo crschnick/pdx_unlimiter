@@ -11,6 +11,7 @@ public abstract class Namespace {
     public static final Namespace EU4_GAMESTATE = new FileNamespace("eu4_gamestate.txt");
     public static final Namespace EU4_AI = new FileNamespace("eu4_ai.txt");
     public static final Namespace EU4_META = new FileNamespace("eu4_meta.txt");
+    public static final Namespace HOI4 = new FileNamespace("hoi4.txt");
 
     public abstract String getKeyName(String id);
 
