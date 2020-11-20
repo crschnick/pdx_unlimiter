@@ -12,6 +12,11 @@ import com.jfoenix.controls.JFXMasonryPane;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -50,8 +55,10 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     }
 
     @Override
-    public Pane createImage(Eu4Campaign campaign) {
-        return GameImage.tagNode(campaign.getTag(), CLASS_TAG_ICON);
+    public ObservableValue<Pane> createImage(Eu4Campaign campaign) {
+        var b = Bindings.createObjectBinding(
+                () -> GameImage.tagNode(campaign.getTag(), CLASS_TAG_ICON), campaign.tagProperty());
+        return b;
     }
 
     @Override
@@ -60,8 +67,10 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     }
 
     @Override
-    public String createInfoString(Eu4Campaign campaign) {
-        return campaign.getDate().toDisplayString();
+    public ObservableValue<String> createInfoString(Eu4Campaign campaign) {
+        var b = Bindings.createObjectBinding(
+                () -> campaign.getDate().toDisplayString(), campaign.dateProperty());
+        return b;
     }
 
     @Override

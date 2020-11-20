@@ -40,8 +40,6 @@ public class PdxuApp extends Application {
     private static PdxuApp APP;
     private Image icon;
     private BorderPane layout = new BorderPane();
-    private SimpleObjectProperty<Optional<Eu4Campaign>> selectedCampaign = new SimpleObjectProperty<>(Optional.empty());
-    private SimpleObjectProperty<Optional<Eu4CampaignEntry>> selectedSave = new SimpleObjectProperty<>(Optional.empty());
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
     public static PdxuApp getApp() {
@@ -62,20 +60,7 @@ public class PdxuApp extends Application {
 
 
     private void setCampainList(BorderPane layout) {
-        layout.setLeft(Eu4SavegameManagerStyle.createCampaignList(SavegameCache.EU4_CACHE.getCampaigns(), selectedCampaign,
-                (c) -> {
-                    if (selectedCampaign.get().isPresent() && selectedCampaign.get().get().equals(c)) {
-                        selectedCampaign.set(Optional.empty());
-
-                        if (selectedSave.get().isPresent() &&
-                                selectedCampaign.get().get().getSavegames().contains(selectedSave.get().get())) {
-                            selectedSave.set(Optional.empty());
-                        }
-                    }
-
-
-                    SavegameCache.EU4_CACHE.delete(c);
-                }));
+        layout.setLeft(Eu4SavegameManagerStyle.createCampaignList());
     }
 
     private void createLayout() {
@@ -90,11 +75,11 @@ public class PdxuApp extends Application {
         layout.setTop(Eu4SavegameManagerStyle.createMenu());
         Pane p = new Pane();
         layout.setBottom(p);
-        GuiStatusBar.createStatusBar(selectedCampaign, selectedSave, p);
+        GuiStatusBar.createStatusBar(p);
         if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
             layout.setCenter(Eu4SavegameManagerStyle.createNoCampaignNode());
         } else {
-            layout.setCenter(Eu4SavegameManagerStyle.createSavegameList(selectedCampaign, selectedSave));
+            layout.setCenter(Eu4SavegameManagerStyle.createSavegameList());
             setCampainList(layout);
         }
 
@@ -161,7 +146,6 @@ public class PdxuApp extends Application {
 
         GameInstallation.initInstallations();
         GameManager.init();
-        GameIntegration.init();
         SavegameCache.loadData();
         AchievementManager.init();
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
@@ -196,6 +180,7 @@ public class PdxuApp extends Application {
 
         layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
         createLayout();
+        GameIntegration.init();
 
         Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);

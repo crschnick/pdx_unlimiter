@@ -10,8 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
 
@@ -20,7 +19,7 @@ public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
     private volatile StringProperty name;
     private UUID campaignId;
     private volatile ObservableSet<E> savegames =
-            FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
+            FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
 
     public GameCampaign(Instant lastPlayed,String name, UUID campaignId) {
         this.lastPlayed = new SimpleObjectProperty<>(lastPlayed);
