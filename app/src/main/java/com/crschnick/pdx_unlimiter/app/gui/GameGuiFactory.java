@@ -13,6 +13,8 @@ import javafx.scene.layout.Pane;
 
 public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends SavegameInfo>,C extends GameCampaign<E>> {
 
+    public abstract Pane createIcon();
+
     public abstract Background createEntryInfoBackground(E entry);
 
     public abstract Pane createGameImage(C campaign);

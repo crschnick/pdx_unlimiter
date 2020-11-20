@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 public abstract class GameIntegration<E extends GameCampaignEntry<? extends SavegameInfo>,C extends GameCampaign<E>> {
@@ -34,6 +35,10 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
         current.set(EU4);
 
+    }
+
+    public static List<GameIntegration<?,?>> getAvailable() {
+        return List.of(EU4, EU4, EU4);
     }
 
     public static <E extends GameCampaignEntry<? extends SavegameInfo>,
@@ -71,6 +76,8 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     protected SimpleObjectProperty<C> selectedCampaign = new SimpleObjectProperty<>();
     protected SimpleObjectProperty<E> selectedEntry = new SimpleObjectProperty<>();
 
+    public abstract String getName();
+
     public abstract void launchCampaignEntry();
 
     public abstract boolean isVersionCompatibe(E entry);
@@ -88,7 +95,7 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         globalSelectedEntryPropertyInternal().set(null);
         this.selectedCampaign.set(c);
         globalSelectedCampaignPropertyInternal().set((GameCampaign<GameCampaignEntry<? extends SavegameInfo>>) c);
-        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign " + c.getName());
+        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign " + (c != null ? c.getName() : "null"));
     }
 
     public void selectEntry(E e) {
@@ -99,7 +106,7 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         this.selectedEntry.set(e);
         globalSelectedEntryPropertyInternal().set(e);
 
-        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign entry " + e.getName());
+        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign entry " + (e != null ? e.getName() : "null"));
     }
 
     public static void selectIntegration(GameIntegration<?,?> newInt) {

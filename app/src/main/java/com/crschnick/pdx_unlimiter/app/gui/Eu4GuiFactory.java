@@ -38,6 +38,11 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> {
 
     @Override
+    public Pane createIcon() {
+        return GameImage.imageNode(EU4_ICON, CLASS_IMAGE_ICON);
+    }
+
+    @Override
     public Background createEntryInfoBackground(Eu4CampaignEntry entry) {
         return new Background(new BackgroundFill(
                 colorFromInt(entry.getInfo().getCurrentTag().getMapColor(), 100),

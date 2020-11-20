@@ -39,6 +39,11 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
     }
 
     @Override
+    public String getName() {
+        return "Europa Universalis IV";
+    }
+
+    @Override
     public void launchCampaignEntry() {
         if (getSelectedCampaign() == null || getSelectedEntry() == null) {
             return;
