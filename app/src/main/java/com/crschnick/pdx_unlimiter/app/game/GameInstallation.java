@@ -13,16 +13,19 @@ import java.util.Optional;
 public abstract class GameInstallation {
 
     public static Eu4Installation EU4 = null;
-    private String name;
+    public static Eu4Installation HOI4 = null;
     private Path path;
-    public GameInstallation(String name, Path path) {
-        this.name = name;
+    public GameInstallation(Path path) {
         this.path = path;
     }
 
     public static void initInstallations() throws Exception {
         if (EU4 != null) {
             EU4.init();
+        }
+
+        if (HOI4 != null) {
+            HOI4.init();
         }
     }
 
@@ -46,15 +49,23 @@ public abstract class GameInstallation {
         return p.toFile().exists() ? Optional.of(p) : Optional.empty();
     }
 
+    protected Path replaceVariablesInPath(String value) {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            value = value.replace("%USER_DOCUMENTS%",
+                    Paths.get(System.getProperty("user.home"), "Documents").toString());
+        }
+        else if (SystemUtils.IS_OS_LINUX) {
+            value = value.replace("$LINUX_DATA_HOME",
+                    Paths.get(System.getProperty("user.home"), ".local", "share").toString());
+        }
+        return Path.of(value);
+    }
+
     public abstract void start();
 
     public abstract void init() throws Exception;
 
     public abstract boolean isValid();
-
-    public String getName() {
-        return name;
-    }
 
     public Path getPath() {
         return path;

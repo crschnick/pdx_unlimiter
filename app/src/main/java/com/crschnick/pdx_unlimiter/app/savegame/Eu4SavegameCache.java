@@ -2,9 +2,9 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
-import com.crschnick.pdx_unlimiter.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,22 +57,22 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
         Path p = getPath(eu4CampaignEntry);
         int v = 0;
         try {
-            v = p.toFile().exists() ? Eu4IntermediateSavegame.getVersion(p.resolve("data.zip")) : 0;
+            v = p.toFile().exists() ? Eu4Savegame.getVersion(p.resolve("data.zip")) : 0;
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return true;
         }
 
-        return v < Eu4IntermediateSavegame.VERSION;
+        return v < Eu4Savegame.VERSION;
     }
 
     @Override
     protected void importSavegameData(Path file) throws Exception {
-        Eu4IntermediateSavegame is = null;
+        Eu4Savegame is = null;
         Eu4SavegameInfo e = null;
 
-        Eu4Savegame save = Eu4Savegame.fromFile(file);
-        is = Eu4IntermediateSavegame.fromSavegame(save);
+        Eu4RawSavegame save = Eu4RawSavegame.fromFile(file);
+        is = Eu4Savegame.fromSavegame(save);
         e = Eu4SavegameInfo.fromSavegame(is);
 
         UUID uuid = e.getCampaignUuid();
@@ -102,9 +102,9 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
 
     @Override
     protected Eu4SavegameInfo loadInfo(Path p) throws Exception {
-        Eu4IntermediateSavegame is = null;
+        Eu4Savegame is = null;
         Eu4SavegameInfo e = null;
-        is = Eu4IntermediateSavegame.fromFile(p);
+        is = Eu4Savegame.fromFile(p);
         e = Eu4SavegameInfo.fromSavegame(is);
         return e;
     }

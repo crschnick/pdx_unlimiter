@@ -1,42 +1,22 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.jfoenix.controls.*;
-import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
-import javafx.geometry.*;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiMenuBar {
 

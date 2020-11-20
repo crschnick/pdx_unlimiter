@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.Hoi4Installation;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -21,7 +22,8 @@ import java.util.Optional;
 public class Settings {
 
     private static Settings INSTANCE;
-    private Optional<Path> eu4;
+    private Path eu4;
+    private Path hoi4;
 
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
@@ -46,7 +48,8 @@ public class Settings {
 
     private static Settings defaultSettings() {
         Settings s = new Settings();
-        s.eu4 = GameInstallation.getInstallPath("Europa Universalis IV");
+        s.eu4 = GameInstallation.getInstallPath("Europa Universalis IV").orElse(null);
+        s.hoi4 = GameInstallation.getInstallPath("Hearts of Iron IV").orElse(null);
         return s;
     }
 
@@ -54,7 +57,8 @@ public class Settings {
         JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
         JsonNode i = node.required("installations");
         Settings s = new Settings();
-        s.eu4 = Optional.ofNullable(i.required("eu4")).map(n -> Paths.get(n.textValue()));
+        s.eu4 = Optional.ofNullable(i.get("eu4")).map(n -> Paths.get(n.textValue())).orElse(null);
+        s.hoi4 = Optional.ofNullable(i.get("hoi4")).map(n -> Paths.get(n.textValue())).orElse(null);
         return s;
     }
 
@@ -71,7 +75,12 @@ public class Settings {
         ObjectNode i = n.putObject("installations");
 
         Settings s = Settings.INSTANCE;
-        s.eu4.ifPresent(path -> i.set("eu4", new TextNode(path.toString())));
+        if (s.eu4 != null) {
+            i.set("eu4", new TextNode(s.eu4.toString()));
+        }
+        if (s.hoi4 != null) {
+            i.set("hoi4", new TextNode(s.hoi4.toString()));
+        }
 
         mapper.writeTree(generator, n);
         out.close();
@@ -80,26 +89,33 @@ public class Settings {
     public Settings copy() {
         Settings c = new Settings();
         c.eu4 = eu4;
+        c.hoi4 = hoi4;
         return c;
     }
 
     public Optional<Path> getEu4() {
-        return eu4;
+        return Optional.ofNullable(eu4);
     }
 
-    public void setEu4(Optional<Path> eu4) {
+    public void setEu4(Path eu4) {
         this.eu4 = eu4;
     }
 
     public void validate() {
-        if (eu4.isPresent() && !new Eu4Installation(eu4.get()).isValid()) {
-            eu4 = Optional.empty();
+        if (eu4 != null && !new Eu4Installation(eu4).isValid()) {
+            eu4 = null;
+        }
+        if (hoi4 != null && !new Hoi4Installation(hoi4).isValid()) {
+            hoi4 = null;
         }
     }
 
     public void apply() {
-        eu4.ifPresentOrElse(
-                value -> GameInstallation.EU4 = new Eu4Installation(value),
-                () -> GameInstallation.EU4 = null);
+        if (eu4 != null) {
+            GameInstallation.EU4 = new Eu4Installation(eu4);
+        }
+        if (hoi4 != null) {
+            GameInstallation.HOI4 = new Eu4Installation(hoi4);
+        }
     }
 }

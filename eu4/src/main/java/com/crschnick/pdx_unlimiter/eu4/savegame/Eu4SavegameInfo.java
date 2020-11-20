@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.eu4;
+package com.crschnick.pdx_unlimiter.eu4.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.parser.*;
 
@@ -31,9 +31,9 @@ public class Eu4SavegameInfo extends SavegameInfo {
     private Map<GameTag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
-    private Eu4IntermediateSavegame savegame;
+    private Eu4Savegame savegame;
 
-    public static Eu4SavegameInfo fromSavegame(Eu4IntermediateSavegame save) throws SavegameParseException {
+    public static Eu4SavegameInfo fromSavegame(Eu4Savegame save) throws SavegameParseException {
         try {
             GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
             String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
@@ -227,7 +227,7 @@ public class Eu4SavegameInfo extends SavegameInfo {
         return campaignUuid;
     }
 
-    public Eu4IntermediateSavegame getSavegame() {
+    public Eu4Savegame getSavegame() {
         return savegame;
     }
 

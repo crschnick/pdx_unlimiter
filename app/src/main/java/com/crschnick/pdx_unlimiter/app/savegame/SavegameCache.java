@@ -4,18 +4,15 @@ import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.eu4.Eu4IntermediateSavegame;
-import com.crschnick.pdx_unlimiter.eu4.Savegame;
-import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.SavegameParseException;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -179,15 +176,19 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         }
 
         for (C campaign : campaigns) {
-            JsonNode campaignNode = o.readTree(in.apply(
-                    Path.of(campaign.getCampaignId().toString()).resolve("campaign.json"))
-                    .readAllBytes());
-            StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
-                UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
-                String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
-                String checksum = entryNode.required("checksum").textValue();
-                campaign.add(readEntry(entryNode, name, eId, checksum));
-            });
+             try {
+                 JsonNode campaignNode = o.readTree(in.apply(
+                         Path.of(campaign.getCampaignId().toString()).resolve("campaign.json"))
+                         .readAllBytes());
+                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
+                     UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
+                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
+                     String checksum = entryNode.required("checksum").textValue();
+                     campaign.add(readEntry(entryNode, name, eId, checksum));
+                 });
+             } catch (Exception e) {
+                 ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName());
+             }
         }
     }
 
@@ -295,17 +296,17 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     public synchronized void updateSavegameData(E e) {
         Path p = getPath(e);
         Path s = p.resolve("savegame.eu4");
-        Eu4Savegame save = null;
+        Eu4RawSavegame save = null;
         try {
-            save = Eu4Savegame.fromFile(s);
+            save = Eu4RawSavegame.fromFile(s);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return;
         }
 
-        Eu4IntermediateSavegame is = null;
+        Eu4Savegame is = null;
         try {
-            is = Eu4IntermediateSavegame.fromSavegame(save);
+            is = Eu4Savegame.fromSavegame(save);
         } catch (SavegameParseException ex) {
             ErrorHandler.handleException(ex);
             return;

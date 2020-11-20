@@ -1,19 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Optional;
 
 public class FileImporter {
 
     private static Optional<String> getCampaignName(Path p) {
         try {
-            boolean ironman = Eu4Savegame.isIronman(p);
+            boolean ironman = Eu4RawSavegame.isIronman(p);
             if (ironman) {
                 String s = p.getFileName().toString().replace("_Backup", "");
                 return Optional.of(s.substring(0, s.length() - 4));

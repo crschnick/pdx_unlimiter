@@ -18,6 +18,7 @@ public class Eu4IronmanParser extends GamedataParser {
     public static final byte[] CLOSE_GROUP = new byte[]{4, 0};
     public static final byte[] INTEGER = new byte[]{0x0c, 0};
     public static final byte[] INTEGER_UNSIGNED = new byte[]{0x14, 0};
+    public static final byte[] LONG = new byte[]{(byte) 0x9C, 0x02};
     public static final byte[] STRING_1 = new byte[]{0x0F, 0};
     public static final byte[] STRING_2 = new byte[]{0x17, 0};
     public static final byte[] FLOAT = new byte[]{0x0D, 0};
@@ -27,8 +28,20 @@ public class Eu4IronmanParser extends GamedataParser {
     public static final byte[] BOOL_FALSE = new byte[]{0x4c, 0x28};
     public static final byte[] MAGIC = new byte[]{0x45, 0x55, 0x34, 0x62, 0x69, 0x6E};
 
+
+    public static final byte[] HOI_MAGIC = new byte[]{0x48, 0x4F, 0x49, 0x34, 0x62, 0x69, 0x6E};
+
     public Eu4IronmanParser(Namespace ns) {
         super(MAGIC, ns);
+    }
+
+
+    public Eu4IronmanParser(byte[] magic, Namespace ns) {
+        super(magic, ns);
+    }
+
+    public static Eu4IronmanParser hoi4Parser() {
+        return new Eu4IronmanParser(HOI_MAGIC, Namespace.HOI4);
     }
 
     public void write(Node node, OutputStream out, boolean isRoot) throws IOException {
@@ -118,6 +131,13 @@ public class Eu4IronmanParser extends GamedataParser {
                 byte[] number = new byte[8];
                 System.arraycopy(Arrays.copyOfRange(bytes, current, current + 4), 0, number, 0, 4);
                 current += 4;
+
+                long numberInt = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getLong();
+                tokens.add(new ValueToken(numberInt));
+            } else if (Arrays.equals(next, LONG)) {
+                byte[] number = new byte[8];
+                System.arraycopy(Arrays.copyOfRange(bytes, current, current + 8), 0, number, 0, 8);
+                current += 8;
 
                 long numberInt = ByteBuffer.wrap(number).order(ByteOrder.LITTLE_ENDIAN).getLong();
                 tokens.add(new ValueToken(numberInt));

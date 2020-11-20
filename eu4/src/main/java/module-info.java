@@ -4,7 +4,7 @@ module com.crschnick.pdx_unlimiter.eu4 {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.core;
 
-    exports com.crschnick.pdx_unlimiter.eu4;
     exports com.crschnick.pdx_unlimiter.eu4.parser;
     exports com.crschnick.pdx_unlimiter.eu4.format;
+    exports com.crschnick.pdx_unlimiter.eu4.savegame;
 }
