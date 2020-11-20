@@ -12,10 +12,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -36,25 +33,18 @@ public class GuiStatusBar {
         }
 
         private Status status;
-        private JFXSnackbar snackbar;
         private Pane pane;
 
         public StatusBar(Pane pane) {
-            this.pane = pane;
-            this.snackbar = new JFXSnackbar(pane);
             this.status = Status.NONE;
-
-            pane.widthProperty().addListener((c,o,n) -> {
-                snackbar.setPrefWidth((Double) n);
-            });
+            this.pane = pane;
         }
 
         private void setRunning() {
-            Region bar = createRunningBar(pane, snackbar);
+            Region bar = createRunningBar(pane);
             if (status == Status.NONE) {
-                showBar(pane, bar ,snackbar);
+                showBar(pane, bar);
             }
-            snackbar.enqueue(new JFXSnackbar.SnackbarEvent(bar, Duration.INDEFINITE));
             status = Status.RUNNING;
         }
 
@@ -63,20 +53,17 @@ public class GuiStatusBar {
                 return;
             }
 
-            Status oldStatus = status;
-            Region bar;
-            if (GameIntegration.current().isVersionCompatibe(GameIntegration.getGlobalSelectedEntry())) {
+            Region bar = null;
+            if (status != Status.SELECTED &&
+                    GameIntegration.current().isVersionCompatibe(GameIntegration.current().getSelectedEntry())) {
                 status = Status.SELECTED;
-                bar = createEntryStatusBar(pane, snackbar);
-            } else {
+                bar = createEntryStatusBar(pane);
+            } else if (status != Status.INCOMPATIBLE){
                 status = Status.INCOMPATIBLE;
-                bar = createInvalidVersionStatusBar(pane, snackbar);
+                bar = createInvalidVersionStatusBar(pane);
             }
 
-            if (oldStatus == Status.NONE) {
-                showBar(pane, bar, snackbar);
-            }
-            snackbar.enqueue(new JFXSnackbar.SnackbarEvent(bar, Duration.INDEFINITE));
+            if (bar != null) showBar(pane, bar);
         }
 
         private void unselect() {
@@ -84,24 +71,20 @@ public class GuiStatusBar {
                 return;
             }
 
-            hideBar(pane, snackbar);
-            snackbar.close();
+            hideBar(pane);
             status = Status.NONE;
         }
     }
 
-    public static void createStatusBar(
-            ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
-            ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry,
-            Pane layout) {
+    public static void createStatusBar(Pane layout) {
 
         StatusBar bar = new StatusBar(layout);
-        selectedEntry.addListener((c,o,n) -> {
-            if (n.isPresent()) {
+        GameIntegration.globalSelectedEntryProperty().addListener((c,o,n) -> {
+            if (n != null) {
                 Platform.runLater(() -> {
                     bar.select();
                 });
-            } else if (n.isEmpty()){
+            } else {
                 bar.unselect();
             }
         });
@@ -114,17 +97,16 @@ public class GuiStatusBar {
         });
     }
 
-    public static void showBar(Pane pane, Region bar, JFXSnackbar s) {
-        pane.prefHeightProperty().bind(bar.heightProperty());
-        s.setPrefWidth(pane.getWidth());
+    public static void showBar(Pane pane, Region bar) {
+        pane.getChildren().setAll(bar);
+        bar.setPrefWidth(pane.getWidth());
     }
 
-    private static void hideBar(Pane pane, JFXSnackbar s) {
-        s.close();
-        pane.maxHeightProperty().setValue(0);
+    private static void hideBar(Pane pane) {
+        pane.getChildren().clear();
     }
 
-    private static Region createRunningBar(Pane pane, JFXSnackbar s) {
+    private static Region createRunningBar(Pane pane) {
 
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add( CLASS_STATUS_BAR);
@@ -139,7 +121,7 @@ public class GuiStatusBar {
         b.setOnAction(event -> {
             event.consume();
 
-            hideBar(pane, s);
+            hideBar(pane);
         });
 
 
@@ -148,14 +130,14 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static Region createEntryStatusBar(Pane pane, JFXSnackbar s) {
+    private static Region createEntryStatusBar(Pane pane) {
 
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add( CLASS_STATUS_BAR);
 
         Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
-        text.getStyleClass().add( CLASS_TEXT);
         barPane.setLeft(text);
+        BorderPane.setAlignment(text, Pos.CENTER);
 
         Label name = new Label("entry");
         name.setGraphic(new FontIcon());
@@ -168,7 +150,7 @@ public class GuiStatusBar {
         e.getStyleClass().add( CLASS_EXPORT);
         e.setOnAction(event -> {
             event.consume();
-            hideBar(pane, s);
+            hideBar(pane);
         });
 
         Button b = new JFXButton("Launch");
@@ -178,7 +160,7 @@ public class GuiStatusBar {
             GameIntegration.current().launchCampaignEntry();
 
             event.consume();
-            hideBar(pane, s);
+            hideBar(pane);
         });
 
 
@@ -190,7 +172,7 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static Region createInvalidVersionStatusBar(Pane pane, JFXSnackbar s) {
+    private static Region createInvalidVersionStatusBar(Pane pane) {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
@@ -209,7 +191,7 @@ public class GuiStatusBar {
         b.setGraphic(new FontIcon());
         b.setOnAction(event -> {
             event.consume();
-            hideBar(pane, s);
+            hideBar(pane);
         });
 
         barPane.setRight(b);

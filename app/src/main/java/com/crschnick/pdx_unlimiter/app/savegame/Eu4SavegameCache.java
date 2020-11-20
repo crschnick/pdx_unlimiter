@@ -96,7 +96,8 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
         is.write(entryPath.resolve("data.zip"), true);
         FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
         FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
-        this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
+        Eu4CampaignEntry entry = this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
+        GameIntegration.EU4.selectEntry(entry);
     }
 
     @Override

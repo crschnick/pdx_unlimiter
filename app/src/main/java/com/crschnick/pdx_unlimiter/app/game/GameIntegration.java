@@ -2,8 +2,12 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.eu4.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -26,39 +30,42 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         EU4 = new Eu4Integration();
         ALL = Set.of(EU4);
         for (var i : ALL) {
-            i.selectedEntryProperty().addListener((c,o,n) -> {
-                globalSelectedEntryProperty().set(n);
-            });
         }
 
-        current.addListener((c,o,n) -> {
-            globalSelectedCampaign = n.selectedCampaign;
-            globalSelectedEntry = n.selectedEntry;
-        });
         current.set(EU4);
 
     }
 
-    public static GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>> getGlobalSelectedCampaign() {
-        return globalSelectedCampaign.get();
+    public static <E extends GameCampaignEntry<? extends SavegameInfo>,
+            C extends GameCampaign<E>> ReadOnlyObjectProperty<C> globalSelectedCampaignProperty() {
+        return (SimpleObjectProperty<C>) globalSelectedCampaign;
     }
 
-    public static SimpleObjectProperty<? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>> globalSelectedCampaignProperty() {
-        return globalSelectedCampaign;
+    private static <E extends GameCampaignEntry<? extends SavegameInfo>,
+            C extends GameCampaign<E>> SimpleObjectProperty<C> globalSelectedCampaignPropertyInternal() {
+        return (SimpleObjectProperty<C>) globalSelectedCampaign;
     }
 
-    public static GameCampaignEntry<? extends SavegameInfo> getGlobalSelectedEntry() {
-        return globalSelectedEntry.get();
-    }
+
 
     public static <E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>>
-    SimpleObjectProperty<E> globalSelectedEntryProperty() {
+    ReadOnlyObjectProperty<E> globalSelectedEntryProperty() {
+        return (SimpleObjectProperty<E>) globalSelectedEntry;
+    }
+
+    private static <E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>>
+    SimpleObjectProperty<E> globalSelectedEntryPropertyInternal() {
         return (SimpleObjectProperty<E>) globalSelectedEntry;
     }
 
     public static <E extends GameCampaignEntry<? extends SavegameInfo>,
             C extends GameCampaign<E>> GameIntegration<E,C> current() {
         return (GameIntegration<E, C>) current.get();
+    }
+
+    public static SimpleObjectProperty<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
+            ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> currentGameProperty() {
+        return current;
     }
 
     protected SimpleObjectProperty<C> selectedCampaign = new SimpleObjectProperty<>();
@@ -76,6 +83,30 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     }
 
+    public void selectCampaign(C c) {
+        this.selectedEntry.set(null);
+        globalSelectedEntryPropertyInternal().set(null);
+        this.selectedCampaign.set(c);
+        globalSelectedCampaignPropertyInternal().set((GameCampaign<GameCampaignEntry<? extends SavegameInfo>>) c);
+        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign " + c.getName());
+    }
+
+    public void selectEntry(E e) {
+        if (e != null) {
+            this.selectedCampaign.set(getSavegameCache().getCampaign(e));
+            globalSelectedCampaignPropertyInternal().set((GameCampaign<GameCampaignEntry<? extends SavegameInfo>>) getSavegameCache().getCampaign(e));
+        }
+        this.selectedEntry.set(e);
+        globalSelectedEntryPropertyInternal().set(e);
+
+        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign entry " + e.getName());
+    }
+
+    public static void selectIntegration(GameIntegration<?,?> newInt) {
+        current().selectCampaign(null);
+        current.set(newInt);
+    }
+
     public C getSelectedCampaign() {
         return selectedCampaign.get();
     }
@@ -90,13 +121,5 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     public SimpleObjectProperty<E> selectedEntryProperty() {
         return selectedEntry;
-    }
-
-    public void setSelectedCampaign(C selectedCampaign) {
-        this.selectedCampaign.set(selectedCampaign);
-    }
-
-    public void setSelectedEntry(E selectedEntry) {
-        this.selectedEntry.set(selectedEntry);
     }
 }

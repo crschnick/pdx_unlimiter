@@ -3,6 +3,8 @@
 -fx-font-size: 1.15em;
 -fx-background-color: #ffffff55;
 -fx-padding: 0.7em 3em 0.7em 3em;
+-fx-min-height: 5em;
+-fx-max-height: 5em;
 }
 
 .status-incompatible {

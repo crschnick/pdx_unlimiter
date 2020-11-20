@@ -19,11 +19,19 @@ public class Eu4CampaignEntry extends GameCampaignEntry<Eu4SavegameInfo> {
         this.date = date;
     }
 
+
+
     public String getTag() {
         return tag;
     }
 
     public GameDate getDate() {
         return date;
+    }
+
+    @Override
+    public int compareTo(GameCampaignEntry<Eu4SavegameInfo> o) {
+        Eu4CampaignEntry e = (Eu4CampaignEntry) o;
+        return e.getDate().compareTo(getDate());
     }
 }

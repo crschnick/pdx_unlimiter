@@ -278,7 +278,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         this.campaigns.remove(c);
     }
 
-    public synchronized void addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i) {
+    public synchronized E addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i) {
         if (this.getCampaign(campainUuid).isEmpty()) {
             this.campaigns.add(createCampaign(i));
         }
@@ -286,6 +286,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         C c = this.getCampaign(campainUuid).get();
         E e = createEntry(entryUuid, checksum, i);
         c.add(e);
+        return e;
     }
 
     protected abstract C createCampaign(I info);

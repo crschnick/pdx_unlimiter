@@ -1,16 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.eu4.SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -65,25 +66,40 @@ public class Eu4SavegameManagerStyle {
         list.getItems().setAll(newOrder);
     }
 
-    public static Node createSavegameList(ObjectProperty<Optional<Eu4Campaign>> selectedCampaign,
-                                           ObjectProperty<Optional<Eu4CampaignEntry>> selectedEntry) {
+    private static <I extends SavegameInfo, E extends GameCampaignEntry<I>> void add(JFXListView<Node> list, Set<E> entries,
+                                                     E entry) {
+        int index = new TreeSet<>(entries).headSet(entry).size();
+        list.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(entry));
+    }
+
+    public static Node createSavegameList() {
         JFXListView<Node> grid = new JFXListView<>();
         grid.getStyleClass().add(CLASS_ENTRY_LIST);
 
-        SetChangeListener<Eu4CampaignEntry> l = (c) -> {
+        SetChangeListener<GameCampaignEntry> l = (c) -> {
             Platform.runLater(() -> {
-                updateSavegames(grid, c.getSet());
+                if (c.wasAdded()) {
+                    int index = new TreeSet<GameCampaignEntry>(c.getSet()).headSet(c.getElementAdded()).size();
+                    grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
+                    grid.getSelectionModel().select(index);
+                    grid.getFocusModel().focus(index);
+                } else {
+                    grid.getItems().remove(grid.getItems().stream()
+                            .filter(n -> !c.getSet().contains(n.getProperties().get("entry"))).findAny().get());
+                }
             });
         };
 
-        selectedCampaign.addListener((c, o, n) -> {
-            if (n.isPresent()) {
-                n.get().getSavegames().addListener(l);
+        GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
+            if (n != null) {
+                n.getSavegames().addListener(l);
                 Platform.runLater(() -> {
-                    updateSavegames(grid, n.get().getSavegames());
+                    grid.setItems(FXCollections.observableArrayList(n.getSavegames().stream()
+                            .map(GuiGameCampaignEntry::createCampaignEntryNode)
+                            .collect(Collectors.toList())));
                 });
             } else {
-                o.get().getSavegames().removeListener(l);
+                o.getSavegames().removeListener(l);
                 Platform.runLater(() -> {
                     grid.setItems(FXCollections.observableArrayList());
                 });
@@ -93,13 +109,13 @@ public class Eu4SavegameManagerStyle {
         return grid;
     }
 
-    private static HBox createCampaignButton(Eu4Campaign c, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
+    private static HBox createCampaignButton(GameCampaign c) {
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());
         del.getStyleClass().add("delete-button");
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showCampaignDeleteDialog()) {
-                onDelete.accept(c);
+                //onDelete.accept(c);
             }
         });
         del.setAlignment(Pos.CENTER);
@@ -110,13 +126,10 @@ public class Eu4SavegameManagerStyle {
         name.getStyleClass().add(CLASS_TEXT_FIELD);
         name.textProperty().bindBidirectional(c.nameProperty());
 
-        Label date = new Label(c.getDate().toDisplayString());
-        c.dateProperty().addListener((change, o, n) -> {
-            Platform.runLater(() -> {
-                date.setText(n.toString());
-            });
-        });
+        Label date = new Label();
+        date.textProperty().bind(GameIntegration.current().getGuiFactory().createInfoString(c));
         date.getStyleClass().add(CLASS_DATE);
+
         HBox top = new HBox();
         top.getChildren().add(name);
         top.getChildren().add(del);
@@ -127,51 +140,55 @@ public class Eu4SavegameManagerStyle {
         b.getChildren().add(date);
         b.setAlignment(Pos.CENTER_LEFT);
 
-        Node w = getImageForTagName(c.getTag(), CLASS_TAG_ICON);
+        ObservableValue<Pane> prop = GameIntegration.current().getGuiFactory().createImage(c);
+        Node w = prop.getValue();
         HBox btn = new HBox();
         btn.getChildren().add(w);
         btn.getChildren().add(b);
-        c.tagProperty().addListener((change, o, n) -> {
+        prop.addListener((change, o, n) -> {
             Platform.runLater(() -> {
-                btn.getChildren().set(0, getImageForTagName(n, CLASS_TAG_ICON));
+                btn.getChildren().set(0, prop.getValue());
             });
         });
 
-        btn.setOnMouseClicked((m) -> selectedCampaign.setValue(Optional.of(c)));
+        btn.setOnMouseClicked((m) -> GameIntegration.current().selectCampaign(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         return btn;
     }
 
-    private static void sortCampaignList(JFXListView<Node> list, ObservableSet<Eu4Campaign> campaigns, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
-        List<Region> newOrder = campaigns.stream()
-                .sorted(Comparator.comparing(Eu4Campaign::getLastPlayed))
-                .map(c -> createCampaignButton(c, selectedCampaign, onDelete))
-                .collect(Collectors.toList());
-        Collections.reverse(newOrder);
-        list.getItems().setAll(newOrder);
-    }
 
-    public static Node createCampaignList(ObservableSet<Eu4Campaign> campaigns, ObjectProperty<Optional<Eu4Campaign>> selectedCampaign, Consumer<Eu4Campaign> onDelete) {
+    public static Node createCampaignList() {
         JFXListView<Node> grid = new JFXListView<Node>();
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
-        for (Eu4Campaign d : campaigns) {
-            d.lastPlayedProperty().addListener((change, o, n) -> {
-                Platform.runLater(() -> {
-                    sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
-                });
-            });
-        }
-        campaigns.addListener((SetChangeListener<? super Eu4Campaign>) (change) -> {
-            Platform.runLater(() -> {
-                if (campaigns.size() == 0) {
 
+        SetChangeListener<GameCampaign> l = (c) -> {
+            Platform.runLater(() -> {
+                if (c.wasAdded()) {
+                    int index = new TreeSet<GameCampaign>(c.getSet()).headSet(c.getElementAdded()).size();
+                    grid.getItems().add(index, createCampaignButton(c.getElementAdded()));
+                    grid.getSelectionModel().select(index);
+                    grid.getFocusModel().focus(index);
+                } else {
+                    grid.getItems().remove(grid.getItems().stream()
+                            .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get());
                 }
-                sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
             });
+        };
+
+        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
+            if (n == null) {
+                o.getSavegameCache().getCampaigns().removeListener(l);
+                grid.setItems(FXCollections.observableArrayList());
+            } else {
+                n.getSavegameCache().getCampaigns().addListener(l);
+                grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().getCampaigns().stream()
+                        .map(Eu4SavegameManagerStyle::createCampaignButton)
+                        .collect(Collectors.toList())));
+            }
         });
-        sortCampaignList(grid, campaigns, selectedCampaign, onDelete);
+
         return grid;
     }
 
