@@ -1,23 +1,17 @@
 package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.gui.Eu4SavegameManagerStyle;
-import com.crschnick.pdx_unlimiter.app.gui.GameImage;
-import com.crschnick.pdx_unlimiter.app.gui.GuiStatusBar;
+import com.crschnick.pdx_unlimiter.app.gui.*;
 import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.jfoenix.controls.JFXSnackbar;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -32,7 +26,6 @@ import org.jnativehook.GlobalScreen;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -60,7 +53,7 @@ public class PdxuApp extends Application {
 
 
     private void setCampainList(BorderPane layout) {
-        layout.setLeft(Eu4SavegameManagerStyle.createCampaignList());
+        layout.setLeft(GuiGameCampaignList.createCampaignList());
     }
 
     private void createLayout() {
@@ -72,14 +65,14 @@ public class PdxuApp extends Application {
             });
         });
 
-        layout.setTop(Eu4SavegameManagerStyle.createMenu());
+        layout.setTop(GuiMenuBar.createMenu());
         Pane p = new Pane();
         layout.setBottom(p);
         GuiStatusBar.createStatusBar(p);
         if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
-            layout.setCenter(Eu4SavegameManagerStyle.createNoCampaignNode());
+            layout.setCenter(GuiGameCampaignList.createNoCampaignNode());
         } else {
-            layout.setCenter(Eu4SavegameManagerStyle.createSavegameList());
+            layout.setCenter(GuiGameCampaignEntryList.createCampaignEntryList());
             setCampainList(layout);
         }
 
@@ -187,16 +180,7 @@ public class PdxuApp extends Application {
         primaryStage.show();
         //setUserAgentStylesheet(STYLESHEET_CASPIAN);
         //primaryStage.getScene().getStylesheets().clear();
-        primaryStage.getScene().getStylesheets().add(
-                PdxuApp.class.getResource("style.css").toExternalForm());
-        primaryStage.getScene().getStylesheets().add(
-                PdxuApp.class.getResource("scrollbar.css").toExternalForm());
-        primaryStage.getScene().getStylesheets().add(
-                PdxuApp.class.getResource("buttons.css").toExternalForm());
-        primaryStage.getScene().getStylesheets().add(
-                PdxuApp.class.getResource("campaign.css").toExternalForm());
-        primaryStage.getScene().getStylesheets().add(
-                PdxuApp.class.getResource("status-bar.css").toExternalForm());
+        GuiStyle.addStylesheets(primaryStage.getScene());
 
 
     }

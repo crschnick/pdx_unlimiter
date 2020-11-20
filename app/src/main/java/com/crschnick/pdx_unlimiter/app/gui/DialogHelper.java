@@ -99,8 +99,15 @@ public class DialogHelper {
     public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
         setIcon(alert);
-        alert.getDialogPane().getScene().getStylesheets().clear();
-        alert.getDialogPane().getScene().getStylesheets().add(DialogHelper.class.getResource("style.css").toExternalForm());
+        GuiStyle.addStylesheets(alert.getDialogPane().getScene());
+        return alert;
+    }
+
+    public static Alert createEmptyAlert() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        setIcon(alert);
+        GuiStyle.addStylesheets(alert.getDialogPane().getScene());
+        GuiStyle.makeEmptyAlert(alert.getDialogPane().getScene());
         return alert;
     }
 

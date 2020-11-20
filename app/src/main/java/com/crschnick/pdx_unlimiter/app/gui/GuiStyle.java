@@ -1,5 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import javafx.scene.Scene;
+
+import java.util.List;
+
 public class GuiStyle {
 
     public static String CLASS_CAMPAIGN_LIST = "campaign-list";
@@ -37,5 +42,17 @@ public class GuiStyle {
     public static String CLASS_ENTRY = "entry";
     public static String CLASS_TAG_BAR = "tag-bar";
     public static String CLASS_BUTTON_BAR = "button-bar";
+    public static String CLASS_GAME_ICON = "game-icon";
+    public static String CLASS_GAME_ICON_BAR = "game-icon-bar";
 
+    public static void addStylesheets(Scene scene) {
+        List.of("style.css", "scrollbar.css", "buttons.css",
+                "campaign.css", "status-bar.css", "game-switcher.css").stream()
+                .map(s -> PdxuApp.class.getResource(s).toExternalForm())
+                .forEach(s -> scene.getStylesheets().add(s));
+    }
+
+    public static void makeEmptyAlert(Scene scene) {
+        scene.getStylesheets().add(PdxuApp.class.getResource("empty-alert.css").toExternalForm());
+    }
 }
