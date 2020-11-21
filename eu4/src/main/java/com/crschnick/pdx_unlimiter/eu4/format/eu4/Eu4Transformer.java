@@ -67,7 +67,7 @@ public class Eu4Transformer {
             } else {
                 return false;
             }
-        }, new DateTransformer()));
+        }, DateTransformer.EU4));
 
         t.add(new RecursiveTransformer((n) -> {
             if (n instanceof KeyValueNode) {
@@ -79,7 +79,7 @@ public class Eu4Transformer {
             }
         }, new BooleanTransformer()));
 
-        t.add(new SubnodeTransformer(Map.of(new String[]{"flags", "*"}, new DateTransformer()), true));
+        t.add(new SubnodeTransformer(Map.of(new String[]{"flags", "*"}, DateTransformer.EU4), true));
         t.add(createSettingsTransformer());
 
         t.add(new CollectNodesTransformer("active_war", "active_wars"));
@@ -128,7 +128,7 @@ public class Eu4Transformer {
             }
         }, new BooleanTransformer()));
 
-        t.add(new SubnodeTransformer(Map.of(new String[]{"date"}, new DateTransformer()), true));
+        t.add(new SubnodeTransformer(Map.of(new String[]{"date"}, DateTransformer.EU4), true));
         t.add(new DefaultValueTransformer("is_random_new_world", new ValueNode(false)));
         t.add(new DefaultValueTransformer("ironman", new ValueNode(false)));
         return new ChainTransformer(t);

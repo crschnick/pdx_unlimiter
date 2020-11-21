@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.eu4.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.format.NodeSplitter;
 import com.crschnick.pdx_unlimiter.eu4.format.eu4.Eu4Transformer;
+import com.crschnick.pdx_unlimiter.eu4.format.hoi4.Hoi4Transformer;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class Hoi4Savegame extends Savegame {
 
     public static Hoi4Savegame fromSavegame(Hoi4RawSavegame save) throws SavegameParseException {
         Node gameState = save.getContent();
+        Hoi4Transformer.TRANSFORMER.transform(gameState);
         Map<String, Node> map;
         try {
             map = new HashMap<>(new NodeSplitter(SPLIT_PARTS).removeNodes(gameState));
