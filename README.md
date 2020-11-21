@@ -1,20 +1,29 @@
+# Pdx-Unlimiter
+
+## Installation
+
+When a release is ready, download the [windows installer](https://github.com/crschnick/pdx_unlimiter/releases/latest/pdxu_installer.exe) or the [linux installer](https://github.com/crschnick/pdx_unlimiter/releases/latest/pdxu.deb).
+When installation is completed, the Pdx-Unlimiter should start automatically and tries to autodetect Paradox game installations.
+
 ## Features
 
-### Savegame management for EU4
+### Savegame management for Paradox games
 
 Since keeping track of all your savegames is getting more complicated with every new savegame you start or backup you revert to,
 the Pdx-Unlimiter provides you with an easy to use interface for choosing the right save file.
 This is done by collecting all savegames and creating a browsable and editable savegame history so you can load any prior saved version of
 a campaign. 
 This works for both Ironman and Non-Ironman savegames.
-All savegames can be also launched directly from within the Pdx-Unlimiter without needing to vist the EU4 main menu.
+All savegames can be also launched directly from within the Pdx-Unlimiter without needing to vist the main menu.
+
+Supported games: EU4, HOI4, Stellaris (soon), CK3 (soon)
 
 ![Example](docs/screenshot.png)
 
 ### Reverting savegames
 
-If you are ingame and the Pdx-Unlimiter is running, you can press (CTRL+SHIFT+I) at any time to import the latest saved savegame.
-If you want to revert to a previously imported savegame, you can press (CTRL+SHIFT+K) to quickly close EU4.
+If you are ingame and the Pdx-Unlimiter is running, you can import the latest saved savegame any time.
+If you want to revert to a previously imported savegame, you can kill the currenty running Paradox game and load the latest save.
 This kind of manual savegame management for ironman games allows you to easily revert to previous saves,
 i.e. to savescum, which is kinda necessary for hard achievements.
 
@@ -29,11 +38,6 @@ visit [https://github.com/crschnick/pdxu_achievements]() for a documentation.
 
 ## Planned features
 
-### Savegame management for other Paradox games
-
-Right now, only EU4 savegames are supported. If the EU4 component works completely, support for other games can easily be added.
-
-Status: Planned
 
 ### Loading time improvements
 
