@@ -19,7 +19,7 @@ public class Hoi4SavegameInfo extends SavegameInfo {
         try {
             i.tag = new Hoi4Tag(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "player")),
                     Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "ideology")));
-            i.date = Hoi4Date.fromString(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "date")));
+            i.date = Hoi4Date.fromNode(Node.getNodeForKey(sg.getNodes().get("gamestate"), "date"));
             i.campaignUuid = UUID.fromString(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "game_unique_id")));
             i.savegame = sg;
         } catch (Exception e) {

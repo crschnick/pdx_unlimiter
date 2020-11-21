@@ -44,7 +44,7 @@ public class Hoi4Installation extends GameInstallation {
         loadSettings();
 
         countryNames = new HashMap<>();
-        Pattern p = Pattern.compile("\\s+([A-Za-z]+)_([a-z]+):0 \"(\\w+)\"");
+        Pattern p = Pattern.compile("\\s+([A-Za-z]+)_([a-z]+):0 \"(.+)\"");
         Files.lines(getPath().resolve("localisation").resolve("countries_l_english.yml")).forEach(s -> {
             Matcher m = p.matcher(s);
             if (m.matches()) {
@@ -53,10 +53,20 @@ public class Hoi4Installation extends GameInstallation {
         });
 
         countryColors = new HashMap<>();
+        loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("00_countries.txt"));
+        loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("01_countries.txt"));
+        loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("zz_dynamic_countries.txt"));
+    }
+
+    private void loadCountryColors(Path path) throws IOException {
         Node node = Eu4NormalParser.textFileParser().parse(
-                Files.newInputStream(getPath().resolve("common").resolve("country_tags").resolve("00_countries.txt"))).get();
+                Files.newInputStream(path)).get();
         for (Node n : Node.getNodeArray(node)) {
             var kv = Node.getKeyValueNode(n);
+            if (!(((ValueNode) kv.getNode()).getValue() instanceof String)) {
+                continue;
+            }
+
             Node data = Eu4NormalParser.textFileParser().parse(
                     Files.newInputStream(getPath().resolve("common").resolve(Node.getString(kv.getNode())))).get();
             List<Node> color;
@@ -69,8 +79,8 @@ public class Hoi4Installation extends GameInstallation {
             }
 
             countryColors.put(kv.getKeyName(), Node.getInteger(color.get(0)) << 16 +
-                            (Node.getInteger(color.get(1)) << 8) +
-                            (Node.getInteger(color.get(2))));
+                    (Node.getInteger(color.get(1)) << 8) +
+                    (Node.getInteger(color.get(2))));
         }
     }
 
