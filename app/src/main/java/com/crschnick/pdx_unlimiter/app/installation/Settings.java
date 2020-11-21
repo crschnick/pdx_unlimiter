@@ -56,9 +56,9 @@ public class Settings {
     private static Settings loadConfig(Path file) throws Exception {
         JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
         JsonNode i = node.required("installations");
-        Settings s = new Settings();
-        s.eu4 = Optional.ofNullable(i.get("eu4")).map(n -> Paths.get(n.textValue())).orElse(null);
-        s.hoi4 = Optional.ofNullable(i.get("hoi4")).map(n -> Paths.get(n.textValue())).orElse(null);
+        Settings s = defaultSettings();
+        s.eu4 = Optional.ofNullable(i.get("eu4")).map(n -> Paths.get(n.textValue())).orElse(s.eu4);
+        s.hoi4 = Optional.ofNullable(i.get("hoi4")).map(n -> Paths.get(n.textValue())).orElse(s.hoi4);
         return s;
     }
 
@@ -97,8 +97,16 @@ public class Settings {
         return Optional.ofNullable(eu4);
     }
 
+    public Optional<Path> getHoi4() {
+        return Optional.ofNullable(hoi4);
+    }
+
     public void setEu4(Path eu4) {
         this.eu4 = eu4;
+    }
+
+    public void setHoi44(Path hoi4) {
+        this.hoi4 = hoi4;
     }
 
     public void validate() {
@@ -115,7 +123,8 @@ public class Settings {
             GameInstallation.EU4 = new Eu4Installation(eu4);
         }
         if (hoi4 != null) {
-            GameInstallation.HOI4 = new Eu4Installation(hoi4);
+            GameInstallation.HOI4 = new Hoi4Installation(hoi4);
         }
     }
+
 }

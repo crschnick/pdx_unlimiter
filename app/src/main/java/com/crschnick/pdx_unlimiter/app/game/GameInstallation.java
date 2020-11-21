@@ -13,7 +13,7 @@ import java.util.Optional;
 public abstract class GameInstallation {
 
     public static Eu4Installation EU4 = null;
-    public static Eu4Installation HOI4 = null;
+    public static Hoi4Installation HOI4 = null;
     private Path path;
     public GameInstallation(Path path) {
         this.path = path;

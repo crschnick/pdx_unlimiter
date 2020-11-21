@@ -1,8 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.parser.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
@@ -13,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -22,6 +22,8 @@ public class Hoi4Installation extends GameInstallation {
 
     private Path executable;
     private Path userDirectory;
+    private Map<Hoi4Tag,String> countryNames;
+    private Map<String,Integer> countryColors;
 
 
     public Hoi4Installation(Path path) {
@@ -40,6 +42,36 @@ public class Hoi4Installation extends GameInstallation {
 
     public void init() throws Exception {
         loadSettings();
+
+        countryNames = new HashMap<>();
+        Pattern p = Pattern.compile("\\s+([A-Za-z]+)_([a-z]+):0 \"(\\w+)\"");
+        Files.lines(getPath().resolve("localisation").resolve("countries_l_english.yml")).forEach(s -> {
+            Matcher m = p.matcher(s);
+            if (m.matches()) {
+                countryNames.put(new Hoi4Tag(m.group(1), m.group(2)), m.group(3));
+            }
+        });
+
+        countryColors = new HashMap<>();
+        Node node = Eu4NormalParser.textFileParser().parse(
+                Files.newInputStream(getPath().resolve("common").resolve("country_tags").resolve("00_countries.txt"))).get();
+        for (Node n : Node.getNodeArray(node)) {
+            var kv = Node.getKeyValueNode(n);
+            Node data = Eu4NormalParser.textFileParser().parse(
+                    Files.newInputStream(getPath().resolve("common").resolve(Node.getString(kv.getNode())))).get();
+            List<Node> color;
+
+            // Fix rgb prefix for some countries
+            if (Node.getNodeForKey(data, "color") instanceof ValueNode) {
+                color = Node.getNodeArray(Node.getNodeArray(data).get(3));
+            } else {
+                color = Node.getNodeArray(Node.getNodeForKey(data, "color"));
+            }
+
+            countryColors.put(kv.getKeyName(), Node.getInteger(color.get(0)) << 16 +
+                            (Node.getInteger(color.get(1)) << 8) +
+                            (Node.getInteger(color.get(2))));
+        }
     }
 
     private Path determineUserDirectory(JsonNode node) {
@@ -78,5 +110,13 @@ public class Hoi4Installation extends GameInstallation {
 
     public Path getSaveDirectory() {
         return userDirectory.resolve("save games");
+    }
+
+    public Map<Hoi4Tag, String> getCountryNames() {
+        return countryNames;
+    }
+
+    public Map<String, Integer> getCountryColors() {
+        return countryColors;
     }
 }

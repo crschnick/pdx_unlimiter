@@ -1,42 +1,45 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public abstract class GameIntegration<E extends GameCampaignEntry<? extends SavegameInfo>,C extends GameCampaign<E>> {
 
-    public static Eu4Integration EU4;
     private static SimpleObjectProperty<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
             ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> current = new SimpleObjectProperty<>();
 
 
-    private static Set<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
+    private static List<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
                 ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> ALL;
 
     private static SimpleObjectProperty<? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>> globalSelectedCampaign =
             new SimpleObjectProperty<>();
     private static SimpleObjectProperty<? extends GameCampaignEntry<? extends SavegameInfo>> globalSelectedEntry =
-            new SimpleObjectProperty<>();;
+            new SimpleObjectProperty<>();
 
     public static void init() {
-        EU4 = new Eu4Integration();
-        ALL = Set.of(EU4);
-        for (var i : ALL) {
+        ALL = new ArrayList<>();
+        if (Settings.getInstance().getEu4().isPresent()) {
+            ALL.add(new Eu4Integration());
         }
-
-        current.set(EU4);
-
+        if (Settings.getInstance().getHoi4().isPresent()) {
+            ALL.add(new Hoi4Integration());
+        }
+        current.set(ALL.get(1));
     }
 
     public static List<GameIntegration<?,?>> getAvailable() {
-        return List.of(EU4, EU4, EU4);
+        return (List<GameIntegration<?, ?>>) ALL;
     }
 
     public static <E extends GameCampaignEntry<? extends SavegameInfo>,
@@ -85,7 +88,11 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     public abstract SavegameCache<? extends SavegameInfo,E,C> getSavegameCache();
 
     public void openCampaignEntry(E entry) {
-
+        try {
+            Desktop.getDesktop().open(getSavegameCache().getPath(entry).toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void selectCampaign(C c) {

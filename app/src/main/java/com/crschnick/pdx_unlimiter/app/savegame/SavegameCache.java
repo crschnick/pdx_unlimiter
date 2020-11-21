@@ -18,6 +18,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.function.FailableFunction;
 
 import java.io.*;
@@ -34,8 +35,9 @@ import java.util.zip.ZipOutputStream;
 public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampaignEntry<I>, C extends GameCampaign<E>> {
 
     public static final Eu4SavegameCache EU4_CACHE = new Eu4SavegameCache();
+    public static final Hoi4SavegameCache HOI4_CACHE = new Hoi4SavegameCache();
 
-    public static final Set<SavegameCache> CACHES = Set.of(EU4_CACHE);
+    public static final Set<SavegameCache<?,?,?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE);
     private volatile Queue<E> toLoad = new ConcurrentLinkedQueue<>();
     private String name;
     private Path path;
@@ -242,9 +244,9 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
                 names.add(name);
                 try {
                     compressFileToZipfile(
-                            getPath(e).resolve("savegame.eu4").toFile(),
+                            getPath(e).resolve("savegame." + name).toFile(),
                             PdxuInstallation.getInstance().getSavegameLocation()
-                                    .relativize(getPath()).resolve(name + ".eu4").toString(),
+                                    .relativize(getPath()).resolve(name + "." + name).toString(),
                             out);
                 } catch (IOException ioException) {
                     ErrorHandler.handleException(ioException);
@@ -295,44 +297,26 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
 
     public synchronized void updateSavegameData(E e) {
         Path p = getPath(e);
-        Path s = p.resolve("savegame.eu4");
-        Eu4RawSavegame save = null;
+        Path s = p.resolve("savegame." + name);
         try {
-            save = Eu4RawSavegame.fromFile(s);
+            PathUtils.delete(p.resolve("data.zip"));
+        } catch (IOException ioException) {
+            ErrorHandler.handleException(ioException);
+            return;
+        }
+
+        try {
+            writeSavegameData(s, p.resolve("data.zip"));
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
-            return;
-        }
-
-        Eu4Savegame is = null;
-        try {
-            is = Eu4Savegame.fromSavegame(save);
-        } catch (SavegameParseException ex) {
-            ErrorHandler.handleException(ex);
-            return;
-        }
-
-        for (File f : p.toFile().listFiles((f) -> !f.toPath().equals(s))) {
-            if (!f.delete()) {
-                try {
-                    throw new IOException("Couldn't delete file " + f.toString());
-                } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException);
-                    return;
-                }
-            }
-        }
-
-        try {
-            is.write(p.resolve("data.zip"), true);
-        } catch (IOException ex) {
-            ErrorHandler.handleException(ex);
-            return;
         }
     }
 
+    protected abstract void writeSavegameData(Path savegame, Path out) throws Exception;
+
     public synchronized C getCampaign(E e) {
-        return campaigns.stream().filter(c -> c.getSavegames().contains(e)).findAny().get();
+        var campaign = campaigns.stream().filter(c -> c.getSavegames().contains(e)).findAny();
+        return campaign.orElseThrow(() -> new IllegalArgumentException("Could not find campaign for entry " + e.getName()));
     }
 
     public synchronized void delete(E e) {
@@ -395,11 +379,11 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     }
 
     public synchronized String getFileName(E e) {
-        return getCampaign(e).getName() + " " + e.getName() + ".eu4";
+        return getCampaign(e).getName() + " " + e.getName() + "." + name;
     }
 
     public synchronized Optional<Path> exportSavegame(E e, Path destPath) {
-        Path srcPath = getPath(e).resolve("savegame.eu4");
+        Path srcPath = getPath(e).resolve("savegame." + name);
         try {
             FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
             return Optional.of(destPath);

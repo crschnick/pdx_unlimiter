@@ -52,9 +52,6 @@ public class Eu4NormalParser extends GamedataParser {
                 t = new EqualsToken();
             } else if (s.charAt(i) == '"') {
                 isInQuotes = !isInQuotes;
-            } else if (s.charAt(i) == '#') {
-                isInComment = true;
-                continue;
             }
 
             boolean isNewLine = s.charAt(i) == '\n';
@@ -68,9 +65,10 @@ public class Eu4NormalParser extends GamedataParser {
 
             boolean isWhitespace = !isInQuotes && (isNewLine || s.charAt(i) == '\r' || s.charAt(i) == ' ' || s.charAt(i) == '\t');
             boolean marksEndOfPreviousToken =
-                    (s.charAt(i) == '\0' && prev < i) // EOF
-                            || (t != null && prev < i)        // New token finishes old token
-                            || (isWhitespace && prev < i);    // Whitespace finishes old token
+                    (s.charAt(i) == '\0' && prev < i)               // EOF
+                            || (t != null && prev < i)              // New token finishes old token
+                            || (isWhitespace && prev < i)           // Whitespace finishes old token
+                            || (s.charAt(i) == '#' && prev < i);    // New comment finishes old token
             if (marksEndOfPreviousToken) {
                 String sub = s.substring(prev, i);
                 if (sub.equals("yes")) {
@@ -93,6 +91,8 @@ public class Eu4NormalParser extends GamedataParser {
             } else if (t != null) {
                 tokens.add(t);
                 prev = i + 1;
+            } else if (s.charAt(i) == '#') {
+                isInComment = true;
             }
         }
         return tokens;

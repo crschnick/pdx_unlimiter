@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -13,6 +16,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class GameImage {
+
+    public static Image HOI4_ICON;
 
     public static Image EU4_ICON;
     public static Image EU4_ICON_VASSAL;
@@ -36,8 +41,9 @@ public class GameImage {
 
     private static Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     private static Map<String, Image> COUNTRY_IMAGES = new HashMap<>();
+    private static Map<Hoi4Tag, Image> HOI4_COUNTRY_IMAGES = new HashMap<>();
 
-    public static Pane tagNode(String tag, String styleClass) {
+    public static Pane eu4TagNode(String tag, String styleClass) {
         if (!COUNTRY_IMAGES.containsKey(tag)) {
             COUNTRY_IMAGES.put(tag, ImageLoader.loadImage(
                     GameInstallation.EU4.getPath().resolve("gfx/flags/" + tag + ".tga")));
@@ -48,6 +54,22 @@ public class GameImage {
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         pane.getStyleClass().add(styleClass);
+        return pane;
+    }
+
+    public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
+        if (!HOI4_COUNTRY_IMAGES.containsKey(tag)) {
+            HOI4_COUNTRY_IMAGES.put(tag, ImageLoader.loadImage(
+                    GameInstallation.HOI4.getPath().resolve("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga")));
+        }
+
+        ImageView v = new ImageView(HOI4_COUNTRY_IMAGES.get(tag));
+        StackPane pane = new StackPane(v);
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        v.preserveRatioProperty().setValue(true);
+        pane.getStyleClass().add(styleClass);
+        pane.setAlignment(Pos.CENTER);
         return pane;
     }
 
@@ -77,6 +99,29 @@ public class GameImage {
     }
 
     public static void loadImages() {
+        loadEu4Images();
+        loadHoiImages();
+    }
+
+    public static void loadHoiImages() {
+        if (GameInstallation.HOI4 == null) {
+            return;
+        }
+
+        Path p = GameInstallation.HOI4.getPath();
+        Path i = p.resolve("gfx").resolve("interface");
+        String s = "image-icon";
+
+        HOI4_ICON = ImageLoader.loadImage(
+                GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("game-icon.png"));
+
+    }
+
+    public static void loadEu4Images() {
+        if (GameInstallation.EU4 == null) {
+            return;
+        }
+
         Path p = GameInstallation.EU4.getPath();
         Path i = p.resolve("gfx").resolve("interface");
         String s = "image-icon";

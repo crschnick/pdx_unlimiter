@@ -44,13 +44,13 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
 
     @Override
     public Pane createImage(Eu4CampaignEntry entry) {
-        return GameImage.tagNode(entry.getTag(), CLASS_TAG_ICON);
+        return GameImage.eu4TagNode(entry.getTag(), CLASS_TAG_ICON);
     }
 
     @Override
     public ObservableValue<Pane> createImage(Eu4Campaign campaign) {
         var b = Bindings.createObjectBinding(
-                () -> GameImage.tagNode(campaign.getTag(), CLASS_TAG_ICON), campaign.tagProperty());
+                () -> GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON), campaign.tagProperty());
         return b;
     }
 
@@ -138,7 +138,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
 
     private static Node getImageForTagName(String tag, String styleClass) {
         if (GameInstallation.EU4.isPreexistingCoutry(tag)) {
-            return GameImage.tagNode(tag, styleClass);
+            return GameImage.eu4TagNode(tag, styleClass);
         } else {
             Label l = new Label("?");
             l.getStyleClass().add(styleClass);

@@ -58,30 +58,13 @@ public class PdxuApp extends Application {
         return layout.getScene();
     }
 
-
-    private void setCampainList(BorderPane layout) {
-        layout.setLeft(GuiGameCampaignList.createCampaignList());
-    }
-
     private void createLayout() {
-        SavegameCache.EU4_CACHE.getCampaigns().addListener((SetChangeListener<? super Eu4Campaign>) (change) -> {
-            Platform.runLater(() -> {
-                if (change.getSet().size() == 1 && change.wasAdded()) {
-                    createLayout();
-                }
-            });
-        });
-
         layout.setTop(GuiMenuBar.createMenu());
         Pane p = new Pane();
         layout.setBottom(p);
         GuiStatusBar.createStatusBar(p);
-        if (SavegameCache.EU4_CACHE.getCampaigns().size() == 0) {
-            layout.setCenter(GuiGameCampaignList.createNoCampaignNode());
-        } else {
-            layout.setCenter(GuiGameCampaignEntryList.createCampaignEntryList());
-            setCampainList(layout);
-        }
+        layout.setCenter(GuiGameCampaignEntryList.createCampaignEntryList());
+        layout.setLeft(GuiGameCampaignList.createCampaignList());
 
 
         layout.setOnDragOver(event -> {
@@ -94,13 +77,7 @@ public class PdxuApp extends Application {
 
         layout.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
-            boolean success = false;
-            for (File f : db.getFiles()) {
-                if (FileImporter.importFile(f.toPath())) {
-                    success = true;
-                }
-            }
-
+            boolean success = FileImporter.importFiles(db.getFiles());
             event.setDropCompleted(success);
             event.consume();
         });
