@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
@@ -83,7 +84,7 @@ public class GuiMenuBar {
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
             try {
-                Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getPath().toFile());
+                Desktop.getDesktop().open(GameIntegration.current().getSavegameCache().getPath().toFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -93,7 +94,7 @@ public class GuiMenuBar {
         MenuItem backups = new MenuItem("Open backup location");
         backups.setOnAction((a) -> {
             try {
-                Desktop.getDesktop().open(SavegameCache.EU4_CACHE.getBackupPath().toFile());
+                Desktop.getDesktop().open(GameIntegration.current().getSavegameCache().getBackupPath().toFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

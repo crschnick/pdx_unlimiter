@@ -53,6 +53,13 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
     }
 
     @Override
+    protected void writeSavegameData(Path savegame, Path out) throws Exception {
+        Eu4RawSavegame save = Eu4RawSavegame.fromFile(savegame);
+        Eu4Savegame sg = Eu4Savegame.fromSavegame(save);
+        sg.write(out, true);
+    }
+
+    @Override
     protected boolean needsUpdate(Eu4CampaignEntry eu4CampaignEntry) throws Exception {
         Path p = getPath(eu4CampaignEntry);
         int v = 0;
@@ -97,7 +104,7 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
         FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
         FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
         Eu4CampaignEntry entry = this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
-        GameIntegration.EU4.selectEntry(entry);
+        //GameIntegration.EU4.selectEntry(entry);
     }
 
     @Override

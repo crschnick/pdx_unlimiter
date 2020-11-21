@@ -1,32 +1,44 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 public class FileImporter {
 
-    private static Optional<String> getCampaignName(Path p) {
-        try {
-            boolean ironman = Eu4RawSavegame.isIronman(p);
-            if (ironman) {
-                String s = p.getFileName().toString().replace("_Backup", "");
-                return Optional.of(s.substring(0, s.length() - 4));
+    public static boolean importFiles(List<File> files) {
+        boolean success = false;
+        for (File f : files) {
+            if (importFile(f.toPath())) {
+                success = true;
             }
-        } catch (IOException e) {
         }
-        return Optional.empty();
+        return success;
     }
 
     public static boolean importFile(Path p) {
-        String name = p.getFileName().toString();
-        if (name.endsWith(".eu4")) {
-            new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(p)).start();
-            return true;
-        }
+        final boolean[] toReturn = {false};
+        new Thread(() -> {
+            RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
+                @Override
+                public void visitEu4(Path file) {
+                   SavegameCache.EU4_CACHE.importSavegame(p);
+                   toReturn[0] = true;
+                }
 
-        return false;
+                @Override
+                public void visitHoi4(Path file) {
+                    SavegameCache.HOI4_CACHE.importSavegame(p);
+                    toReturn[0] = true;
+                }
+            });
+        }).start();
+
+        return toReturn[0];
     }
 }

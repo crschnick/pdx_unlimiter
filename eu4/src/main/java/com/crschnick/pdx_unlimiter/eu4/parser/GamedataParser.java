@@ -101,8 +101,8 @@ public abstract class GamedataParser {
                 currentIndex = result.getValue();
             } else {
                 Map.Entry<Node, Integer> result = createNode(tokens, currentIndex);
-                childs.add(result.getKey());
                 currentIndex = result.getValue();
+                childs.add(result.getKey());
             }
         }
     }
