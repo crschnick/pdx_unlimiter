@@ -1,10 +1,5 @@
 # Pdx-Unlimiter
 
-## Installation
-
-When a release is ready, download the [windows installer](https://github.com/crschnick/pdx_unlimiter/releases/latest/pdxu_installer.exe) or the [linux installer](https://github.com/crschnick/pdx_unlimiter/releases/latest/pdxu.deb).
-When installation is completed, the Pdx-Unlimiter should start automatically and tries to autodetect Paradox game installations.
-
 ## Features
 
 ### Savegame management for Paradox games
