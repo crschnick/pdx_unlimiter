@@ -13,6 +13,15 @@
     -fx-icon-color: white;
 }
 
+.kill-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-stop";
+}
+
+.import-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-import";
+}
+
+
 .launch-button {
 }
 

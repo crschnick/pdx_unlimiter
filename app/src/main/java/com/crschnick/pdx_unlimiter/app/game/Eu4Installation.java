@@ -89,9 +89,9 @@ public class Eu4Installation extends GameInstallation {
         this.version = new GameVersion(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
     }
     @Override
-    public void start() {
+    public void start(boolean continueLast) {
         try {
-            new ProcessBuilder().command(executable.toString(), "-continuelastsave").start();
+            new ProcessBuilder().command(executable.toString(), continueLast ? "-continuelastsave" : "").start();
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
@@ -116,12 +116,13 @@ public class Eu4Installation extends GameInstallation {
         return Files.isRegularFile(executable);
     }
 
-    public Path getUserDirectory() {
-        return userDirectory;
+    @Override
+    public Path getSavegamesPath() {
+        return userDirectory.resolve("save games");
     }
 
-    public Path getSaveDirectory() {
-        return userDirectory.resolve("save games");
+    public Path getUserPath() {
+        return userDirectory;
     }
 
     public GameVersion getVersion() {

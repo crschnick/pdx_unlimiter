@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
@@ -186,69 +187,6 @@ public class DialogHelper {
         return r.isPresent() && r.get().getButtonData().isDefaultButton();
     }
 
-    public static boolean showInitialSettings() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        setIcon(alert);
-        alert.setTitle("Specify EU4 install location");
-        alert.setHeaderText("A valid EU4 installation is required to run the savegame manager. However, no EU4 installation has been found.");
-        alert.getDialogPane().setMinWidth(500);
-
-        Settings s = Settings.getInstance().copy();
-        alert.getDialogPane().setContent(installLocationNode(s));
-
-        Optional<ButtonType> r = alert.showAndWait();
-        if (r.isPresent() && r.get().getButtonData().isDefaultButton()) {
-            Settings.updateSettings(s);
-        }
-
-        return GameInstallation.EU4 != null;
-    }
-
-    private static Node installLocationNode(Settings s) {
-        HBox dialogPaneContent = new HBox();
-
-        Label label = new Label("EU4 location: ");
-
-        TextField textArea = new TextField();
-        textArea.setEditable(false);
-        textArea.setMinWidth(500);
-        Button b = new Button("\uD83D\uDCBE");
-        if (s.getEu4().isPresent()) {
-            b.setDisable(true);
-        }
-        b.setOnMouseClicked((m) -> {
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Select EU4 installation directory");
-            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
-            if (file != null && file.exists()) {
-                textArea.setText(file.toString());
-            }
-        });
-
-        textArea.textProperty().addListener((change, o, n) -> {
-            s.setEu4(n.equals("") ? null : Path.of(n));
-        });
-        textArea.setText(s.getEu4().map(Path::toString).orElse(""));
-
-        dialogPaneContent.getChildren().addAll(label, textArea, b);
-        return dialogPaneContent;
-    }
-
-    public static void showSettings() {
-        Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.getButtonTypes().add(ButtonType.OK);
-        alert.setTitle("Settings");
-        alert.getDialogPane().setMinWidth(500);
-
-        Settings s = Settings.getInstance().copy();
-        alert.getDialogPane().setContent(installLocationNode(s));
-
-        Optional<ButtonType> r = alert.showAndWait();
-        if (r.isPresent() && r.get().getButtonData().isDefaultButton()) {
-            Settings.updateSettings(s);
-        }
-    }
-
     public static Optional<Path> showImportArchiveDialog() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText("Import all savegames from archive");
@@ -311,7 +249,8 @@ public class DialogHelper {
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText("Import all savegames");
-        alert.setContentText("Do you want to import all savegames from " + GameInstallation.EU4.getSaveDirectory().toString() + "? This may take a while.");
+        alert.setContentText("Do you want to import all savegames from " +
+                GameIntegration.current().getInstallation().getSavegamesPath().toString() + "? This may take a while.");
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton();
     }

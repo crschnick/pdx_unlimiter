@@ -33,10 +33,13 @@ public class GuiStyle {
     public static String CLASS_ENTRY_LIST = "entry-list";
     public static String CLASS_ENTRY_LOADING = "entry-loading";
     public static String CLASS_STATUS_BAR = "status-bar";
+    public static String CLASS_STATUS_RUNNING = "status-running";
+    public static String CLASS_STATUS_STOPPED = "status-stopped";
     public static String CLASS_STATUS_INCOMPATIBLE = "status-incompatible";
     public static String CLASS_EXPORT = "export-button";
     public static String CLASS_LAUNCH = "launch-button";
     public static String CLASS_KILL = "kill-button";
+    public static String CLASS_IMPORT = "import-button";
     public static String CLASS_SAVEGAME = "savegame";
     public static String CLASS_ALERT = "alert";
     public static String CLASS_ENTRY = "entry";

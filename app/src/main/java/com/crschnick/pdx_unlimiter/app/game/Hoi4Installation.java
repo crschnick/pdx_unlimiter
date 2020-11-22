@@ -101,9 +101,9 @@ public class Hoi4Installation extends GameInstallation {
     }
 
     @Override
-    public void start() {
+    public void start(boolean continueLast) {
         try {
-            new ProcessBuilder().command(executable.toString()).start();
+            new ProcessBuilder().command(executable.toString(), continueLast ? "--continuelastsave" : "").start();
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
@@ -114,11 +114,12 @@ public class Hoi4Installation extends GameInstallation {
         return Files.isRegularFile(executable);
     }
 
-    public Path getUserDirectory() {
+    public Path getUserPath() {
         return userDirectory;
     }
 
-    public Path getSaveDirectory() {
+    @Override
+    public Path getSavegamesPath() {
         return userDirectory.resolve("save games");
     }
 

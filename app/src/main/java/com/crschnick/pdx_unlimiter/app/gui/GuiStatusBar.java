@@ -1,22 +1,20 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameApp;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.GameManager;
-import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXSnackbar;
-import com.jfoenix.effects.JFXDepthManager;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.Optional;
+
+import java.nio.file.Path;
+import java.util.List;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.EU4_ICON;
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.imageNode;
@@ -29,7 +27,8 @@ public class GuiStatusBar {
             NONE,
             SELECTED,
             INCOMPATIBLE,
-            RUNNING
+            RUNNING,
+            STOPPED
         }
 
         private Status status;
@@ -41,11 +40,19 @@ public class GuiStatusBar {
         }
 
         private void setRunning() {
-            Region bar = createRunningBar(pane);
-            if (status == Status.NONE) {
+            Platform.runLater(() -> {
+                Region bar = createRunningBar(true);
                 showBar(pane, bar);
-            }
-            status = Status.RUNNING;
+                status = Status.RUNNING;
+            });
+        }
+
+        private void stop() {
+            Platform.runLater(() -> {
+                Region bar = createRunningBar(false);
+                showBar(pane, bar);
+                status = Status.STOPPED;
+            });
         }
 
         private void select() {
@@ -54,16 +61,15 @@ public class GuiStatusBar {
             }
 
             Region bar = null;
-            if (status != Status.SELECTED &&
-                    GameIntegration.current().isVersionCompatibe(GameIntegration.current().getSelectedEntry())) {
+            if (GameIntegration.current().isVersionCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
                 status = Status.SELECTED;
                 bar = createEntryStatusBar(pane);
-            } else if (status != Status.INCOMPATIBLE){
+            } else {
                 status = Status.INCOMPATIBLE;
                 bar = createInvalidVersionStatusBar(pane);
             }
 
-            if (bar != null) showBar(pane, bar);
+            showBar(pane, bar);
         }
 
         private void unselect() {
@@ -89,10 +95,11 @@ public class GuiStatusBar {
             }
         });
 
-        GameManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
-            if (n.isPresent()) {
+        GameAppManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
+            if (n != null) {
                 bar.setRunning();
             } else {
+                bar.stop();
             }
         });
     }
@@ -106,27 +113,61 @@ public class GuiStatusBar {
         pane.getChildren().clear();
     }
 
-    private static Region createRunningBar(Pane pane) {
+    private static Region createRunningBar(boolean running) {
 
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add( CLASS_STATUS_BAR);
+        if (running) {
+            barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
+        } else {
+            barPane.getStyleClass().add(CLASS_STATUS_STOPPED);
+        }
 
-        Label text = new Label("Europa Universalis 4 Running", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
+        Label text = new Label(GameIntegration.current().getName() + " (" + (running ? "Running" : "Stopped") + ")",
+                GameIntegration.current().getGuiFactory().createIcon());
         text.getStyleClass().add( CLASS_TEXT);
         barPane.setLeft(text);
+        BorderPane.setAlignment(text, Pos.CENTER);
+
+        Label latest = new Label();
+        latest.setGraphic(new FontIcon());
+        latest.getStyleClass().add( CLASS_TEXT);
+        latest.getStyleClass().add( CLASS_SAVEGAME);
+        javafx.beans.value.ChangeListener<List<Path>> l = (c, o, n) -> {
+            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getFileName().toString(): "None"));
+        };
+        GameIntegration.current().getInstallation().savegamesProperty().addListener(l);
+        l.changed(null, null, GameIntegration.current().getInstallation().savegamesProperty().get());
+        barPane.setCenter(latest);
+
+        Button importLatest = new JFXButton("Import");
+        importLatest.setGraphic(new FontIcon());
+        importLatest.getStyleClass().add( CLASS_IMPORT);
+        importLatest.setOnAction(event -> {
+            if (GameIntegration.current().getInstallation().getSavegames().size() == 0) {
+                return;
+            }
+
+            FileImporter.importFile(GameIntegration.current().getInstallation().getSavegames().get(0));
+            event.consume();
+        });
 
         Button b = new JFXButton("Kill");
         b.setGraphic(new FontIcon());
         b.getStyleClass().add( CLASS_KILL);
         b.setOnAction(event -> {
             event.consume();
-
-            hideBar(pane);
+            GameAppManager.getInstance().getActiveGame().kill();
         });
 
+        HBox buttons = new HBox(importLatest);
+        if (running) {
+            buttons.getChildren().add(b);
+        }
+        buttons.setFillHeight(true);
+        buttons.setAlignment(Pos.CENTER);
 
-        b.setAlignment(Pos.CENTER);
-        barPane.setRight(b);
+        barPane.setRight(buttons);
         return barPane;
     }
 
@@ -135,11 +176,11 @@ public class GuiStatusBar {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add( CLASS_STATUS_BAR);
 
-        Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
+        Label text = new Label(GameIntegration.current().getName(), GameIntegration.current().getGuiFactory().createIcon());
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
 
-        Label name = new Label("entry");
+        Label name = new Label(GameIntegration.globalSelectedEntryProperty().get().getName());
         name.setGraphic(new FontIcon());
         name.getStyleClass().add( CLASS_TEXT);
         name.getStyleClass().add( CLASS_SAVEGAME);
@@ -149,6 +190,9 @@ public class GuiStatusBar {
         e.setGraphic(new FontIcon());
         e.getStyleClass().add( CLASS_EXPORT);
         e.setOnAction(event -> {
+            GameIntegration.current().exportCampaignEntry();
+            GameIntegration.current().launchGame();
+
             event.consume();
             hideBar(pane);
         });
@@ -177,7 +221,7 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
 
-        Label text = new Label("Europa Universalis 4", imageNode(EU4_ICON, CLASS_IMAGE_ICON));
+        Label text = new Label(GameIntegration.current().getName(), GameIntegration.current().getGuiFactory().createIcon());
         text.getStyleClass().add( CLASS_TEXT);
         barPane.setLeft(text);
 

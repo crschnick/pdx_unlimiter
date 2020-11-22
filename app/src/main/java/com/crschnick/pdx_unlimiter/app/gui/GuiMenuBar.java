@@ -52,7 +52,7 @@ public class GuiMenuBar {
         Menu settings = new Menu("Settings");
         MenuItem c = new MenuItem("Change settings");
         c.setOnAction((a) -> {
-            DialogHelper.showSettings();
+            GuiSettings.showSettings();
         });
         settings.getItems().add(c);
 

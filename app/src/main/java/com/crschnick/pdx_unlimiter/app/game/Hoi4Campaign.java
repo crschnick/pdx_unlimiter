@@ -39,6 +39,6 @@ public class Hoi4Campaign extends GameCampaign<Hoi4CampaignEntry> implements Com
 
     @Override
     public int compareTo(Hoi4Campaign o) {
-        return date.get().compareTo(o.date.get());
+        return getLastPlayed().compareTo(o.getLastPlayed());
     }
 }

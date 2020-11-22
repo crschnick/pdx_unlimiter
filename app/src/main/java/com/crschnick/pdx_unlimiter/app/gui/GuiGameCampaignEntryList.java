@@ -24,8 +24,6 @@ public class GuiGameCampaignEntryList {
                 if (c.wasAdded()) {
                     int index = new TreeSet<GameCampaignEntry>(c.getSet()).headSet(c.getElementAdded()).size();
                     grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
-                    grid.getSelectionModel().select(index);
-                    grid.getFocusModel().focus(index);
                 } else {
                     grid.getItems().remove(grid.getItems().stream()
                             .filter(n -> !c.getSet().contains(n.getProperties().get("entry"))).findAny().get());
@@ -34,6 +32,10 @@ public class GuiGameCampaignEntryList {
         };
 
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
+            if (o != null) {
+                o.getSavegames().removeListener(l);
+            }
+
             if (n != null) {
                 n.getSavegames().addListener(l);
                 Platform.runLater(() -> {
@@ -42,10 +44,19 @@ public class GuiGameCampaignEntryList {
                             .collect(Collectors.toList())));
                 });
             } else {
-                o.getSavegames().removeListener(l);
                 Platform.runLater(() -> {
                     grid.setItems(FXCollections.observableArrayList());
                 });
+            }
+        });
+
+        GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
+            if (n != null) {
+                int index = new TreeSet<GameCampaignEntry>(
+                        GameIntegration.globalSelectedCampaignProperty().get().getSavegames()).headSet(n).size();
+                grid.getSelectionModel().select(index);
+                grid.getFocusModel().focus(index);
+            } else {
             }
         });
 

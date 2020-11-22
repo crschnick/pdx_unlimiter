@@ -36,7 +36,7 @@ public abstract class Savegame {
             ZipFile zipFile = new ZipFile(file.toFile());
             var in = zipFile.getInputStream(zipFile.getEntry("version"));
             v = Integer.parseInt(new String(in.readAllBytes()));
-            in.close();
+            zipFile.close();
         } else {
             v = Integer.parseInt(new String(Files.readAllBytes(file.resolve("version"))));
         }

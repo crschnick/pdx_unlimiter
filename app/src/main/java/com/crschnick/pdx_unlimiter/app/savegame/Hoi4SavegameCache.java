@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -71,7 +72,7 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4Campa
     @Override
     protected Hoi4Campaign createCampaign(Hoi4SavegameInfo info) {
         return new Hoi4Campaign(Instant.now(),
-                GameInstallation.HOI4.getCountryNames().get(info.getTag())
+                GameInstallation.HOI4.getCountryNames().getOrDefault(info.getTag(), "Unknown")
                 , info.getCampaignUuid(),
                 info.getTag(),
                 info.getDate());
@@ -127,14 +128,20 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4Campa
 
         UUID uuid = e.getCampaignUuid();
 
-        AtomicBoolean exists = new AtomicBoolean(false);
-        getCampaigns().stream()
+        Optional<Hoi4Campaign> existing = getCampaigns().stream()
                 .filter(c -> c.getCampaignId().equals(uuid))
-                .findAny().ifPresent(c -> exists.set(c.getSavegames().stream()
-                .map(GameCampaignEntry::getChecksum).anyMatch(ch -> ch.equals(save.getFileChecksum()))));
-        if (exists.get()) {
-            FileUtils.forceDelete(file.toFile());
-            return;
+                .findAny();
+
+        if (existing.isPresent()) {
+            Optional<Hoi4CampaignEntry> existingEntry = existing.get().getSavegames().stream()
+                    .filter(c -> c.getChecksum().equals(save.getFileChecksum()))
+                    .findAny();
+            if (existingEntry.isPresent()) {
+                FileUtils.forceDelete(file.toFile());
+                GameIntegration.selectIntegration(GameIntegration.HOI4);
+                GameIntegration.current().selectEntry(existingEntry.get());
+                return;
+            }
         }
 
 
@@ -147,6 +154,5 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4Campa
         FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
         FileUtils.moveFile(file.toFile(), entryPath.resolve(SAVE_NAME).toFile());
         Hoi4CampaignEntry entry = this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
-        //GameIntegration.current().selectEntry(entry);
     }
 }

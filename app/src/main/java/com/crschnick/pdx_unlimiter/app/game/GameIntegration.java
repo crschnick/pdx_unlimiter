@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
@@ -10,8 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class GameIntegration<E extends GameCampaignEntry<? extends SavegameInfo>,C extends GameCampaign<E>> {
 
@@ -27,13 +31,18 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     private static SimpleObjectProperty<? extends GameCampaignEntry<? extends SavegameInfo>> globalSelectedEntry =
             new SimpleObjectProperty<>();
 
+    public static Eu4Integration EU4;
+    public static Hoi4Integration HOI4;
+
     public static void init() {
         ALL = new ArrayList<>();
         if (Settings.getInstance().getEu4().isPresent()) {
-            ALL.add(new Eu4Integration());
+            EU4 = new Eu4Integration();
+            ALL.add(EU4);
         }
         if (Settings.getInstance().getHoi4().isPresent()) {
-            ALL.add(new Hoi4Integration());
+            HOI4 = new Hoi4Integration();
+            ALL.add(HOI4);
         }
         current.set(ALL.get(1));
     }
@@ -74,14 +83,68 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         return current;
     }
 
+    public static GameIntegration<?,?> getForInstallation(GameInstallation i) {
+        for (var g : ALL) {
+            if (g.getInstallation().equals(i)) {
+                return g;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    public static GameIntegration<?,?> getForSavegameCache(SavegameCache c) {
+        for (var g : ALL) {
+            if (g.getSavegameCache().equals(c)) {
+                return g;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
     protected SimpleObjectProperty<C> selectedCampaign = new SimpleObjectProperty<>();
     protected SimpleObjectProperty<E> selectedEntry = new SimpleObjectProperty<>();
 
     public abstract String getName();
 
-    public abstract void launchCampaignEntry();
+    public abstract GameInstallation getInstallation();
 
-    public abstract boolean isVersionCompatibe(E entry);
+    public final void launchGame() {
+        getInstallation().start(false);
+    }
+
+    public final Optional<Path> exportCampaignEntry() {
+        try {
+            var path = getInstallation().getSavegamesPath().resolve(getSavegameCache().getFileName(selectedEntry.get()));
+            getSavegameCache().exportSavegame(selectedEntry.get(),
+                    path);
+            return Optional.of(path);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return Optional.empty();
+        }
+    }
+
+    public final void launchCampaignEntry() {
+        if (selectedEntry.get() == null) {
+            return;
+        }
+
+        Optional<Path> p = exportCampaignEntry();
+        if (p.isPresent()) {
+            try {
+                writeLaunchConfig(selectedEntry.get(), p.get());
+            } catch (IOException ioException) {
+                ErrorHandler.handleException(ioException);
+                return;
+            }
+        }
+        selectedCampaign.get().lastPlayedProperty().setValue(Instant.now());
+        getInstallation().start(true);
+    }
+
+    protected abstract void writeLaunchConfig(E entry, Path path) throws IOException;
+
+    public abstract boolean isVersionCompatible(E entry);
 
     public abstract GameGuiFactory<E,C> getGuiFactory();
 
@@ -96,6 +159,10 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     }
 
     public void selectCampaign(C c) {
+        if (this.selectedCampaign.get() == c) {
+            return;
+        }
+
         this.selectedEntry.set(null);
         globalSelectedEntryPropertyInternal().set(null);
         this.selectedCampaign.set(c);
@@ -104,6 +171,10 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     }
 
     public void selectEntry(E e) {
+        if (this.selectedEntry.get() == e) {
+            return;
+        }
+
         if (e != null) {
             this.selectedCampaign.set(getSavegameCache().getCampaign(e));
             globalSelectedCampaignPropertyInternal().set((GameCampaign<GameCampaignEntry<? extends SavegameInfo>>) getSavegameCache().getCampaign(e));
@@ -115,23 +186,11 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     }
 
     public static void selectIntegration(GameIntegration<?,?> newInt) {
+        if (current.get() == newInt) {
+            return;
+        }
+
         current().selectCampaign(null);
         current.set(newInt);
-    }
-
-    public C getSelectedCampaign() {
-        return selectedCampaign.get();
-    }
-
-    public SimpleObjectProperty<C> selectedCampaignProperty() {
-        return selectedCampaign;
-    }
-
-    public E getSelectedEntry() {
-        return selectedEntry.get();
-    }
-
-    public SimpleObjectProperty<E> selectedEntryProperty() {
-        return selectedEntry;
     }
 }

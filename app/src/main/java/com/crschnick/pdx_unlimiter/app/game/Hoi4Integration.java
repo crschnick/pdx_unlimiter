@@ -2,8 +2,20 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.Hoi4GuiFactory;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Optional;
 
 public class Hoi4Integration extends GameIntegration<Hoi4CampaignEntry, Hoi4Campaign> {
     @Override
@@ -12,12 +24,12 @@ public class Hoi4Integration extends GameIntegration<Hoi4CampaignEntry, Hoi4Camp
     }
 
     @Override
-    public void launchCampaignEntry() {
-
+    public GameInstallation getInstallation() {
+        return GameInstallation.HOI4;
     }
 
     @Override
-    public boolean isVersionCompatibe(Hoi4CampaignEntry entry) {
+    public boolean isVersionCompatible(Hoi4CampaignEntry entry) {
         return true;
     }
 
@@ -29,5 +41,18 @@ public class Hoi4Integration extends GameIntegration<Hoi4CampaignEntry, Hoi4Camp
     @Override
     public SavegameCache<? extends SavegameInfo, Hoi4CampaignEntry, Hoi4Campaign> getSavegameCache() {
         return SavegameCache.HOI4_CACHE;
+    }
+
+    protected void writeLaunchConfig(Hoi4CampaignEntry entry, Path path) throws IOException {
+        var out = Files.newOutputStream(
+                getInstallation().getUserPath().resolve("continue_game.json"));
+        SimpleDateFormat d = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
+        ObjectNode n = JsonNodeFactory.instance.objectNode()
+                .put("title", getSavegameCache().getCampaign(entry).getName() + " " + entry.getName())
+                .put("desc", "")
+                .put("date", d.format(new Date(getSavegameCache().getCampaign(entry).getLastPlayed().toEpochMilli())) + "\n")
+                .put("filename", getInstallation().getSavegamesPath().relativize(path).toString())
+                .put("is_remote", false);
+        JsonHelper.write(n, out);
     }
 }
