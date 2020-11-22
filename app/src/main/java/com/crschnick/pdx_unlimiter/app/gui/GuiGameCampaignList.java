@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import com.jfoenix.controls.JFXListView;
@@ -31,8 +32,6 @@ public class GuiGameCampaignList {
                 if (c.wasAdded()) {
                     int index = new TreeSet<GameCampaign>(c.getSet()).headSet(c.getElementAdded()).size();
                     grid.getItems().add(index, GuiGameCampaign.createCampaignButton(c.getElementAdded()));
-                    grid.getSelectionModel().select(index);
-                    grid.getFocusModel().focus(index);
                 } else {
                     grid.getItems().remove(grid.getItems().stream()
                             .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get());
@@ -41,14 +40,29 @@ public class GuiGameCampaignList {
         };
 
         GameIntegration.currentGameProperty().addListener((c, o, n) -> {
-            if (n == null) {
-                o.getSavegameCache().getCampaigns().removeListener(l);
-                grid.setItems(FXCollections.observableArrayList());
+            Platform.runLater(() -> {
+                if (o != null) {
+                    o.getSavegameCache().getCampaigns().removeListener(l);
+                }
+
+                if (n == null) {
+                    grid.setItems(FXCollections.observableArrayList());
+                } else {
+                    n.getSavegameCache().getCampaigns().addListener(l);
+                    grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().getCampaigns().stream()
+                            .map(GuiGameCampaign::createCampaignButton)
+                            .collect(Collectors.toList())));
+                }
+            });
+        });
+
+        GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
+            if (n != null) {
+                int index = new TreeSet<GameCampaign>(
+                        GameIntegration.current().getSavegameCache().getCampaigns()).headSet(n).size();
+                grid.getSelectionModel().select(index);
+                grid.getFocusModel().focus(index);
             } else {
-                n.getSavegameCache().getCampaigns().addListener(l);
-                grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().getCampaigns().stream()
-                        .map(GuiGameCampaign::createCampaignButton)
-                        .collect(Collectors.toList())));
             }
         });
 

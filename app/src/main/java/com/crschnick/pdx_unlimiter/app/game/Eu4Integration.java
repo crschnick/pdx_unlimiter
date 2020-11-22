@@ -23,7 +23,7 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
     }
 
     @Override
-    public boolean isVersionCompatibe(Eu4CampaignEntry entry) {
+    public boolean isVersionCompatible(Eu4CampaignEntry entry) {
         return areCompatible(GameInstallation.EU4.getVersion(), entry.getInfo().getVersion());
     }
 
@@ -43,34 +43,19 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
     }
 
     @Override
-    public void launchCampaignEntry() {
-        if (getSelectedCampaign() == null || getSelectedEntry() == null) {
-            return;
-        }
-
-        Optional<Path> p = SavegameCache.EU4_CACHE.exportSavegame(getSelectedEntry(),
-                GameInstallation.EU4.getSaveDirectory().resolve(SavegameCache.EU4_CACHE.getFileName(getSelectedEntry())));
-        if (p.isPresent()) {
-            try {
-                writeLaunchConfig(this.getSelectedEntry(), p.get());
-            } catch (IOException ioException) {
-                ErrorHandler.handleException(ioException);
-                return;
-            }
-        }
-        GameInstallation.EU4.start();
-        getSelectedCampaign().lastPlayedProperty().setValue(Instant.now());
+    public GameInstallation getInstallation() {
+        return GameInstallation.EU4;
     }
 
 
-    private void writeLaunchConfig(Eu4CampaignEntry entry, Path path) throws IOException {
+    protected void writeLaunchConfig(Eu4CampaignEntry entry, Path path) throws IOException {
         var out = Files.newOutputStream(
-                GameInstallation.EU4.getUserDirectory().resolve("continue_game.json"));
+                getInstallation().getUserPath().resolve("continue_game.json"));
         ObjectNode n = JsonNodeFactory.instance.objectNode()
-                .put("title", SavegameCache.EU4_CACHE.getCampaign(entry).getName())
+                .put("title", getSavegameCache().getCampaign(entry).getName())
                 .put("desc", entry.getName())
-                .put("date", SavegameCache.EU4_CACHE.getCampaign(entry).getLastPlayed().toString())
-                .put("filename", GameInstallation.EU4.getUserDirectory().relativize(path).toString()
+                .put("date", getSavegameCache().getCampaign(entry).getLastPlayed().toString())
+                .put("filename", getInstallation().getUserPath().relativize(path).toString()
                         .replace('\\', '/'));
         JsonHelper.write(n, out);
     }

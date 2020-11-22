@@ -25,12 +25,12 @@ public class Eu4SavegameImporter {
     }
 
     public static void importLatestSavegame() {
-        if (!Files.exists(GameInstallation.EU4.getSaveDirectory())) {
+        if (!Files.exists(GameInstallation.EU4.getSavegamesPath())) {
             return;
         }
 
         try {
-            Optional<Path> latest = Files.list(GameInstallation.EU4.getSaveDirectory())
+            Optional<Path> latest = Files.list(GameInstallation.EU4.getSavegamesPath())
                     .sorted(Comparator.comparingLong(p -> p.toFile().lastModified()))
                     .sorted(Comparator.reverseOrder())
                     .findFirst();
@@ -45,7 +45,7 @@ public class Eu4SavegameImporter {
 
     public static void importAllSavegames() {
         try {
-            Files.list(GameInstallation.EU4.getSaveDirectory())
+            Files.list(GameInstallation.EU4.getSavegamesPath())
                     .filter(p -> !Files.isDirectory(p))
                     .forEach(p -> {
                         new Thread(() -> SavegameCache.EU4_CACHE.importSavegame(p)).start();

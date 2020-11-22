@@ -116,7 +116,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
 
 
         Label version;
-        if (GameIntegration.current().isVersionCompatibe(entry)) {
+        if (GameIntegration.current().isVersionCompatible(entry)) {
             version = new Label("v" + info.getVersion().toString());
             Tooltip.install(version, tooltip("Compatible version"));
             version.getStyleClass().add(CLASS_VERSION_OK);

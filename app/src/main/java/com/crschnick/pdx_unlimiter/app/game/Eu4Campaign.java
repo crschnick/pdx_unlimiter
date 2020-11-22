@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 
-public class Eu4Campaign extends GameCampaign<Eu4CampaignEntry> {
+public class Eu4Campaign extends GameCampaign<Eu4CampaignEntry> implements Comparable<Eu4Campaign> {
 
     private volatile StringProperty tag;
     private volatile SimpleObjectProperty<GameDate> date;
@@ -34,4 +34,8 @@ public class Eu4Campaign extends GameCampaign<Eu4CampaignEntry> {
         return tag;
     }
 
+    @Override
+    public int compareTo(Eu4Campaign o) {
+        return getLastPlayed().compareTo(o.getLastPlayed());
+    }
 }

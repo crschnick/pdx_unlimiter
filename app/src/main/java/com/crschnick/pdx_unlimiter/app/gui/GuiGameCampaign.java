@@ -27,7 +27,7 @@ public class GuiGameCampaign {
         del.getStyleClass().add("delete-button");
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showCampaignDeleteDialog()) {
-                //onDelete.accept(c);
+                GameIntegration.current().getSavegameCache().delete(c);
             }
         });
         del.setAlignment(Pos.CENTER);
@@ -65,7 +65,7 @@ public class GuiGameCampaign {
         btn.setOnMouseClicked((m) -> GameIntegration.current().selectCampaign(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
-
+        btn.getProperties().put("campaign", c);
         return btn;
     }
 

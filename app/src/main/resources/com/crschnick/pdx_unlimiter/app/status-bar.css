@@ -11,6 +11,14 @@
 -fx-background-color: #99445599;
 }
 
+.status-stopped {
+-fx-background-color: #77445599;
+}
+
+.status-running {
+-fx-background-color: #44995599;
+}
+
 .status-bar .image-icon {
 -fx-min-width: 2.15em;
 -fx-max-width: 2.15em;

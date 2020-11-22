@@ -1,12 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4Campaign;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4CampaignEntry;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -14,8 +18,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campaign> {
 
@@ -69,6 +72,8 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
 
     @Override
     public void fillNodeContainer(Hoi4CampaignEntry entry, JFXMasonryPane grid) {
-
+        var l = new Label("What savegame info would you like to see in this box? Share your feedback on github!");
+        l.setAlignment(Pos.CENTER);
+        grid.getChildren().add(l);
     }
 }

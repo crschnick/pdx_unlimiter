@@ -41,7 +41,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     private volatile Queue<E> toLoad = new ConcurrentLinkedQueue<>();
     private String name;
     private Path path;
-    private volatile ObservableSet<C> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
+    private volatile ObservableSet<C> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
 
     public SavegameCache(String name) {
         this.name = name;
@@ -278,6 +278,11 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (GameIntegration.globalSelectedCampaignProperty().get() == c) {
+            GameIntegration.current().selectCampaign(null);
+        }
+
         this.campaigns.remove(c);
     }
 
@@ -289,6 +294,9 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         C c = this.getCampaign(campainUuid).get();
         E e = createEntry(entryUuid, checksum, i);
         c.add(e);
+
+        GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
+        GameIntegration.current().selectEntry(e);
         return e;
     }
 
@@ -332,6 +340,9 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
             ErrorHandler.handleException(ex);
         }
 
+        if (GameIntegration.globalSelectedEntryProperty().get() == e) {
+            GameIntegration.current().selectEntry(null);
+        }
         c.getSavegames().remove(e);
         if (c.getSavegames().size() == 0) {
             delete(c);
@@ -382,15 +393,10 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         return getCampaign(e).getName() + " " + e.getName() + "." + name;
     }
 
-    public synchronized Optional<Path> exportSavegame(E e, Path destPath) {
+    public synchronized void exportSavegame(E e, Path destPath) throws IOException {
         Path srcPath = getPath(e).resolve("savegame." + name);
-        try {
-            FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
-            return Optional.of(destPath);
-        } catch (IOException ioException) {
-            ErrorHandler.handleException(ioException);
-        }
-        return Optional.empty();
+        FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
+        destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
     public synchronized void importSavegame(Path file) {

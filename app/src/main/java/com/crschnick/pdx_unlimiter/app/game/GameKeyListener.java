@@ -4,11 +4,11 @@ import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-public class Eu4KeyListener implements NativeKeyListener {
+public class GameKeyListener implements NativeKeyListener {
 
-    private Eu4App handle;
+    private GameApp handle;
 
-    public Eu4KeyListener(Eu4App handle) {
+    public GameKeyListener(GameApp handle) {
         this.handle = handle;
     }
 

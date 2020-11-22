@@ -3,17 +3,15 @@ package com.crschnick.pdx_unlimiter.app;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.gui.*;
 import com.crschnick.pdx_unlimiter.app.installation.*;
-import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IronmanParser;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -25,10 +23,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -117,7 +112,6 @@ public class PdxuApp extends Application {
         Settings.init();
 
         GameInstallation.initInstallations();
-        GameManager.init();
         SavegameCache.loadData();
         AchievementManager.init();
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
@@ -153,6 +147,7 @@ public class PdxuApp extends Application {
         layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
         createLayout();
         GameIntegration.init();
+        GameAppManager.init();
 
         Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);
