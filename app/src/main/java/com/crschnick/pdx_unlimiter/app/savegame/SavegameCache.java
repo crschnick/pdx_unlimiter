@@ -390,7 +390,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     }
 
     public synchronized String getFileName(E e) {
-        return getCampaign(e).getName() + " " + e.getName() + "." + name;
+        return getCampaign(e).getName() + " " + e.getName().replace(":", ".") + "." + name;
     }
 
     public synchronized void exportSavegame(E e, Path destPath) throws IOException {

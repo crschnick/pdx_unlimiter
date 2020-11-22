@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
 import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class Hoi4Date implements Comparable<Hoi4Date> {
@@ -21,7 +23,7 @@ public class Hoi4Date implements Comparable<Hoi4Date> {
 
     public static Node toNode(Hoi4Date date) {
         List<Node> nodes = new ArrayList<>(3);
-        nodes.add(KeyValueNode.create("hour", new ValueNode((long) date.getDay())));
+        nodes.add(KeyValueNode.create("hour", new ValueNode((long) date.getHour())));
         nodes.add(KeyValueNode.create("day", new ValueNode((long) date.getDay())));
         nodes.add(KeyValueNode.create("month", new ValueNode((long) date.getMonth().getValue())));
         nodes.add(KeyValueNode.create("year", new ValueNode((long) date.getYear())));
@@ -109,6 +111,11 @@ public class Hoi4Date implements Comparable<Hoi4Date> {
     @Override
     public String toString() {
         return year + "." + month.getValue() + "." + day + "." + hour;
+    }
+
+
+    public String toDisplayString() {
+        return hour + ":00, " + day + " " + month.getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + year;
     }
 
     public int getHour() {
