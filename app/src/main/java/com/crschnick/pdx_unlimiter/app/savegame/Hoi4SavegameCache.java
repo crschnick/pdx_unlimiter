@@ -81,7 +81,7 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4Campa
     @Override
     protected Hoi4CampaignEntry createEntry(UUID uuid, String checksum, Hoi4SavegameInfo info) {
         return new Hoi4CampaignEntry(
-                info.getDate().toString(), uuid,
+                info.getDate().toDisplayString(), uuid,
                 info, checksum, info.getTag(), info.getDate());
     }
 
