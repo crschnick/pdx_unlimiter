@@ -6,5 +6,5 @@
 }
 .game-icon-bar {
   -fx-spacing: 3em;
--fx-background-color: #77777733;
+-fx-padding: 2em;
 }

@@ -1,7 +1,4 @@
 
-.menu .ikonli-font-icon {
-   -fx-icon-code: "mdi-vector-arrange-below";
-}
 
 .entry {
 -fx-background-color: #77777711;
@@ -15,6 +12,11 @@
 
 .entry-bar .tag-bar {
 -fx-spacing: 0.5em;
+}
+
+.unknown-tag {
+ -fx-text-fill: white;
+-fx-font-size: 1.5em;
 }
 
 .entry-bar .text-field {

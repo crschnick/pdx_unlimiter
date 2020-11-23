@@ -5,7 +5,10 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4Campaign;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4CampaignEntry;
 import com.jfoenix.controls.JFXMasonryPane;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,7 +38,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     @Override
     public Background createEntryInfoBackground(Hoi4CampaignEntry entry) {
         return new Background(new BackgroundFill(
-                colorFromInt(GameInstallation.HOI4.getCountryColors().get(entry.getTag().getTag()), 100),
+                colorFromInt(GameInstallation.HOI4.getCountryColors().getOrDefault(entry.getTag().getTag(), 0), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
@@ -52,22 +55,26 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     }
 
     @Override
-    public ObservableValue<Pane> createImage(Hoi4Campaign campaign) {
-        var b = Bindings.createObjectBinding(
-                () -> GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON), campaign.tagProperty());
-        return b;
-    }
-
-    @Override
     public String createInfoString(Hoi4CampaignEntry entry) {
         return entry.getDate().toString();
     }
 
     @Override
+    public ObservableValue<Pane> createImage(Hoi4Campaign campaign) {
+        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
+        campaign.tagProperty().addListener((c,o,n) -> {
+            Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
+        });
+        return prop;
+    }
+
+    @Override
     public ObservableValue<String> createInfoString(Hoi4Campaign campaign) {
-        var b = Bindings.createObjectBinding(
-                () -> campaign.getDate().toString(), campaign.dateProperty());
-        return b;
+        SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
+        campaign.dateProperty().addListener((c,o,n) -> {
+            Platform.runLater(() -> prop.set(n.toString()));
+        });
+        return prop;
     }
 
     @Override

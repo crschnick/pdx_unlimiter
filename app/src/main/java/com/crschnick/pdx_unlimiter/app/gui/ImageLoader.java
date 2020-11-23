@@ -14,6 +14,7 @@ import javax.imageio.spi.IIORegistry;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,10 @@ public class ImageLoader {
     }
 
     static Image loadImage(Path p, Predicate<Integer> pixelSelector) {
+        if (!Files.isRegularFile(p)) {
+            return null;
+        }
+
         File file = p.toFile();
         BufferedImage image = null;
         try {

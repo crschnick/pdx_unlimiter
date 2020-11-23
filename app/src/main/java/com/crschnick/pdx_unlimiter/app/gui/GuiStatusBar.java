@@ -191,7 +191,6 @@ public class GuiStatusBar {
         e.getStyleClass().add( CLASS_EXPORT);
         e.setOnAction(event -> {
             GameIntegration.current().exportCampaignEntry();
-            GameIntegration.current().launchGame();
 
             event.consume();
             hideBar(pane);

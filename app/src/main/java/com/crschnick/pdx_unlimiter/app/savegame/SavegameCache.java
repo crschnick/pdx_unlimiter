@@ -303,21 +303,23 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     protected abstract C createCampaign(I info);
     protected abstract E createEntry(UUID uuid, String checksum, I info);
 
-    public synchronized void updateSavegameData(E e) {
+    public synchronized boolean updateSavegameData(E e) {
         Path p = getPath(e);
         Path s = p.resolve("savegame." + name);
         try {
             PathUtils.delete(p.resolve("data.zip"));
         } catch (IOException ioException) {
             ErrorHandler.handleException(ioException);
-            return;
+            return false;
         }
 
         try {
             writeSavegameData(s, p.resolve("data.zip"));
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
+            return false;
         }
+        return true;
     }
 
     protected abstract void writeSavegameData(Path savegame, Path out) throws Exception;
@@ -362,7 +364,9 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
 
         try {
             if (needsUpdate(e)) {
-                updateSavegameData(e);
+                if (!updateSavegameData(e)) {
+                    return;
+                }
             }
             I info = loadInfo(getPath(e).resolve("data.zip"));
             e.infoProperty().set(info);

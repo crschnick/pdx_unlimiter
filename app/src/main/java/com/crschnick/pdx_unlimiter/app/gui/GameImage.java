@@ -4,6 +4,8 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,6 +20,13 @@ import java.util.function.Predicate;
 public class GameImage {
 
     public static Image HOI4_ICON;
+    public static Image HOI4_ICON_IRONMAN;
+    public static Image HOI4_ICON_VERSION_WARNING;
+    public static Image HOI4_ICON_DIFF_RECRUIT;
+    public static Image HOI4_ICON_DIFF_REGULAR;
+    public static Image HOI4_ICON_DIFF_VETERAN;
+    public static Image HOI4_ICON_DIFF_ELITE;
+    public static Image HOI4_ICON_DIFF_CIVILIAN;
 
     public static Image EU4_ICON;
     public static Image EU4_ICON_VASSAL;
@@ -43,24 +52,45 @@ public class GameImage {
     private static Map<String, Image> COUNTRY_IMAGES = new HashMap<>();
     private static Map<Hoi4Tag, Image> HOI4_COUNTRY_IMAGES = new HashMap<>();
 
+    private static Pane unknownTag(String styleClass) {
+        Label l = new Label("?");
+        l.getStyleClass().add(styleClass);
+        l.getStyleClass().add(GuiStyle.CLASS_UNKNOWN_TAG);
+        l.alignmentProperty().set(Pos.CENTER);
+        var sp = new StackPane(l);
+        StackPane.setAlignment(l, Pos.CENTER);
+        return sp;
+    }
+
     public static Pane eu4TagNode(String tag, String styleClass) {
         if (!COUNTRY_IMAGES.containsKey(tag)) {
-            COUNTRY_IMAGES.put(tag, ImageLoader.loadImage(
-                    GameInstallation.EU4.getPath().resolve("gfx/flags/" + tag + ".tga")));
+            var img = ImageLoader.loadImage(
+                    GameInstallation.EU4.getPath().resolve("gfx/flags/" + tag + ".tga"));
+            if (img == null) {
+                return unknownTag(styleClass);
+            } else {
+                COUNTRY_IMAGES.put(tag, img);
+            }
         }
 
         ImageView v = new ImageView(COUNTRY_IMAGES.get(tag));
         Pane pane = new Pane(v);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
+        v.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
         return pane;
     }
 
     public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
         if (!HOI4_COUNTRY_IMAGES.containsKey(tag)) {
-            HOI4_COUNTRY_IMAGES.put(tag, ImageLoader.loadImage(
-                    GameInstallation.HOI4.getPath().resolve("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga")));
+            var img = ImageLoader.loadImage(
+                    GameInstallation.HOI4.getPath().resolve("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga"));
+            if (img == null) {
+                return unknownTag(styleClass);
+            } else {
+                HOI4_COUNTRY_IMAGES.put(tag, img);
+            }
         }
 
         ImageView v = new ImageView(HOI4_COUNTRY_IMAGES.get(tag));
@@ -110,10 +140,17 @@ public class GameImage {
 
         Path p = GameInstallation.HOI4.getPath();
         Path i = p.resolve("gfx").resolve("interface");
-        String s = "image-icon";
 
         HOI4_ICON = ImageLoader.loadImage(
                 GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("game-icon.png"));
+
+        HOI4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("warning_icon.dds"));
+        HOI4_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+        HOI4_ICON_DIFF_RECRUIT = ImageLoader.loadImage(i.resolve("difficulty_button_recruit.dds"));
+        HOI4_ICON_DIFF_REGULAR = ImageLoader.loadImage(i.resolve("difficulty_button_regular.dds"));
+        HOI4_ICON_DIFF_VETERAN = ImageLoader.loadImage(i.resolve("difficulty_button_veteran.dds"));
+        HOI4_ICON_DIFF_ELITE = ImageLoader.loadImage(i.resolve("difficulty_button_elite.dds"));
+        HOI4_ICON_DIFF_CIVILIAN = ImageLoader.loadImage(i.resolve("difficulty_button_civilian.dds"));
 
     }
 
@@ -124,7 +161,6 @@ public class GameImage {
 
         Path p = GameInstallation.EU4.getPath();
         Path i = p.resolve("gfx").resolve("interface");
-        String s = "image-icon";
 
         EU4_ICON = ImageLoader.loadImage(
                 GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("icon.png"));

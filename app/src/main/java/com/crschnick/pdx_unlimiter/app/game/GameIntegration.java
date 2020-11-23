@@ -36,15 +36,21 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     public static void init() {
         ALL = new ArrayList<>();
+        Settings s = Settings.getInstance();
         if (Settings.getInstance().getEu4().isPresent()) {
             EU4 = new Eu4Integration();
             ALL.add(EU4);
+            if (s.getActiveGame().equals(s.getEu4())) {
+                current.set(EU4);
+            }
         }
         if (Settings.getInstance().getHoi4().isPresent()) {
             HOI4 = new Hoi4Integration();
             ALL.add(HOI4);
+            if (s.getActiveGame().equals(s.getHoi4())) {
+                current.set(HOI4);
+            }
         }
-        current.set(ALL.get(1));
     }
 
     public static List<GameIntegration<?,?>> getAvailable() {
@@ -192,5 +198,6 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
         current().selectCampaign(null);
         current.set(newInt);
+        Settings.getInstance().setActiveGame(current().getInstallation().getPath());
     }
 }

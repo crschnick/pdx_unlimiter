@@ -8,16 +8,19 @@ import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.eu4.savegame.*;
 import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
+import com.jfoenix.controls.JFXButton;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +42,8 @@ public class DialogHelper {
         alert.setTitle("Log");
 
 
-        TextArea textArea = new TextArea();
+        TextArea textArea = new TextArea(LogManager.getInstance().getLogFile().isPresent() ?
+                "" : "Log file output is currently disabled!");
         textArea.editableProperty().setValue(false);
 
         Button val = (Button) alert.getDialogPane().lookupButton(refresh);
@@ -54,6 +58,7 @@ public class DialogHelper {
                             ErrorHandler.handleException(ex);
                         }
                     }
+                    e.consume();
                 }
         );
         val.fireEvent(new ActionEvent());
@@ -188,16 +193,18 @@ public class DialogHelper {
     }
 
     public static Optional<Path> showImportArchiveDialog() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setHeaderText("Import all savegames from archive");
-        alert.setContentText("Do you want to import all savegames from a pdxu savegame archive? This may take a while.");
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Import savegames from archive");
+        alert.setHeaderText("Do you want to import all savegames from a pdxu savegame archive? This may take a while.");
 
         HBox dialogPaneContent = new HBox();
         Label label = new Label("Archive: ");
         label.setAlignment(Pos.BOTTOM_CENTER);
         TextField textArea = new TextField();
-        textArea.setMinWidth(500);
-        Button b = new Button("\uD83D\uDCBE");
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         b.setOnMouseClicked((m) -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select archive to import");
@@ -209,26 +216,31 @@ public class DialogHelper {
         });
 
         dialogPaneContent.getChildren().addAll(label, textArea, b);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
         alert.getDialogPane().setContent(dialogPaneContent);
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton() ? Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
 
     public static Optional<Path> showExportDialog(boolean archive) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Export all savegames to an archive");
         if (archive) {
-            alert.setHeaderText("Export all savegames to archive");
-            alert.setContentText("Do you want to export all savegames to a pdxu savegame archive? This may take a while.");
+            alert.setHeaderText("Do you want to export all savegames to a pdxu savegame archive?\n\n" +
+                    "This allows you to import the archive " +
+                    "into a Pdx-Unlimiter running on a different computer and may take a while.");
         } else {
-
+            alert.setHeaderText("Do you want to export all savegames into an archive? This may take a while.");
         }
 
         HBox dialogPaneContent = new HBox();
-        Label label = new Label("Export to file: ");
+        Label label = new Label("Archive name: ");
         label.setAlignment(Pos.BOTTOM_CENTER);
         TextField textArea = new TextField();
-        textArea.setMinWidth(500);
-        Button b = new Button("\uD83D\uDCBE");
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         b.setOnMouseClicked((m) -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select export location");
@@ -240,24 +252,15 @@ public class DialogHelper {
         });
 
         dialogPaneContent.getChildren().addAll(label, textArea, b);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
         alert.getDialogPane().setContent(dialogPaneContent);
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton() ? Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
 
-    public static boolean showImportSavegamesDialog() {
+    public static boolean showSavegameDeleteDialog() {
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
-        alert.setHeaderText("Import all savegames");
-        alert.setContentText("Do you want to import all savegames from " +
-                GameIntegration.current().getInstallation().getSavegamesPath().toString() + "? This may take a while.");
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton();
-    }
-
-    public static boolean showSavegameDeleteDialog() {
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm deletion");
         alert.setHeaderText("Do you want to delete the selected savegame?");
         Optional<ButtonType> result = alert.showAndWait();
@@ -265,19 +268,9 @@ public class DialogHelper {
 
     }
 
-    public static boolean showUpdateAllSavegamesDialog() {
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm update");
-        alert.setHeaderText("Do you want to update all savegames? This may take a while.");
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton();
-
-    }
-
     public static boolean showCampaignDeleteDialog() {
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm deletion");
         alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");
         Optional<ButtonType> result = alert.showAndWait();

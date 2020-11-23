@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -22,7 +23,9 @@ public class GuiSettings {
 
         TextField textArea = new TextField();
         textArea.setEditable(false);
-        Button b = new Button("\uD83D\uDCBE");
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         if (s.getEu4().isPresent()) {
             b.setDisable(true);
         }
@@ -55,7 +58,9 @@ public class GuiSettings {
 
         TextField textArea = new TextField();
         textArea.setEditable(false);
-        Button b = new Button("\uD83D\uDCBE");
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         if (s.getHoi4().isPresent()) {
             b.setDisable(true);
         }
@@ -88,7 +93,9 @@ public class GuiSettings {
 
         TextField textArea = new TextField();
         textArea.setEditable(false);
-        Button b = new Button("\uD83D\uDCBE");
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         if (s.getCk3().isPresent()) {
             b.setDisable(true);
         }
@@ -121,7 +128,9 @@ public class GuiSettings {
 
         TextField textArea = new TextField();
         textArea.setEditable(false);
-        Button b = new Button("\uD83D\uDCBE");
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         if (s.getStellaris().isPresent()) {
             b.setDisable(true);
         }

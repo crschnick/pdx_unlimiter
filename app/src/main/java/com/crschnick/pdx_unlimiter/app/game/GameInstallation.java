@@ -27,6 +27,8 @@ public abstract class GameInstallation {
     public static StellarisInstallation STELLARIS = null;
 
     private Path path;
+    private List<GameDlc> dlcs = new ArrayList<>();
+    private List<GameMod> mods = new ArrayList<>();
     protected ObjectProperty<List<Path>> savegames = new SimpleObjectProperty<>();
 
     public GameInstallation(Path path) {
@@ -36,13 +38,36 @@ public abstract class GameInstallation {
     public static void initInstallations() throws Exception {
         if (EU4 != null) {
             EU4.init();
+            EU4.loadDlcs();
             EU4.startSavegameWatcher();
+            EU4.loadMods();
         }
 
         if (HOI4 != null) {
             HOI4.init();
+            HOI4.loadDlcs();
             HOI4.startSavegameWatcher();
         }
+    }
+
+    void loadDlcs() throws IOException {
+        Files.list(getPath().resolve("dlc")).forEach(f -> {
+            try {
+                GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+    }
+
+    void loadMods() throws IOException {
+        Files.list(getUserPath().resolve("mod")).forEach(f -> {
+            try {
+                GameMod.fromFile(f).ifPresent(m -> mods.add(m));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
     }
 
     List<Path> getLatestSavegames() {

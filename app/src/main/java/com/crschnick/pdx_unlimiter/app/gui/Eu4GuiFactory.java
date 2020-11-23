@@ -1,13 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.jfoenix.controls.JFXMasonryPane;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -48,22 +48,26 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     }
 
     @Override
-    public ObservableValue<Pane> createImage(Eu4Campaign campaign) {
-        var b = Bindings.createObjectBinding(
-                () -> GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON), campaign.tagProperty());
-        return b;
-    }
-
-    @Override
     public String createInfoString(Eu4CampaignEntry entry) {
         return entry.getDate().toDisplayString();
     }
 
     @Override
+    public ObservableValue<Pane> createImage(Eu4Campaign campaign) {
+        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON));
+        campaign.tagProperty().addListener((c,o,n) -> {
+            Platform.runLater(() -> prop.set(GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
+        });
+        return prop;
+    }
+
+    @Override
     public ObservableValue<String> createInfoString(Eu4Campaign campaign) {
-        var b = Bindings.createObjectBinding(
-                () -> campaign.getDate().toDisplayString(), campaign.dateProperty());
-        return b;
+        SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
+        campaign.dateProperty().addListener((c,o,n) -> {
+            Platform.runLater(() -> prop.set(n.toString()));
+        });
+        return prop;
     }
 
     @Override
@@ -125,6 +129,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
             Tooltip.install(version, tooltip("Incompatible savegame version"));
             version.getStyleClass().add(CLASS_VERSION_INCOMPATIBLE);
         }
+        version.setAlignment(Pos.CENTER);
         version.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
         grid.getChildren().add(version);
     }
