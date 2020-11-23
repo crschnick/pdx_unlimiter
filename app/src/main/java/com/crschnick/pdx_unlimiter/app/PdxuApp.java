@@ -144,13 +144,13 @@ public class PdxuApp extends Application {
                 close(true);
             }
         });
-        primaryStage.setTitle("Pdx-Unlimiter");
         try {
             setup();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
 
+        primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
         layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
         createLayout();
 

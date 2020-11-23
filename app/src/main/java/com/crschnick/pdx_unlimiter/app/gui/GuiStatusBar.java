@@ -144,11 +144,7 @@ public class GuiStatusBar {
         importLatest.setGraphic(new FontIcon());
         importLatest.getStyleClass().add( CLASS_IMPORT);
         importLatest.setOnAction(event -> {
-            if (GameIntegration.current().getInstallation().getSavegames().size() == 0) {
-                return;
-            }
-
-            FileImporter.importFile(GameIntegration.current().getInstallation().getSavegames().get(0));
+            FileImporter.importLatestSavegame();
             event.consume();
         });
 
