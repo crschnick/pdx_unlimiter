@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 
 import java.util.TreeSet;
 import java.util.stream.Collectors;

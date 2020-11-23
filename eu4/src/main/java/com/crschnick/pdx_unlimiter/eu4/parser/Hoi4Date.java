@@ -64,7 +64,7 @@ public class Hoi4Date implements Comparable<Hoi4Date> {
         date -= (year * 365);
         Month m = getMonth(date);
         int day = getDay(m, date);
-        return new Hoi4Date(hour, day, m, year);
+        return new Hoi4Date(hour + 1, day, m, year);
     }
 
     private static int getDay(Month m, long days) {

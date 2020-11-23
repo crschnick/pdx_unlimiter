@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class Hoi4Savegame extends Savegame {
 
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     private static final String[] PARTS = new String[]{"gamestate"};
 

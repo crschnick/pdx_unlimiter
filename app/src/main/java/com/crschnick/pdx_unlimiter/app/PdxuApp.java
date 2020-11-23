@@ -109,11 +109,16 @@ public class PdxuApp extends Application {
         }
         LogManager.init();
         ErrorHandler.init();
-        Settings.init();
+    }
 
+    private void postWindowSetup() throws Exception {
+        Settings.init();
         GameInstallation.initInstallations();
+        GameIntegration.init();
+        GameAppManager.init();
+
         SavegameCache.loadData();
-        AchievementManager.init();
+        //AchievementManager.init();
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
             GlobalScreen.registerNativeHook();
         }
@@ -137,7 +142,7 @@ public class PdxuApp extends Application {
                 close(true);
             }
         });
-        primaryStage.setTitle("EU4 Savegame Manager");
+        primaryStage.setTitle("Pdx-Unlimiter");
         try {
             setup();
         } catch (Exception e) {
@@ -146,14 +151,16 @@ public class PdxuApp extends Application {
 
         layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
         createLayout();
-        GameIntegration.init();
-        GameAppManager.init();
+
+        try {
+            postWindowSetup();
+        } catch (Exception e) {
+            ErrorHandler.handleTerminalException(e);
+        }
 
         Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
-        //setUserAgentStylesheet(STYLESHEET_CASPIAN);
-        //primaryStage.getScene().getStylesheets().clear();
         GuiStyle.addStylesheets(primaryStage.getScene());
 
 

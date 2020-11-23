@@ -21,10 +21,6 @@
     -fx-icon-code: "mdi-import";
 }
 
-
-.launch-button {
-}
-
 .launch-button .ikonli-font-icon {
     -fx-icon-code: "mdi-play";
 }
@@ -33,15 +29,24 @@
     -fx-icon-code: "mdi-export";
 }
 
+.browse-button .ikonli-font-icon {
+     -fx-icon-code: "mdi-content-save";
+     -jfx-button-type: RAISED;
+}
+
 .savegame .ikonli-font-icon {
     -fx-icon-code: "mdi-clipboard-outline";
 }
 
-.alert .ikonli-font-icon {
+.alert-icon .ikonli-font-icon {
     -fx-icon-code: "mdi-alert-outline";
 }
 
 .jfx-button {
      -jfx-button-type: FLAT;
+}
+
+.switch-game-button .ikonli-font-icon {
+   -fx-icon-code: "mdi-vector-arrange-below";
 }
 

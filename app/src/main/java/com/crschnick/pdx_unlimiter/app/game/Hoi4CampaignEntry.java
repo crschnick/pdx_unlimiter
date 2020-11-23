@@ -21,7 +21,7 @@ public class Hoi4CampaignEntry extends GameCampaignEntry<Hoi4SavegameInfo> {
     @Override
     public int compareTo(GameCampaignEntry<Hoi4SavegameInfo> o) {
         Hoi4CampaignEntry e = (Hoi4CampaignEntry) o;
-        return date.compareTo(e.date);
+        return -date.compareTo(e.date);
     }
 
     public Hoi4Tag getTag() {

@@ -22,32 +22,6 @@ import java.util.*;
 public class GuiMenuBar {
 
     private static MenuBar createMenuBar() {
-        Menu menu = new Menu("File");
-
-        MenuItem menuItem0 = new MenuItem("Export savegames...");
-        menuItem0.setOnAction((a) -> {
-            Optional<Path> path = DialogHelper.showExportDialog(false);
-            path.ifPresent(SavegameCache::exportSavegameDirectory);
-        });
-
-
-        MenuItem l = new MenuItem("Import latest savegame (CTRL+SHIFT+I)");
-        l.setOnAction((a) -> {
-            Eu4SavegameImporter.importLatestSavegame();
-
-        });
-        menu.getItems().add(l);
-
-        MenuItem i = new MenuItem("Import all savegames...");
-        i.setOnAction((a) -> {
-            if (DialogHelper.showImportSavegamesDialog()) {
-                Eu4SavegameImporter.importAllSavegames();
-            }
-        });
-        menu.getItems().add(i);
-
-        menu.getItems().add(menuItem0);
-
 
         Menu settings = new Menu("Settings");
         MenuItem c = new MenuItem("Change settings");
@@ -73,13 +47,12 @@ public class GuiMenuBar {
         });
         savegames.getItems().add(menuItem2);
 
-        MenuItem u = new MenuItem("Update all savegames...");
-        u.setOnAction((a) -> {
-            if (DialogHelper.showUpdateAllSavegamesDialog()) {
-                //SavegameCache.EU4_CACHE.updateAllData();
-            }
+        MenuItem exportSg = new MenuItem("Export savegames...");
+        exportSg.setOnAction((a) -> {
+            Optional<Path> path = DialogHelper.showExportDialog(false);
+            path.ifPresent(SavegameCache::exportSavegameDirectory);
         });
-        savegames.getItems().add(u);
+        savegames.getItems().add(exportSg);
 
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
@@ -102,15 +75,7 @@ public class GuiMenuBar {
         savegames.getItems().add(backups);
 
 
-        Menu about = new Menu("Help");
-        MenuItem wiki = new MenuItem("EU4 Wiki");
-        wiki.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://eu4.paradoxwikis.com/Europa_Universalis_4_Wiki"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
+        Menu about = new Menu("About");
         MenuItem src = new MenuItem("Contribute");
         src.setOnAction((a) -> {
             try {
@@ -135,7 +100,6 @@ public class GuiMenuBar {
         tc.setOnAction((a) -> {
             DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
         });
-        about.getItems().add(wiki);
         about.getItems().add(src);
         about.getItems().add(is);
         about.getItems().add(lc);
@@ -158,7 +122,6 @@ public class GuiMenuBar {
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
-        menuBar.getMenus().add(menu);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
         menuBar.getMenus().add(about);
@@ -169,7 +132,9 @@ public class GuiMenuBar {
     }
 
     private static Node createStatusIndicator() {
-        JFXButton m = new JFXButton("Switch game", new FontIcon());
+        JFXButton m = new JFXButton("Switch game");
+        m.setGraphic(new FontIcon());
+        m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
         return m;
     }
