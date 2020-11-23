@@ -10,9 +10,15 @@ import com.crschnick.pdx_unlimiter.eu4.savegame.*;
 import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
 import com.jfoenix.controls.JFXButton;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -22,10 +28,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +47,7 @@ public class DialogHelper {
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.getButtonTypes().add(refresh);
         alert.initModality(Modality.WINDOW_MODAL);
-        alert.setTitle("Log");
+        alert.setTitle("Show log");
 
 
         TextArea textArea = new TextArea(LogManager.getInstance().getLogFile().isPresent() ?
@@ -53,7 +61,6 @@ public class DialogHelper {
                     if (LogManager.getInstance().getLogFile().isPresent()) {
                         try {
                             textArea.setText(Files.readString(LogManager.getInstance().getLogFile().get()));
-                            e.consume();
                         } catch (IOException ex) {
                             ErrorHandler.handleException(ex);
                         }
@@ -163,14 +170,29 @@ public class DialogHelper {
         alert.showAndWait();
     }
 
-    public static boolean showException(Exception e) {
+    public static boolean showException(Throwable e) {
+        ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);
         ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
         ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
         Alert alert = createAlert();
-        alert.getButtonTypes().addAll(foo, bar);
+        alert.getButtonTypes().addAll(report, foo, bar);
+
+        Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
+        reportButton.addEventFilter(ActionEvent.ACTION, event -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues/new"));
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+            event.consume();
+        });
+
         alert.setAlertType(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("An exception occured. If you want to notify the developers of this error, click the 'send error' button. ");
+        alert.setTitle("Error reporter");
+        alert.setHeaderText("An error occured.\n\n" +
+                "If you have a suspicion of the cause and want to help us fix the error, you can report it on github.\n" +
+                "If you have a specific savegame that causes this issue, please attach it as well in a zip.\n\n" +
+                "If you just want to notify the developers of this error automatically, click the 'send error' button.");
 
         VBox dialogPaneContent = new VBox();
 
@@ -183,13 +205,14 @@ public class DialogHelper {
         TextArea textArea = new TextArea();
         textArea.setText(stackTrace);
         textArea.editableProperty().setValue(false);
+        textArea.autosize();
 
         dialogPaneContent.getChildren().addAll(label, textArea);
 
         alert.getDialogPane().setContent(dialogPaneContent);
 
         Optional<ButtonType> r = alert.showAndWait();
-        return r.isPresent() && r.get().getButtonData().isDefaultButton();
+        return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
     }
 
     public static Optional<Path> showImportArchiveDialog() {

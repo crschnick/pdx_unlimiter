@@ -156,10 +156,13 @@ public class GuiSettings {
         return dialogPaneContent;
     }
 
-    public static void showSettings() {
+    public static void showSettings(boolean noInstalls) {
         Alert alert = DialogHelper.createAlert();
-        alert.getButtonTypes().add(new ButtonType("Apply", ButtonBar.ButtonData.APPLY));
+        alert.getButtonTypes().add(ButtonType.APPLY);
         alert.setTitle("Settings");
+        if (noInstalls) {
+            alert.setHeaderText("A valid installation of one these games is required to use the Pdx-Unlimiter: ");
+        }
         alert.getDialogPane().setMinWidth(600);
 
         Settings s = Settings.getInstance().copy();
@@ -168,7 +171,7 @@ public class GuiSettings {
         alert.getDialogPane().setContent(vbox);
 
         Optional<ButtonType> r = alert.showAndWait();
-        if (r.isPresent() && r.get().getButtonData().isDefaultButton()) {
+        if (r.isPresent() && r.get().equals(ButtonType.APPLY)) {
             Settings.updateSettings(s);
         }
     }

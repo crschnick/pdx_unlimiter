@@ -56,7 +56,6 @@ dependencies {
     implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
     implementation files("$buildDir/generated-modules/json-path-master-SNAPSHOT.jar")
-    //implementation 'com.github.json-path:JsonPath:master-SNAPSHOT'
     implementation files("$buildDir/generated-modules/json-smart-2.3.jar")
     implementation files("$buildDir/generated-modules/accessors-smart-1.2.jar")
     implementation project(':eu4')
