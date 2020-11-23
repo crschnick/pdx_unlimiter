@@ -114,7 +114,9 @@ public class PdxuApp extends Application {
     private void postWindowSetup() throws Exception {
         Settings.init();
         GameInstallation.initInstallations();
-        GameIntegration.init();
+        if (!GameIntegration.init()) {
+            GuiSettings.showSettings(true);
+        }
         GameAppManager.init();
 
         SavegameCache.loadData();

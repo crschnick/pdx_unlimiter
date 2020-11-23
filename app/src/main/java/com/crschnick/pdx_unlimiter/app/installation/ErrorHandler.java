@@ -26,9 +26,13 @@ public class ErrorHandler {
         System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion()
                 + ", " + System.getProperty("os.name"));
         Sentry.init();
+
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            handleException(e);
+        });
     }
 
-    private static void handleExcetionWithoutInit(Exception ex) {
+    private static void handleExcetionWithoutInit(Throwable ex) {
         ex.printStackTrace();
         LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
         if (PdxuInstallation.getInstance().isProduction()) {
@@ -37,11 +41,11 @@ public class ErrorHandler {
         Sentry.capture(ex);
     }
 
-    public static void handleException(Exception ex) {
+    public static void handleException(Throwable ex) {
         handleException(ex, "Error occured");
     }
 
-    public static void handleException(Exception ex, String msg) {
+    public static void handleException(Throwable ex, String msg) {
         if (!startupCompleted) {
             handleExcetionWithoutInit(ex);
         }

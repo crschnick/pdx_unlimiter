@@ -171,7 +171,7 @@ public class Settings {
             stellaris = null;
         }
 
-        if (!activeGame.equals(eu4) && !activeGame.equals(hoi4) && !activeGame.equals(ck3) && !activeGame.equals(stellaris) ) {
+        if (activeGame != null && !activeGame.equals(eu4) && !activeGame.equals(hoi4) && !activeGame.equals(ck3) && !activeGame.equals(stellaris) ) {
             activeGame = null;
         }
     }
@@ -189,6 +189,12 @@ public class Settings {
         if (stellaris != null) {
             GameInstallation.STELLARIS = new StellarisInstallation(stellaris);
         }
+        try {
+            GameInstallation.initInstallations();
+        } catch (Exception e) {
+            ErrorHandler.handleTerminalException(e);
+        }
+        GameIntegration.reload();
     }
 
 }

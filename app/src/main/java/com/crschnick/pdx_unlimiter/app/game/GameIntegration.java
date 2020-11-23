@@ -34,7 +34,7 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     public static Eu4Integration EU4;
     public static Hoi4Integration HOI4;
 
-    public static void init() {
+    public static boolean init() {
         ALL = new ArrayList<>();
         Settings s = Settings.getInstance();
         if (Settings.getInstance().getEu4().isPresent()) {
@@ -51,6 +51,22 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
                 current.set(HOI4);
             }
         }
+
+        if (ALL.size() == 0) {
+            return false;
+        }
+
+        if (current.get() == null) {
+            current.set(ALL.get(0));
+        }
+        return true;
+    }
+
+    public static void reload() {
+        if (current() != null) {
+            current().selectCampaign(null);
+        }
+        init();
     }
 
     public static List<GameIntegration<?,?>> getAvailable() {

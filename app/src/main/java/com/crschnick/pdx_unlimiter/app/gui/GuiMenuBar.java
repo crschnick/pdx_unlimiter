@@ -26,7 +26,7 @@ public class GuiMenuBar {
         Menu settings = new Menu("Settings");
         MenuItem c = new MenuItem("Change settings");
         c.setOnAction((a) -> {
-            GuiSettings.showSettings();
+            GuiSettings.showSettings(false);
         });
         settings.getItems().add(c);
 
@@ -75,6 +75,41 @@ public class GuiMenuBar {
         savegames.getItems().add(backups);
 
 
+
+
+        Menu achievements = new Menu("Achievements");
+        MenuItem asrc = new MenuItem("Achievement source");
+        asrc.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdxu_achievements/"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+        MenuItem oa = new MenuItem("Official achievements directory");
+        oa.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().open(PdxuInstallation.getInstance().getOfficialAchievementsLocation().toFile());
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+
+        MenuItem ua = new MenuItem("User achievements directory");
+        ua.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().open(PdxuInstallation.getInstance().getUserAchievementsLocation().toFile());
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+
+        achievements.getItems().add(asrc);
+        achievements.getItems().add(oa);
+        achievements.getItems().add(ua);
+
+
+
         Menu about = new Menu("About");
         MenuItem src = new MenuItem("Contribute");
         src.setOnAction((a) -> {
@@ -119,11 +154,18 @@ public class GuiMenuBar {
         });
         dev.getItems().add(log);
 
+        MenuItem error = new MenuItem("Throw exception");
+        error.setOnAction((a) -> {
+            throw new RuntimeException("This is a test exception!");
+        });
+        dev.getItems().add(error);
+
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
+        menuBar.getMenus().add(achievements);
         menuBar.getMenus().add(about);
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
             menuBar.getMenus().add(dev);
