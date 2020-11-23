@@ -72,7 +72,7 @@ public abstract class GamedataParser {
             return new AbstractMap.SimpleEntry<>(new ValueNode(obj), index + 1);
         }
 
-        List<Node> childs = new LinkedList<>();
+        List<Node> childs = new ArrayList<>();
         int currentIndex = index + 1;
         while (true) {
             if (tokens.get(currentIndex).getType() == TokenType.CLOSE_GROUP) {

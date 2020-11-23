@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
@@ -18,7 +19,7 @@ public class GameKeyListener implements NativeKeyListener {
                 handle.kill();
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I) {
-                Eu4SavegameImporter.importLatestSavegame();
+                FileImporter.importLatestSavegame();
             }
         }
     }

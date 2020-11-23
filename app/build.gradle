@@ -26,7 +26,8 @@ application {
     mainClass = 'com.crschnick.pdx_unlimiter.app.PdxuApp'
     applicationDefaultJvmArgs = ["-Djdk.gtk.version=2",
                                  "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
-                                 "--add-opens", "java.base/java.lang.reflect=com.jfoenix"]
+                                 "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
+                                 '-Xms16384m', '-Xmx16384m']
 }
 
 javafx {

@@ -406,6 +406,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
     public synchronized void importSavegame(Path file) {
         try {
             importSavegameData(file);
+            saveData();
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }

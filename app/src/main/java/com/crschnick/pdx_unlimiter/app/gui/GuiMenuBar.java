@@ -188,7 +188,11 @@ public class GuiMenuBar {
         spacer.getStyleClass().add("menu-bar");
         HBox.setHgrow(spacer, Priority.SOMETIMES);
 
-        HBox menubars = new HBox(leftBar, spacer, createStatusIndicator());
+        StackPane s = new StackPane();
+        s.getStyleClass().add("menu-bar");
+        s.getChildren().add(createStatusIndicator());
+
+        HBox menubars = new HBox(leftBar, spacer, s);
         return menubars;
     }
 }
