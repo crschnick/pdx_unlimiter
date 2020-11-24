@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4NormalParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -89,15 +89,15 @@ public class AchievementContent {
 
         Map<String, Node> nodes = new HashMap<>();
         try {
-            nodes.put("eu4.area", Eu4NormalParser.textFileParser().parse(
+            nodes.put("eu4.area", TextFormatParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("area.txt"))).get());
-            nodes.put("eu4.continent", Eu4NormalParser.textFileParser().parse(
+            nodes.put("eu4.continent", TextFormatParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("continent.txt"))).get());
-            nodes.put("eu4.region", Eu4NormalParser.textFileParser().parse(
+            nodes.put("eu4.region", TextFormatParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("region.txt"))).get());
-            nodes.put("eu4.superregion", Eu4NormalParser.textFileParser().parse(
+            nodes.put("eu4.superregion", TextFormatParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath().resolve("map").resolve("superregion.txt"))).get());
-            nodes.put("eu4.cultures", Eu4NormalParser.textFileParser().parse(
+            nodes.put("eu4.cultures", TextFormatParser.textFileParser().parse(
                     Files.newInputStream(GameInstallation.EU4.getPath()
                             .resolve("common").resolve("cultures").resolve("00_cultures.txt"))).get());
         } catch (IOException e) {

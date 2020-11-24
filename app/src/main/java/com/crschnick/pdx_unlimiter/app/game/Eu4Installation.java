@@ -1,15 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Version;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -27,7 +22,7 @@ public class Eu4Installation extends GameInstallation {
 
     private Path executable;
     private Path userDirectory;
-    private GameVersion version;
+    private Eu4Version version;
     private Map<String, String> countryNames = new HashMap<>();
 
 
@@ -35,8 +30,7 @@ public class Eu4Installation extends GameInstallation {
         super(path);
         if (SystemUtils.IS_OS_WINDOWS) {
             executable = getPath().resolve("eu4.exe");
-        }
-        else if (SystemUtils.IS_OS_LINUX) {
+        } else if (SystemUtils.IS_OS_LINUX) {
             executable = getPath().resolve("eu4");
         }
     }
@@ -68,10 +62,9 @@ public class Eu4Installation extends GameInstallation {
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in EU4 launcher config file"))
                 .textValue();
         if (SystemUtils.IS_OS_WINDOWS) {
-             value = value.replace("%USER_DOCUMENTS%",
-                     Paths.get(System.getProperty("user.home"), "Documents").toString());
-        }
-        else if (SystemUtils.IS_OS_LINUX) {
+            value = value.replace("%USER_DOCUMENTS%",
+                    Paths.get(System.getProperty("user.home"), "Documents").toString());
+        } else if (SystemUtils.IS_OS_LINUX) {
             value = value.replace("$LINUX_DATA_HOME",
                     Paths.get(System.getProperty("user.home"), ".local", "share").toString());
         }
@@ -86,8 +79,9 @@ public class Eu4Installation extends GameInstallation {
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);
         m.find();
-        this.version = new GameVersion(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
+        this.version = new Eu4Version(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
     }
+
     @Override
     public void start(boolean continueLast) {
         try {
@@ -101,7 +95,7 @@ public class Eu4Installation extends GameInstallation {
         return countryNames.containsKey(tag);
     }
 
-    public String getCountryName(GameTag tag) {
+    public String getCountryName(Eu4Tag tag) {
         if (tag.isCustom()) {
             return tag.getName();
         }
@@ -125,7 +119,7 @@ public class Eu4Installation extends GameInstallation {
         return userDirectory;
     }
 
-    public GameVersion getVersion() {
+    public Eu4Version getVersion() {
         return version;
     }
 }

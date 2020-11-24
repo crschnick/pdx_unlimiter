@@ -1,11 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameTag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -24,6 +26,96 @@ import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> {
+
+    private static Tooltip tooltip(String text) {
+
+        Tooltip t = new Tooltip(text);
+        t.setShowDelay(Duration.millis(100));
+        return t;
+    }
+
+    private static Node getImageForTagName(String tag, String styleClass) {
+        if (GameInstallation.EU4.isPreexistingCoutry(tag)) {
+            return GameImage.eu4TagNode(tag, styleClass);
+        } else {
+            Label l = new Label("?");
+            l.getStyleClass().add(styleClass);
+            l.alignmentProperty().set(Pos.CENTER);
+            return l;
+        }
+    }
+
+    private static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
+        return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
+    }
+
+    private static Node getImageForTag(Eu4Tag tag, String styleClass) {
+        Node n = getImageForTagName(tag.getTag(), styleClass);
+        if (tag.isCustom()) {
+            int c = tag.getCountryColor();
+            ((Label) n).setBackground(new Background(
+                    new BackgroundFill(colorFromInt(c, 255), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+        return n;
+    }
+
+    private static Node createRulerLabel(Eu4SavegameInfo.Ruler ruler, boolean isRuler) {
+        VBox box = new VBox();
+        if (isRuler) {
+            box.getChildren().add(new Label(ruler.getName(), imageNode(EU4_ICON_RULER, CLASS_RULER_ICON)));
+        } else {
+            box.getChildren().add(imageNode(EU4_ICON_HEIR, CLASS_RULER_ICON));
+        }
+
+        box.alignmentProperty().set(Pos.CENTER);
+        box.getChildren().add(createRulerStatsNode(ruler));
+        box.getStyleClass().add(CLASS_RULER);
+        box.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
+        return box;
+    }
+
+    private static Node createRulerStatsNode(Eu4SavegameInfo.Ruler ruler) {
+        HBox box = new HBox();
+        box.setAlignment(Pos.CENTER);
+        Label adm = new Label(ruler.getAdm() + "  ", imageNode(EU4_ICON_ADM, CLASS_POWER_ICON));
+        box.getChildren().add(adm);
+
+        Label dip = new Label(ruler.getDip() + "  ", imageNode(EU4_ICON_DIP, CLASS_POWER_ICON));
+        box.getChildren().add(dip);
+
+        Label mil = new Label(String.valueOf(ruler.getMil()), imageNode(EU4_ICON_MIL, CLASS_POWER_ICON));
+        box.getChildren().add(mil);
+        return box;
+    }
+
+    private static String getCountryTooltip(Set<Eu4Tag> tags) {
+        StringBuilder b = new StringBuilder();
+        for (Eu4Tag t : tags) {
+            b.append(GameInstallation.EU4.getCountryName(t));
+            b.append(", ");
+        }
+        b.delete(b.length() - 2, b.length());
+        return b.toString();
+    }
+
+    private static void createDiplomacyRow(JFXMasonryPane pane, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
+        if (tags.size() == 0) {
+            return;
+        }
+
+        HBox box = new HBox();
+        box.setAlignment(Pos.CENTER);
+        box.getChildren().add(icon);
+        for (Eu4Tag tag : tags) {
+            Node n = getImageForTag(tag, CLASS_TAG_ICON);
+            box.getChildren().add(n);
+        }
+        box.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
+        box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
+        box.getStyleClass().add(style);
+        Tooltip.install(box, tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(tags) : none)));
+        pane.getChildren().add(box);
+    }
 
     @Override
     public Pane createIcon() {
@@ -55,7 +147,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     @Override
     public ObservableValue<Pane> createImage(Eu4Campaign campaign) {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON));
-        campaign.tagProperty().addListener((c,o,n) -> {
+        campaign.tagProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
         });
         return prop;
@@ -64,7 +156,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     @Override
     public ObservableValue<String> createInfoString(Eu4Campaign campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
-        campaign.dateProperty().addListener((c,o,n) -> {
+        campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
         });
         return prop;
@@ -132,95 +224,5 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
         version.setAlignment(Pos.CENTER);
         version.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
         grid.getChildren().add(version);
-    }
-
-    private static Tooltip tooltip(String text) {
-
-        Tooltip t = new Tooltip(text);
-        t.setShowDelay(Duration.millis(100));
-        return t;
-    }
-
-    private static Node getImageForTagName(String tag, String styleClass) {
-        if (GameInstallation.EU4.isPreexistingCoutry(tag)) {
-            return GameImage.eu4TagNode(tag, styleClass);
-        } else {
-            Label l = new Label("?");
-            l.getStyleClass().add(styleClass);
-            l.alignmentProperty().set(Pos.CENTER);
-            return l;
-        }
-    }
-
-    private static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
-        return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
-    }
-
-    private static Node getImageForTag(GameTag tag, String styleClass) {
-        Node n = getImageForTagName(tag.getTag(), styleClass);
-        if (tag.isCustom()) {
-            int c = tag.getCountryColor();
-            ((Label)n).setBackground(new Background(
-                    new BackgroundFill(colorFromInt(c, 255), CornerRadii.EMPTY, Insets.EMPTY)));
-        }
-        return n;
-    }
-
-    private static Node createRulerLabel(Eu4SavegameInfo.Ruler ruler, boolean isRuler) {
-        VBox box = new VBox();
-        if (isRuler) {
-            box.getChildren().add(new Label(ruler.getName(), imageNode(EU4_ICON_RULER, CLASS_RULER_ICON)));
-        } else {
-            box.getChildren().add(imageNode(EU4_ICON_HEIR, CLASS_RULER_ICON));
-        }
-
-        box.alignmentProperty().set(Pos.CENTER);
-        box.getChildren().add(createRulerStatsNode(ruler));
-        box.getStyleClass().add(CLASS_RULER);
-        box.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
-        return box;
-    }
-
-    private static Node createRulerStatsNode(Eu4SavegameInfo.Ruler ruler) {
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        Label adm = new Label(ruler.getAdm() + "  ", imageNode(EU4_ICON_ADM, CLASS_POWER_ICON));
-        box.getChildren().add(adm);
-
-        Label dip = new Label(ruler.getDip() + "  ", imageNode(EU4_ICON_DIP, CLASS_POWER_ICON));
-        box.getChildren().add(dip);
-
-        Label mil = new Label(String.valueOf(ruler.getMil()), imageNode(EU4_ICON_MIL, CLASS_POWER_ICON));
-        box.getChildren().add(mil);
-        return box;
-    }
-
-    private static String getCountryTooltip(Set<GameTag> tags) {
-        StringBuilder b = new StringBuilder();
-        for (GameTag t : tags) {
-            b.append(GameInstallation.EU4.getCountryName(t));
-            b.append(", ");
-        }
-        b.delete(b.length() - 2, b.length());
-        return b.toString();
-    }
-
-    private static void createDiplomacyRow(JFXMasonryPane pane, Node icon, Set<GameTag> tags, String tooltipStart, String none, String style) {
-        if (tags.size() == 0) {
-            return;
-        }
-
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        box.getChildren().add(icon);
-        for (GameTag tag : tags) {
-            Node n = getImageForTag(tag, CLASS_TAG_ICON);
-            box.getChildren().add(n);
-        }
-        box.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
-        box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
-        box.getStyleClass().add(style);
-        Tooltip.install(box, tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(tags) : none)));
-        pane.getChildren().add(box);
     }
 }

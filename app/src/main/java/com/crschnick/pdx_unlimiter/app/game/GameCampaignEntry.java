@@ -16,7 +16,7 @@ public abstract class GameCampaignEntry<I extends SavegameInfo> implements Compa
     private boolean persistent;
 
     public GameCampaignEntry(String name, UUID uuid, I info,
-                            String checksum) {
+                             String checksum) {
         this.checksum = checksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;

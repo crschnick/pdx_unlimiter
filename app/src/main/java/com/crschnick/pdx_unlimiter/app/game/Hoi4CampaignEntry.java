@@ -1,9 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Date;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Date;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4SavegameInfo;
-import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.UUID;
 

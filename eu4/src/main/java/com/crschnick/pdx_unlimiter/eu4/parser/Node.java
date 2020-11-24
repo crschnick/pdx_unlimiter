@@ -6,14 +6,6 @@ import java.util.Optional;
 
 public abstract class Node {
 
-    public static String indent(int amount) {
-        String s = "";
-        for (int i = 0; i < amount; i++) {
-            s = s.concat("  ");
-        }
-        return s;
-    }
-
     public static List<Node> copyOfArrayNode(Node node) {
         if (!(node instanceof ArrayNode)) {
             throw new NodeFormatException("Not an array node:\n" + node.toString());
@@ -163,6 +155,4 @@ public abstract class Node {
 
         return nodes;
     }
-
-    public abstract String toString(int indentation);
 }

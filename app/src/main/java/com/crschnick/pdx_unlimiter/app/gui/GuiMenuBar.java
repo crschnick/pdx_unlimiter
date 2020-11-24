@@ -3,21 +3,23 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Optional;
 
 public class GuiMenuBar {
 
@@ -75,8 +77,6 @@ public class GuiMenuBar {
         savegames.getItems().add(backups);
 
 
-
-
         Menu achievements = new Menu("Achievements");
         MenuItem asrc = new MenuItem("Achievement source");
         asrc.setOnAction((a) -> {
@@ -107,7 +107,6 @@ public class GuiMenuBar {
         achievements.getItems().add(asrc);
         achievements.getItems().add(oa);
         achievements.getItems().add(ua);
-
 
 
         Menu about = new Menu("About");

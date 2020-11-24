@@ -8,7 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 
-public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends SavegameInfo>,C extends GameCampaign<E>> {
+public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>> {
 
     public abstract Pane createIcon();
 
@@ -17,9 +17,11 @@ public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends Saveg
     public abstract Pane createGameImage(C campaign);
 
     public abstract Pane createImage(E entry);
+
     public abstract ObservableValue<Pane> createImage(C campaign);
 
     public abstract String createInfoString(E entry);
+
     public abstract ObservableValue<String> createInfoString(C campaign);
 
     public abstract void fillNodeContainer(E entry, JFXMasonryPane grid);

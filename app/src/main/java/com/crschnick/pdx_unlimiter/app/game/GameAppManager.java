@@ -2,10 +2,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class GameAppManager {
@@ -13,6 +10,9 @@ public class GameAppManager {
     private static GameAppManager INSTANCE = new GameAppManager();
 
     private SimpleObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
+
+    private GameAppManager() {
+    }
 
     public static void init() {
         Thread t = new Thread(() -> {
@@ -52,9 +52,6 @@ public class GameAppManager {
 
     public static GameAppManager getInstance() {
         return INSTANCE;
-    }
-
-    private GameAppManager() {
     }
 
     public GameApp getActiveGame() {

@@ -1,18 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class FileImporter {
 
@@ -35,8 +29,8 @@ public class FileImporter {
             RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
                 @Override
                 public void visitEu4(Path file) {
-                   SavegameCache.EU4_CACHE.importSavegame(p);
-                   toReturn[0] = true;
+                    SavegameCache.EU4_CACHE.importSavegame(p);
+                    toReturn[0] = true;
                 }
 
                 @Override

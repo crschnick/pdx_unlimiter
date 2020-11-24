@@ -7,4 +7,5 @@ module com.crschnick.pdx_unlimiter.eu4 {
     exports com.crschnick.pdx_unlimiter.eu4.parser;
     exports com.crschnick.pdx_unlimiter.eu4.format;
     exports com.crschnick.pdx_unlimiter.eu4.savegame;
+    exports com.crschnick.pdx_unlimiter.eu4.data;
 }

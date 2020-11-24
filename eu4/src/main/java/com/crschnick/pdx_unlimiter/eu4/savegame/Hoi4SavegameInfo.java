@@ -1,10 +1,9 @@
 package com.crschnick.pdx_unlimiter.eu4.savegame;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Date;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Date;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class Hoi4SavegameInfo extends SavegameInfo {

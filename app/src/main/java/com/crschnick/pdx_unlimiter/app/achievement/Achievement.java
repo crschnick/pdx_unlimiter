@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import com.fasterxml.jackson.core.JsonFactory;

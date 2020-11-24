@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.eu4.format.eu4;
 
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
 import com.crschnick.pdx_unlimiter.eu4.format.NodeTransformer;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
@@ -29,9 +29,9 @@ public class EventTransformer extends NodeTransformer {
             }
             KeyValueNode kv = (KeyValueNode) n;
             String date = kv.getKeyName();
-            GameDate gd = GameDate.fromString(date);
+            Eu4Date gd = Eu4Date.fromString(date);
             if (gd != null) {
-                Node dateNode = GameDate.toNode(gd);
+                Node dateNode = Eu4Date.toNode(gd);
                 ArrayNode an = (ArrayNode) kv.getNode();
                 an.addNode(KeyValueNode.create("date", dateNode));
                 newEventList.add(an);

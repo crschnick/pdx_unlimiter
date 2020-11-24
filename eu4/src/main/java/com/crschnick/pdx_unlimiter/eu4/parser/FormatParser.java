@@ -6,15 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public abstract class GamedataParser {
+public abstract class FormatParser {
 
     public static final int TOKEN_SLEEP_INTERVAL = 10000;
     public static final int SLEEP_TIME = 2;
 
     private byte[] header;
     private Namespace namespace;
+    private int lastSleep = 0;
 
-    public GamedataParser(byte[] header, Namespace namespace) {
+    public FormatParser(byte[] header, Namespace namespace) {
         this.header = header;
         this.namespace = namespace;
     }
@@ -48,8 +49,6 @@ public abstract class GamedataParser {
         Node result = hierachiseTokens(tokens);
         return Optional.of(result);
     }
-
-    private int lastSleep = 0;
 
     private Node hierachiseTokens(List<Token> tokens) {
         lastSleep = 0;

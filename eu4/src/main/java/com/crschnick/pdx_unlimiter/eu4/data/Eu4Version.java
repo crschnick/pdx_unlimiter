@@ -1,14 +1,14 @@
-package com.crschnick.pdx_unlimiter.eu4.parser;
+package com.crschnick.pdx_unlimiter.eu4.data;
 
 
-public class GameVersion {
+public class Eu4Version {
 
     private int first;
     private int second;
     private int third;
     private int fourth;
 
-    public GameVersion(int first, int second, int third, int fourth) {
+    public Eu4Version(int first, int second, int third, int fourth) {
         this.first = first;
         this.second = second;
         this.third = third;

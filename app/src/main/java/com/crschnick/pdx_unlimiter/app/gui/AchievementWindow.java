@@ -1,12 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.achievement.Achievement;
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementMatcher;
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -19,9 +16,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
-import javafx.util.Duration;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -109,16 +104,16 @@ public class AchievementWindow {
         val.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-                        Optional<AchievementMatcher> m = GameIntegration.current().getAchievementManager().validateSavegame(a, entry);
-                        if (m.isEmpty()) {
-                            return;
-                        }
+                    Optional<AchievementMatcher> m = GameIntegration.current().getAchievementManager().validateSavegame(a, entry);
+                    if (m.isEmpty()) {
+                        return;
+                    }
 
-                        alert.getDialogPane().setContent(AchievementWindow.createAchievementInfoNode(a, m.get(), true));
-                        val.setDisable(true);
-                        alert.hide();
-                        alert.showAndWait();
-                        e.consume();
+                    alert.getDialogPane().setContent(AchievementWindow.createAchievementInfoNode(a, m.get(), true));
+                    val.setDisable(true);
+                    alert.hide();
+                    alert.showAndWait();
+                    e.consume();
                 }
         );
 

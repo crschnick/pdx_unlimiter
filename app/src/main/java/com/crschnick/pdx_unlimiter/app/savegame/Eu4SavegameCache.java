@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
@@ -31,7 +34,7 @@ public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo
 
         c.getSavegames().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
-                .min(Comparator.comparingLong(ca -> GameDate.toLong(c.getDate())))
+                .min(Comparator.comparingLong(ca -> Eu4Date.toLong(c.getDate())))
                 .ifPresent(e -> c.tagProperty().setValue(e.getInfo().getCurrentTag().getTag()));
     }
 
@@ -120,27 +123,27 @@ public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo
     protected Eu4CampaignEntry readEntry(JsonNode node, String name, UUID uuid, String checksum) {
         String tag = node.required("tag").textValue();
         String date = node.required("date").textValue();
-        return new Eu4CampaignEntry(name, uuid, null, checksum, tag, GameDate.fromString(date));
+        return new Eu4CampaignEntry(name, uuid, null, checksum, tag, Eu4Date.fromString(date));
     }
 
     @Override
     protected Eu4Campaign readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed) {
         String tag = node.required("tag").textValue();
         String lastDate = node.required("date").textValue();
-        return new Eu4Campaign(lastPlayed, name, uuid, tag, GameDate.fromString(lastDate));
+        return new Eu4Campaign(lastPlayed, name, uuid, tag, Eu4Date.fromString(lastDate));
     }
 
     @Override
     protected void writeEntry(ObjectNode node, Eu4CampaignEntry entry) {
 
-                            node.put("tag", entry.getTag())
+        node.put("tag", entry.getTag())
                 .put("date", entry.getDate().toString());
     }
 
     @Override
     protected void writeCampaign(ObjectNode node, Eu4Campaign campaign) {
 
-                node.put("tag", campaign.getTag())
+        node.put("tag", campaign.getTag())
                 .put("date", campaign.getDate().toString());
     }
 }

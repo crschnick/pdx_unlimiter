@@ -3,25 +3,21 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Version;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.util.Optional;
 
-public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign> {
+public class Eu4Integration extends GameIntegration<Eu4CampaignEntry, Eu4Campaign> {
 
-    private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
+    private static boolean areCompatible(Eu4Version gameVersion, Eu4Version saveVersion) {
         return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
     }
 

@@ -16,6 +16,7 @@ import java.util.logging.Level;
 public class LogManager {
 
     private static LogManager INSTANCE;
+    private Optional<Path> logFile;
 
     public LogManager(Optional<Path> logFile) {
         this.logFile = logFile;
@@ -61,13 +62,11 @@ public class LogManager {
         INSTANCE = new LogManager(logFile);
     }
 
-    private Optional<Path> logFile;
+    public static LogManager getInstance() {
+        return INSTANCE;
+    }
 
     public Optional<Path> getLogFile() {
         return logFile;
-    }
-
-    public static LogManager getInstance() {
-        return INSTANCE;
     }
 }

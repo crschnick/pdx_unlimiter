@@ -1,13 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import org.apache.commons.io.FileUtils;
 
@@ -31,6 +27,7 @@ public class AchievementManager {
     private AchievementContent content;
     private String checksum;
     private List<Achievement> achievements = new ArrayList<>();
+
     public AchievementManager(String game, AchievementContent content) {
         this.game = game;
         this.content = content;
@@ -115,7 +112,7 @@ public class AchievementManager {
     public <S extends Savegame> Optional<AchievementMatcher> validateSavegame(Achievement a, GameCampaignEntry<?> entry) {
         try {
             if (!validateChecksum()) {
-                    throw new IOException("Wrong achievement checksum");
+                throw new IOException("Wrong achievement checksum");
             }
             loadData();
         } catch (IOException e) {

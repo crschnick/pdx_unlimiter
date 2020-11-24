@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.eu4.savegame.*;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -36,7 +39,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
     public static final Eu4SavegameCache EU4_CACHE = new Eu4SavegameCache();
     public static final Hoi4SavegameCache HOI4_CACHE = new Hoi4SavegameCache();
 
-    public static final Set<SavegameCache<?,?,?,?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE);
+    public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE);
     private volatile Queue<E> toLoad = new ConcurrentLinkedQueue<>();
     private String name;
     private Path path;
@@ -49,31 +52,6 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
         addChangeListeners();
     }
 
-    private void init() throws IOException {
-        FileUtils.forceMkdir(getPath().toFile());
-        FileUtils.forceMkdir(getBackupPath().toFile());
-        if (Files.exists(getPath().resolve(getDataFile()))) {
-            importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
-        }
-
-        Thread loader = new Thread(() -> {
-            while (true) {
-                if (toLoad.peek() != null) {
-                    loadEntry(toLoad.poll());
-                }
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        loader.setName("Savegame loader");
-        loader.setDaemon(true);
-        loader.start();
-    }
-
     public static void loadData() throws IOException {
         for (SavegameCache cache : CACHES) {
             cache.init();
@@ -82,7 +60,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
 
     public static void saveData() throws IOException {
         for (SavegameCache cache : CACHES) {
-            FailableFunction<Path,OutputStream,IOException> f =
+            FailableFunction<Path, OutputStream, IOException> f =
                     (p) -> Files.newOutputStream(cache.getPath().resolve(p));
             cache.exportDataToConfig(f);
         }
@@ -148,6 +126,31 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
         }
     }
 
+    private void init() throws IOException {
+        FileUtils.forceMkdir(getPath().toFile());
+        FileUtils.forceMkdir(getBackupPath().toFile());
+        if (Files.exists(getPath().resolve(getDataFile()))) {
+            importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
+        }
+
+        Thread loader = new Thread(() -> {
+            while (true) {
+                if (toLoad.peek() != null) {
+                    loadEntry(toLoad.poll());
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        loader.setName("Savegame loader");
+        loader.setDaemon(true);
+        loader.start();
+    }
+
     private void addChangeListeners() {
         this.campaigns.addListener((SetChangeListener<? super C>) cc -> {
             if (cc.wasRemoved()) {
@@ -165,7 +168,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
 
     protected abstract void updateCampaignProperties(C c);
 
-    public void importDataFromConfig(FailableFunction<Path,InputStream,IOException> in) throws IOException {
+    public void importDataFromConfig(FailableFunction<Path, InputStream, IOException> in) throws IOException {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(in.apply(Path.of("campaigns.json")).readAllBytes());
 
@@ -178,28 +181,30 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
         }
 
         for (C campaign : campaigns) {
-             try {
-                 JsonNode campaignNode = o.readTree(in.apply(
-                         Path.of(campaign.getCampaignId().toString()).resolve("campaign.json"))
-                         .readAllBytes());
-                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
-                     UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
-                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
-                     String checksum = entryNode.required("checksum").textValue();
-                     campaign.add(readEntry(entryNode, name, eId, checksum));
-                 });
-             } catch (Exception e) {
-                 ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName());
-             }
+            try {
+                JsonNode campaignNode = o.readTree(in.apply(
+                        Path.of(campaign.getCampaignId().toString()).resolve("campaign.json"))
+                        .readAllBytes());
+                StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
+                    UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
+                    String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
+                    String checksum = entryNode.required("checksum").textValue();
+                    campaign.add(readEntry(entryNode, name, eId, checksum));
+                });
+            } catch (Exception e) {
+                ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName());
+            }
         }
     }
 
     protected abstract E readEntry(JsonNode node, String name, UUID uuid, String checksum);
+
     protected abstract C readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed);
 
-    public void exportDataToConfig(FailableFunction<Path,OutputStream,IOException> out) throws IOException {
+    public void exportDataToConfig(FailableFunction<Path, OutputStream, IOException> out) throws IOException {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
-        ArrayNode c = n.putArray("campaigns");;
+        ArrayNode c = n.putArray("campaigns");
+        ;
         for (C campaign : getCampaigns()) {
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
@@ -228,6 +233,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
     }
 
     protected abstract void writeEntry(ObjectNode node, E e);
+
     protected abstract void writeCampaign(ObjectNode node, C c);
 
     public void importSavegameCache(ZipFile zipFile) {
@@ -302,6 +308,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
     }
 
     protected abstract C createCampaign(I info);
+
     protected abstract E createEntry(UUID uuid, String checksum, I info);
 
     public synchronized boolean updateSavegameData(E e) {
@@ -378,7 +385,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
             loadedSavegames.remove(first);
             LoggerFactory.getLogger(SavegameCache.class).debug("Unloaded savegame data of entry " + getEntryName(first));
         }
-;
+        ;
         loadedSavegames.put(entry, savegame);
         LoggerFactory.getLogger(SavegameCache.class).debug("Loaded savegame data of entry " + getEntryName(entry));
     }

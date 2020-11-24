@@ -1,11 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import javafx.beans.property.SimpleObjectProperty;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyListener;
-
-import java.util.Optional;
 
 public class GameApp {
 

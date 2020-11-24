@@ -2,9 +2,6 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -127,36 +124,36 @@ public class Settings {
         return Optional.ofNullable(eu4);
     }
 
-    public Optional<Path> getHoi4() {
-        return Optional.ofNullable(hoi4);
-    }
-
-    public Optional<Path> getCk3() {
-        return Optional.ofNullable(ck3);
-    }
-
-    public Optional<Path> getStellaris() {
-        return Optional.ofNullable(stellaris);
-    }
-
-    public Optional<Path> getActiveGame() {
-        return Optional.ofNullable(activeGame);
-    }
-
     public void setEu4(Path eu4) {
         this.eu4 = eu4;
+    }
+
+    public Optional<Path> getHoi4() {
+        return Optional.ofNullable(hoi4);
     }
 
     public void setHoi4(Path hoi4) {
         this.hoi4 = hoi4;
     }
 
+    public Optional<Path> getCk3() {
+        return Optional.ofNullable(ck3);
+    }
+
     public void setCk3(Path ck3) {
         this.ck3 = ck3;
     }
 
+    public Optional<Path> getStellaris() {
+        return Optional.ofNullable(stellaris);
+    }
+
     public void setStellaris(Path stellaris) {
         this.stellaris = stellaris;
+    }
+
+    public Optional<Path> getActiveGame() {
+        return Optional.ofNullable(activeGame);
     }
 
     public void updateActiveGame(Path activeGame) {
@@ -182,7 +179,7 @@ public class Settings {
             stellaris = null;
         }
 
-        if (activeGame != null && !activeGame.equals(eu4) && !activeGame.equals(hoi4) && !activeGame.equals(ck3) && !activeGame.equals(stellaris) ) {
+        if (activeGame != null && !activeGame.equals(eu4) && !activeGame.equals(hoi4) && !activeGame.equals(ck3) && !activeGame.equals(stellaris)) {
             activeGame = null;
         }
     }

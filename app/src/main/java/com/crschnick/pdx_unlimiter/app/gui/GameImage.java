@@ -1,10 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -166,7 +165,7 @@ public class GameImage {
                 GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("icon.png"));
 
         EU4_ICON_VASSAL = ImageLoader.loadImage(i.resolve("icon_vassal.dds"));
-        EU4_ICON_ALLIANCE= ImageLoader.loadImage(i.resolve("icon_alliance.dds"));
+        EU4_ICON_ALLIANCE = ImageLoader.loadImage(i.resolve("icon_alliance.dds"));
         EU4_ICON_TRIBUTARY = ImageLoader.loadImage(i.resolve("subject_tributary_icon.dds"));
         EU4_ICON_MARCH = ImageLoader.loadImage(i.resolve("icon_march.dds"));
         EU4_ICON_TRUCE = ImageLoader.loadImage(i.resolve("icon_truce.dds"));
