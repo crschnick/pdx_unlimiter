@@ -4,7 +4,7 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
-setVersion '2.0-beta1'
+setVersion '2.0-beta2'
 
 if (!System.getProperty("java.runtime.name").contains("OpenJDK")) {
     println "OpenJDK is required!"
@@ -178,7 +178,12 @@ createRuntimeImage.dependsOn([copyModules, copyOutput])
 createRuntimeImage {
     outputDirectory = file("$buildDir/image")
     modulePath = [file("$buildDir/modules")]
-    modules = ['com.crschnick.pdx_unlimiter.app', 'org.slf4j', 'org.slf4j.simple', 'jdk.crypto.ec']
+    modules = [
+            'com.crschnick.pdx_unlimiter.app',
+            'org.slf4j',
+            'org.slf4j.simple',
+            'jdk.crypto.ec',
+            'org.kordamp.ikonli.materialdesign']
     excludedResources = []
     launcher {
         name = 'pdxu'
