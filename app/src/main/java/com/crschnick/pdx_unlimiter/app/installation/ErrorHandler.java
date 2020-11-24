@@ -3,8 +3,6 @@ package com.crschnick.pdx_unlimiter.app.installation;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import io.sentry.Sentry;
 import javafx.application.Platform;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 public class ErrorHandler {

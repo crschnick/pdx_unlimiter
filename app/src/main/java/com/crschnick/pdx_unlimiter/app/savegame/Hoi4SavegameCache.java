@@ -1,29 +1,31 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.Hoi4Campaign;
+import com.crschnick.pdx_unlimiter.app.game.Hoi4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Date;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.*;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Date;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4RawSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Hoi4SavegameCache extends SavegameCache<Hoi4Savegame, Hoi4SavegameInfo, Hoi4CampaignEntry, Hoi4Campaign> {
+    private static final String SAVE_NAME = "savegame.hoi4";
+
     public Hoi4SavegameCache() {
         super("hoi4");
     }
-
-    private static final String SAVE_NAME = "savegame.hoi4";
 
     @Override
     protected void updateCampaignProperties(Hoi4Campaign c) {
@@ -57,7 +59,7 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Savegame, Hoi4SavegameI
 
 
         node.put("tag", entry.getTag().getTag())
-        .put("ideology", entry.getTag().getIdeology())
+                .put("ideology", entry.getTag().getIdeology())
                 .put("date", entry.getDate().toString());
     }
 

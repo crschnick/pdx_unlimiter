@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.eu4.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.format.NodeSplitter;
-import com.crschnick.pdx_unlimiter.eu4.format.eu4.Eu4Transformer;
 import com.crschnick.pdx_unlimiter.eu4.format.hoi4.Hoi4Transformer;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 

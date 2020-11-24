@@ -9,7 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.TreeSet;
+import java.util.UUID;
 
 public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
 
@@ -20,7 +21,7 @@ public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
     private volatile ObservableSet<E> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
 
-    public GameCampaign(Instant lastPlayed,String name, UUID campaignId) {
+    public GameCampaign(Instant lastPlayed, String name, UUID campaignId) {
         this.lastPlayed = new SimpleObjectProperty<>(lastPlayed);
         this.name = new SimpleStringProperty(name);
         this.campaignId = campaignId;

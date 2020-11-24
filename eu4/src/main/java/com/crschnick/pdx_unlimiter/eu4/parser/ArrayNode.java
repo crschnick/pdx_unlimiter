@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.eu4.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ArrayNode extends Node {
 
@@ -18,12 +17,6 @@ public class ArrayNode extends Node {
 
     public String toString() {
         return "ArrayNode(" + nodes.toString() + ")";
-    }
-
-    public String toString(int indentation) {
-        return "{\n" + getNodes().stream().map(
-                (n) -> indent(indentation + 1) + n.toString(indentation + 1))
-                .collect(Collectors.joining(",\n")) + "\n" + indent(indentation) + "}";
     }
 
     public void addNode(Node node) {

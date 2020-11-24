@@ -1,11 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Date;
-import com.crschnick.pdx_unlimiter.eu4.parser.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Date;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.eu4.parser;
+package com.crschnick.pdx_unlimiter.eu4.data;
 
 import java.util.Objects;
 

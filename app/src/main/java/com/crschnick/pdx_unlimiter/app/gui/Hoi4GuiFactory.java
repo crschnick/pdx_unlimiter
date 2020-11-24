@@ -1,19 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4Campaign;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4CampaignEntry;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -21,7 +18,8 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campaign> {
 
@@ -62,7 +60,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     @Override
     public ObservableValue<Pane> createImage(Hoi4Campaign campaign) {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
-        campaign.tagProperty().addListener((c,o,n) -> {
+        campaign.tagProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
         });
         return prop;
@@ -71,7 +69,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     @Override
     public ObservableValue<String> createInfoString(Hoi4Campaign campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
-        campaign.dateProperty().addListener((c,o,n) -> {
+        campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
         });
         return prop;

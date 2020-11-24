@@ -2,10 +2,10 @@ package com.crschnick.pdx_unlimiter.eu4.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
 import com.crschnick.pdx_unlimiter.eu4.format.NodeSplitter;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IronmanParser;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4NormalParser;
-import com.crschnick.pdx_unlimiter.eu4.parser.GamedataParser;
+import com.crschnick.pdx_unlimiter.eu4.io.SavegameWriter;
+import com.crschnick.pdx_unlimiter.eu4.parser.BinaryFormatParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,7 +22,6 @@ import java.util.zip.ZipOutputStream;
 
 public class Eu4RawSavegame extends RawSavegame {
 
-    private static final GamedataParser normalParser = new Eu4NormalParser();
     private static final String[] META_NODES = new String[]{"date", "save_game", "player",
             "displayed_country_name", "savegame_version", "savegame_versions", "dlc_enabled",
             "multi_player", "not_observer", "campaign_id", "campaign_length", "campaign_stats",
@@ -38,26 +37,6 @@ public class Eu4RawSavegame extends RawSavegame {
         this.gamestate = gamestate;
         this.ai = ai;
         this.meta = meta;
-    }
-
-    public static boolean isIronman(Path file) throws IOException {
-        var in = Files.newInputStream(file);
-        boolean isZipped = new ZipInputStream(in).getNextEntry() != null;
-        in.close();
-        if (isZipped) {
-            ZipFile zipFile = new ZipFile(file.toFile());
-            ZipEntry gamestate = zipFile.getEntry("gamestate");
-            if (gamestate == null) {
-                return false;
-            }
-
-            var stream = zipFile.getInputStream(gamestate);
-            boolean b = new Eu4IronmanParser(Namespace.EMPTY).validateHeader(stream);
-            stream.close();
-            return b;
-        } else {
-            return false;
-        }
     }
 
     public static Eu4RawSavegame fromFile(Path file) throws Exception {
@@ -81,21 +60,21 @@ public class Eu4RawSavegame extends RawSavegame {
             ZipEntry meta = zipFile.getEntry("meta");
             ZipEntry ai = zipFile.getEntry("ai");
 
-            Optional<Node> gamestateNode = new Eu4IronmanParser(Namespace.EU4_GAMESTATE).parse(zipFile.getInputStream(gamestate));
+            Optional<Node> gamestateNode = BinaryFormatParser.eu4Parser(Namespace.EU4_GAMESTATE).parse(zipFile.getInputStream(gamestate));
             if (gamestateNode.isPresent()) {
-                Node metaNode = new Eu4IronmanParser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
-                Node aiNode = new Eu4IronmanParser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
+                Node metaNode = BinaryFormatParser.eu4Parser(Namespace.EU4_META).parse(zipFile.getInputStream(meta)).get();
+                Node aiNode = BinaryFormatParser.eu4Parser(Namespace.EU4_AI).parse(zipFile.getInputStream(ai)).get();
                 zipFile.close();
                 return new Eu4RawSavegame(checksum, gamestateNode.get(), aiNode, metaNode);
             } else {
-                var s = new Eu4RawSavegame(checksum, normalParser.parse(zipFile.getInputStream(gamestate)).get(),
-                        normalParser.parse(zipFile.getInputStream(ai)).get(),
-                        normalParser.parse(zipFile.getInputStream(meta)).get());
+                var s = new Eu4RawSavegame(checksum, TextFormatParser.eu4SavegameParser().parse(zipFile.getInputStream(gamestate)).get(),
+                        TextFormatParser.eu4SavegameParser().parse(zipFile.getInputStream(ai)).get(),
+                        TextFormatParser.eu4SavegameParser().parse(zipFile.getInputStream(meta)).get());
                 zipFile.close();
                 return s;
             }
         } else {
-            Optional<Node> node = normalParser.parse(Files.newInputStream(file));
+            Optional<Node> node = TextFormatParser.eu4SavegameParser().parse(Files.newInputStream(file));
             if (node.isPresent()) {
                 Node meta = new NodeSplitter(META_NODES).splitFromNode(node.get());
                 Node ai = new NodeSplitter(AI_NODES).splitFromNode(node.get());
@@ -110,20 +89,17 @@ public class Eu4RawSavegame extends RawSavegame {
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
         ZipEntry e1 = new ZipEntry("gamestate" + (txtSuffix ? ".txt" : ""));
         out.putNextEntry(e1);
-        byte[] b1 = gamestate.toString(0).getBytes();
-        out.write(b1, 0, b1.length);
+        SavegameWriter.writeNode(gamestate, out);
         out.closeEntry();
 
         ZipEntry e2 = new ZipEntry("meta" + (txtSuffix ? ".txt" : ""));
         out.putNextEntry(e2);
-        byte[] b2 = meta.toString(0).getBytes();
-        out.write(b2, 0, b2.length);
+        SavegameWriter.writeNode(meta, out);
         out.closeEntry();
 
         ZipEntry e3 = new ZipEntry("ai" + (txtSuffix ? ".txt" : ""));
         out.putNextEntry(e3);
-        byte[] b3 = ai.toString(0).getBytes();
-        out.write(b3, 0, b3.length);
+        SavegameWriter.writeNode(ai, out);
         out.closeEntry();
         out.close();
     }

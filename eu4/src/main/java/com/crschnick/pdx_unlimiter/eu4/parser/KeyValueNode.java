@@ -18,10 +18,6 @@ public class KeyValueNode extends Node {
         return getKeyName() + "=" + getNode().toString();
     }
 
-    public String toString(int indentation) {
-        return getKeyName() + "=" + getNode().toString(indentation);
-    }
-
     public String getKeyName() {
         return keyName;
     }

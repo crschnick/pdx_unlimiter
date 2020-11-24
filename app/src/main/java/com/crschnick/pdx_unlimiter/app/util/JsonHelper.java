@@ -6,11 +6,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 public class JsonHelper {
 
@@ -19,7 +17,7 @@ public class JsonHelper {
         JsonGenerator g = f.createGenerator(out)
                 .setPrettyPrinter(new DefaultPrettyPrinter());
         new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-        .writeTree(g, node);
+                .writeTree(g, node);
         out.close();
     }
 }

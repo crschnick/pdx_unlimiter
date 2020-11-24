@@ -1,8 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4NormalParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
-import javafx.scene.image.Image;
+import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +9,11 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class GameDlc {
+
+    private Path filePath;
+    private String name;
+    private boolean affectsChecksum;
+    private boolean affectsCompatability;
 
     public static Optional<GameDlc> fromDirectory(Path p) throws IOException {
         if (!Files.isDirectory(p)) {
@@ -24,7 +28,7 @@ public class GameDlc {
             return Optional.empty();
         }
 
-        Node node = Eu4NormalParser.textFileParser().parse(Files.newInputStream(filePath)).get();
+        Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(filePath)).get();
         GameDlc dlc = new GameDlc();
         dlc.filePath = p.getParent().relativize(filePath);
         dlc.name = Node.getString(Node.getNodeForKey(node, "name"));
@@ -32,11 +36,6 @@ public class GameDlc {
         dlc.affectsCompatability = Node.getBoolean(Node.getNodeForKey(node, "affects_compatability"));
         return Optional.of(dlc);
     }
-
-    private Path filePath;
-    private String name;
-    private boolean affectsChecksum;
-    private boolean affectsCompatability;
 
     public Path getFilePath() {
         return filePath;

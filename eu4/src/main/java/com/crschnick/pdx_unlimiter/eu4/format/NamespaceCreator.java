@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.eu4.format;
 
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
@@ -10,7 +9,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class NamespaceCreator {
-    public static String createNamespace(Map<String,Node> unnamed, Map<String,Node> named) {
+    public static String createNamespace(Map<String, Node> unnamed, Map<String, Node> named) {
         StringBuilder s = new StringBuilder();
         var set = unnamed.keySet();
         set.retainAll(named.keySet());

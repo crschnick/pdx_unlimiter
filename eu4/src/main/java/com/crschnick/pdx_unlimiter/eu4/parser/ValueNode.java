@@ -12,10 +12,6 @@ public class ValueNode extends Node {
         return "ValueNode(" + getValue().toString() + ")";
     }
 
-    public String toString(int indentation) {
-        return getValue().toString();
-    }
-
     public Object getValue() {
         return value;
     }

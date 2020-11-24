@@ -9,32 +9,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Eu4NormalParser extends GamedataParser {
+public class TextFormatParser extends FormatParser {
 
-    public static final byte[] MAGIC = new byte[]{0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
-
+    public static final byte[] EU4_MAGIC = new byte[]{0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
 
     public static final byte[] HOI_MAGIC = new byte[]{0x48, 0x4F, 0x49, 0x34, 0x74, 0x78, 0x74};
 
-    public Eu4NormalParser() {
-        super(MAGIC, Namespace.EMPTY);
-    }
-
-    public Eu4NormalParser(byte[] magic) {
+    private TextFormatParser(byte[] magic) {
         super(magic, Namespace.EMPTY);
     }
 
-    public static Eu4NormalParser textFileParser() {
-        return new Eu4NormalParser(new byte[0]);
+    public static TextFormatParser textFileParser() {
+        return new TextFormatParser(new byte[0]);
     }
 
-    public static Eu4NormalParser savegameParser() {
-        return new Eu4NormalParser(MAGIC);
+    public static TextFormatParser eu4SavegameParser() {
+        return new TextFormatParser(EU4_MAGIC);
     }
 
-
-    public static Eu4NormalParser hoi4SavegameParser() {
-        return new Eu4NormalParser(HOI_MAGIC);
+    public static TextFormatParser hoi4SavegameParser() {
+        return new TextFormatParser(HOI_MAGIC);
     }
 
     private List<Token> tokenize(String s) {
@@ -99,7 +93,7 @@ public class Eu4NormalParser extends GamedataParser {
     }
 
     @Override
-    public List<GamedataParser.Token> tokenize(InputStream stream) throws IOException {
+    public List<FormatParser.Token> tokenize(InputStream stream) throws IOException {
         String s = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         s += "\0";
         return tokenize(s);

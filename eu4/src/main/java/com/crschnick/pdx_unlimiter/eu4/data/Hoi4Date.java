@@ -1,4 +1,9 @@
-package com.crschnick.pdx_unlimiter.eu4.parser;
+package com.crschnick.pdx_unlimiter.eu4.data;
+
+import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -51,7 +56,7 @@ public class Hoi4Date implements Comparable<Hoi4Date> {
         v += date.getYear() * 365;
         v += (5000 * 365);
         v *= 24;
-        v+= date.hour;
+        v += date.hour;
         return v;
     }
 

@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
+import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.gui.*;
-import com.crschnick.pdx_unlimiter.app.installation.*;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.LogManager;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import javafx.application.Application;
@@ -23,7 +26,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -63,12 +65,12 @@ public class PdxuApp extends Application {
 
 
         layout.setOnDragOver(event -> {
-                if (event.getGestureSource() != layout
-                        && event.getDragboard().hasFiles()) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                }
-                event.consume();
-            });
+            if (event.getGestureSource() != layout
+                    && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
 
         layout.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();

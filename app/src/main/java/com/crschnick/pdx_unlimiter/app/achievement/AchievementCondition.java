@@ -12,6 +12,7 @@ public class AchievementCondition {
     private String description;
     private Optional<String> node;
     private String filter;
+
     public AchievementCondition(String description, String node, String condition) {
         this.description = description;
         this.node = Optional.of(node);

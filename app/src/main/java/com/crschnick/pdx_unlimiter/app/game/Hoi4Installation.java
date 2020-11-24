@@ -1,16 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.parser.*;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,16 +23,15 @@ public class Hoi4Installation extends GameInstallation {
 
     private Path executable;
     private Path userDirectory;
-    private Map<Hoi4Tag,String> countryNames;
-    private Map<String,Integer> countryColors;
+    private Map<Hoi4Tag, String> countryNames;
+    private Map<String, Integer> countryColors;
 
 
     public Hoi4Installation(Path path) {
         super(path);
         if (SystemUtils.IS_OS_WINDOWS) {
             executable = getPath().resolve("hoi4.exe");
-        }
-        else if (SystemUtils.IS_OS_LINUX) {
+        } else if (SystemUtils.IS_OS_LINUX) {
             executable = getPath().resolve("hoi");
         }
     }
@@ -59,7 +59,7 @@ public class Hoi4Installation extends GameInstallation {
     }
 
     private void loadCountryColors(Path path) throws IOException {
-        Node node = Eu4NormalParser.textFileParser().parse(
+        Node node = TextFormatParser.textFileParser().parse(
                 Files.newInputStream(path)).get();
         for (Node n : Node.getNodeArray(node)) {
             var kv = Node.getKeyValueNode(n);
@@ -67,7 +67,7 @@ public class Hoi4Installation extends GameInstallation {
                 continue;
             }
 
-            Node data = Eu4NormalParser.textFileParser().parse(
+            Node data = TextFormatParser.textFileParser().parse(
                     Files.newInputStream(getPath().resolve("common").resolve(Node.getString(kv.getNode())))).get();
             List<Node> color;
 

@@ -1,28 +1,29 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.GameDate;
-import javafx.beans.property.*;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 
 public class Eu4Campaign extends GameCampaign<Eu4CampaignEntry> implements Comparable<Eu4Campaign> {
 
     private volatile StringProperty tag;
-    private volatile SimpleObjectProperty<GameDate> date;
+    private volatile SimpleObjectProperty<Eu4Date> date;
 
-    public Eu4Campaign(Instant lastPlayed, String name, UUID campaignId, String tag, GameDate date) {
+    public Eu4Campaign(Instant lastPlayed, String name, UUID campaignId, String tag, Eu4Date date) {
         super(lastPlayed, name, campaignId);
         this.tag = new SimpleStringProperty(tag);
         this.date = new SimpleObjectProperty<>(date);
     }
 
-    public GameDate getDate() {
+    public Eu4Date getDate() {
         return date.get();
     }
 
-    public SimpleObjectProperty<GameDate> dateProperty() {
+    public SimpleObjectProperty<Eu4Date> dateProperty() {
         return date;
     }
 

@@ -25,11 +25,10 @@ public abstract class GameInstallation {
     public static Hoi4Installation HOI4 = null;
     public static Ck3Installation CK3 = null;
     public static StellarisInstallation STELLARIS = null;
-
+    protected ObjectProperty<List<Path>> savegames = new SimpleObjectProperty<>();
     private Path path;
     private List<GameDlc> dlcs = new ArrayList<>();
     private List<GameMod> mods = new ArrayList<>();
-    protected ObjectProperty<List<Path>> savegames = new SimpleObjectProperty<>();
 
     public GameInstallation(Path path) {
         this.path = path;
@@ -48,6 +47,26 @@ public abstract class GameInstallation {
             HOI4.loadDlcs();
             HOI4.startSavegameWatcher();
         }
+    }
+
+    public static Optional<Path> getInstallPath(String app) {
+        Optional<String> steamDir = Optional.empty();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (ArchUtils.getProcessor().is64Bit()) {
+                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+            } else {
+                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
+            }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toString();
+            steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+        }
+
+        if (!steamDir.isPresent()) {
+            return Optional.empty();
+        }
+        Path p = Paths.get(steamDir.get(), "steamapps", "common", app);
+        return p.toFile().exists() ? Optional.of(p) : Optional.empty();
     }
 
     void loadDlcs() throws IOException {
@@ -134,32 +153,11 @@ public abstract class GameInstallation {
         t.start();
     }
 
-    public static Optional<Path> getInstallPath(String app) {
-        Optional<String> steamDir = Optional.empty();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            if (ArchUtils.getProcessor().is64Bit()) {
-                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
-            } else {
-                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
-            }
-        } else if (SystemUtils.IS_OS_LINUX) {
-            String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toString();
-            steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
-        }
-
-        if (!steamDir.isPresent()) {
-            return Optional.empty();
-        }
-        Path p = Paths.get(steamDir.get(), "steamapps", "common", app);
-        return p.toFile().exists() ? Optional.of(p) : Optional.empty();
-    }
-
     protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_WINDOWS) {
             value = value.replace("%USER_DOCUMENTS%",
                     Paths.get(System.getProperty("user.home"), "Documents").toString());
-        }
-        else if (SystemUtils.IS_OS_LINUX) {
+        } else if (SystemUtils.IS_OS_LINUX) {
             value = value.replace("$LINUX_DATA_HOME",
                     Paths.get(System.getProperty("user.home"), ".local", "share").toString());
         }

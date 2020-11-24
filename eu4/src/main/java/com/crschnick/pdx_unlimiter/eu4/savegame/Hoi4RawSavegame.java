@@ -1,8 +1,9 @@
 package com.crschnick.pdx_unlimiter.eu4.savegame;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4IronmanParser;
-import com.crschnick.pdx_unlimiter.eu4.parser.Eu4NormalParser;
+import com.crschnick.pdx_unlimiter.eu4.io.SavegameWriter;
+import com.crschnick.pdx_unlimiter.eu4.parser.BinaryFormatParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,21 +34,20 @@ public class Hoi4RawSavegame extends RawSavegame {
         }
         String checksum = c.toString();
 
-        Optional<Node> node = Eu4IronmanParser.hoi4Parser().parse(Files.newInputStream(file));
+        Optional<Node> node = BinaryFormatParser.hoi4Parser().parse(Files.newInputStream(file));
         if (node.isPresent()) {
             Node content = node.get();
             return new Hoi4RawSavegame(checksum, content);
         } else {
-            return new Hoi4RawSavegame(checksum, Eu4NormalParser.hoi4SavegameParser().parse(Files.newInputStream(file)).get());
+            return new Hoi4RawSavegame(checksum, TextFormatParser.hoi4SavegameParser().parse(Files.newInputStream(file)).get());
         }
 
     }
 
-    public void write(String fileName, boolean txtSuffix) throws IOException {
+    public void write(String fileName) throws IOException {
         File f = new File(fileName);
         OutputStream out = Files.newOutputStream(f.toPath());
-        byte[] b1 = content.toString(0).getBytes();
-        out.write(b1, 0, b1.length);
+        SavegameWriter.writeNode(content, out);
         out.close();
     }
 

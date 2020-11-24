@@ -1,8 +1,6 @@
 package com.crschnick.pdx_unlimiter.eu4.format.hoi4;
 
 import com.crschnick.pdx_unlimiter.eu4.format.*;
-import com.crschnick.pdx_unlimiter.eu4.format.eu4.EventTransformer;
-import com.crschnick.pdx_unlimiter.eu4.format.eu4.ProvincesTransformer;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;

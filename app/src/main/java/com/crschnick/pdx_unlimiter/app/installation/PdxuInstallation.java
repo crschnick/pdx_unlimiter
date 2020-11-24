@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -88,22 +87,22 @@ public class PdxuInstallation {
         return true;
     }
 
+    public static PdxuInstallation getInstance() {
+        return INSTANCE;
+    }
+
     private Path getDataLocation() {
         if (dataDir.isPresent()) {
             return dataDir.get();
         }
 
         if (SystemUtils.IS_OS_WINDOWS) {
-            return Path.of(System.getProperty("user.home"),"Pdx-Unlimiter");
+            return Path.of(System.getProperty("user.home"), "Pdx-Unlimiter");
         } else if (SystemUtils.IS_OS_LINUX) {
-            return Path.of(System.getProperty("user.home"),"pdx-unlimiter");
+            return Path.of(System.getProperty("user.home"), "pdx-unlimiter");
         } else {
             return installLocation;
         }
-    }
-
-    public static PdxuInstallation getInstance() {
-        return INSTANCE;
     }
 
     private boolean isAlreadyRunning() {

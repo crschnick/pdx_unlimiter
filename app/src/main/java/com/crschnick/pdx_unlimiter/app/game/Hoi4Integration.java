@@ -3,12 +3,10 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.Hoi4GuiFactory;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -16,9 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
-import java.util.Optional;
 
 public class Hoi4Integration extends GameIntegration<Hoi4CampaignEntry, Hoi4Campaign> {
     @Override
