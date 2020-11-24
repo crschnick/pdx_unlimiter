@@ -3,11 +3,9 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameParseException;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -20,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -32,16 +31,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampaignEntry<I>, C extends GameCampaign<E>> {
+public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, E extends GameCampaignEntry<I>, C extends GameCampaign<E>> {
 
     public static final Eu4SavegameCache EU4_CACHE = new Eu4SavegameCache();
     public static final Hoi4SavegameCache HOI4_CACHE = new Hoi4SavegameCache();
 
-    public static final Set<SavegameCache<?,?,?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE);
+    public static final Set<SavegameCache<?,?,?,?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE);
     private volatile Queue<E> toLoad = new ConcurrentLinkedQueue<>();
     private String name;
     private Path path;
     private volatile ObservableSet<C> campaigns = FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
+    private volatile Map<E, S> loadedSavegames = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public SavegameCache(String name) {
         this.name = name;
@@ -69,8 +69,8 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
                 }
             }
         });
+        loader.setName("Savegame loader");
         loader.setDaemon(true);
-        loader.setPriority(Thread.MIN_PRIORITY);
         loader.start();
     }
 
@@ -286,7 +286,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         this.campaigns.remove(c);
     }
 
-    public synchronized E addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i) {
+    public synchronized E addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i, S savegame) {
         if (this.getCampaign(campainUuid).isEmpty()) {
             this.campaigns.add(createCampaign(i));
         }
@@ -297,6 +297,7 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
 
         GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
         GameIntegration.current().selectEntry(e);
+        updateLoadedSavegames(e, savegame);
         return e;
     }
 
@@ -351,25 +352,62 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
         }
     }
 
+    public final Optional<S> loadDataForEntry(E entry) {
+        if (loadedSavegames.containsKey(entry)) {
+            return Optional.ofNullable(loadedSavegames.get(entry));
+        }
+
+        try {
+            return Optional.ofNullable(updateLoadedSavegames(entry));
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+            return Optional.empty();
+        }
+    }
+
+
+    private S updateLoadedSavegames(E entry) throws Exception {
+        S s = loadData(getPath(entry).resolve("data.zip"));
+        updateLoadedSavegames(entry, s);
+        return s;
+    }
+
+    private void updateLoadedSavegames(E entry, S savegame) {
+        if (loadedSavegames.size() >= Settings.getInstance().getMaxLoadedSavegames()) {
+            E first = loadedSavegames.keySet().iterator().next();
+            loadedSavegames.remove(first);
+            LoggerFactory.getLogger(SavegameCache.class).debug("Unloaded savegame data of entry " + getEntryName(first));
+        }
+;
+        loadedSavegames.put(entry, savegame);
+        LoggerFactory.getLogger(SavegameCache.class).debug("Loaded savegame data of entry " + getEntryName(entry));
+    }
+
     public void loadEntryAsync(E e) {
         if (e.infoProperty().isNull().get()) {
+            LoggerFactory.getLogger(SavegameCache.class).debug("Added entry " + getEntryName(e) + " to loader queue");
             this.toLoad.add(e);
         }
     }
 
     private synchronized void loadEntry(E e) {
+        LoggerFactory.getLogger(SavegameCache.class).debug("Starting to load entry " + getEntryName(e));
         if (e.infoProperty().isNotNull().get()) {
             return;
         }
 
         try {
             if (needsUpdate(e)) {
+                LoggerFactory.getLogger(SavegameCache.class).debug("Updating entry " + getEntryName(e));
                 if (!updateSavegameData(e)) {
+                    LoggerFactory.getLogger(SavegameCache.class).debug("Update failed for entry " + getEntryName(e));
                     return;
                 }
             }
-            I info = loadInfo(getPath(e).resolve("data.zip"));
+            S savegame = updateLoadedSavegames(e);
+            I info = loadInfo(savegame);
             e.infoProperty().set(info);
+            LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
         } catch (Exception exception) {
             ErrorHandler.handleException(exception);
         }
@@ -377,7 +415,9 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
 
     protected abstract boolean needsUpdate(E e) throws Exception;
 
-    protected abstract I loadInfo(Path p) throws Exception;
+    protected abstract I loadInfo(S data) throws Exception;
+
+    protected abstract S loadData(Path p) throws Exception;
 
     public synchronized Path getPath(E e) {
         Path campaignPath = path.resolve(getCampaign(e).getCampaignId().toString());
@@ -434,32 +474,5 @@ public abstract class SavegameCache<I extends SavegameInfo, E extends GameCampai
 
     public ObservableSet<C> getCampaigns() {
         return campaigns;
-    }
-
-    public static class Status {
-        private Type type;
-        private String path;
-
-        public Status(Type type, String path) {
-            this.type = type;
-            this.path = path;
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public static enum Type {
-            IMPORTING,
-            LOADING,
-            UPDATING,
-            DELETING,
-            IMPORTING_ARCHIVE,
-            EXPORTING_ARCHIVE
-        }
     }
 }

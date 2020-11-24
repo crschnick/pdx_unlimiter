@@ -12,6 +12,7 @@ import java.util.*;
 public class AchievementContent {
 
     public static AchievementContent EU4;
+    public static AchievementContent HOI4;
 
     static {
         List<AchievementVariable.ValueVariable> pathVariables = new ArrayList<>();
@@ -104,6 +105,8 @@ public class AchievementContent {
         }
 
         EU4 = new AchievementContent(pathVariables, eu4Variables, eu4Conditions, eu4Scorers, nodes);
+
+        HOI4 = new AchievementContent(new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
     }
 
     private List<AchievementVariable.ValueVariable> pathVariables;

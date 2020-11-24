@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4CampaignEntry, Eu4Campaign> {
+public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo, Eu4CampaignEntry, Eu4Campaign> {
 
     public Eu4SavegameCache() {
         super("eu4");
@@ -74,15 +74,25 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
     }
 
     @Override
+    protected Eu4SavegameInfo loadInfo(Eu4Savegame data) throws Exception {
+        return Eu4SavegameInfo.fromSavegame(data);
+    }
+
+    @Override
+    protected Eu4Savegame loadData(Path p) throws Exception {
+        return Eu4Savegame.fromFile(p);
+    }
+
+    @Override
     protected void importSavegameData(Path file) throws Exception {
-        Eu4Savegame is = null;
-        Eu4SavegameInfo e = null;
+        Eu4Savegame savegame = null;
+        Eu4SavegameInfo info = null;
 
         Eu4RawSavegame save = Eu4RawSavegame.fromFile(file);
-        is = Eu4Savegame.fromSavegame(save);
-        e = Eu4SavegameInfo.fromSavegame(is);
+        savegame = Eu4Savegame.fromSavegame(save);
+        info = Eu4SavegameInfo.fromSavegame(savegame);
 
-        UUID uuid = e.getCampaignUuid();
+        UUID uuid = info.getCampaignUuid();
 
         AtomicBoolean exists = new AtomicBoolean(false);
         getCampaigns().stream()
@@ -100,20 +110,10 @@ public class Eu4SavegameCache extends SavegameCache<Eu4SavegameInfo, Eu4Campaign
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
         FileUtils.forceMkdir(entryPath.toFile());
-        is.write(entryPath.resolve("data.zip"), true);
+        savegame.write(entryPath.resolve("data.zip"), true);
         FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
         FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
-        Eu4CampaignEntry entry = this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
-        //GameIntegration.EU4.selectEntry(entry);
-    }
-
-    @Override
-    protected Eu4SavegameInfo loadInfo(Path p) throws Exception {
-        Eu4Savegame is = null;
-        Eu4SavegameInfo e = null;
-        is = Eu4Savegame.fromFile(p);
-        e = Eu4SavegameInfo.fromSavegame(is);
-        return e;
+        this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), info, savegame);
     }
 
     @Override

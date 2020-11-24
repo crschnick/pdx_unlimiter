@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4CampaignEntry, Hoi4Campaign> {
+public class Hoi4SavegameCache extends SavegameCache<Hoi4Savegame, Hoi4SavegameInfo, Hoi4CampaignEntry, Hoi4Campaign> {
     public Hoi4SavegameCache() {
         super("hoi4");
     }
@@ -110,10 +110,13 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4Campa
     }
 
     @Override
-    protected Hoi4SavegameInfo loadInfo(Path p) throws Exception {
-        Hoi4Savegame sg = Hoi4Savegame.fromFile(p);
-        Hoi4SavegameInfo info = Hoi4SavegameInfo.fromSavegame(sg);
-        return info;
+    protected Hoi4SavegameInfo loadInfo(Hoi4Savegame data) throws Exception {
+        return Hoi4SavegameInfo.fromSavegame(data);
+    }
+
+    @Override
+    protected Hoi4Savegame loadData(Path p) throws Exception {
+        return Hoi4Savegame.fromFile(p);
     }
 
     @Override
@@ -153,6 +156,6 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4SavegameInfo, Hoi4Campa
         is.write(entryPath.resolve("data.zip"), true);
         FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
         FileUtils.moveFile(file.toFile(), entryPath.resolve(SAVE_NAME).toFile());
-        Hoi4CampaignEntry entry = this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e);
+        this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e, is);
     }
 }

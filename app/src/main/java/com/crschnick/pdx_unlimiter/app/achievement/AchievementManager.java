@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -16,11 +19,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AchievementManager {
 
-    private static AchievementManager INSTANCE;
+    public static AchievementManager EU4;
+    public static AchievementManager HOI4;
+
     private String game;
     private AchievementContent content;
     private String checksum;
@@ -30,14 +36,15 @@ public class AchievementManager {
         this.content = content;
     }
 
-    public static AchievementManager getInstance() {
-        return INSTANCE;
-    }
-
     public static void init() throws IOException {
-        INSTANCE = new AchievementManager("eu4",
+        EU4 = new AchievementManager("eu4",
                 AchievementContent.EU4);
-        INSTANCE.loadData();
+        EU4.loadData();
+
+        HOI4 = new AchievementManager("hoi4",
+                AchievementContent.HOI4);
+        HOI4.loadData();
+
         JsonPathConfiguration.init();
     }
 
@@ -105,23 +112,25 @@ public class AchievementManager {
         return c.toString();
     }
 
-    public AchievementMatcher validateSavegame(Achievement a, Eu4CampaignEntry entry) throws IOException {
-        INSTANCE.loadData();
-        Eu4Savegame loaded = Eu4Savegame.fromFile(
-                SavegameCache.EU4_CACHE.getPath(entry).resolve("data.zip"));
-
-        if (!validateChecksum()) {
-            throw new IOException("Wrong achievement checksum");
+    public <S extends Savegame> Optional<AchievementMatcher> validateSavegame(Achievement a, GameCampaignEntry<?> entry) {
+        try {
+            if (!validateChecksum()) {
+                    throw new IOException("Wrong achievement checksum");
+            }
+            loadData();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return Optional.empty();
         }
 
-        return a.match(loaded);
+        return a.match(entry);
     }
 
     public boolean validateChecksum() throws IOException {
         return checksum.equals(calculateChecksum());
     }
 
-    public List<Achievement> getSuitableAchievements(Eu4Savegame s, boolean onlyOfficial, boolean onlyElgible) {
+    public List<Achievement> getSuitableAchievements(GameCampaignEntry<?> entry, boolean onlyOfficial, boolean onlyElgible) {
         return achievements.stream()
                 .filter(a -> !onlyOfficial || a.isOfficial())
                 .filter(a -> {
@@ -130,8 +139,8 @@ public class AchievementManager {
                     }
 
                     try {
-                        AchievementMatcher m = a.match(s);
-                        return m.getValidType().isPresent() && m.getEligibleStatus().isFullfilled();
+                        Optional<AchievementMatcher> m = a.match(entry);
+                        return m.isPresent() && m.get().getValidType().isPresent() && m.get().getEligibleStatus().isFullfilled();
                     } catch (Exception e) {
                         ErrorHandler.handleException(e);
                         return false;
