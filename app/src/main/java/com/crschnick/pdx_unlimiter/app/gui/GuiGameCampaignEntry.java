@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.achievement.Achievement;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -20,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,7 +56,7 @@ public class GuiGameCampaignEntry {
         Button achievements = new JFXButton();
         achievements.setGraphic(new FontIcon());
         achievements.setOnMouseClicked((m) -> {
-            //e.getInfo().ifPresent(s -> AchievementWindow.showAchievementList(e));
+            AchievementWindow.showAchievementList(e);
         });
         achievements.getStyleClass().add("achievement-button");
 
@@ -124,7 +127,7 @@ public class GuiGameCampaignEntry {
         }
 
         AtomicBoolean load = new AtomicBoolean(false);
-        stack.layoutBoundsProperty().addListener((c, o, n) -> {
+        stack.sceneProperty().addListener((c, o, n) -> {
             if (stack.localToScreen(0, 0) == null) {
                 return;
             }

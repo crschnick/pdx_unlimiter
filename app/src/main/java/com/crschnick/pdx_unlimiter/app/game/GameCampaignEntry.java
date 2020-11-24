@@ -13,6 +13,7 @@ public abstract class GameCampaignEntry<I extends SavegameInfo> implements Compa
     private UUID uuid;
     private ObjectProperty<I> info;
     private String checksum;
+    private boolean persistent;
 
     public GameCampaignEntry(String name, UUID uuid, I info,
                             String checksum) {
@@ -20,6 +21,11 @@ public abstract class GameCampaignEntry<I extends SavegameInfo> implements Compa
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
         this.info = new SimpleObjectProperty<>(info);
+        this.persistent = true;
+    }
+
+    public boolean isPersistent() {
+        return persistent;
     }
 
     public String getName() {

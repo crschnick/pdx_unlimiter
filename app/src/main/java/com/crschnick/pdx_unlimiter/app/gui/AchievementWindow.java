@@ -4,6 +4,8 @@ import com.crschnick.pdx_unlimiter.app.achievement.Achievement;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementMatcher;
 import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -28,19 +30,13 @@ import java.util.stream.Collectors;
 
 public class AchievementWindow {
 
-    private static Tooltip tooltip(String text) {
-        Tooltip t = new Tooltip(text);
-        t.setShowDelay(Duration.millis(100));
-        t.setStyle("-fx-font-size: 14px;");
-        return t;
-    }
-
-    private static void sortAchievementList(VBox list, List<Achievement> as, Eu4CampaignEntry entry) {
+    private static void sortAchievementList(VBox list, List<Achievement> as, GameCampaignEntry<?> entry) {
         List<Node> newOrder = as.stream()
                 .map(a -> {
                     Node n = AchievementWindow.createAchievementInfoNode(a);
                     n.setOnMouseClicked(e -> {
-                        showAchievementDialog(a, entry);
+                        Optional<AchievementMatcher> matcher = a.match(entry);
+                        matcher.ifPresent(m -> showAchievementDialog(a, m, entry));
                     });
                     return n;
                 })
@@ -48,8 +44,8 @@ public class AchievementWindow {
         list.getChildren().setAll(newOrder);
     }
 
-    public static void showAchievementList(Eu4CampaignEntry entry) {
-        Alert alert = DialogHelper.createAlert();
+    public static void showAchievementList(GameCampaignEntry<?> entry) {
+        Alert alert = DialogHelper.createEmptyAlert();
         alert.setTitle("Achievement List");
 
         VBox grid = new VBox();
@@ -65,17 +61,17 @@ public class AchievementWindow {
         HBox.setHgrow(spacer, Priority.SOMETIMES);
 
         refresh.setOnMouseClicked(e -> {
-            AchievementManager.getInstance().refresh();
-            sortAchievementList(grid, AchievementManager.getInstance().getSuitableAchievements(
-                    entry.getInfo().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
+            GameIntegration.current().getAchievementManager().refresh();
+            sortAchievementList(grid, GameIntegration.current().getAchievementManager().getSuitableAchievements(
+                    entry, onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
         });
 
         top.setSpacing(10);
         top.setPadding(new Insets(5, 5, 5, 5));
 
         javafx.beans.value.ChangeListener<? super Boolean> l = (c, o, n) -> {
-            sortAchievementList(grid, AchievementManager.getInstance().getSuitableAchievements(
-                    entry.getInfo().getSavegame(), onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
+            sortAchievementList(grid, GameIntegration.current().getAchievementManager().getSuitableAchievements(
+                    entry, onlyOfficial.isSelected(), onlyEligible.isSelected()), entry);
         };
         onlyEligible.selectedProperty().addListener(l);
         onlyOfficial.selectedProperty().addListener(l);
@@ -98,15 +94,10 @@ public class AchievementWindow {
         Platform.runLater(alert::showAndWait);
     }
 
-    public static void showAchievementDialog(Achievement a, Eu4CampaignEntry entry) {
-        if (entry.infoProperty().isNull().get()) {
-            return;
-        }
-
+    public static void showAchievementDialog(Achievement a, AchievementMatcher matcher, GameCampaignEntry<?> entry) {
         ButtonType foo = new ButtonType("Validate", ButtonBar.ButtonData.OK_DONE);
         ButtonType bar = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-        AchievementMatcher matcher = a.match(entry.getInfo().getSavegame());
-        Alert alert = DialogHelper.createAlert();
+        Alert alert = DialogHelper.createEmptyAlert();
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Achievement Information");
         var node = AchievementWindow.createAchievementInfoNode(a, matcher, false);
@@ -118,16 +109,16 @@ public class AchievementWindow {
         val.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-                    try {
-                        AchievementMatcher m = AchievementManager.getInstance().validateSavegame(a, entry);
-                        alert.getDialogPane().setContent(AchievementWindow.createAchievementInfoNode(a, m, true));
+                        Optional<AchievementMatcher> m = GameIntegration.current().getAchievementManager().validateSavegame(a, entry);
+                        if (m.isEmpty()) {
+                            return;
+                        }
+
+                        alert.getDialogPane().setContent(AchievementWindow.createAchievementInfoNode(a, m.get(), true));
                         val.setDisable(true);
                         alert.hide();
                         alert.showAndWait();
                         e.consume();
-                    } catch (IOException ioException) {
-                        ErrorHandler.handleException(ioException);
-                    }
                 }
         );
 
@@ -161,7 +152,7 @@ public class AchievementWindow {
 
     private static Node getImageForIcon(Optional<Path> p, int size) {
         if (p.isPresent()) {
-            ImageView img = new ImageView();
+            ImageView img = new ImageView(ImageLoader.loadImage(p.get()));
             img.setFitWidth(size);
             img.setFitHeight(size);
             return img;

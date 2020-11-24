@@ -31,14 +31,11 @@ public class Eu4SavegameInfo extends SavegameInfo {
     private Map<GameTag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
-    private Eu4Savegame savegame;
-
     public static Eu4SavegameInfo fromSavegame(Eu4Savegame save) throws SavegameParseException {
         try {
             GameDate date = GameDate.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
             String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
             Eu4SavegameInfo e = new Eu4SavegameInfo();
-            e.savegame = save;
             e.campaignUuid = UUID.fromString(Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "campaign_id")));
 
             for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {
@@ -225,10 +222,6 @@ public class Eu4SavegameInfo extends SavegameInfo {
 
     public UUID getCampaignUuid() {
         return campaignUuid;
-    }
-
-    public Eu4Savegame getSavegame() {
-        return savegame;
     }
 
     public static class Ruler {

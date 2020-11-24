@@ -1,7 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -74,11 +78,23 @@ public class Achievement {
         return a;
     }
 
-    public AchievementMatcher match(Eu4Savegame sg) {
+    public <S extends Savegame> Optional<AchievementMatcher> match(GameCampaignEntry<?> entry) {
+        Optional<S> loaded = (Optional<S>) GameIntegration.current().getSavegameCache().loadDataForEntry(entry);
+        if (loaded.isEmpty()) {
+            return Optional.empty();
+        }
+
         Map<String, Node> nodes = new HashMap<>();
-        nodes.putAll(sg.getNodes());
+        nodes.putAll(loaded.get().getNodes());
         nodes.putAll(content.getNodes());
-        return new AchievementMatcher(nodes, this);
+        AchievementMatcher m = null;
+        try {
+            m = AchievementMatcher.create(nodes, this);
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+            return Optional.empty();
+        }
+        return Optional.of(m);
     }
 
     public String getName() {

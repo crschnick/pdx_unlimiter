@@ -20,10 +20,12 @@ public class AchievementMatcher {
     private ConditionStatus achievementStatus;
     private ScoreStatus status;
 
-    AchievementMatcher(Map<String, Node> nodes, Achievement a) {
+    public static AchievementMatcher create(Map<String, Node> nodes, Achievement a) throws Exception {
+        AchievementMatcher m = new AchievementMatcher();
+
         LoggerFactory.getLogger(Achievement.class).debug("Evaluating variables for achievement " + a.getName());
         Map<AchievementVariable, String> vars = AchievementVariable.evaluateVariables(a.getVariables(), nodes);
-        this.typeStatus = a.getTypes().stream()
+        m.typeStatus = a.getTypes().stream()
                 .collect(Collectors.toMap(t -> t, t -> {
                     LoggerFactory.getLogger(Achievement.class).debug(
                             "Checking type " + t.getName() + " for achievement " + a.getName());
@@ -31,11 +33,12 @@ public class AchievementMatcher {
                 }));
 
         LoggerFactory.getLogger(Achievement.class).debug("Checking eligibility for achievement " + a.getName());
-        this.eligibleStatus = checkConditions(nodes, vars, a.getEligibilityConditions());
+        m.eligibleStatus = checkConditions(nodes, vars, a.getEligibilityConditions());
         LoggerFactory.getLogger(Achievement.class).debug("Checking achievement for achievement " + a.getName());
-        this.achievementStatus = checkConditions(nodes, vars, a.getAchievementConditions());
+        m.achievementStatus = checkConditions(nodes, vars, a.getAchievementConditions());
         LoggerFactory.getLogger(Achievement.class).debug("Calculating score for achievement " + a.getName());
-        this.status = score(nodes, a, vars);
+        m.status = score(nodes, a, vars);
+        return m;
     }
 
     public static AchievementMatcher.ConditionStatus checkConditions(Map<String, Node> nodes,
@@ -77,7 +80,7 @@ public class AchievementMatcher {
         return r.getNodes().size() > 0;
     }
 
-    private AchievementMatcher.ScoreStatus score(Map<String, Node> nodes, Achievement a, Map<AchievementVariable, String> vars) {
+    private static AchievementMatcher.ScoreStatus score(Map<String, Node> nodes, Achievement a, Map<AchievementVariable, String> vars) {
         return new AchievementMatcher.ScoreStatus(
                 a.getScorer().score(nodes, vars),
                 a.getScorer().getValues(nodes, vars));

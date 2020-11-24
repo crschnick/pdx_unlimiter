@@ -26,6 +26,7 @@ public class Settings {
     private Path ck3;
     private Path stellaris;
     private Path activeGame;
+    private int maxLoadedSavegames = 5;
 
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
@@ -46,6 +47,11 @@ public class Settings {
         INSTANCE = newS;
         INSTANCE.validate();
         INSTANCE.apply();
+        try {
+            saveConfig();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     private static Settings defaultSettings() {
@@ -153,8 +159,13 @@ public class Settings {
         this.stellaris = stellaris;
     }
 
-    public void setActiveGame(Path activeGame) {
+    public void updateActiveGame(Path activeGame) {
         this.activeGame = activeGame;
+        try {
+            saveConfig();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     public void validate() {
@@ -197,4 +208,7 @@ public class Settings {
         GameIntegration.reload();
     }
 
+    public int getMaxLoadedSavegames() {
+        return maxLoadedSavegames;
+    }
 }

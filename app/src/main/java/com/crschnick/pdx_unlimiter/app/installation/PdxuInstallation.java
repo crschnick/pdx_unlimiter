@@ -102,22 +102,8 @@ public class PdxuInstallation {
         }
     }
 
-    public static void shutdown() throws Exception {
-        INSTANCE.updateLauncher();
-    }
-
     public static PdxuInstallation getInstance() {
         return INSTANCE;
-    }
-
-    private void updateLauncher() throws Exception {
-        if (!INSTANCE.getNewLauncherLocation().toFile().exists()) {
-            return;
-        }
-
-        FileUtils.deleteDirectory(INSTANCE.getOldLauncherLocation().toFile());
-        FileUtils.moveDirectory(INSTANCE.getLauncherLocation().toFile(), INSTANCE.getOldLauncherLocation().toFile());
-        FileUtils.moveDirectory(INSTANCE.getNewLauncherLocation().toFile(), INSTANCE.getLauncherLocation().toFile());
     }
 
     private boolean isAlreadyRunning() {

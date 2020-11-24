@@ -1,9 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -130,6 +132,8 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     public abstract GameInstallation getInstallation();
 
+    public abstract AchievementManager getAchievementManager();
+
     public final void launchGame() {
         getInstallation().start(false);
     }
@@ -170,7 +174,7 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     public abstract GameGuiFactory<E,C> getGuiFactory();
 
-    public abstract SavegameCache<? extends SavegameInfo,E,C> getSavegameCache();
+    public abstract SavegameCache<? extends Savegame, ? extends SavegameInfo,E,C> getSavegameCache();
 
     public void openCampaignEntry(E entry) {
         try {
@@ -214,6 +218,6 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
         current().selectCampaign(null);
         current.set(newInt);
-        Settings.getInstance().setActiveGame(current().getInstallation().getPath());
+        Settings.getInstance().updateActiveGame(current().getInstallation().getPath());
     }
 }

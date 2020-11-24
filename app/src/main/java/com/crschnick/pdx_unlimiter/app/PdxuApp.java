@@ -78,23 +78,10 @@ public class PdxuApp extends Application {
         });
     }
 
-    public void save() {
-        try {
-            SavegameCache.saveData();
-            Settings.saveConfig();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-    }
-
-    public void close(boolean save) {
-        if (save) {
-            save();
-        }
+    public void close() {
         running.setValue(false);
         Platform.exit();
         try {
-            PdxuInstallation.shutdown();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.unregisterNativeHook();
             }
@@ -120,7 +107,7 @@ public class PdxuApp extends Application {
         GameAppManager.init();
 
         SavegameCache.loadData();
-        //AchievementManager.init();
+        AchievementManager.init();
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
             GlobalScreen.registerNativeHook();
         }
@@ -141,7 +128,7 @@ public class PdxuApp extends Application {
                         .collect(Collectors.toList())
                         .forEach(w -> w.fireEvent(event));
 
-                close(true);
+                close();
             }
         });
         try {

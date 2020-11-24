@@ -1,10 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.parser.GameVersion;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -33,7 +36,7 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
     }
 
     @Override
-    public SavegameCache<? extends SavegameInfo, Eu4CampaignEntry, Eu4Campaign> getSavegameCache() {
+    public SavegameCache<Eu4Savegame, Eu4SavegameInfo, Eu4CampaignEntry, Eu4Campaign> getSavegameCache() {
         return SavegameCache.EU4_CACHE;
     }
 
@@ -45,6 +48,11 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry,Eu4Campaign
     @Override
     public GameInstallation getInstallation() {
         return GameInstallation.EU4;
+    }
+
+    @Override
+    public AchievementManager getAchievementManager() {
+        return AchievementManager.EU4;
     }
 
 
