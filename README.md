@@ -5,7 +5,7 @@
 
 #### Windows
 
-Download the [windows installer](https://github.com/crschnick/pdx_unlimiter/raw/master/installers/Pdx-Unlimiter-2.0.msi).
+TODO
 
 Note that there might be some issues with Windows SmartScreen blocking the installer.
 If you are facing these issues, click on "More info" and then "Run anyway".
