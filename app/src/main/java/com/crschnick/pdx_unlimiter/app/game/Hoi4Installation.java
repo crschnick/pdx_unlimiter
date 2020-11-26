@@ -42,8 +42,14 @@ public class Hoi4Installation extends GameInstallation {
 
     public void init() throws Exception {
         loadSettings();
-
         countryNames = new HashMap<>();
+        countryColors = new HashMap<>();
+    }
+
+    @Override
+    public void initOptional() throws Exception {
+        super.initOptional();
+
         Pattern p = Pattern.compile("\\s+([A-Za-z]+)_([a-z]+):0 \"(.+)\"");
         Files.lines(getPath().resolve("localisation").resolve("countries_l_english.yml")).forEach(s -> {
             Matcher m = p.matcher(s);
@@ -52,10 +58,14 @@ public class Hoi4Installation extends GameInstallation {
             }
         });
 
-        countryColors = new HashMap<>();
         loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("00_countries.txt"));
         loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("01_countries.txt"));
         loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("zz_dynamic_countries.txt"));
+    }
+
+    @Override
+    public Optional<GameMod> getModForName(String name) {
+        return mods.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
     private void loadCountryColors(Path path) throws IOException {

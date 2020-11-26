@@ -33,7 +33,6 @@ public class GuiGameCampaignEntry {
         main.setAlignment(Pos.CENTER);
         main.setFillWidth(true);
         main.getProperties().put("entry", e);
-        Node n = GameIntegration.current().getGuiFactory().createImage(e);
         Label l = new Label(GameIntegration.current().getGuiFactory().createInfoString(e));
         l.getStyleClass().add(CLASS_DATE);
 
@@ -67,8 +66,18 @@ public class GuiGameCampaignEntry {
         });
         del.getStyleClass().add("delete-button");
 
-        HBox tagBar = new HBox(n, l);
+
+        var tagImage = GameIntegration.current().getGuiFactory().createImage(e);
+        HBox tagBar = new HBox(tagImage.getValue(), l);
         tagBar.getStyleClass().add(CLASS_TAG_BAR);
+        tagImage.addListener((change, o, n) -> {
+            Platform.runLater(() -> {
+                tagBar.getChildren().set(0, tagImage.getValue());
+                tagBar.layout();
+            });
+        });
+
+
         BorderPane layout = new BorderPane();
         layout.setLeft(tagBar);
         layout.setCenter(name);

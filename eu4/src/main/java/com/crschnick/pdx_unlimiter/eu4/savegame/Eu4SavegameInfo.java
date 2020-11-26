@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.NodeFormatException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Eu4SavegameInfo extends SavegameInfo {
 
@@ -40,6 +41,15 @@ public class Eu4SavegameInfo extends SavegameInfo {
             Eu4Date date = Eu4Date.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
             String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
             Eu4SavegameInfo e = new Eu4SavegameInfo();
+
+            e.mods = Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("gamestate"), "mod_enabled"))
+                    .stream().map(Node::getString)
+                    .collect(Collectors.toList());
+
+            e.dlcs = Node.getNodeArray(Node.getNodeForKey(save.getNodes().get("meta"), "dlc_enabled"))
+                    .stream().map(Node::getString)
+                    .collect(Collectors.toList());
+
             e.campaignUuid = UUID.fromString(Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "campaign_id")));
 
             for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {

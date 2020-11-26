@@ -176,6 +176,10 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
         for (int i = 0; i < c.size(); i++) {
             String name = c.get(i).required("name").textValue();
             UUID id = UUID.fromString(c.get(i).required("uuid").textValue());
+            if (!Files.isDirectory(getPath().resolve(id.toString()))) {
+                continue;
+            }
+
             Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
             campaigns.add(readCampaign(c.get(i), name, id, lastDate));
         }
@@ -293,12 +297,12 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
     }
 
     public synchronized E addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i, S savegame) {
+        E e = createEntry(entryUuid, checksum, i);
         if (this.getCampaign(campainUuid).isEmpty()) {
-            this.campaigns.add(createCampaign(i));
+            this.campaigns.add(createNewCampaignForEntry(e));
         }
 
         C c = this.getCampaign(campainUuid).get();
-        E e = createEntry(entryUuid, checksum, i);
         c.add(e);
 
         GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
@@ -307,7 +311,7 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
         return e;
     }
 
-    protected abstract C createCampaign(I info);
+    protected abstract C createNewCampaignForEntry(E entry);
 
     protected abstract E createEntry(UUID uuid, String checksum, I info);
 
@@ -333,7 +337,9 @@ public abstract class SavegameCache<S extends Savegame, I extends SavegameInfo, 
     protected abstract void writeSavegameData(Path savegame, Path out) throws Exception;
 
     public synchronized C getCampaign(E e) {
-        var campaign = campaigns.stream().filter(c -> c.getSavegames().contains(e)).findAny();
+        var campaign = campaigns.stream()
+                .filter(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
+                .findAny();
         return campaign.orElseThrow(() -> new IllegalArgumentException("Could not find campaign for entry " + e.getName()));
     }
 

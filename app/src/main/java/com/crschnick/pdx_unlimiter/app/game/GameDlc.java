@@ -11,6 +11,7 @@ import java.util.Optional;
 public class GameDlc {
 
     private Path filePath;
+    private Path dataPath;
     private String name;
     private boolean affectsChecksum;
     private boolean affectsCompatability;
@@ -23,6 +24,7 @@ public class GameDlc {
         String dlcName = p.getFileName().toString();
         String dlcId = dlcName.split("_")[0];
         Path filePath = p.resolve(dlcId + ".dlc");
+        Path dataPath = p.resolve(dlcId + ".zip");
 
         if (!Files.exists(filePath)) {
             return Optional.empty();
@@ -31,18 +33,23 @@ public class GameDlc {
         Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(filePath)).get();
         GameDlc dlc = new GameDlc();
         dlc.filePath = p.getParent().relativize(filePath);
+        dlc.dataPath = p.getParent().relativize(dataPath);
         dlc.name = Node.getString(Node.getNodeForKey(node, "name"));
         dlc.affectsChecksum = Node.getBoolean(Node.getNodeForKey(node, "affects_checksum"));
         dlc.affectsCompatability = Node.getBoolean(Node.getNodeForKey(node, "affects_compatability"));
         return Optional.of(dlc);
     }
 
-    public Path getFilePath() {
+    public Path getInfoFilePath() {
         return filePath;
     }
 
     public String getName() {
         return name;
+    }
+
+    public Path getDataPath() {
+        return dataPath;
     }
 
     public boolean isAffectsChecksum() {

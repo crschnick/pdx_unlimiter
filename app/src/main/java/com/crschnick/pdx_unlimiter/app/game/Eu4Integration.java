@@ -4,16 +4,23 @@ import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Version;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Eu4Integration extends GameIntegration<Eu4CampaignEntry, Eu4Campaign> {
 

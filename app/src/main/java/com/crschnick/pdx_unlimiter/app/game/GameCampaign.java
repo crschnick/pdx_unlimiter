@@ -43,6 +43,10 @@ public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
         return campaignId;
     }
 
+    public E getLatestSavegame() {
+        return getSavegames().iterator().next();
+    }
+
     public ObservableSet<E> getSavegames() {
         return savegames;
     }

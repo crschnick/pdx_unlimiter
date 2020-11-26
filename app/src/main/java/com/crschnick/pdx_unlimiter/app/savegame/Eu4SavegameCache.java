@@ -1,10 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4Campaign;
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
@@ -39,20 +37,24 @@ public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo
     }
 
     @Override
-    protected Eu4Campaign createCampaign(Eu4SavegameInfo info) {
-        return new Eu4Campaign(Instant.now(),
-                info.getCurrentTag().isCustom() ?
-                        info.getCurrentTag().getName() : GameInstallation.EU4.getCountryName(info.getCurrentTag())
-                , info.getCampaignUuid(),
-                info.getCurrentTag().getTag(),
-                info.getDate());
+    protected Eu4Campaign createNewCampaignForEntry(Eu4CampaignEntry entry) {
+        return new Eu4Campaign(
+                Instant.now(),
+                GameLocalisation.getTagNameForEntry(entry, entry.getInfo().getCurrentTag()),
+                entry.getInfo().getCampaignUuid(),
+                entry.getInfo().getCurrentTag().getTag(),
+                entry.getInfo().getDate());
     }
 
     @Override
     protected Eu4CampaignEntry createEntry(UUID uuid, String checksum, Eu4SavegameInfo info) {
         return new Eu4CampaignEntry(
-                null, uuid,
-                info, checksum, info.getCurrentTag().getTag(), info.getDate());
+                info.getDate().toDisplayString(),
+                uuid,
+                info,
+                checksum,
+                info.getCurrentTag().getTag(),
+                info.getDate());
     }
 
     @Override
@@ -103,7 +105,7 @@ public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo
                 .findAny().ifPresent(c -> exists.set(c.getSavegames().stream()
                 .map(GameCampaignEntry::getChecksum).anyMatch(ch -> ch.equals(save.getFileChecksum()))));
         if (exists.get()) {
-            FileUtils.forceDelete(file.toFile());
+            if (Settings.getInstance().deleteOnImport()) FileUtils.forceDelete(file.toFile());
             return;
         }
 
@@ -114,8 +116,12 @@ public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo
 
         FileUtils.forceMkdir(entryPath.toFile());
         savegame.write(entryPath.resolve("data.zip"), true);
-        FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
-        FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
+        if (Settings.getInstance().deleteOnImport()) {
+            FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
+            FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
+        } else {
+            FileUtils.copyFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
+        }
         this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), info, savegame);
     }
 

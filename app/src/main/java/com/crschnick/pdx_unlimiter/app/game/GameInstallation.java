@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
 import com.crschnick.pdx_unlimiter.app.util.WindowsRegistry;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -25,10 +26,11 @@ public abstract class GameInstallation {
     public static Hoi4Installation HOI4 = null;
     public static Ck3Installation CK3 = null;
     public static StellarisInstallation STELLARIS = null;
+
     protected ObjectProperty<List<Path>> savegames = new SimpleObjectProperty<>();
     private Path path;
     private List<GameDlc> dlcs = new ArrayList<>();
-    private List<GameMod> mods = new ArrayList<>();
+    protected List<GameMod> mods = new ArrayList<>();
 
     public GameInstallation(Path path) {
         this.path = path;
@@ -37,16 +39,40 @@ public abstract class GameInstallation {
     public static void initInstallations() throws Exception {
         if (EU4 != null) {
             EU4.init();
-            EU4.loadDlcs();
-            EU4.startSavegameWatcher();
-            EU4.loadMods();
         }
 
         if (HOI4 != null) {
             HOI4.init();
-            HOI4.loadDlcs();
-            HOI4.startSavegameWatcher();
         }
+
+        initInstallationsOptional();
+    }
+
+    public static void initInstallationsOptional() {
+        if (EU4 != null) {
+            try {
+                EU4.initOptional();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+
+        if (HOI4 != null) {
+            try {
+                HOI4.initOptional();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+    }
+
+    public void initOptional() throws Exception {
+        loadDlcs();
+        loadMods();
+        savegames.set(getLatestSavegames());
+        WatcherHelper.startWatcherInDirectory("Savegame watcher", getSavegamesPath(), p -> {
+            savegames.set(getLatestSavegames());
+        }, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
     }
 
     public static Optional<Path> getInstallPath(String app) {
@@ -62,14 +88,14 @@ public abstract class GameInstallation {
             steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
         }
 
-        if (!steamDir.isPresent()) {
+        if (steamDir.isEmpty()) {
             return Optional.empty();
         }
         Path p = Paths.get(steamDir.get(), "steamapps", "common", app);
         return p.toFile().exists() ? Optional.of(p) : Optional.empty();
     }
 
-    void loadDlcs() throws IOException {
+    private void loadDlcs() throws IOException {
         Files.list(getPath().resolve("dlc")).forEach(f -> {
             try {
                 GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
@@ -79,7 +105,11 @@ public abstract class GameInstallation {
         });
     }
 
-    void loadMods() throws IOException {
+    private void loadMods() throws IOException {
+        if (!Files.isDirectory(getUserPath().resolve("mod"))) {
+            return;
+        }
+
         Files.list(getUserPath().resolve("mod")).forEach(f -> {
             try {
                 GameMod.fromFile(f).ifPresent(m -> mods.add(m));
@@ -89,7 +119,7 @@ public abstract class GameInstallation {
         });
     }
 
-    List<Path> getLatestSavegames() {
+    private List<Path> getLatestSavegames() {
         try {
             return Files.list(getSavegamesPath()).sorted(Comparator.comparingLong(p -> {
                 try {
@@ -105,54 +135,6 @@ public abstract class GameInstallation {
         }
     }
 
-    void startSavegameWatcher() throws IOException {
-        savegames.set(getLatestSavegames());
-
-        WatchService watcher = FileSystems.getDefault().newWatchService();
-        Path dir = getSavegamesPath();
-        dir.register(watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-
-        Thread t = new Thread(() -> {
-            while (true) {
-                WatchKey key;
-                try {
-                    // wait for a key to be available
-                    key = watcher.take();
-                } catch (InterruptedException ex) {
-                    return;
-                }
-
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    while (true) {
-                        try {
-                            @SuppressWarnings("unchecked")
-                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                            Path fileName = ev.context();
-                            if (!Files.exists(fileName)) {
-                                break;
-                            }
-
-                            FileLock lock = FileChannel.open(getSavegamesPath().resolve(fileName), StandardOpenOption.READ, StandardOpenOption.WRITE)
-                                    .lock(0, Long.MAX_VALUE, false);
-                            lock.release();
-                            break;
-                        } catch (Exception e) {
-                        }
-                    }
-                    savegames.set(getLatestSavegames());
-
-                }
-
-                boolean valid = key.reset();
-                if (!valid) {
-                    break;
-                }
-            }
-        });
-        t.setDaemon(true);
-        t.start();
-    }
-
     protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_WINDOWS) {
             value = value.replace("%USER_DOCUMENTS%",
@@ -163,6 +145,12 @@ public abstract class GameInstallation {
         }
         return Path.of(value);
     }
+
+    public Optional<GameDlc> getDlcForName(String name) {
+        return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
+    }
+
+    public abstract Optional<GameMod> getModForName(String name);
 
     public abstract void start(boolean continueLast);
 

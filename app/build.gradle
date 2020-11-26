@@ -114,6 +114,8 @@ addDependenciesModuleInfo {
             moduleInfoSource = '''
                 module io.sentry {
                     exports io.sentry;
+                    exports io.sentry.event;
+                    exports io.sentry.context;
                     requires org.slf4j;
                     requires java.naming;
                     requires com.fasterxml.jackson.core;
@@ -158,6 +160,7 @@ addDependenciesModuleInfo {
                     requires java.se;
                     exports org.apache.commons.io;
                     exports org.apache.commons.io.file;
+                    exports org.apache.commons.io.filefilter;
                 }
             '''
         }

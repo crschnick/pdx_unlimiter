@@ -14,6 +14,7 @@ import javax.imageio.spi.IIORegistry;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Predicate;
@@ -34,12 +35,21 @@ public class ImageLoader {
             return null;
         }
 
-        File file = p.toFile();
+        try {
+            return loadImage(Files.newInputStream(p), pixelSelector);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e, "Can't read image " + p.toString());
+            return null;
+        }
+    }
+
+    static Image loadImage(InputStream in, Predicate<Integer> pixelSelector) {
         BufferedImage image = null;
         try {
-            image = ImageIO.read(file);
+            image = ImageIO.read(in);
+            in.close();
         } catch (IOException e) {
-            ErrorHandler.handleException(new IOException("Can't read image " + p.toString(), e));
+            ErrorHandler.handleException(e);
         }
 
         if (pixelSelector != null) {
@@ -56,24 +66,5 @@ public class ImageLoader {
         WritableImage w = new WritableImage(image.getWidth(), image.getHeight());
         w = SwingFXUtils.toFXImage(image, w);
         return w;
-    }
-
-    public static Node createImageNode(Path p, String styleClass) {
-        return createImageNode(p, styleClass, null, null);
-    }
-
-    public static Node createImageNode(Path p, String styleClass, Rectangle2D viewport) {
-        return createImageNode(p, styleClass, viewport, null);
-    }
-
-    public static Node createImageNode(Path p, String styleClass, Rectangle2D viewport, Predicate<Integer> pixelSelector) {
-        Image w = loadImage(p, pixelSelector);
-        ImageView v = new ImageView(w);
-        Pane pane = new Pane(v);
-        if (viewport != null) v.setViewport(viewport);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        pane.getStyleClass().add(styleClass);
-        return pane;
     }
 }

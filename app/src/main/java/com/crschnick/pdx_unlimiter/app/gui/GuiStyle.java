@@ -10,11 +10,12 @@ public class GuiStyle {
     public static String CLASS_CAMPAIGN_LIST = "campaign-list";
     public static String CLASS_DIPLOMACY_ROW = "diplomacy-row";
     public static String CLASS_CAMPAIGN_ENTRY_NODE = "node";
+    public static String CLASS_CAMPAIGN_ENTRY_NODE_CONTENT = "node-content";
     public static String CLASS_CAMPAIGN_LIST_ENTRY = "campaign-list-entry";
     public static String CLASS_DATE = "date";
     public static String CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER = "node-container";
-    public static String CLASS_VERSION_OK = "version-ok";
-    public static String CLASS_VERSION_INCOMPATIBLE = "version-incompatible";
+    public static String CLASS_COMPATIBLE = "compatible";
+    public static String CLASS_INCOMPATIBLE = "incompatible";
     public static String CLASS_RULER = "ruler";
     public static String CLASS_WAR = "war";
     public static String CLASS_ALLIANCE = "alliance";
@@ -50,6 +51,7 @@ public class GuiStyle {
     public static String CLASS_GAME_ICON = "game-icon";
     public static String CLASS_GAME_ICON_BAR = "game-icon-bar";
     public static String CLASS_SWTICH_GAME = "switch-game-button";
+    public static String CLASS_CONTENT = "content";
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",

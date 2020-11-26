@@ -3,6 +3,10 @@
                  -fx-icon-color: white;
              }
 
+.content .ikonli-font-icon {
+ -fx-icon-code: "mdi-folder-multiple-outline";
+}
+
 .delete-button .ikonli-font-icon {
     -fx-icon-code: "mdi-delete";
     -fx-icon-color: white;

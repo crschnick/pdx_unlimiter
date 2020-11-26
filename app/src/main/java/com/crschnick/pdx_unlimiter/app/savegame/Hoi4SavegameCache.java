@@ -72,12 +72,12 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Savegame, Hoi4SavegameI
     }
 
     @Override
-    protected Hoi4Campaign createCampaign(Hoi4SavegameInfo info) {
+    protected Hoi4Campaign createNewCampaignForEntry(Hoi4CampaignEntry entry) {
         return new Hoi4Campaign(Instant.now(),
-                GameInstallation.HOI4.getCountryNames().getOrDefault(info.getTag(), "Unknown")
-                , info.getCampaignUuid(),
-                info.getTag(),
-                info.getDate());
+                GameInstallation.HOI4.getCountryNames().getOrDefault(entry.getInfo().getTag(), "Unknown"),
+                entry.getInfo().getCampaignUuid(),
+                entry.getInfo().getTag(),
+                entry.getInfo().getDate());
     }
 
     @Override

@@ -97,7 +97,12 @@
 }
 
 .node-container .node {
--fx-padding: 0.2em;
+-fx-background-radius: 0.1em;
+-fx-background-color: #ffffff55;
+-fx-padding: 0.3em;
+}
+
+.node-container .node-content {
 -fx-background-radius: 0.1em;
 }
 
@@ -107,11 +112,14 @@
 }
 
 .node-container .diplomacy-row {
--fx-padding: 0.2em;
 -fx-spacing: 0.5em;
 }
 
-.version-incompatible {
+.compatible {
+     -fx-background-color: #00ee0055;
+}
+
+.incompatible {
      -fx-background-color: #ff000055;
 }
 
@@ -120,7 +128,6 @@
 }
 
 .ruler {
-     -fx-background-color: #ffffff55;
 }
 
 .guarantee {

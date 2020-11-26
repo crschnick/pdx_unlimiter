@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.eu4.parser;
 
 import com.crschnick.pdx_unlimiter.eu4.format.Namespace;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameParseException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,6 +75,10 @@ public abstract class FormatParser {
         List<Node> childs = new ArrayList<>();
         int currentIndex = index + 1;
         while (true) {
+            if (currentIndex == tokens.size()) {
+                throw new IllegalStateException("Reached EOF but found no closing group token");
+            }
+
             if (tokens.get(currentIndex).getType() == TokenType.CLOSE_GROUP) {
                 return new AbstractMap.SimpleEntry<>(new ArrayNode(childs), currentIndex + 1);
             }

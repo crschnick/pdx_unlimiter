@@ -41,15 +41,14 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     }
 
     @Override
-    public Pane createGameImage(Hoi4Campaign campaign) {
-        return GameImage.hoi4TagNode(campaign.getTag(), CLASS_IMAGE_ICON);
-    }
-
-    @Override
-    public Pane createImage(Hoi4CampaignEntry entry) {
-        var icon = GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON);
-        Tooltip.install(icon, new Tooltip(GameInstallation.HOI4.getCountryNames().get(entry.getTag())));
-        return icon;
+    public ObservableValue<Pane> createImage(Hoi4CampaignEntry entry) {
+        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
+        entry.infoProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> {
+                //prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
+            });
+        });
+        return prop;
     }
 
     @Override

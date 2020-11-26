@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public class GameMod {
 
+    private Path modFile;
     private Path path;
     private String name;
     private String supportedVersion;
@@ -21,6 +22,7 @@ public class GameMod {
 
         Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(p)).get();
         GameMod mod = new GameMod();
+        mod.modFile = p;
         mod.name = Node.getString(Node.getNodeForKey(node, "name"));
         var path = Node.getNodeForKeyIfExistent(node, "path");
         if (path.isEmpty()) {
@@ -30,6 +32,10 @@ public class GameMod {
         mod.path = Path.of(Node.getString(path.get()));
         mod.supportedVersion = Node.getString(Node.getNodeForKey(node, "supported_version"));
         return Optional.of(mod);
+    }
+
+    public Path getModFile() {
+        return modFile;
     }
 
     public Path getPath() {

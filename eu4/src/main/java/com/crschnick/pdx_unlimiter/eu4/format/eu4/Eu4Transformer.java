@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.eu4.format.eu4;
 
 import com.crschnick.pdx_unlimiter.eu4.format.*;
+import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
@@ -112,6 +113,8 @@ public class Eu4Transformer {
 
         t.add(new SubnodeTransformer(Map.of(new String[]{"map_area_data", "*", "state"}, new CollectNodesTransformer("country_state", "country_states")), false));
 
+        t.add(new DefaultValueTransformer("mod_enabled", new ArrayNode()));
+
         return new ChainTransformer(t);
     }
 
@@ -131,6 +134,7 @@ public class Eu4Transformer {
         t.add(new SubnodeTransformer(Map.of(new String[]{"date"}, DateTransformer.EU4), true));
         t.add(new DefaultValueTransformer("is_random_new_world", new ValueNode(false)));
         t.add(new DefaultValueTransformer("ironman", new ValueNode(false)));
+        t.add(new DefaultValueTransformer("dlc_enabled", new ArrayNode()));
         return new ChainTransformer(t);
     }
 }

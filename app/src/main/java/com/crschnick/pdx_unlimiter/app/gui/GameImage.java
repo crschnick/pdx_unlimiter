@@ -1,6 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -11,6 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +52,6 @@ public class GameImage {
     public static Image EU4_ICON_MIL;
 
     private static Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
-    private static Map<String, Image> COUNTRY_IMAGES = new HashMap<>();
-    private static Map<Hoi4Tag, Image> HOI4_COUNTRY_IMAGES = new HashMap<>();
 
     private static Pane unknownTag(String styleClass) {
         Label l = new Label("?");
@@ -61,44 +63,46 @@ public class GameImage {
         return sp;
     }
 
+    private static Path getEu4TagPath(String tag) {
+        return Path.of("gfx/flags/" + tag + ".tga");
+    }
+
+    private static Path getHoi4TagPath(Hoi4Tag tag) {
+        return Path.of("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga");
+    }
+
+    public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
+        return tagNode(getHoi4TagPath(tag), null, styleClass);
+    }
+
     public static Pane eu4TagNode(String tag, String styleClass) {
-        if (!COUNTRY_IMAGES.containsKey(tag)) {
-            var img = ImageLoader.loadImage(
-                    GameInstallation.EU4.getPath().resolve("gfx/flags/" + tag + ".tga"));
-            if (img == null) {
-                return unknownTag(styleClass);
-            } else {
-                COUNTRY_IMAGES.put(tag, img);
-            }
+        return tagNode(getEu4TagPath(tag), null, styleClass);
+    }
+
+    public static Pane eu4TagNode(Eu4CampaignEntry entry, String styleClass) {
+        return tagNode(getEu4TagPath(entry.getTag()), entry, styleClass);
+    }
+
+    private static Pane tagNode(Path path, Eu4CampaignEntry entry, String styleClass) {
+        Image img = null;
+        try {
+            var in = CascadeDirectoryHelper.openFile(
+                    path, entry, GameInstallation.EU4);
+            img = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
         }
 
-        ImageView v = new ImageView(COUNTRY_IMAGES.get(tag));
+        if (img == null) {
+            return unknownTag(styleClass);
+        }
+
+        ImageView v = new ImageView(img);
         Pane pane = new Pane(v);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         v.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
-        return pane;
-    }
-
-    public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
-        if (!HOI4_COUNTRY_IMAGES.containsKey(tag)) {
-            var img = ImageLoader.loadImage(
-                    GameInstallation.HOI4.getPath().resolve("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga"));
-            if (img == null) {
-                return unknownTag(styleClass);
-            } else {
-                HOI4_COUNTRY_IMAGES.put(tag, img);
-            }
-        }
-
-        ImageView v = new ImageView(HOI4_COUNTRY_IMAGES.get(tag));
-        StackPane pane = new StackPane(v);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        v.preserveRatioProperty().setValue(true);
-        pane.getStyleClass().add(styleClass);
-        pane.setAlignment(Pos.CENTER);
         return pane;
     }
 

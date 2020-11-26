@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class Eu4Savegame extends Savegame {
 
-    public static final int VERSION = 13;
+    public static final int VERSION = 14;
 
     private static final String[] SAVEGAME_PARTS = new String[]{"ai", "meta", "gamestate"};
 

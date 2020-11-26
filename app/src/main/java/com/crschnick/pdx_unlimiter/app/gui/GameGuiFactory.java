@@ -14,9 +14,7 @@ public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends Saveg
 
     public abstract Background createEntryInfoBackground(E entry);
 
-    public abstract Pane createGameImage(C campaign);
-
-    public abstract Pane createImage(E entry);
+    public abstract ObservableValue<Pane> createImage(E entry);
 
     public abstract ObservableValue<Pane> createImage(C campaign);
 

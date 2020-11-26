@@ -10,11 +10,13 @@ public interface RawSavegameVisitor {
         } else if (file.getFileName().toString().endsWith("hoi4")) {
             visitor.visitHoi4(file);
         } else {
-            throw new IllegalArgumentException("Invalid file type: " + file.getFileName());
+            visitor.visitOther(file);
         }
     }
 
     void visitEu4(Path file);
 
     void visitHoi4(Path file);
+
+    void visitOther(Path file);
 }

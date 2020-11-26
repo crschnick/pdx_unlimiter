@@ -1,11 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class StellarisInstallation extends GameInstallation {
 
     public StellarisInstallation(Path path) {
         super(path);
+    }
+
+    @Override
+    public Optional<GameMod> getModForName(String name) {
+        return Optional.empty();
     }
 
     @Override

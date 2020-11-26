@@ -23,7 +23,6 @@ public class Eu4Installation extends GameInstallation {
     private Path executable;
     private Path userDirectory;
     private Eu4Version version;
-    private Map<String, String> countryNames = new HashMap<>();
 
 
     public Eu4Installation(Path path) {
@@ -40,11 +39,6 @@ public class Eu4Installation extends GameInstallation {
     }
 
     public void init() throws Exception {
-        for (File f : getPath().resolve("history").resolve("countries").toFile().listFiles()) {
-            String[] s = f.getName().split("-");
-            countryNames.put(s[0].trim(), s[1].substring(0, s[1].length() - 4).trim());
-        }
-
         loadSettings();
     }
 
@@ -91,18 +85,9 @@ public class Eu4Installation extends GameInstallation {
         }
     }
 
-    public boolean isPreexistingCoutry(String tag) {
-        return countryNames.containsKey(tag);
-    }
-
-    public String getCountryName(Eu4Tag tag) {
-        if (tag.isCustom()) {
-            return tag.getName();
-        }
-        if (!countryNames.containsKey(tag.getTag())) {
-            throw new IllegalArgumentException("Invalid country tag " + tag.getTag());
-        }
-        return countryNames.get(tag.getTag());
+    @Override
+    public Optional<GameMod> getModForName(String name) {
+        return mods.stream().filter(d -> getUserPath().relativize(d.getModFile()).equals(Path.of(name))).findAny();
     }
 
     @Override

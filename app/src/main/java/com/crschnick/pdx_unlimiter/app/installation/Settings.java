@@ -24,6 +24,7 @@ public class Settings {
     private Path stellaris;
     private Path activeGame;
     private int maxLoadedSavegames = 5;
+    private boolean deleteOnImport = false;
 
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
@@ -203,6 +204,10 @@ public class Settings {
             ErrorHandler.handleTerminalException(e);
         }
         GameIntegration.reload();
+    }
+
+    public boolean deleteOnImport() {
+        return deleteOnImport;
     }
 
     public int getMaxLoadedSavegames() {

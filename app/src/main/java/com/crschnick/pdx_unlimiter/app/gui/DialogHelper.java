@@ -113,6 +113,11 @@ public class DialogHelper {
                     ErrorHandler.handleException(e);
                 }
             }
+
+            @Override
+            public void visitOther(Path file) {
+
+            }
         });
     }
 

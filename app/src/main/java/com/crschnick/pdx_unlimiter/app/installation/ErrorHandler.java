@@ -2,6 +2,8 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import io.sentry.Sentry;
+import io.sentry.SentryOptions;
+import io.sentry.event.EventBuilder;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +23,10 @@ public class ErrorHandler {
         System.setProperty("sentry.stacktrace.app.packages", "");
         System.setProperty("sentry.uncaught.handler.enabled", "true");
         System.setProperty("sentry.environment", "production");
-        System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion()
-                + ", " + System.getProperty("os.name"));
+        System.setProperty("sentry.servername", System.getProperty("os.name"));
+        System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion());
         Sentry.init();
+
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             handleException(e);
@@ -32,7 +35,7 @@ public class ErrorHandler {
 
     private static void handleExcetionWithoutInit(Throwable ex) {
         ex.printStackTrace();
-        LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
+        LoggerFactory.getLogger(ErrorHandler.class).error("Init error", ex);
         if (PdxuInstallation.getInstance().isProduction()) {
             Sentry.init("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
         }

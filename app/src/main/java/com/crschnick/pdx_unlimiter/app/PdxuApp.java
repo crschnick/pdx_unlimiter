@@ -25,7 +25,11 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -40,10 +44,6 @@ public class PdxuApp extends Application {
     }
 
     public static void main(String[] args) {
-
-        String file = "C:\\Users\\cschn\\Documents\\Paradox Interactive\\Hearts of Iron IV\\save games\\ENG_1936_01_12_16.hoi4";
-
-
         try {
             launch(args);
         } catch (Exception e) {
@@ -74,8 +74,8 @@ public class PdxuApp extends Application {
 
         layout.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
-            boolean success = FileImporter.importFiles(db.getFiles());
-            event.setDropCompleted(success);
+            FileImporter.addToImportQueue(db.getFiles().stream().map(File::toPath).collect(Collectors.toList()));
+            event.setDropCompleted(true);
             event.consume();
         });
     }
@@ -93,22 +93,26 @@ public class PdxuApp extends Application {
     }
 
     private void setup() throws Exception {
-        if (!PdxuInstallation.init()) {
-            System.exit(1);
-        }
+        PdxuInstallation.init();
         LogManager.init();
         ErrorHandler.init();
+
+        LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + getParameters().getRaw());
+        FileImporter.addToImportQueue(getParameters().getRaw().stream().map(Path::of).collect(Collectors.toList()));
+        if (!PdxuInstallation.shouldStart()) {
+            System.exit(0);
+        }
     }
 
     private void postWindowSetup() throws Exception {
         Settings.init();
-        GameInstallation.initInstallations();
         if (!GameIntegration.init()) {
             GuiSettings.showSettings(true);
         }
         GameAppManager.init();
 
         SavegameCache.loadData();
+        FileImporter.init();
         AchievementManager.init();
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
             GlobalScreen.registerNativeHook();

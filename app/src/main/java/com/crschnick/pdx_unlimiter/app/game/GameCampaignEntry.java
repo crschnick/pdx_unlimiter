@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import java.util.UUID;
 
 public abstract class GameCampaignEntry<I extends SavegameInfo> implements Comparable<GameCampaignEntry<I>> {
+
     private StringProperty name;
     private UUID uuid;
     private ObjectProperty<I> info;
