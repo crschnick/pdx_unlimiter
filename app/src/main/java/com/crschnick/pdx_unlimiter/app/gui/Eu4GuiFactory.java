@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import javax.tools.Tool;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +29,10 @@ import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> {
+
+    public Eu4GuiFactory() {
+        super(GameInstallation.EU4);
+    }
 
     private static Tooltip tooltip(String text) {
 
@@ -59,7 +64,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
         if (isRuler) {
             box.getChildren().add(new Label(ruler.getName(), imageNode(EU4_ICON_RULER, CLASS_RULER_ICON)));
         } else {
-            box.getChildren().add(imageNode(EU4_ICON_HEIR, CLASS_RULER_ICON));
+            box.getChildren().add(new Label(ruler.getName(), imageNode(EU4_ICON_HEIR, CLASS_RULER_ICON)));
         }
 
         box.alignmentProperty().set(Pos.CENTER);
@@ -90,19 +95,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
         }
         b.delete(b.length() - 2, b.length());
         return b.toString();
-    }
-
-    private static void addNode(JFXMasonryPane pane, Region content) {
-        content.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTENT);
-        StackPane p = new StackPane(content);
-        p.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
-        content.setPadding(new Insets(5, 10, 5, 10));
-        pane.getChildren().add(p);
-        content.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getWidth() - p.getPadding().getLeft() - p.getPadding().getRight(), p.widthProperty()));
-        content.prefHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
-        p.setAlignment(Pos.CENTER);
     }
 
     private static void createDiplomacyRow(JFXMasonryPane pane, Eu4CampaignEntry entry, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
@@ -174,6 +166,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     public void fillNodeContainer(Eu4CampaignEntry entry, JFXMasonryPane grid) {
         Eu4SavegameInfo info = entry.getInfo();
         if (info.isObserver()) {
+            super.fillNodeContainer(entry, grid);
             return;
         }
 
@@ -182,16 +175,33 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
             addNode(grid, createRulerLabel(info.getHeir().get(), false));
         }
 
-        HBox status = new HBox();
-        status.setStyle("-fx-border-width: 3px;");
-        status.setSpacing(4);
+        if (entry.getInfo().isIronman()) {
+            var ironman = new StackPane(imageNode(EU4_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
+            ironman.setAlignment(Pos.CENTER);
+            Tooltip.install(ironman, new Tooltip("Ironman savegame"));
+            addNode(grid, ironman);
+        }
 
+        if (entry.getInfo().isRandomNewWorld()) {
+            var rnw = new StackPane(imageNode(EU4_ICON_RANDOM_NEW_WORLD, CLASS_IMAGE_ICON, null));
+            rnw.setAlignment(Pos.CENTER);
+            Tooltip.install(rnw, new Tooltip("Random new world enabled"));
+            addNode(grid, rnw);
+        }
 
-        status.getChildren().add(imageNode(EU4_ICON_IRONMAN, CLASS_IMAGE_ICON, "Ironman savegame"));
-        status.getChildren().add(imageNode(EU4_ICON_RANDOM_NEW_WORLD, CLASS_IMAGE_ICON, "Random new world enabled"));
-        status.getChildren().add(imageNode(EU4_ICON_CUSTOM_NATION, CLASS_IMAGE_ICON, "A custom nation exists in the world"));
-        status.getChildren().add(imageNode(EU4_ICON_RELEASED_VASSAL, CLASS_IMAGE_ICON, "Is playing as a released vassal"));
-        //grid.add(status, 0, 1);
+        if (entry.getInfo().isCustomNationInWorld()) {
+            var cn = new StackPane(imageNode(EU4_ICON_CUSTOM_NATION, CLASS_IMAGE_ICON, null));
+            cn.setAlignment(Pos.CENTER);
+            Tooltip.install(cn, new Tooltip("A custom nation exists in the world"));
+            addNode(grid, cn);
+        }
+
+        if (entry.getInfo().isReleasedVassal()) {
+            var rv = new StackPane(imageNode(EU4_ICON_RELEASED_VASSAL, CLASS_IMAGE_ICON, null));
+            rv.setAlignment(Pos.CENTER);
+            Tooltip.install(rv, new Tooltip("Is playing as a released vassal"));
+            addNode(grid, rv);
+        }
 
         for (Eu4SavegameInfo.War war : info.getWars()) {
             createDiplomacyRow(grid, entry, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),
@@ -218,60 +228,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
                 info.getSeniorPartner().map(Set::of).orElse(Set.of()),
                 "Under personal union with ", "no country", CLASS_VASSAL);
 
-
-        Label version;
-        if (GameIntegration.current().isVersionCompatible(entry)) {
-            version = new Label("v" + info.getVersion().toString());
-            Tooltip.install(version, tooltip("Compatible version"));
-            version.getStyleClass().add(CLASS_COMPATIBLE);
-        } else {
-            version = new Label("v" + info.getVersion().toString(), imageNode(EU4_ICON_VERSION_WARNING, CLASS_IMAGE_ICON));
-            Tooltip.install(version, tooltip("Incompatible savegame version"));
-            version.getStyleClass().add(CLASS_INCOMPATIBLE);
-        }
-        version.setAlignment(Pos.CENTER);
-        addNode(grid, version);
-
-        if (entry.getInfo().getMods().size() > 0) {
-            Label mods = new Label("Mods");
-            mods.setGraphic(new FontIcon());
-            mods.getStyleClass().add(CLASS_CONTENT);
-            Tooltip.install(mods, new Tooltip(
-                    "Requires the following " + entry.getInfo().getMods().size() + " mods:\n" +
-                            entry.getInfo().getMods().stream()
-                                    .map(s -> {
-                                        var m = GameInstallation.EU4.getModForName(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
-                                    })
-                                    .collect(Collectors.joining("\n"))));
-
-            boolean missing = entry.getInfo().getMods().stream()
-                    .map(m -> GameInstallation.EU4.getModForName(m))
-                    .anyMatch(Optional::isEmpty);
-            mods.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
-            mods.setAlignment(Pos.CENTER);
-            addNode(grid, mods);
-        }
-
-        if (entry.getInfo().getMods().size() > 0) {
-            Label dlcs = new Label("DLCs");
-            dlcs.setGraphic(new FontIcon());
-            dlcs.getStyleClass().add(CLASS_CONTENT);
-            Tooltip.install(dlcs, new Tooltip(
-                    "Requires the following " + entry.getInfo().getMods().size() + " DLCs:\n" +
-                            entry.getInfo().getDlcs().stream()
-                                    .map(s -> {
-                                        var m = GameInstallation.EU4.getDlcForName(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
-                                    })
-                                    .collect(Collectors.joining("\n"))));
-            boolean missing = entry.getInfo().getDlcs().stream()
-                    .map(m -> GameInstallation.EU4.getDlcForName(m))
-                    .anyMatch(Optional::isEmpty);
-            dlcs.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
-            dlcs.setAlignment(Pos.CENTER);
-
-            addNode(grid, dlcs);
-        }
+        super.fillNodeContainer(entry, grid);
     }
 }

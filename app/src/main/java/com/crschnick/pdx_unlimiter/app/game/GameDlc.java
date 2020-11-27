@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public class GameDlc {
 
+    private boolean expansion;
     private Path filePath;
     private Path dataPath;
     private String name;
@@ -32,12 +33,17 @@ public class GameDlc {
 
         Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(filePath)).get();
         GameDlc dlc = new GameDlc();
+        dlc.expansion = Node.getString(Node.getNodeForKey(node, "category")).equals("expansion");
         dlc.filePath = p.getParent().relativize(filePath);
         dlc.dataPath = p.getParent().relativize(dataPath);
         dlc.name = Node.getString(Node.getNodeForKey(node, "name"));
         dlc.affectsChecksum = Node.getBoolean(Node.getNodeForKey(node, "affects_checksum"));
         dlc.affectsCompatability = Node.getBoolean(Node.getNodeForKey(node, "affects_compatability"));
         return Optional.of(dlc);
+    }
+
+    public boolean isExpansion() {
+        return expansion;
     }
 
     public Path getInfoFilePath() {

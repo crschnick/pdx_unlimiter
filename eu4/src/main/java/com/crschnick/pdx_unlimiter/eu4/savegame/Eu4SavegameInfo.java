@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.eu4.savegame;
 
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Version;
+import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.NodeFormatException;
 
@@ -20,7 +20,6 @@ public class Eu4SavegameInfo extends SavegameInfo {
     private Set<Eu4Tag> allTags = new HashSet<>();
     private Eu4Tag currentTag;
     private Eu4Date date;
-    private Eu4Version version;
     private Ruler ruler;
     private Optional<Ruler> heir;
     private Set<Eu4Tag> vassals = new HashSet<>();
@@ -65,10 +64,12 @@ public class Eu4SavegameInfo extends SavegameInfo {
             e.date = date;
 
             Node v = Node.getNodeForKey(save.getNodes().get("meta"), "savegame_version");
-            e.version = new Eu4Version(Node.getInteger(Node.getNodeForKey(v, "first")),
+            e.version = new GameVersion(
+                    Node.getInteger(Node.getNodeForKey(v, "first")),
                     Node.getInteger(Node.getNodeForKey(v, "second")),
                     Node.getInteger(Node.getNodeForKey(v, "third")),
-                    Node.getInteger(Node.getNodeForKey(v, "forth")));
+                    Node.getInteger(Node.getNodeForKey(v, "forth")),
+                    Node.getString(Node.getNodeForKey(v, "name")));
 
             e.currentTag = Eu4Tag.getTag(e.allTags, tag);
 
@@ -170,7 +171,7 @@ public class Eu4SavegameInfo extends SavegameInfo {
         return heir;
     }
 
-    public Eu4Version getVersion() {
+    public GameVersion getVersion() {
         return version;
     }
 

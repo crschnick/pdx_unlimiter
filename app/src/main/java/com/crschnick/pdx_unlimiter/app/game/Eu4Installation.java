@@ -1,19 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Version;
+import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +18,6 @@ public class Eu4Installation extends GameInstallation {
 
     private Path executable;
     private Path userDirectory;
-    private Eu4Version version;
 
 
     public Eu4Installation(Path path) {
@@ -71,15 +66,20 @@ public class Eu4Installation extends GameInstallation {
         JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
         this.userDirectory = determineUserDirectory(node);
         String v = node.required("version").textValue();
-        Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);
+        Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)\\.\\w+\\s.+").matcher(v);
         m.find();
-        this.version = new Eu4Version(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
+        this.version = new GameVersion(
+                Integer.parseInt(m.group(1)),
+                Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(3)),
+                Integer.parseInt(m.group(4)),
+                m.group(5));
     }
 
     @Override
-    public void start(boolean continueLast) {
+    public void start() {
         try {
-            new ProcessBuilder().command(executable.toString(), continueLast ? "-continuelastsave" : "").start();
+            new ProcessBuilder().command(executable.toString(), "-continuelastsave").start();
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
@@ -102,9 +102,5 @@ public class Eu4Installation extends GameInstallation {
 
     public Path getUserPath() {
         return userDirectory;
-    }
-
-    public Eu4Version getVersion() {
-        return version;
     }
 }

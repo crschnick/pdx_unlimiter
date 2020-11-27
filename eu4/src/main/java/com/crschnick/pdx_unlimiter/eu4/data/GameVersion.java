@@ -1,23 +1,25 @@
 package com.crschnick.pdx_unlimiter.eu4.data;
 
 
-public class Eu4Version {
+public class GameVersion {
 
     private int first;
     private int second;
     private int third;
     private int fourth;
+    private String name;
 
-    public Eu4Version(int first, int second, int third, int fourth) {
+    public GameVersion(int first, int second, int third, int fourth, String name) {
         this.first = first;
         this.second = second;
         this.third = third;
         this.fourth = fourth;
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return first + "." + second + "." + third + "." + fourth;
+        return first + "." + second + "." + third + (fourth != 0 ? "." + fourth : "") + (name != null ? " " + name : "");
     }
 
     public int getFirst() {
@@ -34,5 +36,9 @@ public class Eu4Version {
 
     public int getFourth() {
         return fourth;
+    }
+
+    public String getName() {
+        return name;
     }
 }

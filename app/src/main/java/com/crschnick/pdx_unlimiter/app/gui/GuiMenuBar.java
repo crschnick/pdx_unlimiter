@@ -5,6 +5,9 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXButton;
+import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -172,12 +175,26 @@ public class GuiMenuBar {
         return menuBar;
     }
 
-    private static Node createStatusIndicator() {
-        JFXButton m = new JFXButton("Switch game");
+    private static Node createGameIndicator() {
+        JFXButton m = new JFXButton();
+        m.textProperty().bind(Bindings.createStringBinding(() -> {
+            var current = GameIntegration.current();
+            return current != null ? GameIntegration.current().getName() : "None";
+        }, GameIntegration.currentGameProperty()));
         m.setGraphic(new FontIcon());
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
-        return m;
+
+        JFXButton launch = new JFXButton();
+        launch.setOnAction(e -> {
+            GameIntegration.current().getInstallation().startLauncher();
+            e.consume();
+        });
+        launch.setGraphic(new FontIcon());
+        launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
+        var box = new HBox(m, launch);
+        box.setAlignment(Pos.CENTER);
+        return box;
     }
 
     public static Node createMenu() {
@@ -189,7 +206,7 @@ public class GuiMenuBar {
 
         StackPane s = new StackPane();
         s.getStyleClass().add("menu-bar");
-        s.getChildren().add(createStatusIndicator());
+        s.getChildren().add(createGameIndicator());
 
         HBox menubars = new HBox(leftBar, spacer, s);
         return menubars;

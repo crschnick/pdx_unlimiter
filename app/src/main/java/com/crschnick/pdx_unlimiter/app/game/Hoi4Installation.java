@@ -111,9 +111,9 @@ public class Hoi4Installation extends GameInstallation {
     }
 
     @Override
-    public void start(boolean continueLast) {
+    public void start() {
         try {
-            new ProcessBuilder().command(executable.toString(), continueLast ? "--continuelastsave" : "").start();
+            new ProcessBuilder().command(executable.toString(), "--continuelastsave").start();
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }

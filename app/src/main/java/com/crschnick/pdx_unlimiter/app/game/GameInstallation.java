@@ -1,12 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
 import com.crschnick.pdx_unlimiter.app.util.WindowsRegistry;
+import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -31,6 +36,7 @@ public abstract class GameInstallation {
     private Path path;
     private List<GameDlc> dlcs = new ArrayList<>();
     protected List<GameMod> mods = new ArrayList<>();
+    protected GameVersion version;
 
     public GameInstallation(Path path) {
         this.path = path;
@@ -95,6 +101,43 @@ public abstract class GameInstallation {
         return p.toFile().exists() ? Optional.of(p) : Optional.empty();
     }
 
+    public void startLauncher() {
+        Path bootstrapper = null;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
+                    .resolve("Programs")
+                    .resolve("Paradox Interactive")
+                    .resolve("bootstrapper-v2.exe");
+        } else if (SystemUtils.IS_OS_LINUX) {
+        }
+
+        try {
+            new ProcessBuilder()
+                    .directory(getPath().toFile())
+                    .command(bootstrapper.toString(),
+                            "--pdxlGameDir", getPath().toString(),
+                            "--gameDir", getPath().toString())
+                    .start();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+    }
+
+    public void writeDlcLoadFile(List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
+        var out = Files.newOutputStream(getUserPath().resolve("dlc_load.json"));
+        ObjectNode n = JsonNodeFactory.instance.objectNode();
+        n.putArray("enabled_mods").addAll(mods.stream()
+                .map(m -> m.getModFile().toString())
+                .map(JsonNodeFactory.instance::textNode)
+                .collect(Collectors.toList()));
+        n.putArray("disabled_dlcs").addAll(this.dlcs.stream()
+                .filter(d -> d.isExpansion() && !dlcs.contains(d))
+                .map(d -> d.getInfoFilePath().toString())
+                .map(JsonNodeFactory.instance::textNode)
+                .collect(Collectors.toList()));
+        JsonHelper.write(n, out);
+    }
+
     private void loadDlcs() throws IOException {
         Files.list(getPath().resolve("dlc")).forEach(f -> {
             try {
@@ -112,7 +155,11 @@ public abstract class GameInstallation {
 
         Files.list(getUserPath().resolve("mod")).forEach(f -> {
             try {
-                GameMod.fromFile(f).ifPresent(m -> mods.add(m));
+                GameMod.fromFile(f).ifPresent(m -> {
+                    if (Files.exists(m.getPath())) mods.add(m);
+                    LoggerFactory.getLogger(GameInstallation.class).debug("Found mod " + m.getName() +
+                            " at " + m.getModFile().toString()+ ". Content exists: " + Files.exists(m.getPath()));
+                });
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
@@ -152,7 +199,7 @@ public abstract class GameInstallation {
 
     public abstract Optional<GameMod> getModForName(String name);
 
-    public abstract void start(boolean continueLast);
+    public abstract void start();
 
     public abstract void init() throws Exception;
 
@@ -174,5 +221,9 @@ public abstract class GameInstallation {
 
     public ObjectProperty<List<Path>> savegamesProperty() {
         return savegames;
+    }
+
+    public GameVersion getVersion() {
+        return version;
     }
 }

@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -17,7 +18,9 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class GameIntegration<E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>> {
 
@@ -137,10 +140,6 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
 
     public abstract AchievementManager getAchievementManager();
 
-    public final void launchGame() {
-        getInstallation().start(false);
-    }
-
     public final Optional<Path> exportCampaignEntry() {
         try {
             var path = getInstallation().getSavegamesPath().resolve(getSavegameCache().getFileName(selectedEntry.get()));
@@ -168,12 +167,30 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
             }
         }
         selectedCampaign.get().lastPlayedProperty().setValue(Instant.now());
-        getInstallation().start(true);
+        getInstallation().start();
     }
 
     protected abstract void writeLaunchConfig(E entry, Path path) throws IOException;
 
-    public abstract boolean isVersionCompatible(E entry);
+    private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
+        return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
+    }
+
+    public boolean isVersionCompatible(E entry) {
+        return areCompatible(getInstallation().getVersion(), entry.getInfo().getVersion());
+    }
+
+    public boolean isEntryCompatible(E entry) {
+        boolean missingMods = entry.getInfo().getMods().stream()
+                .map(m -> getInstallation().getModForName(m))
+                .anyMatch(Optional::isEmpty);
+
+        boolean missingDlc = entry.getInfo().getDlcs().stream()
+                .map(m -> getInstallation().getDlcForName(m))
+                .anyMatch(Optional::isEmpty);
+
+        return isVersionCompatible(entry) && !missingMods && !missingDlc;
+    }
 
     public abstract GameGuiFactory<E, C> getGuiFactory();
 

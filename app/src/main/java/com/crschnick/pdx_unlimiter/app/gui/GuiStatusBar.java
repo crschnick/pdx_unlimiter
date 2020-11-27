@@ -158,21 +158,28 @@ public class GuiStatusBar {
         Label text = new Label(GameIntegration.current().getName(), GameIntegration.current().getGuiFactory().createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
+        BorderPane.setAlignment(text, Pos.CENTER);
 
         Label name = new Label("Incompatible version");
         name.setGraphic(new FontIcon());
         name.getStyleClass().add(CLASS_TEXT);
         name.getStyleClass().add(CLASS_ALERT);
         barPane.setCenter(name);
+        BorderPane.setAlignment(name, Pos.CENTER);
 
-        Button b = new JFXButton("Close");
+        Button b = new JFXButton("Launch");
         b.setGraphic(new FontIcon());
+        b.getStyleClass().add(CLASS_LAUNCH);
         b.setOnAction(event -> {
             event.consume();
-            hideBar(pane);
+            if (GameIntegration.current().getGuiFactory().displayIncompatibleWarning(
+                    GameIntegration.globalSelectedEntryProperty().get())) {
+                GameIntegration.current().launchCampaignEntry();
+            }
         });
 
         barPane.setRight(b);
+        BorderPane.setAlignment(b, Pos.CENTER);
         return barPane;
     }
 
@@ -206,7 +213,7 @@ public class GuiStatusBar {
             }
 
             Region bar = null;
-            if (GameIntegration.current().isVersionCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
+            if (GameIntegration.current().isEntryCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
                 status = Status.SELECTED;
                 bar = createEntryStatusBar(pane);
             } else {

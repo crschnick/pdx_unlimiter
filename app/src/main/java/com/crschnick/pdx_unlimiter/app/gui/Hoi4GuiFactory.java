@@ -24,6 +24,10 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campaign> {
 
 
+    public Hoi4GuiFactory() {
+        super(GameInstallation.HOI4);
+    }
+
     private static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
         return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
     }

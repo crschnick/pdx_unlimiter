@@ -15,7 +15,7 @@ public class StellarisInstallation extends GameInstallation {
     }
 
     @Override
-    public void start(boolean continueLast) {
+    public void start() {
 
     }
 

@@ -14,9 +14,10 @@ public class Ck3Installation extends GameInstallation {
     }
 
     @Override
-    public void start(boolean continueLast) {
+    public void start() {
 
     }
+
 
     @Override
     public void init() throws Exception {
