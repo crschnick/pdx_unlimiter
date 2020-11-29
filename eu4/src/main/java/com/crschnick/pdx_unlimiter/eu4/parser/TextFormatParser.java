@@ -27,6 +27,10 @@ public class TextFormatParser extends FormatParser {
         return new TextFormatParser(EU4_MAGIC);
     }
 
+    public static TextFormatParser stellarisSavegameParser() {
+        return new TextFormatParser(new byte[0]);
+    }
+
     public static TextFormatParser hoi4SavegameParser() {
         return new TextFormatParser(HOI_MAGIC);
     }
@@ -38,14 +42,20 @@ public class TextFormatParser extends FormatParser {
         boolean isInComment = false;
         for (int i = 0; i < s.length(); i++) {
             Token t = null;
-            if (s.charAt(i) == '{') {
+            if (isInQuotes && s.charAt(i) != '"') {
+                continue;
+            }
+
+            else if (s.charAt(i) == '"') {
+                isInQuotes = !isInQuotes;
+            }
+
+            else if (s.charAt(i) == '{') {
                 t = new OpenGroupToken();
             } else if (s.charAt(i) == '}') {
                 t = new CloseGroupToken();
             } else if (s.charAt(i) == '=') {
                 t = new EqualsToken();
-            } else if (s.charAt(i) == '"') {
-                isInQuotes = !isInQuotes;
             }
 
             boolean isNewLine = s.charAt(i) == '\n';
@@ -74,6 +84,10 @@ public class TextFormatParser extends FormatParser {
                 } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", sub)) {
                     tokens.add(new ValueToken(Double.valueOf(sub)));
                 } else if (sub.startsWith("\"") && sub.endsWith("\"")) {
+                    if (sub.length() == 1) {
+                        String ss = s.substring(i - 100, i + 100);
+                        int a = 0;
+                    }
                     tokens.add(new ValueToken(sub.substring(1, sub.length() - 1)));
                 } else {
                     tokens.add(new ValueToken(sub));

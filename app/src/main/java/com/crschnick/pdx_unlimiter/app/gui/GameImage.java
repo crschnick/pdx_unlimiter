@@ -1,10 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.Eu4CampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
@@ -13,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,6 +26,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class GameImage {
+
+    public static Image STELLARIS_ICON;
+    public static Image STELLARIS_ICON_IRONMAN;
 
     public static Image HOI4_ICON;
     public static Image HOI4_ICON_IRONMAN;
@@ -79,15 +87,50 @@ public class GameImage {
         return tagNode(getEu4TagPath(tag), null, styleClass);
     }
 
-    public static Pane eu4TagNode(Eu4CampaignEntry entry, String styleClass) {
-        return tagNode(getEu4TagPath(entry.getTag()), entry, styleClass);
+    public static Pane eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
+        return tagNode(getEu4TagPath(entry.getTag().getTag()), entry, styleClass);
     }
 
-    private static Pane tagNode(Path path, Eu4CampaignEntry entry, String styleClass) {
+    private static Pane tagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
         Image img = null;
         try {
             var in = CascadeDirectoryHelper.openFile(
                     path, entry, GameInstallation.EU4);
+            img = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+
+        if (img == null) {
+            return unknownTag(styleClass);
+        }
+
+        ImageView v = new ImageView(img);
+        Pane pane = new Pane(v);
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        v.preserveRatioProperty().setValue(true);
+        pane.getStyleClass().add(styleClass);
+        return pane;
+    }
+
+    public static Pane stellarisTagNode(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
+        return stellarisTagNode(Path.of(entry.getTag().getBackgroundFile()), entry, styleClass);
+        //var bg = stellarisTagNode(GameInstallation.STELLARIS.getPath().resolve("flags"))
+    }
+
+    public static Pane stellarisTagNode(StellarisTag tag, String styleClass) {
+        return stellarisTagNode(Path.of(tag.getBackgroundFile()), null, styleClass);
+        //var bg = stellarisTagNode(GameInstallation.STELLARIS.getPath().resolve("flags"))
+    }
+
+
+    private static Pane stellarisTagNode(
+            Path path, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
+        Image img = null;
+        try {
+            var in = CascadeDirectoryHelper.openFile(
+                    path, entry, GameInstallation.STELLARIS);
             img = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -115,6 +158,9 @@ public class GameImage {
     }
 
     public static Pane imageNode(Image i, String styleClass, String tt) {
+        if (i == null) {
+            throw new NullPointerException();
+        }
         ImageView v = new ImageView(i);
         Pane pane = new Pane(v);
         Rectangle2D viewport = VIEWPORTS.get(i);
@@ -133,10 +179,26 @@ public class GameImage {
 
     public static void loadImages() {
         loadEu4Images();
-        loadHoiImages();
+        loadHoi4Images();
+        loadStellarisImages();
     }
 
-    public static void loadHoiImages() {
+    public static void loadStellarisImages() {
+        if (GameInstallation.STELLARIS == null) {
+            return;
+        }
+
+        Path p = GameInstallation.STELLARIS.getPath();
+        Path i = p.resolve("gfx").resolve("interface").resolve("icons");
+
+        STELLARIS_ICON = ImageLoader.loadImage(
+                GameInstallation.STELLARIS.getPath().resolve("gfx").resolve("exe_icon.bmp"));
+
+        STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+
+    }
+
+    public static void loadHoi4Images() {
         if (GameInstallation.HOI4 == null) {
             return;
         }

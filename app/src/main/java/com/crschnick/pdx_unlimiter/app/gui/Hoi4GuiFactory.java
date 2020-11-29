@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.Hoi4Campaign;
-import com.crschnick.pdx_unlimiter.app.game.Hoi4CampaignEntry;
+import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,7 +23,7 @@ import javafx.scene.paint.Color;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
-public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campaign> {
+public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
 
     public Hoi4GuiFactory() {
@@ -38,14 +40,14 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     }
 
     @Override
-    public Background createEntryInfoBackground(Hoi4CampaignEntry entry) {
+    public Background createEntryInfoBackground(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
         return new Background(new BackgroundFill(
                 colorFromInt(GameInstallation.HOI4.getCountryColors().getOrDefault(entry.getTag().getTag(), 0), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public ObservableValue<Pane> createImage(Hoi4CampaignEntry entry) {
+    public ObservableValue<Pane> createImage(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
@@ -56,12 +58,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     }
 
     @Override
-    public String createInfoString(Hoi4CampaignEntry entry) {
-        return entry.getDate().toString();
-    }
-
-    @Override
-    public ObservableValue<Pane> createImage(Hoi4Campaign campaign) {
+    public ObservableValue<Pane> createImage(GameCampaign<Hoi4Tag,Hoi4SavegameInfo> campaign) {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
         campaign.tagProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
@@ -70,7 +67,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     }
 
     @Override
-    public ObservableValue<String> createInfoString(Hoi4Campaign campaign) {
+    public ObservableValue<String> createInfoString(GameCampaign<Hoi4Tag,Hoi4SavegameInfo> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
         campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
@@ -79,7 +76,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4CampaignEntry, Hoi4Campai
     }
 
     @Override
-    public void fillNodeContainer(Hoi4CampaignEntry entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);

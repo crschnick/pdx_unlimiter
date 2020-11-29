@@ -115,6 +115,11 @@ public class DialogHelper {
             }
 
             @Override
+            public void visitStellaris(Path file) {
+                throw new IllegalArgumentException("No need to create namespace");
+            }
+
+            @Override
             public void visitOther(Path file) {
 
             }

@@ -57,8 +57,7 @@ public class GuiGameCampaignList {
 
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
             if (n != null) {
-                int index = new TreeSet<GameCampaign>(
-                        GameIntegration.current().getSavegameCache().getCampaigns()).headSet(n).size();
+                int index = GameIntegration.current().getSavegameCache().indexOf(n);
                 grid.getSelectionModel().select(index);
                 grid.getFocusModel().focus(index);
             } else {

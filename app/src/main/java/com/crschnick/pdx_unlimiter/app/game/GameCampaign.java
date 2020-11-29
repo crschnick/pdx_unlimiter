@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -12,22 +14,34 @@ import java.time.Instant;
 import java.util.TreeSet;
 import java.util.UUID;
 
-public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
+public final class GameCampaign<T,I extends SavegameInfo<T>> {
 
 
     private volatile ObjectProperty<Instant> lastPlayed;
     private volatile StringProperty name;
     private UUID campaignId;
-    private volatile ObservableSet<E> savegames =
+    private volatile ObservableSet<GameCampaignEntry<T,I>> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
+    private volatile ObjectProperty<GameDate> date;
+    private ObjectProperty<T> tag;
 
-    public GameCampaign(Instant lastPlayed, String name, UUID campaignId) {
+    public GameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, T tag) {
         this.lastPlayed = new SimpleObjectProperty<>(lastPlayed);
         this.name = new SimpleStringProperty(name);
         this.campaignId = campaignId;
+        this.date = new SimpleObjectProperty<>(date);
+        this.tag = new SimpleObjectProperty<>(tag);
     }
 
-    public void add(E e) {
+    public T getTag() {
+        return tag.get();
+    }
+
+    public ObjectProperty<T> tagProperty() {
+        return tag;
+    }
+
+    public void add(GameCampaignEntry<T,I> e) {
         this.savegames.add(e);
     }
 
@@ -43,11 +57,11 @@ public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
         return campaignId;
     }
 
-    public E getLatestSavegame() {
+    public GameCampaignEntry<T,I> getLatestSavegame() {
         return getSavegames().iterator().next();
     }
 
-    public ObservableSet<E> getSavegames() {
+    public ObservableSet<GameCampaignEntry<T,I>> getSavegames() {
         return savegames;
     }
 
@@ -59,4 +73,11 @@ public class GameCampaign<E extends GameCampaignEntry<? extends SavegameInfo>> {
         return lastPlayed;
     }
 
+    public GameDate getDate() {
+        return date.get();
+    }
+
+    public ObjectProperty<GameDate> dateProperty() {
+        return date;
+    }
 }

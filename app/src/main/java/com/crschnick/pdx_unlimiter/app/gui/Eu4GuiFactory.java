@@ -28,17 +28,10 @@ import java.util.stream.Collectors;
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
-public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> {
+public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
     public Eu4GuiFactory() {
         super(GameInstallation.EU4);
-    }
-
-    private static Tooltip tooltip(String text) {
-
-        Tooltip t = new Tooltip(text);
-        t.setShowDelay(Duration.millis(100));
-        return t;
     }
 
     private static Node getImageForTagName(String tag, String styleClass) {
@@ -87,7 +80,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
         return box;
     }
 
-    private static String getCountryTooltip(Eu4CampaignEntry entry, Set<Eu4Tag> tags) {
+    private static String getCountryTooltip(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Set<Eu4Tag> tags) {
         StringBuilder b = new StringBuilder();
         for (Eu4Tag t : tags) {
             b.append(GameLocalisation.getTagNameForEntry(entry, t));
@@ -97,7 +90,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
         return b.toString();
     }
 
-    private static void createDiplomacyRow(JFXMasonryPane pane, Eu4CampaignEntry entry, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
+    private static void createDiplomacyRow(JFXMasonryPane pane, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
         if (tags.size() == 0) {
             return;
         }
@@ -112,7 +105,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
         box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         box.getStyleClass().add(style);
         box.setSpacing(6);
-        Tooltip.install(box, tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none)));
+        Tooltip.install(box, new Tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none)));
         addNode(pane, box);
     }
 
@@ -122,14 +115,14 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     }
 
     @Override
-    public Background createEntryInfoBackground(Eu4CampaignEntry entry) {
+    public Background createEntryInfoBackground(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         return new Background(new BackgroundFill(
-                colorFromInt(entry.getInfo().getCurrentTag().getMapColor(), 100),
+                colorFromInt(entry.getInfo().getTag().getMapColor(), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public ObservableValue<Pane> createImage(Eu4CampaignEntry entry) {
+    public ObservableValue<Pane> createImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
                 prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
@@ -139,31 +132,17 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4CampaignEntry, Eu4Campaign>
     }
 
     @Override
-    public String createInfoString(Eu4CampaignEntry entry) {
-        return entry.getDate().toString();
-    }
-
-    @Override
-    public ObservableValue<Pane> createImage(Eu4Campaign campaign) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Pane> createImage(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign) {
+        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag().getTag(), CLASS_TAG_ICON));
         prop.bind(createImage(campaign.getLatestSavegame()));
-        campaign.getSavegames().addListener((SetChangeListener<? super Eu4CampaignEntry>) c -> {
+        campaign.getSavegames().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> >) c -> {
             prop.bind(createImage(campaign.getLatestSavegame()));
         });
         return prop;
     }
 
     @Override
-    public ObservableValue<String> createInfoString(Eu4Campaign campaign) {
-        SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
-        campaign.dateProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(n.toString()));
-        });
-        return prop;
-    }
-
-    @Override
-    public void fillNodeContainer(Eu4CampaignEntry entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, JFXMasonryPane grid) {
         Eu4SavegameInfo info = entry.getInfo();
         if (info.isObserver()) {
             super.fillNodeContainer(entry, grid);

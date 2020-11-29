@@ -109,7 +109,7 @@ public class AchievementManager {
         return c.toString();
     }
 
-    public <S extends Savegame> Optional<AchievementMatcher> validateSavegame(Achievement a, GameCampaignEntry<?> entry) {
+    public <S extends Savegame> Optional<AchievementMatcher> validateSavegame(Achievement a, GameCampaignEntry<?,?> entry) {
         try {
             if (!validateChecksum()) {
                 throw new IOException("Wrong achievement checksum");
@@ -127,7 +127,7 @@ public class AchievementManager {
         return checksum.equals(calculateChecksum());
     }
 
-    public List<Achievement> getSuitableAchievements(GameCampaignEntry<?> entry, boolean onlyOfficial, boolean onlyElgible) {
+    public List<Achievement> getSuitableAchievements(GameCampaignEntry<?,?> entry, boolean onlyOfficial, boolean onlyElgible) {
         return achievements.stream()
                 .filter(a -> !onlyOfficial || a.isOfficial())
                 .filter(a -> {

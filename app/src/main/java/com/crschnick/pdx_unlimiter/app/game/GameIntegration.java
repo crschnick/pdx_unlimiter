@@ -6,8 +6,10 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.LoggerFactory;
@@ -22,20 +24,25 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class GameIntegration<E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>> {
+public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
     public static Eu4Integration EU4;
     public static Hoi4Integration HOI4;
-    private static SimpleObjectProperty<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
-            ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> current = new SimpleObjectProperty<>();
-    private static List<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
-            ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> ALL;
-    private static SimpleObjectProperty<? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>> globalSelectedCampaign =
+    public static StellarisIntegration STELLARIS;
+
+    private static SimpleObjectProperty<GameIntegration<?,? extends SavegameInfo>> current = new SimpleObjectProperty<>();
+
+    private static List<GameIntegration<?,? extends SavegameInfo<?>>> ALL;
+
+    private static SimpleObjectProperty<? extends GameCampaign<?,? extends SavegameInfo<?>>> globalSelectedCampaign =
             new SimpleObjectProperty<>();
-    private static SimpleObjectProperty<? extends GameCampaignEntry<? extends SavegameInfo>> globalSelectedEntry =
+
+    private static SimpleObjectProperty<? extends GameCampaignEntry<?,? extends SavegameInfo<?>>> globalSelectedEntry =
             new SimpleObjectProperty<>();
-    protected SimpleObjectProperty<C> selectedCampaign = new SimpleObjectProperty<>();
-    protected SimpleObjectProperty<E> selectedEntry = new SimpleObjectProperty<>();
+
+
+    protected SimpleObjectProperty<GameCampaign<T,I>> selectedCampaign = new SimpleObjectProperty<>();
+    protected SimpleObjectProperty<GameCampaignEntry<T,I>> selectedEntry = new SimpleObjectProperty<>();
 
     public static boolean init() {
         ALL = new ArrayList<>();
@@ -52,6 +59,14 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
             ALL.add(HOI4);
             if (s.getActiveGame().equals(s.getHoi4())) {
                 current.set(HOI4);
+            }
+        }
+
+        if (Settings.getInstance().getStellaris().isPresent()) {
+            STELLARIS = new StellarisIntegration();
+            ALL.add(STELLARIS);
+            if (s.getActiveGame().equals(s.getStellaris())) {
+                current.set(STELLARIS);
             }
         }
 
@@ -73,37 +88,33 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
     }
 
     public static List<GameIntegration<?, ?>> getAvailable() {
-        return (List<GameIntegration<?, ?>>) ALL;
+        return ALL;
     }
 
-    public static <E extends GameCampaignEntry<? extends SavegameInfo>,
-            C extends GameCampaign<E>> ReadOnlyObjectProperty<C> globalSelectedCampaignProperty() {
-        return (SimpleObjectProperty<C>) globalSelectedCampaign;
+    public static <T, I extends SavegameInfo<T>> ReadOnlyObjectProperty<GameCampaign<T,I>> globalSelectedCampaignProperty() {
+        return (SimpleObjectProperty<GameCampaign<T,I>>) globalSelectedCampaign;
     }
 
-    private static <E extends GameCampaignEntry<? extends SavegameInfo>,
-            C extends GameCampaign<E>> SimpleObjectProperty<C> globalSelectedCampaignPropertyInternal() {
-        return (SimpleObjectProperty<C>) globalSelectedCampaign;
+    private static <T, I extends SavegameInfo<T>> SimpleObjectProperty<GameCampaign<T,I>> globalSelectedCampaignPropertyInternal() {
+        return (SimpleObjectProperty<GameCampaign<T,I>>) globalSelectedCampaign;
     }
 
-    public static <E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>>
-    ReadOnlyObjectProperty<E> globalSelectedEntryProperty() {
-        return (SimpleObjectProperty<E>) globalSelectedEntry;
+    public static <T, I extends SavegameInfo<T>>
+    ReadOnlyObjectProperty<GameCampaignEntry<T,I>> globalSelectedEntryProperty() {
+        return (SimpleObjectProperty<GameCampaignEntry<T,I>>) globalSelectedEntry;
     }
 
-    private static <E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>>
-    SimpleObjectProperty<E> globalSelectedEntryPropertyInternal() {
-        return (SimpleObjectProperty<E>) globalSelectedEntry;
+    private static <T, I extends SavegameInfo<T>>
+    SimpleObjectProperty<GameCampaignEntry<T,I>> globalSelectedEntryPropertyInternal() {
+        return (SimpleObjectProperty<GameCampaignEntry<T,I>>) globalSelectedEntry;
     }
 
-    public static <E extends GameCampaignEntry<? extends SavegameInfo>,
-            C extends GameCampaign<E>> GameIntegration<E, C> current() {
-        return (GameIntegration<E, C>) current.get();
+    public static <T, I extends SavegameInfo<T>> GameIntegration<T,I> current() {
+        return (GameIntegration<T,I>) current.get();
     }
 
-    public static SimpleObjectProperty<GameIntegration<? extends GameCampaignEntry<? extends SavegameInfo>,
-            ? extends GameCampaign<? extends GameCampaignEntry<? extends SavegameInfo>>>> currentGameProperty() {
-        return current;
+    public static <T, I extends SavegameInfo<T>, G extends GameIntegration<T,I>> SimpleObjectProperty<G> currentGameProperty() {
+        return (SimpleObjectProperty<G>) current;
     }
 
     public static GameIntegration<?, ?> getForInstallation(GameInstallation i) {
@@ -170,17 +181,17 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         getInstallation().start();
     }
 
-    protected abstract void writeLaunchConfig(E entry, Path path) throws IOException;
+    protected abstract void writeLaunchConfig(GameCampaignEntry<T,I> entry, Path path) throws IOException;
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
         return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
     }
 
-    public boolean isVersionCompatible(E entry) {
+    public boolean isVersionCompatible(GameCampaignEntry<T,I> entry) {
         return areCompatible(getInstallation().getVersion(), entry.getInfo().getVersion());
     }
 
-    public boolean isEntryCompatible(E entry) {
+    public boolean isEntryCompatible(GameCampaignEntry<T,I> entry) {
         boolean missingMods = entry.getInfo().getMods().stream()
                 .map(m -> getInstallation().getModForName(m))
                 .anyMatch(Optional::isEmpty);
@@ -192,11 +203,11 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         return isVersionCompatible(entry) && !missingMods && !missingDlc;
     }
 
-    public abstract GameGuiFactory<E, C> getGuiFactory();
+    public abstract GameGuiFactory<T,I> getGuiFactory();
 
-    public abstract SavegameCache<? extends Savegame, ? extends SavegameInfo, E, C> getSavegameCache();
+    public abstract SavegameCache<? extends RawSavegame, ? extends Savegame, T, I> getSavegameCache();
 
-    public void openCampaignEntry(E entry) {
+    public void openCampaignEntry(GameCampaignEntry<T,I> entry) {
         try {
             Desktop.getDesktop().open(getSavegameCache().getPath(entry).toFile());
         } catch (IOException e) {
@@ -204,7 +215,7 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         }
     }
 
-    public void selectCampaign(C c) {
+    public void selectCampaign(GameCampaign<T,I> c) {
         if (this.selectedCampaign.get() == c) {
             return;
         }
@@ -212,21 +223,22 @@ public abstract class GameIntegration<E extends GameCampaignEntry<? extends Save
         this.selectedEntry.set(null);
         globalSelectedEntryPropertyInternal().set(null);
         this.selectedCampaign.set(c);
-        globalSelectedCampaignPropertyInternal().set((GameCampaign<GameCampaignEntry<? extends SavegameInfo>>) c);
+        globalSelectedCampaignPropertyInternal().set((GameCampaign<Object, SavegameInfo<Object>>) c);
         LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign " + (c != null ? c.getName() : "null"));
     }
 
-    public void selectEntry(E e) {
+    public void selectEntry(GameCampaignEntry<T,I> e) {
         if (this.selectedEntry.get() == e) {
             return;
         }
 
         if (e != null) {
             this.selectedCampaign.set(getSavegameCache().getCampaign(e));
-            globalSelectedCampaignPropertyInternal().set((GameCampaign<GameCampaignEntry<? extends SavegameInfo>>) getSavegameCache().getCampaign(e));
+            globalSelectedCampaignPropertyInternal().set(
+                    (GameCampaign<Object, SavegameInfo<Object>>) getSavegameCache().getCampaign(e));
         }
         this.selectedEntry.set(e);
-        globalSelectedEntryPropertyInternal().set(e);
+        globalSelectedEntryPropertyInternal().set((GameCampaignEntry<Object, SavegameInfo<Object>>) e);
 
         LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign entry " + (e != null ? e.getName() : "null"));
     }

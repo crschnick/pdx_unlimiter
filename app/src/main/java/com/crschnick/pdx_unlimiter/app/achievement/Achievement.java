@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -77,8 +78,8 @@ public class Achievement {
         return a;
     }
 
-    public <S extends Savegame> Optional<AchievementMatcher> match(GameCampaignEntry<?> entry) {
-        Optional<S> loaded = (Optional<S>) GameIntegration.current().getSavegameCache().loadDataForEntry(entry);
+    public <T,I extends SavegameInfo<T>, S extends Savegame> Optional<AchievementMatcher> match(GameCampaignEntry<T,I> entry) {
+        Optional<S> loaded = (Optional<S>) GameIntegration.<T,I>current().getSavegameCache().loadDataForEntry(entry);
         if (loaded.isEmpty()) {
             return Optional.empty();
         }

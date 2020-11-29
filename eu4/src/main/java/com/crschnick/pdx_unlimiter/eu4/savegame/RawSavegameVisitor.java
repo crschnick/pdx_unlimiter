@@ -9,6 +9,8 @@ public interface RawSavegameVisitor {
             visitor.visitEu4(file);
         } else if (file.getFileName().toString().endsWith("hoi4")) {
             visitor.visitHoi4(file);
+        } else if (file.getFileName().toString().endsWith("sav")) {
+            visitor.visitStellaris(file);
         } else {
             visitor.visitOther(file);
         }
@@ -17,6 +19,8 @@ public interface RawSavegameVisitor {
     void visitEu4(Path file);
 
     void visitHoi4(Path file);
+
+    void visitStellaris(Path file);
 
     void visitOther(Path file);
 }

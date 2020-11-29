@@ -3,7 +3,9 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.data.GameDateType;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
@@ -14,59 +16,66 @@ import org.apache.commons.io.FileUtils;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo, Eu4CampaignEntry, Eu4Campaign> {
+public class Eu4SavegameCache extends SavegameCache<
+        Eu4RawSavegame,
+        Eu4Savegame,
+        Eu4Tag,
+        Eu4SavegameInfo> {
 
     public Eu4SavegameCache() {
-        super("eu4");
+        super("eu4", "eu4", GameDateType.EU4);
     }
 
     @Override
-    protected void updateCampaignProperties(Eu4Campaign c) {
-        c.getSavegames().stream()
-                .filter(s -> s.infoProperty().isNotNull().get())
-                .map(s -> s.getInfo().getDate()).min(Comparator.naturalOrder())
-                .ifPresent(d -> c.dateProperty().setValue(d));
-
-        c.getSavegames().stream()
-                .filter(s -> s.infoProperty().isNotNull().get())
-                .min(Comparator.comparingLong(ca -> Eu4Date.toLong(c.getDate())))
-                .ifPresent(e -> c.tagProperty().setValue(e.getInfo().getCurrentTag().getTag()));
+    protected GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
+        String tag = node.required("tag").textValue();
+        return new GameCampaignEntry<>(name, uuid, null, checksum, date, new Eu4Tag(tag, 0, 0, Optional.empty()));
     }
 
     @Override
-    protected Eu4Campaign createNewCampaignForEntry(Eu4CampaignEntry entry) {
-        return new Eu4Campaign(
+    protected GameCampaign<Eu4Tag, Eu4SavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
+        String tag = node.required("tag").textValue();
+        return new GameCampaign<>(lastPlayed, name, uuid, date, new Eu4Tag(tag, 0, 0, Optional.empty()));
+    }
+
+    @Override
+    protected void writeEntry(ObjectNode node, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> e) {
+        node.put("tag", e.getTag().getTag());
+    }
+
+    @Override
+    protected void writeCampaign(ObjectNode node, GameCampaign<Eu4Tag, Eu4SavegameInfo> c) {
+        node.put("tag", c.getTag().getTag());
+    }
+
+    @Override
+    protected GameCampaign<Eu4Tag, Eu4SavegameInfo> createNewCampaignForEntry(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
+        return new GameCampaign<>(
                 Instant.now(),
-                GameLocalisation.getTagNameForEntry(entry, entry.getInfo().getCurrentTag()),
+                GameLocalisation.getTagNameForEntry(entry, entry.getInfo().getTag()),
                 entry.getInfo().getCampaignUuid(),
-                entry.getInfo().getCurrentTag().getTag(),
-                entry.getInfo().getDate());
+                entry.getInfo().getDate(),
+                entry.getInfo().getTag());
     }
 
     @Override
-    protected Eu4CampaignEntry createEntry(UUID uuid, String checksum, Eu4SavegameInfo info) {
-        return new Eu4CampaignEntry(
-                info.getDate().toDisplayString(),
-                uuid,
-                info,
-                checksum,
-                info.getCurrentTag().getTag(),
-                info.getDate());
+    protected GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>  createEntry(UUID uuid, String checksum, Eu4SavegameInfo info) {
+        return new GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>(
+                        info.getDate().toDisplayString(),
+                        uuid,
+                        info,
+                        checksum,
+                info.getDate(),
+                info.getTag());
     }
 
     @Override
-    protected void writeSavegameData(Path savegame, Path out) throws Exception {
-        Eu4RawSavegame save = Eu4RawSavegame.fromFile(savegame);
-        Eu4Savegame sg = Eu4Savegame.fromSavegame(save);
-        sg.write(out, true);
-    }
-
-    @Override
-    protected boolean needsUpdate(Eu4CampaignEntry eu4CampaignEntry) throws Exception {
-        Path p = getPath(eu4CampaignEntry);
+    protected boolean needsUpdate(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> e) {
+        Path p = getPath(e);
         int v = 0;
         try {
             v = p.toFile().exists() ? Eu4Savegame.getVersion(p.resolve("data.zip")) : 0;
@@ -84,72 +93,17 @@ public class Eu4SavegameCache extends SavegameCache<Eu4Savegame, Eu4SavegameInfo
     }
 
     @Override
-    protected Eu4Savegame loadData(Path p) throws Exception {
+    protected Eu4RawSavegame loadRaw(Path p) throws Exception {
+        return Eu4RawSavegame.fromFile(p);
+    }
+
+    @Override
+    protected Eu4Savegame loadDataFromFile(Path p) throws Exception {
         return Eu4Savegame.fromFile(p);
     }
 
     @Override
-    protected void importSavegameData(Path file) throws Exception {
-        Eu4Savegame savegame = null;
-        Eu4SavegameInfo info = null;
-
-        Eu4RawSavegame save = Eu4RawSavegame.fromFile(file);
-        savegame = Eu4Savegame.fromSavegame(save);
-        info = Eu4SavegameInfo.fromSavegame(savegame);
-
-        UUID uuid = info.getCampaignUuid();
-
-        AtomicBoolean exists = new AtomicBoolean(false);
-        getCampaigns().stream()
-                .filter(c -> c.getCampaignId().equals(uuid))
-                .findAny().ifPresent(c -> exists.set(c.getSavegames().stream()
-                .map(GameCampaignEntry::getChecksum).anyMatch(ch -> ch.equals(save.getFileChecksum()))));
-        if (exists.get()) {
-            if (Settings.getInstance().deleteOnImport()) FileUtils.forceDelete(file.toFile());
-            return;
-        }
-
-
-        UUID saveUuid = UUID.randomUUID();
-        Path campaignPath = getPath().resolve(uuid.toString());
-        Path entryPath = campaignPath.resolve(saveUuid.toString());
-
-        FileUtils.forceMkdir(entryPath.toFile());
-        savegame.write(entryPath.resolve("data.zip"), true);
-        if (Settings.getInstance().deleteOnImport()) {
-            FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
-            FileUtils.moveFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
-        } else {
-            FileUtils.copyFile(file.toFile(), entryPath.resolve("savegame.eu4").toFile());
-        }
-        this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), info, savegame);
-    }
-
-    @Override
-    protected Eu4CampaignEntry readEntry(JsonNode node, String name, UUID uuid, String checksum) {
-        String tag = node.required("tag").textValue();
-        String date = node.required("date").textValue();
-        return new Eu4CampaignEntry(name, uuid, null, checksum, tag, Eu4Date.fromString(date));
-    }
-
-    @Override
-    protected Eu4Campaign readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed) {
-        String tag = node.required("tag").textValue();
-        String lastDate = node.required("date").textValue();
-        return new Eu4Campaign(lastPlayed, name, uuid, tag, Eu4Date.fromString(lastDate));
-    }
-
-    @Override
-    protected void writeEntry(ObjectNode node, Eu4CampaignEntry entry) {
-
-        node.put("tag", entry.getTag())
-                .put("date", entry.getDate().toString());
-    }
-
-    @Override
-    protected void writeCampaign(ObjectNode node, Eu4Campaign campaign) {
-
-        node.put("tag", campaign.getTag())
-                .put("date", campaign.getDate().toString());
+    protected Eu4Savegame loadDataFromRaw(Eu4RawSavegame raw) throws Exception {
+        return Eu4Savegame.fromSavegame(raw);
     }
 }

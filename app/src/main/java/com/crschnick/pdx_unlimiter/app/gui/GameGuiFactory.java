@@ -6,7 +6,9 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,7 +32,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GameImage.EU4_ICON_VERSION_WAR
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.imageNode;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
-public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends SavegameInfo>, C extends GameCampaign<E>> {
+public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     private GameInstallation installation;
 
@@ -38,7 +40,7 @@ public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends Saveg
         this.installation = installation;
     }
 
-    public boolean displayIncompatibleWarning(E entry) {
+    public boolean displayIncompatibleWarning(GameCampaignEntry<T,I> entry) {
         var launch = new ButtonType("Launch anyway");
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.WARNING);
@@ -48,7 +50,7 @@ public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends Saveg
         alert.setTitle("Incompatible savegame");
 
         StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
-        if (!GameIntegration.current().isVersionCompatible(entry)) {
+        if (!GameIntegration.<T,I>current().isVersionCompatible(entry)) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: " + installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: " + entry.getInfo().getVersion().toString());
@@ -86,15 +88,19 @@ public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends Saveg
 
     public abstract Pane createIcon();
 
-    public abstract Background createEntryInfoBackground(E entry);
+    public abstract Background createEntryInfoBackground(GameCampaignEntry<T,I> entry);
 
-    public abstract ObservableValue<Pane> createImage(E entry);
+    public abstract ObservableValue<Pane> createImage(GameCampaignEntry<T,I> entry);
 
-    public abstract ObservableValue<Pane> createImage(C campaign);
+    public abstract ObservableValue<Pane> createImage(GameCampaign<T,I> campaign);
 
-    public abstract String createInfoString(E entry);
-
-    public abstract ObservableValue<String> createInfoString(C campaign);
+    public ObservableValue<String> createInfoString(GameCampaign<T,I> campaign) {
+        SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
+        campaign.dateProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> prop.set(n.toString()));
+        });
+        return prop;
+    }
 
 
     protected static void addNode(JFXMasonryPane pane, Region content) {
@@ -110,9 +116,9 @@ public abstract class GameGuiFactory<E extends GameCampaignEntry<? extends Saveg
         p.setAlignment(Pos.CENTER);
     }
 
-    public void fillNodeContainer(E entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(GameCampaignEntry<T,I> entry, JFXMasonryPane grid) {
         Label version;
-        if (GameIntegration.current().isVersionCompatible(entry)) {
+        if (GameIntegration.<T,I>current().isVersionCompatible(entry)) {
             version = new Label(entry.getInfo().getVersion().toString());
             Tooltip.install(version, new Tooltip("Compatible version"));
             version.getStyleClass().add(CLASS_COMPATIBLE);

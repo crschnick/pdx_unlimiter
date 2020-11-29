@@ -3,8 +3,10 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
@@ -15,15 +17,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class Eu4Integration extends GameIntegration<Eu4CampaignEntry, Eu4Campaign> {
+public class Eu4Integration extends GameIntegration<Eu4Tag, Eu4SavegameInfo> {
 
     @Override
-    public GameGuiFactory<Eu4CampaignEntry, Eu4Campaign> getGuiFactory() {
+    public GameGuiFactory<Eu4Tag, Eu4SavegameInfo> getGuiFactory() {
         return new Eu4GuiFactory();
     }
 
     @Override
-    public SavegameCache<Eu4Savegame, Eu4SavegameInfo, Eu4CampaignEntry, Eu4Campaign> getSavegameCache() {
+    public Eu4SavegameCache getSavegameCache() {
         return SavegameCache.EU4_CACHE;
     }
 
@@ -42,8 +44,8 @@ public class Eu4Integration extends GameIntegration<Eu4CampaignEntry, Eu4Campaig
         return AchievementManager.EU4;
     }
 
-
-    protected void writeLaunchConfig(Eu4CampaignEntry entry, Path path) throws IOException {
+    @Override
+    protected void writeLaunchConfig(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Path path) throws IOException {
         var out = Files.newOutputStream(
                 getInstallation().getUserPath().resolve("continue_game.json"));
         ObjectNode n = JsonNodeFactory.instance.objectNode()

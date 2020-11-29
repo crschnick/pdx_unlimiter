@@ -28,12 +28,12 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class GuiGameCampaignEntry {
 
 
-    public static Node createCampaignEntryNode(GameCampaignEntry<? extends SavegameInfo> e) {
+    public static <T,I extends SavegameInfo<T>> Node createCampaignEntryNode(GameCampaignEntry<T,I> e) {
         VBox main = new VBox();
         main.setAlignment(Pos.CENTER);
         main.setFillWidth(true);
         main.getProperties().put("entry", e);
-        Label l = new Label(GameIntegration.current().getGuiFactory().createInfoString(e));
+        Label l = new Label(e.getDate().toDisplayString());
         l.getStyleClass().add(CLASS_DATE);
 
         JFXTextField name = new JFXTextField();
@@ -43,7 +43,7 @@ public class GuiGameCampaignEntry {
 
         Button open = new JFXButton();
         open.setOnMouseClicked((m) -> {
-            GameIntegration.current().openCampaignEntry(e);
+            GameIntegration.<T,I>current().openCampaignEntry(e);
         });
         open.setGraphic(new FontIcon());
         open.getStyleClass().add("open-button");
@@ -61,13 +61,13 @@ public class GuiGameCampaignEntry {
         del.setGraphic(new FontIcon());
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showSavegameDeleteDialog()) {
-                GameIntegration.current().getSavegameCache().delete(e);
+                GameIntegration.<T,I>current().getSavegameCache().delete(e);
             }
         });
         del.getStyleClass().add("delete-button");
 
 
-        var tagImage = GameIntegration.current().getGuiFactory().createImage(e);
+        var tagImage = GameIntegration.<T,I>current().getGuiFactory().createImage(e);
         HBox tagBar = new HBox(tagImage.getValue(), l);
         tagBar.getStyleClass().add(CLASS_TAG_BAR);
         tagImage.addListener((change, o, n) -> {
@@ -93,7 +93,7 @@ public class GuiGameCampaignEntry {
 
         InvalidationListener lis = (change) -> {
             Platform.runLater(() -> {
-                layout.setBackground(GameIntegration.current().getGuiFactory().createEntryInfoBackground(e));
+                layout.setBackground(GameIntegration.<T,I>current().getGuiFactory().createEntryInfoBackground(e));
             });
         };
         e.infoProperty().addListener(lis);
@@ -105,13 +105,13 @@ public class GuiGameCampaignEntry {
         main.getStyleClass().add(CLASS_ENTRY);
         main.setOnMouseClicked(event -> {
             if (e.infoProperty().isNotNull().get()) {
-                GameIntegration.current().selectEntry(e);
+                GameIntegration.<T,I>current().selectEntry(e);
             }
         });
         return main;
     }
 
-    private static Node createSavegameInfoNode(GameCampaignEntry<? extends SavegameInfo> entry) {
+    private static <T, I extends SavegameInfo<T>>Node createSavegameInfoNode(GameCampaignEntry<T,I> entry) {
         StackPane stack = new StackPane();
         JFXMasonryPane grid =
                 new JFXMasonryPane();
@@ -127,7 +127,7 @@ public class GuiGameCampaignEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(grid);
         if (entry.infoProperty().isNotNull().get()) {
-            GameIntegration.current().getGuiFactory().fillNodeContainer(entry, grid);
+            GameIntegration.<T,I>current().getGuiFactory().fillNodeContainer(entry, grid);
         } else {
             stack.getChildren().add(loading);
         }
@@ -140,14 +140,14 @@ public class GuiGameCampaignEntry {
 
             if (stack.localToScreen(0, 0).getY() < PdxuApp.getApp().getScene().getWindow().getHeight() && !load.get()) {
                 load.set(true);
-                GameIntegration.current().getSavegameCache().loadEntryAsync(entry);
+                GameIntegration.<T,I>current().getSavegameCache().loadEntryAsync(entry);
             }
         });
 
         entry.infoProperty().addListener((change) -> {
             Platform.runLater(() -> {
                 stack.getChildren().remove(loading);
-                GameIntegration.current().getGuiFactory().fillNodeContainer(entry, grid);
+                GameIntegration.<T,I>current().getGuiFactory().fillNodeContainer(entry, grid);
             });
         });
 

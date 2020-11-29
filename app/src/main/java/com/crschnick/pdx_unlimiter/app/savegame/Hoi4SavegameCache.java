@@ -1,11 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.Hoi4Campaign;
-import com.crschnick.pdx_unlimiter.app.game.Hoi4CampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Date;
+import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
+import com.crschnick.pdx_unlimiter.eu4.data.GameDateType;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4Savegame;
@@ -20,86 +21,59 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Hoi4SavegameCache extends SavegameCache<Hoi4Savegame, Hoi4SavegameInfo, Hoi4CampaignEntry, Hoi4Campaign> {
-    private static final String SAVE_NAME = "savegame.hoi4";
+public class Hoi4SavegameCache extends SavegameCache<
+        Hoi4RawSavegame, Hoi4Savegame, Hoi4Tag, Hoi4SavegameInfo> {
 
     public Hoi4SavegameCache() {
-        super("hoi4");
+        super("hoi4", "hoi4", GameDateType.HOI4);
     }
 
     @Override
-    protected void updateCampaignProperties(Hoi4Campaign c) {
-        c.getSavegames().stream()
-                .filter(s -> s.infoProperty().isNotNull().get())
-                .map(s -> s.getInfo().getDate()).min(Comparator.naturalOrder())
-                .ifPresent(d -> c.dateProperty().setValue(d));
-
-        c.getSavegames().stream()
-                .filter(s -> s.infoProperty().isNotNull().get())
-                .min(Comparator.naturalOrder())
-                .ifPresent(e -> c.tagProperty().setValue(e.getInfo().getTag()));
-    }
-
-    @Override
-    protected Hoi4CampaignEntry readEntry(JsonNode node, String name, UUID uuid, String checksum) {
+    protected GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
         Hoi4Tag tag = new Hoi4Tag(node.required("tag").textValue(), node.required("ideology").textValue());
-        String date = node.required("date").textValue();
-        return new Hoi4CampaignEntry(name, uuid, null, checksum, tag, Hoi4Date.fromString(date));
+        return new GameCampaignEntry<>(name, uuid, null, checksum, date, tag);
     }
 
     @Override
-    protected Hoi4Campaign readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed) {
+    protected GameCampaign<Hoi4Tag, Hoi4SavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
         Hoi4Tag tag = new Hoi4Tag(node.required("tag").textValue(), node.required("ideology").textValue());
-        String date = node.required("date").textValue();
-        return new Hoi4Campaign(lastPlayed, name, uuid, tag, Hoi4Date.fromString(date));
+        return new GameCampaign<>(lastPlayed, name, uuid, date, tag);
     }
 
     @Override
-    protected void writeEntry(ObjectNode node, Hoi4CampaignEntry entry) {
+    protected void writeEntry(ObjectNode node, GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
+
 
 
         node.put("tag", entry.getTag().getTag())
-                .put("ideology", entry.getTag().getIdeology())
-                .put("date", entry.getDate().toString());
+                .put("ideology", entry.getTag().getIdeology());
     }
 
     @Override
-    protected void writeCampaign(ObjectNode node, Hoi4Campaign campaign) {
-
+    protected void writeCampaign(ObjectNode node, GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
         node.put("tag", campaign.getTag().getTag())
-                .put("ideology", campaign.getTag().getIdeology())
-                .put("date", campaign.getDate().toString());
+                .put("ideology", campaign.getTag().getIdeology());
     }
 
     @Override
-    protected Hoi4Campaign createNewCampaignForEntry(Hoi4CampaignEntry entry) {
-        return new Hoi4Campaign(Instant.now(),
+    protected GameCampaign<Hoi4Tag, Hoi4SavegameInfo> createNewCampaignForEntry(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
+        return new GameCampaign<>(Instant.now(),
                 GameInstallation.HOI4.getCountryNames().getOrDefault(entry.getInfo().getTag(), "Unknown"),
                 entry.getInfo().getCampaignUuid(),
-                entry.getInfo().getTag(),
-                entry.getInfo().getDate());
+                entry.getInfo().getDate(),
+                entry.getInfo().getTag());
     }
 
     @Override
-    protected Hoi4CampaignEntry createEntry(UUID uuid, String checksum, Hoi4SavegameInfo info) {
-        return new Hoi4CampaignEntry(
+    protected GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> createEntry(UUID uuid, String checksum, Hoi4SavegameInfo info) {
+        return new GameCampaignEntry<>(
                 info.getDate().toDisplayString(), uuid,
-                info, checksum, info.getTag(), info.getDate());
+                info, checksum, info.getDate(), info.getTag());
     }
 
     @Override
-    protected void writeSavegameData(Path savegame, Path out) throws Exception {
-        Hoi4Savegame is = null;
-        Hoi4SavegameInfo e = null;
-
-        Hoi4RawSavegame save = Hoi4RawSavegame.fromFile(savegame);
-        is = Hoi4Savegame.fromSavegame(save);
-        is.write(out, true);
-    }
-
-    @Override
-    protected boolean needsUpdate(Hoi4CampaignEntry hoi4CampaignEntry) throws Exception {
-        Path p = getPath(hoi4CampaignEntry);
+    protected boolean needsUpdate(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> e) {
+        Path p = getPath(e);
         int v = 0;
         try {
             v = p.toFile().exists() ? Hoi4Savegame.getVersion(p.resolve("data.zip")) : 0;
@@ -117,47 +91,17 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Savegame, Hoi4SavegameI
     }
 
     @Override
-    protected Hoi4Savegame loadData(Path p) throws Exception {
+    protected Hoi4RawSavegame loadRaw(Path p) throws Exception {
+        return Hoi4RawSavegame.fromFile(p);
+    }
+
+    @Override
+    protected Hoi4Savegame loadDataFromFile(Path p) throws Exception {
         return Hoi4Savegame.fromFile(p);
     }
 
     @Override
-    protected void importSavegameData(Path file) throws Exception {
-
-        Hoi4Savegame is = null;
-        Hoi4SavegameInfo e = null;
-
-        Hoi4RawSavegame save = Hoi4RawSavegame.fromFile(file);
-        is = Hoi4Savegame.fromSavegame(save);
-        e = Hoi4SavegameInfo.fromSavegame(is);
-
-        UUID uuid = e.getCampaignUuid();
-
-        Optional<Hoi4Campaign> existing = getCampaigns().stream()
-                .filter(c -> c.getCampaignId().equals(uuid))
-                .findAny();
-
-        if (existing.isPresent()) {
-            Optional<Hoi4CampaignEntry> existingEntry = existing.get().getSavegames().stream()
-                    .filter(c -> c.getChecksum().equals(save.getFileChecksum()))
-                    .findAny();
-            if (existingEntry.isPresent()) {
-                FileUtils.forceDelete(file.toFile());
-                GameIntegration.selectIntegration(GameIntegration.HOI4);
-                GameIntegration.current().selectEntry(existingEntry.get());
-                return;
-            }
-        }
-
-
-        UUID saveUuid = UUID.randomUUID();
-        Path campaignPath = getPath().resolve(uuid.toString());
-        Path entryPath = campaignPath.resolve(saveUuid.toString());
-
-        FileUtils.forceMkdir(entryPath.toFile());
-        is.write(entryPath.resolve("data.zip"), true);
-        FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
-        FileUtils.moveFile(file.toFile(), entryPath.resolve(SAVE_NAME).toFile());
-        this.addNewEntry(uuid, saveUuid, save.getFileChecksum(), e, is);
+    protected Hoi4Savegame loadDataFromRaw(Hoi4RawSavegame raw) throws Exception {
+        return Hoi4Savegame.fromSavegame(raw);
     }
 }

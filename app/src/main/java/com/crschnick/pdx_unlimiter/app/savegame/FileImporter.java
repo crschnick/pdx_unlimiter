@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
+import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisRawSavegame;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -44,6 +45,11 @@ public class FileImporter {
             @Override
             public void visitHoi4(Path file) {
                 SavegameCache.HOI4_CACHE.importSavegame(p);
+            }
+
+            @Override
+            public void visitStellaris(Path file) {
+                SavegameCache.STELLARIS_CACHE.importSavegame(p);
             }
 
             @Override

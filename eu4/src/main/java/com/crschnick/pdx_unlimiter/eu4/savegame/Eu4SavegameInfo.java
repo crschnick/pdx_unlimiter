@@ -1,25 +1,19 @@
 package com.crschnick.pdx_unlimiter.eu4.savegame;
 
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Date;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.data.*;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.NodeFormatException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Eu4SavegameInfo extends SavegameInfo {
+public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
-    private UUID campaignUuid;
-    private boolean ironman;
     private boolean randomNewWorld;
     private boolean customNationInWorld;
     private boolean releasedVassal;
     private boolean observer;
     private Set<Eu4Tag> allTags = new HashSet<>();
-    private Eu4Tag currentTag;
-    private Eu4Date date;
     private Ruler ruler;
     private Optional<Ruler> heir;
     private Set<Eu4Tag> vassals = new HashSet<>();
@@ -32,12 +26,12 @@ public class Eu4SavegameInfo extends SavegameInfo {
     private Optional<Eu4Tag> seniorPartner = Optional.empty();
     private Set<Eu4Tag> tributaryJuniors = new HashSet<>();
     private Optional<Eu4Tag> tributarySenior = Optional.empty();
-    private Map<Eu4Tag, Eu4Date> truces = new HashMap<>();
+    private Map<Eu4Tag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
     public static Eu4SavegameInfo fromSavegame(Eu4Savegame save) throws SavegameParseException {
         try {
-            Eu4Date date = Eu4Date.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
+            GameDate date = GameDateType.EU4.fromNode(Node.getNodeForKey(save.getNodes().get("meta"), "date"));
             String tag = Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "player"));
             Eu4SavegameInfo e = new Eu4SavegameInfo();
 
@@ -71,7 +65,7 @@ public class Eu4SavegameInfo extends SavegameInfo {
                     Node.getInteger(Node.getNodeForKey(v, "forth")),
                     Node.getString(Node.getNodeForKey(v, "name")));
 
-            e.currentTag = Eu4Tag.getTag(e.allTags, tag);
+            e.tag = Eu4Tag.getTag(e.allTags, tag);
 
             if (e.observer) {
                 return e;
@@ -175,16 +169,8 @@ public class Eu4SavegameInfo extends SavegameInfo {
         return version;
     }
 
-    public Eu4Date getDate() {
-        return date;
-    }
-
     public Set<Eu4Tag> getAllTags() {
         return allTags;
-    }
-
-    public Eu4Tag getCurrentTag() {
-        return currentTag;
     }
 
     public Set<Eu4Tag> getVassals() {
@@ -227,7 +213,7 @@ public class Eu4SavegameInfo extends SavegameInfo {
         return tributarySenior;
     }
 
-    public Map<Eu4Tag, Eu4Date> getTruces() {
+    public Map<Eu4Tag, GameDate> getTruces() {
         return truces;
     }
 

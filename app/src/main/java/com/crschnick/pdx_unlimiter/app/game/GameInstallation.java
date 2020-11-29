@@ -51,6 +51,10 @@ public abstract class GameInstallation {
             HOI4.init();
         }
 
+        if (STELLARIS != null) {
+            STELLARIS.init();
+        }
+
         initInstallationsOptional();
     }
 
@@ -66,6 +70,14 @@ public abstract class GameInstallation {
         if (HOI4 != null) {
             try {
                 HOI4.initOptional();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+
+        if (STELLARIS != null) {
+            try {
+                STELLARIS.initOptional();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
