@@ -12,6 +12,7 @@ public abstract class Namespace {
     public static final Namespace EU4_AI = new FileNamespace("eu4_ai.txt");
     public static final Namespace EU4_META = new FileNamespace("eu4_meta.txt");
     public static final Namespace HOI4 = new FileNamespace("hoi4.txt");
+    public static final Namespace CK3 = new FileNamespace("ck3.txt");
 
     public abstract String getKeyName(String id);
 
@@ -54,10 +55,11 @@ public abstract class Namespace {
                     int id = Integer.parseInt(parts[0]);
                     String key = parts[1];
                     if (keyNames.containsKey(id)) {
-                        throw new RuntimeException("Duplicate entries for id " + id + ": " + keyNames.get(id) + ", " + key);
+                        System.err.println("Duplicate entries for id " + id + ": " + keyNames.get(id) + ", " + key);
+                    } else {
+                        keyNames.put(id, key);
                     }
 
-                    keyNames.put(id, key);
                 }
             } catch (FileNotFoundException e) {
                 System.err.println("Unable to find the file: fileName");

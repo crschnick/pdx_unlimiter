@@ -37,6 +37,8 @@ public abstract class GameDateType {
         }
     };
 
+    public static final GameDateType CK3 = EU4;
+
     public static final GameDateType STELLARIS = new GameDateType() {
         @Override
         public boolean hasHours() {

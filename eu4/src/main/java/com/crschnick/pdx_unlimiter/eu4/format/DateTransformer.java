@@ -7,14 +7,28 @@ import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class DateTransformer extends NodeTransformer {
 
     public static final DateTransformer EU4 = new DateTransformer(GameDateType.EU4);
+    public static final DateTransformer CK3 = new DateTransformer(GameDateType.CK3);
     public static final DateTransformer HOI4 = new DateTransformer(GameDateType.HOI4);
     public static final DateTransformer STELLARIS = new DateTransformer(GameDateType.STELLARIS);
 
     private GameDateType type;
+
+    public static NodeTransformer recursive(DateTransformer t, Predicate<String> isDateEntry) {
+        return new RecursiveTransformer((n) -> {
+            if (n instanceof KeyValueNode && isDateEntry.test(Node.getKeyValueNode(n).getKeyName())) {
+                Node val = Node.getKeyValueNode(n).getNode();
+                return val instanceof ValueNode &&
+                        (((ValueNode) val).getValue() instanceof String || ((ValueNode) val).getValue() instanceof Long);
+            } else {
+                return false;
+            }
+        }, t);
+    }
 
     public DateTransformer(GameDateType type) {
         this.type = type;

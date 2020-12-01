@@ -33,6 +33,10 @@ public class BinaryFormatParser extends FormatParser {
         super(magic, ns);
     }
 
+    public static BinaryFormatParser ck3Parser() {
+        return new BinaryFormatParser(new byte[]{}, Namespace.CK3);
+    }
+
     public static BinaryFormatParser eu4Parser(Namespace ns) {
         return new BinaryFormatParser(EU4_MAGIC, ns);
     }

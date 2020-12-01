@@ -120,6 +120,18 @@ public class DialogHelper {
             }
 
             @Override
+            public void visitCk3(Path file) {
+                try {
+                    Ck3RawSavegame un = Ck3RawSavegame.fromFile(unnamed.toPath());
+                    Ck3RawSavegame n = Ck3RawSavegame.fromFile(named.toPath());
+                    System.out.println(NamespaceCreator.createNamespace(
+                            Ck3Savegame.fromSavegame(un).getNodes(), Ck3Savegame.fromSavegame(n).getNodes()));
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            }
+
+            @Override
             public void visitOther(Path file) {
 
             }

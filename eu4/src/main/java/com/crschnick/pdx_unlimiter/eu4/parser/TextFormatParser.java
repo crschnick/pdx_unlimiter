@@ -81,13 +81,9 @@ public class TextFormatParser extends FormatParser {
                     tokens.add(new ValueToken(false));
                 } else if (Pattern.matches("-?[0-9]+", sub)) {
                     tokens.add(new ValueToken(Long.parseLong(sub)));
-                } else if (Pattern.matches("([0-9]*)\\.([0-9]*)", sub)) {
+                } else if (Pattern.matches("([0-9]+)\\.([0-9]+)", sub)) {
                     tokens.add(new ValueToken(Double.valueOf(sub)));
                 } else if (sub.startsWith("\"") && sub.endsWith("\"")) {
-                    if (sub.length() == 1) {
-                        String ss = s.substring(i - 100, i + 100);
-                        int a = 0;
-                    }
                     tokens.add(new ValueToken(sub.substring(1, sub.length() - 1)));
                 } else {
                     tokens.add(new ValueToken(sub));

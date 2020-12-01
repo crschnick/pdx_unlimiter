@@ -54,6 +54,10 @@ public class NamespaceCreator {
 
             if (Pattern.compile("[0-9]+").matcher(((KeyValueNode) unnamed).getKeyName()).matches()) {
                 int i = Integer.parseInt(((KeyValueNode) unnamed).getKeyName());
+                if (i >= 1 << 16) {
+                    return;
+                }
+
                 if (map.containsKey(i) && !map.get(i).equals(kv.getKeyName())) {
                     System.err.println("Ambigous keys: " + map.get(i) + ", " + kv.getKeyName());
                 } else {

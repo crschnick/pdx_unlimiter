@@ -5,10 +5,14 @@ import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
+import com.crschnick.pdx_unlimiter.eu4.io.SavegameWriter;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3RawSavegame;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisRawSavegame;
 import org.apache.commons.io.FileUtils;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,6 +54,17 @@ public class FileImporter {
             @Override
             public void visitStellaris(Path file) {
                 SavegameCache.STELLARIS_CACHE.importSavegame(p);
+            }
+
+            @Override
+            public void visitCk3(Path file) {
+                try {
+                    var s = Ck3RawSavegame.fromFile(file);
+                    var ss = Ck3Savegame.fromSavegame(s);
+                    ss.write(Path.of("C:\\Users\\cschn\\Desktop\\pdx_test\\ck3.zip"), true);
+      } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
