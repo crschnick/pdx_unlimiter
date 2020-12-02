@@ -54,7 +54,7 @@ public class Ck3RawSavegame extends RawSavegame {
         String first = contentString.lines().findFirst().get();
         int metaStart = first.length() + 1;
         boolean binary = !contentString.startsWith("meta", metaStart);
-        int metaEnd = binary ? indexOf(content, "PK".getBytes()) : (contentString.indexOf("}\nPK") + 3);
+        int metaEnd = binary ? indexOf(content, "PK".getBytes()) : (contentString.indexOf("}\nPK") + 2);
         byte[] metaContent = Arrays.copyOfRange(content, metaStart, metaEnd);
         byte[] zipContent = Arrays.copyOfRange(content, metaEnd, content.length);
         var zipIn = new ZipInputStream(new ByteArrayInputStream(zipContent));

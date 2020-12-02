@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -55,6 +56,10 @@ public abstract class GameInstallation {
             STELLARIS.init();
         }
 
+        if (CK3 != null) {
+            CK3.init();
+        }
+
         initInstallationsOptional();
     }
 
@@ -78,6 +83,14 @@ public abstract class GameInstallation {
         if (STELLARIS != null) {
             try {
                 STELLARIS.initOptional();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+
+        if (CK3 != null) {
+            try {
+                CK3.initOptional();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
@@ -127,8 +140,8 @@ public abstract class GameInstallation {
             new ProcessBuilder()
                     .directory(getPath().toFile())
                     .command(bootstrapper.toString(),
-                            "--pdxlGameDir", getPath().toString(),
-                            "--gameDir", getPath().toString())
+                            "--pdxlGameDir", getLauncherDataPath().toString(),
+                            "--gameDir", getLauncherDataPath().toString())
                     .start();
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -151,7 +164,7 @@ public abstract class GameInstallation {
     }
 
     private void loadDlcs() throws IOException {
-        Files.list(getPath().resolve("dlc")).forEach(f -> {
+        Files.list(getDlcPath()).forEach(f -> {
             try {
                 GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
             } catch (Exception e) {
@@ -169,7 +182,7 @@ public abstract class GameInstallation {
             try {
                 GameMod.fromFile(f).ifPresent(m -> {
                     if (Files.exists(m.getPath())) mods.add(m);
-                    LoggerFactory.getLogger(GameInstallation.class).debug("Found mod " + m.getName() +
+                    LoggerFactory.getLogger(getClass()).debug("Found mod " + m.getName() +
                             " at " + m.getModFile().toString()+ ". Content exists: " + Files.exists(m.getPath()));
                 });
             } catch (Exception e) {
@@ -209,6 +222,12 @@ public abstract class GameInstallation {
         return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
+    public Path getDlcPath() {
+        return getPath().resolve("dlc");
+    }
+
+    public abstract void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException;
+
     public abstract Optional<GameMod> getModForName(String name);
 
     public abstract void start();
@@ -216,6 +235,10 @@ public abstract class GameInstallation {
     public abstract void init() throws Exception;
 
     public abstract boolean isValid();
+
+    protected Path getLauncherDataPath() {
+        return getPath();
+    }
 
     public Path getPath() {
         return path;

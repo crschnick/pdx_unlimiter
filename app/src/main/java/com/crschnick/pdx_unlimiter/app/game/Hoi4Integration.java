@@ -35,20 +35,6 @@ public class Hoi4Integration extends GameIntegration<Hoi4Tag, Hoi4SavegameInfo> 
     }
 
     @Override
-    protected void writeLaunchConfig(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry, Path path) throws IOException {
-        var out = Files.newOutputStream(
-                getInstallation().getUserPath().resolve("continue_game.json"));
-        SimpleDateFormat d = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
-        ObjectNode n = JsonNodeFactory.instance.objectNode()
-                .put("title", getSavegameCache().getCampaign(entry).getName() + " " + entry.getName())
-                .put("desc", "")
-                .put("date", d.format(new Date(getSavegameCache().getCampaign(entry).getLastPlayed().toEpochMilli())) + "\n")
-                .put("filename", getInstallation().getSavegamesPath().relativize(path).toString())
-                .put("is_remote", false);
-        JsonHelper.write(n, out);
-    }
-
-    @Override
     public boolean isVersionCompatible(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
         return true;
     }

@@ -56,7 +56,7 @@ public class Settings {
         Settings s = new Settings();
         s.eu4 = GameInstallation.getInstallPath("Europa Universalis IV").orElse(null);
         s.hoi4 = GameInstallation.getInstallPath("Hearts of Iron IV").orElse(null);
-        s.ck3 = GameInstallation.getInstallPath("Crusader Kings 3").orElse(null);
+        s.ck3 = GameInstallation.getInstallPath("Crusader Kings III").orElse(null);
         s.stellaris = GameInstallation.getInstallPath("Stellaris").orElse(null);
 
         if (s.eu4 != null) {

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +26,11 @@ public class StellarisInstallation extends GameInstallation {
         } else if (SystemUtils.IS_OS_LINUX) {
             executable = getPath().resolve("stellaris");
         }
+    }
+
+    @Override
+    public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
+
     }
 
     @Override

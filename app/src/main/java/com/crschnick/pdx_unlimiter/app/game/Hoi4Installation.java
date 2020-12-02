@@ -1,21 +1,23 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +63,19 @@ public class Hoi4Installation extends GameInstallation {
         loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("00_countries.txt"));
         loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("01_countries.txt"));
         loadCountryColors(getPath().resolve("common").resolve("country_tags").resolve("zz_dynamic_countries.txt"));
+    }
+
+    @Override
+    public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
+        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
+        SimpleDateFormat d = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
+        ObjectNode n = JsonNodeFactory.instance.objectNode()
+                .put("title", name)
+                .put("desc", "")
+                .put("date", d.format(new Date(lastPlayed.toEpochMilli())) + "\n")
+                .put("filename", getSavegamesPath().relativize(path).toString())
+                .put("is_remote", false);
+        JsonHelper.write(n, out);
     }
 
     @Override

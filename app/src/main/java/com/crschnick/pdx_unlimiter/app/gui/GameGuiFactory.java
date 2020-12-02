@@ -28,8 +28,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.DialogHelper.createAlert;
-import static com.crschnick.pdx_unlimiter.app.gui.GameImage.EU4_ICON_VERSION_WARNING;
-import static com.crschnick.pdx_unlimiter.app.gui.GameImage.imageNode;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
@@ -123,8 +121,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             Tooltip.install(version, new Tooltip("Compatible version"));
             version.getStyleClass().add(CLASS_COMPATIBLE);
         } else {
-            version = new Label(entry.getInfo().getVersion().toString(),
-                    imageNode(EU4_ICON_VERSION_WARNING, CLASS_IMAGE_ICON));
+            version = new Label(entry.getInfo().getVersion().toString());
             Tooltip.install(version, new Tooltip("Incompatible savegame version"));
             version.getStyleClass().add(CLASS_INCOMPATIBLE);
         }
@@ -139,20 +136,20 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
                     "Requires the following " + entry.getInfo().getMods().size() + " mods:\n" +
                             entry.getInfo().getMods().stream()
                                     .map(s -> {
-                                        var m = GameInstallation.EU4.getModForName(s);
+                                        var m = installation.getModForName(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
                                     .collect(Collectors.joining("\n"))));
 
             boolean missing = entry.getInfo().getMods().stream()
-                    .map(m -> GameInstallation.EU4.getModForName(m))
+                    .map(m -> installation.getModForName(m))
                     .anyMatch(Optional::isEmpty);
             mods.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
             mods.setAlignment(Pos.CENTER);
             addNode(grid, mods);
         }
 
-        if (entry.getInfo().getMods().size() > 0) {
+        if (entry.getInfo().getDlcs().size() > 0) {
             Label dlcs = new Label("DLCs");
             dlcs.setGraphic(new FontIcon());
             dlcs.getStyleClass().add(CLASS_CONTENT);
@@ -160,12 +157,12 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
                     "Requires the following " + entry.getInfo().getDlcs().size() + " DLCs:\n" +
                             entry.getInfo().getDlcs().stream()
                                     .map(s -> {
-                                        var m = GameInstallation.EU4.getDlcForName(s);
+                                        var m = installation.getDlcForName(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
                                     .collect(Collectors.joining("\n"))));
             boolean missing = entry.getInfo().getDlcs().stream()
-                    .map(m -> GameInstallation.EU4.getDlcForName(m))
+                    .map(m -> installation.getDlcForName(m))
                     .anyMatch(Optional::isEmpty);
             dlcs.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
             dlcs.setAlignment(Pos.CENTER);

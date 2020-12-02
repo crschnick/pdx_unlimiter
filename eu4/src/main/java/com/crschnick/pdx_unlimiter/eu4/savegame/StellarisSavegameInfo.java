@@ -70,10 +70,6 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
         return i;
     }
 
-    public StellarisTag getTag() {
-        return tag;
-    }
-
     public Set<StellarisTag> getAllTags() {
         return allTags;
     }

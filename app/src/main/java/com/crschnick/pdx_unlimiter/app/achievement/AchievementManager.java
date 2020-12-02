@@ -22,6 +22,8 @@ public class AchievementManager {
 
     public static AchievementManager EU4;
     public static AchievementManager HOI4;
+    public static AchievementManager STELLARIS;
+    public static AchievementManager CK3;
 
     private String game;
     private AchievementContent content;
@@ -41,6 +43,14 @@ public class AchievementManager {
         HOI4 = new AchievementManager("hoi4",
                 AchievementContent.HOI4);
         HOI4.loadData();
+
+        STELLARIS = new AchievementManager("stellaris",
+                AchievementContent.HOI4);
+        STELLARIS.loadData();
+
+        CK3 = new AchievementManager("ck3",
+                AchievementContent.HOI4);
+        CK3.loadData();
 
         JsonPathConfiguration.init();
     }

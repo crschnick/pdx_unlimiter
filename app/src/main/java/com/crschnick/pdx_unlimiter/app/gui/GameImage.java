@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
@@ -17,7 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class GameImage {
+
+    public static Image CK3_ICON;
+    public static Image CK3_ICON_IRONMAN;
 
     public static Image STELLARIS_ICON;
     public static Image STELLARIS_ICON_IRONMAN;
@@ -38,6 +41,7 @@ public class GameImage {
     public static Image HOI4_ICON_DIFF_VETERAN;
     public static Image HOI4_ICON_DIFF_ELITE;
     public static Image HOI4_ICON_DIFF_CIVILIAN;
+    public static Image HOI4_BACKGROUND;
 
     public static Image EU4_ICON;
     public static Image EU4_ICON_VASSAL;
@@ -77,6 +81,10 @@ public class GameImage {
 
     private static Path getHoi4TagPath(Hoi4Tag tag) {
         return Path.of("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga");
+    }
+
+    public static Pane ck3TagNode(Ck3Tag tag, String styleClass) {
+        return unknownTag(styleClass);
     }
 
     public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
@@ -181,6 +189,22 @@ public class GameImage {
         loadEu4Images();
         loadHoi4Images();
         loadStellarisImages();
+        loadCk3Images();
+    }
+
+    public static void loadCk3Images() {
+        if (GameInstallation.CK3 == null) {
+            return;
+        }
+
+        Path p = GameInstallation.CK3.getPath().resolve("game");
+        Path i = p.resolve("gfx").resolve("interface").resolve("icons");
+
+        CK3_ICON = ImageLoader.loadImage(
+                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
+
+        CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+
     }
 
     public static void loadStellarisImages() {
@@ -216,6 +240,8 @@ public class GameImage {
         HOI4_ICON_DIFF_VETERAN = ImageLoader.loadImage(i.resolve("difficulty_button_veteran.dds"));
         HOI4_ICON_DIFF_ELITE = ImageLoader.loadImage(i.resolve("difficulty_button_elite.dds"));
         HOI4_ICON_DIFF_CIVILIAN = ImageLoader.loadImage(i.resolve("difficulty_button_civilian.dds"));
+        HOI4_BACKGROUND = ImageLoader.loadImage(
+                GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("app-background.png"));
 
     }
 

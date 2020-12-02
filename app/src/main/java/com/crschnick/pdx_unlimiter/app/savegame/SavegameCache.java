@@ -45,8 +45,9 @@ public abstract class SavegameCache<
     public static final Eu4SavegameCache EU4_CACHE = new Eu4SavegameCache();
     public static final Hoi4SavegameCache HOI4_CACHE = new Hoi4SavegameCache();
     public static final StellarisSavegameCache STELLARIS_CACHE = new StellarisSavegameCache();
+    public static final Ck3SavegameCache CK3_CACHE = new Ck3SavegameCache();
 
-    public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE, STELLARIS_CACHE);
+    public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE, STELLARIS_CACHE, CK3_CACHE);
     private volatile Queue<GameCampaignEntry<T,I>> toLoad = new ConcurrentLinkedQueue<>();
 
     private String fileEnding;
@@ -54,7 +55,7 @@ public abstract class SavegameCache<
     private GameDateType dateType;
     private Path path;
     private volatile ObservableSet<GameCampaign<T,I>> campaigns = FXCollections.synchronizedObservableSet(
-            FXCollections.observableSet(new TreeSet<>(Comparator.comparing(GameCampaign::getDate))));
+            FXCollections.observableSet(new HashSet<>()));
     private volatile Map<GameCampaignEntry<T,I>, S> loadedSavegames = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public SavegameCache(String name, String fileEnding, GameDateType dateType) {
@@ -326,7 +327,8 @@ public abstract class SavegameCache<
     public synchronized GameCampaignEntry<T,I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i, S savegame) {
         GameCampaignEntry<T,I> e = createEntry(entryUuid, checksum, i);
         if (this.getCampaign(campainUuid).isEmpty()) {
-            this.campaigns.add(createNewCampaignForEntry(e));
+            var newCampaign = createNewCampaignForEntry(e);
+            this.campaigns.add(newCampaign);
         }
 
         GameCampaign<T,I> c = this.getCampaign(campainUuid).get();
@@ -562,10 +564,9 @@ public abstract class SavegameCache<
     }
 
     public int indexOf(GameCampaign<T,I> c) {
-        var set = new TreeSet<GameCampaign<T,I>>(
-                Comparator.comparing(ca -> ca.getDate()));
-        set.addAll(getCampaigns());
-        return set.headSet(c).size();
+        var list = new ArrayList<GameCampaign<T,I>>(getCampaigns());
+        list.sort(Comparator.comparing(GameCampaign::getDate));
+        return list.indexOf(c);
     }
 
     public ObservableSet<GameCampaign<T,I> > getCampaigns() {

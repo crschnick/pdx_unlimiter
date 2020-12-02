@@ -22,6 +22,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
@@ -153,7 +154,10 @@ public class PdxuApp extends Application {
             ErrorHandler.handleTerminalException(e);
         }
 
-        Scene scene = new Scene(layout, 1000, 800);
+        //GameImage.loadImages();
+        StackPane stack = new StackPane(GameImage.imageNode(GameImage.HOI4_BACKGROUND), layout);
+
+        Scene scene = new Scene(stack, 1000, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
         GuiStyle.addStylesheets(primaryStage.getScene());

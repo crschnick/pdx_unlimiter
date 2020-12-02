@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class SavegameInfo<T> {
@@ -15,6 +16,7 @@ public class SavegameInfo<T> {
     protected UUID campaignUuid;
     protected GameDate date;
     protected T tag;
+    protected Set<T> allTags;
 
     public List<String> getMods() {
         return mods;
@@ -42,5 +44,9 @@ public class SavegameInfo<T> {
 
     public GameVersion getVersion() {
         return version;
+    }
+
+    public Set<T> getAllTags() {
+        return allTags;
     }
 }

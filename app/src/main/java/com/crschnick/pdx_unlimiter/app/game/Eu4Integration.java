@@ -43,17 +43,4 @@ public class Eu4Integration extends GameIntegration<Eu4Tag, Eu4SavegameInfo> {
     public AchievementManager getAchievementManager() {
         return AchievementManager.EU4;
     }
-
-    @Override
-    protected void writeLaunchConfig(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Path path) throws IOException {
-        var out = Files.newOutputStream(
-                getInstallation().getUserPath().resolve("continue_game.json"));
-        ObjectNode n = JsonNodeFactory.instance.objectNode()
-                .put("title", getSavegameCache().getCampaign(entry).getName())
-                .put("desc", entry.getName())
-                .put("date", getSavegameCache().getCampaign(entry).getLastPlayed().toString())
-                .put("filename", getInstallation().getUserPath().relativize(path).toString()
-                        .replace('\\', '/'));
-        JsonHelper.write(n, out);
-    }
 }

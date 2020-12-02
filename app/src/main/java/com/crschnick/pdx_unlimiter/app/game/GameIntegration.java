@@ -29,6 +29,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     public static Eu4Integration EU4;
     public static Hoi4Integration HOI4;
     public static StellarisIntegration STELLARIS;
+    public static Ck3Integration CK3;
 
     private static SimpleObjectProperty<GameIntegration<?,? extends SavegameInfo>> current = new SimpleObjectProperty<>();
 
@@ -67,6 +68,14 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             ALL.add(STELLARIS);
             if (s.getActiveGame().equals(s.getStellaris())) {
                 current.set(STELLARIS);
+            }
+        }
+
+        if (Settings.getInstance().getCk3().isPresent()) {
+            CK3 = new Ck3Integration();
+            ALL.add(CK3);
+            if (s.getActiveGame().equals(s.getCk3())) {
+                current.set(CK3);
             }
         }
 
@@ -171,7 +180,8 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         Optional<Path> p = exportCampaignEntry();
         if (p.isPresent()) {
             try {
-                writeLaunchConfig(selectedEntry.get(), p.get());
+                getInstallation().writeLaunchConfig(
+                        selectedEntry.get().getName(), selectedCampaign.get().getLastPlayed(), p.get());
             } catch (IOException ioException) {
                 ErrorHandler.handleException(ioException);
                 return;
@@ -180,8 +190,6 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         selectedCampaign.get().lastPlayedProperty().setValue(Instant.now());
         getInstallation().start();
     }
-
-    protected abstract void writeLaunchConfig(GameCampaignEntry<T,I> entry, Path path) throws IOException;
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
         return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();

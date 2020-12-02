@@ -70,6 +70,18 @@ public abstract class Node {
         return (int) ((ValueNode) node).getValue();
     }
 
+    public static long getLong(Node node) {
+        if (!(node instanceof ValueNode)) {
+            throw new NodeFormatException("Not a value node:\n" + node.toString());
+        }
+
+        if (((ValueNode) node).getValue() instanceof Long) {
+            long v = (long) ((ValueNode) node).getValue();
+            return v;
+        }
+        throw new NodeFormatException("Cannot cast to int");
+    }
+
     public static double getDouble(Node node) {
         if (!(node instanceof ValueNode)) {
             throw new NodeFormatException("Not a value node:\n" + node.toString());

@@ -30,11 +30,6 @@ public class StellarisIntegration extends GameIntegration<StellarisTag, Stellari
     }
 
     @Override
-    protected void writeLaunchConfig(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, Path path) throws IOException {
-
-    }
-
-    @Override
     public GameGuiFactory<StellarisTag, StellarisSavegameInfo> getGuiFactory() {
         return new StellarisGuiFactory();
     }

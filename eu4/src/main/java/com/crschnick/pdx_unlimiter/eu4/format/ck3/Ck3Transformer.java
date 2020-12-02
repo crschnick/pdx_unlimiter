@@ -46,6 +46,7 @@ public class Ck3Transformer {
         List<NodeTransformer> t = new ArrayList<>();
         t.add(DateTransformer.recursive(DateTransformer.CK3, Ck3Transformer::isDateEntry));
         t.add(BooleanTransformer.recursive());
+        t.add(new DefaultValueTransformer("mods", new ArrayNode()));
         return new ChainTransformer(t);
     }
 }

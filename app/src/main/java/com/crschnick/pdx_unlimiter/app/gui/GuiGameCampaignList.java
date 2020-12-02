@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -29,8 +30,8 @@ public class GuiGameCampaignList {
         SetChangeListener<GameCampaign> l = (c) -> {
             Platform.runLater(() -> {
                 if (c.wasAdded()) {
-                    int index = new TreeSet<GameCampaign>(c.getSet()).headSet(c.getElementAdded()).size();
-                    grid.getItems().add(index, GuiGameCampaign.createCampaignButton(c.getElementAdded()));
+                    //TODO
+                    grid.getItems().add(0, GuiGameCampaign.createCampaignButton(c.getElementAdded()));
                 } else {
                     grid.getItems().remove(grid.getItems().stream()
                             .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get());

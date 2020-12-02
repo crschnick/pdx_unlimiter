@@ -1,15 +1,19 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +31,17 @@ public class Eu4Installation extends GameInstallation {
         } else if (SystemUtils.IS_OS_LINUX) {
             executable = getPath().resolve("eu4");
         }
+    }
+
+    @Override
+    public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
+        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
+        ObjectNode n = JsonNodeFactory.instance.objectNode()
+                .put("title", name)
+                .put("desc", "")
+                .put("date", lastPlayed.toString())
+                .put("filename", getUserPath().relativize(path).toString().replace('\\', '/'));
+        JsonHelper.write(n, out);
     }
 
     public Path getExecutable() {

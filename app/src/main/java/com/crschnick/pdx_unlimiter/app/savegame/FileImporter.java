@@ -58,13 +58,7 @@ public class FileImporter {
 
             @Override
             public void visitCk3(Path file) {
-                try {
-                    var s = Ck3RawSavegame.fromFile(file);
-                    var ss = Ck3Savegame.fromSavegame(s);
-                    ss.write(Path.of("C:\\Users\\cschn\\Desktop\\pdx_test\\ck3.zip"), true);
-      } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                SavegameCache.CK3_CACHE.importSavegame(file);
             }
 
             @Override
