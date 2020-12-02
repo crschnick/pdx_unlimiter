@@ -10,6 +10,9 @@
 
 .campaign-list {
 -fx-min-width: 20em;
+ -fx-padding: 0;
+-fx-background-insets: 0;
+-fx-background-radius: 0;
 -fx-focus-color: transparent;
 }
 

@@ -10,6 +10,7 @@ import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
@@ -29,9 +30,11 @@ public class GameImage {
 
     public static Image CK3_ICON;
     public static Image CK3_ICON_IRONMAN;
+    public static Image CK3_BACKGROUND;
 
     public static Image STELLARIS_ICON;
     public static Image STELLARIS_ICON_IRONMAN;
+    public static Image STELLARIS_BACKGROUND;
 
     public static Image HOI4_ICON;
     public static Image HOI4_ICON_IRONMAN;
@@ -62,6 +65,7 @@ public class GameImage {
     public static Image EU4_ICON_ADM;
     public static Image EU4_ICON_DIP;
     public static Image EU4_ICON_MIL;
+    public static Image EU4_BACKGROUND;
 
     private static Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
 
@@ -185,6 +189,45 @@ public class GameImage {
         return pane;
     }
 
+    public static Pane backgroundNode(Image i) {
+        ImageView v = new ImageView(i);
+        Pane pane = new Pane(v);
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        double imageAspect = i.getWidth() / i.getHeight();
+        ChangeListener<? extends Number> cl = (c, o, n) -> {
+            double w = (double) n;
+            double h = w / imageAspect;
+            double paneAspect = pane.getWidth() / pane.getHeight();
+
+            double relViewportWidth = 0;
+            double relViewportHeight = 0;
+
+            // Pane width too big for image
+            if (paneAspect > imageAspect) {
+                relViewportWidth = 1;
+                double newImageHeight = pane.getWidth() / imageAspect;
+                relViewportHeight = Math.min(1, pane.getHeight() / newImageHeight);
+            }
+
+            // Height too big
+            else {
+                relViewportHeight = 1;
+                double newImageWidth = pane.getHeight() * imageAspect;
+                relViewportWidth = Math.min(1, pane.getWidth() / newImageWidth);
+            }
+
+            v.setViewport(new Rectangle2D(
+                    ((1 - relViewportWidth) / 2.0) * i.getWidth(),
+                    ((1 - relViewportHeight) / 2.0) * i.getHeight(),
+                    i.getWidth() * relViewportWidth,
+                    i.getHeight() * relViewportHeight));
+        };
+        pane.widthProperty().addListener((ChangeListener<? super Number>) cl);
+        pane.heightProperty().addListener((ChangeListener<? super Number>) cl);
+        return pane;
+    }
+
     public static void loadImages() {
         loadEu4Images();
         loadHoi4Images();
@@ -205,6 +248,9 @@ public class GameImage {
 
         CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
 
+        CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.CK3.getPath()
+                .resolve("launcher").resolve("launcher-assets").resolve("app-background.png"));
+
     }
 
     public static void loadStellarisImages() {
@@ -219,6 +265,8 @@ public class GameImage {
                 GameInstallation.STELLARIS.getPath().resolve("gfx").resolve("exe_icon.bmp"));
 
         STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+        STELLARIS_BACKGROUND = ImageLoader.loadImage(
+                GameInstallation.STELLARIS.getPath().resolve("launcher-assets").resolve("app-background.png"));
 
     }
 
@@ -308,5 +356,8 @@ public class GameImage {
         EU4_ICON_RELEASED_VASSAL = ImageLoader.loadImage(
                 i.resolve("release_nation_icon.dds"));
         VIEWPORTS.put(EU4_ICON_RELEASED_VASSAL, new Rectangle2D(37, 0, 36, 30));
+
+        EU4_BACKGROUND = ImageLoader.loadImage(
+                GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("app-background.png"));
     }
 }

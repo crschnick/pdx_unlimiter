@@ -63,6 +63,7 @@ public class PdxuApp extends Application {
         GuiStatusBar.createStatusBar(p);
         layout.setCenter(GuiGameCampaignEntryList.createCampaignEntryList());
         layout.setLeft(GuiGameCampaignList.createCampaignList());
+        layout.setOpacity(0.7);
 
 
         layout.setOnDragOver(event -> {
@@ -154,8 +155,12 @@ public class PdxuApp extends Application {
             ErrorHandler.handleTerminalException(e);
         }
 
-        //GameImage.loadImages();
-        StackPane stack = new StackPane(GameImage.imageNode(GameImage.HOI4_BACKGROUND), layout);
+        StackPane stack = new StackPane(GameImage.backgroundNode(GameImage.HOI4_BACKGROUND), layout);
+        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
+            if (n != null) {
+                stack.getChildren().set(0, GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND));
+            }
+        });
 
         Scene scene = new Scene(stack, 1000, 800);
         primaryStage.setScene(scene);

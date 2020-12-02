@@ -1,5 +1,3 @@
-
-
 .entry {
 -fx-background-color: #77777711;
 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
@@ -34,7 +32,9 @@
 }
 
 .entry-list {
--fx-focus-color: transparent;
+ -fx-padding: 0;
+-fx-background-insets: 0;
+-fx-background-radius: 0;
 }
 
 .entry-loading {

@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -25,6 +26,8 @@ public class GuiGameCampaignList {
 
     public static Node createCampaignList() {
         JFXListView<Node> grid = new JFXListView<Node>();
+        grid.setExpanded(true);
+        grid.setBorder(Border.EMPTY);
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
         SetChangeListener<GameCampaign> l = (c) -> {
