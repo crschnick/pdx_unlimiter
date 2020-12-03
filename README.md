@@ -28,7 +28,7 @@ i.e. to savescum, which is kinda necessary for hard achievements.
 Every imported save game is parsed and converted into a more readable and usable json format internally.
 This allows for operations on these savegames such as custom achievement creation and validation.
 If you are interested in creating and sharing your own achievements,
-visit [https://github.com/crschnick/pdxu_achievements]() for a documentation.
+visit [the achievement repository](https://github.com/crschnick/pdxu_achievements) for a documentation.
 
 ![Example](docs/achievements.png)
 
