@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.jfoenix.controls.JFXSlider;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -156,6 +157,23 @@ public class GuiSettings {
         return dialogPaneContent;
     }
 
+    private static Node fontSize(Settings s) {
+        HBox dialogPaneContent = new HBox();
+
+        Label label = new Label("Font size: ");
+
+        JFXSlider slider = new JFXSlider(10, 24, s.getFontSize());
+        slider.valueProperty().addListener((c,o,n) -> {
+            s.setFontSize(n.intValue());
+        });
+        HBox hbox = new HBox(label,slider);
+        HBox.setHgrow(slider, Priority.ALWAYS);
+        hbox.setAlignment(Pos.CENTER);
+        dialogPaneContent.getChildren().add(hbox);
+        hbox.prefWidthProperty().bind(dialogPaneContent.widthProperty());
+        return dialogPaneContent;
+    }
+
     public static void showSettings(boolean noInstalls) {
         Alert alert = DialogHelper.createAlert();
         alert.getButtonTypes().add(ButtonType.APPLY);
@@ -166,7 +184,12 @@ public class GuiSettings {
         alert.getDialogPane().setMinWidth(600);
 
         Settings s = Settings.getInstance().copy();
-        VBox vbox = new VBox(eu4InstallLocationNode(s), hoi4InstallLocationNode(s), ck3InstallLocationNode(s), stellarisInstallLocationNode(s));
+        VBox vbox = new VBox(
+                eu4InstallLocationNode(s),
+                hoi4InstallLocationNode(s),
+                ck3InstallLocationNode(s),
+                stellarisInstallLocationNode(s),
+                fontSize(s));
         vbox.setSpacing(10);
         alert.getDialogPane().setContent(vbox);
 

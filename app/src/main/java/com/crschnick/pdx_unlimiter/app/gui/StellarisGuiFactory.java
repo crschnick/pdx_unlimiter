@@ -18,6 +18,10 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
@@ -26,6 +30,23 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
 
     public StellarisGuiFactory() {
         super(GameInstallation.STELLARIS);
+    }
+
+    @Override
+    public Font font() throws IOException {
+        return Font.loadFont(
+                Files.newInputStream(GameInstallation.STELLARIS.getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+
+    }
+
+    @Override
+    public Pane background() {
+        return GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
+    }
+
+    @Override
+    public double foregroundOpacity() {
+        return 0.8;
     }
 
     @Override

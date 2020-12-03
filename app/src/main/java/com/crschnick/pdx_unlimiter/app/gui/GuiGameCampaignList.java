@@ -26,7 +26,6 @@ public class GuiGameCampaignList {
 
     public static Node createCampaignList() {
         JFXListView<Node> grid = new JFXListView<Node>();
-        grid.setExpanded(true);
         grid.setBorder(Border.EMPTY);
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 

@@ -98,12 +98,14 @@ public abstract class GameInstallation {
     }
 
     public void initOptional() throws Exception {
+        LoggerFactory.getLogger(getClass()).debug("Initializing optional data");
         loadDlcs();
         loadMods();
         savegames.set(getLatestSavegames());
         WatcherHelper.startWatcherInDirectory("Savegame watcher", getSavegamesPath(), p -> {
             savegames.set(getLatestSavegames());
         }, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+        LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
     public static Optional<Path> getInstallPath(String app) {

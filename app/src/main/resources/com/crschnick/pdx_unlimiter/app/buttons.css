@@ -1,20 +1,21 @@
 .open-button .ikonli-font-icon {
-                 -fx-icon-code: "mdi-content-save";
-                 -fx-icon-color: white;
-             }
+ -fx-icon-code: "mdi-content-save";
+}
 
 .content .ikonli-font-icon {
  -fx-icon-code: "mdi-folder-multiple-outline";
 }
 
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-inner-color;
+}
+
 .delete-button .ikonli-font-icon {
     -fx-icon-code: "mdi-delete";
-    -fx-icon-color: white;
 }
 
 .achievement-button .ikonli-font-icon {
     -fx-icon-code: "mdi-trophy";
-    -fx-icon-color: white;
 }
 
 .kill-button .ikonli-font-icon {

@@ -249,7 +249,7 @@ public class GameImage {
         CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
 
         CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.CK3.getPath()
-                .resolve("launcher").resolve("launcher-assets").resolve("app-background.png"));
+                .resolve("launcher").resolve("assets").resolve("app-background.png"));
 
     }
 

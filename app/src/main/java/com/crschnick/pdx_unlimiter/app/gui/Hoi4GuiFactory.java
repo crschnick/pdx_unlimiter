@@ -19,6 +19,10 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
@@ -32,6 +36,22 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     private static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
         return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
+    }
+
+    @Override
+    public Font font() throws IOException {
+        return Font.loadFont(
+                Files.newInputStream(GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+    }
+
+    @Override
+    public Pane background() {
+        return GameImage.backgroundNode(GameImage.HOI4_BACKGROUND);
+    }
+
+    @Override
+    public double foregroundOpacity() {
+        return 0.9;
     }
 
     @Override

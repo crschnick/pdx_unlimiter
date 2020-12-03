@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
@@ -37,7 +38,7 @@ public class PdxuApp extends Application {
 
     private static PdxuApp APP;
     private Image icon;
-    private BorderPane layout = new BorderPane();
+    private Pane layout;
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
     public static PdxuApp getApp() {
@@ -54,32 +55,6 @@ public class PdxuApp extends Application {
 
     public Scene getScene() {
         return layout.getScene();
-    }
-
-    private void createLayout() {
-        layout.setTop(GuiMenuBar.createMenu());
-        Pane p = new Pane();
-        layout.setBottom(p);
-        GuiStatusBar.createStatusBar(p);
-        layout.setCenter(GuiGameCampaignEntryList.createCampaignEntryList());
-        layout.setLeft(GuiGameCampaignList.createCampaignList());
-        layout.setOpacity(0.7);
-
-
-        layout.setOnDragOver(event -> {
-            if (event.getGestureSource() != layout
-                    && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
-        });
-
-        layout.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
-            FileImporter.addToImportQueue(db.getFiles().stream().map(File::toPath).collect(Collectors.toList()));
-            event.setDropCompleted(true);
-            event.consume();
-        });
     }
 
     public void close() {
@@ -108,6 +83,10 @@ public class PdxuApp extends Application {
 
     private void postWindowSetup() throws Exception {
         Settings.init();
+
+        GameImage.loadImages();
+        layout = GuiLayout.createLayout();
+
         if (!GameIntegration.init()) {
             GuiSettings.showSettings(true);
         }
@@ -119,8 +98,6 @@ public class PdxuApp extends Application {
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
             GlobalScreen.registerNativeHook();
         }
-
-        GameImage.loadImages();
     }
 
     @Override
@@ -146,8 +123,6 @@ public class PdxuApp extends Application {
         }
 
         primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
-        layout.styleProperty().setValue("-fx-font-size: 12pt; -fx-text-fill: white;");
-        createLayout();
 
         try {
             postWindowSetup();
@@ -155,14 +130,7 @@ public class PdxuApp extends Application {
             ErrorHandler.handleTerminalException(e);
         }
 
-        StackPane stack = new StackPane(GameImage.backgroundNode(GameImage.HOI4_BACKGROUND), layout);
-        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
-            if (n != null) {
-                stack.getChildren().set(0, GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND));
-            }
-        });
-
-        Scene scene = new Scene(stack, 1000, 800);
+        Scene scene = new Scene(layout, 1000, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
         GuiStyle.addStylesheets(primaryStage.getScene());

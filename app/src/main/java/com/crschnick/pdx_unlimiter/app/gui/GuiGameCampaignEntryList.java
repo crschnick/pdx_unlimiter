@@ -18,6 +18,7 @@ public class GuiGameCampaignEntryList {
 
     public static Node createCampaignEntryList() {
         JFXListView<Node> grid = new JFXListView<>();
+        grid.setOpacity(0.9);
         grid.getStyleClass().add(CLASS_ENTRY_LIST);
 
         SetChangeListener<GameCampaignEntry> l = (c) -> {

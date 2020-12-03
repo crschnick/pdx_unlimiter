@@ -20,9 +20,11 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,6 +85,12 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         alert.setHeaderText(builder.toString());
         return alert.showAndWait().orElse(ButtonType.CLOSE).equals(launch);
     }
+
+    public abstract Font font() throws IOException;
+
+    public abstract Pane background();
+
+    public abstract double foregroundOpacity();
 
     public abstract Pane createIcon();
 

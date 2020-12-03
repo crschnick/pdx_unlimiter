@@ -1,6 +1,25 @@
 .entry {
--fx-background-color: #77777711;
--fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+-fx-background-color: #AAAAAA55;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 0);
+}
+
+.jfx-list-cell {
+ -fx-padding: 0.4em 0.4em 0 0.4em;
+}
+
+.jfx-list-cell:selected .label {
+ -fx-text-fill: white;
+ -fx-text-inner-color: white;
+}
+
+.jfx-list-cell:selected {
+ -fx-text-fill: white;
+ -fx-text-inner-color: white;
+}
+
+.jfx-list-cell {
+ -fx-text-fill: #333;
+ -fx-text-inner-color: #333;
 }
 
 .entry-bar {
@@ -13,14 +32,12 @@
 }
 
 .unknown-tag {
- -fx-text-fill: white;
 -fx-font-size: 1.5em;
 }
 
 .entry-bar .text-field {
 -fx-max-width: 20em;
 -fx-font-size: 1.15em;
- -fx-text-fill: white;
  -jfx-label-float: true;
 -fx-padding: 0.4em 0.4em 0.4em 0.4em;
 -jfx-unfocus-color: #00000000;
@@ -32,6 +49,7 @@
 }
 
 .entry-list {
+-fx-background-color: #FFFFFFBB;
  -fx-padding: 0;
 -fx-background-insets: 0;
 -fx-background-radius: 0;
@@ -51,7 +69,6 @@
 .entry-bar .date {
 -fx-font-size: 1.15em;
 -fx-padding: 0.3em 0.3em 0.3em 0.3em;
- -fx-text-fill: white;
 -fx-background-radius: 0.15em;
 }
 
@@ -59,7 +76,6 @@
 -fx-background-color: #777777;
 -fx-padding: 0.4em;
 -fx-background-radius: 0.2em;
- -fx-text-fill: white;
 }
 
 .ruler-icon{

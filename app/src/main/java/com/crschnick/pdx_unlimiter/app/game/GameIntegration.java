@@ -152,6 +152,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         current().selectCampaign(null);
         current.set(newInt);
         Settings.getInstance().updateActiveGame(current().getInstallation().getPath());
+        LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " + (newInt != null ? newInt.getName() : "null"));
     }
 
     public abstract String getName();

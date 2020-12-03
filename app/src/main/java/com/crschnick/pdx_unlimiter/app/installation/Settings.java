@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ public class Settings {
     private Path stellaris;
     private Path activeGame;
     private int maxLoadedSavegames = 5;
+    private int fontSize = 12;
     private boolean deleteOnImport = false;
 
     public static void init() throws Exception {
@@ -58,6 +60,7 @@ public class Settings {
         s.hoi4 = GameInstallation.getInstallPath("Hearts of Iron IV").orElse(null);
         s.ck3 = GameInstallation.getInstallPath("Crusader Kings III").orElse(null);
         s.stellaris = GameInstallation.getInstallPath("Stellaris").orElse(null);
+        s.fontSize = 12;
 
         if (s.eu4 != null) {
             s.activeGame = s.eu4;
@@ -82,6 +85,7 @@ public class Settings {
         s.ck3 = Optional.ofNullable(i.get("ck3")).map(n -> Paths.get(n.textValue())).orElse(s.ck3);
         s.stellaris = Optional.ofNullable(i.get("stellaris")).map(n -> Paths.get(n.textValue())).orElse(s.stellaris);
         s.activeGame = Optional.ofNullable(i.get("activeGame")).map(n -> Paths.get(n.textValue())).orElse(s.activeGame);
+        //s.fontSize = i.required("fontSize").intValue();
         return s;
     }
 
@@ -108,6 +112,8 @@ public class Settings {
             i.set("activeGame", new TextNode(s.activeGame.toString()));
         }
 
+        i.put("fontSize", s.fontSize);
+
         JsonHelper.write(n, Files.newOutputStream(file));
     }
 
@@ -118,6 +124,7 @@ public class Settings {
         c.ck3 = ck3;
         c.stellaris = stellaris;
         c.activeGame = activeGame;
+        c.fontSize = fontSize;
         return c;
     }
 
@@ -155,6 +162,14 @@ public class Settings {
 
     public Optional<Path> getActiveGame() {
         return Optional.ofNullable(activeGame);
+    }
+
+    public int getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(int fontSize) {
+        this.fontSize = fontSize;
     }
 
     public void updateActiveGame(Path activeGame) {
@@ -204,6 +219,7 @@ public class Settings {
             ErrorHandler.handleTerminalException(e);
         }
         GameIntegration.reload();
+        GuiLayout.setFontSize(fontSize);
     }
 
     public boolean deleteOnImport() {

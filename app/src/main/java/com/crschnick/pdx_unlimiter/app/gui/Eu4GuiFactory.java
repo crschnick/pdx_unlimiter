@@ -15,12 +15,16 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.tools.Tool;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,6 +111,26 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.setSpacing(6);
         Tooltip.install(box, new Tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none)));
         addNode(pane, box);
+    }
+
+    @Override
+    public Font font() throws IOException {
+        return Font.loadFont(
+                Files.newInputStream(GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+    }
+
+    @Override
+    public Pane background() {
+        var bg = GameImage.backgroundNode(EU4_BACKGROUND);
+        ColorAdjust desaturate = new ColorAdjust();
+        desaturate.setSaturation(0);
+        bg.setEffect(desaturate);
+        return bg;
+    }
+
+    @Override
+    public double foregroundOpacity() {
+        return 0.0;
     }
 
     @Override

@@ -9,6 +9,7 @@
 
 
 .campaign-list {
+-fx-background-color: #FFFFFFDD;
 -fx-min-width: 20em;
  -fx-padding: 0;
 -fx-background-insets: 0;
@@ -24,21 +25,18 @@
 
 .campaign-list-entry .text-field {
 -fx-font-size: 1.15em;
- -fx-text-fill: white;
 -fx-padding: 0.3em 0.3em 0.3em 0.3em;
--jfx-unfocus-color: #00000000;
+-jfx-unfocus-color: transparent;
 }
 
 .campaign-list-entry .date {
 -fx-padding: 0.3em 0.3em 0.3em 0.3em;
 -fx-font-size: 1.15em;
- -fx-text-fill: white;
 }
 
 .campaign-list-entry {
- -fx-text-fill: white;
 -fx-padding: 0.25em;
 -fx-max-width: 18em;
--fx-background-color: #77777733;
+-fx-background-color: #77777722;
 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
