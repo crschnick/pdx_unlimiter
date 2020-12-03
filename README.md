@@ -1,25 +1,6 @@
 # Pdx-Unlimiter
 
 
-## Installation
-
-#### Windows
-
-TODO
-
-Note that there might be some issues with Windows SmartScreen blocking the installer.
-If you are facing these issues, click on "More info" and then "Run anyway".
-
-#### Linux
-
-TODO
-
-#### Mac
-
-TODO
-
-
-
 ## Features
 
 ### Savegame management for Paradox games
@@ -31,7 +12,7 @@ a campaign.
 This works for both Ironman and Non-Ironman savegames.
 All savegames can be also launched directly from within the Pdx-Unlimiter without needing to vist the main menu.
 
-Supported games: EU4, HOI4, Stellaris (soon), CK3 (soon)
+Supported games: EU4, HOI4, Stellaris, CK3
 
 ![Example](docs/screenshot.png)
 
@@ -51,18 +32,16 @@ visit [https://github.com/crschnick/pdxu_achievements]() for a documentation.
 
 ![Example](docs/achievements.png)
 
+### Full Mod support
+
+Savegames that use mods are also fully supported.
+This includes displaying modded country information in the savegame manager and mod installation support.
+When you launch a savegame from within the Pdx-Unlimiter, exactly the required mods and DLCs are automatically
+enabled without having to use Paradox launcher configuration.
+It is also checked whether a mod is missing or incompatible with the current version, so that nothing can potentially corrupt your savegames.
+
+
 ## Planned features
-
-
-### Loading time improvements
-
-When using the EU4 Unlimiter for savegame management, you can also enable a feature which automatically removes all unnecessary
-data from a savegame file.
-This includes country histories, province histories, war histories and economic statistics of the ledger and should only be done
-if you are not interested in these kinds of data.
-This speeds up the loading time for an eu4 savegame.
-
-Status: Planned
 
 ### Gameplay assistance
 
