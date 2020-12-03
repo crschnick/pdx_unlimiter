@@ -122,9 +122,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(EU4_BACKGROUND);
-        ColorAdjust desaturate = new ColorAdjust();
-        desaturate.setSaturation(0);
-        bg.setEffect(desaturate);
         return bg;
     }
 
