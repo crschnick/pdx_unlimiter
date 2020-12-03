@@ -172,6 +172,16 @@ hours = Node.getInteger(Node.getNodeForKey(node, "hour"));
         return new GameDate(hasHours() ? hour + 1 : 0, day, m, year, this);
     }
 
+    public boolean isDate(String s) {
+        if (hasHours() && Pattern.matches("-?\\d+\\.\\d+\\.\\d+\\.\\d+", s)) {
+            return true;
+        } else if (!hasHours() && Pattern.matches("-?\\d+\\.\\d+\\.\\d+", s)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public GameDate fromString(String s) {
         if (hasHours() && Pattern.matches("-?\\d+\\.\\d+\\.\\d+\\.\\d+", s)) {
             String[] split = s.split("\\.");
