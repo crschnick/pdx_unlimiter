@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.eu4.format;
 
 import java.io.*;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -8,11 +9,11 @@ import java.util.regex.Pattern;
 public abstract class Namespace {
 
     public static final Namespace EMPTY = new EmptyNamespace();
+    public static final Namespace CK3 = new FileNamespace("ck3.txt");
     public static final Namespace EU4_GAMESTATE = new FileNamespace("eu4_gamestate.txt");
     public static final Namespace EU4_AI = new FileNamespace("eu4_ai.txt");
     public static final Namespace EU4_META = new FileNamespace("eu4_meta.txt");
     public static final Namespace HOI4 = new FileNamespace("hoi4.txt");
-    public static final Namespace CK3 = new FileNamespace("ck3.txt");
 
     public abstract String getKeyName(String id);
 
@@ -45,7 +46,7 @@ public abstract class Namespace {
             InputStream in = Namespace.class.getResourceAsStream(fileName);
             String strLine = "";
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(Base64.getDecoder().wrap(in)));
                 while ((strLine = reader.readLine()) != null) {
                     if (strLine.isEmpty()) {
                         continue;
@@ -61,10 +62,8 @@ public abstract class Namespace {
                     }
 
                 }
-            } catch (FileNotFoundException e) {
-                System.err.println("Unable to find the file: fileName");
             } catch (IOException e) {
-                System.err.println("Unable to read the file: fileName");
+                e.printStackTrace();
             }
         }
 
