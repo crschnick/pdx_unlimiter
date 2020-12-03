@@ -37,6 +37,5 @@
 .campaign-list-entry {
 -fx-padding: 0.25em;
 -fx-max-width: 18em;
--fx-background-color: #77777722;
--fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+-fx-background-color: #cccccc22;
 }
