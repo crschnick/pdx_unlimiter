@@ -62,9 +62,10 @@ The current focus primarily lies on perfecting already existing features.
 
 ## Building and running
 
-You can build the project with `gradle build`.
-To create jlink images and installers, use `gradle createDist`.
-For running, you can use `gradle run`.
+To build this project, [OpenJDK 15](https://openjdk.java.net/) is required.
+You can build the project with `gradlew build` or `gradlew.bat build`.
+To create jlink images and installers, use `gradlew createDist`.
+For running, you can use `gradlew run`.
 To correctly run the Pdx-Unlimiter in a development environment, you need to set the property `installDir=<installation directory>`
 in the `pdxu.properties` file. This is needed for a dev build to simulate the program operating
 in a real installation directory and not in the build directory.
