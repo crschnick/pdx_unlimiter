@@ -46,7 +46,9 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     @Override
     public Pane background() {
-        return GameImage.backgroundNode(GameImage.HOI4_BACKGROUND);
+        var bg = GameImage.backgroundNode(GameImage.HOI4_BACKGROUND);
+        bg.setOpacity(0.4);
+        return bg;
     }
 
     @Override

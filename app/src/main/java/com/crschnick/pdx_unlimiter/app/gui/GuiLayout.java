@@ -4,7 +4,13 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.jfoenix.controls.JFXSpinner;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -23,16 +29,15 @@ public class GuiLayout {
         layout = new BorderPane();
         var menu = GuiMenuBar.createMenu();
         layout.setTop(menu);
-        Pane p = new Pane();
-        layout.setBottom(p);
-        GuiStatusBar.createStatusBar(p);
+        layout.setBottom(GuiStatusBar.createStatusBar());
 
-        var entryList = GuiGameCampaignEntryList.createCampaignEntryList();
-        layout.setCenter(entryList);
+        Pane pane = new Pane(new Label());
+        layout.setCenter(pane);
+        GuiGameCampaignEntryList.createCampaignEntryList(pane);
+        layout.setCenter(pane);
 
-        var campaignList = GuiGameCampaignList.createCampaignList();
-        layout.setLeft(campaignList);
-
+        layout.setLeft(GuiGameCampaignList.createCampaignList());
+        BorderPane.setAlignment(pane, Pos.CENTER);
 
         layout.setOnDragOver(event -> {
             if (event.getGestureSource() != layout
@@ -50,7 +55,17 @@ public class GuiLayout {
         });
         setFontSize(Settings.getInstance().getFontSize());
 
-        StackPane stack = new StackPane(new Pane(), layout);
+        JFXSpinner loading = new JFXSpinner();
+        Pane loadingBg = new StackPane(loading);
+        loadingBg.getStyleClass().add(GuiStyle.CLASS_LOADING);
+        loadingBg.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
+            return SavegameCache.CACHES.stream().anyMatch(c -> c.loadingProperty().get());
+        }, SavegameCache.CACHES.stream().map(SavegameCache::loadingProperty).toArray(BooleanProperty[]::new)));
+        loadingBg.setMinWidth(Pane.USE_COMPUTED_SIZE);
+        loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
+
+        StackPane stack = new StackPane(new Pane(), layout, loadingBg);
+
         GameIntegration.currentGameProperty().addListener((c, o, n) -> {
             if (n != null) {
                 stack.getChildren().set(0, n.getGuiFactory().background());
@@ -62,6 +77,7 @@ public class GuiLayout {
                 }
             }
         });
+
         return stack;
     }
 

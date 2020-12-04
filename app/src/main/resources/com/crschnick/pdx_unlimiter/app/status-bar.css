@@ -11,8 +11,8 @@
 -fx-background-color: #99445599;
 }
 
-.status-stopped {
--fx-background-color: #77445599;
+.status-import {
+-fx-background-color: #eeeeeeee;
 }
 
 .status-running {

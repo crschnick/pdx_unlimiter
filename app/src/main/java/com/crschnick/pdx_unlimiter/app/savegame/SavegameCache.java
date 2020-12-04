@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -51,6 +53,7 @@ public abstract class SavegameCache<
     public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE, STELLARIS_CACHE, CK3_CACHE);
     private volatile Queue<GameCampaignEntry<T,I>> toLoad = new ConcurrentLinkedQueue<>();
 
+    private BooleanProperty loading = new SimpleBooleanProperty(false);
     private String fileEnding;
     private String name;
     private GameDateType dateType;
@@ -65,6 +68,10 @@ public abstract class SavegameCache<
         this.dateType = dateType;
         this.path = PdxuInstallation.getInstance().getSavegameLocation().resolve(name);
         addChangeListeners();
+    }
+
+    public BooleanProperty loadingProperty() {
+        return loading;
     }
 
     public static void loadData() throws IOException {
@@ -494,12 +501,15 @@ public abstract class SavegameCache<
     }
 
     public synchronized boolean importSavegame(Path file) {
+        loading.setValue(true);
         try {
             importSavegameData(file);
             saveData();
+            loading.setValue(false);
             return true;
         } catch (Exception e) {
             ErrorHandler.handleException(e);
+            loading.setValue(false);
             return false;
         }
     }
@@ -519,15 +529,22 @@ public abstract class SavegameCache<
 
         UUID uuid = info.getCampaignUuid();
 
-        AtomicBoolean exists = new AtomicBoolean(false);
+        final Optional<GameCampaignEntry<T, I>>[] exists = new Optional[]{Optional.empty()};
         getCampaigns().stream()
                 .filter(c -> c.getCampaignId().equals(uuid))
-                .findAny().ifPresent(c -> exists.set(c.getEntries().stream()
-                .map(GameCampaignEntry::getChecksum).anyMatch(ch -> ch.equals(rawSavegame.getFileChecksum()))));
-        if (exists.get()) {
+                .findAny().ifPresent(c -> {
+                    exists[0] = (c.getEntries().stream()
+                            .filter(ch -> ch.getChecksum().equals(rawSavegame.getFileChecksum())))
+                            .findAny();
+        });
+        if (exists[0].isPresent()) {
             if (Settings.getInstance().deleteOnImport()) {
                 FileUtils.forceDelete(file.toFile());
             }
+
+            loadEntry(exists[0].get());
+            GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
+            GameIntegration.<T,I>current().selectEntry(exists[0].get());
             return;
         }
 

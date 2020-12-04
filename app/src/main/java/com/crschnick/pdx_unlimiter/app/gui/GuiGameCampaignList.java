@@ -11,10 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -66,35 +63,14 @@ public class GuiGameCampaignList {
         });
 
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
-            if (n != null) {
-                int index = GameIntegration.current().getSavegameCache().indexOf(n);
+            Platform.runLater(() -> {
                 grid.getSelectionModel().clearSelection();
-                grid.getSelectionModel().select(index);
-                grid.getFocusModel().focus(index);
-            } else {
-                grid.getSelectionModel().clearSelection();
-                grid.getFocusModel().focus(-1);
-            }
+                if (n != null) {
+                    int index = GameIntegration.current().getSavegameCache().indexOf(n);
+                    grid.getSelectionModel().select(index);
+                }
+            });
         });
-
         return grid;
-    }
-
-    public static Node createNoCampaignNode() {
-        Label text = new Label("Welcome to the Pdx-Unlimiter!" +
-                " To get started, import your latest EU4 savegame.");
-        StackPane textPane = new StackPane(text);
-        StackPane.setAlignment(textPane, Pos.CENTER);
-
-        Button b = new Button("Import latest EU4 savegame");
-        b.setOnMouseClicked(e -> {
-            FileImporter.importLatestSavegame();
-        });
-        StackPane p = new StackPane();
-        p.getChildren().add(b);
-        StackPane.setAlignment(b, Pos.CENTER);
-        VBox v = new VBox(textPane, new Label(), p);
-        v.setAlignment(Pos.CENTER);
-        return v;
     }
 }

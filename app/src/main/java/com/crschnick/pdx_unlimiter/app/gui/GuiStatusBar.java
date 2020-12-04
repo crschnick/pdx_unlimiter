@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -21,9 +22,15 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiStatusBar {
 
-    public static void createStatusBar(Pane layout) {
+    private static StatusBar bar;
 
-        StatusBar bar = new StatusBar(layout);
+    public static StatusBar getStatusBar() {
+        return bar;
+    }
+
+    public static Pane createStatusBar() {
+        Pane pane = new Pane();
+        bar = new StatusBar(pane);
         GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 if (n != null) {
@@ -38,31 +45,70 @@ public class GuiStatusBar {
             if (n != null) {
                 bar.setRunning();
             } else {
-                bar.stop();
+                bar.showImport();
             }
         });
+
+        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
+            if (n != null) {
+                bar.showImport();
+            } else {
+                bar.hide();
+            }
+        });
+
+        return pane;
     }
 
-    public static void showBar(Pane pane, Region bar) {
-        pane.getChildren().setAll(bar);
-        bar.prefWidthProperty().bind(pane.widthProperty());
-    }
-
-    private static void hideBar(Pane pane) {
-        pane.getChildren().clear();
-    }
-
-    private static Region createRunningBar(boolean running) {
+    private static Region createImportBar() {
 
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
-        if (running) {
-            barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
-        } else {
-            barPane.getStyleClass().add(CLASS_STATUS_STOPPED);
-        }
+        barPane.getStyleClass().add(CLASS_STATUS_IMPORT);
 
-        Label text = new Label(GameIntegration.current().getName() + " (" + (running ? "Running" : "Stopped") + ")",
+        Label text = new Label(GameIntegration.current().getName(),
+                GameIntegration.current().getGuiFactory().createIcon());
+        text.getStyleClass().add(CLASS_TEXT);
+        barPane.setLeft(text);
+        BorderPane.setAlignment(text, Pos.CENTER);
+
+        Label latest = new Label();
+        latest.setGraphic(new FontIcon());
+        latest.getStyleClass().add(CLASS_TEXT);
+        latest.getStyleClass().add(CLASS_SAVEGAME);
+        javafx.beans.value.ChangeListener<List<Path>> l = (c, o, n) -> {
+            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getFileName().toString() : "None"));
+        };
+        GameIntegration.current().getInstallation().savegamesProperty().addListener(l);
+        l.changed(null, null, GameIntegration.current().getInstallation().savegamesProperty().get());
+        barPane.setCenter(latest);
+
+        Button importLatest = new JFXButton("Import");
+        importLatest.setGraphic(new FontIcon());
+        importLatest.getStyleClass().add(CLASS_IMPORT);
+        importLatest.setOnAction(event -> {
+            FileImporter.importLatestSavegame();
+            if (!Settings.getInstance().deleteOnImport()) {
+                getStatusBar().hide();
+            }
+            event.consume();
+        });
+
+        HBox buttons = new HBox(importLatest);
+        buttons.setFillHeight(true);
+        buttons.setAlignment(Pos.CENTER);
+
+        barPane.setRight(buttons);
+        return barPane;
+    }
+
+    private static Region createRunningBar() {
+
+        BorderPane barPane = new BorderPane();
+        barPane.getStyleClass().add(CLASS_STATUS_BAR);
+        barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
+
+        Label text = new Label(GameIntegration.current().getName() + "(Running)",
                 GameIntegration.current().getGuiFactory().createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
@@ -96,9 +142,8 @@ public class GuiStatusBar {
         });
 
         HBox buttons = new HBox(importLatest);
-        if (running) {
-            buttons.getChildren().add(b);
-        }
+        buttons.getChildren().add(b);
+
         buttons.setFillHeight(true);
         buttons.setAlignment(Pos.CENTER);
 
@@ -106,7 +151,7 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static Region createEntryStatusBar(Pane pane) {
+    private static Region createEntryStatusBar() {
 
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
@@ -128,7 +173,7 @@ public class GuiStatusBar {
             GameIntegration.current().exportCampaignEntry();
 
             event.consume();
-            hideBar(pane);
+            getStatusBar().hide();
         });
 
         Button b = new JFXButton("Launch");
@@ -138,7 +183,7 @@ public class GuiStatusBar {
             GameIntegration.current().launchCampaignEntry();
 
             event.consume();
-            hideBar(pane);
+            getStatusBar().hide();
         });
 
 
@@ -150,7 +195,7 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static Region createInvalidVersionStatusBar(Pane pane) {
+    private static Region createInvalidVersionStatusBar() {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
@@ -183,27 +228,37 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static class StatusBar {
+    public static class StatusBar {
         private Status status;
         private Pane pane;
+
         public StatusBar(Pane pane) {
             this.status = Status.NONE;
             this.pane = pane;
         }
 
+        private void show(Region bar) {
+            pane.getChildren().setAll(bar);
+            bar.prefWidthProperty().bind(pane.widthProperty());
+        }
+
+        private void hide() {
+            pane.getChildren().clear();
+        }
+
         private void setRunning() {
             Platform.runLater(() -> {
-                Region bar = createRunningBar(true);
-                showBar(pane, bar);
+                Region bar = createRunningBar();
+                getStatusBar().show(bar);
                 status = Status.RUNNING;
             });
         }
 
-        private void stop() {
+        public void showImport() {
             Platform.runLater(() -> {
-                Region bar = createRunningBar(false);
-                showBar(pane, bar);
-                status = Status.STOPPED;
+                Region bar = createImportBar();
+                show(bar);
+                status = Status.IMPORT;
             });
         }
 
@@ -212,16 +267,16 @@ public class GuiStatusBar {
                 return;
             }
 
-            Region bar = null;
+            Region bar;
             if (GameIntegration.current().isEntryCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
                 status = Status.SELECTED;
-                bar = createEntryStatusBar(pane);
+                bar = createEntryStatusBar();
             } else {
                 status = Status.INCOMPATIBLE;
-                bar = createInvalidVersionStatusBar(pane);
+                bar = createInvalidVersionStatusBar();
             }
 
-            showBar(pane, bar);
+            show(bar);
         }
 
         private void unselect() {
@@ -229,7 +284,7 @@ public class GuiStatusBar {
                 return;
             }
 
-            hideBar(pane);
+            hide();
             status = Status.NONE;
         }
 
@@ -238,7 +293,7 @@ public class GuiStatusBar {
             SELECTED,
             INCOMPATIBLE,
             RUNNING,
-            STOPPED
+            IMPORT
         }
     }
 }

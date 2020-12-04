@@ -3,8 +3,21 @@
 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 0);
 }
 
+.loading {
+-fx-background-color: #FFFFFFcc;
+}
+
+.loading > .jfx-spinner {
+-jfx-radius: 2.15em;
+}
+
+.no-campaign {
+-fx-background-color: #FFFFFFcc;
+-fx-padding: 2em;
+}
+
 .jfx-list-cell {
- -fx-padding: 0.4em 0.4em 0 0.4em;
+ -fx-padding: 0.4em 0 0 0;
 }
 
 .jfx-list-cell:selected .label {
@@ -16,6 +29,7 @@
  -fx-text-fill: white;
  -fx-text-inner-color: white;
 }
+
 
 .jfx-list-cell {
  -fx-text-fill: #333;
@@ -50,7 +64,7 @@
 
 .entry-list {
 -fx-background-color: #FFFFFFBB;
- -fx-padding: 0;
+ -fx-padding: 0 0 0 0.4em;
 -fx-background-insets: 0;
 -fx-background-radius: 0;
 }
