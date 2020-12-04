@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -172,7 +173,7 @@ public abstract class SavegameCache<
             }
 
             GameCampaign<T,I> c = cc.getElementAdded();
-            c.getSavegames().addListener((SetChangeListener<? super GameCampaignEntry<T,I>>) (change) -> {
+            c.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<T,I>>) (change) -> {
                 boolean isNewEntry = change.wasAdded() && change.getElementAdded().infoProperty().isNotNull().get();
                 boolean wasRemoved = change.wasRemoved();
                 if (isNewEntry || wasRemoved) updateCampaignProperties(c);
@@ -181,12 +182,12 @@ public abstract class SavegameCache<
     }
 
     private void updateCampaignProperties(GameCampaign<T,I>  c) {
-        c.getSavegames().stream()
+        c.getEntries().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
                 .map(s -> s.getInfo().getDate()).min(Comparator.naturalOrder())
                 .ifPresent(d -> c.dateProperty().setValue(d));
 
-        c.getSavegames().stream()
+        c.getEntries().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
                 .min(Comparator.naturalOrder())
                 .ifPresent(e -> c.tagProperty().setValue(e.getInfo().getTag()));
@@ -238,7 +239,7 @@ public abstract class SavegameCache<
         for (GameCampaign<T,I>  campaign : getCampaigns()) {
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
-            campaign.getSavegames().stream()
+            campaign.getEntries().stream()
                     .map(entry -> {
                         ObjectNode node = JsonNodeFactory.instance.objectNode()
                                 .put("name", entry.getName())
@@ -274,7 +275,7 @@ public abstract class SavegameCache<
     private void exportSavegameDirectory(ZipOutputStream out) {
         Set<String> names = new HashSet<>();
         for (GameCampaign<T,I> c : getCampaigns()) {
-            for (GameCampaignEntry<T,I> e : c.getSavegames()) {
+            for (GameCampaignEntry<T,I> e : c.getEntries()) {
                 String name = getEntryName(e);
                 if (names.contains(name)) {
                     name += "_" + UUID.randomUUID().toString();
@@ -371,14 +372,14 @@ public abstract class SavegameCache<
 
     public synchronized GameCampaign<T,I> getCampaign(GameCampaignEntry<T,I>  e) {
         var campaign = campaigns.stream()
-                .filter(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
+                .filter(c -> c.getEntries().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
                 .findAny();
         return campaign.orElseThrow(() -> new IllegalArgumentException("Could not find campaign for entry " + e.getName()));
     }
 
     public synchronized void delete(GameCampaignEntry<T,I> e) {
         GameCampaign<T,I> c = getCampaign(e);
-        if (!this.campaigns.contains(c) || !c.getSavegames().contains(e)) {
+        if (!this.campaigns.contains(c) || !c.getEntries().contains(e)) {
             return;
         }
 
@@ -392,8 +393,8 @@ public abstract class SavegameCache<
         if (GameIntegration.globalSelectedEntryProperty().get() == e) {
             GameIntegration.current().selectEntry(null);
         }
-        c.getSavegames().remove(e);
-        if (c.getSavegames().size() == 0) {
+        c.getEntries().remove(e);
+        if (c.getEntries().size() == 0) {
             delete(c);
         }
     }
@@ -521,7 +522,7 @@ public abstract class SavegameCache<
         AtomicBoolean exists = new AtomicBoolean(false);
         getCampaigns().stream()
                 .filter(c -> c.getCampaignId().equals(uuid))
-                .findAny().ifPresent(c -> exists.set(c.getSavegames().stream()
+                .findAny().ifPresent(c -> exists.set(c.getEntries().stream()
                 .map(GameCampaignEntry::getChecksum).anyMatch(ch -> ch.equals(rawSavegame.getFileChecksum()))));
         if (exists.get()) {
             if (Settings.getInstance().deleteOnImport()) {
@@ -563,10 +564,18 @@ public abstract class SavegameCache<
         return PdxuInstallation.getInstance().getSavegameBackupLocation().resolve(name);
     }
 
-    public int indexOf(GameCampaign<T,I> c) {
+    public int indexOf(GameCampaign<?,?> c) {
         var list = new ArrayList<GameCampaign<T,I>>(getCampaigns());
-        list.sort(Comparator.comparing(GameCampaign::getDate));
+        list.sort(Comparator.comparing(GameCampaign::getLastPlayed));
+        Collections.reverse(list);
         return list.indexOf(c);
+    }
+
+    public Stream<GameCampaign<T,I>> campaignStream() {
+        var list = new ArrayList<GameCampaign<T,I>>(getCampaigns());
+        list.sort(Comparator.comparing(GameCampaign::getLastPlayed));
+        Collections.reverse(list);
+        return list.stream();
     }
 
     public ObservableSet<GameCampaign<T,I> > getCampaigns() {

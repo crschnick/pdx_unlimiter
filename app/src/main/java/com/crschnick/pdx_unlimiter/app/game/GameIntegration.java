@@ -242,9 +242,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         }
 
         if (e != null) {
-            this.selectedCampaign.set(getSavegameCache().getCampaign(e));
-            globalSelectedCampaignPropertyInternal().set(
-                    (GameCampaign<Object, SavegameInfo<Object>>) getSavegameCache().getCampaign(e));
+            selectCampaign(getSavegameCache().getCampaign(e));
         }
         this.selectedEntry.set(e);
         globalSelectedEntryPropertyInternal().set((GameCampaignEntry<Object, SavegameInfo<Object>>) e);

@@ -3,10 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -74,9 +71,9 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public ObservableValue<Pane> createImage(GameCampaign<StellarisTag, StellarisSavegameInfo> campaign) {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.stellarisTagNode(campaign.getTag(), CLASS_TAG_ICON));
-        prop.bind(createImage(campaign.getLatestSavegame()));
-        campaign.getSavegames().addListener((SetChangeListener<? super GameCampaignEntry<StellarisTag, StellarisSavegameInfo> >) c -> {
-            prop.bind(createImage(campaign.getLatestSavegame()));
+        prop.bind(createImage(campaign.getLatestEntry()));
+        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<StellarisTag, StellarisSavegameInfo> >) c -> {
+            prop.bind(createImage(campaign.getLatestEntry()));
         });
         return prop;
     }

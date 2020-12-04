@@ -25,13 +25,13 @@ public class GuiStatusBar {
 
         StatusBar bar = new StatusBar(layout);
         GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
-            if (n != null) {
-                Platform.runLater(() -> {
+            Platform.runLater(() -> {
+                if (n != null) {
                     bar.select();
-                });
-            } else {
-                bar.unselect();
-            }
+                } else {
+                    bar.unselect();
+                }
+            });
         });
 
         GameAppManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
@@ -45,7 +45,7 @@ public class GuiStatusBar {
 
     public static void showBar(Pane pane, Region bar) {
         pane.getChildren().setAll(bar);
-        bar.setPrefWidth(pane.getWidth());
+        bar.prefWidthProperty().bind(pane.widthProperty());
     }
 
     private static void hideBar(Pane pane) {

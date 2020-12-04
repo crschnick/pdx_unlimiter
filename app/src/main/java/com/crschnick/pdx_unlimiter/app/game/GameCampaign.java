@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -11,8 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import java.time.Instant;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class GameCampaign<T,I extends SavegameInfo<T>> {
 
@@ -21,7 +21,7 @@ public final class GameCampaign<T,I extends SavegameInfo<T>> {
     private volatile StringProperty name;
     private UUID campaignId;
     private volatile ObservableSet<GameCampaignEntry<T,I>> savegames =
-            FXCollections.synchronizedObservableSet(FXCollections.observableSet(new TreeSet<>()));
+            FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
     private volatile ObjectProperty<GameDate> date;
     private ObjectProperty<T> tag;
 
@@ -57,12 +57,23 @@ public final class GameCampaign<T,I extends SavegameInfo<T>> {
         return campaignId;
     }
 
-    public GameCampaignEntry<T,I> getLatestSavegame() {
-        return getSavegames().iterator().next();
+    public GameCampaignEntry<T,I> getLatestEntry() {
+        return entryStream().findFirst().get();
     }
 
-    public ObservableSet<GameCampaignEntry<T,I>> getSavegames() {
+    public ObservableSet<GameCampaignEntry<T,I>> getEntries() {
         return savegames;
+    }
+
+    public int indexOf(GameCampaignEntry<T,I> e) {
+        return entryStream().collect(Collectors.toList()).indexOf(e);
+    }
+
+    public Stream<GameCampaignEntry<T,I>> entryStream() {
+        var list = new ArrayList<GameCampaignEntry<T,I>>(getEntries());
+        list.sort(Comparator.comparing(GameCampaignEntry::getDate));
+        Collections.reverse(list);
+        return list.stream();
     }
 
     public Instant getLastPlayed() {

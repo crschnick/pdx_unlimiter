@@ -12,11 +12,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Border;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CAMPAIGN_LIST;
@@ -29,11 +30,16 @@ public class GuiGameCampaignList {
         grid.setBorder(Border.EMPTY);
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
+        Consumer<GameCampaign<?,?>> addButton = (GameCampaign<?,?> c) -> {
+            var button = GuiGameCampaign.createCampaignButton(c);
+            int index = GameIntegration.current().getSavegameCache().indexOf(c);
+            grid.getItems().add(index, button);
+        };
+
         SetChangeListener<GameCampaign> l = (c) -> {
             Platform.runLater(() -> {
                 if (c.wasAdded()) {
-                    //TODO
-                    grid.getItems().add(0, GuiGameCampaign.createCampaignButton(c.getElementAdded()));
+                    addButton.accept(c.getElementAdded());
                 } else {
                     grid.getItems().remove(grid.getItems().stream()
                             .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get());
@@ -49,11 +55,12 @@ public class GuiGameCampaignList {
 
                 if (n == null) {
                     grid.setItems(FXCollections.observableArrayList());
-                } else {
-                    n.getSavegameCache().getCampaigns().addListener(l);
-                    grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().getCampaigns().stream()
+                }
+                else {
+                    grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().campaignStream()
                             .map(GuiGameCampaign::createCampaignButton)
                             .collect(Collectors.toList())));
+                    n.getSavegameCache().getCampaigns().addListener(l);
                 }
             });
         });
@@ -61,9 +68,12 @@ public class GuiGameCampaignList {
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
             if (n != null) {
                 int index = GameIntegration.current().getSavegameCache().indexOf(n);
+                grid.getSelectionModel().clearSelection();
                 grid.getSelectionModel().select(index);
                 grid.getFocusModel().focus(index);
             } else {
+                grid.getSelectionModel().clearSelection();
+                grid.getFocusModel().focus(-1);
             }
         });
 
