@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -76,8 +77,8 @@ public class GuiStatusBar {
         latest.setGraphic(new FontIcon());
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
-        javafx.beans.value.ChangeListener<List<Path>> l = (c, o, n) -> {
-            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getFileName().toString() : "None"));
+        javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
+            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getName() : "None"));
         };
         GameIntegration.current().getInstallation().savegamesProperty().addListener(l);
         l.changed(null, null, GameIntegration.current().getInstallation().savegamesProperty().get());
@@ -118,8 +119,8 @@ public class GuiStatusBar {
         latest.setGraphic(new FontIcon());
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
-        javafx.beans.value.ChangeListener<List<Path>> l = (c, o, n) -> {
-            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getFileName().toString() : "None"));
+        javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
+            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getName() : "None"));
         };
         GameIntegration.current().getInstallation().savegamesProperty().addListener(l);
         l.changed(null, null, GameIntegration.current().getInstallation().savegamesProperty().get());

@@ -30,6 +30,10 @@
     -fx-icon-code: "mdi-play";
 }
 
+.upload-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-upload"
+}
+
 .export-button .ikonli-font-icon {
     -fx-icon-code: "mdi-export";
 }

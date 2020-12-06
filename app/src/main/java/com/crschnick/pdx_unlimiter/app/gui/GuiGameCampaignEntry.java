@@ -3,6 +3,11 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -77,12 +82,22 @@ public class GuiGameCampaignEntry {
             });
         });
 
+        HBox buttonBar = new HBox(achievements, open, del);
+        if (SavegameCache.EU4_CACHE.contains(e) && Settings.getInstance().getRakalyApiKey().isPresent()) {
+            Button upload = new JFXButton();
+            upload.setGraphic(new FontIcon());
+            upload.setOnMouseClicked((m) -> {
+                RakalyHelper.uploadSavegame(SavegameCache.EU4_CACHE, e);
+            });
+            upload.getStyleClass().add(CLASS_UPLOAD);
+            buttonBar.getChildren().add(0, upload);
+        }
+
 
         BorderPane layout = new BorderPane();
         layout.setLeft(tagBar);
         layout.setCenter(name);
 
-        HBox buttonBar = new HBox(achievements, open, del);
         buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
         layout.setRight(buttonBar);
 

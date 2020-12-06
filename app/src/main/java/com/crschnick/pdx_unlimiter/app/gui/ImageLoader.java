@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class ImageLoader {
@@ -30,7 +31,7 @@ public class ImageLoader {
         return loadImage(p, null);
     }
 
-    static Image loadImage(Path p, Predicate<Integer> pixelSelector) {
+    static Image loadImage(Path p, Function<Integer,Integer> pixelSelector) {
         if (!Files.isRegularFile(p)) {
             return null;
         }
@@ -43,7 +44,7 @@ public class ImageLoader {
         }
     }
 
-    static Image loadImage(InputStream in, Predicate<Integer> pixelSelector) {
+    static Image loadImage(InputStream in, Function<Integer,Integer> pixelSelector) {
         BufferedImage image = null;
         try {
             image = ImageIO.read(in);
@@ -56,9 +57,7 @@ public class ImageLoader {
             for (int x = 0; x < image.getWidth(); x++) {
                 for (int y = 0; y < image.getHeight(); y++) {
                     int rgb = image.getRGB(x, y);
-                    if (!pixelSelector.test(rgb)) {
-                        image.setRGB(x, y, 0x01FFFFFF);
-                    }
+                    image.setRGB(x, y, pixelSelector.apply(rgb));
                 }
             }
         }

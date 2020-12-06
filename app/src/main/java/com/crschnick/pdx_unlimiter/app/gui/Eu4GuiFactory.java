@@ -117,11 +117,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public double foregroundOpacity() {
-        return 0.0;
-    }
-
-    @Override
     public Pane createIcon() {
         return GameImage.imageNode(EU4_ICON, CLASS_IMAGE_ICON);
     }
@@ -148,7 +143,9 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag().getTag(), CLASS_TAG_ICON));
         prop.bind(createImage(campaign.getLatestEntry()));
         campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> >) c -> {
-            prop.bind(createImage(campaign.getLatestEntry()));
+            if (c.getSet().size() > 0) {
+                prop.bind(createImage(campaign.getLatestEntry()));
+            }
         });
         return prop;
     }

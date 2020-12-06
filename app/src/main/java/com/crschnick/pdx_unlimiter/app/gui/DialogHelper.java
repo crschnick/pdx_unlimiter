@@ -186,44 +186,53 @@ public class DialogHelper {
         alert.showAndWait();
     }
 
+
     public static boolean showException(Throwable e) {
-        ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);
-        ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
-        ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert alert = createAlert();
-        alert.getButtonTypes().addAll(report, foo, bar);
-
-        Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
-        reportButton.addEventFilter(ActionEvent.ACTION, event -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues/new"));
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
-            }
-            event.consume();
-        });
-
-        alert.setAlertType(Alert.AlertType.ERROR);
-        alert.setTitle("Error reporter");
-        alert.setHeaderText("An error occured.\n\n" +
-                "If you have a suspicion of the cause and want to help us fix the error, you can report it on github.\n" +
-                "If you have a specific savegame that causes this issue, please attach it as well in a zip.\n\n" +
-                "If you just want to notify the developers of this error automatically, click the 'send error' button.");
-
-        VBox dialogPaneContent = new VBox();
-
-        Label label = new Label("Stack Trace:");
-
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         String stackTrace = sw.toString();
-        TextArea textArea = new TextArea();
-        textArea.setText(stackTrace);
-        textArea.editableProperty().setValue(false);
-        textArea.autosize();
+        return showErrorMessage(e.getMessage(), stackTrace, true);
+    }
 
-        dialogPaneContent.getChildren().addAll(label, textArea);
+    public static boolean showErrorMessage(String msg, String details, boolean reportable) {
+        Alert alert = createAlert();
+        if (reportable) {
+            ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);
+            ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().addAll(report, foo);
+
+            Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
+            reportButton.addEventFilter(ActionEvent.ACTION, event -> {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues/new"));
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
+                event.consume();
+            });
+        }
+        ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().add(bar);
+
+        alert.setAlertType(Alert.AlertType.ERROR);
+        alert.setTitle("Error reporter");
+        alert.setHeaderText("An error occured: " + msg + "\n\n" + (reportable ?
+                "If you have a suspicion of the cause and want to help us fix the error, you can report it on github.\n" +
+                "If you have a specific savegame that causes this issue, please attach it as well in a zip.\n\n" +
+                "If you just want to notify the developers of this error automatically, click the 'send error' button." : ""));
+
+        VBox dialogPaneContent = new VBox();
+
+        if (details != null) {
+            Label label = new Label("Details:");
+
+            TextArea textArea = new TextArea();
+            textArea.setText(details);
+            textArea.editableProperty().setValue(false);
+            textArea.autosize();
+            dialogPaneContent.getChildren().addAll(label, textArea);
+        }
 
         alert.getDialogPane().setContent(dialogPaneContent);
 

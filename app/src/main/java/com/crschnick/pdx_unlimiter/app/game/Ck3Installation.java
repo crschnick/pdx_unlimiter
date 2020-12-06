@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
@@ -78,6 +79,14 @@ public class Ck3Installation extends GameInstallation {
                 Integer.parseInt(m.group(3)),
                 0,
                 m.group(4));
+
+        String platform = node.required("distPlatform").textValue();
+        if (platform.equals("steam") && Settings.getInstance().startSteam()) {
+            this.distType = new DistributionType.Steam(
+                    Integer.parseInt(Files.readString(getPath().resolve("binaries").resolve("steam_appid.txt"))));
+        } else {
+            this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
+        }
     }
 
     @Override

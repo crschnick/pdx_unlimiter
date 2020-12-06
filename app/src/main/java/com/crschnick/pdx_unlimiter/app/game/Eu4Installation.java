@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -89,6 +90,12 @@ public class Eu4Installation extends GameInstallation {
                 Integer.parseInt(m.group(3)),
                 Integer.parseInt(m.group(4)),
                 m.group(5));
+        String platform = node.required("distPlatform").textValue();
+        if (platform.equals("steam") && Settings.getInstance().startSteam()) {
+            this.distType = new DistributionType.Steam(Integer.parseInt(Files.readString(getPath().resolve("steam_appid.txt"))));
+        } else {
+            this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
+        }
     }
 
     @Override

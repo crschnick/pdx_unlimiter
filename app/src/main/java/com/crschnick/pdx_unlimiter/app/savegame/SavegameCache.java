@@ -377,6 +377,11 @@ public abstract class SavegameCache<
         sg.write(out, true);
     }
 
+    public synchronized boolean contains(GameCampaignEntry<?,?> e) {
+        return campaigns.stream()
+                .anyMatch(c -> c.getEntries().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
+    }
+
     public synchronized GameCampaign<T,I> getCampaign(GameCampaignEntry<T,I>  e) {
         var campaign = campaigns.stream()
                 .filter(c -> c.getEntries().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
@@ -491,7 +496,7 @@ public abstract class SavegameCache<
     }
 
     public synchronized String getFileName(GameCampaignEntry<T,I> e) {
-        return getCampaign(e).getName() + " " + e.getName().replace(":", ".") + "." + name;
+        return getCampaign(e).getName() + " " + e.getName().replace(":", ".") + "." + fileEnding;
     }
 
     public synchronized void exportSavegame(GameCampaignEntry<T,I> e, Path destPath) throws IOException {
@@ -538,10 +543,6 @@ public abstract class SavegameCache<
                             .findAny();
         });
         if (exists[0].isPresent()) {
-            if (Settings.getInstance().deleteOnImport()) {
-                FileUtils.forceDelete(file.toFile());
-            }
-
             loadEntry(exists[0].get());
             GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
             GameIntegration.<T,I>current().selectEntry(exists[0].get());
@@ -554,12 +555,7 @@ public abstract class SavegameCache<
 
         FileUtils.forceMkdir(entryPath.toFile());
         savegame.write(entryPath.resolve(getDataFileName()), true);
-        if (Settings.getInstance().deleteOnImport()) {
-            FileUtils.copyFile(file.toFile(), getBackupPath().resolve(file.getFileName()).toFile());
-            FileUtils.moveFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-        } else {
-            FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-        }
+        FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
         this.addNewEntry(uuid, saveUuid, rawSavegame.getFileChecksum(), info, savegame);
     }
 

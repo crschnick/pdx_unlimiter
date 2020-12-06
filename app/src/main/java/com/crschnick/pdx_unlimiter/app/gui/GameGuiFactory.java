@@ -90,8 +90,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane background();
 
-    public abstract double foregroundOpacity();
-
     public abstract Pane createIcon();
 
     public abstract Background createEntryInfoBackground(GameCampaignEntry<T,I> entry);

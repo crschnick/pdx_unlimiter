@@ -45,11 +45,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public double foregroundOpacity() {
-        return 1.0;
-    }
-
-    @Override
     public Pane createIcon() {
         return GameImage.imageNode(GameImage.CK3_ICON, CLASS_IMAGE_ICON);
     }

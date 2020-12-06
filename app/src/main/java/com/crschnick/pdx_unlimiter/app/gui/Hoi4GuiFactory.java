@@ -52,11 +52,6 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public double foregroundOpacity() {
-        return 0.9;
-    }
-
-    @Override
     public Pane createIcon() {
         return GameImage.imageNode(GameImage.HOI4_ICON, CLASS_IMAGE_ICON);
     }
@@ -99,6 +94,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     @Override
     public void fillNodeContainer(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
+        super.fillNodeContainer(entry, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);

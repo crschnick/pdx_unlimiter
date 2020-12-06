@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class GameImage {
@@ -92,22 +93,22 @@ public class GameImage {
     }
 
     public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
-        return tagNode(getHoi4TagPath(tag), null, styleClass);
+        return tagNode(GameInstallation.HOI4, getHoi4TagPath(tag), null, styleClass);
     }
 
     public static Pane eu4TagNode(String tag, String styleClass) {
-        return tagNode(getEu4TagPath(tag), null, styleClass);
+        return tagNode(GameInstallation.EU4, getEu4TagPath(tag), null, styleClass);
     }
 
     public static Pane eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
-        return tagNode(getEu4TagPath(entry.getTag().getTag()), entry, styleClass);
+        return tagNode(GameInstallation.EU4, getEu4TagPath(entry.getTag().getTag()), entry, styleClass);
     }
 
-    private static Pane tagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
+    private static Pane tagNode(GameInstallation install, Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
         Image img = null;
         try {
             var in = CascadeDirectoryHelper.openFile(
-                    path, entry, GameInstallation.EU4);
+                    path, entry, install);
             img = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -118,32 +119,41 @@ public class GameImage {
         }
 
         ImageView v = new ImageView(img);
-        Pane pane = new Pane(v);
+        StackPane pane = new StackPane(v);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         v.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
+        pane.setAlignment(Pos.CENTER);
         return pane;
     }
 
     public static Pane stellarisTagNode(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
-        return stellarisTagNode(Path.of(entry.getTag().getBackgroundFile()), entry, styleClass);
+        return stellarisTagNode(Path.of(entry.getTag().getBackgroundFile()), entry.getTag(), entry, styleClass);
         //var bg = stellarisTagNode(GameInstallation.STELLARIS.getPath().resolve("flags"))
     }
 
     public static Pane stellarisTagNode(StellarisTag tag, String styleClass) {
-        return stellarisTagNode(Path.of(tag.getBackgroundFile()), null, styleClass);
+        return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, null, styleClass);
         //var bg = stellarisTagNode(GameInstallation.STELLARIS.getPath().resolve("flags"))
     }
 
 
     private static Pane stellarisTagNode(
-            Path path, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
+            Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
         Image img = null;
+
+        Function<Integer,Integer> customFilter = (Integer rgb) -> {
+            if (rgb == 0xFFFF0000) {
+                return 0x0;
+            }
+            return rgb;
+        };
+
         try {
             var in = CascadeDirectoryHelper.openFile(
-                    path, entry, GameInstallation.STELLARIS);
-            img = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
+                    Path.of("flags", "backgrounds").resolve(path), entry, GameInstallation.STELLARIS);
+            img = in.map(inputStream -> ImageLoader.loadImage(inputStream, customFilter)).orElse(null);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
@@ -152,11 +162,29 @@ public class GameImage {
             return unknownTag(styleClass);
         }
 
+        Image icon = null;
+        try {
+            var in = CascadeDirectoryHelper.openFile(
+                    Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile()),
+                    entry, GameInstallation.STELLARIS);
+            icon = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+
+        if (icon == null) {
+            return unknownTag(styleClass);
+        }
+
         ImageView v = new ImageView(img);
-        Pane pane = new Pane(v);
+        ImageView iconV = new ImageView(icon);
+        Pane pane = new StackPane(v, iconV);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
+        iconV.fitWidthProperty().bind(pane.widthProperty());
+        iconV.fitHeightProperty().bind(pane.heightProperty());
         v.preserveRatioProperty().setValue(true);
+        iconV.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
         return pane;
     }
@@ -322,31 +350,31 @@ public class GameImage {
         EU4_ICON_DIP = ImageLoader.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
         EU4_ICON_MIL = ImageLoader.loadImage(i.resolve("icon_powers_military_in_text.dds"));
 
-        Predicate<Integer> rnwFilter = (Integer rgb) -> {
+        Function<Integer,Integer> rnwFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
             int g = (rgb >> 8) & 0xFF;
             int b = rgb & 0xFF;
             boolean gold = (r > 100 && g > 87 && b < 100 && Math.max(r, Math.max(g, b) - 2) == r);
             boolean blue = Math.max(r, Math.max(g, b)) < 135;
             if (blue || gold) {
-                return false;
+                return 0x00000001;
             }
-            return true;
+            return rgb;
         };
         EU4_ICON_RANDOM_NEW_WORLD = ImageLoader.loadImage(
                 i.resolve("frontend_random_world.dds"),
                 rnwFilter);
         VIEWPORTS.put(EU4_ICON_RANDOM_NEW_WORLD, new Rectangle2D(14, 0, 33, 30));
 
-        Predicate<Integer> customFilter = (Integer rgb) -> {
+        Function<Integer,Integer> customFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
             int g = (rgb >> 8) & 0xFF;
             int b = rgb & 0xFF;
             boolean blue = Math.max(r, Math.max(g, b)) < 142;
             if (blue) {
-                return false;
+                return 0x00000001;
             }
-            return true;
+            return rgb;
         };
         EU4_ICON_CUSTOM_NATION = ImageLoader.loadImage(
                 i.resolve("frontend_custom_nation.dds"),

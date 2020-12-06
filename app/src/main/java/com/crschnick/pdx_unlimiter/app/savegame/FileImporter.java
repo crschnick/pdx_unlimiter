@@ -1,18 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
-import com.crschnick.pdx_unlimiter.eu4.io.SavegameWriter;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3RawSavegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
-import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisRawSavegame;
 import org.apache.commons.io.FileUtils;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,44 +23,31 @@ public class FileImporter {
         INSTANCE = new FileImporter();
         var path = PdxuInstallation.getInstance().getSavegameLocation().resolve("import");
         FileUtils.cleanDirectory(path.toFile());
-        WatcherHelper.startWatcherInDirectory("Importer", path,
-                p -> {
-                    try {
-                        String toImport = Files.readString(p);
-                        importFileInternal(p, Path.of(toImport));
-                    } catch (IOException e) {
-                        ErrorHandler.handleException(e);
-                    }
-                }, StandardWatchEventKinds.ENTRY_CREATE);
+        WatcherHelper.startWatchersInDirectories("Importer", List.of(path), p -> {
+            if (!Files.exists(p)) {
+                return;
+            }
+            try {
+                String toImport = Files.readString(p);
+                importFileInternal(p, Path.of(toImport));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        });
     }
 
     private static void importFileInternal(Path queueFile, Path p) throws IOException {
-        RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
-            @Override
-            public void visitEu4(Path file) {
-                SavegameCache.EU4_CACHE.importSavegame(p);
-            }
+        var target = FileImportTarget.create(p);
+        if (target.isEmpty()) {
+            return;
+        }
 
-            @Override
-            public void visitHoi4(Path file) {
-                SavegameCache.HOI4_CACHE.importSavegame(p);
-            }
+        boolean succ = target.get().importTarget();
+        if (succ && Settings.getInstance().deleteOnImport()) {
+            target.get().delete();
+        }
 
-            @Override
-            public void visitStellaris(Path file) {
-                SavegameCache.STELLARIS_CACHE.importSavegame(p);
-            }
-
-            @Override
-            public void visitCk3(Path file) {
-                SavegameCache.CK3_CACHE.importSavegame(file);
-            }
-
-            @Override
-            public void visitOther(Path file) {
-            }
-        });
-        FileUtils.forceDelete(queueFile.toFile());
+        Files.delete(queueFile);
     }
 
     public static void addToImportQueue(List<Path> files) {
@@ -94,6 +76,6 @@ public class FileImporter {
             return;
         }
 
-        addToImportQueue(List.of(savegames.get(0)));
+        addToImportQueue(List.of(savegames.get(0).getPath()));
     }
 }

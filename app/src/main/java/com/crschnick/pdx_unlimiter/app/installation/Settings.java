@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
+import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +28,9 @@ public class Settings {
     private int maxLoadedSavegames = 5;
     private int fontSize = 12;
     private boolean deleteOnImport = false;
+    private boolean startSteam = true;
+    private String rakalyUserId;
+    private String rakalyApiKey;
 
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
@@ -56,11 +60,14 @@ public class Settings {
 
     private static Settings defaultSettings() {
         Settings s = new Settings();
-        s.eu4 = GameInstallation.getInstallPath("Europa Universalis IV").orElse(null);
-        s.hoi4 = GameInstallation.getInstallPath("Hearts of Iron IV").orElse(null);
-        s.ck3 = GameInstallation.getInstallPath("Crusader Kings III").orElse(null);
-        s.stellaris = GameInstallation.getInstallPath("Stellaris").orElse(null);
+        s.eu4 = InstallLocationHelper.getInstallPath("Europa Universalis IV").orElse(null);
+        s.hoi4 = InstallLocationHelper.getInstallPath("Hearts of Iron IV").orElse(null);
+        s.ck3 = InstallLocationHelper.getInstallPath("Crusader Kings III").orElse(null);
+        s.stellaris = InstallLocationHelper.getInstallPath("Stellaris").orElse(null);
         s.fontSize = 12;
+        s.startSteam = true;
+        s.rakalyUserId = null;
+        s.rakalyApiKey = null;
 
         if (s.eu4 != null) {
             s.activeGame = s.eu4;
@@ -85,7 +92,10 @@ public class Settings {
         s.ck3 = Optional.ofNullable(i.get("ck3")).map(n -> Paths.get(n.textValue())).orElse(s.ck3);
         s.stellaris = Optional.ofNullable(i.get("stellaris")).map(n -> Paths.get(n.textValue())).orElse(s.stellaris);
         s.activeGame = Optional.ofNullable(i.get("activeGame")).map(n -> Paths.get(n.textValue())).orElse(s.activeGame);
-        //s.fontSize = i.required("fontSize").intValue();
+        s.fontSize = i.required("fontSize").intValue();
+        s.startSteam = i.required("startSteam").booleanValue();
+        s.rakalyUserId = Optional.ofNullable(i.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
+        s.rakalyApiKey = Optional.ofNullable(i.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
         return s;
     }
 
@@ -113,6 +123,9 @@ public class Settings {
         }
 
         i.put("fontSize", s.fontSize);
+        i.put("startSteam", s.startSteam);
+        i.put("rakalyUserId", s.rakalyUserId);
+        i.put("rakalyApiKey", s.rakalyApiKey);
 
         JsonHelper.write(n, Files.newOutputStream(file));
     }
@@ -125,6 +138,9 @@ public class Settings {
         c.stellaris = stellaris;
         c.activeGame = activeGame;
         c.fontSize = fontSize;
+        c.startSteam = startSteam;
+        c.rakalyUserId = rakalyUserId;
+        c.rakalyApiKey = rakalyApiKey;
         return c;
     }
 
@@ -164,12 +180,36 @@ public class Settings {
         return Optional.ofNullable(activeGame);
     }
 
+    public Optional<String> getRakalyApiKey() {
+        return Optional.ofNullable(rakalyApiKey);
+    }
+
+    public void setRakalyApiKey(String rakalyApiKey) {
+        this.rakalyApiKey = rakalyApiKey;
+    }
+
+    public boolean startSteam() {
+        return startSteam;
+    }
+
+    public void setStartSteam(boolean startSteam) {
+        this.startSteam = startSteam;
+    }
+
     public int getFontSize() {
         return fontSize;
     }
 
     public void setFontSize(int fontSize) {
         this.fontSize = fontSize;
+    }
+
+    public Optional<String> getRakalyUserId() {
+        return Optional.ofNullable(rakalyUserId);
+    }
+
+    public void setRakalyUserId(String rakalyUserId) {
+        this.rakalyUserId = rakalyUserId;
     }
 
     public void updateActiveGame(Path activeGame) {

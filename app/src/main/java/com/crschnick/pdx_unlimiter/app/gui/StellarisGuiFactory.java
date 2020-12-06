@@ -42,11 +42,6 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public double foregroundOpacity() {
-        return 0.8;
-    }
-
-    @Override
     public Pane createIcon() {
         return GameImage.imageNode(GameImage.STELLARIS_ICON, CLASS_IMAGE_ICON);
     }

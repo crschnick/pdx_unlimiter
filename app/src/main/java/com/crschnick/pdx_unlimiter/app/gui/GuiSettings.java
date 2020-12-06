@@ -1,12 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -174,6 +176,65 @@ public class GuiSettings {
         return dialogPaneContent;
     }
 
+    private static Node startSteam(Settings s) {
+        HBox dialogPaneContent = new HBox();
+
+        Label label = new Label("Start Steam");
+
+        JFXCheckBox cb = new JFXCheckBox();
+        cb.setSelected(s.startSteam());
+        cb.selectedProperty().addListener((c, o, n) -> {
+            s.setStartSteam(n);
+        });
+        Region spacer = new Region();
+        HBox hbox = new HBox(cb, label, spacer);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        hbox.setAlignment(Pos.CENTER);
+        dialogPaneContent.getChildren().add(hbox);
+        hbox.prefWidthProperty().bind(dialogPaneContent.widthProperty());
+        return dialogPaneContent;
+    }
+
+    private static Node rakalyUserId(Settings s) {
+        HBox dialogPaneContent = new HBox();
+
+        Label label = new Label("rakaly.com User ID:");
+
+        TextField textArea = new TextField();
+
+        textArea.textProperty().addListener((change, o, n) -> {
+            s.setRakalyUserId(n.equals("") ? null : n);
+        });
+        textArea.setText(s.getRakalyUserId().orElse(""));
+
+        HBox hbox = new HBox(label, textArea);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
+        hbox.setAlignment(Pos.CENTER);
+        dialogPaneContent.getChildren().add(hbox);
+        hbox.prefWidthProperty().bind(dialogPaneContent.widthProperty());
+        return dialogPaneContent;
+    }
+
+    private static Node rakalyApiKey(Settings s) {
+        HBox dialogPaneContent = new HBox();
+
+        Label label = new Label("rakaly.com API Key:");
+
+        TextField textArea = new TextField();
+
+        textArea.textProperty().addListener((change, o, n) -> {
+            s.setRakalyApiKey(n.equals("") ? null : n);
+        });
+        textArea.setText(s.getRakalyApiKey().orElse(""));
+
+        HBox hbox = new HBox(label, textArea);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
+        hbox.setAlignment(Pos.CENTER);
+        dialogPaneContent.getChildren().add(hbox);
+        hbox.prefWidthProperty().bind(dialogPaneContent.widthProperty());
+        return dialogPaneContent;
+    }
+
     public static void showSettings(boolean noInstalls) {
         Alert alert = DialogHelper.createAlert();
         alert.getButtonTypes().add(ButtonType.APPLY);
@@ -189,7 +250,10 @@ public class GuiSettings {
                 hoi4InstallLocationNode(s),
                 ck3InstallLocationNode(s),
                 stellarisInstallLocationNode(s),
-                fontSize(s));
+                fontSize(s),
+                startSteam(s),
+                rakalyUserId(s),
+                rakalyApiKey(s));
         vbox.setSpacing(10);
         alert.getDialogPane().setContent(vbox);
 
