@@ -1,12 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -18,16 +23,20 @@ public class ColorHelper {
         return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
     }
 
+    public static int intFromColor(Color c) {
+        return (0xFF << 24) + ((int) (c.getRed() * 0xFF) << 16) + ((int) (c.getGreen() * 0xFF) << 8) + ((int) (c.getBlue() * 0xFF));
+    }
+
     private static javafx.scene.paint.Color colorFromNodes(List<Node> c, boolean hsv) {
         if (hsv) {
             return Color.hsb(Node.getDouble(c.get(0)), Node.getDouble(c.get(1)), Node.getDouble(c.get(2)));
         } else {
 
-            return Color.rgb(Node.getInteger(c.get(0)), Node.getInteger(c.get(1)), Node.getInteger(c.get(2)));
+            return Color.color(Node.getDouble(c.get(0)), Node.getDouble(c.get(1)), Node.getDouble(c.get(2)));
         }
     }
 
-    private static Map<String,Color> loadColor(List<Node> nodes) throws IOException {
+    private static Map<String,Color> loadPredefinedColors(List<Node> nodes) {
         Map<String,Color> map = new HashMap<>();
         for (Node n : nodes) {
             var kv = Node.getKeyValueNode(n);
@@ -51,9 +60,14 @@ public class ColorHelper {
         return map;
     }
 
-    public static Map<String,Color> loadStellarisColors(Path path) throws IOException {
-        Node node = TextFormatParser.textFileParser().parse(
-                Files.newInputStream(path)).get();
-        return loadColor(Node.getNodeArray(Node.getNodeForKey(node, "colors")));
+    public static Map<String,Color> loadStellarisColors(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> e)  {
+        try {
+            InputStream in = CascadeDirectoryHelper.openFile(Path.of("flags").resolve("colors.txt"), e, GameInstallation.STELLARIS).get();
+            Node node = TextFormatParser.textFileParser().parse(in).get();
+            return loadPredefinedColors(Node.getNodeArray(Node.getNodeForKey(node, "colors")));
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
+            return Map.of();
+        }
     }
 }

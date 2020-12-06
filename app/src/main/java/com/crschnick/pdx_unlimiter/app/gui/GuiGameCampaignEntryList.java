@@ -69,6 +69,9 @@ public class GuiGameCampaignEntryList {
                     grid.setItems(FXCollections.observableArrayList(n.entryStream()
                             .map(GuiGameCampaignEntry::createCampaignEntryNode)
                             .collect(Collectors.toList())));
+
+                    // Bug in JFoenix? We have to set this everytime we update the list view
+                    grid.setExpanded(true);
                 });
             } else {
                 Platform.runLater(() -> {

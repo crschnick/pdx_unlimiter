@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
@@ -18,7 +19,9 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -119,23 +122,20 @@ public class GameImage {
         }
 
         ImageView v = new ImageView(img);
-        StackPane pane = new StackPane(v);
+        Pane pane = new Pane(v);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         v.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
-        pane.setAlignment(Pos.CENTER);
         return pane;
     }
 
     public static Pane stellarisTagNode(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
         return stellarisTagNode(Path.of(entry.getTag().getBackgroundFile()), entry.getTag(), entry, styleClass);
-        //var bg = stellarisTagNode(GameInstallation.STELLARIS.getPath().resolve("flags"))
     }
 
     public static Pane stellarisTagNode(StellarisTag tag, String styleClass) {
         return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, null, styleClass);
-        //var bg = stellarisTagNode(GameInstallation.STELLARIS.getPath().resolve("flags"))
     }
 
 
@@ -143,9 +143,11 @@ public class GameImage {
             Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
         Image img = null;
 
+        int bgPrimary = ColorHelper.intFromColor(ColorHelper.loadStellarisColors(entry)
+                .getOrDefault(tag.getBackgroundPrimaryColor(), Color.TRANSPARENT));
         Function<Integer,Integer> customFilter = (Integer rgb) -> {
             if (rgb == 0xFFFF0000) {
-                return 0x0;
+                return bgPrimary;
             }
             return rgb;
         };
@@ -178,14 +180,14 @@ public class GameImage {
 
         ImageView v = new ImageView(img);
         ImageView iconV = new ImageView(icon);
-        Pane pane = new StackPane(v, iconV);
+        StackPane pane = new StackPane(v, iconV);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         iconV.fitWidthProperty().bind(pane.widthProperty());
         iconV.fitHeightProperty().bind(pane.heightProperty());
-        v.preserveRatioProperty().setValue(true);
-        iconV.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
+        pane.setMaxWidth(Region.USE_PREF_SIZE);
+        pane.setMaxHeight(Region.USE_PREF_SIZE);
         return pane;
     }
 

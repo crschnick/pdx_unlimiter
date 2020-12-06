@@ -129,8 +129,8 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
                 prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
                 Tooltip.install(prop.get(), new Tooltip());
@@ -139,8 +139,8 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag().getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag().getTag(), CLASS_TAG_ICON));
         prop.bind(createImage(campaign.getLatestEntry()));
         campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> >) c -> {
             if (c.getSet().size() > 0) {

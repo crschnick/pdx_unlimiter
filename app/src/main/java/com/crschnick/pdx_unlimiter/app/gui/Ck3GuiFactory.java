@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -57,8 +58,8 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.ck3TagNode(entry.getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.ck3TagNode(entry.getTag(), CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 //prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
@@ -68,8 +69,8 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaign<Ck3Tag, Ck3SavegameInfo> campaign) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.ck3TagNode(campaign.getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaign<Ck3Tag, Ck3SavegameInfo> campaign) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.ck3TagNode(campaign.getTag(), CLASS_TAG_ICON));
         campaign.tagProperty().addListener((c, o, n) -> {
             //Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
         });

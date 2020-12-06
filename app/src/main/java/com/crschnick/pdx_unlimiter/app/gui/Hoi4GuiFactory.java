@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
@@ -64,8 +65,8 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 //prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
@@ -75,8 +76,8 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaign<Hoi4Tag,Hoi4SavegameInfo> campaign) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaign<Hoi4Tag,Hoi4SavegameInfo> campaign) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
         campaign.tagProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
         });

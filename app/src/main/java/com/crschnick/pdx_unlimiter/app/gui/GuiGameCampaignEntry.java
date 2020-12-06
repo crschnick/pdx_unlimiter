@@ -20,10 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -73,12 +70,13 @@ public class GuiGameCampaignEntry {
 
 
         var tagImage = GameIntegration.<T,I>current().getGuiFactory().createImage(e);
-        HBox tagBar = new HBox(tagImage.getValue(), l);
+        Pane tagPane = new Pane(tagImage.getValue());
+        tagPane.setMaxWidth(80);
+        HBox tagBar = new HBox(tagPane, l);
         tagBar.getStyleClass().add(CLASS_TAG_BAR);
         tagImage.addListener((change, o, n) -> {
             Platform.runLater(() -> {
-                tagBar.getChildren().set(0, tagImage.getValue());
-                tagBar.layout();
+                tagPane.getChildren().set(0, n);
             });
         });
 
@@ -126,10 +124,9 @@ public class GuiGameCampaignEntry {
         return main;
     }
 
-    private static <T, I extends SavegameInfo<T>>Node createSavegameInfoNode(GameCampaignEntry<T,I> entry) {
+    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(GameCampaignEntry<T,I> entry) {
         StackPane stack = new StackPane();
-        JFXMasonryPane grid =
-                new JFXMasonryPane();
+        JFXMasonryPane grid = new JFXMasonryPane();
         grid.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);
         grid.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
         grid.setHSpacing(10);
@@ -161,7 +158,7 @@ public class GuiGameCampaignEntry {
 
         entry.infoProperty().addListener((change) -> {
             Platform.runLater(() -> {
-                stack.getChildren().remove(loading);
+                loading.setVisible(false);
                 GameIntegration.<T,I>current().getGuiFactory().fillNodeContainer(entry, grid);
             });
         });

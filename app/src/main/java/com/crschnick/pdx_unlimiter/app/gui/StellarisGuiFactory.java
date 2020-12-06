@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -54,8 +55,8 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.stellarisTagNode(entry, CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.stellarisTagNode(entry, CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
             prop.set(GameImage.stellarisTagNode(entry, CLASS_TAG_ICON));
             Tooltip.install(prop.get(), new Tooltip());
@@ -64,8 +65,8 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public ObservableValue<Pane> createImage(GameCampaign<StellarisTag, StellarisSavegameInfo> campaign) {
-        SimpleObjectProperty<Pane> prop = new SimpleObjectProperty<>(GameImage.stellarisTagNode(campaign.getTag(), CLASS_TAG_ICON));
+    public ObservableValue<Node> createImage(GameCampaign<StellarisTag, StellarisSavegameInfo> campaign) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.stellarisTagNode(campaign.getTag(), CLASS_TAG_ICON));
         prop.bind(createImage(campaign.getLatestEntry()));
         campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<StellarisTag, StellarisSavegameInfo> >) c -> {
             prop.bind(createImage(campaign.getLatestEntry()));

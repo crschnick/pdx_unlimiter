@@ -50,7 +50,7 @@ public class GuiGameCampaign {
         b.getChildren().add(date);
         b.setAlignment(Pos.CENTER_LEFT);
 
-        ObservableValue<Pane> prop = GameIntegration.current().getGuiFactory().createImage(c);
+        ObservableValue<Node> prop = GameIntegration.current().getGuiFactory().createImage(c);
         Node w = prop.getValue();
         HBox btn = new HBox();
         btn.getChildren().add(w);

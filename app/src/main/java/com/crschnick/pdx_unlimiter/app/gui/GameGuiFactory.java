@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -94,9 +95,9 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Background createEntryInfoBackground(GameCampaignEntry<T,I> entry);
 
-    public abstract ObservableValue<Pane> createImage(GameCampaignEntry<T,I> entry);
+    public abstract ObservableValue<Node> createImage(GameCampaignEntry<T,I> entry);
 
-    public abstract ObservableValue<Pane> createImage(GameCampaign<T,I> campaign);
+    public abstract ObservableValue<Node> createImage(GameCampaign<T,I> campaign);
 
     public ObservableValue<String> createInfoString(GameCampaign<T,I> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
