@@ -11,6 +11,7 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.Test;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -73,6 +74,7 @@ public class PdxuApp extends Application {
         PdxuInstallation.init();
         LogManager.init();
         ErrorHandler.init();
+        Test.test();
 
         LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + getParameters().getRaw());
         FileImporter.addToImportQueue(getParameters().getRaw().stream().map(Path::of).collect(Collectors.toList()));

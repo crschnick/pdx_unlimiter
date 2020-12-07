@@ -15,16 +15,30 @@ if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
 }
 
-java {
-    modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+
+tasks.withType(JavaCompile).configureEach {
+    javaCompiler = javaToolchains.compilerFor {
+        modularity.inferModulePath = true
+        languageVersion = JavaLanguageVersion.of(16)
+        sourceCompatibility = JavaVersion.VERSION_15
+        targetCompatibility = JavaVersion.VERSION_15
+    }
+}
+
+
+modularity.disableEffectiveArgumentsAdjustment()
+tasks.withType(JavaLauncher).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        modularity.inferModulePath = true
+        languageVersion = JavaLanguageVersion.of(16)
+    }
 }
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
     mainClass = 'com.crschnick.pdx_unlimiter.app.PdxuApp'
-    applicationDefaultJvmArgs = ["-Djdk.gtk.version=2",
+    applicationDefaultJvmArgs = ["-Dforeign.restricted=permit",
+                                 "-Djdk.gtk.version=2",
                                  "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
                                  "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
                                  '-Xms16384m', '-Xmx16384m']

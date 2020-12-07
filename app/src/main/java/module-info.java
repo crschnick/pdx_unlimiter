@@ -16,6 +16,7 @@ module com.crschnick.pdx_unlimiter.app {
     requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
     requires com.jfoenix;
+    requires jdk.incubator.foreign;
 
     requires org.slf4j;
     requires org.slf4j.simple;
