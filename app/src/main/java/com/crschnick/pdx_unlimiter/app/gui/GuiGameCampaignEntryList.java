@@ -36,6 +36,9 @@ public class GuiGameCampaignEntryList {
         SetChangeListener<GameCampaignEntry> l = (c) -> {
             Platform.runLater(() -> {
                 if (c.wasAdded()) {
+                    if (c.getSet().size() == 1) {
+                        pane.getChildren().set(0, grid);
+                    }
                     int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(c.getElementAdded());
                     grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
                 } else {

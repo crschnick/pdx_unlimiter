@@ -3,10 +3,13 @@ package com.crschnick.pdx_unlimiter.app.util;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.eu4.format.ColorTransformer;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
 import javafx.scene.paint.Color;
 
@@ -16,6 +19,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ColorHelper {
 
@@ -58,6 +62,43 @@ public class ColorHelper {
             map.put(kv.getKeyName(), colorFromNodes(color, isHsv));
         }
         return map;
+    }
+
+    private static Map<String,Color> loadPredefinedCk3Colors(List<Node> nodes) {
+        Map<String,Color> map = new HashMap<>();
+        for (Node n : nodes) {
+            var kv = Node.getKeyValueNode(n);
+            Node data = kv.getNode();
+
+            boolean isHsv = false;
+
+            var colorData = Node.getNodeArray(Node.getNodeForKey(data, "values"));
+            if (Node.getString(Node.getNodeForKey(data, "type")).equals("hsv")) {
+                isHsv = true;
+            }
+            if (Node.getString(Node.getNodeForKey(data, "type")).equals("hsv360")) {
+                isHsv = true;
+                colorData = colorData.stream()
+                        .map(v -> new ValueNode(Node.getDouble(v) / 360D))
+                        .collect(Collectors.toList());
+            }
+
+            map.put(kv.getKeyName(), colorFromNodes(colorData, isHsv));
+        }
+        return map;
+    }
+
+    public static Map<String,Color> loadCk3(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e)  {
+        try {
+            InputStream in = CascadeDirectoryHelper.openFile(
+                    Path.of("common").resolve("named_colors").resolve("default_colors.txt"), e, GameInstallation.CK3).get();
+            Node node = TextFormatParser.textFileParser().parse(in).get();
+            new ColorTransformer().transform(Node.getNodeForKey(node, "colors"));
+            return loadPredefinedCk3Colors(Node.getNodeArray(Node.getNodeForKey(node, "colors")));
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
+            return Map.of();
+        }
     }
 
     public static Map<String,Color> loadStellarisColors(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> e)  {

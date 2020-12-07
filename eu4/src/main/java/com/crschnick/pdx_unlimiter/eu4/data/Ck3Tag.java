@@ -2,16 +2,18 @@ package com.crschnick.pdx_unlimiter.eu4.data;
 
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ck3Tag {
 
     private Person ruler;
     private List<Title> titles;
+
+    public Ck3Tag(Person ruler, List<Title> titles) {
+        this.ruler = ruler;
+        this.titles = titles;
+    }
 
     public static Ck3Tag getPlayerTag(Node gamestate, Set<Ck3Tag> tags) {
         return tags.stream().filter(t -> t.ruler.id == Node.getInteger(Node.getNodeForKey(
@@ -36,12 +38,11 @@ public class Ck3Tag {
                     var domain = Node.getNodeForKey(
                             Node.getNodeForKey(Node.getKeyValueNode(n).getNode(), "landed_data"), "domain");
 
-                    Ck3Tag tag = new Ck3Tag();
-                    tag.titles = Node.getNodeArray(domain).stream()
+                    var tagTitles = Node.getNodeArray(domain).stream()
                             .map(id -> titles.stream().filter(t -> t.id == Node.getInteger(id)).findFirst().get())
                             .collect(Collectors.toList());
-                    tag.ruler = Person.fromNode(n);
-                    return tag;
+                    var ruler = Person.fromNode(n);
+                    return new Ck3Tag(ruler, tagTitles);
                 })
                 .collect(Collectors.toSet());
 
@@ -92,15 +93,18 @@ public class Ck3Tag {
             var kvn = Node.getKeyValueNode(kv);
             var n = kvn.getNode();
 
-            Title t = new Title();
-            t.id = Integer.parseInt(kvn.getKeyName());
-            t.name = Node.getString(Node.getNodeForKey(n, "name"));
+            var id = Integer.parseInt(kvn.getKeyName());
+            var name = Node.getString(Node.getNodeForKey(n, "name"));
             var coaId = Node.getInteger(Node.getNodeForKey(n, "coat_of_arms_id"));
-            t.coatOfArms = coas.stream().filter(c -> c.id == coaId).findFirst().get();
-            return t;
+            var coatOfArms = coas.stream().filter(c -> c.id == coaId).findFirst().get();
+            return new Title(id, name, coatOfArms);
         }
 
-        private Title() {}
+        public Title(int id, String name, CoatOfArms coatOfArms) {
+            this.id = id;
+            this.name = name;
+            this.coatOfArms = coatOfArms;
+        }
 
         public int getId() {
             return id;
@@ -119,46 +123,52 @@ public class Ck3Tag {
         private int id;
 
         private String patternFile;
-        private String[] colors;
+        private List<String> colors;
 
         private String emblemFile;
-        private String[] emblemColors;
+        private List<String> emblemColors;
 
         public static CoatOfArms fromNode(Node kv) {
             var kvn = Node.getKeyValueNode(kv);
             var n = kvn.getNode();
 
-            CoatOfArms c = new CoatOfArms();
-            c.id = Integer.parseInt(kvn.getKeyName());
-            c.patternFile = Node.getNodeForKeyIfExistent(n, "pattern").map(Node::getString).orElse(null);
+            var id = Integer.parseInt(kvn.getKeyName());
+            var patternFile = Node.getNodeForKeyIfExistent(n, "pattern").map(Node::getString).orElse(null);
 
-            c.colors = new String[4];
-            c.colors[0] = Node.getNodeForKeyIfExistent(n, "color1").map(Node::getString).orElse(null);
-            c.colors[1] = Node.getNodeForKeyIfExistent(n, "color2").map(Node::getString).orElse(null);
-            c.colors[2] = Node.getNodeForKeyIfExistent(n, "color3").map(Node::getString).orElse(null);
-            c.colors[3] = Node.getNodeForKeyIfExistent(n, "color4").map(Node::getString).orElse(null);
+            List<String> colors = new ArrayList<>();
+            Node.getNodeForKeyIfExistent(n, "color1").map(Node::getString).ifPresent(colors::add);
+            Node.getNodeForKeyIfExistent(n, "color2").map(Node::getString).ifPresent(colors::add);
+            Node.getNodeForKeyIfExistent(n, "color3").map(Node::getString).ifPresent(colors::add);
+            Node.getNodeForKeyIfExistent(n, "color4").map(Node::getString).ifPresent(colors::add);
 
-            c.emblemColors = new String[2];
-            boolean isColoredEmbled = Node.hasKey(n, "colored_emblem");
-            if (isColoredEmbled) {
+            List<String> emblemColors = new ArrayList<>();
+            String emblemFile = null;
+            boolean isColoredEmblem = Node.hasKey(n, "colored_emblem");
+            if (isColoredEmblem) {
                 var e = Node.getNodesForKey(n, "colored_emblem").get(0);
-                c.emblemFile = Node.getString(Node.getNodeForKey(e, "texture"));
-                c.emblemColors[0] = Node.getString(Node.getNodeForKey(e, "color1"));
-                c.emblemColors[1] = Node.getNodeForKeyIfExistent(e, "color2").map(Node::getString).orElse(null);
+                emblemFile = Node.getString(Node.getNodeForKey(e, "texture"));
+                emblemColors.add(Node.getString(Node.getNodeForKey(e, "color1")));
+                Node.getNodeForKeyIfExistent(e, "color2").map(Node::getString).ifPresent(emblemColors::add);
             } else if (Node.hasKey(n, "textured_emblem")) {
-                c.emblemFile = Node.getString(Node.getNodeForKey(
+                emblemFile = Node.getString(Node.getNodeForKey(
                         Node.getNodeForKey(n, "textured_emblem"), "texture"));
             }
-            return c;
+            return new CoatOfArms(id, patternFile, colors, emblemFile, emblemColors);
         }
 
-        private CoatOfArms() {}
+        public CoatOfArms(int id, String patternFile, List<String> colors, String emblemFile, List<String> emblemColors) {
+            this.id = id;
+            this.patternFile = patternFile;
+            this.colors = colors;
+            this.emblemFile = emblemFile;
+            this.emblemColors = emblemColors;
+        }
 
         public String getPatternFile() {
             return patternFile;
         }
 
-        public String[] getColors() {
+        public List<String> getColors() {
             return colors;
         }
 
@@ -166,7 +176,7 @@ public class Ck3Tag {
             return emblemFile;
         }
 
-        public String[] getEmblemColors() {
+        public List<String> getEmblemColors() {
             return emblemColors;
         }
     }

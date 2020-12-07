@@ -4,18 +4,17 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.data.GameDateType;
+import com.crschnick.pdx_unlimiter.eu4.data.*;
 import com.crschnick.pdx_unlimiter.eu4.savegame.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class Ck3SavegameCache extends SavegameCache<Ck3RawSavegame, Ck3Savegame, Ck3Tag, Ck3SavegameInfo> {
 
@@ -23,24 +22,57 @@ public class Ck3SavegameCache extends SavegameCache<Ck3RawSavegame, Ck3Savegame,
         super("ck3", "ck3", GameDateType.CK3);
     }
 
+    private Ck3Tag.CoatOfArms readCoa(JsonNode node) {
+        Ck3Tag.CoatOfArms coa = new Ck3Tag.CoatOfArms(
+                0,
+                node.required("pattern").textValue(),
+                StreamSupport.stream(node.required("patternColors").spliterator(), false)
+                        .map(JsonNode::textValue).collect(Collectors.toList()),
+
+                node.required("emblem").textValue(),
+                StreamSupport.stream(node.required("emblemColors").spliterator(), false)
+                        .map(JsonNode::textValue).collect(Collectors.toList()));
+        return coa;
+    }
+
     @Override
     protected GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
-        return new GameCampaignEntry<>(name, uuid, null, checksum, date, new Ck3Tag());
+        Ck3Tag.Title title = new Ck3Tag.Title(0, "", readCoa(node));
+        return new GameCampaignEntry<>(name, uuid, null, checksum, date, new Ck3Tag(null, List.of(title)));
     }
 
     @Override
     protected GameCampaign<Ck3Tag, Ck3SavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
-        return new GameCampaign<>(lastPlayed, name, uuid, date, new Ck3Tag());
+        Ck3Tag.Title title = new Ck3Tag.Title(0, "", readCoa(node));
+        return new GameCampaign<>(lastPlayed, name, uuid, date, new Ck3Tag(null, List.of(title)));
+    }
+
+    private void writeCoa(ObjectNode node, Ck3Tag.CoatOfArms coa) {
+        node.put("pattern", coa.getPatternFile());
+        node.putArray("patternColors").addAll(coa.getColors().stream()
+                .filter(Objects::nonNull)
+                .map(TextNode::new)
+                .collect(Collectors.toList()));
+
+        node.put("emblem", coa.getEmblemFile());
+        node.putArray("emblemColors").addAll(coa.getEmblemColors().stream()
+                .filter(Objects::nonNull)
+                .map(TextNode::new)
+                .collect(Collectors.toList()));
     }
 
     @Override
     protected void writeEntry(ObjectNode node, GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e) {
-
+        Ck3Tag tag = e.getTag();
+        Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
+        writeCoa(node, coa);
     }
 
     @Override
     protected void writeCampaign(ObjectNode node, GameCampaign<Ck3Tag, Ck3SavegameInfo> c) {
-
+        Ck3Tag tag = c.getTag();
+        Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
+        writeCoa(node, coa);
     }
 
     @Override

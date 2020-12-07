@@ -35,11 +35,13 @@ public class ColorTransformer extends NodeTransformer {
 
         ArrayNode a = (ArrayNode) n;
         for (int i = 0; i < a.getNodes().size() - 1; i++) {
-            var typeNode = a.getNodes().get(i) instanceof KeyValueNode ?
+            Node typeKvNode = a.getNodes().get(i);
+            var typeNode = typeKvNode instanceof KeyValueNode ?
                     ((KeyValueNode) a.getNodes().get(i)).getNode() : a.getNodes().get(i);
             boolean rgb = typeNode instanceof ValueNode && (((ValueNode) typeNode).getValue().equals("rgb") || ((ValueNode) typeNode).getValue().equals("579"));
             boolean hsv = typeNode instanceof ValueNode && ((ValueNode) typeNode).getValue().equals("hsv");
-            if (!rgb && !hsv) {
+            boolean hsv360 = typeNode instanceof ValueNode && ((ValueNode) typeNode).getValue().equals("hsv360");
+            if (!rgb && !hsv && !hsv360) {
                 continue;
             }
 
@@ -48,15 +50,15 @@ public class ColorTransformer extends NodeTransformer {
                 continue;
             }
 
-            a.getNodes().remove(typeNode);
+            a.getNodes().remove(typeKvNode);
             a.getNodes().remove(colors);
 
             ArrayNode replacement = new ArrayNode();
             replacement.getNodes().add(KeyValueNode.create("type", typeNode));
             replacement.getNodes().add(KeyValueNode.create("values", colors));
 
-            String key = a.getNodes().get(i) instanceof KeyValueNode ?
-                    ((KeyValueNode) a.getNodes().get(i)).getKeyName() : null;
+            String key = typeKvNode instanceof KeyValueNode ?
+                    ((KeyValueNode) typeKvNode).getKeyName() : null;
             a.getNodes().add(i, key != null ? KeyValueNode.create(key, replacement) : replacement);
         }
 

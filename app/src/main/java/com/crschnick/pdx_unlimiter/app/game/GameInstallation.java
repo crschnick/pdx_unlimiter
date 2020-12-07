@@ -226,6 +226,10 @@ public abstract class GameInstallation {
         return path;
     }
 
+    public Path getModBasePath() {
+        return path;
+    }
+
     public abstract Path getExecutable();
 
     public abstract Path getUserPath();

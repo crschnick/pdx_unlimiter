@@ -44,6 +44,15 @@ public class ImageLoader {
         }
     }
 
+    public static Function<Integer,Integer> replaceColorFunction(int replaceColor, int newColor) {
+        return (Integer rgb) -> {
+            if (rgb == replaceColor) {
+                return newColor;
+            }
+            return rgb;
+        };
+    }
+
     static Image loadImage(InputStream in, Function<Integer,Integer> pixelSelector) {
         BufferedImage image = null;
         try {

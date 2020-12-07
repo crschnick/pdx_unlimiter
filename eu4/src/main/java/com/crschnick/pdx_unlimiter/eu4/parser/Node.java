@@ -91,6 +91,12 @@ public abstract class Node {
             double v = (double) ((ValueNode) node).getValue();
             return v;
         }
+
+        if (((ValueNode) node).getValue() instanceof Long) {
+            long v = (long) ((ValueNode) node).getValue();
+            return v;
+        }
+
         throw new NodeFormatException("Not a double value node:\n" + node.toString());
     }
 

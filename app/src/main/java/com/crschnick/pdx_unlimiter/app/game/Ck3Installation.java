@@ -90,6 +90,11 @@ public class Ck3Installation extends GameInstallation {
     }
 
     @Override
+    public Path getModBasePath() {
+        return getPath().resolve("game");
+    }
+
+    @Override
     protected Path getLauncherDataPath() {
         return getPath().resolve("launcher");
     }

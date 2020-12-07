@@ -9,6 +9,7 @@ import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
 import javafx.beans.value.ChangeListener;
@@ -92,7 +93,7 @@ public class GameImage {
     }
 
     public static Pane ck3TagNode(Ck3Tag tag, String styleClass) {
-        return unknownTag(styleClass);
+        return ck3TagNode(tag.getPrimaryTitle().getCoatOfArms(), null, styleClass);
     }
 
     public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
@@ -188,6 +189,100 @@ public class GameImage {
         pane.getStyleClass().add(styleClass);
         pane.setMaxWidth(Region.USE_PREF_SIZE);
         pane.setMaxHeight(Region.USE_PREF_SIZE);
+        return pane;
+    }
+
+    private static Pane ck3TagNode(
+            Ck3Tag.CoatOfArms coa, GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, String styleClass) {
+        Image pattern = null;
+
+        {
+            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getColors().get(0), Color.TRANSPARENT)) : 0;
+            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getColors().get(1), Color.TRANSPARENT)) : 0;
+            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getColors().get(2), Color.TRANSPARENT)) : 0;
+            Function<Integer, Integer> patternFunction = (Integer rgb) -> {
+                if (rgb == 0xFFFF0000) {
+                    return pColor1;
+                }
+                if (rgb == 0xFFFFFF00) {
+                    return pColor2;
+                }
+                if (rgb == 0xFFFFFFFF) {
+                    return pColor3;
+                }
+
+                return rgb;
+            };
+            try {
+                var in = CascadeDirectoryHelper.openFile(
+                        Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
+                        entry,
+                        GameInstallation.CK3);
+                pattern = in.map(inputStream -> ImageLoader.loadImage(inputStream, patternFunction)).orElse(null);
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+
+
+        Image emblem = null;
+        if (coa.getEmblemFile() != null) {
+            boolean hasColor = coa.getEmblemColors().size() > 0;
+            int eColor1 = coa.getEmblemColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getEmblemColors().get(0), Color.TRANSPARENT)) : 0;
+            int eColor2 = coa.getEmblemColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getEmblemColors().get(1), Color.TRANSPARENT)) : 0;
+            int eColor3 = coa.getEmblemColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getEmblemColors().get(2), Color.TRANSPARENT)) : 0;
+            Function<Integer,Integer> customFilter = (Integer rgb) -> {
+                if (hasColor) {
+                    if (rgb == 0xFFFF0000) {
+                        return eColor1;
+                    }
+                    if (rgb == 0xFF00007F) {
+                        return eColor2;
+                    }
+                    if (rgb == 0xFFFFFFFF) {
+                        return eColor3;
+                    }
+                }
+                return rgb;
+            };
+
+            try {
+                var in = CascadeDirectoryHelper.openFile(
+                        Path.of("gfx", "coat_of_arms",
+                                (hasColor ? "colored" : "textured") + "_emblems").resolve(coa.getEmblemFile()),
+                        entry,
+                        GameInstallation.CK3);
+                emblem = in.map(inputStream -> ImageLoader.loadImage(inputStream, customFilter)).orElse(null);
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+
+        try {
+            var in = CascadeDirectoryHelper.openFile(
+                    Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getEmblemFile()),
+                    entry,
+                    GameInstallation.CK3);
+            in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+
+        ImageView v = new ImageView(pattern);
+        ImageView iconV = new ImageView(emblem);
+        StackPane pane = new StackPane(v, iconV);
+        v.setPreserveRatio(true);
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        iconV.fitWidthProperty().bind(pane.widthProperty());
+        iconV.fitHeightProperty().bind(pane.heightProperty());
+        pane.getStyleClass().add(styleClass);
         return pane;
     }
 
