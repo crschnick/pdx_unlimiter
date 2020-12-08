@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.GameDate;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

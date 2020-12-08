@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.Node;
-import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jayway.jsonpath.JsonPath;
 import org.slf4j.LoggerFactory;
 

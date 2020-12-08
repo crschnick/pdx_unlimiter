@@ -1,11 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
-import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.GameVersion;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -17,9 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,6 +71,15 @@ public class StellarisInstallation extends GameInstallation {
 
     @Override
     public void init() throws Exception {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            executable = getPath().resolve("stellaris.exe");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            executable = getPath().resolve("stellaris");
+        }
+        if (!Files.isRegularFile(executable)) {
+            throw new IllegalArgumentException("Executable not found");
+        }
+
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
         String value = Optional.ofNullable(node.get("gameDataPath"))

@@ -5,13 +5,13 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.eu4.savegame.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class GameImage {
 

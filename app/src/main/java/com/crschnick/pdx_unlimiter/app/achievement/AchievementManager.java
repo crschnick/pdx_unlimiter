@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
+import com.crschnick.pdx_unlimiter.core.savegame.Savegame;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

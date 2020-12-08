@@ -3,14 +3,13 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.CK3_BACKGROUND;
-import static com.crschnick.pdx_unlimiter.app.gui.GameImage.EU4_BACKGROUND;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 

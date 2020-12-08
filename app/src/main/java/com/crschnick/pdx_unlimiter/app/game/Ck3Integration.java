@@ -4,11 +4,8 @@ import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Ck3GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.crschnick.pdx_unlimiter.eu4.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Ck3SavegameInfo;
-
-import java.io.IOException;
-import java.nio.file.Path;
+import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 
 public class Ck3Integration extends GameIntegration<Ck3Tag, Ck3SavegameInfo> {
     @Override

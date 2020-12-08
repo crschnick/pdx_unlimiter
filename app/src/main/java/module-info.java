@@ -1,6 +1,6 @@
 module com.crschnick.pdx_unlimiter.app {
     requires java.se;
-    requires com.crschnick.pdx_unlimiter.eu4;
+    requires com.crschnick.pdx_unlimiter.core;
     requires com.realityinteractive.imageio.tga;
     requires org.apache.commons.lang3;
     requires org.apache.commons.io;

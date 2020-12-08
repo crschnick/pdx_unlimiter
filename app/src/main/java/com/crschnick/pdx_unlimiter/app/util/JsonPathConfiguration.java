@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.eu4.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.eu4.parser.Node;
-import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.Option;
@@ -99,6 +99,7 @@ public class JsonPathConfiguration {
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public Object getArrayIndex(Object o, int i, boolean b) {
             throw new UnsupportedOperationException();
         }

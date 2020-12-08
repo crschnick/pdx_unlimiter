@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.parser.Node;
-import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.IOException;
 import java.nio.file.Files;

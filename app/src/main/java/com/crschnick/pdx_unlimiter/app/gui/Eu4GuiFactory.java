@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;

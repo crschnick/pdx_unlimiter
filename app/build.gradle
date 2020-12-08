@@ -59,7 +59,7 @@ dependencies {
     implementation files("$buildDir/generated-modules/json-path-master-SNAPSHOT.jar")
     implementation files("$buildDir/generated-modules/json-smart-2.3.jar")
     implementation files("$buildDir/generated-modules/accessors-smart-1.2.jar")
-    implementation project(':eu4')
+    implementation project(':core')
 }
 
 addDependenciesModuleInfo {

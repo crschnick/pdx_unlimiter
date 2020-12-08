@@ -2,23 +2,19 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.data.GameDateType;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4RawSavegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.data.GameDate;
+import com.crschnick.pdx_unlimiter.core.data.GameDateType;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4RawSavegame;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4Savegame;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Eu4SavegameCache extends SavegameCache<
         Eu4RawSavegame,

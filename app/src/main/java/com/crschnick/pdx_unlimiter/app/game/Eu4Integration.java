@@ -5,17 +5,8 @@ import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.eu4.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4Savegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Eu4SavegameInfo;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 
 public class Eu4Integration extends GameIntegration<Eu4Tag, Eu4SavegameInfo> {
 

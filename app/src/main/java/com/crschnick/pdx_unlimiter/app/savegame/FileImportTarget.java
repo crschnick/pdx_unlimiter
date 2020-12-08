@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
+import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;

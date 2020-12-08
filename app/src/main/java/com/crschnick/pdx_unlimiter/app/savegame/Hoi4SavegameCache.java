@@ -3,22 +3,18 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.eu4.data.GameDate;
-import com.crschnick.pdx_unlimiter.eu4.data.GameDateType;
-import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4RawSavegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4Savegame;
-import com.crschnick.pdx_unlimiter.eu4.savegame.Hoi4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.data.GameDate;
+import com.crschnick.pdx_unlimiter.core.data.GameDateType;
+import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Hoi4RawSavegame;
+import com.crschnick.pdx_unlimiter.core.savegame.Hoi4Savegame;
+import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.Optional;
 import java.util.UUID;
 
 public class Hoi4SavegameCache extends SavegameCache<
