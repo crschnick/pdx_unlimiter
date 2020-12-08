@@ -35,6 +35,10 @@ public class FileImporter {
         });
     }
 
+    public static void importTarget(FileImportTarget target) {
+        new Thread(target::importTarget).start();
+    }
+
     private static void importFileInternal(Path queueFile, Path p) throws IOException {
         var targets = FileImportTarget.createTargets(p);
         if (targets.size() == 0) {

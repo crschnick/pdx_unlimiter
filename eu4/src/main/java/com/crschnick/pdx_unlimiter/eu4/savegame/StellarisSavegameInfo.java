@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.eu4.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
+import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -12,9 +13,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
-
-    private StellarisTag tag;
-    private Set<StellarisTag> allTags = new HashSet<>();
 
     public static StellarisSavegameInfo fromSavegame(StellarisSavegame sg) throws SavegameParseException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
@@ -31,8 +29,14 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             new Random(seed).nextBytes(b);
             i.campaignUuid = UUID.nameUUIDFromBytes(b);
 
+            i.allTags = new HashSet<>();
             for (Node country : Node.getNodeArray(sg.getNodes().get("countries"))) {
                 KeyValueNode kv = Node.getKeyValueNode(country);
+
+                // Invalid country node
+                if (kv.getNode() instanceof ValueNode && ((ValueNode) kv.getNode()).getValue() instanceof String) {
+                    continue;
+                }
 
                 Node flag = Node.getNodeForKey(kv.getNode(), "flag");
                 Node icon = Node.getNodeForKey(flag, "icon");

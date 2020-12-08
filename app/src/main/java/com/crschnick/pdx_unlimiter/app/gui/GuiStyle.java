@@ -43,6 +43,7 @@ public class GuiStyle {
     public static String CLASS_LAUNCH = "launch-button";
     public static String CLASS_KILL = "kill-button";
     public static String CLASS_IMPORT = "import-button";
+    public static String CLASS_DELETE = "delete-button";
     public static String CLASS_SAVEGAME = "savegame";
     public static String CLASS_ALERT = "alert-icon";
     public static String CLASS_ENTRY = "entry";

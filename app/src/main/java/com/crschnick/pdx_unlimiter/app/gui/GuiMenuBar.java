@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -177,6 +178,14 @@ public class GuiMenuBar {
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
 
+        JFXButton importB = new JFXButton();
+        importB.setOnAction(e -> {
+            GuiImporter.createImporterDialog(GameIntegration.current().getInstallation());
+            e.consume();
+        });
+        importB.setGraphic(new FontIcon());
+        importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
+
         JFXButton launch = new JFXButton();
         launch.setOnAction(e -> {
             GameIntegration.current().getInstallation().startLauncher();
@@ -185,7 +194,7 @@ public class GuiMenuBar {
         launch.setGraphic(new FontIcon());
         launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
 
-        var box = new HBox(m, launch);
+        var box = new HBox(m, importB, launch);
         box.setAlignment(Pos.CENTER);
         return box;
     }

@@ -25,7 +25,7 @@ public class GuiLayout {
 
     private static BorderPane layout;
 
-    public static Pane createLayout() {
+    public static StackPane createLayout() {
         layout = new BorderPane();
         var menu = GuiMenuBar.createMenu();
         layout.setTop(menu);

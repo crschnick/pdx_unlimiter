@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,19 +10,18 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class FileImportTarget {
 
-    private SavegameCache<?,?,?,?> savegameCache;
+    private SavegameCache<?, ?, ?, ?> savegameCache;
     protected Path path;
 
-    public FileImportTarget(SavegameCache<?,?,?,?> savegameCache, Path path) {
+    public FileImportTarget(SavegameCache<?, ?, ?, ?> savegameCache, Path path) {
         this.savegameCache = savegameCache;
         this.path = path;
     }
 
-    public final boolean importTarget() {
+    final boolean importTarget() {
         return savegameCache.importSavegame(path);
     }
 
@@ -29,7 +29,7 @@ public abstract class FileImportTarget {
         return Files.getLastModifiedTime(path).toInstant();
     }
 
-    public abstract void delete() throws IOException;
+    public abstract void delete();
 
     public abstract String getName();
 
@@ -85,13 +85,17 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public void delete() throws IOException {
-            Files.delete(path);
+        public void delete() {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
         }
 
         @Override
         public String getName() {
-            return path.getFileName().toString();
+            return FilenameUtils.getBaseName(path.getFileName().toString());
         }
     }
 
@@ -102,16 +106,20 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public void delete() throws IOException {
-            Files.delete(path);
-            if (Files.list(path.getParent()).count() == 0) {
-                Files.delete(path.getParent());
+        public void delete() {
+            try {
+                Files.delete(path);
+                if (Files.list(path.getParent()).count() == 0) {
+                    Files.delete(path.getParent());
+                }
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
             }
         }
 
         @Override
         public String getName() {
-            return path.getParent().getFileName().toString() + " " + path.getFileName().toString();
+            return path.getParent().getFileName().toString().split("_")[0] + " " + path.getFileName().toString();
         }
     }
 
@@ -122,13 +130,18 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public void delete() throws IOException {
-            Files.delete(path.getParent());
+        public void delete() {
+            try {
+                Files.delete(path.getParent());
+            } catch (IOException e) {
+
+                ErrorHandler.handleException(e);
+            }
         }
 
         @Override
         public String getName() {
-            return path.getParent().getFileName().toString();
+            return path.getParent().getFileName().toString().split("_")[0];
         }
     }
 }

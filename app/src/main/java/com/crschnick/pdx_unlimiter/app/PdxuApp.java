@@ -38,11 +38,15 @@ public class PdxuApp extends Application {
 
     private static PdxuApp APP;
     private Image icon;
-    private Pane layout;
+    private StackPane layout;
     private BooleanProperty running = new SimpleBooleanProperty(true);
 
     public static PdxuApp getApp() {
         return APP;
+    }
+
+    public StackPane getLayout() {
+        return layout;
     }
 
     public static void main(String[] args) {

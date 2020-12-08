@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.eu4.format.NamespaceCreator;
 import com.crschnick.pdx_unlimiter.eu4.savegame.*;
 import javafx.event.ActionEvent;
@@ -140,6 +141,7 @@ public class DialogHelper {
 
     public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.getDialogPane().styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
         return alert;

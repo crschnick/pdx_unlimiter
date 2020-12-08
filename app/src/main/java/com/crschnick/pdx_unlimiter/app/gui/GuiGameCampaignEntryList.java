@@ -13,13 +13,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -30,15 +28,14 @@ public class GuiGameCampaignEntryList {
 
     public static void createCampaignEntryList(Pane pane) {
         JFXListView<Node> grid = new JFXListView<>();
+        grid.setPrefWidth(Region.USE_COMPUTED_SIZE);
         grid.setOpacity(0.9);
-        grid.getStyleClass().add(CLASS_ENTRY_LIST);
+        grid.prefWidthProperty().bind(pane.widthProperty());
+        grid.prefHeightProperty().bind(pane.heightProperty());
 
         SetChangeListener<GameCampaignEntry> l = (c) -> {
             Platform.runLater(() -> {
                 if (c.wasAdded()) {
-                    if (c.getSet().size() == 1) {
-                        pane.getChildren().set(0, grid);
-                    }
                     int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(c.getElementAdded());
                     grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
                 } else {
@@ -52,35 +49,34 @@ public class GuiGameCampaignEntryList {
             Platform.runLater(() -> {
                 if (n.getSavegameCache().getCampaigns().size() > 0) {
                     pane.getChildren().set(0, grid);
-                    grid.prefWidthProperty().bind(pane.widthProperty());
-                    grid.prefHeightProperty().bind(pane.heightProperty());
                 } else {
                     pane.getChildren().set(0, createNoCampaignNode(pane));
-                    GuiStatusBar.getStatusBar().showImport();
                 }
             });
         });
 
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
-            if (o != null) {
-                o.getEntries().removeListener(l);
-            }
+            Platform.runLater(() -> {
+                if (o != null) {
+                    o.getEntries().removeListener(l);
+                }
 
-            if (n != null) {
-                n.getEntries().addListener(l);
-                Platform.runLater(() -> {
+                if (n != null) {
+                    // Remove no-campaign node if necessary
+                    pane.getChildren().set(0, grid);
+
+                    n.getEntries().addListener(l);
                     grid.setItems(FXCollections.observableArrayList(n.entryStream()
                             .map(GuiGameCampaignEntry::createCampaignEntryNode)
                             .collect(Collectors.toList())));
 
                     // Bug in JFoenix? We have to set this everytime we update the list view
                     grid.setExpanded(true);
-                });
-            } else {
-                Platform.runLater(() -> {
+                } else {
                     grid.setItems(FXCollections.observableArrayList());
-                });
-            }
+
+                }
+            });
         });
 
         GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
@@ -103,8 +99,17 @@ public class GuiGameCampaignEntryList {
                 GameIntegration.current().getName() + " yet.\n");
         v.getChildren().add(text);
 
+        Button importB = new Button("Import savegames");
+        importB.setOnAction(e -> {
+            GuiImporter.createImporterDialog(GameIntegration.current().getInstallation());
+            e.consume();
+        });
+        importB.setGraphic(new FontIcon());
+        importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
+        v.getChildren().add(importB);
+
         v.getChildren().add(new Label());
-        Label text2 = new Label("To get started, you can use the status bar below to import the latest savegame at any time." +
+        Label text2 = new Label("Furthermore, you can use the status bar below to import the latest savegame at any time. " +
                 "Alternatively, can also drag and drop any savegame into " +
                 "this window or double click any savegame file if its extension is associated with the Pdx-Unlimiter.");
         text2.setWrapText(true);
