@@ -9,7 +9,6 @@ import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.Savegame;
 import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -163,9 +161,8 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
     public final Optional<Path> exportCampaignEntry() {
         try {
-            var path = getInstallation().getSavegamesPath().resolve(getSavegameCache().getFileName(selectedEntry.get()));
-            getSavegameCache().exportSavegame(selectedEntry.get(),
-                    path);
+            var path = getInstallation().getExportTarget(getSavegameCache(), selectedEntry.get());
+            getSavegameCache().exportSavegame(selectedEntry.get(), path);
             return Optional.of(path);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -178,18 +175,33 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             return;
         }
 
+        var e = selectedEntry.get();
+
         Optional<Path> p = exportCampaignEntry();
         if (p.isPresent()) {
             try {
                 getInstallation().writeLaunchConfig(
                         selectedEntry.get().getName(), selectedCampaign.get().getLastPlayed(), p.get());
-            } catch (IOException ioException) {
-                ErrorHandler.handleException(ioException);
+
+                var mods = e.getInfo().getMods().stream()
+                        .map(m -> getInstallation().getModForName(m))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
+                var dlcs = e.getInfo().getDlcs().stream()
+                        .map(d -> getInstallation().getDlcForName(d))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
+                getInstallation().writeDlcLoadFile(mods, dlcs);
+
+                selectedCampaign.get().lastPlayedProperty().setValue(Instant.now());
+                getInstallation().startDirectly();
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
                 return;
             }
         }
-        selectedCampaign.get().lastPlayedProperty().setValue(Instant.now());
-        getInstallation().start();
     }
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {

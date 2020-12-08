@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
 import com.crschnick.pdx_unlimiter.eu4.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.eu4.parser.Node;
@@ -9,16 +10,17 @@ import com.crschnick.pdx_unlimiter.eu4.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.eu4.parser.ValueNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +53,16 @@ public class Ck3Installation extends GameInstallation {
 
     @Override
     public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
-
+        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
+        SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        var date = d.format(new Date(lastPlayed.toEpochMilli()));
+        var sgPath = FilenameUtils.getBaseName(
+                FilenameUtils.separatorsToUnix(getSavegamesPath().relativize(path).toString()));
+        ObjectNode n = JsonNodeFactory.instance.objectNode()
+                .put("title", sgPath)
+                .put("desc", "")
+                .put("date", date);
+        JsonHelper.write(n, out);
     }
 
     @Override
@@ -105,7 +116,7 @@ public class Ck3Installation extends GameInstallation {
     }
 
     @Override
-    public void start() {
+    public void startDirectly() {
         try {
             new ProcessBuilder().command(executable.toString(), "--continuelastsave").start();
         } catch (IOException e) {

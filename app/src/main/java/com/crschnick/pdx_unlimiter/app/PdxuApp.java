@@ -145,8 +145,4 @@ public class PdxuApp extends Application {
     public boolean isRunning() {
         return running.get();
     }
-
-    public BooleanProperty runningProperty() {
-        return running;
-    }
 }

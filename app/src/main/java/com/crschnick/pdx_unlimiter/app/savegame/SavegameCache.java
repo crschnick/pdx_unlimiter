@@ -150,7 +150,6 @@ public abstract class SavegameCache<
 
     private void init() throws IOException {
         FileUtils.forceMkdir(getPath().toFile());
-        FileUtils.forceMkdir(getBackupPath().toFile());
         if (Files.exists(getPath().resolve(getDataFile()))) {
             importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
         }
@@ -500,7 +499,8 @@ public abstract class SavegameCache<
     }
 
     public synchronized void exportSavegame(GameCampaignEntry<T,I> e, Path destPath) throws IOException {
-        Path srcPath = getPath(e).resolve("savegame." + name);
+        Path srcPath = getPath(e).resolve("savegame." + fileEnding);
+        FileUtils.forceMkdirParent(destPath.toFile());
         FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
@@ -573,10 +573,6 @@ public abstract class SavegameCache<
         return Path.of("campaigns.json");
     }
 
-    public Path getBackupPath() {
-        return PdxuInstallation.getInstance().getSavegameBackupLocation().resolve(name);
-    }
-
     public int indexOf(GameCampaign<?,?> c) {
         var list = new ArrayList<GameCampaign<T,I>>(getCampaigns());
         list.sort(Comparator.comparing(GameCampaign::getLastPlayed));
@@ -593,5 +589,9 @@ public abstract class SavegameCache<
 
     public ObservableSet<GameCampaign<T,I> > getCampaigns() {
         return campaigns;
+    }
+
+    public String getFileEnding() {
+        return fileEnding;
     }
 }

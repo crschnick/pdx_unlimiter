@@ -2,13 +2,16 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +109,7 @@ public abstract class GameInstallation {
 
         List<Path> savegameDirs = getAllSavegameDirectories();
 
-        WatcherHelper.startWatchersInDirectories("Savegame watcher", savegameDirs, (p) -> {
+        WatcherHelper.startWatchersInDirectories(this.getClass().getName(), savegameDirs, (p) -> {
             savegames.set(getLatestSavegames());
         });
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
@@ -120,16 +123,22 @@ public abstract class GameInstallation {
         getDistType().launch();
     }
 
+    public <T, I extends SavegameInfo<T>> Path getExportTarget(
+            SavegameCache<?,?,T,I> cache, GameCampaignEntry<T, I> e) {
+        Path file = getSavegamesPath().resolve(cache.getFileName(e));
+        return file;
+    }
+
     public void writeDlcLoadFile(List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
         var out = Files.newOutputStream(getUserPath().resolve("dlc_load.json"));
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         n.putArray("enabled_mods").addAll(mods.stream()
-                .map(m -> m.getModFile().toString())
+                .map(d -> FilenameUtils.separatorsToUnix(getUserPath().relativize(d.getModFile()).toString()))
                 .map(JsonNodeFactory.instance::textNode)
                 .collect(Collectors.toList()));
         n.putArray("disabled_dlcs").addAll(this.dlcs.stream()
                 .filter(d -> d.isExpansion() && !dlcs.contains(d))
-                .map(d -> d.getInfoFilePath().toString())
+                .map(d -> FilenameUtils.separatorsToUnix(getPath().relativize(d.getInfoFilePath()).toString()))
                 .map(JsonNodeFactory.instance::textNode)
                 .collect(Collectors.toList()));
         JsonHelper.write(n, out);
@@ -164,24 +173,18 @@ public abstract class GameInstallation {
     }
 
     private List<FileImportTarget> getLatestSavegames() {
-        return getAllSavegameDirectories().stream().map(d -> {
-                    try {
-                        return Files.list(d);
-                    } catch (IOException e) {
-                        return Collections.<Path>emptyList().stream();
-                    }
-                })
+        return getAllSavegameDirectories().stream()
+                .map(FileImportTarget::createTargets)
+                .map(List::stream)
                 .flatMap(Stream::distinct)
-                .sorted(Comparator.comparingLong(p -> {
+                .sorted(Comparator.comparingLong(t -> {
                     try {
-                        return Long.MAX_VALUE - Files.getLastModifiedTime(p).toMillis();
+                        return t.getLastModified().toEpochMilli();
                     } catch (IOException e) {
                         ErrorHandler.handleException(e);
                         return 0;
                     }
                 }))
-                .map(FileImportTarget::create)
-                .filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toList());
     }
 
@@ -212,7 +215,7 @@ public abstract class GameInstallation {
 
     public abstract Optional<GameMod> getModForName(String name);
 
-    public abstract void start();
+    public abstract void startDirectly() throws IOException;
 
     public abstract void init() throws Exception;
 

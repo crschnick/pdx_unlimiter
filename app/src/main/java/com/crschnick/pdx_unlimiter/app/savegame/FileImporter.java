@@ -5,13 +5,12 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
-import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
 import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,14 +36,16 @@ public class FileImporter {
     }
 
     private static void importFileInternal(Path queueFile, Path p) throws IOException {
-        var target = FileImportTarget.create(p);
-        if (target.isEmpty()) {
+        var targets = FileImportTarget.createTargets(p);
+        if (targets.size() == 0) {
             return;
         }
 
-        boolean succ = target.get().importTarget();
-        if (succ && Settings.getInstance().deleteOnImport()) {
-            target.get().delete();
+        for (FileImportTarget t : targets) {
+            boolean succ = t.importTarget();
+            if (succ && Settings.getInstance().deleteOnImport()) {
+                t.delete();
+            }
         }
 
         Files.delete(queueFile);

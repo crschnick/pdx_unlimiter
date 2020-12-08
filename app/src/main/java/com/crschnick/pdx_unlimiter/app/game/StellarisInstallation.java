@@ -1,16 +1,25 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.eu4.data.GameVersion;
+import com.crschnick.pdx_unlimiter.eu4.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,9 +38,28 @@ public class StellarisInstallation extends GameInstallation {
         }
     }
 
+    public <T, I extends SavegameInfo<T>> Path getExportTarget(
+            SavegameCache<?,?,T,I> cache, GameCampaignEntry<T, I> e) {
+        Path file;
+        Path dir = getSavegamesPath().resolve(cache.getEntryName(e));
+        if (e.getInfo().isIronman()) {
+            file = dir.resolve("ironman.sav");
+        } else {
+            file = dir.resolve(e.getDate().toString() + ".sav");
+        }
+        return file;
+    }
+
     @Override
     public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
-
+        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
+        var sgPath = FilenameUtils.getBaseName(
+                FilenameUtils.separatorsToUnix(getUserPath().relativize(path).toString()));
+        ObjectNode n = JsonNodeFactory.instance.objectNode()
+                .put("title", sgPath)
+                .put("desc", name)
+                .put("date", "");
+        JsonHelper.write(n, out);
     }
 
     @Override
@@ -40,8 +68,8 @@ public class StellarisInstallation extends GameInstallation {
     }
 
     @Override
-    public void start() {
-
+    public void startDirectly() throws IOException {
+        new ProcessBuilder().command(executable.toString(), "--continuelastsave").start();
     }
 
     @Override

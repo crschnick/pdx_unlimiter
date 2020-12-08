@@ -21,6 +21,8 @@ public abstract class DistributionType {
         this.name = name;
     }
 
+    public abstract void onDirectStart();
+
     public abstract void launch();
 
     public abstract List<Path> getSavegamePaths();
@@ -32,6 +34,15 @@ public abstract class DistributionType {
         public Steam(int appId) {
             super("Steam");
             this.appId = appId;
+        }
+
+        @Override
+        public void onDirectStart() {
+            try {
+                Desktop.getDesktop().browse(new URI("steam:"));
+            } catch (IOException | URISyntaxException e) {
+                ErrorHandler.handleException(e);
+            }
         }
 
         @Override
@@ -58,6 +69,10 @@ public abstract class DistributionType {
         public PdxLauncher(Path launcherPath) {
             super("Paradox Launcher");
             this.launcherPath = launcherPath;
+        }
+
+        @Override
+        public void onDirectStart() {
         }
 
         @Override

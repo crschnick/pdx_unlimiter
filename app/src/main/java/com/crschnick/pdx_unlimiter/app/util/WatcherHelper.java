@@ -1,11 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,29 +19,29 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class WatcherHelper {
 
-    private static class Watcher {
-        public WatchService watchService;
-        public Path directory;
+    private static Map<WatchService,Path> createRecursiveWatchers(Path dir) {
+        Map<WatchService,Path> watchers = new HashMap<>();
+        try {
+            var w = FileSystems.getDefault().newWatchService();
+            dir.register(w, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+            watchers.put(w, dir);
+            Files.list(dir).filter(Files::isDirectory).forEach(d -> watchers.putAll(createRecursiveWatchers(d)));
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+        return watchers;
     }
 
     public static void startWatchersInDirectories(
             String game,
             List<Path> dirs,
-            Consumer<Path> listener) throws IOException {
-        var watchers = dirs.stream().collect(Collectors.toMap(d -> {
-            WatchService watcher = null;
-            try {
-                watcher = FileSystems.getDefault().newWatchService();
-                d.register(watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return watcher;
-        }, d -> d));
+            Consumer<Path> listener) {
+        Map<WatchService,Path> watchers = new HashMap<>();
+        dirs.forEach(d -> watchers.putAll(createRecursiveWatchers(d)));
         startWatcher(game + " savegame watcher", watchers, listener);
     }
 
-    private static void startWatcher(String name, Map<WatchService,Path> watchers, Consumer<Path> listener) throws IOException {
+    private static void startWatcher(String name, Map<WatchService,Path> watchers, Consumer<Path> listener) {
         Thread t = new Thread(() -> {
             while (true) {
                 for (var entry : new HashMap<>(watchers).entrySet()) {

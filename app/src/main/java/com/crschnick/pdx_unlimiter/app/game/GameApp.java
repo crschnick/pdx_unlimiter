@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyListener;
 
@@ -15,13 +17,17 @@ public class GameApp {
     }
 
     public void onStart() {
-        listener = new GameKeyListener(this);
-        GlobalScreen.addNativeKeyListener(listener);
+        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+            listener = new GameKeyListener(this);
+            GlobalScreen.addNativeKeyListener(listener);
+        }
     }
 
     public void onShutdown() {
-        GlobalScreen.removeNativeKeyListener(listener);
-        listener = null;
+        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+            GlobalScreen.removeNativeKeyListener(listener);
+            listener = null;
+        }
     }
 
     public GameInstallation getInstallation() {

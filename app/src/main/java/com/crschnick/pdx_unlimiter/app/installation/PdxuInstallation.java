@@ -111,18 +111,6 @@ public class PdxuInstallation {
         }
     }
 
-    public Path getLauncherLocation() {
-        return installLocation.resolve("launcher");
-    }
-
-    public Path getOldLauncherLocation() {
-        return installLocation.resolve("launcher_old");
-    }
-
-    public Path getNewLauncherLocation() {
-        return installLocation.resolve("launcher_new");
-    }
-
     public Path getLogsLocation() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return installLocation.resolve("logs");
@@ -151,10 +139,6 @@ public class PdxuInstallation {
 
     public Path getSavegameLocation() {
         return getDataLocation().resolve("savegames");
-    }
-
-    public Path getSavegameBackupLocation() {
-        return getDataLocation().resolve("savegames_backup");
     }
 
     public String getVersion() {

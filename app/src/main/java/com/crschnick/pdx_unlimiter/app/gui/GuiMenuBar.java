@@ -72,17 +72,6 @@ public class GuiMenuBar {
         });
         savegames.getItems().add(sd);
 
-        MenuItem backups = new MenuItem("Open backup location");
-        backups.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().open(GameIntegration.current().getSavegameCache().getBackupPath().toFile());
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        });
-        savegames.getItems().add(backups);
-
-
         Menu achievements = new Menu("Achievements");
         MenuItem asrc = new MenuItem("Achievement source");
         asrc.setOnAction((a) -> {

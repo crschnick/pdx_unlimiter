@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -36,12 +37,13 @@ public class Eu4Installation extends GameInstallation {
 
     @Override
     public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
+        var sgPath = FilenameUtils.separatorsToUnix(getUserPath().relativize(path).toString());
         var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
         ObjectNode n = JsonNodeFactory.instance.objectNode()
                 .put("title", name)
                 .put("desc", "")
                 .put("date", lastPlayed.toString())
-                .put("filename", getUserPath().relativize(path).toString().replace('\\', '/'));
+                .put("filename", sgPath);
         JsonHelper.write(n, out);
     }
 
@@ -99,12 +101,8 @@ public class Eu4Installation extends GameInstallation {
     }
 
     @Override
-    public void start() {
-        try {
-            new ProcessBuilder().command(executable.toString(), "-continuelastsave").start();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+    public void startDirectly() throws IOException {
+        new ProcessBuilder().command(executable.toString(), "-continuelastsave").start();
     }
 
     @Override

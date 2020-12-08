@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.eu4.savegame.RawSavegameVisitor;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class FileImportTarget {
@@ -22,6 +25,10 @@ public abstract class FileImportTarget {
         return savegameCache.importSavegame(path);
     }
 
+    public Instant getLastModified() throws IOException {
+        return Files.getLastModifiedTime(path).toInstant();
+    }
+
     public abstract void delete() throws IOException;
 
     public abstract String getName();
@@ -30,42 +37,45 @@ public abstract class FileImportTarget {
         return path;
     }
 
-    public static Optional<FileImportTarget> create(Path toImport) {
-        final FileImportTarget[] target = {null};
+    public static List<FileImportTarget> createTargets(Path toImport) {
+        List<FileImportTarget> targets = new ArrayList<>();
         RawSavegameVisitor.vist(toImport, new RawSavegameVisitor() {
             @Override
             public void visitEu4(Path file) {
-                target[0] = new StandardImportTarget(SavegameCache.EU4_CACHE, file);
+                targets.add(new StandardImportTarget(SavegameCache.EU4_CACHE, file));
             }
 
             @Override
             public void visitHoi4(Path file) {
-                target[0] = new StandardImportTarget(SavegameCache.HOI4_CACHE, file);
+                targets.add(new StandardImportTarget(SavegameCache.HOI4_CACHE, file));
             }
 
             @Override
             public void visitStellaris(Path file) {
                 if (file.getFileName().toString().equals("ironman.sav")) {
-                    target[0] = new StellarisIronmanImportTarget(file);
+                    targets.add(new StellarisIronmanImportTarget(file));
                 } else {
-                    target[0] = new StellarisNormalImportTarget(file);
+                    targets.add(new StellarisNormalImportTarget(file));
                 }
             }
 
             @Override
             public void visitCk3(Path file) {
-                target[0] = new StandardImportTarget(SavegameCache.CK3_CACHE, file);
+                targets.add(new StandardImportTarget(SavegameCache.CK3_CACHE, file));
             }
 
             @Override
             public void visitOther(Path file) {
-                Path p = file.resolve("ironman.sav");
-                if (Files.isDirectory(file) && Files.isRegularFile(p)) {
-                    target[0] = new StellarisIronmanImportTarget(p);
+                if (Files.isDirectory(file)) {
+                    try {
+                        Files.list(file).forEach(f -> targets.addAll(FileImportTarget.createTargets(f)));
+                    } catch (IOException e) {
+                        ErrorHandler.handleException(e);
+                    }
                 }
             }
         });
-        return Optional.ofNullable(target[0]);
+        return targets;
     }
 
     public static final class StandardImportTarget extends FileImportTarget {
