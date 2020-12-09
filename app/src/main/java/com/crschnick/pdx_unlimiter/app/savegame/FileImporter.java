@@ -6,22 +6,27 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class FileImporter {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileImporter.class);
 
     private static FileImporter INSTANCE;
 
     public static void init() throws IOException {
         INSTANCE = new FileImporter();
         var path = PdxuInstallation.getInstance().getSavegameLocation().resolve("import");
-        FileUtils.cleanDirectory(path.toFile());
-        WatcherHelper.startWatchersInDirectories("Importer", List.of(path), p -> {
+
+        Consumer<Path> importFunc = p -> {
             if (!Files.exists(p)) {
                 return;
             }
@@ -31,22 +36,29 @@ public class FileImporter {
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
-        });
+        };
+
+        Files.list(path).forEach(importFunc);
+        WatcherHelper.startWatchersInDirectories("Importer", List.of(path), importFunc);
     }
 
     private static void importFileInternal(Path queueFile, Path p) throws IOException {
+        logger.debug("Starting to import " + p + " from queue file " + queueFile);
         var targets = FileImportTarget.createTargets(p);
         if (targets.size() == 0) {
-            return;
-        }
-
-        for (FileImportTarget t : targets) {
-            boolean succ = t.importTarget();
-            if (succ && Settings.getInstance().deleteOnImport()) {
-                t.delete();
+            logger.debug("No targets to import");
+        } else {
+            for (FileImportTarget t : targets) {
+                logger.debug("Starting to import target " + t.getName() + " with path " + t.getPath());
+                boolean succ = t.importTarget();
+                if (succ && Settings.getInstance().deleteOnImport()) {
+                    logger.debug("Deleting import target " + t.getName());
+                    t.delete();
+                }
             }
         }
 
+        logger.debug("Deleting queue file " + queueFile);
         Files.delete(queueFile);
     }
 
@@ -61,6 +73,8 @@ public class FileImporter {
         var path = PdxuInstallation.getInstance().getSavegameLocation()
                 .resolve("import")
                 .resolve(UUID.randomUUID().toString());
+
+        logger.debug("Creating queue file at " + path + " for import file " + file);
         try {
             Files.writeString(path, file.toString());
         } catch (IOException e) {

@@ -27,6 +27,7 @@ import org.jnativehook.GlobalScreen;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -42,6 +43,7 @@ public class PdxuApp extends Application {
 
     public static void main(String[] args) {
         try {
+            initialSetup(args);
             launch(args);
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
@@ -68,38 +70,47 @@ public class PdxuApp extends Application {
         }
     }
 
-    private void setup() throws Exception {
+    private static void initialSetup(String[] args) throws Exception {
         PdxuInstallation.init();
         LogManager.init();
         ErrorHandler.init();
 
-        LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + getParameters().getRaw());
-        getParameters().getRaw().stream()
+        LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
+        Arrays.stream(args)
                 .map(Path::of)
                 .forEach(FileImporter::addToImportQueue);
 
         if (!PdxuInstallation.shouldStart()) {
             System.exit(0);
         }
+
+        Settings.init();
+    }
+
+    private void layoutSetup() {
+        GameImage.loadImages();
+        layout = GuiLayout.createLayout();
     }
 
     private void postWindowSetup() throws Exception {
-        Settings.init();
+        new Thread(() -> {
+            try {
+                if (!GameIntegration.init()) {
+                    GuiSettings.showSettings(true);
+                }
+                GameAppManager.init();
 
-        GameImage.loadImages();
-        layout = GuiLayout.createLayout();
+                SavegameCache.loadData();
+                FileImporter.init();
 
-        if (!GameIntegration.init()) {
-            GuiSettings.showSettings(true);
-        }
-        GameAppManager.init();
+                AchievementManager.init();
+                if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+                    GlobalScreen.registerNativeHook();
+                }
+            } catch (Exception e) {
 
-        SavegameCache.loadData();
-        FileImporter.init();
-        AchievementManager.init();
-        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-            GlobalScreen.registerNativeHook();
-        }
+            }
+        }).start();
     }
 
     @Override
@@ -118,25 +129,20 @@ public class PdxuApp extends Application {
                 close();
             }
         });
-        try {
-            setup();
-        } catch (Exception e) {
-            ErrorHandler.handleTerminalException(e);
-        }
+
+        layoutSetup();
 
         primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
+        Scene scene = new Scene(layout, 1000, 800);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        GuiStyle.addStylesheets(primaryStage.getScene());
 
         try {
             postWindowSetup();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
-
-        Scene scene = new Scene(layout, 1000, 800);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        GuiStyle.addStylesheets(primaryStage.getScene());
-
 
     }
 
