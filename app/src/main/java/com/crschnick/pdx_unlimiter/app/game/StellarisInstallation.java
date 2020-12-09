@@ -23,16 +23,8 @@ import java.util.regex.Pattern;
 
 public class StellarisInstallation extends GameInstallation {
 
-    private Path executable;
-    private Path userDirectory;
-
     public StellarisInstallation(Path path) {
-        super(path);
-        if (SystemUtils.IS_OS_WINDOWS) {
-            executable = getPath().resolve("stellaris.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            executable = getPath().resolve("stellaris");
-        }
+        super(path, Path.of("stellaris"));
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
@@ -66,33 +58,24 @@ public class StellarisInstallation extends GameInstallation {
 
     @Override
     public void startDirectly() throws IOException {
-        new ProcessBuilder().command(executable.toString(), "--continuelastsave").start();
+        new ProcessBuilder().command(getExecutable().toString(), "--continuelastsave").start();
     }
 
     @Override
     public void init() throws Exception {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            executable = getPath().resolve("stellaris.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            executable = getPath().resolve("stellaris");
-        }
-        if (!Files.isRegularFile(executable)) {
+        if (!Files.isRegularFile(getExecutable())) {
             throw new IllegalArgumentException("Executable not found");
         }
 
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
         String value = Optional.ofNullable(node.get("gameDataPath"))
-                .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in EU4 launcher config file"))
+                .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in Stellaris launcher config file"))
                 .textValue();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            value = value.replace("%USER_DOCUMENTS%",
-                    Paths.get(System.getProperty("user.home"), "Documents").toString());
-        } else if (SystemUtils.IS_OS_LINUX) {
-            value = value.replace("$LINUX_DATA_HOME",
-                    Paths.get(System.getProperty("user.home"), ".local", "share").toString());
+        this.userDir = super.replaceVariablesInPath(value);
+        if (!Files.exists(userDir)) {
+            throw new IllegalArgumentException("User directory not found");
         }
-        this.userDirectory = Path.of(value);
 
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("(\\w)+\\s+v(\\d)\\.(\\d+)\\.(\\d+).+").matcher(v);
@@ -111,26 +94,5 @@ public class StellarisInstallation extends GameInstallation {
         } else {
             this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
         }
-    }
-
-    @Override
-    public boolean isValid() {
-        return Files.isRegularFile(executable);
-    }
-
-    @Override
-    public Path getExecutable() {
-        return executable;
-    }
-
-    @Override
-    public Path getUserPath() {
-        return userDirectory;
-    }
-
-
-    @Override
-    public Path getSavegamesPath() {
-        return userDirectory.resolve("save games");
     }
 }

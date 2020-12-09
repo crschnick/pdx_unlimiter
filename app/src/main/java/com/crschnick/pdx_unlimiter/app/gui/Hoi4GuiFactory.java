@@ -67,9 +67,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     public ObservableValue<Node> createImage(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                //prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
-            });
+            Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON)));
         });
         return prop;
     }

@@ -24,12 +24,12 @@ public class Ck3Integration extends GameIntegration<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public GameGuiFactory getGuiFactory() {
+    public Ck3GuiFactory getGuiFactory() {
         return new Ck3GuiFactory();
     }
 
     @Override
-    public SavegameCache getSavegameCache() {
+    public SavegameCache<?,?,Ck3Tag, Ck3SavegameInfo> getSavegameCache() {
         return SavegameCache.CK3_CACHE;
     }
 }

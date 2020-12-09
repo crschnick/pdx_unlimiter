@@ -109,7 +109,7 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(GameIntegration.current().getName() + "(Running)",
+        Label text = new Label(GameIntegration.current().getName() + " (Running)",
                 GameIntegration.current().getGuiFactory().createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
@@ -206,7 +206,7 @@ public class GuiStatusBar {
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
 
-        Label name = new Label("Incompatible version");
+        Label name = new Label("Incompatible");
         name.setGraphic(new FontIcon());
         name.getStyleClass().add(CLASS_TEXT);
         name.getStyleClass().add(CLASS_ALERT);

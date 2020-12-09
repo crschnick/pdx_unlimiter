@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXSpinner;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Pos;
@@ -67,15 +68,17 @@ public class GuiLayout {
         StackPane stack = new StackPane(new Pane(), layout, loadingBg);
 
         GameIntegration.currentGameProperty().addListener((c, o, n) -> {
-            if (n != null) {
-                stack.getChildren().set(0, n.getGuiFactory().background());
-                try {
-                    menu.setOpacity(0.95);
-                    stack.styleProperty().set("-fx-font-family: " + n.getGuiFactory().font().getName() + ";");
-                } catch (IOException e) {
-                    e.printStackTrace();
+            Platform.runLater(() -> {
+                if (n != null) {
+                    stack.getChildren().set(0, n.getGuiFactory().background());
+                    try {
+                        menu.setOpacity(0.95);
+                        stack.styleProperty().set("-fx-font-family: " + n.getGuiFactory().font().getName() + ";");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+            });
         });
 
         return stack;

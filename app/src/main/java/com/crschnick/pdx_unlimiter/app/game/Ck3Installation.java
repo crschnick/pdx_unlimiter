@@ -22,20 +22,8 @@ import java.util.regex.Pattern;
 
 public class Ck3Installation extends GameInstallation {
 
-    private Path executable;
-    private Path userDirectory;
-
     public Ck3Installation(Path path) {
-        super(path);
-        if (SystemUtils.IS_OS_WINDOWS) {
-            executable = getPath().resolve("binaries").resolve("ck3.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            executable = getPath().resolve("binaries").resolve("ck3");
-        }
-    }
-
-    public Path getExecutable() {
-        return executable;
+        super(path, Path.of("binaries", "ck3"));
     }
 
     public void init() throws Exception {
@@ -76,7 +64,7 @@ public class Ck3Installation extends GameInstallation {
     public void loadSettings() throws IOException {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(getLauncherDataPath().resolve("launcher-settings.json")));
-        this.userDirectory = determineUserDirectory(node);
+        this.userDir = determineUserDirectory(node);
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)\\s+\\((\\w+)\\)").matcher(v);
         m.find();
@@ -112,25 +100,7 @@ public class Ck3Installation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() {
-        try {
-            new ProcessBuilder().command(executable.toString(), "--continuelastsave").start();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-    }
-
-    @Override
-    public boolean isValid() {
-        return Files.isRegularFile(executable);
-    }
-
-    public Path getUserPath() {
-        return userDirectory;
-    }
-
-    @Override
-    public Path getSavegamesPath() {
-        return userDirectory.resolve("save games");
+    public void startDirectly() throws IOException {
+        new ProcessBuilder().command(getExecutable().toString(), "--continuelastsave").start();
     }
 }

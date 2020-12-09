@@ -22,17 +22,8 @@ import java.util.regex.Pattern;
 
 public class Eu4Installation extends GameInstallation {
 
-    private Path executable;
-    private Path userDirectory;
-
-
     public Eu4Installation(Path path) {
-        super(path);
-        if (SystemUtils.IS_OS_WINDOWS) {
-            executable = getPath().resolve("eu4.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            executable = getPath().resolve("eu4");
-        }
+        super(path, Path.of("eu4"));
     }
 
     @Override
@@ -45,10 +36,6 @@ public class Eu4Installation extends GameInstallation {
                 .put("date", lastPlayed.toString())
                 .put("filename", sgPath);
         JsonHelper.write(n, out);
-    }
-
-    public Path getExecutable() {
-        return executable;
     }
 
     public void init() throws Exception {
@@ -68,21 +55,13 @@ public class Eu4Installation extends GameInstallation {
         String value = Optional.ofNullable(node.get("gameDataPath"))
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in EU4 launcher config file"))
                 .textValue();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            value = value.replace("%USER_DOCUMENTS%",
-                    Paths.get(System.getProperty("user.home"), "Documents").toString());
-        } else if (SystemUtils.IS_OS_LINUX) {
-            value = value.replace("$LINUX_DATA_HOME",
-                    Paths.get(System.getProperty("user.home"), ".local", "share").toString());
-        }
-
-        return Path.of(value);
+        return super.replaceVariablesInPath(value);
     }
 
     public void loadSettings() throws IOException {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
-        this.userDirectory = determineUserDirectory(node);
+        super.userDir = determineUserDirectory(node);
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)\\.\\w+\\s.+").matcher(v);
         m.find();
@@ -102,25 +81,11 @@ public class Eu4Installation extends GameInstallation {
 
     @Override
     public void startDirectly() throws IOException {
-        new ProcessBuilder().command(executable.toString(), "-continuelastsave").start();
+        new ProcessBuilder().command(getExecutable().toString(), "-continuelastsave").start();
     }
 
     @Override
     public Optional<GameMod> getModForName(String name) {
         return mods.stream().filter(d -> getUserPath().relativize(d.getModFile()).equals(Path.of(name))).findAny();
-    }
-
-    @Override
-    public boolean isValid() {
-        return Files.isRegularFile(executable);
-    }
-
-    @Override
-    public Path getSavegamesPath() {
-        return userDirectory.resolve("save games");
-    }
-
-    public Path getUserPath() {
-        return userDirectory;
     }
 }

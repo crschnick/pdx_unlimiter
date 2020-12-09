@@ -12,17 +12,17 @@ import java.util.Properties;
 public class PdxuInstallation {
 
     private static PdxuInstallation INSTANCE;
-    private Path installLocation;
+    private Path dataLocation;
     private String version;
     private boolean production;
     private Path officialAchievementsLocation;
     private boolean developerMode;
     private boolean nativeHookEnabled;
 
-    public PdxuInstallation(Path installLocation, String version, boolean production,
+    public PdxuInstallation(Path dataLocation, String version, boolean production,
                             Path officialAchievementsLocation, boolean developerMode,
                             boolean nativeHookEnabled) {
-        this.installLocation = installLocation;
+        this.dataLocation = dataLocation;
         this.version = version;
         this.production = production;
         this.officialAchievementsLocation = officialAchievementsLocation;
@@ -35,30 +35,27 @@ public class PdxuInstallation {
         boolean prod = appPath.toFile().getName().equals("app")
                 || appPath.toFile().getName().equals("image");
         String v = "unknown";
-        Path installDir;
+        Path dataDir;
         Path achievementsLocation = null;
         boolean developerMode = false;
         boolean nativeHook = true;
 
         Properties props = new Properties();
         if (prod) {
-            v = Files.readString(appPath.resolve("version"));
-            installDir = appPath.getParent();
-            props.load(Files.newInputStream(appPath.resolve("pdxu.properties")));
+            dataDir = Path.of(System.getProperty("user.home"), "Pdx-Unlimiter");
+            v = Files.readString(dataDir.resolve("version"));
+            props.load(Files.newInputStream(dataDir.resolve("pdxu.properties")));
         } else {
-            props.load(Files.newInputStream(Path.of("pdxu.properties")));
-
             v = "dev";
-            installDir = Optional.ofNullable(props.get("installDir"))
+            props.load(Files.newInputStream(Path.of("pdxu.properties")));
+            dataDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
                     .filter(val -> val.isAbsolute() && Files.exists(val))
-                    .orElseThrow(() -> new NoSuchElementException("Invalid installDir for dev build"));
+                    .orElseThrow(() -> new NoSuchElementException("Invalid dataDir for dev build"));
 
-
-            boolean simulateProd = Optional.ofNullable(props.get("simulateProduction"))
+            prod = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
-            prod = simulateProd;
         }
         achievementsLocation = Optional.ofNullable(props.get("achievementDir"))
                 .map(val -> Path.of(val.toString()))
@@ -70,12 +67,12 @@ public class PdxuInstallation {
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
 
-        INSTANCE = new PdxuInstallation(installDir, v, prod, achievementsLocation, developerMode, nativeHook);
+        INSTANCE = new PdxuInstallation(dataDir, v, prod, achievementsLocation, developerMode, nativeHook);
     }
 
 
     public static boolean shouldStart() {
-        if (INSTANCE.isAlreadyRunning()) {
+        if (INSTANCE.isProduction() && INSTANCE.isAlreadyRunning()) {
             LoggerFactory.getLogger(PdxuInstallation.class).info("A Pdxu instance is already running.");
             return false;
         }
@@ -87,7 +84,7 @@ public class PdxuInstallation {
     }
 
     private Path getDataLocation() {
-        return installLocation;
+        return dataLocation;
     }
 
     private boolean isAlreadyRunning() {
@@ -102,31 +99,28 @@ public class PdxuInstallation {
     }
 
     public Path getExecutableLocation() {
+        Path appPath = Path.of(System.getProperty("java.home"));
         if (SystemUtils.IS_OS_WINDOWS) {
-            return getAppLocation().resolve("bin").resolve("java.exe");
+            return appPath.resolve("bin").resolve("java.exe");
         } else if (SystemUtils.IS_OS_LINUX) {
-            return getAppLocation().resolve("bin").resolve("java");
+            return appPath.resolve("bin").resolve("java");
         } else {
-            return getAppLocation().resolve("bin").resolve("java.exe");
+            return appPath.resolve("bin").resolve("java.exe");
         }
     }
 
     public Path getLogsLocation() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            return installLocation.resolve("logs");
+            return dataLocation.resolve("logs");
         } else if (SystemUtils.IS_OS_LINUX) {
             return Path.of("var", "logs", "Pdx-Unlimiter");
         } else {
-            return installLocation.resolve("logs");
+            return dataLocation.resolve("logs");
         }
     }
 
-    public Path getAppLocation() {
-        return installLocation.resolve("app");
-    }
-
     public Path getOfficialAchievementsLocation() {
-        return officialAchievementsLocation != null ? officialAchievementsLocation : installLocation.resolve("achievements");
+        return officialAchievementsLocation != null ? officialAchievementsLocation : dataLocation.resolve("achievements");
     }
 
     public Path getUserAchievementsLocation() {

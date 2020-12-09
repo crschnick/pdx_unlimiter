@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.net.ssl.HttpsURLConnection;
+import java.awt.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,15 +24,18 @@ public class RakalyHelper {
             return;
         }
 
-        try {
-            byte[] body = Files.readAllBytes(cache.getPath(entry).resolve("savegame.eu4"));
-            executePost(cache.getFileName(entry), new URL("https://rakaly.com/api/saves"), body);
-        } catch (Exception e) {
-            DialogHelper.showErrorMessage(e.getMessage(), null, false);
-        }
+        new Thread(() -> {
+            try {
+                byte[] body = Files.readAllBytes(cache.getPath(entry).resolve("savegame.eu4"));
+                String saveId = executePost(cache.getFileName(entry), new URL("https://rakaly.com/api/saves"), body);
+                Desktop.getDesktop().browse(new URL("https://rakaly.com/eu4/saves/" + saveId).toURI());
+            } catch (Exception e) {
+                DialogHelper.showErrorMessage(e.getMessage(), null, false);
+            }
+        }).start();
     }
 
-    private static void executePost(String sgName, URL targetURL, byte[] data) throws IOException {
+    private static String executePost(String sgName, URL targetURL, byte[] data) throws IOException {
         HttpsURLConnection connection = null;
         try {
             connection = (HttpsURLConnection) targetURL.openConnection();
@@ -66,6 +70,9 @@ public class RakalyHelper {
             if (responseCode != 200) {
                 throw new IOException(msg);
             }
+
+            String saveId = node.get("save_id").textValue();
+            return saveId;
         } finally {
             if (connection != null) {
                 connection.disconnect();

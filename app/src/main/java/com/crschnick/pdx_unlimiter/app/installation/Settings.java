@@ -222,17 +222,38 @@ public class Settings {
     }
 
     public void validate() {
-        if (eu4 != null && !new Eu4Installation(eu4).isValid()) {
-            eu4 = null;
+        if (eu4 != null) {
+            try {
+                new Eu4Installation(eu4).init();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                eu4 = null;
+            }
         }
-        if (hoi4 != null && !new Hoi4Installation(hoi4).isValid()) {
-            hoi4 = null;
+        if (hoi4 != null) {
+            try {
+                new Hoi4Installation(hoi4).init();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                hoi4 = null;
+            }
         }
-        if (ck3 != null && !new Ck3Installation(ck3).isValid()) {
-            ck3 = null;
+        if (ck3 != null) {
+            try {
+                new Ck3Installation(ck3).init();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                ck3 = null;
+            }
         }
-        if (stellaris != null && !new StellarisInstallation(stellaris).isValid()) {
-            stellaris = null;
+        if (stellaris != null) {
+
+            try {
+                new StellarisInstallation(stellaris).init();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                stellaris = null;
+            }
         }
 
         if (activeGame != null && !activeGame.equals(eu4) && !activeGame.equals(hoi4) && !activeGame.equals(ck3) && !activeGame.equals(stellaris)) {

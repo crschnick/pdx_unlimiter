@@ -5,11 +5,14 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -51,7 +54,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     @Override
     public Background createEntryInfoBackground(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
         return new Background(new BackgroundFill(
-                Color.ALICEBLUE,
+                Color.CORAL,
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
@@ -59,9 +62,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     public ObservableValue<Node> createImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.ck3TagNode(entry.getTag(), CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                //prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
-            });
+            Platform.runLater(() -> prop.set(GameImage.ck3TagNode(entry.getTag(), CLASS_TAG_ICON)));
         });
         return prop;
     }
@@ -70,8 +71,16 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     public ObservableValue<Node> createImage(GameCampaign<Ck3Tag, Ck3SavegameInfo> campaign) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.ck3TagNode(campaign.getTag(), CLASS_TAG_ICON));
         campaign.tagProperty().addListener((c, o, n) -> {
-            //Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
+            Platform.runLater(() -> prop.set(GameImage.ck3TagNode(campaign.getTag(), CLASS_TAG_ICON)));
         });
         return prop;
+    }
+
+    @Override
+    public void fillNodeContainer(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, JFXMasonryPane grid) {
+        super.fillNodeContainer(entry, grid);
+        var l = new Label("What info would you like to see in this box? Share your feedback on github!");
+        l.setAlignment(Pos.CENTER);
+        grid.getChildren().add(l);
     }
 }

@@ -24,23 +24,12 @@ import java.util.regex.Pattern;
 
 public class Hoi4Installation extends GameInstallation {
 
-    private Path executable;
-    private Path userDirectory;
     private Map<Hoi4Tag, String> countryNames;
     private Map<String, Integer> countryColors;
 
 
     public Hoi4Installation(Path path) {
-        super(path);
-        if (SystemUtils.IS_OS_WINDOWS) {
-            executable = getPath().resolve("hoi4.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            executable = getPath().resolve("hoi");
-        }
-    }
-
-    public Path getExecutable() {
-        return executable;
+        super(path, Path.of("hoi4"));
     }
 
     public void init() throws Exception {
@@ -120,7 +109,7 @@ public class Hoi4Installation extends GameInstallation {
     public void loadSettings() throws IOException {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
-        this.userDirectory = determineUserDirectory(node);
+        this.userDir = determineUserDirectory(node);
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);
         m.find();
@@ -134,26 +123,8 @@ public class Hoi4Installation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() {
-        try {
-            new ProcessBuilder().command(executable.toString(), "--continuelastsave").start();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-    }
-
-    @Override
-    public boolean isValid() {
-        return Files.isRegularFile(executable);
-    }
-
-    public Path getUserPath() {
-        return userDirectory;
-    }
-
-    @Override
-    public Path getSavegamesPath() {
-        return userDirectory.resolve("save games");
+    public void startDirectly() throws IOException {
+        new ProcessBuilder().command(getExecutable().toString(), "--continuelastsave").start();
     }
 
     public Map<Hoi4Tag, String> getCountryNames() {

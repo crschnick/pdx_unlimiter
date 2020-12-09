@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.core.format.NamespaceCreator;
 import com.crschnick.pdx_unlimiter.core.savegame.*;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,6 +34,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DialogHelper {
 
@@ -198,6 +201,20 @@ public class DialogHelper {
     }
 
     public static boolean showErrorMessage(String msg, String details, boolean reportable) {
+        AtomicBoolean shouldSend = new AtomicBoolean(false);
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            shouldSend.set(showErrorMessageInternal(msg, details, reportable));
+            latch.countDown();
+        });
+        try {
+            latch.await();
+        } catch (InterruptedException ignored) {
+        }
+        return shouldSend.get();
+    }
+
+    public static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
         Alert alert = createAlert();
         if (reportable) {
             ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);

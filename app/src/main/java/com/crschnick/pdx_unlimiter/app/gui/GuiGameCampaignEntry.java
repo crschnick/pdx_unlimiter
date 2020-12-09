@@ -18,6 +18,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -47,6 +48,7 @@ public class GuiGameCampaignEntry {
         });
         open.setGraphic(new FontIcon());
         open.getStyleClass().add("open-button");
+        Tooltip.install(open, new Tooltip("Open stored savegame location"));
 
 
         Button achievements = new JFXButton();
@@ -55,6 +57,7 @@ public class GuiGameCampaignEntry {
             AchievementWindow.showAchievementList(e);
         });
         achievements.getStyleClass().add("achievement-button");
+        Tooltip.install(achievements, new Tooltip("Show achievements (Experimental)"));
 
 
         Button del = new JFXButton();
@@ -65,6 +68,7 @@ public class GuiGameCampaignEntry {
             }
         });
         del.getStyleClass().add("delete-button");
+        Tooltip.install(del, new Tooltip("Delete savegame"));
 
 
         var tagImage = GameIntegration.<T,I>current().getGuiFactory().createImage(e);
@@ -86,6 +90,7 @@ public class GuiGameCampaignEntry {
                 RakalyHelper.uploadSavegame(SavegameCache.EU4_CACHE, e);
             });
             upload.getStyleClass().add(CLASS_UPLOAD);
+            Tooltip.install(upload, new Tooltip("Upload to Rakaly.com"));
             buttonBar.getChildren().add(0, upload);
         }
 

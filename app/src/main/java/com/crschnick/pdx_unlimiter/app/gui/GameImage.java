@@ -122,11 +122,12 @@ public class GameImage {
         }
 
         ImageView v = new ImageView(img);
-        Pane pane = new Pane(v);
+        StackPane pane = new StackPane(v);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
         v.preserveRatioProperty().setValue(true);
         pane.getStyleClass().add(styleClass);
+        pane.setAlignment(Pos.CENTER);
         return pane;
     }
 
@@ -238,7 +239,7 @@ public class GameImage {
                     .getOrDefault(coa.getEmblemColors().get(2), Color.TRANSPARENT)) : 0;
             Function<Integer,Integer> customFilter = (Integer rgb) -> {
                 if (hasColor) {
-                    if (rgb == 0xFFFF0000) {
+                    if (rgb == 0xFF800000) {
                         return eColor1;
                     }
                     if (rgb == 0xFF00007F) {

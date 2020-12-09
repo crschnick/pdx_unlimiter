@@ -32,12 +32,20 @@ public abstract class GameInstallation {
     protected ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
     protected DistributionType distType;
     private Path path;
+    private Path executable;
+    protected Path userDir;
+
     private List<GameDlc> dlcs = new ArrayList<>();
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
 
-    public GameInstallation(Path path) {
+    public GameInstallation(Path path, Path executable) {
         this.path = path;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            this.executable = getPath().resolve(executable).resolveSibling(executable.getFileName().toString() + ".exe");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            this.executable = getPath().resolve(executable);
+        }
     }
 
     public static void initInstallations() throws Exception {
@@ -219,8 +227,6 @@ public abstract class GameInstallation {
 
     public abstract void init() throws Exception;
 
-    public abstract boolean isValid();
-
     protected Path getLauncherDataPath() {
         return getPath();
     }
@@ -233,11 +239,17 @@ public abstract class GameInstallation {
         return path;
     }
 
-    public abstract Path getExecutable();
+    public Path getExecutable() {
+        return executable;
+    }
 
-    public abstract Path getUserPath();
+    public Path getUserPath() {
+        return userDir;
+    }
 
-    public abstract Path getSavegamesPath();
+    public Path getSavegamesPath() {
+        return getUserPath().resolve("save games");
+    }
 
     public List<FileImportTarget> getSavegames() {
         return savegames.get();
