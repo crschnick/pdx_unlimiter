@@ -18,6 +18,7 @@ public class ErrorHandler {
             return;
         }
 
+        LoggerFactory.getLogger(ErrorHandler.class).info("Initializing error handler");
         System.setProperty("sentry.dsn", "https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
         System.setProperty("sentry.stacktrace.hidecommon", "false");
         System.setProperty("sentry.stacktrace.app.packages", "");
@@ -27,10 +28,11 @@ public class ErrorHandler {
         System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion());
         Sentry.init();
 
-
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             handleException(e);
         });
+
+        LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
     }
 
     private static void handleExcetionWithoutInit(Throwable ex) {
@@ -71,17 +73,10 @@ public class ErrorHandler {
             handleExcetionWithoutInit(ex);
         }
 
-        Runnable run = () -> {
-            LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
-            if (DialogHelper.showException(ex)) {
-                Sentry.capture(ex);
-            }
-            System.exit(1);
-        };
-        if (Platform.isFxApplicationThread()) {
-            run.run();
-        } else {
-            Platform.runLater(run);
+        LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
+        if (DialogHelper.showException(ex)) {
+            Sentry.capture(ex);
         }
+        System.exit(1);
     }
 }

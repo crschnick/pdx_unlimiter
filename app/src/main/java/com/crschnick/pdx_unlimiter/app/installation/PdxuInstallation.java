@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class PdxuInstallation {
 
@@ -18,22 +19,25 @@ public class PdxuInstallation {
     private Path officialAchievementsLocation;
     private boolean developerMode;
     private boolean nativeHookEnabled;
+    private boolean image;
 
     public PdxuInstallation(Path dataLocation, String version, boolean production,
                             Path officialAchievementsLocation, boolean developerMode,
-                            boolean nativeHookEnabled) {
+                            boolean nativeHookEnabled, boolean image) {
         this.dataLocation = dataLocation;
         this.version = version;
         this.production = production;
         this.officialAchievementsLocation = officialAchievementsLocation;
         this.developerMode = developerMode;
         this.nativeHookEnabled = nativeHookEnabled;
+        this.image = image;
     }
 
     public static void init() throws Exception {
         Path appPath = Path.of(System.getProperty("java.home"));
-        boolean prod = appPath.toFile().getName().equals("app")
+        boolean image = appPath.toFile().getName().equals("app")
                 || appPath.toFile().getName().equals("image");
+        boolean prod = image;
         String v = "unknown";
         Path dataDir;
         Path achievementsLocation = null;
@@ -44,7 +48,11 @@ public class PdxuInstallation {
         if (prod) {
             dataDir = Path.of(System.getProperty("user.home"), "Pdx-Unlimiter");
             v = Files.readString(appPath.resolve("version"));
-            props.load(Files.newInputStream(dataDir.resolve("pdxu.properties")));
+
+            Path propsFile = dataDir.resolve("settings").resolve("pdxu.properties");
+            if (Files.exists(propsFile)) {
+                props.load(Files.newInputStream(propsFile));
+            }
         } else {
             v = "dev";
             props.load(Files.newInputStream(Path.of("pdxu.properties")));
@@ -67,12 +75,12 @@ public class PdxuInstallation {
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
 
-        INSTANCE = new PdxuInstallation(dataDir, v, prod, achievementsLocation, developerMode, nativeHook);
+        INSTANCE = new PdxuInstallation(dataDir, v, prod, achievementsLocation, developerMode, nativeHook, image);
     }
 
 
     public static boolean shouldStart() {
-        if (INSTANCE.isProduction() && INSTANCE.isAlreadyRunning()) {
+        if (INSTANCE.isImage() && INSTANCE.isProduction() && INSTANCE.isAlreadyRunning()) {
             LoggerFactory.getLogger(PdxuInstallation.class).info("A Pdxu instance is already running.");
             return false;
         }
@@ -88,10 +96,13 @@ public class PdxuInstallation {
     }
 
     private boolean isAlreadyRunning() {
-        return ProcessHandle.allProcesses()
+        var procs = ProcessHandle.allProcesses()
                 .map(h -> h.info().command().orElse(""))
                 .filter(s -> s.equals(getExecutableLocation().toString()))
-                .count() >= 2;
+                .collect(Collectors.toList());
+        procs.forEach(p -> LoggerFactory.getLogger(PdxuInstallation.class)
+                .info("Detected running pdxu instance: " + p));
+        return procs.size() >= 2;
     }
 
     public boolean isNativeHookEnabled() {
@@ -145,5 +156,9 @@ public class PdxuInstallation {
 
     public boolean isDeveloperMode() {
         return developerMode;
+    }
+
+    public boolean isImage() {
+        return image;
     }
 }

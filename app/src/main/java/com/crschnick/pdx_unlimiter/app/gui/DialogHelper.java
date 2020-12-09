@@ -202,19 +202,23 @@ public class DialogHelper {
 
     public static boolean showErrorMessage(String msg, String details, boolean reportable) {
         AtomicBoolean shouldSend = new AtomicBoolean(false);
-        CountDownLatch latch = new CountDownLatch(1);
-        Platform.runLater(() -> {
+        if (!Platform.isFxApplicationThread()) {
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.runLater(() -> {
+                shouldSend.set(showErrorMessageInternal(msg, details, reportable));
+                latch.countDown();
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException ignored) {
+            }
+        } else {
             shouldSend.set(showErrorMessageInternal(msg, details, reportable));
-            latch.countDown();
-        });
-        try {
-            latch.await();
-        } catch (InterruptedException ignored) {
         }
         return shouldSend.get();
     }
 
-    public static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
+    private static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
         Alert alert = createAlert();
         if (reportable) {
             ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);

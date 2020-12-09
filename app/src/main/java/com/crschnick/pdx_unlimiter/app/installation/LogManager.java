@@ -16,15 +16,28 @@ import java.util.logging.Level;
 public class LogManager {
 
     private static LogManager INSTANCE;
-    private Optional<Path> logFile;
 
-    public LogManager(Optional<Path> logFile) {
+    private Path logFile;
+    private boolean debugInstallations;
+    private boolean debugAchievements;
+
+    private LogManager(Path logFile, boolean debugInstallations, boolean debugAchievements) {
         this.logFile = logFile;
+        this.debugInstallations = debugInstallations;
+        this.debugAchievements = debugAchievements;
     }
 
-    private static void setLogLevels(boolean debug) {
+    private void setLogLevels(boolean debug) {
         if (debug) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+        }
+
+        if (!debugAchievements) {
+            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.achievement", "info");
+        }
+
+        if (!debugInstallations) {
+            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
         }
 
         System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.CompiledPath", "warn");
@@ -43,23 +56,25 @@ public class LogManager {
 
         FileUtils.forceMkdir(i.getLogsLocation().toFile());
 
-        Optional<Path> logFile = Optional.empty();
+        Path logFile = null;
         if (i.isProduction()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
                     .withZone(ZoneId.systemDefault());
-            logFile = Optional.of(i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log"));
-            System.setProperty("org.slf4j.simpleLogger.logFile", logFile.get().toString());
+            logFile = i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log");
+            System.setProperty("org.slf4j.simpleLogger.logFile", logFile.toString());
         }
-        setLogLevels(i.isDeveloperMode());
 
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
 
+        INSTANCE = new LogManager(logFile, true, false);
+        INSTANCE.setLogLevels(i.isDeveloperMode());
 
         Logger l = LoggerFactory.getLogger(LogManager.class);
         l.info("Initializing LogManager");
-
-        INSTANCE = new LogManager(logFile);
+        if (logFile != null) {
+            l.info("Writing to log file " + logFile.toString());
+        }
     }
 
     public static LogManager getInstance() {
@@ -67,6 +82,6 @@ public class LogManager {
     }
 
     public Optional<Path> getLogFile() {
-        return logFile;
+        return Optional.ofNullable(logFile);
     }
 }

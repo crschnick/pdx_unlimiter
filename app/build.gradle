@@ -4,7 +4,7 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
-setVersion '2.0-beta4'
+setVersion '2.0-beta5'
 
 if (!System.getProperty("java.runtime.name").contains("OpenJDK")) {
     println "OpenJDK is required!"
