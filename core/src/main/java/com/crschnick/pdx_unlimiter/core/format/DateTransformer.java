@@ -17,10 +17,6 @@ public class DateTransformer extends NodeTransformer {
 
     private GameDateType type;
 
-    public DateTransformer(GameDateType type) {
-        this.type = type;
-    }
-
     public static NodeTransformer recursive(DateTransformer t, Predicate<String> isDateEntry) {
         return new RecursiveTransformer((n) -> {
             if (n instanceof KeyValueNode && isDateEntry.test(Node.getKeyValueNode(n).getKeyName())) {
@@ -31,6 +27,10 @@ public class DateTransformer extends NodeTransformer {
                 return false;
             }
         }, t);
+    }
+
+    public DateTransformer(GameDateType type) {
+        this.type = type;
     }
 
     @Override

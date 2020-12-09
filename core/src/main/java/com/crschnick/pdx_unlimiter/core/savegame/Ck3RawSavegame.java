@@ -77,10 +77,10 @@ public class Ck3RawSavegame extends RawSavegame {
     }
 
     private static int indexOf(byte[] array, byte[] toFind) {
-        for (int i = 0; i < array.length - toFind.length + 1; ++i) {
+        for(int i = 0; i < array.length - toFind.length + 1; ++i) {
             boolean found = true;
             for (int j = 0; j < toFind.length; ++j) {
-                if (array[i + j] != toFind[j]) {
+                if (array[i+j] != toFind[j]) {
                     found = false;
                     break;
                 }

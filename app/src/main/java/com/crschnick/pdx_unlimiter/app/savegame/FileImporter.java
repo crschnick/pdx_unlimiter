@@ -34,10 +34,6 @@ public class FileImporter {
         });
     }
 
-    public static void importTarget(FileImportTarget target) {
-        new Thread(target::importTarget).start();
-    }
-
     private static void importFileInternal(Path queueFile, Path p) throws IOException {
         var targets = FileImportTarget.createTargets(p);
         if (targets.size() == 0) {
@@ -54,7 +50,7 @@ public class FileImporter {
         Files.delete(queueFile);
     }
 
-    private static void addToImportQueue(List<Path> files) {
+    public static void addToImportQueue(Path file) {
         try {
             FileUtils.forceMkdir(PdxuInstallation.getInstance().getSavegameLocation().resolve("import").toFile());
         } catch (IOException e) {
@@ -62,16 +58,15 @@ public class FileImporter {
             return;
         }
 
-        for (Path p : files) {
-            var path = PdxuInstallation.getInstance().getSavegameLocation()
-                    .resolve("import")
-                    .resolve(UUID.randomUUID().toString());
-            try {
-                Files.writeString(path, p.toString());
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+        var path = PdxuInstallation.getInstance().getSavegameLocation()
+                .resolve("import")
+                .resolve(UUID.randomUUID().toString());
+        try {
+            Files.writeString(path, file.toString());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
         }
+
     }
 
     public static void importLatestSavegame() {
@@ -80,6 +75,6 @@ public class FileImporter {
             return;
         }
 
-        addToImportQueue(List.of(savegames.get(0).getPath()));
+        addToImportQueue(savegames.get(0).getPath());
     }
 }

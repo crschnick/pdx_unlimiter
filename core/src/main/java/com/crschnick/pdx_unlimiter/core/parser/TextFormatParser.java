@@ -44,9 +44,13 @@ public class TextFormatParser extends FormatParser {
             Token t = null;
             if (isInQuotes && s.charAt(i) != '"') {
                 continue;
-            } else if (s.charAt(i) == '"') {
+            }
+
+            else if (s.charAt(i) == '"') {
                 isInQuotes = !isInQuotes;
-            } else if (s.charAt(i) == '{') {
+            }
+
+            else if (s.charAt(i) == '{') {
                 t = new OpenGroupToken();
             } else if (s.charAt(i) == '}') {
                 t = new CloseGroupToken();

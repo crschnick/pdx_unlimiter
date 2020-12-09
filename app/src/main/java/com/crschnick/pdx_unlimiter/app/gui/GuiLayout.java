@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXSpinner;
@@ -19,7 +18,6 @@ import javafx.scene.layout.StackPane;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 public class GuiLayout {
 
@@ -51,9 +49,7 @@ public class GuiLayout {
             Dragboard db = event.getDragboard();
             db.getFiles().stream()
                     .map(File::toPath)
-                    .map(p -> FileImportTarget.createTargets(p).stream())
-                    .flatMap(Stream::distinct)
-                    .forEach(FileImporter::importTarget);
+                    .forEach(FileImporter::addToImportQueue);
             event.setDropCompleted(true);
             event.consume();
         });
