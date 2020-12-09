@@ -2,7 +2,9 @@ package com.crschnick.pdx_unlimiter.core.data;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Ck3Tag {
@@ -89,6 +91,12 @@ public class Ck3Tag {
         private String name;
         private CoatOfArms coatOfArms;
 
+        public Title(int id, String name, CoatOfArms coatOfArms) {
+            this.id = id;
+            this.name = name;
+            this.coatOfArms = coatOfArms;
+        }
+
         public static Title fromNode(Node kv, List<CoatOfArms> coas) {
             var kvn = Node.getKeyValueNode(kv);
             var n = kvn.getNode();
@@ -98,12 +106,6 @@ public class Ck3Tag {
             var coaId = Node.getInteger(Node.getNodeForKey(n, "coat_of_arms_id"));
             var coatOfArms = coas.stream().filter(c -> c.id == coaId).findFirst().get();
             return new Title(id, name, coatOfArms);
-        }
-
-        public Title(int id, String name, CoatOfArms coatOfArms) {
-            this.id = id;
-            this.name = name;
-            this.coatOfArms = coatOfArms;
         }
 
         public int getId() {
@@ -127,6 +129,14 @@ public class Ck3Tag {
 
         private String emblemFile;
         private List<String> emblemColors;
+
+        public CoatOfArms(int id, String patternFile, List<String> colors, String emblemFile, List<String> emblemColors) {
+            this.id = id;
+            this.patternFile = patternFile;
+            this.colors = colors;
+            this.emblemFile = emblemFile;
+            this.emblemColors = emblemColors;
+        }
 
         public static CoatOfArms fromNode(Node kv) {
             var kvn = Node.getKeyValueNode(kv);
@@ -154,14 +164,6 @@ public class Ck3Tag {
                         Node.getNodeForKey(n, "textured_emblem"), "texture"));
             }
             return new CoatOfArms(id, patternFile, colors, emblemFile, emblemColors);
-        }
-
-        public CoatOfArms(int id, String patternFile, List<String> colors, String emblemFile, List<String> emblemColors) {
-            this.id = id;
-            this.patternFile = patternFile;
-            this.colors = colors;
-            this.emblemFile = emblemFile;
-            this.emblemColors = emblemColors;
         }
 
         public String getPatternFile() {

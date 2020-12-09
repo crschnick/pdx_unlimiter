@@ -165,10 +165,10 @@ public class GuiSettings {
         Label label = new Label("Font size: ");
 
         JFXSlider slider = new JFXSlider(10, 24, s.getFontSize());
-        slider.valueProperty().addListener((c,o,n) -> {
+        slider.valueProperty().addListener((c, o, n) -> {
             s.setFontSize(n.intValue());
         });
-        HBox hbox = new HBox(label,slider);
+        HBox hbox = new HBox(label, slider);
         HBox.setHgrow(slider, Priority.ALWAYS);
         hbox.setAlignment(Pos.CENTER);
         dialogPaneContent.getChildren().add(hbox);

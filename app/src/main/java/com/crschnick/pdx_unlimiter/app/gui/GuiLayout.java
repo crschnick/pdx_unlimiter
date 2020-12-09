@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXSpinner;
@@ -10,7 +10,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -20,7 +19,7 @@ import javafx.scene.layout.StackPane;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GuiLayout {
 
@@ -50,7 +49,11 @@ public class GuiLayout {
 
         layout.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
-            FileImporter.addToImportQueue(db.getFiles().stream().map(File::toPath).collect(Collectors.toList()));
+            db.getFiles().stream()
+                    .map(File::toPath)
+                    .map(p -> FileImportTarget.createTargets(p).stream())
+                    .flatMap(Stream::distinct)
+                    .forEach(FileImporter::importTarget);
             event.setDropCompleted(true);
             event.consume();
         });

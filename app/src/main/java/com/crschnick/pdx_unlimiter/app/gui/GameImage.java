@@ -146,7 +146,7 @@ public class GameImage {
 
         int bgPrimary = ColorHelper.intFromColor(ColorHelper.loadStellarisColors(entry)
                 .getOrDefault(tag.getBackgroundPrimaryColor(), Color.TRANSPARENT));
-        Function<Integer,Integer> customFilter = (Integer rgb) -> {
+        Function<Integer, Integer> customFilter = (Integer rgb) -> {
             if (rgb == 0xFFFF0000) {
                 return bgPrimary;
             }
@@ -237,7 +237,7 @@ public class GameImage {
                     .getOrDefault(coa.getEmblemColors().get(1), Color.TRANSPARENT)) : 0;
             int eColor3 = coa.getEmblemColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
                     .getOrDefault(coa.getEmblemColors().get(2), Color.TRANSPARENT)) : 0;
-            Function<Integer,Integer> customFilter = (Integer rgb) -> {
+            Function<Integer, Integer> customFilter = (Integer rgb) -> {
                 if (hasColor) {
                     if (rgb == 0xFF800000) {
                         return eColor1;
@@ -447,7 +447,7 @@ public class GameImage {
         EU4_ICON_DIP = ImageLoader.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
         EU4_ICON_MIL = ImageLoader.loadImage(i.resolve("icon_powers_military_in_text.dds"));
 
-        Function<Integer,Integer> rnwFilter = (Integer rgb) -> {
+        Function<Integer, Integer> rnwFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
             int g = (rgb >> 8) & 0xFF;
             int b = rgb & 0xFF;
@@ -463,7 +463,7 @@ public class GameImage {
                 rnwFilter);
         VIEWPORTS.put(EU4_ICON_RANDOM_NEW_WORLD, new Rectangle2D(14, 0, 33, 30));
 
-        Function<Integer,Integer> customFilter = (Integer rgb) -> {
+        Function<Integer, Integer> customFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
             int g = (rgb >> 8) & 0xFF;
             int b = rgb & 0xFF;

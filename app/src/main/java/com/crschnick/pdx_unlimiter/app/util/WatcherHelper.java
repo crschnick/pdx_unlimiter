@@ -7,20 +7,18 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class WatcherHelper {
 
-    private static Map<WatchService,Path> createRecursiveWatchers(Path dir) {
-        Map<WatchService,Path> watchers = new HashMap<>();
+    private static Map<WatchService, Path> createRecursiveWatchers(Path dir) {
+        Map<WatchService, Path> watchers = new HashMap<>();
         try {
             var w = FileSystems.getDefault().newWatchService();
             dir.register(w, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
@@ -36,12 +34,12 @@ public class WatcherHelper {
             String game,
             List<Path> dirs,
             Consumer<Path> listener) {
-        Map<WatchService,Path> watchers = new HashMap<>();
+        Map<WatchService, Path> watchers = new HashMap<>();
         dirs.forEach(d -> watchers.putAll(createRecursiveWatchers(d)));
         startWatcher(game + " savegame watcher", watchers, listener);
     }
 
-    private static void startWatcher(String name, Map<WatchService,Path> watchers, Consumer<Path> listener) {
+    private static void startWatcher(String name, Map<WatchService, Path> watchers, Consumer<Path> listener) {
         Thread t = new Thread(() -> {
             while (true) {
                 for (var entry : new HashMap<>(watchers).entrySet()) {

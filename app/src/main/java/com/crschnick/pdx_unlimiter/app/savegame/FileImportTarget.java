@@ -13,28 +13,12 @@ import java.util.List;
 
 public abstract class FileImportTarget {
 
-    private SavegameCache<?, ?, ?, ?> savegameCache;
     protected Path path;
+    private SavegameCache<?, ?, ?, ?> savegameCache;
 
     public FileImportTarget(SavegameCache<?, ?, ?, ?> savegameCache, Path path) {
         this.savegameCache = savegameCache;
         this.path = path;
-    }
-
-    final boolean importTarget() {
-        return savegameCache.importSavegame(path);
-    }
-
-    public Instant getLastModified() throws IOException {
-        return Files.getLastModifiedTime(path).toInstant();
-    }
-
-    public abstract void delete();
-
-    public abstract String getName();
-
-    public Path getPath() {
-        return path;
     }
 
     public static List<FileImportTarget> createTargets(Path toImport) {
@@ -76,6 +60,22 @@ public abstract class FileImportTarget {
             }
         });
         return targets;
+    }
+
+    final boolean importTarget() {
+        return savegameCache.importSavegame(path);
+    }
+
+    public Instant getLastModified() throws IOException {
+        return Files.getLastModifiedTime(path).toInstant();
+    }
+
+    public abstract void delete();
+
+    public abstract String getName();
+
+    public Path getPath() {
+        return path;
     }
 
     public static final class StandardImportTarget extends FileImportTarget {

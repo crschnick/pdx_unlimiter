@@ -1,6 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -132,8 +135,8 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     public ObservableValue<Node> createImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
-                prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
-                Tooltip.install(prop.get(), new Tooltip());
+            prop.set(GameImage.eu4TagNode(entry, CLASS_TAG_ICON));
+            Tooltip.install(prop.get(), new Tooltip());
         });
         return prop;
     }
@@ -142,7 +145,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     public ObservableValue<Node> createImage(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag().getTag(), CLASS_TAG_ICON));
         prop.bind(createImage(campaign.getLatestEntry()));
-        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> >) c -> {
+        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>>) c -> {
             if (c.getSet().size() > 0) {
                 prop.bind(createImage(campaign.getLatestEntry()));
             }

@@ -39,8 +39,8 @@ public class ColorHelper {
         }
     }
 
-    private static Map<String,Color> loadPredefinedColors(List<Node> nodes) {
-        Map<String,Color> map = new HashMap<>();
+    private static Map<String, Color> loadPredefinedColors(List<Node> nodes) {
+        Map<String, Color> map = new HashMap<>();
         for (Node n : nodes) {
             var kv = Node.getKeyValueNode(n);
             Node data = kv.getNode();
@@ -63,8 +63,8 @@ public class ColorHelper {
         return map;
     }
 
-    private static Map<String,Color> loadPredefinedCk3Colors(List<Node> nodes) {
-        Map<String,Color> map = new HashMap<>();
+    private static Map<String, Color> loadPredefinedCk3Colors(List<Node> nodes) {
+        Map<String, Color> map = new HashMap<>();
         for (Node n : nodes) {
             var kv = Node.getKeyValueNode(n);
             Node data = kv.getNode();
@@ -87,7 +87,7 @@ public class ColorHelper {
         return map;
     }
 
-    public static Map<String,Color> loadCk3(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e)  {
+    public static Map<String, Color> loadCk3(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e) {
         try {
             InputStream in = CascadeDirectoryHelper.openFile(
                     Path.of("common").resolve("named_colors").resolve("default_colors.txt"), e, GameInstallation.CK3).get();
@@ -100,7 +100,7 @@ public class ColorHelper {
         }
     }
 
-    public static Map<String,Color> loadStellarisColors(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> e)  {
+    public static Map<String, Color> loadStellarisColors(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> e) {
         try {
             InputStream in = CascadeDirectoryHelper.openFile(Path.of("flags").resolve("colors.txt"), e, GameInstallation.STELLARIS).get();
             Node node = TextFormatParser.textFileParser().parse(in).get();

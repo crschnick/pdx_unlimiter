@@ -57,14 +57,14 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public Background createEntryInfoBackground(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
+    public Background createEntryInfoBackground(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
         return new Background(new BackgroundFill(
                 colorFromInt(GameInstallation.HOI4.getCountryColors().getOrDefault(entry.getTag().getTag(), 0), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public ObservableValue<Node> createImage(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry) {
+    public ObservableValue<Node> createImage(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
         entry.infoProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON)));
@@ -73,7 +73,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Node> createImage(GameCampaign<Hoi4Tag,Hoi4SavegameInfo> campaign) {
+    public ObservableValue<Node> createImage(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
         campaign.tagProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
@@ -82,7 +82,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<String> createInfoString(GameCampaign<Hoi4Tag,Hoi4SavegameInfo> campaign) {
+    public ObservableValue<String> createInfoString(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
         campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
@@ -91,7 +91,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public void fillNodeContainer(GameCampaignEntry<Hoi4Tag,Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
         super.fillNodeContainer(entry, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);

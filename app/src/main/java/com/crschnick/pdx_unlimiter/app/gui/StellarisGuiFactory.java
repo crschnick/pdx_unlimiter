@@ -71,7 +71,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     public ObservableValue<Node> createImage(GameCampaign<StellarisTag, StellarisSavegameInfo> campaign) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.stellarisTagNode(campaign.getTag(), CLASS_TAG_ICON));
         prop.bind(createImage(campaign.getLatestEntry()));
-        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<StellarisTag, StellarisSavegameInfo> >) c -> {
+        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<StellarisTag, StellarisSavegameInfo>>) c -> {
             prop.bind(createImage(campaign.getLatestEntry()));
         });
         return prop;

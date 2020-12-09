@@ -2,8 +2,6 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import io.sentry.Sentry;
-import io.sentry.SentryOptions;
-import io.sentry.event.EventBuilder;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 

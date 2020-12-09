@@ -40,7 +40,6 @@ public class Hoi4SavegameCache extends SavegameCache<
     protected void writeEntry(ObjectNode node, GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
 
 
-
         node.put("tag", entry.getTag().getTag())
                 .put("ideology", entry.getTag().getIdeology());
     }

@@ -84,8 +84,11 @@ public abstract class GameDateType {
     };
 
     public abstract boolean hasHours();
+
     public abstract int getDaysInMonth(int month);
+
     public abstract String toShortString(GameDate date);
+
     public abstract String toLongString(GameDate date);
 
     private int getDay(int m, long days) {
@@ -135,7 +138,7 @@ public abstract class GameDateType {
     public GameDate fromNode(Node node) {
         int hours = 0;
         if (hasHours()) {
-hours = Node.getInteger(Node.getNodeForKey(node, "hour"));
+            hours = Node.getInteger(Node.getNodeForKey(node, "hour"));
         }
         int day = Node.getInteger(Node.getNodeForKey(node, "day"));
         int month = Node.getInteger(Node.getNodeForKey(node, "month"));

@@ -6,14 +6,13 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SteamHelper {
 
-    public static List<Path> getRemoteDataPaths(int appId)  {
+    public static List<Path> getRemoteDataPaths(int appId) {
         var p = getSteamPath();
         if (p.isEmpty()) {
             return List.of();

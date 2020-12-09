@@ -27,30 +27,6 @@ public class LogManager {
         this.debugAchievements = debugAchievements;
     }
 
-    private void setLogLevels(boolean debug) {
-        if (debug) {
-            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-        }
-
-        if (!debugAchievements) {
-            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.achievement", "info");
-        }
-
-        if (!debugInstallations) {
-            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
-        }
-
-        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.CompiledPath", "warn");
-        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.PredicateContextImpl", "warn");
-
-        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.OFF);
-            logger.setUseParentHandlers(false);
-            GlobalScreen.getAutoRepeatDelay();
-        }
-    }
-
     public static void init() throws IOException {
         PdxuInstallation i = PdxuInstallation.getInstance();
 
@@ -79,6 +55,30 @@ public class LogManager {
 
     public static LogManager getInstance() {
         return INSTANCE;
+    }
+
+    private void setLogLevels(boolean debug) {
+        if (debug) {
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+        }
+
+        if (!debugAchievements) {
+            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.achievement", "info");
+        }
+
+        if (!debugInstallations) {
+            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
+        }
+
+        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.CompiledPath", "warn");
+        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.PredicateContextImpl", "warn");
+
+        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
+            logger.setLevel(Level.OFF);
+            logger.setUseParentHandlers(false);
+            GlobalScreen.getAutoRepeatDelay();
+        }
     }
 
     public Optional<Path> getLogFile() {

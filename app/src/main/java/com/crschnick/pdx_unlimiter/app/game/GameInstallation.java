@@ -16,9 +16,14 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,13 +36,12 @@ public abstract class GameInstallation {
 
     protected ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
     protected DistributionType distType;
-    private Path path;
-    private Path executable;
     protected Path userDir;
-
-    private List<GameDlc> dlcs = new ArrayList<>();
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
+    private Path path;
+    private Path executable;
+    private List<GameDlc> dlcs = new ArrayList<>();
 
     public GameInstallation(Path path, Path executable) {
         this.path = path;
@@ -132,7 +136,7 @@ public abstract class GameInstallation {
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
-            SavegameCache<?,?,T,I> cache, GameCampaignEntry<T, I> e) {
+            SavegameCache<?, ?, T, I> cache, GameCampaignEntry<T, I> e) {
         Path file = getSavegamesPath().resolve(cache.getFileName(e));
         return file;
     }
@@ -172,7 +176,7 @@ public abstract class GameInstallation {
                 GameMod.fromFile(f).ifPresent(m -> {
                     if (Files.exists(m.getPath())) mods.add(m);
                     LoggerFactory.getLogger(getClass()).debug("Found mod " + m.getName() +
-                            " at " + m.getModFile().toString()+ ". Content exists: " + Files.exists(m.getPath()));
+                            " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(m.getPath()));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e);

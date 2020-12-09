@@ -54,7 +54,7 @@ public class GuiStyle {
     public static String CLASS_SWTICH_GAME = "switch-game-button";
     public static String CLASS_CONTENT = "content";
     public static String CLASS_NO_CAMPAIGN = "no-campaign";
-    public static String CLASS_LOADING= "loading";
+    public static String CLASS_LOADING = "loading";
     public static String CLASS_UPLOAD = "upload-button";
 
     public static void addStylesheets(Scene scene) {

@@ -16,7 +16,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -50,7 +49,7 @@ public class GuiStatusBar {
             }
         });
 
-        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
             if (n != null) {
                 bar.showImport();
             } else {

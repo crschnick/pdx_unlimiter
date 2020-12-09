@@ -2,18 +2,13 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Border;
 
-import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -27,7 +22,7 @@ public class GuiGameCampaignList {
         grid.setBorder(Border.EMPTY);
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
-        Consumer<GameCampaign<?,?>> addButton = (GameCampaign<?,?> c) -> {
+        Consumer<GameCampaign<?, ?>> addButton = (GameCampaign<?, ?> c) -> {
             var button = GuiGameCampaign.createCampaignButton(c);
             int index = GameIntegration.current().getSavegameCache().indexOf(c);
             grid.getItems().add(index, button);
@@ -52,8 +47,7 @@ public class GuiGameCampaignList {
 
                 if (n == null) {
                     grid.setItems(FXCollections.observableArrayList());
-                }
-                else {
+                } else {
                     grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().campaignStream()
                             .map(GuiGameCampaign::createCampaignButton)
                             .collect(Collectors.toList())));

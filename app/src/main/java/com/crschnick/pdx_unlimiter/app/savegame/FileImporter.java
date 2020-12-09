@@ -7,7 +7,6 @@ import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,7 +54,7 @@ public class FileImporter {
         Files.delete(queueFile);
     }
 
-    public static void addToImportQueue(List<Path> files) {
+    private static void addToImportQueue(List<Path> files) {
         try {
             FileUtils.forceMkdir(PdxuInstallation.getInstance().getSavegameLocation().resolve("import").toFile());
         } catch (IOException e) {

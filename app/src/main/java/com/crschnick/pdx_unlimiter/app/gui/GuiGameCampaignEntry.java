@@ -29,7 +29,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class GuiGameCampaignEntry {
 
 
-    public static <T,I extends SavegameInfo<T>> Node createCampaignEntryNode(GameCampaignEntry<T,I> e) {
+    public static <T, I extends SavegameInfo<T>> Node createCampaignEntryNode(GameCampaignEntry<T, I> e) {
         VBox main = new VBox();
         main.setAlignment(Pos.CENTER);
         main.setFillWidth(true);
@@ -44,7 +44,7 @@ public class GuiGameCampaignEntry {
 
         Button open = new JFXButton();
         open.setOnMouseClicked((m) -> {
-            GameIntegration.<T,I>current().openCampaignEntry(e);
+            GameIntegration.<T, I>current().openCampaignEntry(e);
         });
         open.setGraphic(new FontIcon());
         open.getStyleClass().add("open-button");
@@ -64,14 +64,14 @@ public class GuiGameCampaignEntry {
         del.setGraphic(new FontIcon());
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showSavegameDeleteDialog()) {
-                GameIntegration.<T,I>current().getSavegameCache().delete(e);
+                GameIntegration.<T, I>current().getSavegameCache().delete(e);
             }
         });
         del.getStyleClass().add("delete-button");
         Tooltip.install(del, new Tooltip("Delete savegame"));
 
 
-        var tagImage = GameIntegration.<T,I>current().getGuiFactory().createImage(e);
+        var tagImage = GameIntegration.<T, I>current().getGuiFactory().createImage(e);
         Pane tagPane = new Pane(tagImage.getValue());
         tagPane.setMaxWidth(80);
         HBox tagBar = new HBox(tagPane, l);
@@ -109,7 +109,7 @@ public class GuiGameCampaignEntry {
 
         InvalidationListener lis = (change) -> {
             Platform.runLater(() -> {
-                layout.setBackground(GameIntegration.<T,I>current().getGuiFactory().createEntryInfoBackground(e));
+                layout.setBackground(GameIntegration.<T, I>current().getGuiFactory().createEntryInfoBackground(e));
             });
         };
         e.infoProperty().addListener(lis);
@@ -121,13 +121,13 @@ public class GuiGameCampaignEntry {
         main.getStyleClass().add(CLASS_ENTRY);
         main.setOnMouseClicked(event -> {
             if (e.infoProperty().isNotNull().get()) {
-                GameIntegration.<T,I>current().selectEntry(e);
+                GameIntegration.<T, I>current().selectEntry(e);
             }
         });
         return main;
     }
 
-    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(GameCampaignEntry<T,I> entry) {
+    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(GameCampaignEntry<T, I> entry) {
         StackPane stack = new StackPane();
         JFXMasonryPane grid = new JFXMasonryPane();
         grid.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);
@@ -142,7 +142,7 @@ public class GuiGameCampaignEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(grid);
         if (entry.infoProperty().isNotNull().get()) {
-            GameIntegration.<T,I>current().getGuiFactory().fillNodeContainer(entry, grid);
+            GameIntegration.<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
         } else {
             stack.getChildren().add(loading);
         }
@@ -155,14 +155,14 @@ public class GuiGameCampaignEntry {
 
             if (stack.localToScreen(0, 0).getY() < PdxuApp.getApp().getScene().getWindow().getHeight() && !load.get()) {
                 load.set(true);
-                GameIntegration.<T,I>current().getSavegameCache().loadEntryAsync(entry);
+                GameIntegration.<T, I>current().getSavegameCache().loadEntryAsync(entry);
             }
         });
 
         entry.infoProperty().addListener((change) -> {
             Platform.runLater(() -> {
                 loading.setVisible(false);
-                GameIntegration.<T,I>current().getGuiFactory().fillNodeContainer(entry, grid);
+                GameIntegration.<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
             });
         });
 

@@ -27,7 +27,7 @@ public class CascadeDirectoryHelper {
 
     public static void traverseDirectory(
             Path dir,
-            GameCampaignEntry<?,? extends SavegameInfo<?>> entry,
+            GameCampaignEntry<?, ? extends SavegameInfo<?>> entry,
             GameInstallation install,
             Consumer<InputStream> consumer) {
         traverseDir(dir, getCascadingDirectories(entry, install), consumer);
@@ -35,13 +35,13 @@ public class CascadeDirectoryHelper {
 
     public static Optional<InputStream> openFile(
             Path file,
-            GameCampaignEntry<?,? extends SavegameInfo<?>> entry,
+            GameCampaignEntry<?, ? extends SavegameInfo<?>> entry,
             GameInstallation install) throws IOException {
         return openFile(file, getCascadingDirectories(entry, install));
     }
 
     private static List<Path> getCascadingDirectories(
-            GameCampaignEntry<?,? extends SavegameInfo<?>> entry, GameInstallation install) {
+            GameCampaignEntry<?, ? extends SavegameInfo<?>> entry, GameInstallation install) {
         boolean loaded = entry != null && entry.getInfo() != null;
         List<Path> dirs = new ArrayList<>();
         if (loaded) {

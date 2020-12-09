@@ -9,7 +9,7 @@ import com.crschnick.pdx_unlimiter.core.savegame.RawSavegame;
 import com.crschnick.pdx_unlimiter.core.savegame.Savegame;
 import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
 
-public class StellarisIntegration extends GameIntegration<StellarisTag, StellarisSavegameInfo>  {
+public class StellarisIntegration extends GameIntegration<StellarisTag, StellarisSavegameInfo> {
 
     @Override
     public String getName() {

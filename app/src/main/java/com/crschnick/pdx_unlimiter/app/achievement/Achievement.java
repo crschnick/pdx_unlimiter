@@ -78,8 +78,8 @@ public class Achievement {
         return a;
     }
 
-    public <T,I extends SavegameInfo<T>, S extends Savegame> Optional<AchievementMatcher> match(GameCampaignEntry<T,I> entry) {
-        Optional<S> loaded = (Optional<S>) GameIntegration.<T,I>current().getSavegameCache().loadDataForEntry(entry);
+    public <T, I extends SavegameInfo<T>, S extends Savegame> Optional<AchievementMatcher> match(GameCampaignEntry<T, I> entry) {
+        Optional<S> loaded = (Optional<S>) GameIntegration.<T, I>current().getSavegameCache().loadDataForEntry(entry);
         if (loaded.isEmpty()) {
             return Optional.empty();
         }

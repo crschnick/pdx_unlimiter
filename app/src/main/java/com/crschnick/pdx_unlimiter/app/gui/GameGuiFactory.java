@@ -40,7 +40,20 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         this.installation = installation;
     }
 
-    public boolean displayIncompatibleWarning(GameCampaignEntry<T,I> entry) {
+    protected static void addNode(JFXMasonryPane pane, Region content) {
+        content.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTENT);
+        StackPane p = new StackPane(content);
+        p.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
+        content.setPadding(new Insets(5, 10, 5, 10));
+        pane.getChildren().add(p);
+        content.minWidthProperty().bind(Bindings.createDoubleBinding(
+                () -> p.getWidth() - p.getPadding().getLeft() - p.getPadding().getRight(), p.widthProperty()));
+        content.prefHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
+        p.setAlignment(Pos.CENTER);
+    }
+
+    public boolean displayIncompatibleWarning(GameCampaignEntry<T, I> entry) {
         var launch = new ButtonType("Launch anyway");
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.WARNING);
@@ -50,7 +63,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         alert.setTitle("Incompatible savegame");
 
         StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
-        if (!GameIntegration.<T,I>current().isVersionCompatible(entry)) {
+        if (!GameIntegration.<T, I>current().isVersionCompatible(entry)) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: " + installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: " + entry.getInfo().getVersion().toString());
@@ -92,13 +105,13 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane createIcon();
 
-    public abstract Background createEntryInfoBackground(GameCampaignEntry<T,I> entry);
+    public abstract Background createEntryInfoBackground(GameCampaignEntry<T, I> entry);
 
-    public abstract ObservableValue<Node> createImage(GameCampaignEntry<T,I> entry);
+    public abstract ObservableValue<Node> createImage(GameCampaignEntry<T, I> entry);
 
-    public abstract ObservableValue<Node> createImage(GameCampaign<T,I> campaign);
+    public abstract ObservableValue<Node> createImage(GameCampaign<T, I> campaign);
 
-    public ObservableValue<String> createInfoString(GameCampaign<T,I> campaign) {
+    public ObservableValue<String> createInfoString(GameCampaign<T, I> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
         campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
@@ -106,23 +119,9 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-
-    protected static void addNode(JFXMasonryPane pane, Region content) {
-        content.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTENT);
-        StackPane p = new StackPane(content);
-        p.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
-        content.setPadding(new Insets(5, 10, 5, 10));
-        pane.getChildren().add(p);
-        content.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getWidth() - p.getPadding().getLeft() - p.getPadding().getRight(), p.widthProperty()));
-        content.prefHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
-        p.setAlignment(Pos.CENTER);
-    }
-
-    public void fillNodeContainer(GameCampaignEntry<T,I> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(GameCampaignEntry<T, I> entry, JFXMasonryPane grid) {
         Label version;
-        if (GameIntegration.<T,I>current().isVersionCompatible(entry)) {
+        if (GameIntegration.<T, I>current().isVersionCompatible(entry)) {
             version = new Label(entry.getInfo().getVersion().toString());
             Tooltip.install(version, new Tooltip("Compatible version"));
             version.getStyleClass().add(CLASS_COMPATIBLE);

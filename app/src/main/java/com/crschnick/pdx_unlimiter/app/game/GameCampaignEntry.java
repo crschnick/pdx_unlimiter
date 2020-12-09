@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
 
 import java.util.UUID;
 
-public final class GameCampaignEntry<T,I extends SavegameInfo> implements Comparable<GameCampaignEntry<T,I>> {
+public final class GameCampaignEntry<T, I extends SavegameInfo> implements Comparable<GameCampaignEntry<T, I>> {
 
     private StringProperty name;
     private UUID uuid;
@@ -31,7 +31,7 @@ public final class GameCampaignEntry<T,I extends SavegameInfo> implements Compar
     }
 
     @Override
-    public int compareTo(GameCampaignEntry<T,I> o) {
+    public int compareTo(GameCampaignEntry<T, I> o) {
         return o.getDate().compareTo(getDate());
     }
 

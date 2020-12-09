@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class AchievementWindow {
 
-    private static void sortAchievementList(VBox list, List<Achievement> as, GameCampaignEntry<?,?> entry) {
+    private static void sortAchievementList(VBox list, List<Achievement> as, GameCampaignEntry<?, ?> entry) {
         List<Node> newOrder = as.stream()
                 .map(a -> {
                     Node n = AchievementWindow.createAchievementInfoNode(a);
@@ -39,7 +39,7 @@ public class AchievementWindow {
         list.getChildren().setAll(newOrder);
     }
 
-    public static void showAchievementList(GameCampaignEntry<?,?> entry) {
+    public static void showAchievementList(GameCampaignEntry<?, ?> entry) {
         Alert alert = DialogHelper.createEmptyAlert();
         alert.setTitle("Achievement List");
 
@@ -89,7 +89,7 @@ public class AchievementWindow {
         Platform.runLater(alert::showAndWait);
     }
 
-    public static void showAchievementDialog(Achievement a, AchievementMatcher matcher, GameCampaignEntry<?,?> entry) {
+    public static void showAchievementDialog(Achievement a, AchievementMatcher matcher, GameCampaignEntry<?, ?> entry) {
         ButtonType foo = new ButtonType("Validate", ButtonBar.ButtonData.OK_DONE);
         ButtonType bar = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
         Alert alert = DialogHelper.createEmptyAlert();

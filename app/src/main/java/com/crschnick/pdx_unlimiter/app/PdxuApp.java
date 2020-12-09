@@ -2,13 +2,16 @@ package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.gui.*;
+import com.crschnick.pdx_unlimiter.app.gui.GameImage;
+import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
+import com.crschnick.pdx_unlimiter.app.gui.GuiSettings;
+import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import javafx.application.Application;
@@ -16,23 +19,17 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PdxuApp extends Application {
 
@@ -45,16 +42,16 @@ public class PdxuApp extends Application {
         return APP;
     }
 
-    public StackPane getLayout() {
-        return layout;
-    }
-
     public static void main(String[] args) {
         try {
             launch(args);
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
+    }
+
+    public StackPane getLayout() {
+        return layout;
     }
 
     public Scene getScene() {
@@ -79,7 +76,12 @@ public class PdxuApp extends Application {
         ErrorHandler.init();
 
         LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + getParameters().getRaw());
-        FileImporter.addToImportQueue(getParameters().getRaw().stream().map(Path::of).collect(Collectors.toList()));
+        getParameters().getRaw().stream()
+                .map(Path::of)
+                .map(p -> FileImportTarget.createTargets(p).stream())
+                .flatMap(Stream::distinct)
+                .forEach(FileImporter::importTarget);
+
         if (!PdxuInstallation.shouldStart()) {
             System.exit(0);
         }

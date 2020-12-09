@@ -14,13 +14,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class GameCampaign<T,I extends SavegameInfo<T>> {
+public final class GameCampaign<T, I extends SavegameInfo<T>> {
 
 
     private volatile ObjectProperty<Instant> lastPlayed;
     private volatile StringProperty name;
     private UUID campaignId;
-    private volatile ObservableSet<GameCampaignEntry<T,I>> savegames =
+    private volatile ObservableSet<GameCampaignEntry<T, I>> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
     private volatile ObjectProperty<GameDate> date;
     private ObjectProperty<T> tag;
@@ -41,7 +41,7 @@ public final class GameCampaign<T,I extends SavegameInfo<T>> {
         return tag;
     }
 
-    public void add(GameCampaignEntry<T,I> e) {
+    public void add(GameCampaignEntry<T, I> e) {
         this.savegames.add(e);
     }
 
@@ -57,20 +57,20 @@ public final class GameCampaign<T,I extends SavegameInfo<T>> {
         return campaignId;
     }
 
-    public GameCampaignEntry<T,I> getLatestEntry() {
+    public GameCampaignEntry<T, I> getLatestEntry() {
         return entryStream().findFirst().get();
     }
 
-    public ObservableSet<GameCampaignEntry<T,I>> getEntries() {
+    public ObservableSet<GameCampaignEntry<T, I>> getEntries() {
         return savegames;
     }
 
-    public int indexOf(GameCampaignEntry<T,I> e) {
+    public int indexOf(GameCampaignEntry<T, I> e) {
         return entryStream().collect(Collectors.toList()).indexOf(e);
     }
 
-    public Stream<GameCampaignEntry<T,I>> entryStream() {
-        var list = new ArrayList<GameCampaignEntry<T,I>>(getEntries());
+    public Stream<GameCampaignEntry<T, I>> entryStream() {
+        var list = new ArrayList<GameCampaignEntry<T, I>>(getEntries());
         list.sort(Comparator.comparing(GameCampaignEntry::getDate));
         Collections.reverse(list);
         return list.stream();

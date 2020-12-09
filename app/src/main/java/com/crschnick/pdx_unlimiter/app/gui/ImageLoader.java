@@ -2,23 +2,17 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.Pane;
 
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class ImageLoader {
 
@@ -31,7 +25,7 @@ public class ImageLoader {
         return loadImage(p, null);
     }
 
-    static Image loadImage(Path p, Function<Integer,Integer> pixelSelector) {
+    static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
         if (!Files.isRegularFile(p)) {
             return null;
         }
@@ -44,7 +38,7 @@ public class ImageLoader {
         }
     }
 
-    public static Function<Integer,Integer> replaceColorFunction(int replaceColor, int newColor) {
+    public static Function<Integer, Integer> replaceColorFunction(int replaceColor, int newColor) {
         return (Integer rgb) -> {
             if (rgb == replaceColor) {
                 return newColor;
@@ -53,7 +47,7 @@ public class ImageLoader {
         };
     }
 
-    static Image loadImage(InputStream in, Function<Integer,Integer> pixelSelector) {
+    static Image loadImage(InputStream in, Function<Integer, Integer> pixelSelector) {
         BufferedImage image = null;
         try {
             image = ImageIO.read(in);

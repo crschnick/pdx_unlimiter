@@ -9,7 +9,9 @@ import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.*;
+import com.crschnick.pdx_unlimiter.core.savegame.RawSavegame;
+import com.crschnick.pdx_unlimiter.core.savegame.Savegame;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -50,16 +52,16 @@ public abstract class SavegameCache<
     public static final Ck3SavegameCache CK3_CACHE = new Ck3SavegameCache();
 
     public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE, STELLARIS_CACHE, CK3_CACHE);
-    private volatile Queue<GameCampaignEntry<T,I>> toLoad = new ConcurrentLinkedQueue<>();
+    private volatile Queue<GameCampaignEntry<T, I>> toLoad = new ConcurrentLinkedQueue<>();
 
     private BooleanProperty loading = new SimpleBooleanProperty(false);
     private String fileEnding;
     private String name;
     private GameDateType dateType;
     private Path path;
-    private volatile ObservableSet<GameCampaign<T,I>> campaigns = FXCollections.synchronizedObservableSet(
+    private volatile ObservableSet<GameCampaign<T, I>> campaigns = FXCollections.synchronizedObservableSet(
             FXCollections.observableSet(new HashSet<>()));
-    private volatile Map<GameCampaignEntry<T,I>, S> loadedSavegames = Collections.synchronizedMap(new LinkedHashMap<>());
+    private volatile Map<GameCampaignEntry<T, I>, S> loadedSavegames = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public SavegameCache(String name, String fileEnding, GameDateType dateType) {
         this.name = name;
@@ -67,10 +69,6 @@ public abstract class SavegameCache<
         this.dateType = dateType;
         this.path = PdxuInstallation.getInstance().getSavegameLocation().resolve(name);
         addChangeListeners();
-    }
-
-    public BooleanProperty loadingProperty() {
-        return loading;
     }
 
     public static void loadData() throws IOException {
@@ -147,6 +145,10 @@ public abstract class SavegameCache<
         }
     }
 
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
+
     private void init() throws IOException {
         FileUtils.forceMkdir(getPath().toFile());
         if (Files.exists(getPath().resolve(getDataFile()))) {
@@ -172,13 +174,13 @@ public abstract class SavegameCache<
     }
 
     private void addChangeListeners() {
-        this.campaigns.addListener((SetChangeListener<? super GameCampaign<T,I>>) cc -> {
+        this.campaigns.addListener((SetChangeListener<? super GameCampaign<T, I>>) cc -> {
             if (cc.wasRemoved()) {
                 return;
             }
 
-            GameCampaign<T,I> c = cc.getElementAdded();
-            c.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<T,I>>) (change) -> {
+            GameCampaign<T, I> c = cc.getElementAdded();
+            c.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<T, I>>) (change) -> {
                 boolean isNewEntry = change.wasAdded() && change.getElementAdded().infoProperty().isNotNull().get();
                 boolean wasRemoved = change.wasRemoved();
                 if (isNewEntry || wasRemoved) updateCampaignProperties(c);
@@ -186,7 +188,7 @@ public abstract class SavegameCache<
         });
     }
 
-    private void updateCampaignProperties(GameCampaign<T,I>  c) {
+    private void updateCampaignProperties(GameCampaign<T, I> c) {
         c.getEntries().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
                 .map(s -> s.getInfo().getDate()).min(Comparator.naturalOrder())
@@ -215,7 +217,7 @@ public abstract class SavegameCache<
             campaigns.add(readCampaign(c.get(i), name, id, lastDate, date));
         }
 
-        for (GameCampaign<T,I>  campaign : campaigns) {
+        for (GameCampaign<T, I> campaign : campaigns) {
             try {
                 JsonNode campaignNode = o.readTree(in.apply(
                         Path.of(campaign.getCampaignId().toString()).resolve("campaign.json"))
@@ -233,15 +235,15 @@ public abstract class SavegameCache<
         }
     }
 
-    protected abstract GameCampaignEntry<T,I>  readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date);
+    protected abstract GameCampaignEntry<T, I> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date);
 
-    protected abstract GameCampaign<T,I> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date);
+    protected abstract GameCampaign<T, I> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date);
 
     public void exportDataToConfig(FailableFunction<Path, OutputStream, IOException> out) throws IOException {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ArrayNode c = n.putArray("campaigns");
         ;
-        for (GameCampaign<T,I>  campaign : getCampaigns()) {
+        for (GameCampaign<T, I> campaign : getCampaigns()) {
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
             campaign.getEntries().stream()
@@ -270,17 +272,17 @@ public abstract class SavegameCache<
         JsonHelper.write(n, out.apply(Path.of("campaigns.json")));
     }
 
-    protected abstract void writeEntry(ObjectNode node, GameCampaignEntry<T,I> e);
+    protected abstract void writeEntry(ObjectNode node, GameCampaignEntry<T, I> e);
 
-    protected abstract void writeCampaign(ObjectNode node, GameCampaign<T,I> c);
+    protected abstract void writeCampaign(ObjectNode node, GameCampaign<T, I> c);
 
     public void importSavegameCache(ZipFile zipFile) {
     }
 
     private void exportSavegameDirectory(ZipOutputStream out) {
         Set<String> names = new HashSet<>();
-        for (GameCampaign<T,I> c : getCampaigns()) {
-            for (GameCampaignEntry<T,I> e : c.getEntries()) {
+        for (GameCampaign<T, I> c : getCampaigns()) {
+            for (GameCampaignEntry<T, I> e : c.getEntries()) {
                 String name = getEntryName(e);
                 if (names.contains(name)) {
                     name += "_" + UUID.randomUUID().toString();
@@ -311,7 +313,7 @@ public abstract class SavegameCache<
         in.close();
     }
 
-    public synchronized void delete(GameCampaign<T,I> c) {
+    public synchronized void delete(GameCampaign<T, I> c) {
         if (!this.campaigns.contains(c)) {
             return;
         }
@@ -330,27 +332,27 @@ public abstract class SavegameCache<
         this.campaigns.remove(c);
     }
 
-    public synchronized GameCampaignEntry<T,I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i, S savegame) {
-        GameCampaignEntry<T,I> e = createEntry(entryUuid, checksum, i);
+    public synchronized GameCampaignEntry<T, I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i, S savegame) {
+        GameCampaignEntry<T, I> e = createEntry(entryUuid, checksum, i);
         if (this.getCampaign(campainUuid).isEmpty()) {
             var newCampaign = createNewCampaignForEntry(e);
             this.campaigns.add(newCampaign);
         }
 
-        GameCampaign<T,I> c = this.getCampaign(campainUuid).get();
+        GameCampaign<T, I> c = this.getCampaign(campainUuid).get();
         c.add(e);
 
         GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
-        GameIntegration.<T,I>current().selectEntry(e);
+        GameIntegration.<T, I>current().selectEntry(e);
         updateLoadedSavegames(e, savegame);
         return e;
     }
 
-    protected abstract GameCampaign<T,I> createNewCampaignForEntry(GameCampaignEntry<T,I> entry);
+    protected abstract GameCampaign<T, I> createNewCampaignForEntry(GameCampaignEntry<T, I> entry);
 
-    protected abstract GameCampaignEntry<T,I> createEntry(UUID uuid, String checksum, I info);
+    protected abstract GameCampaignEntry<T, I> createEntry(UUID uuid, String checksum, I info);
 
-    public synchronized boolean updateSavegameData(GameCampaignEntry<T,I> e) {
+    public synchronized boolean updateSavegameData(GameCampaignEntry<T, I> e) {
         Path p = getPath(e);
         Path s = p.resolve("savegame." + name);
         try {
@@ -375,20 +377,20 @@ public abstract class SavegameCache<
         sg.write(out, true);
     }
 
-    public synchronized boolean contains(GameCampaignEntry<?,?> e) {
+    public synchronized boolean contains(GameCampaignEntry<?, ?> e) {
         return campaigns.stream()
                 .anyMatch(c -> c.getEntries().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
     }
 
-    public synchronized GameCampaign<T,I> getCampaign(GameCampaignEntry<T,I>  e) {
+    public synchronized GameCampaign<T, I> getCampaign(GameCampaignEntry<T, I> e) {
         var campaign = campaigns.stream()
                 .filter(c -> c.getEntries().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
                 .findAny();
         return campaign.orElseThrow(() -> new IllegalArgumentException("Could not find campaign for entry " + e.getName()));
     }
 
-    public synchronized void delete(GameCampaignEntry<T,I> e) {
-        GameCampaign<T,I> c = getCampaign(e);
+    public synchronized void delete(GameCampaignEntry<T, I> e) {
+        GameCampaign<T, I> c = getCampaign(e);
         if (!this.campaigns.contains(c) || !c.getEntries().contains(e)) {
             return;
         }
@@ -409,7 +411,7 @@ public abstract class SavegameCache<
         }
     }
 
-    public final Optional<S> loadDataForEntry(GameCampaignEntry<T,I> entry) {
+    public final Optional<S> loadDataForEntry(GameCampaignEntry<T, I> entry) {
         if (loadedSavegames.containsKey(entry)) {
             return Optional.ofNullable(loadedSavegames.get(entry));
         }
@@ -423,15 +425,15 @@ public abstract class SavegameCache<
     }
 
 
-    private S updateLoadedSavegames(GameCampaignEntry<T,I> entry) throws Exception {
+    private S updateLoadedSavegames(GameCampaignEntry<T, I> entry) throws Exception {
         S s = loadDataFromFile(getPath(entry).resolve("data.zip"));
         updateLoadedSavegames(entry, s);
         return s;
     }
 
-    private void updateLoadedSavegames(GameCampaignEntry<T,I> entry, S savegame) {
+    private void updateLoadedSavegames(GameCampaignEntry<T, I> entry, S savegame) {
         if (loadedSavegames.size() >= Settings.getInstance().getMaxLoadedSavegames()) {
-            GameCampaignEntry<T,I> first = loadedSavegames.keySet().iterator().next();
+            GameCampaignEntry<T, I> first = loadedSavegames.keySet().iterator().next();
             loadedSavegames.remove(first);
             LoggerFactory.getLogger(SavegameCache.class).debug("Unloaded savegame data of entry " + getEntryName(first));
         }
@@ -440,14 +442,14 @@ public abstract class SavegameCache<
         LoggerFactory.getLogger(SavegameCache.class).debug("Loaded savegame data of entry " + getEntryName(entry));
     }
 
-    public void loadEntryAsync(GameCampaignEntry<T,I> e) {
+    public void loadEntryAsync(GameCampaignEntry<T, I> e) {
         if (e.infoProperty().isNull().get()) {
             LoggerFactory.getLogger(SavegameCache.class).debug("Added entry " + getEntryName(e) + " to loader queue");
             this.toLoad.add(e);
         }
     }
 
-    private synchronized void loadEntry(GameCampaignEntry<T,I> e) {
+    private synchronized void loadEntry(GameCampaignEntry<T, I> e) {
         LoggerFactory.getLogger(SavegameCache.class).debug("Starting to load entry " + getEntryName(e));
         if (e.infoProperty().isNotNull().get()) {
             return;
@@ -470,22 +472,23 @@ public abstract class SavegameCache<
         }
     }
 
-    protected abstract boolean needsUpdate(GameCampaignEntry<T,I> e);
+    protected abstract boolean needsUpdate(GameCampaignEntry<T, I> e);
 
     protected abstract I loadInfo(S data) throws Exception;
 
     protected abstract R loadRaw(Path p) throws Exception;
 
     protected abstract S loadDataFromFile(Path p) throws Exception;
+
     protected abstract S loadDataFromRaw(R raw) throws Exception;
 
-    public synchronized Path getPath(GameCampaignEntry<T,I> e) {
+    public synchronized Path getPath(GameCampaignEntry<T, I> e) {
         Path campaignPath = path.resolve(getCampaign(e).getCampaignId().toString());
         return campaignPath.resolve(e.getUuid().toString());
     }
 
-    public synchronized Optional<GameCampaign<T,I>> getCampaign(UUID uuid) {
-        for (GameCampaign<T,I> c : campaigns) {
+    public synchronized Optional<GameCampaign<T, I>> getCampaign(UUID uuid) {
+        for (GameCampaign<T, I> c : campaigns) {
             if (c.getCampaignId().equals(uuid)) {
                 return Optional.of(c);
             }
@@ -493,11 +496,11 @@ public abstract class SavegameCache<
         return Optional.empty();
     }
 
-    public synchronized String getFileName(GameCampaignEntry<T,I> e) {
+    public synchronized String getFileName(GameCampaignEntry<T, I> e) {
         return getCampaign(e).getName() + " " + e.getName().replace(":", ".") + "." + fileEnding;
     }
 
-    public synchronized void exportSavegame(GameCampaignEntry<T,I> e, Path destPath) throws IOException {
+    public synchronized void exportSavegame(GameCampaignEntry<T, I> e, Path destPath) throws IOException {
         Path srcPath = getPath(e).resolve("savegame." + fileEnding);
         FileUtils.forceMkdirParent(destPath.toFile());
         FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
@@ -537,14 +540,14 @@ public abstract class SavegameCache<
         getCampaigns().stream()
                 .filter(c -> c.getCampaignId().equals(uuid))
                 .findAny().ifPresent(c -> {
-                    exists[0] = (c.getEntries().stream()
-                            .filter(ch -> ch.getChecksum().equals(rawSavegame.getFileChecksum())))
-                            .findAny();
+            exists[0] = (c.getEntries().stream()
+                    .filter(ch -> ch.getChecksum().equals(rawSavegame.getFileChecksum())))
+                    .findAny();
         });
         if (exists[0].isPresent()) {
             loadEntry(exists[0].get());
             GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
-            GameIntegration.<T,I>current().selectEntry(exists[0].get());
+            GameIntegration.<T, I>current().selectEntry(exists[0].get());
             return;
         }
 
@@ -558,7 +561,7 @@ public abstract class SavegameCache<
         this.addNewEntry(uuid, saveUuid, rawSavegame.getFileChecksum(), info, savegame);
     }
 
-    public String getEntryName(GameCampaignEntry<T,I>  e) {
+    public String getEntryName(GameCampaignEntry<T, I> e) {
         String cn = getCampaign(e).getName();
         String en = e.getName();
         return cn + " (" + en + ")";
@@ -572,21 +575,21 @@ public abstract class SavegameCache<
         return Path.of("campaigns.json");
     }
 
-    public int indexOf(GameCampaign<?,?> c) {
-        var list = new ArrayList<GameCampaign<T,I>>(getCampaigns());
+    public int indexOf(GameCampaign<?, ?> c) {
+        var list = new ArrayList<GameCampaign<T, I>>(getCampaigns());
         list.sort(Comparator.comparing(GameCampaign::getLastPlayed));
         Collections.reverse(list);
         return list.indexOf(c);
     }
 
-    public Stream<GameCampaign<T,I>> campaignStream() {
-        var list = new ArrayList<GameCampaign<T,I>>(getCampaigns());
+    public Stream<GameCampaign<T, I>> campaignStream() {
+        var list = new ArrayList<GameCampaign<T, I>>(getCampaigns());
         list.sort(Comparator.comparing(GameCampaign::getLastPlayed));
         Collections.reverse(list);
         return list.stream();
     }
 
-    public ObservableSet<GameCampaign<T,I> > getCampaigns() {
+    public ObservableSet<GameCampaign<T, I>> getCampaigns() {
         return campaigns;
     }
 

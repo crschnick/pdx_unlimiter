@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.core.format.NamespaceCreator;
 import com.crschnick.pdx_unlimiter.core.savegame.*;
 import javafx.application.Platform;
@@ -242,8 +241,8 @@ public class DialogHelper {
         alert.setTitle("Error reporter");
         alert.setHeaderText("An error occured: " + msg + "\n\n" + (reportable ?
                 "If you have a suspicion of the cause and want to help us fix the error, you can report it on github.\n" +
-                "If you have a specific savegame that causes this issue, please attach it as well in a zip.\n\n" +
-                "If you just want to notify the developers of this error automatically, click the 'send error' button." : ""));
+                        "If you have a specific savegame that causes this issue, please attach it as well in a zip.\n\n" +
+                        "If you just want to notify the developers of this error automatically, click the 'send error' button." : ""));
 
         VBox dialogPaneContent = new VBox();
 
