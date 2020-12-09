@@ -1,15 +1,13 @@
+import org.beryx.jlink.JlinkTask
+
 plugins {
     id 'application'
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
     id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.beryx.jlink' version '2.22.3'
 }
 
-setVersion '2.0-beta5'
-
-if (!System.getProperty("java.runtime.name").contains("OpenJDK")) {
-    println "OpenJDK is required!"
-    return
-}
+setVersion '2.0-beta6'
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
@@ -21,13 +19,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_15
 }
 
+List<String> runArgs = [
+        "-Djdk.gtk.version=2",
+        "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
+        "--add-opens", "java.base/java.lang.reflect=com.jfoenix"]
+
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
     mainClass = 'com.crschnick.pdx_unlimiter.app.PdxuApp'
-    applicationDefaultJvmArgs = ["-Djdk.gtk.version=2",
-                                 "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
-                                 "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
-                                 '-Xms16384m', '-Xmx16384m']
+    applicationDefaultJvmArgs = runArgs
 }
 
 javafx {
@@ -177,25 +177,26 @@ task copyOutput(type: Copy) {
     from "${buildDir}/libs"
 }
 
-createRuntimeImage.dependsOn([copyModules, copyOutput])
-createRuntimeImage {
-    outputDirectory = file("$buildDir/image")
-    modulePath = [file("$buildDir/modules")]
-    modules = [
-            'com.crschnick.pdx_unlimiter.app',
-            'org.slf4j',
-            'org.slf4j.simple',
-            'jdk.crypto.ec',
-            'org.kordamp.ikonli.materialdesign']
-    excludedResources = []
+jlink {
+    imageDir = file("$buildDir/image")
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'pdxu'
-        module = 'com.crschnick.pdx_unlimiter.app'
+        jvmArgs = runArgs
     }
-    compression = 2
-    stripDebug = true
-    noHeaderFiles = true
-    noManPages = true
+
+    customImage {
+        appModules = [
+                'com.crschnick.pdx_unlimiter.app',
+                'org.slf4j',
+                'org.slf4j.simple',
+                'jdk.crypto.ec',
+                'org.kordamp.ikonli.materialdesign'
+        ]
+    }
+}
+
+task createImage(type: JlinkTask, dependsOn: [copyModules, copyOutput]) {
 }
 
 task writeVersion(type: DefaultTask) {
@@ -205,15 +206,9 @@ task writeVersion(type: DefaultTask) {
     }
 }
 
-task copyPdxuProperties(type: Copy) {
-    into file("${buildDir}/image/")
-    from file("${projectDir}/pdxu_prod.properties")
-    rename { f -> return "pdxu.properties"}
-}
+createImage.finalizedBy(writeVersion)
 
-createRuntimeImage.finalizedBy([writeVersion, copyPdxuProperties])
-
-task createDist(type: Zip, dependsOn: createRuntimeImage) {
+task createDist(type: Zip, dependsOn: createImage) {
     destinationDirectory = buildDir
     archivesBaseName = "pdx_unlimiter"
     archiveAppendix = "windows"

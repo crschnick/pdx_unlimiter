@@ -1,4 +1,5 @@
-installDir=
+dataDir=
 achievementDir=
 developerMode=true
 enableJNativeHook=false
+simulateProduction=false

@@ -144,7 +144,7 @@ public class DialogHelper {
 
     public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.getDialogPane().styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
+        //alert.getDialogPane().styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
         return alert;
