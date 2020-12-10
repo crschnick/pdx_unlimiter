@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
@@ -27,6 +28,7 @@ public class ImageLoader {
 
     static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
         if (!Files.isRegularFile(p)) {
+            LoggerFactory.getLogger(ImageLoader.class).warn("Image file " + p.toString() + " not found.");
             return null;
         }
 

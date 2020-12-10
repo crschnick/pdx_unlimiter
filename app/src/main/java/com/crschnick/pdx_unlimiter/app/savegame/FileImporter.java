@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.SynchronousQueue;
 import java.util.function.Consumer;
 
 public class FileImporter {
@@ -21,6 +23,8 @@ public class FileImporter {
     private static final Logger logger = LoggerFactory.getLogger(FileImporter.class);
 
     private static FileImporter INSTANCE;
+
+    private Queue<Path> importQueue = new SynchronousQueue<>();
 
     public static void init() throws IOException {
         INSTANCE = new FileImporter();
@@ -42,7 +46,7 @@ public class FileImporter {
         WatcherHelper.startWatchersInDirectories("Importer", List.of(path), importFunc);
     }
 
-    private static void importFileInternal(Path queueFile, Path p) throws IOException {
+    private static void importFileInternal(Path queueFile, Path p) {
         logger.debug("Starting to import " + p + " from queue file " + queueFile);
         var targets = FileImportTarget.createTargets(p);
         if (targets.size() == 0) {
@@ -50,16 +54,17 @@ public class FileImporter {
         } else {
             for (FileImportTarget t : targets) {
                 logger.debug("Starting to import target " + t.getName() + " with path " + t.getPath());
-                boolean succ = t.importTarget();
-                if (succ && Settings.getInstance().deleteOnImport()) {
-                    logger.debug("Deleting import target " + t.getName());
-                    t.delete();
-                }
+                t.importTarget(() -> {
+                    if (Settings.getInstance().deleteOnImport()) {
+                        logger.debug("Deleting import target " + t.getName());
+                        t.delete();
+                    }
+                });
             }
         }
 
         logger.debug("Deleting queue file " + queueFile);
-        Files.delete(queueFile);
+        FileUtils.deleteQuietly(queueFile.toFile());
     }
 
     public static void addToImportQueue(Path file) {

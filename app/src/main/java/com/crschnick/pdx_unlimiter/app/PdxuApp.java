@@ -60,7 +60,10 @@ public class PdxuApp extends Application {
 
     public void close() {
         running.setValue(false);
+        SavegameCache.destroyCaches();
+
         Platform.exit();
+
         try {
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.unregisterNativeHook();
@@ -121,12 +124,13 @@ public class PdxuApp extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
+                close();
+
                 Stage.getWindows().stream()
                         .filter(w -> !w.equals(getScene().getWindow()))
                         .collect(Collectors.toList())
                         .forEach(w -> w.fireEvent(event));
 
-                close();
             }
         });
 

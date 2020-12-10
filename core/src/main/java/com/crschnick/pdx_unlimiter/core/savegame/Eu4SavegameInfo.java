@@ -13,7 +13,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private boolean customNationInWorld;
     private boolean releasedVassal;
     private boolean observer;
-    private Set<Eu4Tag> allTags = new HashSet<>();
     private Ruler ruler;
     private Optional<Ruler> heir;
     private Set<Eu4Tag> vassals = new HashSet<>();
@@ -45,6 +44,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
             e.campaignUuid = UUID.fromString(Node.getString(Node.getNodeForKey(save.getNodes().get("meta"), "campaign_id")));
 
+            e.allTags = new HashSet<>();
             for (Node n : Node.getNodeArray(save.getNodes().get("countries"))) {
                 e.allTags.add(Eu4Tag.fromNode(n));
                 if (Node.hasKey(Node.getKeyValueNode(n).getNode(), "custom_nation_points")) {
@@ -141,10 +141,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return observer;
     }
 
-    public boolean isIronman() {
-        return ironman;
-    }
-
     public boolean isRandomNewWorld() {
         return randomNewWorld;
     }
@@ -163,14 +159,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public Optional<Ruler> getHeir() {
         return heir;
-    }
-
-    public GameVersion getVersion() {
-        return version;
-    }
-
-    public Set<Eu4Tag> getAllTags() {
-        return allTags;
     }
 
     public Set<Eu4Tag> getVassals() {

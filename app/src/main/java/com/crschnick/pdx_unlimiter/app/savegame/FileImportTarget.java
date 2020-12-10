@@ -62,8 +62,8 @@ public abstract class FileImportTarget {
         return targets;
     }
 
-    final boolean importTarget() {
-        return savegameCache.importSavegame(path);
+    final void importTarget(Runnable onFinish) {
+        savegameCache.importSavegameAsync(path, onFinish);
     }
 
     public Instant getLastModified() throws IOException {

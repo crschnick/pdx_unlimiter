@@ -40,21 +40,21 @@ public class GuiMenuBar {
         MenuItem menuItem1 = new MenuItem("Import storage...");
         menuItem1.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showImportArchiveDialog();
-            path.ifPresent(SavegameCache::importSavegameCache);
+            //path.ifPresent(SavegameCache::importSavegameCache);
         });
         savegames.getItems().add(menuItem1);
 
         MenuItem menuItem2 = new MenuItem("Export storage...");
         menuItem2.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showExportDialog(true);
-            path.ifPresent(SavegameCache::exportSavegameCache);
+            //path.ifPresent(SavegameCache::exportSavegameCache);
         });
         savegames.getItems().add(menuItem2);
 
         MenuItem exportSg = new MenuItem("Export savegames...");
         exportSg.setOnAction((a) -> {
             Optional<Path> path = DialogHelper.showExportDialog(false);
-            path.ifPresent(SavegameCache::exportSavegameDirectory);
+            //path.ifPresent(SavegameCache::exportSavegameDirectory);
         });
         savegames.getItems().add(exportSg);
 

@@ -58,7 +58,7 @@ public class LogManager {
     }
 
     private void setLogLevels(boolean debug) {
-        if (debug) {
+        if (true) { //if (debug) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
 

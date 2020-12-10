@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
@@ -34,6 +35,9 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
@@ -52,7 +56,8 @@ public abstract class SavegameCache<
     public static final Ck3SavegameCache CK3_CACHE = new Ck3SavegameCache();
 
     public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE, STELLARIS_CACHE, CK3_CACHE);
-    private volatile Queue<GameCampaignEntry<T, I>> toLoad = new ConcurrentLinkedQueue<>();
+    private ExecutorService loadService;
+    private ExecutorService importService;
 
     private BooleanProperty loading = new SimpleBooleanProperty(false);
     private String fileEnding;
@@ -77,71 +82,17 @@ public abstract class SavegameCache<
         }
     }
 
-    public static void saveData() throws IOException {
+    public static void destroyCaches() {
+        for (SavegameCache<?,?,?,?> cache : CACHES) {
+            cache.destroy();
+        }
+    }
+
+    private static void saveData() throws IOException {
         for (SavegameCache cache : CACHES) {
             FailableFunction<Path, OutputStream, IOException> f =
                     (p) -> Files.newOutputStream(cache.getPath().resolve(p));
             cache.exportDataToConfig(f);
-        }
-    }
-
-    public static void importSavegameCache(Path in) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(in.toFile());
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return;
-        }
-
-        for (SavegameCache cache : SavegameCache.CACHES) {
-            cache.importSavegameCache(zipFile);
-        }
-
-        try {
-            zipFile.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-    }
-
-    public static void exportSavegameCache(Path out) {
-        ZipOutputStream zipFile = null;
-        try {
-            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
-        } catch (FileNotFoundException e) {
-            ErrorHandler.handleException(e);
-            return;
-        }
-
-        for (SavegameCache cache : SavegameCache.CACHES) {
-            cache.exportSavegameCache(zipFile);
-        }
-
-        try {
-            zipFile.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-    }
-
-    public static void exportSavegameDirectory(Path out) {
-        ZipOutputStream zipFile = null;
-        try {
-            zipFile = new ZipOutputStream(new FileOutputStream(out.toString()));
-        } catch (FileNotFoundException e) {
-            ErrorHandler.handleException(e);
-            return;
-        }
-
-        for (SavegameCache cache : SavegameCache.CACHES) {
-            cache.exportSavegameDirectory(zipFile);
-        }
-
-        try {
-            zipFile.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
         }
     }
 
@@ -155,22 +106,13 @@ public abstract class SavegameCache<
             importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
         }
 
-        Thread loader = new Thread(() -> {
-            while (true) {
-                if (toLoad.peek() != null) {
-                    loadEntry(toLoad.poll());
-                }
+        loadService = Executors.newSingleThreadExecutor();
+        importService = Executors.newSingleThreadExecutor();
+    }
 
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        loader.setName("Savegame loader");
-        loader.setDaemon(true);
-        loader.start();
+    private void destroy() {
+        loadService.shutdown();
+        importService.shutdown();
     }
 
     private void addChangeListeners() {
@@ -275,43 +217,6 @@ public abstract class SavegameCache<
     protected abstract void writeEntry(ObjectNode node, GameCampaignEntry<T, I> e);
 
     protected abstract void writeCampaign(ObjectNode node, GameCampaign<T, I> c);
-
-    public void importSavegameCache(ZipFile zipFile) {
-    }
-
-    private void exportSavegameDirectory(ZipOutputStream out) {
-        Set<String> names = new HashSet<>();
-        for (GameCampaign<T, I> c : getCampaigns()) {
-            for (GameCampaignEntry<T, I> e : c.getEntries()) {
-                String name = getEntryName(e);
-                if (names.contains(name)) {
-                    name += "_" + UUID.randomUUID().toString();
-                }
-                names.add(name);
-                try {
-                    compressFileToZipfile(
-                            getPath(e).resolve("savegame." + name).toFile(),
-                            PdxuInstallation.getInstance().getSavegameLocation()
-                                    .relativize(getPath()).resolve(name + "." + name).toString(),
-                            out);
-                } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException);
-                }
-            }
-        }
-    }
-
-    private void exportSavegameCache(ZipOutputStream out) {
-    }
-
-    private void compressFileToZipfile(File file, String name, ZipOutputStream out) throws IOException {
-        ZipEntry entry = new ZipEntry(name);
-        out.putNextEntry(entry);
-
-        FileInputStream in = new FileInputStream(file);
-        IOUtils.copy(in, out);
-        in.close();
-    }
 
     public synchronized void delete(GameCampaign<T, I> c) {
         if (!this.campaigns.contains(c)) {
@@ -444,8 +349,13 @@ public abstract class SavegameCache<
 
     public void loadEntryAsync(GameCampaignEntry<T, I> e) {
         if (e.infoProperty().isNull().get()) {
-            LoggerFactory.getLogger(SavegameCache.class).debug("Added entry " + getEntryName(e) + " to loader queue");
-            this.toLoad.add(e);
+            LoggerFactory.getLogger(SavegameCache.class).debug("Adding entry " + getEntryName(e) + " to loader queue");
+            loadService.submit(() -> {
+                loadEntry(e);
+                if (!PdxuApp.getApp().isRunning()) {
+                    loadService.shutdownNow();
+                }
+            });
         }
     }
 
@@ -507,7 +417,20 @@ public abstract class SavegameCache<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    public synchronized boolean importSavegame(Path file) {
+
+    public synchronized void importSavegameAsync(Path file, Runnable onFinish) {
+        importService.submit(() -> {
+            boolean r = importSavegame(file);
+            if (r) {
+                onFinish.run();
+            }
+            if (!PdxuApp.getApp().isRunning()) {
+                importService.shutdownNow();
+            }
+        });
+    }
+
+    private synchronized boolean importSavegame(Path file) {
         loading.setValue(true);
         try {
             importSavegameData(file);

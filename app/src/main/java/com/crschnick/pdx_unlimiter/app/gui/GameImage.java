@@ -319,6 +319,10 @@ public class GameImage {
         Pane pane = new Pane(v);
         v.fitWidthProperty().bind(pane.widthProperty());
         v.fitHeightProperty().bind(pane.heightProperty());
+        if (i == null) {
+            return pane;
+        }
+
         double imageAspect = i.getWidth() / i.getHeight();
         ChangeListener<? extends Number> cl = (c, o, n) -> {
             double w = (double) n;
