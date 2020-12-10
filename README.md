@@ -40,6 +40,9 @@ visit [the achievement repository](https://github.com/crschnick/pdxu_achievement
 
 ![Example](imgs/achievements.png)
 
+It is also possible to upload your savegames to [Rakaly](https://rakaly.com),
+a website to analyze and share your eu4 achievements and compete against other players.
+
 ### Full Mod support
 
 Savegames that use mods are also fully supported.
@@ -49,31 +52,17 @@ enabled without having to use Paradox launcher configuration.
 It is also checked whether a mod is missing or incompatible with the current version, so that nothing can potentially corrupt your savegames.
 
 
-## Planned features
+## Community and Support
 
-### Gameplay assistance
-
-Every imported savegame date is parsed and converted into a more readable and usable json format and therefore
-would allow the Pdx-Unlimiter to take over some of the tedious micromanagement,
-e.g. building buildings, converting or razing all provinces, and carpet sieging provinces.
-
-Status: Planned
-
-
-## Contributing
-
-You can help the project by reporting issues, fixing bugs and making the planned issues a reality.
-Contributing guidelines coming soon. 
-This project is only in its infancy and only a handful of features are currently included,
-however the solid foundation needed for more planned features already exists.
-The current focus primarily lies on perfecting already existing features.
+If you have suggestions, need help, run into any issues or just want to talk to other friendly people, you can join the [Pdx-Unlimiter Discord](https://discord.gg/afErBW9Z).
+You can also help the project by reporting issues, fixing bugs and making the planned issues a reality.
+Contributing guidelines are coming soon. 
 
 ## Building and running
 
-To build this project, [OpenJDK 15](https://openjdk.java.net/) is required.
+To build this project, [JDK 15](https://openjdk.java.net/projects/jdk/15/) is required.
 You can build the project with `gradlew build` or `gradlew.bat build`.
 To create jlink images and installers, use `gradlew createDist`.
 For running, you can use `gradlew run`.
-To correctly run the Pdx-Unlimiter in a development environment, you need to set the property `installDir=<installation directory>`
-in the `pdxu.properties` file. This is needed for a dev build to simulate the program operating
-in a real installation directory and not in the build directory.
+To correctly run the Pdx-Unlimiter in a development environment, you need to set the property `dataDir=<installation directory>`
+in the `pdxu.properties` file. This is needed for a dev build to specify where to save data such as savegames.
