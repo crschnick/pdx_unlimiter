@@ -218,7 +218,8 @@ public class DialogHelper {
     }
 
     private static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
-        Alert alert = createAlert();
+        // Create Alert without icon since it may not have loaded yet
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         if (reportable) {
             ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);
             ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
@@ -239,7 +240,7 @@ public class DialogHelper {
 
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Error reporter");
-        alert.setHeaderText(msg  + (reportable ?
+        alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
                 """
 
 

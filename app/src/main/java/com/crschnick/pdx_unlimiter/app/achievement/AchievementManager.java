@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.achievement;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.util.JsonPathConfiguration;
@@ -36,21 +37,29 @@ public class AchievementManager {
     }
 
     public static void init() throws IOException {
-        EU4 = new AchievementManager("eu4",
-                AchievementContent.EU4);
-        EU4.loadData();
+        if (GameInstallation.EU4 != null) {
+            EU4 = new AchievementManager("eu4",
+                    AchievementContent.EU4);
+            EU4.loadData();
+        }
 
-        HOI4 = new AchievementManager("hoi4",
-                AchievementContent.HOI4);
-        HOI4.loadData();
+        if (GameInstallation.HOI4 != null) {
+            HOI4 = new AchievementManager("hoi4",
+                    AchievementContent.HOI4);
+            HOI4.loadData();
+        }
 
-        STELLARIS = new AchievementManager("stellaris",
-                AchievementContent.HOI4);
-        STELLARIS.loadData();
+        if (GameInstallation.STELLARIS != null) {
+            STELLARIS = new AchievementManager("stellaris",
+                    AchievementContent.HOI4);
+            STELLARIS.loadData();
+        }
 
-        CK3 = new AchievementManager("ck3",
-                AchievementContent.HOI4);
-        CK3.loadData();
+        if (GameInstallation.CK3 != null) {
+            CK3 = new AchievementManager("ck3",
+                    AchievementContent.HOI4);
+            CK3.loadData();
+        }
 
         JsonPathConfiguration.init();
     }

@@ -36,7 +36,7 @@ public class Eu4Installation extends GameInstallation {
         JsonHelper.write(n, out);
     }
 
-    public void init() throws Exception {
+    public void loadData() throws Exception {
         loadSettings();
     }
 

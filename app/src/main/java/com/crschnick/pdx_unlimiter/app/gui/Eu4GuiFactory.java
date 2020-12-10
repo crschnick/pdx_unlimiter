@@ -144,7 +144,9 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public ObservableValue<Node> createImage(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.eu4TagNode(campaign.getTag().getTag(), CLASS_TAG_ICON));
-        prop.bind(createImage(campaign.getLatestEntry()));
+        if (campaign.getEntries().size() > 0) {
+            prop.bind(createImage(campaign.getLatestEntry()));
+        }
         campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>>) c -> {
             if (c.getSet().size() > 0) {
                 prop.bind(createImage(campaign.getLatestEntry()));

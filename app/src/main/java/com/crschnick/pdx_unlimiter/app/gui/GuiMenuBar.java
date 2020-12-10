@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXButton;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -165,10 +166,11 @@ public class GuiMenuBar {
 
     private static Node createGameIndicator() {
         JFXButton m = new JFXButton();
-        m.textProperty().bind(Bindings.createStringBinding(() -> {
+        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
             var current = GameIntegration.current();
-            return current != null ? GameIntegration.current().getName() : "None";
-        }, GameIntegration.currentGameProperty()));
+            var name = current != null ? GameIntegration.current().getName() : "None";
+            Platform.runLater(() -> m.setText(name));
+        });
         m.setGraphic(new FontIcon());
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());

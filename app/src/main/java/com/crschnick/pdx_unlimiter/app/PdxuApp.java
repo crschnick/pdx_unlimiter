@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.GameImage;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
@@ -44,10 +45,11 @@ public class PdxuApp extends Application {
     public static void main(String[] args) {
         try {
             initialSetup(args);
-            launch(args);
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
+
+        launch(args);
     }
 
     public StackPane getLayout() {
@@ -86,66 +88,54 @@ public class PdxuApp extends Application {
         if (!PdxuInstallation.shouldStart()) {
             System.exit(0);
         }
-
-        Settings.init();
     }
 
-    private void layoutSetup() {
-        GameImage.loadImages();
-        layout = GuiLayout.createLayout();
-    }
-
-    private void postWindowSetup() throws Exception {
+    private void postWindowSetup() {
         new Thread(() -> {
             try {
-                if (!GameIntegration.init()) {
-                    GuiSettings.showSettings(true);
-                }
+                Settings.init();
                 GameAppManager.init();
-
-                SavegameCache.loadData();
                 FileImporter.init();
 
-                AchievementManager.init();
                 if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                     GlobalScreen.registerNativeHook();
                 }
             } catch (Exception e) {
-
+                ErrorHandler.handleTerminalException(e);
             }
         }).start();
     }
 
     @Override
     public void start(Stage primaryStage) {
-        APP = this;
-        icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
-        primaryStage.getIcons().add(icon);
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                close();
-
-                Stage.getWindows().stream()
-                        .filter(w -> !w.equals(getScene().getWindow()))
-                        .collect(Collectors.toList())
-                        .forEach(w -> w.fireEvent(event));
-
-            }
-        });
-
-        layoutSetup();
-
-        primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
-        Scene scene = new Scene(layout, 1000, 720);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        GuiStyle.addStylesheets(primaryStage.getScene());
-
         try {
+            APP = this;
+            icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
+            primaryStage.getIcons().add(icon);
+            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    close();
+
+                    Stage.getWindows().stream()
+                            .filter(w -> !w.equals(getScene().getWindow()))
+                            .collect(Collectors.toList())
+                            .forEach(w -> w.fireEvent(event));
+
+                }
+            });
+
+            layout = GuiLayout.createLayout();
+
+            primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
+            Scene scene = new Scene(layout, 1000, 720);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            GuiStyle.addStylesheets(primaryStage.getScene());
+
             postWindowSetup();
-        } catch (Exception e) {
-            ErrorHandler.handleTerminalException(e);
+        } catch (Exception ex) {
+            ErrorHandler.handleTerminalException(ex);
         }
 
     }

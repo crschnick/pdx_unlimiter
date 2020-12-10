@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.jfoenix.controls.JFXListView;
@@ -16,9 +17,38 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class GuiGameCampaignEntryList {
+
+    private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
+        Consumer<Set<? extends GameCampaign<?,?>>> update = (s) -> {
+            Platform.runLater(() -> {
+                if (s.size() > 0) {
+                    pane.getChildren().set(0, listNode);
+                } else {
+                    pane.getChildren().set(0, createNoCampaignNode(pane));
+                }
+            });
+        };
+
+        SetChangeListener<GameCampaign<?,?>> campaignListListener = (change) -> {
+            update.accept(change.getSet());
+        };
+
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+            if (o != null) {
+                n.getSavegameCache().getCampaigns().removeListener(campaignListListener);
+            }
+
+            if (n != null) {
+                n.getSavegameCache().getCampaigns().addListener(campaignListListener);
+                update.accept(n.getSavegameCache().getCampaigns());
+            }
+        });
+    }
 
     public static void createCampaignEntryList(Pane pane) {
         JFXListView<Node> grid = new JFXListView<>();
@@ -38,16 +68,6 @@ public class GuiGameCampaignEntryList {
             });
         };
 
-        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                if (n.getSavegameCache().getCampaigns().size() > 0) {
-                    pane.getChildren().set(0, grid);
-                } else {
-                    pane.getChildren().set(0, createNoCampaignNode(pane));
-                }
-            });
-        });
-
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 if (o != null) {
@@ -55,9 +75,6 @@ public class GuiGameCampaignEntryList {
                 }
 
                 if (n != null) {
-                    // Remove no-campaign node if necessary
-                    pane.getChildren().set(0, grid);
-
                     n.getEntries().addListener(l);
                     grid.setItems(FXCollections.observableArrayList(n.entryStream()
                             .map(GuiGameCampaignEntry::createCampaignEntryNode)
@@ -84,6 +101,8 @@ public class GuiGameCampaignEntryList {
                 }
             });
         });
+
+        addNoCampaignNodeListeners(pane, grid);
     }
 
     private static Node createNoCampaignNode(Pane pane) {

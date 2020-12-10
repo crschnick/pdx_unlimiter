@@ -29,14 +29,14 @@ public class GuiGameCampaignList {
         };
 
         SetChangeListener<GameCampaign> l = (c) -> {
-            Platform.runLater(() -> {
-                if (c.wasAdded()) {
-                    addButton.accept(c.getElementAdded());
-                } else {
-                    grid.getItems().remove(grid.getItems().stream()
-                            .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get());
-                }
-            });
+            if (c.wasAdded()) {
+                var button = GuiGameCampaign.createCampaignButton(c.getElementAdded());
+                int index = GameIntegration.current().getSavegameCache().indexOf(c.getElementAdded());
+                Platform.runLater(() -> grid.getItems().add(index, button));
+            } else {
+                Platform.runLater(() -> grid.getItems().remove(grid.getItems().stream()
+                        .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get()));
+            }
         };
 
         GameIntegration.currentGameProperty().addListener((c, o, n) -> {

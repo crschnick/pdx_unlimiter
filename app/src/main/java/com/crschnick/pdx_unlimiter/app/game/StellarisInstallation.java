@@ -60,7 +60,7 @@ public class StellarisInstallation extends GameInstallation {
     }
 
     @Override
-    public void init() throws Exception {
+    public void loadData() throws Exception {
         if (!Files.isRegularFile(getExecutable())) {
             throw new IllegalArgumentException("Executable not found");
         }

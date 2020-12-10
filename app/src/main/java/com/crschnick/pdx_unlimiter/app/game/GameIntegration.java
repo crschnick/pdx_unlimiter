@@ -43,17 +43,17 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     protected SimpleObjectProperty<GameCampaign<T, I>> selectedCampaign = new SimpleObjectProperty<>();
     protected SimpleObjectProperty<GameCampaignEntry<T, I>> selectedEntry = new SimpleObjectProperty<>();
 
-    public static boolean init() {
+    private static void init() {
         ALL = new ArrayList<>();
         Settings s = Settings.getInstance();
-        if (Settings.getInstance().getEu4().isPresent()) {
+        if (GameInstallation.EU4 != null) {
             EU4 = new Eu4Integration();
             ALL.add(EU4);
             if (s.getActiveGame().equals(s.getEu4())) {
                 current.set(EU4);
             }
         }
-        if (Settings.getInstance().getHoi4().isPresent()) {
+        if (GameInstallation.HOI4 != null) {
             HOI4 = new Hoi4Integration();
             ALL.add(HOI4);
             if (s.getActiveGame().equals(s.getHoi4())) {
@@ -61,7 +61,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             }
         }
 
-        if (Settings.getInstance().getStellaris().isPresent()) {
+        if (GameInstallation.STELLARIS != null) {
             STELLARIS = new StellarisIntegration();
             ALL.add(STELLARIS);
             if (s.getActiveGame().equals(s.getStellaris())) {
@@ -69,7 +69,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             }
         }
 
-        if (Settings.getInstance().getCk3().isPresent()) {
+        if (GameInstallation.CK3 != null) {
             CK3 = new Ck3Integration();
             ALL.add(CK3);
             if (s.getActiveGame().equals(s.getCk3())) {
@@ -77,19 +77,19 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             }
         }
 
-        if (ALL.size() == 0) {
-            return false;
-        }
-
-        if (current.get() == null) {
+        if (ALL.size() > 0 && current.get() == null) {
             current.set(ALL.get(0));
         }
-        return true;
     }
 
     public static void reload() {
         if (current() != null) {
             current().selectCampaign(null);
+            ALL.clear();
+            EU4 = null;
+            CK3 = null;
+            STELLARIS = null;
+            HOI4 = null;
         }
         init();
     }

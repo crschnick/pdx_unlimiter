@@ -25,7 +25,7 @@ public class Ck3Installation extends GameInstallation {
         super(path, Path.of("binaries", "ck3"));
     }
 
-    public void init() throws Exception {
+    public void loadData() throws Exception {
         loadSettings();
     }
 

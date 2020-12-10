@@ -1,7 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.gui.GameImage;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,7 +22,7 @@ import java.util.Optional;
 
 public class Settings {
 
-    private static Settings INSTANCE;
+    private static Settings INSTANCE = defaultSettings();
     private Path eu4;
     private Path hoi4;
     private Path ck3;
@@ -34,9 +37,7 @@ public class Settings {
 
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
-        if (!file.toFile().exists()) {
-            INSTANCE = defaultSettings();
-        } else {
+        if (file.toFile().exists()) {
             INSTANCE = loadConfig(file);
         }
         INSTANCE.validate();
@@ -224,7 +225,7 @@ public class Settings {
     public void validate() {
         if (eu4 != null) {
             try {
-                new Eu4Installation(eu4).init();
+                new Eu4Installation(eu4).loadData();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
                 eu4 = null;
@@ -232,7 +233,7 @@ public class Settings {
         }
         if (hoi4 != null) {
             try {
-                new Hoi4Installation(hoi4).init();
+                new Hoi4Installation(hoi4).loadData();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
                 hoi4 = null;
@@ -240,7 +241,7 @@ public class Settings {
         }
         if (ck3 != null) {
             try {
-                new Ck3Installation(ck3).init();
+                new Ck3Installation(ck3).loadData();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
                 ck3 = null;
@@ -249,7 +250,7 @@ public class Settings {
         if (stellaris != null) {
 
             try {
-                new StellarisInstallation(stellaris).init();
+                new StellarisInstallation(stellaris).loadData();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
                 stellaris = null;
@@ -274,13 +275,20 @@ public class Settings {
         if (stellaris != null) {
             GameInstallation.STELLARIS = new StellarisInstallation(stellaris);
         }
+        activeGame = null;
+
         try {
             GameInstallation.initInstallations();
+
+            GameImage.loadImages();
+            GameIntegration.reload();
+            AchievementManager.init();
+            SavegameCache.loadData();
+
+            GuiLayout.setFontSize(fontSize);
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
-        GameIntegration.reload();
-        GuiLayout.setFontSize(fontSize);
     }
 
     public boolean deleteOnImport() {

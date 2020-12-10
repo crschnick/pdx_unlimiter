@@ -83,7 +83,7 @@ public class GuiGameCampaignEntry {
         });
 
         HBox buttonBar = new HBox(achievements, open, del);
-        if (SavegameCache.EU4_CACHE.contains(e) && Settings.getInstance().getRakalyApiKey().isPresent()) {
+        if (SavegameCache.EU4_CACHE.contains(e)) {
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {

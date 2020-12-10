@@ -71,9 +71,11 @@ public class ErrorHandler {
             handleExcetionWithoutInit(ex);
         }
 
-        LoggerFactory.getLogger(ErrorHandler.class).error("Error", ex);
-        if (DialogHelper.showException(ex)) {
-            Sentry.capture(ex);
+        LoggerFactory.getLogger(ErrorHandler.class).error("Terminal Error", ex);
+        if (PdxuInstallation.getInstance().isProduction()) {
+            if (DialogHelper.showException(ex)) {
+                Sentry.capture(ex);
+            }
         }
         System.exit(1);
     }

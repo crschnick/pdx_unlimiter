@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class ImageLoader {
@@ -20,6 +21,10 @@ public class ImageLoader {
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
         registry.registerServiceProvider(new com.realityinteractive.imageio.tga.TGAImageReaderSpi());
+    }
+
+    public static Optional<Image> loadImageOptional(Path p) {
+        return Optional.empty();
     }
 
     public static Image loadImage(Path p) {
@@ -38,15 +43,6 @@ public class ImageLoader {
             ErrorHandler.handleException(e, "Can't read image " + p.toString());
             return null;
         }
-    }
-
-    public static Function<Integer, Integer> replaceColorFunction(int replaceColor, int newColor) {
-        return (Integer rgb) -> {
-            if (rgb == replaceColor) {
-                return newColor;
-            }
-            return rgb;
-        };
     }
 
     static Image loadImage(InputStream in, Function<Integer, Integer> pixelSelector) {

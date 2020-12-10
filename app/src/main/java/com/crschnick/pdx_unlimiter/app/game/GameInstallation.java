@@ -54,19 +54,19 @@ public abstract class GameInstallation {
 
     public static void initInstallations() throws Exception {
         if (EU4 != null) {
-            EU4.init();
+            EU4.loadData();
         }
 
         if (HOI4 != null) {
-            HOI4.init();
+            HOI4.loadData();
         }
 
         if (STELLARIS != null) {
-            STELLARIS.init();
+            STELLARIS.loadData();
         }
 
         if (CK3 != null) {
-            CK3.init();
+            CK3.loadData();
         }
 
         initInstallationsOptional();
@@ -229,7 +229,7 @@ public abstract class GameInstallation {
 
     public abstract void startDirectly() throws IOException;
 
-    public abstract void init() throws Exception;
+    public abstract void loadData() throws Exception;
 
     protected Path getLauncherDataPath() {
         return getPath();

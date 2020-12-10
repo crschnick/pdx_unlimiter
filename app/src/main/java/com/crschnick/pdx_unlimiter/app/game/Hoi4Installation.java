@@ -30,7 +30,7 @@ public class Hoi4Installation extends GameInstallation {
         super(path, Path.of("hoi4"));
     }
 
-    public void init() throws Exception {
+    public void loadData() throws Exception {
         loadSettings();
         countryNames = new HashMap<>();
         countryColors = new HashMap<>();

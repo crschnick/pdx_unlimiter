@@ -50,11 +50,7 @@ public class GuiStatusBar {
         });
 
         GameIntegration.currentGameProperty().addListener((c, o, n) -> {
-            if (n != null) {
-                bar.showImport();
-            } else {
-                bar.hide();
-            }
+            bar.hide();
         });
 
         return pane;
@@ -238,12 +234,16 @@ public class GuiStatusBar {
         }
 
         private void show(Region bar) {
-            pane.getChildren().setAll(bar);
-            bar.prefWidthProperty().bind(pane.widthProperty());
+            Platform.runLater(() -> {
+                pane.getChildren().setAll(bar);
+                bar.prefWidthProperty().bind(pane.widthProperty());
+            });
         }
 
         private void hide() {
-            pane.getChildren().clear();
+            Platform.runLater(() -> {
+                pane.getChildren().clear();
+            });
         }
 
         private void setRunning() {
@@ -263,29 +263,33 @@ public class GuiStatusBar {
         }
 
         private void select() {
-            if (status == Status.RUNNING) {
-                return;
-            }
+            Platform.runLater(() -> {
+                if (status == Status.RUNNING) {
+                    return;
+                }
 
-            Region bar;
-            if (GameIntegration.current().isEntryCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
-                status = Status.SELECTED;
-                bar = createEntryStatusBar();
-            } else {
-                status = Status.INCOMPATIBLE;
-                bar = createInvalidVersionStatusBar();
-            }
+                Region bar;
+                if (GameIntegration.current().isEntryCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
+                    status = Status.SELECTED;
+                    bar = createEntryStatusBar();
+                } else {
+                    status = Status.INCOMPATIBLE;
+                    bar = createInvalidVersionStatusBar();
+                }
 
-            show(bar);
+                show(bar);
+            });
         }
 
         private void unselect() {
-            if (status == Status.RUNNING) {
-                return;
-            }
+            Platform.runLater(() -> {
+                if (status == Status.RUNNING) {
+                    return;
+                }
 
-            hide();
-            status = Status.NONE;
+                hide();
+                status = Status.NONE;
+            });
         }
 
         private enum Status {
