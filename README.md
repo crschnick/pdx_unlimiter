@@ -14,7 +14,7 @@ All savegames can be also launched directly from within the Pdx-Unlimiter withou
 
 Supported games: EU4, HOI4, Stellaris, CK3
 
-![Example](docs/screenshot.png)
+![Example](imgs/screenshot.png)
 
 ### Reverting savegames
 
@@ -30,7 +30,7 @@ This allows for operations on these savegames such as custom achievement creatio
 If you are interested in creating and sharing your own achievements,
 visit [the achievement repository](https://github.com/crschnick/pdxu_achievements) for a documentation.
 
-![Example](docs/achievements.png)
+![Example](imgs/achievements.png)
 
 ### Full Mod support
 
