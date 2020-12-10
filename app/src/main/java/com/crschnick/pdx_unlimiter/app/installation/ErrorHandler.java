@@ -1,9 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
-import io.sentry.Sentry;
+import io.sentry.*;
+import io.sentry.transport.StdoutTransport;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.Map;
 
 public class ErrorHandler {
 
@@ -17,14 +21,16 @@ public class ErrorHandler {
         }
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Initializing error handler");
-        System.setProperty("sentry.dsn", "https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
         System.setProperty("sentry.stacktrace.hidecommon", "false");
         System.setProperty("sentry.stacktrace.app.packages", "");
         System.setProperty("sentry.uncaught.handler.enabled", "true");
         System.setProperty("sentry.environment", "production");
         System.setProperty("sentry.servername", System.getProperty("os.name"));
         System.setProperty("sentry.release", PdxuInstallation.getInstance().getVersion());
-        Sentry.init();
+        Sentry.init(sentryOptions -> {
+            sentryOptions.setRelease("test@test");
+            sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262");
+        });
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             handleException(e);
@@ -37,9 +43,12 @@ public class ErrorHandler {
         ex.printStackTrace();
         LoggerFactory.getLogger(ErrorHandler.class).error("Init error", ex);
         if (PdxuInstallation.getInstance() == null || PdxuInstallation.getInstance().isProduction()) {
-            Sentry.init("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
+            Sentry.init(sentryOptions -> {
+                sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@o462618.ingest.sentry.io/5466262");
+                sentryOptions.setDebug(true);
+            });
         }
-        Sentry.capture(ex);
+        Sentry.captureException(ex);
     }
 
     public static void handleException(Throwable ex) {
@@ -55,7 +64,7 @@ public class ErrorHandler {
             LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
             if (PdxuInstallation.getInstance().isProduction()) {
                 if (DialogHelper.showException(ex)) {
-                    Sentry.capture(ex);
+                    Sentry.captureException(ex);
                 }
             }
         };
@@ -74,7 +83,7 @@ public class ErrorHandler {
         LoggerFactory.getLogger(ErrorHandler.class).error("Terminal Error", ex);
         if (PdxuInstallation.getInstance().isProduction()) {
             if (DialogHelper.showException(ex)) {
-                Sentry.capture(ex);
+                Sentry.captureException(ex);
             }
         }
         System.exit(1);

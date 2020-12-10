@@ -22,6 +22,7 @@ java {
 List<String> runArgs = [
         "-Djdk.gtk.version=2",
         "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
+        "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix"]
 
 application {
@@ -37,6 +38,7 @@ javafx {
 
 repositories {
     mavenCentral()
+    jcenter()
     maven {
         url = 'https://maven.nikr.net/'
     }
@@ -45,6 +47,7 @@ repositories {
 
 dependencies {
     compile 'com.jfoenix:jfoenix:9.0.10'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
@@ -54,7 +57,7 @@ dependencies {
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
-    implementation files("$buildDir/generated-modules/sentry-1.7.30.jar")
+    implementation files("$buildDir/generated-modules/sentry-4.0.0-alpha.2.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
     implementation files("$buildDir/generated-modules/json-path-master-SNAPSHOT.jar")
     implementation files("$buildDir/generated-modules/json-smart-2.3.jar")
@@ -110,15 +113,28 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact 'io.sentry:sentry:1.7.30'
+            artifact 'io.sentry:sentry:4.0.0-alpha.2'
             moduleInfoSource = '''
                 module io.sentry {
                     exports io.sentry;
-                    exports io.sentry.event;
-                    exports io.sentry.context;
-                    requires org.slf4j;
-                    requires java.naming;
-                    requires com.fasterxml.jackson.core;
+                    opens io.sentry to com.google.gson;
+                    
+                    exports io.sentry.protocol to com.google.gson;
+                    opens io.sentry.protocol to com.google.gson;
+                    
+                    exports io.sentry.adapters;
+                    opens io.sentry.adapters to com.google.gson;
+                    
+                    exports io.sentry.config;
+                    opens io.sentry.config to com.google.gson;
+                    
+                    exports io.sentry.transport;
+                    opens io.sentry.transport to com.google.gson;
+                    
+                    exports io.sentry.util;
+                    opens io.sentry.util to com.google.gson;
+                    
+                    requires com.google.gson;
                 }
             '''
         }
