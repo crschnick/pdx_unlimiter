@@ -19,6 +19,10 @@ public class WatcherHelper {
 
     private static Map<WatchService, Path> createRecursiveWatchers(Path dir) {
         Map<WatchService, Path> watchers = new HashMap<>();
+        if (!Files.isDirectory(dir)) {
+            return watchers;
+        }
+
         try {
             var w = FileSystems.getDefault().newWatchService();
             dir.register(w, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
