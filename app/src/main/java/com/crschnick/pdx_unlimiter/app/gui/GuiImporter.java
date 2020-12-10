@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.jfoenix.controls.JFXButton;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -55,7 +56,9 @@ public class GuiImporter {
         alert.setTitle("Import savegames");
         alert.getDialogPane().setContent(createTargetList(install.getSavegames()));
         install.savegamesProperty().addListener((c, o, n) -> {
-            alert.getDialogPane().setContent(createTargetList(n));
+            Platform.runLater(() -> {
+                alert.getDialogPane().setContent(createTargetList(n));
+            });
         });
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
         alert.showAndWait();
