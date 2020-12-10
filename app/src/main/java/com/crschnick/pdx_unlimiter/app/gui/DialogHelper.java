@@ -239,10 +239,14 @@ public class DialogHelper {
 
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Error reporter");
-        alert.setHeaderText("An error occured: " + msg + "\n\n" + (reportable ?
-                "If you have a suspicion of the cause and want to help us fix the error, you can report it on github.\n" +
-                        "If you have a specific savegame that causes this issue, please attach it as well in a zip.\n\n" +
-                        "If you just want to notify the developers of this error automatically, click the 'send error' button." : ""));
+        alert.setHeaderText(msg  + (reportable ?
+                """
+
+
+                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
+                        If you have a specific savegame that causes this issue, please attach it as well in a zip.
+
+                        If you just want to notify the developers of this error automatically, click the 'send error' button.""" : ""));
 
         VBox dialogPaneContent = new VBox();
 

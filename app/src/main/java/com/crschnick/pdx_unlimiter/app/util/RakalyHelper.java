@@ -21,6 +21,8 @@ public class RakalyHelper {
 
     public static void uploadSavegame(SavegameCache cache, GameCampaignEntry<?, ?> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
+            DialogHelper.showErrorMessage("Missing rakaly.com User ID or API key. " +
+                    "To use this functionality, set both in the settings menu.", null, false);
             return;
         }
 
