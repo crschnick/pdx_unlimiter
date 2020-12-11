@@ -40,7 +40,7 @@ public class GuiGameCampaignEntryList {
 
         GameIntegration.currentGameProperty().addListener((c, o, n) -> {
             if (o != null) {
-                n.getSavegameCache().getCampaigns().removeListener(campaignListListener);
+                o.getSavegameCache().getCampaigns().removeListener(campaignListListener);
             }
 
             if (n != null) {
@@ -97,7 +97,6 @@ public class GuiGameCampaignEntryList {
                     grid.getSelectionModel().clearSelection();
                     grid.scrollTo(index);
                     grid.getSelectionModel().select(index);
-                    PdxuApp.getApp().getScene().getWindow().requestFocus();
                 }
             });
         });

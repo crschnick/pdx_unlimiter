@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class CascadeDirectoryHelper {
     public static Optional<InputStream> openFile(
             Path file,
             GameCampaignEntry<?, ? extends SavegameInfo<?>> entry,
-            GameInstallation install) throws IOException {
+            GameInstallation install) {
         return openFile(file, getCascadingDirectories(entry, install));
     }
 
@@ -88,9 +89,9 @@ public class CascadeDirectoryHelper {
         }
     }
 
-    private static Optional<InputStream> openFile(Path file, List<Path> cascadingDirectories) throws IOException {
+    private static Optional<InputStream> openFile(Path file, List<Path> cascadingDirectories) {
         for (Path dir : cascadingDirectories) {
-            Optional<InputStream> r = null;
+            Optional<InputStream> r;
             if (Files.isRegularFile(dir)) {
                 r = fromZip(file, dir);
             } else {
@@ -103,21 +104,30 @@ public class CascadeDirectoryHelper {
         return Optional.empty();
     }
 
-    private static Optional<InputStream> fromDir(Path file, Path dir) throws IOException {
+    private static Optional<InputStream> fromDir(Path file, Path dir) {
         var abs = dir.resolve(file);
-        if (Files.isRegularFile(abs)) {
-            return Optional.of(Files.newInputStream(abs));
-        } else {
-            return Optional.empty();
+        try {
+            if (Files.isRegularFile(abs)) {
+                return Optional.of(Files.newInputStream(abs));
+            }
+        } catch (Exception e) {
+            LoggerFactory.getLogger(CascadeDirectoryHelper.class)
+                    .trace("Exception while loading file " + file + " from directory " + dir, e);
         }
+        return Optional.empty();
     }
 
-    private static Optional<InputStream> fromZip(Path file, Path zip) throws IOException {
-        ZipFile z = new ZipFile(zip.toString());
-        ZipEntry e = z.getEntry(file.toString());
-        if (e == null) {
-            return Optional.empty();
+    private static Optional<InputStream> fromZip(Path file, Path zip) {
+        try {
+            ZipFile z = new ZipFile(zip.toString());
+            ZipEntry e = z.getEntry(file.toString());
+            if (e != null) {
+                return Optional.ofNullable(z.getInputStream(e));
+            }
+        } catch (Exception e) {
+            LoggerFactory.getLogger(CascadeDirectoryHelper.class)
+                    .trace("Exception while loading file " + file + " from zip file " + zip.getFileName().toString(), e);
         }
-        return Optional.ofNullable(z.getInputStream(e));
+        return Optional.empty();
     }
 }

@@ -20,10 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,6 +30,8 @@ public abstract class GameInstallation {
     public static Hoi4Installation HOI4 = null;
     public static Ck3Installation CK3 = null;
     public static StellarisInstallation STELLARIS = null;
+
+    private static Set<GameInstallation> ALL;
 
     protected ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
     protected DistributionType distType;
@@ -52,58 +51,26 @@ public abstract class GameInstallation {
         }
     }
 
-    public static void initInstallations() throws Exception {
-        if (EU4 != null) {
-            EU4.loadData();
+    public static void init() throws Exception {
+        ALL = Set.of(EU4, HOI4, STELLARIS, CK3).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        for ( GameInstallation i : ALL) {
+            i.loadData();
+            try {
+                i.initOptional();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
         }
-
-        if (HOI4 != null) {
-            HOI4.loadData();
-        }
-
-        if (STELLARIS != null) {
-            STELLARIS.loadData();
-        }
-
-        if (CK3 != null) {
-            CK3.loadData();
-        }
-
-        initInstallationsOptional();
     }
 
-    public static void initInstallationsOptional() {
-        if (EU4 != null) {
-            try {
-                EU4.initOptional();
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        }
-
-        if (HOI4 != null) {
-            try {
-                HOI4.initOptional();
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        }
-
-        if (STELLARIS != null) {
-            try {
-                STELLARIS.initOptional();
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        }
-
-        if (CK3 != null) {
-            try {
-                CK3.initOptional();
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        }
+    public static void reset() {
+        ALL = Set.of();
+        EU4 = null;
+        HOI4 = null;
+        STELLARIS = null;
+        CK3 = null;
     }
 
     private List<Path> getAllSavegameDirectories() {

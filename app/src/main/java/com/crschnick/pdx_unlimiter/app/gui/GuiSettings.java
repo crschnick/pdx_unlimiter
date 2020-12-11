@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.installation.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
@@ -260,6 +261,7 @@ public class GuiSettings {
         Optional<ButtonType> r = alert.showAndWait();
         if (r.isPresent() && r.get().equals(ButtonType.APPLY)) {
             Settings.updateSettings(s);
+            ComponentManager.reloadSettings();
         }
     }
 

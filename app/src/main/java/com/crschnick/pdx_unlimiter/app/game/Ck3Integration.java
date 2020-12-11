@@ -29,6 +29,6 @@ public class Ck3Integration extends GameIntegration<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public SavegameCache<?, ?, Ck3Tag, Ck3SavegameInfo> getSavegameCache() {
-        return SavegameCache.CK3_CACHE;
+        return SavegameCache.CK3;
     }
 }

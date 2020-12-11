@@ -2,10 +2,13 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.concurrent.Task;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
@@ -21,20 +24,20 @@ public class RakalyHelper {
 
     public static void uploadSavegame(SavegameCache cache, GameCampaignEntry<?, ?> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
-            DialogHelper.showErrorMessage("Missing rakaly.com User ID or API key. " +
+            GuiErrorReporter.showErrorMessage("Missing rakaly.com User ID or API key. " +
                     "To use this functionality, set both in the settings menu.", null, false);
             return;
         }
 
-        new Thread(() -> {
+        TaskExecutor.getInstance().submitTask(() -> {
             try {
                 byte[] body = Files.readAllBytes(cache.getPath(entry).resolve("savegame.eu4"));
                 String saveId = executePost(cache.getFileName(entry), new URL("https://rakaly.com/api/saves"), body);
                 Desktop.getDesktop().browse(new URL("https://rakaly.com/eu4/saves/" + saveId).toURI());
             } catch (Exception e) {
-                DialogHelper.showErrorMessage(e.getMessage(), null, false);
+                GuiErrorReporter.showErrorMessage(e.getMessage(), null, false);
             }
-        }).start();
+        });
     }
 
     private static String executePost(String sgName, URL targetURL, byte[] data) throws IOException {

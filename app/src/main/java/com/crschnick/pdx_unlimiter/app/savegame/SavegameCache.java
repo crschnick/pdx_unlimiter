@@ -3,10 +3,12 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
@@ -24,7 +26,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.LoggerFactory;
@@ -34,15 +35,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public abstract class SavegameCache<
         R extends RawSavegame,
@@ -50,14 +48,15 @@ public abstract class SavegameCache<
         T,
         I extends SavegameInfo<T>> {
 
-    public static final Eu4SavegameCache EU4_CACHE = new Eu4SavegameCache();
-    public static final Hoi4SavegameCache HOI4_CACHE = new Hoi4SavegameCache();
-    public static final StellarisSavegameCache STELLARIS_CACHE = new StellarisSavegameCache();
-    public static final Ck3SavegameCache CK3_CACHE = new Ck3SavegameCache();
+    public static Eu4SavegameCache EU4;
+    public static Hoi4SavegameCache HOI4;
+    public static StellarisSavegameCache STELLARIS;
+    public static Ck3SavegameCache CK3;
+    public static Set<SavegameCache<?, ?, ?, ?>> ALL;
 
-    public static final Set<SavegameCache<?, ?, ?, ?>> CACHES = Set.of(EU4_CACHE, HOI4_CACHE, STELLARIS_CACHE, CK3_CACHE);
+
+
     private ExecutorService loadService;
-    private ExecutorService importService;
 
     private BooleanProperty loading = new SimpleBooleanProperty(false);
     private String fileEnding;
@@ -76,43 +75,65 @@ public abstract class SavegameCache<
         addChangeListeners();
     }
 
-    public static void loadData() throws IOException {
-        for (SavegameCache cache : CACHES) {
-            cache.init();
+    public static void init() throws IOException {
+        if (GameInstallation.EU4 != null) {
+            EU4 = new Eu4SavegameCache();
+        }
+        if (GameInstallation.HOI4 != null) {
+            HOI4 = new Hoi4SavegameCache();
+        }
+        if (GameInstallation.STELLARIS != null) {
+            STELLARIS = new StellarisSavegameCache();
+        }
+        if (GameInstallation.CK3 != null) {
+            CK3 = new Ck3SavegameCache();
+        }
+        ALL = Set.of(EU4, HOI4, STELLARIS, CK3).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (SavegameCache<?,?,?,?> cache : ALL) {
+            cache.start();
         }
     }
 
-    public static void destroyCaches() {
-        for (SavegameCache<?,?,?,?> cache : CACHES) {
-            cache.destroy();
+    public static void reset() throws IOException {
+        for (SavegameCache<?,?,?,?> cache : ALL) {
+            cache.shutdown();
         }
+
+        EU4 = null;
+        HOI4 = null;
+        STELLARIS = null;
+        CK3 = null;
+        ALL = Set.of();
     }
 
-    private static void saveData() throws IOException {
-        for (SavegameCache cache : CACHES) {
-            FailableFunction<Path, OutputStream, IOException> f =
-                    (p) -> Files.newOutputStream(cache.getPath().resolve(p));
-            cache.exportDataToConfig(f);
-        }
+    private void saveData() throws IOException {
+        FailableFunction<Path, OutputStream, IOException> f =
+                (p) -> Files.newOutputStream(getPath().resolve(p));
+        exportDataToConfig(f);
     }
 
     public BooleanProperty loadingProperty() {
         return loading;
     }
 
-    private void init() throws IOException {
+    private void start() throws IOException {
         FileUtils.forceMkdir(getPath().toFile());
         if (Files.exists(getPath().resolve(getDataFile()))) {
             importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
         }
 
-        loadService = Executors.newSingleThreadExecutor();
-        importService = Executors.newSingleThreadExecutor();
+        loadService = Executors.newSingleThreadExecutor(r -> {
+            Thread t = Executors.defaultThreadFactory().newThread(r);
+            t.setDaemon(true);
+            return t;
+        });
     }
 
-    private void destroy() {
-        loadService.shutdown();
-        importService.shutdown();
+    private void shutdown() throws IOException {
+        saveData();
     }
 
     private void addChangeListeners() {
@@ -172,7 +193,7 @@ public abstract class SavegameCache<
                     campaign.add(readEntry(entryNode, name, eId, checksum, date));
                 });
             } catch (Exception e) {
-                ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName());
+                ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName(), null);
             }
         }
     }
@@ -352,9 +373,6 @@ public abstract class SavegameCache<
             LoggerFactory.getLogger(SavegameCache.class).debug("Adding entry " + getEntryName(e) + " to loader queue");
             loadService.submit(() -> {
                 loadEntry(e);
-                if (!PdxuApp.getApp().isRunning()) {
-                    loadService.shutdownNow();
-                }
             });
         }
     }
@@ -419,13 +437,10 @@ public abstract class SavegameCache<
 
 
     public synchronized void importSavegameAsync(Path file, Runnable onFinish) {
-        importService.submit(() -> {
+        TaskExecutor.getInstance().submitTask(() -> {
             boolean r = importSavegame(file);
             if (r) {
                 onFinish.run();
-            }
-            if (!PdxuApp.getApp().isRunning()) {
-                importService.shutdownNow();
             }
         });
     }
@@ -438,7 +453,7 @@ public abstract class SavegameCache<
             loading.setValue(false);
             return true;
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            ErrorHandler.handleException(e, "Could not import " + name + " savegame", file);
             loading.setValue(false);
             return false;
         }

@@ -4,14 +4,9 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
-import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -20,15 +15,15 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public class GameImage {
 
@@ -73,298 +68,14 @@ public class GameImage {
 
     private static Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
 
-    private static Pane unknownTag(String styleClass) {
-        Label l = new Label("?");
-        l.getStyleClass().add(styleClass);
-        l.getStyleClass().add(GuiStyle.CLASS_UNKNOWN_TAG);
-        l.alignmentProperty().set(Pos.CENTER);
-        var sp = new StackPane(l);
-        StackPane.setAlignment(l, Pos.CENTER);
-        return sp;
-    }
-
-    private static Path getEu4TagPath(String tag) {
-        return Path.of("gfx/flags/" + tag + ".tga");
-    }
-
-    private static Path getHoi4TagPath(Hoi4Tag tag) {
-        return Path.of("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga");
-    }
-
-    public static Pane ck3TagNode(Ck3Tag tag, String styleClass) {
-        return ck3TagNode(tag.getPrimaryTitle().getCoatOfArms(), null, styleClass);
-    }
-
-    public static Pane hoi4TagNode(Hoi4Tag tag, String styleClass) {
-        return tagNode(GameInstallation.HOI4, getHoi4TagPath(tag), null, styleClass);
-    }
-
-    public static Pane eu4TagNode(String tag, String styleClass) {
-        return tagNode(GameInstallation.EU4, getEu4TagPath(tag), null, styleClass);
-    }
-
-    public static Pane eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
-        return tagNode(GameInstallation.EU4, getEu4TagPath(entry.getTag().getTag()), entry, styleClass);
-    }
-
-    private static Pane tagNode(GameInstallation install, Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, String styleClass) {
-        Image img = null;
-        try {
-            var in = CascadeDirectoryHelper.openFile(
-                    path, entry, install);
-            img = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-
-        if (img == null) {
-            return unknownTag(styleClass);
-        }
-
-        ImageView v = new ImageView(img);
-        StackPane pane = new StackPane(v);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        v.preserveRatioProperty().setValue(true);
-        pane.getStyleClass().add(styleClass);
-        pane.setAlignment(Pos.CENTER);
-        return pane;
-    }
-
-    public static Pane stellarisTagNode(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
-        return stellarisTagNode(Path.of(entry.getTag().getBackgroundFile()), entry.getTag(), entry, styleClass);
-    }
-
-    public static Pane stellarisTagNode(StellarisTag tag, String styleClass) {
-        return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, null, styleClass);
-    }
-
-
-    private static Pane stellarisTagNode(
-            Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
-        Image img = null;
-
-        int bgPrimary = ColorHelper.intFromColor(ColorHelper.loadStellarisColors(entry)
-                .getOrDefault(tag.getBackgroundPrimaryColor(), Color.TRANSPARENT));
-        Function<Integer, Integer> customFilter = (Integer rgb) -> {
-            if (rgb == 0xFFFF0000) {
-                return bgPrimary;
-            }
-            return rgb;
-        };
-
-        try {
-            var in = CascadeDirectoryHelper.openFile(
-                    Path.of("flags", "backgrounds").resolve(path), entry, GameInstallation.STELLARIS);
-            img = in.map(inputStream -> ImageLoader.loadImage(inputStream, customFilter)).orElse(null);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-
-        if (img == null) {
-            return unknownTag(styleClass);
-        }
-
-        Image icon = null;
-        try {
-            var in = CascadeDirectoryHelper.openFile(
-                    Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile()),
-                    entry, GameInstallation.STELLARIS);
-            icon = in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-
-        if (icon == null) {
-            return unknownTag(styleClass);
-        }
-
-        ImageView v = new ImageView(img);
-        ImageView iconV = new ImageView(icon);
-        StackPane pane = new StackPane(v, iconV);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        iconV.fitWidthProperty().bind(pane.widthProperty());
-        iconV.fitHeightProperty().bind(pane.heightProperty());
-        pane.getStyleClass().add(styleClass);
-        pane.setMaxWidth(Region.USE_PREF_SIZE);
-        pane.setMaxHeight(Region.USE_PREF_SIZE);
-        return pane;
-    }
-
-    private static Pane ck3TagNode(
-            Ck3Tag.CoatOfArms coa, GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, String styleClass) {
-        Image pattern = null;
-
-        {
-            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getColors().get(0), Color.TRANSPARENT)) : 0;
-            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getColors().get(1), Color.TRANSPARENT)) : 0;
-            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getColors().get(2), Color.TRANSPARENT)) : 0;
-            Function<Integer, Integer> patternFunction = (Integer rgb) -> {
-                if (rgb == 0xFFFF0000) {
-                    return pColor1;
-                }
-                if (rgb == 0xFFFFFF00) {
-                    return pColor2;
-                }
-                if (rgb == 0xFFFFFFFF) {
-                    return pColor3;
-                }
-
-                return rgb;
-            };
-            try {
-                var in = CascadeDirectoryHelper.openFile(
-                        Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
-                        entry,
-                        GameInstallation.CK3);
-                pattern = in.map(inputStream -> ImageLoader.loadImage(inputStream, patternFunction)).orElse(null);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        }
-
-
-        Image emblem = null;
-        if (coa.getEmblemFile() != null) {
-            boolean hasColor = coa.getEmblemColors().size() > 0;
-            int eColor1 = coa.getEmblemColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getEmblemColors().get(0), Color.TRANSPARENT)) : 0;
-            int eColor2 = coa.getEmblemColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getEmblemColors().get(1), Color.TRANSPARENT)) : 0;
-            int eColor3 = coa.getEmblemColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getEmblemColors().get(2), Color.TRANSPARENT)) : 0;
-            Function<Integer, Integer> customFilter = (Integer rgb) -> {
-                if (hasColor) {
-                    if (rgb == 0xFF800000) {
-                        return eColor1;
-                    }
-                    if (rgb == 0xFF00007F) {
-                        return eColor2;
-                    }
-                    if (rgb == 0xFFFFFFFF) {
-                        return eColor3;
-                    }
-                }
-                return rgb;
-            };
-
-            try {
-                var in = CascadeDirectoryHelper.openFile(
-                        Path.of("gfx", "coat_of_arms",
-                                (hasColor ? "colored" : "textured") + "_emblems").resolve(coa.getEmblemFile()),
-                        entry,
-                        GameInstallation.CK3);
-                emblem = in.map(inputStream -> ImageLoader.loadImage(inputStream, customFilter)).orElse(null);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        }
-
-        try {
-            var in = CascadeDirectoryHelper.openFile(
-                    Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getEmblemFile()),
-                    entry,
-                    GameInstallation.CK3);
-            in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-
-        ImageView v = new ImageView(pattern);
-        ImageView iconV = new ImageView(emblem);
-        StackPane pane = new StackPane(v, iconV);
-        v.setPreserveRatio(true);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        iconV.fitWidthProperty().bind(pane.widthProperty());
-        iconV.fitHeightProperty().bind(pane.heightProperty());
-        pane.getStyleClass().add(styleClass);
-        return pane;
-    }
-
-    public static Pane imageNode(Image i) {
-        return imageNode(i, null, null);
-    }
-
-    public static Pane imageNode(Image i, String styleClass) {
-        return imageNode(i, styleClass, null);
-    }
-
-    public static Pane imageNode(Image i, String styleClass, String tt) {
-        if (i == null) {
-            throw new NullPointerException();
-        }
-        ImageView v = new ImageView(i);
-        Pane pane = new Pane(v);
-        Rectangle2D viewport = VIEWPORTS.get(i);
-        if (viewport != null) v.setViewport(viewport);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        v.preserveRatioProperty().setValue(true);
-        if (styleClass != null) pane.getStyleClass().add(styleClass);
-
-        var t = new Tooltip(tt);
-        t.getStyleClass().add("tooltip");
-        Tooltip.install(pane, t);
-
-        return pane;
-    }
-
-    public static Pane backgroundNode(Image i) {
-        ImageView v = new ImageView(i);
-        Pane pane = new Pane(v);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        if (i == null) {
-            return pane;
-        }
-
-        double imageAspect = i.getWidth() / i.getHeight();
-        ChangeListener<? extends Number> cl = (c, o, n) -> {
-            double w = (double) n;
-            double h = w / imageAspect;
-            double paneAspect = pane.getWidth() / pane.getHeight();
-
-            double relViewportWidth = 0;
-            double relViewportHeight = 0;
-
-            // Pane width too big for image
-            if (paneAspect > imageAspect) {
-                relViewportWidth = 1;
-                double newImageHeight = pane.getWidth() / imageAspect;
-                relViewportHeight = Math.min(1, pane.getHeight() / newImageHeight);
-            }
-
-            // Height too big
-            else {
-                relViewportHeight = 1;
-                double newImageWidth = pane.getHeight() * imageAspect;
-                relViewportWidth = Math.min(1, pane.getWidth() / newImageWidth);
-            }
-
-            v.setViewport(new Rectangle2D(
-                    ((1 - relViewportWidth) / 2.0) * i.getWidth(),
-                    ((1 - relViewportHeight) / 2.0) * i.getHeight(),
-                    i.getWidth() * relViewportWidth,
-                    i.getHeight() * relViewportHeight));
-        };
-        pane.widthProperty().addListener((ChangeListener<? super Number>) cl);
-        pane.heightProperty().addListener((ChangeListener<? super Number>) cl);
-        return pane;
-    }
-
-    public static void loadImages() {
+    public static void init() throws IOException {
         loadEu4Images();
         loadHoi4Images();
         loadStellarisImages();
         loadCk3Images();
     }
 
-    public static void loadCk3Images() {
+    public static void loadCk3Images() throws IOException {
         if (GameInstallation.CK3 == null) {
             return;
         }
@@ -375,14 +86,14 @@ public class GameImage {
         CK3_ICON = ImageLoader.loadImage(
                 GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
 
-        CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+        CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
 
         CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.CK3.getPath()
                 .resolve("launcher").resolve("assets").resolve("app-background.png"));
 
     }
 
-    public static void loadStellarisImages() {
+    public static void loadStellarisImages() throws IOException {
         if (GameInstallation.STELLARIS == null) {
             return;
         }
@@ -399,7 +110,7 @@ public class GameImage {
 
     }
 
-    public static void loadHoi4Images() {
+    public static void loadHoi4Images() throws IOException {
         if (GameInstallation.HOI4 == null) {
             return;
         }
@@ -422,7 +133,7 @@ public class GameImage {
 
     }
 
-    public static void loadEu4Images() {
+    public static void loadEu4Images() throws IOException {
         if (GameInstallation.EU4 == null) {
             return;
         }
@@ -488,5 +199,103 @@ public class GameImage {
 
         EU4_BACKGROUND = ImageLoader.loadImage(
                 GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("app-background.png"));
+    }
+
+
+    public static Pane unknownTag() {
+        Label l = new Label("?");
+        l.getStyleClass().add(CLASS_TAG_ICON);
+        l.getStyleClass().add(GuiStyle.CLASS_UNKNOWN_TAG);
+        l.alignmentProperty().set(Pos.CENTER);
+        var sp = new StackPane(l);
+        StackPane.setAlignment(l, Pos.CENTER);
+        return sp;
+    }
+
+    public static Path getEu4TagPath(String tag) {
+        return Path.of("gfx/flags/" + tag + ".tga");
+    }
+
+    private static Path getHoi4TagPath(Hoi4Tag tag) {
+        return Path.of("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga");
+    }
+
+    public static Pane imageNode(Image i) {
+        return imageNode(i, null, null);
+    }
+
+    public static Pane imageNode(Image i, String styleClass) {
+        return imageNode(i, styleClass, null);
+    }
+
+    public static Pane imageNode(Image i, String styleClass, String tt) {
+        if (i == null) {
+            throw new NullPointerException();
+        }
+
+        ImageView v = new ImageView(i);
+        Pane pane = new Pane(v);
+
+        Rectangle2D viewport = VIEWPORTS.get(i);
+        if (viewport != null) {
+            v.setViewport(viewport);
+        }
+
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        v.preserveRatioProperty().setValue(true);
+
+        if (styleClass != null) {
+            pane.getStyleClass().add(styleClass);
+        }
+
+        var t = new Tooltip(tt);
+        t.getStyleClass().add("tooltip");
+        Tooltip.install(pane, t);
+
+        return pane;
+    }
+
+    public static Pane backgroundNode(Image i) {
+        ImageView v = new ImageView(i);
+        Pane pane = new Pane(v);
+        v.fitWidthProperty().bind(pane.widthProperty());
+        v.fitHeightProperty().bind(pane.heightProperty());
+        if (i == null) {
+            return pane;
+        }
+
+        double imageAspect = i.getWidth() / i.getHeight();
+        ChangeListener<? extends Number> cl = (c, o, n) -> {
+            double w = (double) n;
+            double h = w / imageAspect;
+            double paneAspect = pane.getWidth() / pane.getHeight();
+
+            double relViewportWidth = 0;
+            double relViewportHeight = 0;
+
+            // Pane width too big for image
+            if (paneAspect > imageAspect) {
+                relViewportWidth = 1;
+                double newImageHeight = pane.getWidth() / imageAspect;
+                relViewportHeight = Math.min(1, pane.getHeight() / newImageHeight);
+            }
+
+            // Height too big
+            else {
+                relViewportHeight = 1;
+                double newImageWidth = pane.getHeight() * imageAspect;
+                relViewportWidth = Math.min(1, pane.getWidth() / newImageWidth);
+            }
+
+            v.setViewport(new Rectangle2D(
+                    ((1 - relViewportWidth) / 2.0) * i.getWidth(),
+                    ((1 - relViewportHeight) / 2.0) * i.getHeight(),
+                    i.getWidth() * relViewportWidth,
+                    i.getHeight() * relViewportHeight));
+        };
+        pane.widthProperty().addListener((ChangeListener<? super Number>) cl);
+        pane.heightProperty().addListener((ChangeListener<? super Number>) cl);
+        return pane;
     }
 }

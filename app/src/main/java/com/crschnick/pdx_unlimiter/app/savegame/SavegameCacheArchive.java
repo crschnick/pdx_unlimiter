@@ -27,7 +27,7 @@ public class SavegameCacheArchive {
             return;
         }
 
-        for (SavegameCache cache : SavegameCache.CACHES) {
+        for (SavegameCache cache : SavegameCache.ALL) {
             //cache.importSavegameCache(zipFile);
         }
 
@@ -47,7 +47,7 @@ public class SavegameCacheArchive {
             return;
         }
 
-        for (SavegameCache cache : SavegameCache.CACHES) {
+        for (SavegameCache cache : SavegameCache.ALL) {
             exportSavegameDirectory(cache, zipFile);
         }
 

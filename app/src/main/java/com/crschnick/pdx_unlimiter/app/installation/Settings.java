@@ -275,20 +275,6 @@ public class Settings {
         if (stellaris != null) {
             GameInstallation.STELLARIS = new StellarisInstallation(stellaris);
         }
-        activeGame = null;
-
-        try {
-            GameInstallation.initInstallations();
-
-            GameImage.loadImages();
-            GameIntegration.reload();
-            AchievementManager.init();
-            SavegameCache.loadData();
-
-            GuiLayout.setFontSize(fontSize);
-        } catch (Exception e) {
-            ErrorHandler.handleTerminalException(e);
-        }
     }
 
     public boolean deleteOnImport() {

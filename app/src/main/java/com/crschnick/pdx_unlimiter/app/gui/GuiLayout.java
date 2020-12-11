@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXSpinner;
@@ -18,6 +19,7 @@ import javafx.scene.layout.StackPane;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 public class GuiLayout {
 
@@ -40,7 +42,7 @@ public class GuiLayout {
         layout.setOnDragOver(event -> {
             if (event.getGestureSource() != layout
                     && event.getDragboard().hasFiles()) {
-                event.acceptTransferModes(TransferMode.MOVE);
+                event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
             }
             event.consume();
         });
@@ -53,14 +55,11 @@ public class GuiLayout {
             event.setDropCompleted(true);
             event.consume();
         });
-        setFontSize(Settings.getInstance().getFontSize());
 
         JFXSpinner loading = new JFXSpinner();
         Pane loadingBg = new StackPane(loading);
         loadingBg.getStyleClass().add(GuiStyle.CLASS_LOADING);
-        loadingBg.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
-            return SavegameCache.CACHES.stream().anyMatch(c -> c.loadingProperty().get());
-        }, SavegameCache.CACHES.stream().map(SavegameCache::loadingProperty).toArray(BooleanProperty[]::new)));
+        loadingBg.visibleProperty().bind(TaskExecutor.getInstance().busyProperty());
         loadingBg.setMinWidth(Pane.USE_COMPUTED_SIZE);
         loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
 
@@ -83,9 +82,7 @@ public class GuiLayout {
         return stack;
     }
 
-    public static void setFontSize(int size) {
-        if (layout != null) {
-            layout.styleProperty().setValue("-fx-font-size: " + size + "pt;");
-        }
+    public static void init() {
+        layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
     }
 }

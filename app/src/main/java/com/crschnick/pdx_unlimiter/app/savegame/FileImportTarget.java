@@ -26,12 +26,12 @@ public abstract class FileImportTarget {
         RawSavegameVisitor.vist(toImport, new RawSavegameVisitor() {
             @Override
             public void visitEu4(Path file) {
-                targets.add(new StandardImportTarget(SavegameCache.EU4_CACHE, file));
+                targets.add(new StandardImportTarget(SavegameCache.EU4, file));
             }
 
             @Override
             public void visitHoi4(Path file) {
-                targets.add(new StandardImportTarget(SavegameCache.HOI4_CACHE, file));
+                targets.add(new StandardImportTarget(SavegameCache.HOI4, file));
             }
 
             @Override
@@ -45,7 +45,7 @@ public abstract class FileImportTarget {
 
             @Override
             public void visitCk3(Path file) {
-                targets.add(new StandardImportTarget(SavegameCache.CK3_CACHE, file));
+                targets.add(new StandardImportTarget(SavegameCache.CK3, file));
             }
 
             @Override
@@ -102,7 +102,7 @@ public abstract class FileImportTarget {
     public static final class StellarisNormalImportTarget extends FileImportTarget {
 
         public StellarisNormalImportTarget(Path path) {
-            super(SavegameCache.STELLARIS_CACHE, path);
+            super(SavegameCache.STELLARIS, path);
         }
 
         @Override
@@ -126,7 +126,7 @@ public abstract class FileImportTarget {
     public static final class StellarisIronmanImportTarget extends FileImportTarget {
 
         public StellarisIronmanImportTarget(Path path) {
-            super(SavegameCache.STELLARIS_CACHE, path);
+            super(SavegameCache.STELLARIS, path);
         }
 
         @Override

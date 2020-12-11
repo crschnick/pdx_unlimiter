@@ -3,6 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -14,16 +16,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
+import static com.crschnick.pdx_unlimiter.app.gui.GameImage.unknownTag;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
@@ -32,10 +33,6 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     public Hoi4GuiFactory() {
         super(GameInstallation.HOI4);
-    }
-
-    private static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
-        return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
     }
 
     @Override
@@ -59,24 +56,24 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public Background createEntryInfoBackground(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
         return new Background(new BackgroundFill(
-                colorFromInt(GameInstallation.HOI4.getCountryColors().getOrDefault(entry.getTag().getTag(), 0), 100),
+                ColorHelper.colorFromInt(GameInstallation.HOI4.getCountryColors().getOrDefault(entry.getTag().getTag(), 0), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
     public ObservableValue<Node> createImage(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON));
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(hoi4TagNode(entry));
         entry.infoProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(entry.getTag(), CLASS_TAG_ICON)));
+            Platform.runLater(() -> prop.set(hoi4TagNode(entry)));
         });
         return prop;
     }
 
     @Override
     public ObservableValue<Node> createImage(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON));
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(hoi4TagNode(campaign));
         campaign.tagProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(GameImage.hoi4TagNode(campaign.getTag(), CLASS_TAG_ICON)));
+            Platform.runLater(() -> prop.set(hoi4TagNode(campaign)));
         });
         return prop;
     }
@@ -96,5 +93,24 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);
+    }
+
+    private Pane hoi4TagNode(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
+        return hoi4TagNode(GameImage.getEu4TagPath(campaign.getTag().getTag()), null);
+    }
+
+    private Pane hoi4TagNode(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
+        return hoi4TagNode(GameImage.getEu4TagPath(entry.getTag().getTag()), entry);
+    }
+
+    private Pane hoi4TagNode(Path path, GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
+        var in = CascadeDirectoryHelper.openFile(
+                path, entry, GameInstallation.EU4);
+        Image img = in.flatMap(inputStream -> ImageLoader.loadImageOptional(inputStream, null)).orElse(null);
+        if (img == null) {
+            return unknownTag();
+        }
+
+        return GameImage.imageNode(img, CLASS_TAG_ICON);
     }
 }

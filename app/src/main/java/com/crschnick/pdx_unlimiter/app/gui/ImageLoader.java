@@ -24,35 +24,38 @@ public class ImageLoader {
     }
 
     public static Optional<Image> loadImageOptional(Path p) {
-        return Optional.empty();
+        try {
+            return Optional.of(loadImage(p));
+        } catch (Exception e) {
+            LoggerFactory.getLogger(ImageLoader.class).warn("Image file " + p.toString() + " not found.");
+            return Optional.empty();
+        }
     }
 
-    public static Image loadImage(Path p) {
+    public static Image loadImage(Path p) throws IOException {
         return loadImage(p, null);
     }
 
-    static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
-        if (!Files.isRegularFile(p)) {
-            LoggerFactory.getLogger(ImageLoader.class).warn("Image file " + p.toString() + " not found.");
-            return null;
-        }
-
+    public static Optional<Image> loadImageOptional(InputStream in, Function<Integer, Integer> pixelSelector) {
         try {
-            return loadImage(Files.newInputStream(p), pixelSelector);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e, "Can't read image " + p.toString());
-            return null;
+            return Optional.of(loadImage(in, pixelSelector));
+        } catch (Exception e) {
+            LoggerFactory.getLogger(ImageLoader.class).warn("", e);
+            return Optional.empty();
         }
     }
 
-    static Image loadImage(InputStream in, Function<Integer, Integer> pixelSelector) {
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(in);
-            in.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
+    static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) throws IOException {
+        if (!Files.isRegularFile(p)) {
+            throw new IOException("Image file " + p.toString() + " not found.");
         }
+
+        return loadImage(Files.newInputStream(p), pixelSelector);
+    }
+
+    static Image loadImage(InputStream in, Function<Integer, Integer> pixelSelector) throws IOException {
+        BufferedImage image = ImageIO.read(in);
+        in.close();
 
         if (pixelSelector != null) {
             for (int x = 0; x < image.getWidth(); x++) {

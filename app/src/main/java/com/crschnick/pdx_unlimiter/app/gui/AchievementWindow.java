@@ -147,7 +147,7 @@ public class AchievementWindow {
 
     private static Node getImageForIcon(Optional<Path> p, int size) {
         if (p.isPresent()) {
-            ImageView img = new ImageView(ImageLoader.loadImage(p.get()));
+            ImageView img = new ImageView(ImageLoader.loadImageOptional(p.get()).orElse(null));
             img.setFitWidth(size);
             img.setFitHeight(size);
             return img;

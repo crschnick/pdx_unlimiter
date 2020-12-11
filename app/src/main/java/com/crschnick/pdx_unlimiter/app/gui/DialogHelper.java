@@ -157,7 +157,7 @@ public class DialogHelper {
         return alert;
     }
 
-    private static void setIcon(Alert a) {
+    public static void setIcon(Alert a) {
         ((Stage) a.getDialogPane().getScene().getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
     }
 
@@ -188,83 +188,6 @@ public class DialogHelper {
         alert.getDialogPane().setContent(p);
 
         alert.showAndWait();
-    }
-
-
-    public static boolean showException(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        String stackTrace = sw.toString();
-        return showErrorMessage(e.getMessage(), stackTrace, true);
-    }
-
-    public static boolean showErrorMessage(String msg, String details, boolean reportable) {
-        AtomicBoolean shouldSend = new AtomicBoolean(false);
-        if (!Platform.isFxApplicationThread()) {
-            CountDownLatch latch = new CountDownLatch(1);
-            Platform.runLater(() -> {
-                shouldSend.set(showErrorMessageInternal(msg, details, reportable));
-                latch.countDown();
-            });
-            try {
-                latch.await();
-            } catch (InterruptedException ignored) {
-            }
-        } else {
-            shouldSend.set(showErrorMessageInternal(msg, details, reportable));
-        }
-        return shouldSend.get();
-    }
-
-    private static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
-        // Create Alert without icon since it may not have loaded yet
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        if (reportable) {
-            ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.OK_DONE);
-            ButtonType foo = new ButtonType("Send error", ButtonBar.ButtonData.OK_DONE);
-            alert.getButtonTypes().addAll(report, foo);
-
-            Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
-            reportButton.addEventFilter(ActionEvent.ACTION, event -> {
-                try {
-                    Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues/new"));
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                }
-                event.consume();
-            });
-        }
-        ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().add(bar);
-
-        alert.setAlertType(Alert.AlertType.ERROR);
-        alert.setTitle("Error reporter");
-        alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
-                """
-
-
-                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
-                        If you have a specific savegame that causes this issue, please attach it as well in a zip.
-
-                        If you just want to notify the developers of this error automatically, click the 'send error' button.""" : ""));
-
-        VBox dialogPaneContent = new VBox();
-
-        if (details != null) {
-            Label label = new Label("Details:");
-
-            TextArea textArea = new TextArea();
-            textArea.setText(details);
-            textArea.editableProperty().setValue(false);
-            textArea.autosize();
-            dialogPaneContent.getChildren().addAll(label, textArea);
-        }
-
-        alert.getDialogPane().setContent(dialogPaneContent);
-
-        Optional<ButtonType> r = alert.showAndWait();
-        return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
     }
 
     public static Optional<Path> showImportArchiveDialog() {

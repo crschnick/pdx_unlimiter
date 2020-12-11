@@ -43,7 +43,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     protected SimpleObjectProperty<GameCampaign<T, I>> selectedCampaign = new SimpleObjectProperty<>();
     protected SimpleObjectProperty<GameCampaignEntry<T, I>> selectedEntry = new SimpleObjectProperty<>();
 
-    private static void init() {
+    public static void init() {
         ALL = new ArrayList<>();
         Settings s = Settings.getInstance();
         if (GameInstallation.EU4 != null) {
@@ -82,16 +82,16 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         }
     }
 
-    public static void reload() {
+    public static void reset() {
         if (current() != null) {
             current().selectCampaign(null);
-            ALL.clear();
-            EU4 = null;
-            CK3 = null;
-            STELLARIS = null;
-            HOI4 = null;
+            currentGameProperty().set(null);
         }
-        init();
+        ALL.clear();
+        EU4 = null;
+        CK3 = null;
+        STELLARIS = null;
+        HOI4 = null;
     }
 
     public static List<GameIntegration<?, ?>> getAvailable() {

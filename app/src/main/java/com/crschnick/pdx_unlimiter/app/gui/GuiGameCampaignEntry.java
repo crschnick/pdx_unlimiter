@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -83,11 +82,11 @@ public class GuiGameCampaignEntry {
         });
 
         HBox buttonBar = new HBox(achievements, open, del);
-        if (SavegameCache.EU4_CACHE.contains(e)) {
+        if (SavegameCache.EU4.contains(e)) {
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
-                RakalyHelper.uploadSavegame(SavegameCache.EU4_CACHE, e);
+                RakalyHelper.uploadSavegame(SavegameCache.EU4, e);
             });
             upload.getStyleClass().add(CLASS_UPLOAD);
             Tooltip.install(upload, new Tooltip("Upload to Rakaly.com"));

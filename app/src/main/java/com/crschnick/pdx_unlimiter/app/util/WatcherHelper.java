@@ -54,10 +54,6 @@ public class WatcherHelper {
                         return;
                     }
 
-                    if (!PdxuApp.getApp().isRunning()) {
-                        return;
-                    }
-
                     if (key == null) {
                         continue;
                     }
@@ -101,6 +97,7 @@ public class WatcherHelper {
                 }
             }
         });
+        t.setDaemon(true);
         t.setName(name);
         t.start();
     }

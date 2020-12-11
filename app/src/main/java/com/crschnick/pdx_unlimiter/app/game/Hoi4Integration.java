@@ -35,6 +35,6 @@ public class Hoi4Integration extends GameIntegration<Hoi4Tag, Hoi4SavegameInfo> 
 
     @Override
     public Hoi4SavegameCache getSavegameCache() {
-        return SavegameCache.HOI4_CACHE;
+        return SavegameCache.HOI4;
     }
 }
