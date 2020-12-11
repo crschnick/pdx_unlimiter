@@ -34,6 +34,7 @@ public class Settings {
     private boolean startSteam = true;
     private String rakalyUserId;
     private String rakalyApiKey;
+    private Path storageDirectory;
 
     public static void init() throws Exception {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
@@ -69,6 +70,7 @@ public class Settings {
         s.startSteam = true;
         s.rakalyUserId = null;
         s.rakalyApiKey = null;
+        s.storageDirectory = null;
 
         if (s.eu4 != null) {
             s.activeGame = s.eu4;
@@ -97,6 +99,7 @@ public class Settings {
         s.startSteam = i.required("startSteam").booleanValue();
         s.rakalyUserId = Optional.ofNullable(i.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
         s.rakalyApiKey = Optional.ofNullable(i.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
+        s.storageDirectory = Optional.ofNullable(i.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
         return s;
     }
 
@@ -125,8 +128,15 @@ public class Settings {
 
         i.put("fontSize", s.fontSize);
         i.put("startSteam", s.startSteam);
-        i.put("rakalyUserId", s.rakalyUserId);
-        i.put("rakalyApiKey", s.rakalyApiKey);
+        if (s.rakalyUserId != null) {
+            i.put("rakalyUserId", s.rakalyUserId);
+        }
+        if (s.rakalyApiKey != null) {
+            i.put("rakalyApiKey", s.rakalyApiKey);
+        }
+        if (s.storageDirectory != null) {
+            i.put("storageDirectory", s.storageDirectory.toString());
+        }
 
         JsonHelper.write(n, Files.newOutputStream(file));
     }
@@ -142,6 +152,7 @@ public class Settings {
         c.startSteam = startSteam;
         c.rakalyUserId = rakalyUserId;
         c.rakalyApiKey = rakalyApiKey;
+        c.storageDirectory = storageDirectory;
         return c;
     }
 
@@ -211,6 +222,14 @@ public class Settings {
 
     public void setRakalyUserId(String rakalyUserId) {
         this.rakalyUserId = rakalyUserId;
+    }
+
+    public Optional<Path> getStorageDirectory() {
+        return Optional.ofNullable(storageDirectory);
+    }
+
+    public void setStorageDirectory(Path storageDirectory) {
+        this.storageDirectory = storageDirectory;
     }
 
     public void updateActiveGame(Path activeGame) {

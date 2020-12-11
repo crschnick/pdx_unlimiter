@@ -142,8 +142,12 @@ public class PdxuInstallation {
         return getDataLocation().resolve("settings");
     }
 
-    public Path getSavegameLocation() {
+    public Path getDefaultSavegameLocation() {
         return getDataLocation().resolve("savegames");
+    }
+
+    public Path getSavegameLocation() {
+        return Settings.getInstance().getStorageDirectory().orElse(getDefaultSavegameLocation());
     }
 
     public String getVersion() {

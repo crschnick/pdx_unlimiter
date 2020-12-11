@@ -83,6 +83,8 @@ public class GuiLayout {
     }
 
     public static void init() {
-        layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
+        Platform.runLater(() -> {
+            layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
+        });
     }
 }

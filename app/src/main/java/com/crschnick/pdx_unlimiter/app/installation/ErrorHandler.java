@@ -24,7 +24,6 @@ public class ErrorHandler {
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Initializing error handler");
         Sentry.init(sentryOptions -> {
-            sentryOptions.setEnableUncaughtExceptionHandler(true);
             sentryOptions.setEnvironment("production");
             sentryOptions.setServerName(System.getProperty("os.name"));
             sentryOptions.setRelease(PdxuInstallation.getInstance().getVersion());

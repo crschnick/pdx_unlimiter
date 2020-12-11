@@ -29,6 +29,7 @@ public class FileImporter {
     public static void init() throws IOException {
         INSTANCE = new FileImporter();
         var path = PdxuInstallation.getInstance().getSavegameLocation().resolve("import");
+        FileUtils.forceMkdir(path.toFile());
 
         Consumer<Path> importFunc = p -> {
             if (!Files.exists(p)) {

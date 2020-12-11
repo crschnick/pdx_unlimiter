@@ -31,7 +31,7 @@ public class GuiMenuBar {
         Menu settings = new Menu("Settings");
         MenuItem c = new MenuItem("Change settings");
         c.setOnAction((a) -> {
-            GuiSettings.showSettings(false);
+            GuiSettings.showSettings();
         });
         settings.getItems().add(c);
 
