@@ -37,21 +37,23 @@ public class ComponentManager {
     }
 
     public static void additionalSetup() {
-        TaskExecutor.start();
+        TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init);
     }
 
     public static void reloadSettings() {
-        TaskExecutor.stopAndWait();
-        reset();
-        Settings.getInstance().apply();
-        init();
-        TaskExecutor.start();
+        TaskExecutor.getInstance().stopAndWait();
+        TaskExecutor.getInstance().start();
+        TaskExecutor.getInstance().submitTask(() -> {
+            reset();
+            Settings.getInstance().apply();
+            init();
+        });
     }
 
     public static void finalTeardown() {
         TaskExecutor.getInstance().submitTask(ComponentManager::reset);
-        TaskExecutor.stopAndWait();
+        TaskExecutor.getInstance().stopAndWait();
     }
 
     private static void init() {

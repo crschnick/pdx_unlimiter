@@ -11,18 +11,18 @@ public class TaskExecutor {
 
     private static final TaskExecutor INSTANCE = new TaskExecutor();
 
-    public static void start() {
-        INSTANCE.active = true;
-        INSTANCE.executorService = Executors.newSingleThreadExecutor();
+    public void start() {
+        active = true;
+        executorService = Executors.newSingleThreadExecutor();
     }
 
-    public static void stopAndWait() {
-        INSTANCE.active = false;
-        INSTANCE.executorService.shutdown();
+    public void stopAndWait() {
+        active = false;
+        executorService.shutdown();
 
         try {
             // Should terminate fast
-            INSTANCE.executorService.awaitTermination(1, TimeUnit.DAYS);
+            executorService.awaitTermination(1, TimeUnit.DAYS);
         } catch (InterruptedException e) {
             ErrorHandler.handleException(e);
         }

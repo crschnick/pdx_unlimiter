@@ -55,7 +55,7 @@ public class GuiErrorReporter {
         }
         alert.getButtonTypes().clear();
 
-        ButtonType bar = new ButtonType("Ignore", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().add(bar);
 
         if (reportable) {
@@ -77,12 +77,12 @@ public class GuiErrorReporter {
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Error reporter");
         alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
-                """
+"""
 
-                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
+If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
 
-                        Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
-                        This will send some diagnostics data""" : ""));
+Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
+This will send some diagnostics data""" : ""));
 
         VBox dialogPaneContent = new VBox();
 

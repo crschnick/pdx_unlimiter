@@ -28,7 +28,7 @@ public class Settings {
     private Path ck3;
     private Path stellaris;
     private Path activeGame;
-    private int maxLoadedSavegames = 5;
+    private int maxLoadedSavegames = 1;
     private int fontSize = 12;
     private boolean deleteOnImport = false;
     private boolean startSteam = true;
@@ -68,6 +68,7 @@ public class Settings {
         s.stellaris = InstallLocationHelper.getInstallPath("Stellaris").orElse(null);
         s.fontSize = 12;
         s.startSteam = true;
+        s.deleteOnImport = false;
         s.rakalyUserId = null;
         s.rakalyApiKey = null;
         s.storageDirectory = null;
@@ -97,6 +98,7 @@ public class Settings {
         s.activeGame = Optional.ofNullable(i.get("activeGame")).map(n -> Paths.get(n.textValue())).orElse(s.activeGame);
         s.fontSize = i.required("fontSize").intValue();
         s.startSteam = i.required("startSteam").booleanValue();
+        s.deleteOnImport = Optional.ofNullable(i.get("deleteOnImport")).map(JsonNode::booleanValue).orElse(false);
         s.rakalyUserId = Optional.ofNullable(i.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
         s.rakalyApiKey = Optional.ofNullable(i.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
         s.storageDirectory = Optional.ofNullable(i.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
@@ -126,6 +128,7 @@ public class Settings {
             i.set("activeGame", new TextNode(s.activeGame.toString()));
         }
 
+        i.put("deleteOnImport", s.deleteOnImport);
         i.put("fontSize", s.fontSize);
         i.put("startSteam", s.startSteam);
         if (s.rakalyUserId != null) {
@@ -150,6 +153,7 @@ public class Settings {
         c.activeGame = activeGame;
         c.fontSize = fontSize;
         c.startSteam = startSteam;
+        c.deleteOnImport = deleteOnImport;
         c.rakalyUserId = rakalyUserId;
         c.rakalyApiKey = rakalyApiKey;
         c.storageDirectory = storageDirectory;
@@ -230,6 +234,10 @@ public class Settings {
 
     public void setStorageDirectory(Path storageDirectory) {
         this.storageDirectory = storageDirectory;
+    }
+
+    public void setDeleteOnImport(boolean deleteOnImport) {
+        this.deleteOnImport = deleteOnImport;
     }
 
     public void updateActiveGame(Path activeGame) {

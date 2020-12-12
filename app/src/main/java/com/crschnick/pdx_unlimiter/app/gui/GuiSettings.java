@@ -11,6 +11,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
+import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
@@ -196,6 +197,17 @@ public class GuiSettings {
         return grid;
     }
 
+
+    private static Node help(String text) {
+        Label q = new Label(" ? ");
+        q.setStyle("-fx-border-color: black;");
+        var t = new Tooltip(text);
+        t.setShowDelay(Duration.ZERO);
+        t.setShowDuration(Duration.INDEFINITE);
+        q.setTooltip(t);
+        return q;
+    }
+
     private static Node misc(Settings s) {
         GridPane grid = new GridPane();
 
@@ -204,26 +216,52 @@ public class GuiSettings {
         TextFlow name = new TextFlow(t);
         grid.add(name, 0, 0, 2, 1);
 
-        grid.add(new Label("Font size:"), 0, 1);
+        grid.add(help("""
+                The font size within the app.
+
+                If you have a high display resolution, you can turn this up to increase readability."""),
+                0, 1);
+        grid.add(new Label("Font size:"), 1, 1);
         JFXSlider slider = new JFXSlider(10, 24, s.getFontSize());
         slider.valueProperty().addListener((c, o, n) -> {
             s.setFontSize(n.intValue());
         });
-        grid.add(slider, 1, 1);
+        grid.add(slider, 2, 1);
         GridPane.setHgrow(slider, Priority.ALWAYS);
 
-        grid.add(new Label("Start steam:"), 0, 2);
+        grid.add(help("""
+                Specifies whether to start Steam when launching a game through the Pdx-Unlimiter.
+
+                If you disable this, Steam might not register your achievements while playing."""),
+                0, 2);
+        grid.add(new Label("Start steam:"), 1, 2);
         JFXCheckBox cb = new JFXCheckBox();
         cb.setSelected(s.startSteam());
         cb.selectedProperty().addListener((c, o, n) -> {
             s.setStartSteam(n);
         });
-        grid.add(cb, 1, 2);
+        grid.add(cb, 2, 2);
         GridPane.setHgrow(cb, Priority.ALWAYS);
 
-        grid.add(new Label("Storage directory:"), 0, 3);
+        grid.add(help("""
+                Specifies whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
+                              
+                Recommended to keep this disabled while the Pdx-Unlimiter is in beta."""), 0, 3);
+        grid.add(new Label("Delete on import:"), 1, 3);
+        JFXCheckBox doi = new JFXCheckBox();
+        doi.setSelected(s.deleteOnImport());
+        doi.selectedProperty().addListener((c, o, n) -> {
+            s.setDeleteOnImport(n);
+        });
+        grid.add(doi, 2, 3);
+        GridPane.setHgrow(doi, Priority.ALWAYS);
+
+        grid.add(help("""
+                The directory where the Pdx-Unlimiter stores all imported savegames.
+                """), 0, 4);
+        grid.add(new Label("Storage directory:"), 1, 4);
         Node loc = storageLocationNode(s);
-        grid.add(loc, 1, 3);
+        grid.add(loc, 2, 4);
         GridPane.setHgrow(loc, Priority.ALWAYS);
 
         grid.setHgap(10);
@@ -237,23 +275,35 @@ public class GuiSettings {
         var t = new Text("Rakaly.com");
         t.setStyle("-fx-font-weight: bold");
         TextFlow name = new TextFlow(t);
-        grid.add(name, 0, 0, 2, 1);
+        grid.add(name, 0, 0, 3, 1);
 
-        grid.add(new Label("User ID:"), 0, 1);
-        TextField textArea = new TextField();
-        textArea.textProperty().addListener((change, o, n) -> {
+        grid.add(help("""
+                Your Rakaly.com User ID.
+
+                You can find this by going to 'My Saves' on Rakaly.com and looking at the url that looks like this: 'https://rakaly.com/users/<User ID>
+                """), 0, 1);
+        grid.add(new Label("User ID:"), 1, 1);
+        TextField userId = new TextField();
+        userId.textProperty().addListener((change, o, n) -> {
             s.setRakalyUserId(n.equals("") ? null : n);
         });
-        textArea.setText(s.getRakalyUserId().orElse(""));
-        grid.add(textArea, 1, 1);
+        userId.setText(s.getRakalyUserId().orElse(""));
+        grid.add(userId, 2, 1);
+        GridPane.setHgrow(userId, Priority.ALWAYS);
 
-        grid.add(new Label("API key:"), 0, 2);
+        grid.add(help("""
+                Your Rakaly.com API key.
+
+                To obtain this, you currently have to ask for it on the Rakaly Discord.
+                """), 0, 2);
+        grid.add(new Label("API key:"), 1, 2);
         TextField apikey = new TextField();
         apikey.textProperty().addListener((change, o, n) -> {
             s.setRakalyApiKey(n.equals("") ? null : n);
         });
         apikey.setText(s.getRakalyApiKey().orElse(""));
-        grid.add(apikey, 1, 2);
+        grid.add(apikey, 2, 2);
+        GridPane.setHgrow(apikey, Priority.ALWAYS);
         grid.setHgap(10);
         grid.setVgap(10);
 
