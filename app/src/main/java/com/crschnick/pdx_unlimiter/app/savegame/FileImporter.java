@@ -44,7 +44,7 @@ public class FileImporter {
         };
 
         Files.list(path).forEach(importFunc);
-        WatcherHelper.startWatchersInDirectories("Importer", List.of(path), importFunc);
+        WatcherHelper.getInstance().startWatchersInDirectories("Importer", List.of(path), importFunc);
     }
 
     private static void importFileInternal(Path queueFile, Path p) {

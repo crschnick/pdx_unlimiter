@@ -8,8 +8,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -17,7 +19,22 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class WatcherHelper {
 
-    private static Map<WatchService, Path> createRecursiveWatchers(Path dir) {
+    private static WatcherHelper INSTANCE = new WatcherHelper();
+
+    private Map<WatchService, Path> watchers = new ConcurrentHashMap<>();
+
+    public static WatcherHelper getInstance() {
+        return INSTANCE;
+    }
+
+    public void reset() throws IOException {
+        for (var e : new HashSet<>(watchers.entrySet())) {
+            e.getKey().close();
+        }
+        watchers.clear();
+    }
+
+    private Map<WatchService, Path> createRecursiveWatchers(Path dir) {
         Map<WatchService, Path> watchers = new HashMap<>();
         if (!Files.isDirectory(dir)) {
             return watchers;
@@ -34,24 +51,25 @@ public class WatcherHelper {
         return watchers;
     }
 
-    public static void startWatchersInDirectories(
+    public void startWatchersInDirectories(
             String game,
             List<Path> dirs,
             Consumer<Path> listener) {
-        Map<WatchService, Path> watchers = new HashMap<>();
-        dirs.forEach(d -> watchers.putAll(createRecursiveWatchers(d)));
-        startWatcher(game + " savegame watcher", watchers, listener);
+        Map<WatchService, Path> localWatchers = new HashMap<>();
+        dirs.forEach(d -> localWatchers.putAll(createRecursiveWatchers(d)));
+        watchers.putAll(localWatchers);
+        startWatcher(game + " savegame watcher", localWatchers, listener);
     }
 
-    private static void startWatcher(String name, Map<WatchService, Path> watchers, Consumer<Path> listener) {
+    private void startWatcher(String name, Map<WatchService, Path> localWatchers, Consumer<Path> listener) {
         Thread t = new Thread(() -> {
             while (true) {
-                for (var entry : new HashMap<>(watchers).entrySet()) {
+                for (var entry : new HashMap<>(localWatchers).entrySet()) {
                     WatchKey key;
                     try {
                         key = entry.getKey().poll(500, TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException ex) {
-                        return;
+                    } catch (Exception ex) {
+                        continue;
                     }
 
                     if (key == null) {
@@ -94,6 +112,12 @@ public class WatcherHelper {
                     if (!valid) {
                         break;
                     }
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });

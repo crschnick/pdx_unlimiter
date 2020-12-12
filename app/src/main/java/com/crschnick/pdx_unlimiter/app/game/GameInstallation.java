@@ -88,7 +88,7 @@ public abstract class GameInstallation {
 
         List<Path> savegameDirs = getAllSavegameDirectories();
 
-        WatcherHelper.startWatchersInDirectories(this.getClass().getName(), savegameDirs, (p) -> {
+        WatcherHelper.getInstance().startWatchersInDirectories(this.getClass().getName(), savegameDirs, (p) -> {
             savegames.set(getLatestSavegames());
         });
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
