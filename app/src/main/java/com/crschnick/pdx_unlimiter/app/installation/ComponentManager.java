@@ -77,7 +77,7 @@ public class ComponentManager {
             GameIntegration.init();
 
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-                GlobalScreen.registerNativeHook();
+                GlobalScreen.unregisterNativeHook();
             }
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
