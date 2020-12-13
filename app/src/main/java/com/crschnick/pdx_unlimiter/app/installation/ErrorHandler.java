@@ -43,12 +43,9 @@ public class ErrorHandler {
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
     }
 
-
-    public static void initPlatformHandler() {
-        Platform.runLater(() -> {
-            Thread.setDefaultUncaughtExceptionHandler((t,e) -> {
-                ErrorHandler.handleException(e);
-            });
+    public static void registerThread(Thread thread) {
+        thread.setUncaughtExceptionHandler((t,e) -> {
+            ErrorHandler.handleException(e);
         });
     }
 

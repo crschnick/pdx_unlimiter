@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -13,7 +14,8 @@ public class TaskExecutor {
 
     public void start() {
         active = true;
-        executorService = Executors.newSingleThreadExecutor();
+        executorService = Executors.newSingleThreadExecutor(
+                r -> ThreadHelper.create("Task Executor", false, r));
     }
 
     public void stopAndWait() {
@@ -22,7 +24,8 @@ public class TaskExecutor {
 
         try {
             // Should terminate fast
-            executorService.awaitTermination(1, TimeUnit.DAYS);
+            // TODO: Temp solution!
+            executorService.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             ErrorHandler.handleException(e);
         }

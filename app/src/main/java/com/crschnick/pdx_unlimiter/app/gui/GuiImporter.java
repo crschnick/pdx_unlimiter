@@ -41,13 +41,15 @@ public class GuiImporter {
         return box;
     }
 
-    public static Node createTargetList(List<FileImportTarget> targets) {
+    public static Region createTargetList(List<FileImportTarget> targets) {
         VBox box = new VBox();
         for (var t : targets) {
             box.getChildren().add(createTargetNode(t));
         }
         ScrollPane s = new ScrollPane(box);
-        s.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        s.setMaxHeight(600);
+        s.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        s.setFitToWidth(true);
         return s;
     }
 
@@ -57,7 +59,8 @@ public class GuiImporter {
         alert.getDialogPane().setContent(createTargetList(install.getSavegames()));
         install.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                alert.getDialogPane().setContent(createTargetList(n));
+                var tl = createTargetList(n);
+                alert.getDialogPane().setContent(tl);
             });
         });
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));

@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
+import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -52,10 +52,10 @@ public abstract class GameInstallation {
     }
 
     public static void init() throws Exception {
-        ALL = Set.of(EU4, HOI4, STELLARIS, CK3).stream()
+        ALL = Stream.of(EU4, HOI4, STELLARIS, CK3)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-        for ( GameInstallation i : ALL) {
+        for (GameInstallation i : ALL) {
             i.loadData();
             try {
                 i.initOptional();
@@ -88,7 +88,7 @@ public abstract class GameInstallation {
 
         List<Path> savegameDirs = getAllSavegameDirectories();
 
-        WatcherHelper.getInstance().startWatchersInDirectories(this.getClass().getName(), savegameDirs, (p) -> {
+        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p) -> {
             savegames.set(getLatestSavegames());
         });
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");

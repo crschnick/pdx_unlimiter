@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.app.util.WatcherHelper;
+import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class FileImporter {
         };
 
         Files.list(path).forEach(importFunc);
-        WatcherHelper.getInstance().startWatchersInDirectories("Importer", List.of(path), importFunc);
+        FileWatchManager.getInstance().startWatchersInDirectories(List.of(path), importFunc);
     }
 
     private static void importFileInternal(Path queueFile, Path p) {

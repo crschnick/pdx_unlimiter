@@ -10,6 +10,7 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegame;
@@ -27,6 +28,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.file.PathUtils;
+import org.apache.commons.lang3.Streams;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +60,6 @@ public abstract class SavegameCache<
 
     private ExecutorService loadService;
 
-    private BooleanProperty loading = new SimpleBooleanProperty(false);
     private String fileEnding;
     private String name;
     private GameDateType dateType;
@@ -88,7 +89,7 @@ public abstract class SavegameCache<
         if (GameInstallation.CK3 != null) {
             CK3 = new Ck3SavegameCache();
         }
-        ALL = Set.of(EU4, HOI4, STELLARIS, CK3).stream()
+        ALL = Stream.of(EU4, HOI4, STELLARIS, CK3)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -115,21 +116,14 @@ public abstract class SavegameCache<
         exportDataToConfig(f);
     }
 
-    public BooleanProperty loadingProperty() {
-        return loading;
-    }
-
     private void start() throws IOException {
         FileUtils.forceMkdir(getPath().toFile());
         if (Files.exists(getPath().resolve(getDataFile()))) {
             importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
         }
 
-        loadService = Executors.newSingleThreadExecutor(r -> {
-            Thread t = Executors.defaultThreadFactory().newThread(r);
-            t.setDaemon(true);
-            return t;
-        });
+        loadService = Executors.newSingleThreadExecutor(
+                r -> ThreadHelper.create(name + " entry loader", true, r));
     }
 
     private void shutdown() throws IOException {
@@ -446,15 +440,12 @@ public abstract class SavegameCache<
     }
 
     private synchronized boolean importSavegame(Path file) {
-        loading.setValue(true);
         try {
             importSavegameData(file);
             saveData();
-            loading.setValue(false);
             return true;
         } catch (Exception e) {
             ErrorHandler.handleException(e, "Could not import " + name + " savegame", file);
-            loading.setValue(false);
             return false;
         }
     }
