@@ -153,14 +153,10 @@ public class FileWatchManager {
     }
 
     private void startWatcher() {
-        var t = ThreadHelper.create("Directory watcher", true, () -> {
-            while (true) {
-                for (var wd : new HashSet<>(watchedDirectories)) {
-                    wd.update();
-                }
-                ThreadHelper.sleep(100);
+        TaskExecutor.getInstance().submitLoop(() -> {
+            for (var wd : new HashSet<>(watchedDirectories)) {
+                wd.update();
             }
         });
-        t.start();
     }
 }

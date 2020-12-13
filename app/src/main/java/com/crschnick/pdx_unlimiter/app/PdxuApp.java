@@ -29,7 +29,6 @@ public class PdxuApp extends Application {
     public static void main(String[] args) {
         ComponentManager.initialSetup(args);
         launch(args);
-        ComponentManager.finalTeardown();
     }
 
     public Scene getScene() {
@@ -49,7 +48,7 @@ public class PdxuApp extends Application {
                             .filter(w -> !w.equals(getScene().getWindow()))
                             .collect(Collectors.toList())
                             .forEach(w -> w.fireEvent(event));
-
+                    ComponentManager.finalTeardown();
                 }
             });
 

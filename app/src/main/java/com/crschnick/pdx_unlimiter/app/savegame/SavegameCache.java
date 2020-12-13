@@ -57,9 +57,6 @@ public abstract class SavegameCache<
     public static Set<SavegameCache<?, ?, ?, ?>> ALL;
 
 
-
-    private ExecutorService loadService;
-
     private String fileEnding;
     private String name;
     private GameDateType dateType;
@@ -121,9 +118,6 @@ public abstract class SavegameCache<
         if (Files.exists(getPath().resolve(getDataFile()))) {
             importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
         }
-
-        loadService = Executors.newSingleThreadExecutor(
-                r -> ThreadHelper.create(name + " entry loader", true, r));
     }
 
     private void shutdown() throws IOException {
@@ -364,8 +358,8 @@ public abstract class SavegameCache<
 
     public void loadEntryAsync(GameCampaignEntry<T, I> e) {
         if (e.infoProperty().isNull().get()) {
-            LoggerFactory.getLogger(SavegameCache.class).debug("Adding entry " + getEntryName(e) + " to loader queue");
-            loadService.submit(() -> {
+            TaskExecutor.getInstance().submitTask(() -> {
+                LoggerFactory.getLogger(SavegameCache.class).debug("Loading entry " + getEntryName(e));
                 loadEntry(e);
             });
         }

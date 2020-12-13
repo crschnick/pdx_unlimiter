@@ -39,7 +39,9 @@ public class ComponentManager {
     }
 
     public static void additionalSetup() {
+        Platform.setImplicitExit(false);
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
+
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init);
     }
@@ -55,11 +57,14 @@ public class ComponentManager {
     }
 
     public static void finalTeardown() {
-        TaskExecutor.getInstance().submitTask(ComponentManager::reset);
-        TaskExecutor.getInstance().stopAndWait();
+        TaskExecutor.getInstance().stop(() -> {
+            ComponentManager.reset();
+            Platform.exit();
+        });
     }
 
     private static void init() {
+        LoggerFactory.getLogger(ComponentManager.class).debug("Initializing ...");
         try {
             Settings.init();
 
@@ -83,17 +88,21 @@ public class ComponentManager {
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
+        LoggerFactory.getLogger(ComponentManager.class).debug("Finished initialization");
     }
 
     private static void reset() {
+        LoggerFactory.getLogger(ComponentManager.class).debug("Resetting program state ...");
         try {
             FileWatchManager.reset();
             GameIntegration.reset();
 
+            LoggerFactory.getLogger(ComponentManager.class).debug("Waiting for platform thread");
             // Sync with platform thread after GameIntegration reset
             CountDownLatch latch = new CountDownLatch(1);
             Platform.runLater(latch::countDown);
             latch.await();
+            LoggerFactory.getLogger(ComponentManager.class).debug("Synced with platform thread");
 
             SavegameCache.reset();
             GameInstallation.reset();
@@ -103,6 +112,6 @@ public class ComponentManager {
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }
-
+        LoggerFactory.getLogger(ComponentManager.class).debug("Reset completed");
     }
 }

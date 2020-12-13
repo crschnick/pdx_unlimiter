@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.Objects;
@@ -15,39 +17,30 @@ public class GameAppManager {
     }
 
     public static void init() {
-        Thread t = new Thread(() -> {
-            while (true) {
-                if ((INSTANCE.activeGame.get() == null)) {
-                    var process = Stream.of(GameInstallation.EU4, GameInstallation.HOI4,
-                            GameInstallation.CK3, GameInstallation.STELLARIS)
-                            .filter(Objects::nonNull)
-                            .map(g -> new GameApp(ProcessHandle.allProcesses()
-                                    .filter(p -> p.info().command()
-                                            .map(cs -> cs.contains(g.getExecutable().toString())).orElse(false))
-                                    .findAny().orElse(null), g)
-                            )
-                            .filter(ga -> ga.getProcess() != null)
-                            .findAny();
-                    if (process.isPresent()) {
-                        INSTANCE.activeGame.set(process.get());
-                        INSTANCE.activeGame.get().onStart();
-                        GameIntegration.selectIntegration(GameIntegration.getForInstallation(process.get().getInstallation()));
-                    }
-                } else {
-                    if (!INSTANCE.activeGame.get().isAlive()) {
-                        INSTANCE.activeGame.get().onShutdown();
-                        INSTANCE.activeGame.set(null);
-                    }
+        TaskExecutor.getInstance().submitLoop(() -> {
+            if ((INSTANCE.activeGame.get() == null)) {
+                var process = Stream.of(GameInstallation.EU4, GameInstallation.HOI4,
+                        GameInstallation.CK3, GameInstallation.STELLARIS)
+                        .filter(Objects::nonNull)
+                        .map(g -> new GameApp(ProcessHandle.allProcesses()
+                                .filter(p -> p.info().command()
+                                        .map(cs -> cs.contains(g.getExecutable().toString())).orElse(false))
+                                .findAny().orElse(null), g)
+                        )
+                        .filter(ga -> ga.getProcess() != null)
+                        .findAny();
+                if (process.isPresent()) {
+                    INSTANCE.activeGame.set(process.get());
+                    INSTANCE.activeGame.get().onStart();
+                    GameIntegration.selectIntegration(GameIntegration.getForInstallation(process.get().getInstallation()));
                 }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            } else {
+                if (!INSTANCE.activeGame.get().isAlive()) {
+                    INSTANCE.activeGame.get().onShutdown();
+                    INSTANCE.activeGame.set(null);
                 }
             }
         });
-        t.setDaemon(true);
-        t.start();
     }
 
     public static GameAppManager getInstance() {

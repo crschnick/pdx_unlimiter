@@ -2,8 +2,10 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -19,21 +21,45 @@ public class TaskExecutor {
     }
 
     public void stopAndWait() {
-        active = false;
-        executorService.shutdown();
-
+        stop(null);
         try {
             // Should terminate fast
-            // TODO: Temp solution!
-            executorService.awaitTermination(10, TimeUnit.SECONDS);
+            executorService.awaitTermination(10, TimeUnit.DAYS);
+            LoggerFactory.getLogger(TaskExecutor.class).debug("Task executor stopped");
         } catch (InterruptedException e) {
             ErrorHandler.handleException(e);
         }
     }
 
+    public void stop(Runnable finalize) {
+        LoggerFactory.getLogger(TaskExecutor.class).debug("Stopping task executor ...");
+
+        active = false;
+
+        LoggerFactory.getLogger(TaskExecutor.class).debug("Waiting for tasks to finish ...");
+        executorService.submit(() -> {
+            LoggerFactory.getLogger(TaskExecutor.class).debug("Performing finalizing task");
+            if (finalize != null) finalize.run();
+            LoggerFactory.getLogger(TaskExecutor.class).debug("Task executor finished");
+        });
+        executorService.shutdown();
+    }
+
     private boolean active = false;
     private BooleanProperty busy = new SimpleBooleanProperty(false);
     private ExecutorService executorService;
+
+    public void submitLoop(Runnable r) {
+        if (!executorService.isShutdown()) {
+            executorService.submit(() -> {
+                r.run();
+                if (active) {
+                    ThreadHelper.sleep(10);
+                    executorService.submit(r);
+                }
+            });
+        }
+    }
 
     public void submitTask(Runnable r) {
         submitTask(() -> {
