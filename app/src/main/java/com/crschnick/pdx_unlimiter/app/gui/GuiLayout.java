@@ -50,7 +50,7 @@ public class GuiLayout {
         layout.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             db.getFiles().stream()
-                    .map(File::toPath)
+                    .map(File::toString)
                     .forEach(FileImporter::addToImportQueue);
             event.setDropCompleted(true);
             event.consume();

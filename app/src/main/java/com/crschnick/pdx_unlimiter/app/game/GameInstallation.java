@@ -153,17 +153,11 @@ public abstract class GameInstallation {
 
     private List<FileImportTarget> getLatestSavegames() {
         return getAllSavegameDirectories().stream()
+                .map(Path::toString)
                 .map(FileImportTarget::createTargets)
                 .map(List::stream)
                 .flatMap(Stream::distinct)
-                .sorted(Comparator.comparingLong(t -> {
-                    try {
-                        return t.getLastModified().toEpochMilli();
-                    } catch (IOException e) {
-                        ErrorHandler.handleException(e);
-                        return 0;
-                    }
-                }))
+                .sorted(Comparator.comparingLong(t -> t.getLastModified().toEpochMilli()))
                 .collect(Collectors.toList());
     }
 

@@ -26,7 +26,7 @@ public class GuiImporter {
         Button b = new JFXButton();
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(CLASS_IMPORT);
-        b.setOnAction(e -> FileImporter.addToImportQueue(target.getPath()));
+        b.setOnAction(e -> FileImporter.addToImportQueue(target.toImportString()));
 
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());

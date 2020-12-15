@@ -1,6 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
 import javax.net.ssl.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -42,5 +46,29 @@ public class HttpHelper {
 
     public static void disableDebugProxy() {
 
+    }
+
+    public static byte[] executeGet(URL targetURL) throws Exception {
+        HttpURLConnection connection = null;
+
+        try {
+            //Create connection
+            connection = (HttpURLConnection) targetURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.addRequestProperty("User-Agent", "https://github.com/crschnick/pdx_unlimiter");
+            connection.addRequestProperty("Accept", "*/*");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                throw new IOException("Got http " + responseCode + " for " + targetURL);
+            }
+
+            InputStream is = connection.getInputStream();
+            return is.readAllBytes();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 }

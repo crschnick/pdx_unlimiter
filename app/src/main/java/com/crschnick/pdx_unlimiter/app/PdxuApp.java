@@ -27,6 +27,7 @@ public class PdxuApp extends Application {
     }
 
     public static void main(String[] args) {
+        args = new String[] {"pdxu://rakaly.com/eu4/saves/bdTtsaXJNL0TpuWl_YPtb"};
         ComponentManager.initialSetup(args);
         launch(args);
     }

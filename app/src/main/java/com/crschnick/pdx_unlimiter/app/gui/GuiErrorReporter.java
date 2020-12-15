@@ -50,7 +50,7 @@ public class GuiErrorReporter {
     private static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         // Create Alert without icon since it may not have loaded yet
-        if (PdxuApp.getApp().getIcon() != null) {
+        if (PdxuApp.getApp() != null && PdxuApp.getApp().getIcon() != null) {
             DialogHelper.setIcon(alert);
         }
         alert.getButtonTypes().clear();

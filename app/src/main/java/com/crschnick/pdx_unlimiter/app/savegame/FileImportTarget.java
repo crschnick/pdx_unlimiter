@@ -1,87 +1,193 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
+import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class FileImportTarget {
 
-    protected Path path;
-    private SavegameCache<?, ?, ?, ?> savegameCache;
+    public static List<FileImportTarget> createTargets(String toImport) {
+        try {
+            List<FileImportTarget> targets = new ArrayList<>();
+            Path p = Path.of(toImport);
+            RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
+                @Override
+                public void visitEu4(Path file) {
+                    if (SavegameCache.EU4 == null) {
+                        return;
+                    }
 
-    public FileImportTarget(SavegameCache<?, ?, ?, ?> savegameCache, Path path) {
-        this.savegameCache = savegameCache;
-        this.path = path;
-    }
-
-    public static List<FileImportTarget> createTargets(Path toImport) {
-        List<FileImportTarget> targets = new ArrayList<>();
-        RawSavegameVisitor.vist(toImport, new RawSavegameVisitor() {
-            @Override
-            public void visitEu4(Path file) {
-                targets.add(new StandardImportTarget(SavegameCache.EU4, file));
-            }
-
-            @Override
-            public void visitHoi4(Path file) {
-                targets.add(new StandardImportTarget(SavegameCache.HOI4, file));
-            }
-
-            @Override
-            public void visitStellaris(Path file) {
-                if (file.getFileName().toString().equals("ironman.sav")) {
-                    targets.add(new StellarisIronmanImportTarget(file));
-                } else {
-                    targets.add(new StellarisNormalImportTarget(file));
+                    targets.add(new StandardImportTarget(SavegameCache.EU4, file));
                 }
-            }
 
-            @Override
-            public void visitCk3(Path file) {
-                targets.add(new StandardImportTarget(SavegameCache.CK3, file));
-            }
+                @Override
+                public void visitHoi4(Path file) {
+                    if (SavegameCache.HOI4 == null) {
+                        return;
+                    }
 
-            @Override
-            public void visitOther(Path file) {
-                if (Files.isDirectory(file)) {
-                    try {
-                        Files.list(file).forEach(f -> targets.addAll(FileImportTarget.createTargets(f)));
-                    } catch (IOException e) {
-                        ErrorHandler.handleException(e);
+                    targets.add(new StandardImportTarget(SavegameCache.HOI4, file));
+                }
+
+                @Override
+                public void visitStellaris(Path file) {
+                    if (SavegameCache.STELLARIS == null) {
+                        return;
+                    }
+
+                    if (file.getFileName().toString().equals("ironman.sav")) {
+                        targets.add(new StellarisIronmanImportTarget(file));
+                    } else {
+                        targets.add(new StellarisNormalImportTarget(file));
                     }
                 }
-            }
-        });
-        return targets;
+
+                @Override
+                public void visitCk3(Path file) {
+                    if (SavegameCache.CK3 == null) {
+                        return;
+                    }
+
+                    targets.add(new StandardImportTarget(SavegameCache.CK3, file));
+                }
+
+                @Override
+                public void visitOther(Path file) {
+                    if (Files.isDirectory(file)) {
+                        try {
+                            Files.list(file).forEach(f -> targets.addAll(FileImportTarget.createTargets(f.toString())));
+                        } catch (IOException e) {
+                            ErrorHandler.handleException(e);
+                        }
+                    }
+                }
+            });
+            return targets;
+        } catch (InvalidPathException ignored) {
+        }
+
+
+        if (SavegameCache.EU4 == null) {
+            return List.of();
+        }
+
+        try {
+            URL url = new URL(toImport.startsWith("pdxu") ?
+                    toImport.replace("pdxu", "https") : toImport);
+            String id = Path.of(url.getPath()).getFileName().toString();
+            URL fileUrl = new URL("https://rakaly.com/api/saves/" + id + "/file");
+            return List.of(new DownloadImportTarget(fileUrl));
+        } catch (Exception ignored) {
+        }
+
+        LoggerFactory.getLogger(FileImportTarget.class).warn("Unable to determine import target for " + toImport);
+        return List.of();
     }
 
-    final void importTarget(Runnable onFinish) {
-        savegameCache.importSavegameAsync(path, onFinish);
-    }
+    public abstract void importTarget(Runnable onFinish);
 
-    public Instant getLastModified() throws IOException {
-        return Files.getLastModifiedTime(path).toInstant();
-    }
+    public abstract Instant getLastModified();
 
     public abstract void delete();
 
     public abstract String getName();
 
-    public Path getPath() {
-        return path;
+    public abstract String toImportString();
+
+    public static final class DownloadImportTarget extends FileImportTarget {
+
+        private URL url;
+        private Path downloadedFile;
+
+        public DownloadImportTarget(URL url) {
+            this.url = url;
+        }
+
+        @Override
+        public void importTarget(Runnable onFinish) {
+            TaskExecutor.getInstance().submitTask(() -> {
+                try {
+                    byte[] data = HttpHelper.executeGet(url);
+
+                    String tempDir = System.getProperty("java.io.tmpdir");
+                    this.downloadedFile = Paths.get(tempDir).resolve("pdxu")
+                            .resolve(Path.of(url.getPath()).getFileName().toString() + ".eu4");
+                    FileUtils.forceMkdirParent(downloadedFile.toFile());
+                    Files.write(downloadedFile, data);
+
+                    SavegameCache.EU4.importSavegameAsync(downloadedFile, onFinish);
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            });
+        }
+
+        @Override
+        public Instant getLastModified() {
+            return Instant.now();
+        }
+
+        @Override
+        public void delete() {
+            if (!Files.exists(downloadedFile)) {
+                throw new IllegalStateException("File not downloaded yet");
+            }
+
+            try {
+                Files.delete(downloadedFile);
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+
+        @Override
+        public String getName() {
+            return "Rakaly.com savegame";
+        }
+
+        @Override
+        public String toImportString() {
+            return url.toString();
+        }
     }
 
-    public static final class StandardImportTarget extends FileImportTarget {
+    public static class StandardImportTarget extends FileImportTarget {
+
+        protected Path path;
+        private SavegameCache<?, ?, ?, ?> savegameCache;
 
         public StandardImportTarget(SavegameCache<?, ?, ?, ?> savegameCache, Path path) {
-            super(savegameCache, path);
+            this.savegameCache = savegameCache;
+            this.path = path;
+        }
+
+        public void importTarget(Runnable onFinish) {
+            savegameCache.importSavegameAsync(path, onFinish);
+        }
+
+        public Instant getLastModified() {
+            try {
+                return Files.getLastModifiedTime(path).toInstant();
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+                return Instant.MIN;
+            }
         }
 
         @Override
@@ -97,24 +203,21 @@ public abstract class FileImportTarget {
         public String getName() {
             return FilenameUtils.getBaseName(path.getFileName().toString());
         }
+
+        @Override
+        public String toImportString() {
+            return path.toString();
+        }
+
+        public Path getPath() {
+            return path;
+        }
     }
 
-    public static final class StellarisNormalImportTarget extends FileImportTarget {
+    public static final class StellarisNormalImportTarget extends StandardImportTarget {
 
         public StellarisNormalImportTarget(Path path) {
             super(SavegameCache.STELLARIS, path);
-        }
-
-        @Override
-        public void delete() {
-            try {
-                Files.delete(path);
-                if (Files.list(path.getParent()).count() == 0) {
-                    Files.delete(path.getParent());
-                }
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
         }
 
         @Override
@@ -123,20 +226,10 @@ public abstract class FileImportTarget {
         }
     }
 
-    public static final class StellarisIronmanImportTarget extends FileImportTarget {
+    public static final class StellarisIronmanImportTarget extends StandardImportTarget {
 
         public StellarisIronmanImportTarget(Path path) {
             super(SavegameCache.STELLARIS, path);
-        }
-
-        @Override
-        public void delete() {
-            try {
-                Files.delete(path.getParent());
-            } catch (IOException e) {
-
-                ErrorHandler.handleException(e);
-            }
         }
 
         @Override
