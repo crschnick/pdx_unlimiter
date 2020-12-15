@@ -1,6 +1,19 @@
 .entry {
 -fx-background-color: #AAAAAA55;
--fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 0);
+-fx-border-color: transparent;
+-fx-border-width: 0 0.4em 0 0.4em;
+-fx-background-insets: 0 0.4em 0 0.4em;
+}
+
+.entry-list {
+-fx-background-color: #FFFFFFAA;
+-fx-background-insets: 0;
+-fx-background-radius: 0;
+}
+
+.entry-list .jfx-list-cell {
+ -fx-padding: 0;
+-fx-background-color: transparent;
 }
 
 .loading {
@@ -12,12 +25,8 @@
 }
 
 .no-campaign {
--fx-background-color: #FFFFFFcc;
+-fx-background-color: #FFFFFFAA;
 -fx-padding: 2em;
-}
-
-.jfx-list-cell {
- -fx-padding: 0;
 }
 
 .jfx-list-cell:selected .label {
@@ -34,11 +43,12 @@
 .jfx-list-cell {
  -fx-text-fill: #333;
  -fx-text-inner-color: #333;
+    -fx-focus-color: transparent;
 }
 
 .jfx-list-view {
     -jfx-vertical-gap: 0.4em;
-    -jfx-expanded: true;
+    -fx-focus-color: transparent;
 }
 
 .entry-bar {
@@ -59,19 +69,12 @@
 -fx-font-size: 1.15em;
  -jfx-label-float: true;
 -fx-padding: 0.4em 0.4em 0.4em 0.4em;
--jfx-unfocus-color: #00000000;
+-jfx-unfocus-color: transparent;
 }
 
 .entry-bar .button-bar {
 -fx-spacing: 0.5em;
 -fx-font-size: 1.35em;
-}
-
-.entry-list {
--fx-background-color: #FFFFFFBB;
- -fx-padding: 0;
--fx-background-insets: 0;
--fx-background-radius: 0;
 }
 
 .entry-loading {

@@ -85,7 +85,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.setAlignment(Pos.CENTER);
         box.getChildren().add(icon);
         for (Eu4Tag tag : tags) {
-            Node n = eu4TagNode(entry);
+            Node n = eu4TagNode(entry, tag);
             box.getChildren().add(n);
         }
         box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
@@ -120,9 +120,9 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
     @Override
     public ObservableValue<Node> createImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(eu4TagNode(entry));
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(eu4TagNode(entry, entry.getTag()));
         entry.infoProperty().addListener((c, o, n) -> {
-            prop.set(eu4TagNode(entry));
+            prop.set(eu4TagNode(entry, entry.getTag()));
             Tooltip.install(prop.get(), new Tooltip());
         });
         return prop;
@@ -216,8 +216,8 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         return eu4TagNode(GameImage.getEu4TagPath(campaign.getTag().getTag()), null);
     }
 
-    private Pane eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
-        return eu4TagNode(GameImage.getEu4TagPath(entry.getTag().getTag()), entry);
+    private Pane eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
     }
 
     private Pane eu4TagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {

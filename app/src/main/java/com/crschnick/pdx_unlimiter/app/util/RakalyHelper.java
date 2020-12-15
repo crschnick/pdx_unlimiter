@@ -45,7 +45,7 @@ public class RakalyHelper {
             } catch (Exception e) {
                 GuiErrorReporter.showErrorMessage(e.getMessage(), null, false);
             }
-        });
+        }, true);
     }
 
     private static String executePost(String sgName, URL targetURL, byte[] data) throws IOException {

@@ -46,7 +46,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(CK3_BACKGROUND);
-        bg.setOpacity(0.5);
+        bg.setOpacity(0.3);
         return bg;
     }
 

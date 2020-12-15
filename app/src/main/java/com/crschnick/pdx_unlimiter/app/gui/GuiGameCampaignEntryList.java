@@ -53,6 +53,7 @@ public class GuiGameCampaignEntryList {
     public static void createCampaignEntryList(Pane pane) {
         JFXListView<Node> grid = new JFXListView<>();
         grid.setOpacity(0.9);
+        grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);
         grid.prefWidthProperty().bind(pane.widthProperty());
         grid.prefHeightProperty().bind(pane.heightProperty());
 

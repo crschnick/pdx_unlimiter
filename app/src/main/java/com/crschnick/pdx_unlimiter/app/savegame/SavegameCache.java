@@ -361,7 +361,7 @@ public abstract class SavegameCache<
             TaskExecutor.getInstance().submitTask(() -> {
                 LoggerFactory.getLogger(SavegameCache.class).debug("Loading entry " + getEntryName(e));
                 loadEntry(e);
-            });
+            }, false);
         }
     }
 
@@ -430,7 +430,7 @@ public abstract class SavegameCache<
             if (r) {
                 onFinish.run();
             }
-        });
+        }, true);
     }
 
     private synchronized boolean importSavegame(Path file) {

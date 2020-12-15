@@ -61,27 +61,31 @@ public class TaskExecutor {
         }
     }
 
-    public void submitTask(Runnable r) {
+    public void submitTask(Runnable r, boolean isBlocking) {
         submitTask(() -> {
             r.run();
             return null;
-        }, v -> {});
+        }, v -> {}, isBlocking);
     }
 
-    public <T> void submitTask(Callable<T> r, Consumer<T> onFinish) {
+    public <T> void submitTask(Callable<T> r, Consumer<T> onFinish, boolean isBlocking) {
         executorService.submit(() -> {
             if (!active) {
                 return;
             }
 
-            busy.setValue(true);
+            if (isBlocking) {
+                busy.setValue(true);
+            }
             try {
                 T v = r.call();
                 onFinish.accept(v);
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
-            busy.setValue(false);
+            if (isBlocking) {
+                busy.setValue(false);
+            }
         });
     }
 

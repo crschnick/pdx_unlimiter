@@ -132,10 +132,11 @@ public abstract class FileImportTarget {
                     Files.write(downloadedFile, data);
 
                     SavegameCache.EU4.importSavegameAsync(downloadedFile, onFinish);
+                    onFinish.run();
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
-            });
+            }, true);
         }
 
         @Override
