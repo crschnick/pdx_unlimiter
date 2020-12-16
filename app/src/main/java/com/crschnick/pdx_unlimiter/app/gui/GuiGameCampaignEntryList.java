@@ -96,7 +96,6 @@ public class GuiGameCampaignEntryList {
                 if (n != null) {
                     int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(n);
                     grid.getSelectionModel().clearSelection();
-                    grid.scrollTo(index);
                     grid.getSelectionModel().select(index);
                 }
             });

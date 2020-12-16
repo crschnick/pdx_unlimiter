@@ -1,12 +1,8 @@
 .entry {
 -fx-background-color: #AAAAAA55;
--fx-border-color: transparent;
--fx-border-width: 0 0.4em 0 0.4em;
--fx-background-insets: 0 0.4em 0 0.4em;
 }
 
 .import-dialog {
-
  -fx-padding: 1em;
 }
 
@@ -18,7 +14,9 @@
 
 .entry-list .jfx-list-cell {
  -fx-padding: 0;
--fx-background-color: transparent;
+-fx-border-color: transparent;
+-fx-border-width: 0 0.4em 0 0.4em;
+-fx-background-insets: 0 0.4em 0 0.4em;
 }
 
 .loading {
