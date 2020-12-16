@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,8 +23,9 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiImporter {
 
-    public static Node createTargetNode(FileImportTarget target) {
+    public static Region createTargetNode(FileImportTarget target) {
         Label name = new Label(target.getName());
+        name.setTextOverrun(OverrunStyle.ELLIPSIS);
         Button b = new JFXButton();
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(CLASS_IMPORT);
@@ -46,16 +48,12 @@ public class GuiImporter {
         return box;
     }
 
-    public static Region createTargetList(List<FileImportTarget> targets) {
-        VBox box = new VBox();
+    public static void createTargetList(JFXListView<Node> box, List<FileImportTarget> targets) {
+        box.getItems().clear();
         for (var t : targets) {
-            box.getChildren().add(createTargetNode(t));
+            var n = createTargetNode(t);
+            box.getItems().add(n);
         }
-        ScrollPane s = new ScrollPane(box);
-        s.setMaxHeight(600);
-        s.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        s.setFitToWidth(true);
-        return s;
     }
 
     private static void showNoSavegamesDialog() {
@@ -72,14 +70,17 @@ public class GuiImporter {
             return;
         }
 
-        Alert alert = DialogHelper.createAlert();
+        JFXListView<Node> box = new JFXListView<>();
+        box.setMinWidth(400);
+        createTargetList(box, watcher.getSavegames());
+
+        Alert alert = DialogHelper.createEmptyAlert();
         alert.setTitle("Import savegames");
-        alert.getDialogPane().setContent(createTargetList(watcher.getSavegames()));
-        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
+        alert.getDialogPane().setContent(box);
+        //alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
         watcher.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                var tl = createTargetList(n);
-                alert.getDialogPane().setContent(tl);
+                createTargetList(box, n);
             });
         });
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
