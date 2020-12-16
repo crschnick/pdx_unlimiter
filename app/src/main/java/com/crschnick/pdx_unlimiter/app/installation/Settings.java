@@ -29,9 +29,10 @@ public class Settings {
     private Path stellaris;
     private Path activeGame;
     private int maxLoadedSavegames = 1;
-    private int fontSize = 12;
-    private boolean deleteOnImport = false;
-    private boolean startSteam = true;
+    private int fontSize;
+    private boolean deleteOnImport;
+    private boolean startSteam;
+    private boolean confirmDeletion = true;
     private String rakalyUserId;
     private String rakalyApiKey;
     private Path storageDirectory;
@@ -66,7 +67,7 @@ public class Settings {
         s.hoi4 = InstallLocationHelper.getInstallPath("Hearts of Iron IV").orElse(null);
         s.ck3 = InstallLocationHelper.getInstallPath("Crusader Kings III").orElse(null);
         s.stellaris = InstallLocationHelper.getInstallPath("Stellaris").orElse(null);
-        s.fontSize = 12;
+        s.fontSize = 11;
         s.startSteam = true;
         s.deleteOnImport = false;
         s.rakalyUserId = null;
@@ -302,6 +303,10 @@ public class Settings {
         if (stellaris != null) {
             GameInstallation.STELLARIS = new StellarisInstallation(stellaris);
         }
+    }
+
+    public boolean confirmDeletion() {
+        return confirmDeletion;
     }
 
     public boolean deleteOnImport() {

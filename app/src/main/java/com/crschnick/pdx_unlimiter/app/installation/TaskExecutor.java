@@ -50,14 +50,19 @@ public class TaskExecutor {
     private ExecutorService executorService;
 
     public void submitLoop(Runnable r) {
-        if (!executorService.isShutdown()) {
-            executorService.submit(() -> {
+        Runnable loopRunner = new Runnable() {
+            @Override
+            public void run() {
                 r.run();
                 if (active) {
                     ThreadHelper.sleep(10);
-                    executorService.submit(r);
+                    executorService.submit(this);
                 }
-            });
+            }
+        };
+
+        if (!executorService.isShutdown()) {
+            executorService.submit(loopRunner);
         }
     }
 

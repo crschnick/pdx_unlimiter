@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegame;
 import com.crschnick.pdx_unlimiter.core.savegame.Savegame;
@@ -160,6 +161,8 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     public abstract String getName();
 
     public abstract GameInstallation getInstallation();
+
+    public abstract SavegameWatcher getSavegameWatcher();
 
     public abstract AchievementManager getAchievementManager();
 

@@ -5,6 +5,11 @@
 -fx-background-insets: 0 0.4em 0 0.4em;
 }
 
+.import-dialog {
+
+ -fx-padding: 1em;
+}
+
 .entry-list {
 -fx-background-color: #FFFFFFAA;
 -fx-background-insets: 0;

@@ -9,6 +9,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GameImage;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,7 @@ public class ComponentManager {
             GameImage.init();
             AchievementManager.init();
             SavegameCache.init();
+            SavegameWatcher.init();
 
             GameAppManager.init();
             FileImporter.init();
@@ -103,6 +105,7 @@ public class ComponentManager {
             latch.await();
             LoggerFactory.getLogger(ComponentManager.class).debug("Synced with platform thread");
 
+            SavegameWatcher.reset();
             SavegameCache.reset();
             GameInstallation.reset();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {

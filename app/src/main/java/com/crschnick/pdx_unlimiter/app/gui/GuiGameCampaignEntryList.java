@@ -113,7 +113,7 @@ public class GuiGameCampaignEntryList {
 
         Button importB = new Button("Import savegames");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(GameIntegration.current().getInstallation());
+            GuiImporter.createImporterDialog(GameIntegration.current().getSavegameWatcher());
             e.consume();
         });
         importB.setGraphic(new FontIcon());

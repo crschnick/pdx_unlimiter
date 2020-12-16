@@ -92,7 +92,7 @@ public class FileImporter {
     }
 
     public static void importLatestSavegame() {
-        var savegames = GameIntegration.current().getInstallation().getSavegames();
+        var savegames = GameIntegration.current().getSavegameWatcher().getSavegames();
         if (savegames.size() == 0) {
             return;
         }

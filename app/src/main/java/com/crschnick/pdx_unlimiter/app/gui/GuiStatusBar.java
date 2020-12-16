@@ -75,8 +75,8 @@ public class GuiStatusBar {
         javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getName() : "None"));
         };
-        GameIntegration.current().getInstallation().savegamesProperty().addListener(l);
-        l.changed(null, null, GameIntegration.current().getInstallation().savegamesProperty().get());
+        GameIntegration.current().getSavegameWatcher().savegamesProperty().addListener(l);
+        l.changed(null, null, GameIntegration.current().getSavegameWatcher().savegamesProperty().get());
         barPane.setCenter(latest);
 
         Button importLatest = new JFXButton("Import");
@@ -117,8 +117,8 @@ public class GuiStatusBar {
         javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getName() : "None"));
         };
-        GameIntegration.current().getInstallation().savegamesProperty().addListener(l);
-        l.changed(null, null, GameIntegration.current().getInstallation().savegamesProperty().get());
+        GameIntegration.current().getSavegameWatcher().savegamesProperty().addListener(l);
+        l.changed(null, null, GameIntegration.current().getSavegameWatcher().savegamesProperty().get());
         barPane.setCenter(latest);
 
         Button importLatest = new JFXButton("Import");

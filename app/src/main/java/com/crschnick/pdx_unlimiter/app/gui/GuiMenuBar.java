@@ -3,19 +3,15 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.awt.*;
@@ -164,26 +160,21 @@ public class GuiMenuBar {
         return menuBar;
     }
 
-    private static Node createGameIndicator() {
-        JFXButton m = new JFXButton();
-        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
-            var current = GameIntegration.current();
-            var name = current != null ? GameIntegration.current().getName() : "None";
-            Platform.runLater(() -> m.setText(name));
-        });
+    private static Node createRightBar() {
+        JFXButton m = new JFXButton("Switch game");
         m.setGraphic(new FontIcon());
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
 
-        JFXButton importB = new JFXButton();
+        JFXButton importB = new JFXButton("Import");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(GameIntegration.current().getInstallation());
+            GuiImporter.createImporterDialog(GameIntegration.current().getSavegameWatcher());
             e.consume();
         });
         importB.setGraphic(new FontIcon());
         importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
 
-        JFXButton launch = new JFXButton();
+        JFXButton launch = new JFXButton("Launch");
         launch.setOnAction(e -> {
             GameIntegration.current().getInstallation().startLauncher();
             e.consume();
@@ -199,13 +190,22 @@ public class GuiMenuBar {
     public static Node createMenu() {
         MenuBar leftBar = createMenuBar();
 
-        Region spacer = new Region();
+        StackPane spacer = new StackPane();
+        Label game = new Label();
+        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
+            var current = GameIntegration.current();
+            var name = current != null ? GameIntegration.current().getName() : "None";
+            Platform.runLater(() -> game.setText(name));
+        });
+        spacer.getChildren().add(game);
+        spacer.setAlignment(Pos.CENTER);
+
         spacer.getStyleClass().add("menu-bar");
         HBox.setHgrow(spacer, Priority.SOMETIMES);
 
         StackPane s = new StackPane();
         s.getStyleClass().add("menu-bar");
-        s.getChildren().add(createGameIndicator());
+        s.getChildren().add(createRightBar());
 
         HBox menubars = new HBox(leftBar, spacer, s);
         return menubars;

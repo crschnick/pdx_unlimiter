@@ -33,7 +33,6 @@ public abstract class GameInstallation {
 
     private static Set<GameInstallation> ALL;
 
-    protected ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
     protected DistributionType distType;
     protected Path userDir;
     protected List<GameMod> mods = new ArrayList<>();
@@ -73,7 +72,7 @@ public abstract class GameInstallation {
         CK3 = null;
     }
 
-    private List<Path> getAllSavegameDirectories() {
+    public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
         savegameDirs.add(getSavegamesPath());
         savegameDirs.addAll(getDistType().getSavegamePaths());
@@ -84,13 +83,6 @@ public abstract class GameInstallation {
         LoggerFactory.getLogger(getClass()).debug("Initializing optional data");
         loadDlcs();
         loadMods();
-        savegames.set(getLatestSavegames());
-
-        List<Path> savegameDirs = getAllSavegameDirectories();
-
-        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p) -> {
-            savegames.set(getLatestSavegames());
-        });
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
@@ -151,16 +143,6 @@ public abstract class GameInstallation {
         });
     }
 
-    private List<FileImportTarget> getLatestSavegames() {
-        return getAllSavegameDirectories().stream()
-                .map(Path::toString)
-                .map(FileImportTarget::createTargets)
-                .map(List::stream)
-                .flatMap(Stream::distinct)
-                .sorted(Comparator.comparingLong(t -> t.getLastModified().toEpochMilli()))
-                .collect(Collectors.toList());
-    }
-
     protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_WINDOWS) {
             value = value.replace("%USER_DOCUMENTS%",
@@ -214,14 +196,6 @@ public abstract class GameInstallation {
 
     public Path getSavegamesPath() {
         return getUserPath().resolve("save games");
-    }
-
-    public List<FileImportTarget> getSavegames() {
-        return savegames.get();
-    }
-
-    public ObjectProperty<List<FileImportTarget>> savegamesProperty() {
-        return savegames;
     }
 
     public GameVersion getVersion() {

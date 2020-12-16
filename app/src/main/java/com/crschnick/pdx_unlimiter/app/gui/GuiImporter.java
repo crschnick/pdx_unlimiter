@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -16,8 +18,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_DELETE;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMPORT;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiImporter {
 
@@ -31,11 +32,15 @@ public class GuiImporter {
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());
         del.getStyleClass().add(CLASS_DELETE);
-        del.setOnAction(e -> target.delete());
+        del.setOnAction(e -> {
+            if (!Settings.getInstance().confirmDeletion() || DialogHelper.showSavegameDeleteDialog()) {
+                target.delete();
+            }
+        });
 
         Region spacer = new Region();
 
-        HBox box = new HBox(name, spacer, b, del);
+        HBox box = new HBox(name, new Label("   "), spacer, b, del);
         HBox.setHgrow(spacer, Priority.ALWAYS);
         box.setAlignment(Pos.CENTER);
         return box;
@@ -53,11 +58,25 @@ public class GuiImporter {
         return s;
     }
 
-    public static void createImporterDialog(GameInstallation install) {
+    private static void showNoSavegamesDialog() {
+        Alert alert = DialogHelper.createAlert();
+        alert.setAlertType(Alert.AlertType.INFORMATION);
+        alert.setTitle("No savegames found");
+        alert.setHeaderText("It seems like there are no savegames to import!");
+        alert.showAndWait();
+    }
+
+    public static void createImporterDialog(SavegameWatcher watcher) {
+        if (watcher.getSavegames().size() == 0) {
+            showNoSavegamesDialog();
+            return;
+        }
+
         Alert alert = DialogHelper.createAlert();
         alert.setTitle("Import savegames");
-        alert.getDialogPane().setContent(createTargetList(install.getSavegames()));
-        install.savegamesProperty().addListener((c, o, n) -> {
+        alert.getDialogPane().setContent(createTargetList(watcher.getSavegames()));
+        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
+        watcher.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 var tl = createTargetList(n);
                 alert.getDialogPane().setContent(tl);
