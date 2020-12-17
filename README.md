@@ -22,7 +22,7 @@ All savegames can be also launched directly from within the Pdx-Unlimiter withou
 
 Supported games: EU4, HOI4, Stellaris, CK3
 
-![Example](imgs/screenshot.png)
+![Example](docs/screenshot.png)
 
 ### Reverting savegames
 
@@ -38,7 +38,7 @@ This allows for operations on these savegames such as custom achievement creatio
 If you are interested in creating and sharing your own achievements,
 visit [the achievement repository](https://github.com/crschnick/pdxu_achievements) for a documentation.
 
-![Example](imgs/achievements.png)
+![Example](docs/achievements.png)
 
 It is also possible to upload your savegames to [Rakaly](https://rakaly.com),
 a website to analyze and share your eu4 achievements and compete against other players.
