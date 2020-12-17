@@ -1,8 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import javafx.scene.control.Tooltip;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
+
+import java.awt.*;
 
 public class GameKeyListener implements NativeKeyListener {
 
@@ -19,6 +22,7 @@ public class GameKeyListener implements NativeKeyListener {
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I) {
                 FileImporter.importLatestSavegame();
+                Toolkit.getDefaultToolkit().beep();
             }
         }
     }
