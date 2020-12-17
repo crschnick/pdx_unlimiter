@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.installation;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
@@ -33,7 +34,7 @@ public class PdxuInstallation {
         this.image = image;
     }
 
-    public static void init() throws Exception {
+    public static void init() {
         Path appPath = Path.of(System.getProperty("java.home"));
         boolean image = appPath.toFile().getName().equals("app")
                 || appPath.toFile().getName().equals("image");
@@ -47,15 +48,29 @@ public class PdxuInstallation {
         Properties props = new Properties();
         if (prod) {
             dataDir = Path.of(System.getProperty("user.home"), "Pdx-Unlimiter");
-            v = Files.readString(appPath.resolve("version"));
+            try {
+                v = Files.readString(appPath.resolve("version"));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
 
             Path propsFile = dataDir.resolve("settings").resolve("pdxu.properties");
             if (Files.exists(propsFile)) {
-                props.load(Files.newInputStream(propsFile));
+                try {
+                    props.load(Files.newInputStream(propsFile));
+
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
             }
         } else {
             v = "dev";
-            props.load(Files.newInputStream(Path.of("pdxu.properties")));
+            try {
+                props.load(Files.newInputStream(Path.of("pdxu.properties")));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+
             dataDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
                     .filter(val -> val.isAbsolute() && Files.exists(val))

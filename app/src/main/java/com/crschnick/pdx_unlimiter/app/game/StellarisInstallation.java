@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 public class StellarisInstallation extends GameInstallation {
 
     public StellarisInstallation(Path path) {
-        super(path, Path.of("stellaris"));
+        super("stellaris", path, Path.of("stellaris"));
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(

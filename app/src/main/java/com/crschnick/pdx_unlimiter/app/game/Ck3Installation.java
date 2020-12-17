@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 public class Ck3Installation extends GameInstallation {
 
     public Ck3Installation(Path path) {
-        super(path, Path.of("binaries", "ck3"));
+        super("ck3", path, Path.of("binaries", "ck3"));
     }
 
     public void loadData() throws Exception {

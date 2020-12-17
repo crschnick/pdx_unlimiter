@@ -19,7 +19,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class GuiGameCampaign {
 
 
-    static HBox createCampaignButton(GameCampaign c) {
+    static HBox createCampaignButton(GameCampaign c, GameGuiFactory gf) {
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());
         del.getStyleClass().add("delete-button");
@@ -36,7 +36,7 @@ public class GuiGameCampaign {
         name.textProperty().bindBidirectional(c.nameProperty());
 
         Label date = new Label();
-        date.textProperty().bind(GameIntegration.current().getGuiFactory().createInfoString(c));
+        date.textProperty().bind(gf.createInfoString(c));
         date.getStyleClass().add(CLASS_DATE);
 
         HBox top = new HBox();
@@ -49,7 +49,7 @@ public class GuiGameCampaign {
         b.getChildren().add(date);
         b.setAlignment(Pos.CENTER_LEFT);
 
-        ObservableValue<Node> prop = GameIntegration.current().getGuiFactory().createImage(c);
+        ObservableValue<Node> prop = gf.createImage(c);
         Node w = prop.getValue();
         HBox btn = new HBox();
         btn.getChildren().add(w);
@@ -60,7 +60,7 @@ public class GuiGameCampaign {
             });
         });
 
-        btn.setOnMouseClicked((m) -> GameIntegration.current().selectCampaign(c));
+        btn.setOnMouseClicked((m) -> GameIntegration.selectCampaign(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
         btn.getProperties().put("campaign", c);

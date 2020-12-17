@@ -240,7 +240,7 @@ public abstract class SavegameCache<
         }
 
         if (GameIntegration.globalSelectedCampaignProperty().get() == c) {
-            GameIntegration.current().selectCampaign(null);
+            GameIntegration.selectCampaign(null);
         }
 
         this.campaigns.remove(c);
@@ -257,7 +257,7 @@ public abstract class SavegameCache<
         c.add(e);
 
         GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
-        GameIntegration.<T, I>current().selectEntry(e);
+        GameIntegration.selectEntry(e);
         updateLoadedSavegames(e, savegame);
         return e;
     }
@@ -317,7 +317,7 @@ public abstract class SavegameCache<
         }
 
         if (GameIntegration.globalSelectedEntryProperty().get() == e) {
-            GameIntegration.current().selectEntry(null);
+            GameIntegration.selectEntry(null);
         }
         c.getEntries().remove(e);
         if (c.getEntries().size() == 0) {
@@ -469,8 +469,7 @@ public abstract class SavegameCache<
         });
         if (exists[0].isPresent()) {
             loadEntry(exists[0].get());
-            GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
-            GameIntegration.<T, I>current().selectEntry(exists[0].get());
+            GameIntegration.selectEntry(exists[0].get());
             return;
         }
 

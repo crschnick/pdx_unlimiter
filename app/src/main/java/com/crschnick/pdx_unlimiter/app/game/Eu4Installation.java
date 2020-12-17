@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class Eu4Installation extends GameInstallation {
 
     public Eu4Installation(Path path) {
-        super(path, Path.of("eu4"));
+        super("eu4", path, Path.of("eu4"));
     }
 
     @Override

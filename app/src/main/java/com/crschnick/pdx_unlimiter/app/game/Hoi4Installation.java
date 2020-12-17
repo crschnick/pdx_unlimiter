@@ -27,7 +27,7 @@ public class Hoi4Installation extends GameInstallation {
 
 
     public Hoi4Installation(Path path) {
-        super(path, Path.of("hoi4"));
+        super("hoi4", path, Path.of("hoi4"));
     }
 
     public void loadData() throws Exception {

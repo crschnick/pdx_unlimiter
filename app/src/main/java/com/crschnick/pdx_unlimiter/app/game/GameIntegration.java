@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.SavedState;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
@@ -43,57 +44,6 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
     protected SimpleObjectProperty<GameCampaign<T, I>> selectedCampaign = new SimpleObjectProperty<>();
     protected SimpleObjectProperty<GameCampaignEntry<T, I>> selectedEntry = new SimpleObjectProperty<>();
-
-    public static void init() {
-        ALL = new ArrayList<>();
-        Settings s = Settings.getInstance();
-        if (GameInstallation.EU4 != null) {
-            EU4 = new Eu4Integration();
-            ALL.add(EU4);
-            if (s.getActiveGame().equals(s.getEu4())) {
-                current.set(EU4);
-            }
-        }
-        if (GameInstallation.HOI4 != null) {
-            HOI4 = new Hoi4Integration();
-            ALL.add(HOI4);
-            if (s.getActiveGame().equals(s.getHoi4())) {
-                current.set(HOI4);
-            }
-        }
-
-        if (GameInstallation.STELLARIS != null) {
-            STELLARIS = new StellarisIntegration();
-            ALL.add(STELLARIS);
-            if (s.getActiveGame().equals(s.getStellaris())) {
-                current.set(STELLARIS);
-            }
-        }
-
-        if (GameInstallation.CK3 != null) {
-            CK3 = new Ck3Integration();
-            ALL.add(CK3);
-            if (s.getActiveGame().equals(s.getCk3())) {
-                current.set(CK3);
-            }
-        }
-
-        if (ALL.size() > 0 && current.get() == null) {
-            current.set(ALL.get(0));
-        }
-    }
-
-    public static void reset() {
-        if (current() != null) {
-            current().selectCampaign(null);
-            currentGameProperty().set(null);
-        }
-        ALL.clear();
-        EU4 = null;
-        CK3 = null;
-        STELLARIS = null;
-        HOI4 = null;
-    }
 
     public static List<GameIntegration<?, ?>> getAvailable() {
         return ALL;
@@ -141,17 +91,6 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             }
         }
         throw new IllegalArgumentException();
-    }
-
-    public static void selectIntegration(GameIntegration<?, ?> newInt) {
-        if (current.get() == newInt) {
-            return;
-        }
-
-        current().selectCampaign(null);
-        current.set(newInt);
-        Settings.getInstance().updateActiveGame(current().getInstallation().getPath());
-        LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " + (newInt != null ? newInt.getName() : "null"));
     }
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
@@ -239,29 +178,127 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         }
     }
 
-    public void selectCampaign(GameCampaign<T, I> c) {
-        if (this.selectedCampaign.get() == c) {
-            return;
+
+    public static void init() {
+        ALL = new ArrayList<>();
+        SavedState s = SavedState.getInstance();
+        if (GameInstallation.EU4 != null) {
+            EU4 = new Eu4Integration();
+            ALL.add(EU4);
+            if (s.getActiveGame().equals(GameInstallation.EU4)) {
+                current.set(EU4);
+            }
+        }
+        if (GameInstallation.HOI4 != null) {
+            HOI4 = new Hoi4Integration();
+            ALL.add(HOI4);
+            if (s.getActiveGame().equals(GameInstallation.HOI4)) {
+                current.set(HOI4);
+            }
         }
 
-        this.selectedEntry.set(null);
-        globalSelectedEntryPropertyInternal().set(null);
-        this.selectedCampaign.set(c);
-        globalSelectedCampaignPropertyInternal().set((GameCampaign<Object, SavegameInfo<Object>>) c);
-        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign " + (c != null ? c.getName() : "null"));
+        if (GameInstallation.STELLARIS != null) {
+            STELLARIS = new StellarisIntegration();
+            ALL.add(STELLARIS);
+            if (s.getActiveGame().equals(GameInstallation.STELLARIS)) {
+                current.set(STELLARIS);
+            }
+        }
+
+        if (GameInstallation.CK3 != null) {
+            CK3 = new Ck3Integration();
+            ALL.add(CK3);
+            if (s.getActiveGame().equals(GameInstallation.CK3)) {
+                current.set(CK3);
+            }
+        }
+
+        if (ALL.size() > 0 && current.get() == null) {
+            current.set(ALL.get(0));
+        }
     }
 
-    public void selectEntry(GameCampaignEntry<T, I> e) {
-        if (this.selectedEntry.get() == e) {
+    public static void reset() {
+        if (current() != null) {
+            selectIntegration(null);
+        }
+        ALL.clear();
+        EU4 = null;
+        CK3 = null;
+        STELLARIS = null;
+        HOI4 = null;
+    }
+
+
+    private static void unselectCampaignAndEntry() {
+        if (current.isNotNull().get()) {
+            current().selectedEntry.set(null);
+            globalSelectedEntryPropertyInternal().set(null);
+            current().selectedCampaign.set(null);
+            globalSelectedCampaignPropertyInternal().set(null);
+        }
+    }
+
+    public static void selectIntegration(GameIntegration<?, ?> newInt) {
+        if (current.get() == newInt) {
             return;
         }
 
-        if (e != null) {
-            selectCampaign(getSavegameCache().getCampaign(e));
-        }
-        this.selectedEntry.set(e);
-        globalSelectedEntryPropertyInternal().set((GameCampaignEntry<Object, SavegameInfo<Object>>) e);
+        unselectCampaignAndEntry();
 
-        LoggerFactory.getLogger(GameIntegration.class).debug("Selecting campaign entry " + (e != null ? e.getName() : "null"));
+        current.set(newInt);
+        LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " + (newInt != null ? newInt.getName() : "null"));
+    }
+
+    public static <T,I extends SavegameInfo<T>> void selectCampaign(GameCampaign<T, I> c) {
+        if (c == null) {
+            if (current.isNotNull().get()) {
+                unselectCampaignAndEntry();
+            }
+            LoggerFactory.getLogger(GameIntegration.class).debug("Unselected campaign");
+            return;
+        }
+
+        Optional<GameIntegration<T,I>> gi = ALL.stream()
+                .filter(i -> i.getSavegameCache().getCampaigns().contains(c))
+                .findFirst()
+                .map(v -> (GameIntegration<T,I>) v);
+        gi.ifPresentOrElse(v -> {
+            selectIntegration(v);
+            v.selectedCampaign.set(c);
+            globalSelectedCampaignPropertyInternal().set((GameCampaign<Object, SavegameInfo<Object>>) c);
+            LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign " + c.getName());
+        }, () -> {
+            LoggerFactory.getLogger(GameIntegration.class).debug("No game integration found for campaign " + c.getName());
+            selectIntegration(null);
+        });
+    }
+
+    public static <T,I extends SavegameInfo<T>> void selectEntry(GameCampaignEntry<T, I> e) {
+        if (globalSelectedEntryPropertyInternal().isEqualTo(e).get()) {
+            return;
+        }
+
+        if (e == null) {
+            if (current.isNotNull().get()) {
+                current.get().selectedEntry.set(null);
+                globalSelectedEntryPropertyInternal().set(null);
+            }
+            return;
+        }
+
+        Optional<GameIntegration<T,I>> gi = ALL.stream()
+                .filter(i -> i.getSavegameCache().contains(e))
+                .findFirst()
+                .map(v -> (GameIntegration<T,I>) v);
+        gi.ifPresentOrElse(v -> {
+            selectCampaign(v.getSavegameCache().getCampaign(e));
+
+            v.selectedEntry.set(e);
+            globalSelectedEntryPropertyInternal().set((GameCampaignEntry<Object, SavegameInfo<Object>>) e);
+            LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign entry " + e.getName());
+        }, () -> {
+            LoggerFactory.getLogger(GameIntegration.class).debug("No game integration found for campaign entry " + e.getName());
+        });
     }
 }

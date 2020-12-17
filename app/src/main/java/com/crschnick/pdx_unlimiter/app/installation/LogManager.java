@@ -27,17 +27,21 @@ public class LogManager {
         this.debugAchievements = debugAchievements;
     }
 
-    public static void init() throws IOException {
+    public static void init() {
         PdxuInstallation i = PdxuInstallation.getInstance();
 
-        FileUtils.forceMkdir(i.getLogsLocation().toFile());
 
         Path logFile = null;
         if (i.isProduction()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
                     .withZone(ZoneId.systemDefault());
-            logFile = i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log");
-            System.setProperty("org.slf4j.simpleLogger.logFile", logFile.toString());
+            try {
+                FileUtils.forceMkdir(i.getLogsLocation().toFile());
+                logFile = i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log");
+                System.setProperty("org.slf4j.simpleLogger.logFile", logFile.toString());
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
         }
 
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");

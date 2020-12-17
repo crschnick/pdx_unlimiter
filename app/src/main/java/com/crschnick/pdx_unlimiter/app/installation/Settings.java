@@ -22,12 +22,11 @@ import java.util.Optional;
 
 public class Settings {
 
-    private static Settings INSTANCE = defaultSettings();
+    private static Settings INSTANCE;
     private Path eu4;
     private Path hoi4;
     private Path ck3;
     private Path stellaris;
-    private Path activeGame;
     private int maxLoadedSavegames = 1;
     private int fontSize;
     private boolean deleteOnImport;
@@ -36,14 +35,12 @@ public class Settings {
     private String rakalyUserId;
     private String rakalyApiKey;
     private Path storageDirectory;
+    private boolean enableAutoUpdate;
 
-    public static void init() throws Exception {
-        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
-        if (file.toFile().exists()) {
-            INSTANCE = loadConfig(file);
-        }
+    public static void init() {
+        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
+        INSTANCE = loadConfig(file);
         INSTANCE.validate();
-        INSTANCE.apply();
     }
 
     public static Settings getInstance() {
@@ -53,7 +50,6 @@ public class Settings {
     public static void updateSettings(Settings newS) {
         INSTANCE = newS;
         INSTANCE.validate();
-        INSTANCE.apply();
         try {
             saveConfig();
         } catch (IOException e) {
@@ -61,57 +57,54 @@ public class Settings {
         }
     }
 
-    private static Settings defaultSettings() {
-        Settings s = new Settings();
-        s.eu4 = InstallLocationHelper.getInstallPath("Europa Universalis IV").orElse(null);
-        s.hoi4 = InstallLocationHelper.getInstallPath("Hearts of Iron IV").orElse(null);
-        s.ck3 = InstallLocationHelper.getInstallPath("Crusader Kings III").orElse(null);
-        s.stellaris = InstallLocationHelper.getInstallPath("Stellaris").orElse(null);
-        s.fontSize = 11;
-        s.startSteam = true;
-        s.deleteOnImport = false;
-        s.rakalyUserId = null;
-        s.rakalyApiKey = null;
-        s.storageDirectory = null;
-
-        if (s.eu4 != null) {
-            s.activeGame = s.eu4;
-        } else if (s.hoi4 != null) {
-            s.activeGame = s.hoi4;
-        } else if (s.ck3 != null) {
-            s.activeGame = s.ck3;
-        } else if (s.stellaris != null) {
-            s.activeGame = s.stellaris;
+    private static Settings loadConfig(Path file) {
+        JsonNode sNode;
+        if (Files.exists(file)) {
+            try {
+                JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
+                sNode = node.required("settings");
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                sNode = JsonNodeFactory.instance.objectNode();
+            }
         } else {
-            s.activeGame = null;
+            sNode = JsonNodeFactory.instance.objectNode();
         }
-        return s;
-    }
 
-    private static Settings loadConfig(Path file) throws Exception {
-        JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
-        JsonNode i = node.required("installations");
-        Settings s = defaultSettings();
-        s.eu4 = Optional.ofNullable(i.get("eu4")).map(n -> Paths.get(n.textValue())).orElse(s.eu4);
-        s.hoi4 = Optional.ofNullable(i.get("hoi4")).map(n -> Paths.get(n.textValue())).orElse(s.hoi4);
-        s.ck3 = Optional.ofNullable(i.get("ck3")).map(n -> Paths.get(n.textValue())).orElse(s.ck3);
-        s.stellaris = Optional.ofNullable(i.get("stellaris")).map(n -> Paths.get(n.textValue())).orElse(s.stellaris);
-        s.activeGame = Optional.ofNullable(i.get("activeGame")).map(n -> Paths.get(n.textValue())).orElse(s.activeGame);
-        s.fontSize = i.required("fontSize").intValue();
-        s.startSteam = i.required("startSteam").booleanValue();
-        s.deleteOnImport = Optional.ofNullable(i.get("deleteOnImport")).map(JsonNode::booleanValue).orElse(false);
-        s.rakalyUserId = Optional.ofNullable(i.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
-        s.rakalyApiKey = Optional.ofNullable(i.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
-        s.storageDirectory = Optional.ofNullable(i.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
+        Settings s = new Settings();
+        s.eu4 = Optional.ofNullable(sNode.get("eu4")).map(n -> Paths.get(n.textValue()))
+                .orElse(InstallLocationHelper.getInstallPath("Europa Universalis IV").orElse(null));
+        s.hoi4 = Optional.ofNullable(sNode.get("hoi4")).map(n -> Paths.get(n.textValue()))
+                .orElse(InstallLocationHelper.getInstallPath("Hearts of Iron IV").orElse(null));
+        s.ck3 = Optional.ofNullable(sNode.get("ck3")).map(n -> Paths.get(n.textValue()))
+                .orElse(InstallLocationHelper.getInstallPath("Crusader Kings III").orElse(null));
+        s.stellaris = Optional.ofNullable(sNode.get("stellaris")).map(n -> Paths.get(n.textValue()))
+                .orElse(InstallLocationHelper.getInstallPath("Stellaris").orElse(null));
+
+        s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(12);
+        s.startSteam = Optional.ofNullable(sNode.get("startSteam")).map(JsonNode::booleanValue).orElse(true);
+        s.deleteOnImport = Optional.ofNullable(sNode.get("deleteOnImport")).map(JsonNode::booleanValue).orElse(false);
+        s.rakalyUserId = Optional.ofNullable(sNode.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
+        s.rakalyApiKey = Optional.ofNullable(sNode.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
+        s.storageDirectory = Optional.ofNullable(sNode.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
+
+        Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
+        s.enableAutoUpdate = true;
+        try {
+            s.enableAutoUpdate = !Files.exists(updateFile) || Boolean.parseBoolean(Files.readString(updateFile));
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+
         return s;
     }
 
     public static void saveConfig() throws IOException {
-        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("installations.json");
+        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
         FileUtils.forceMkdirParent(file.toFile());
 
         ObjectNode n = JsonNodeFactory.instance.objectNode();
-        ObjectNode i = n.putObject("installations");
+        ObjectNode i = n.putObject("settings");
         Settings s = Settings.INSTANCE;
         if (s.eu4 != null) {
             i.set("eu4", new TextNode(s.eu4.toString()));
@@ -124,9 +117,6 @@ public class Settings {
         }
         if (s.stellaris != null) {
             i.set("stellaris", new TextNode(s.stellaris.toString()));
-        }
-        if (s.activeGame != null) {
-            i.set("activeGame", new TextNode(s.activeGame.toString()));
         }
 
         i.put("deleteOnImport", s.deleteOnImport);
@@ -143,6 +133,10 @@ public class Settings {
         }
 
         JsonHelper.write(n, Files.newOutputStream(file));
+
+
+        Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
+        Files.writeString(updateFile, Boolean.toString(s.enableAutoUpdate));
     }
 
     public Settings copy() {
@@ -151,7 +145,6 @@ public class Settings {
         c.hoi4 = hoi4;
         c.ck3 = ck3;
         c.stellaris = stellaris;
-        c.activeGame = activeGame;
         c.fontSize = fontSize;
         c.startSteam = startSteam;
         c.deleteOnImport = deleteOnImport;
@@ -191,10 +184,6 @@ public class Settings {
 
     public void setStellaris(Path stellaris) {
         this.stellaris = stellaris;
-    }
-
-    public Optional<Path> getActiveGame() {
-        return Optional.ofNullable(activeGame);
     }
 
     public Optional<String> getRakalyApiKey() {
@@ -241,15 +230,6 @@ public class Settings {
         this.deleteOnImport = deleteOnImport;
     }
 
-    public void updateActiveGame(Path activeGame) {
-        this.activeGame = activeGame;
-        try {
-            saveConfig();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-    }
-
     public void validate() {
         if (eu4 != null) {
             try {
@@ -276,32 +256,12 @@ public class Settings {
             }
         }
         if (stellaris != null) {
-
             try {
                 new StellarisInstallation(stellaris).loadData();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
                 stellaris = null;
             }
-        }
-
-        if (activeGame != null && !activeGame.equals(eu4) && !activeGame.equals(hoi4) && !activeGame.equals(ck3) && !activeGame.equals(stellaris)) {
-            activeGame = null;
-        }
-    }
-
-    public void apply() {
-        if (eu4 != null) {
-            GameInstallation.EU4 = new Eu4Installation(eu4);
-        }
-        if (hoi4 != null) {
-            GameInstallation.HOI4 = new Hoi4Installation(hoi4);
-        }
-        if (ck3 != null) {
-            GameInstallation.CK3 = new Ck3Installation(ck3);
-        }
-        if (stellaris != null) {
-            GameInstallation.STELLARIS = new StellarisInstallation(stellaris);
         }
     }
 

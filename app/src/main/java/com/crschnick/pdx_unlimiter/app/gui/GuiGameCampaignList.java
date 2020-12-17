@@ -22,15 +22,10 @@ public class GuiGameCampaignList {
         grid.setBorder(Border.EMPTY);
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
-        Consumer<GameCampaign<?, ?>> addButton = (GameCampaign<?, ?> c) -> {
-            var button = GuiGameCampaign.createCampaignButton(c);
-            int index = GameIntegration.current().getSavegameCache().indexOf(c);
-            grid.getItems().add(index, button);
-        };
-
         SetChangeListener<GameCampaign> l = (c) -> {
             if (c.wasAdded()) {
-                var button = GuiGameCampaign.createCampaignButton(c.getElementAdded());
+                var button = GuiGameCampaign.createCampaignButton(
+                        c.getElementAdded(), GameIntegration.current().getGuiFactory());
                 int index = GameIntegration.current().getSavegameCache().indexOf(c.getElementAdded());
                 Platform.runLater(() -> grid.getItems().add(index, button));
             } else {
@@ -49,7 +44,7 @@ public class GuiGameCampaignList {
                     grid.setItems(FXCollections.observableArrayList());
                 } else {
                     grid.setItems(FXCollections.observableArrayList(n.getSavegameCache().campaignStream()
-                            .map(GuiGameCampaign::createCampaignButton)
+                            .map(camp -> GuiGameCampaign.createCampaignButton(camp, n.getGuiFactory()))
                             .collect(Collectors.toList())));
                     n.getSavegameCache().getCampaigns().addListener(l);
                 }

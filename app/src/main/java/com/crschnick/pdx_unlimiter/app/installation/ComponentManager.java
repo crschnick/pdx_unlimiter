@@ -51,7 +51,6 @@ public class ComponentManager {
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(() -> {
             reset();
-            Settings.getInstance().apply();
             init();
         }, true);
     }
@@ -71,6 +70,10 @@ public class ComponentManager {
             GuiLayout.init();
 
             GameInstallation.init();
+
+            SavedState.init();
+            PdxuApp.getApp().setupWindowState();
+
             GameImage.init();
             AchievementManager.init();
             SavegameCache.init();
@@ -95,6 +98,8 @@ public class ComponentManager {
     private static void reset() {
         LoggerFactory.getLogger(ComponentManager.class).debug("Resetting program state ...");
         try {
+            SavedState.getInstance().saveConfig();
+
             FileWatchManager.reset();
             GameIntegration.reset();
 

@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
 import java.util.stream.Collectors;
@@ -35,6 +36,24 @@ public class PdxuApp extends Application {
         return layout.getScene();
     }
 
+    public void setupWindowState() {
+        Platform.runLater(() -> {
+            Scene scene = getScene();
+            Window w = getScene().getWindow();
+            w.setX(SavedState.getInstance().getWindowX());
+            w.setY(SavedState.getInstance().getWindowY());
+            w.setWidth(SavedState.getInstance().getWindowWidth());
+            w.setHeight(SavedState.getInstance().getWindowHeight());
+
+            scene.getWindow().xProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowX(n.intValue()));
+            scene.getWindow().yProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowY(n.intValue()));
+            scene.getWindow().widthProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowWidth(n.intValue()));
+            scene.getWindow().heightProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowHeight(n.intValue()));
+
+            ((Stage) w).show();
+        });
+    }
+
     @Override
     public void start(Stage primaryStage) {
         try {
@@ -44,11 +63,11 @@ public class PdxuApp extends Application {
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
+                    ComponentManager.finalTeardown();
                     Stage.getWindows().stream()
                             .filter(w -> !w.equals(getScene().getWindow()))
                             .collect(Collectors.toList())
                             .forEach(w -> w.fireEvent(event));
-                    ComponentManager.finalTeardown();
                 }
             });
 
@@ -57,9 +76,7 @@ public class PdxuApp extends Application {
             primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
             Scene scene = new Scene(layout, 1000, 720);
             primaryStage.setScene(scene);
-            primaryStage.show();
             GuiStyle.addStylesheets(primaryStage.getScene());
-
             ComponentManager.additionalSetup();
         } catch (Exception ex) {
             ErrorHandler.handleTerminalException(ex);

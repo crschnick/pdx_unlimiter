@@ -1,11 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.SavedState;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.HBox;
+
+import java.util.Optional;
 
 public class GuiGameSwitcher {
 
@@ -23,6 +26,7 @@ public class GuiGameSwitcher {
             Tooltip.install(icon, new Tooltip(integ.getName()));
             icon.setOnMouseClicked(e -> {
                 GameIntegration.selectIntegration(integ);
+                SavedState.getInstance().setActiveGame(integ.getInstallation());
                 alert.setResult(ButtonType.CLOSE);
             });
 

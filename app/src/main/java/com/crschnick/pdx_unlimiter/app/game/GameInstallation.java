@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
@@ -31,17 +32,20 @@ public abstract class GameInstallation {
     public static Ck3Installation CK3 = null;
     public static StellarisInstallation STELLARIS = null;
 
-    private static Set<GameInstallation> ALL;
+    public static Set<GameInstallation> ALL;
 
     protected DistributionType distType;
     protected Path userDir;
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
+
+    private String id;
     private Path path;
     private Path executable;
     private List<GameDlc> dlcs = new ArrayList<>();
 
-    public GameInstallation(Path path, Path executable) {
+    public GameInstallation(String id, Path path, Path executable) {
+        this.id = id;
         this.path = path;
         if (SystemUtils.IS_OS_WINDOWS) {
             this.executable = getPath().resolve(executable).resolveSibling(executable.getFileName().toString() + ".exe");
@@ -50,7 +54,16 @@ public abstract class GameInstallation {
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
     public static void init() throws Exception {
+        Settings s = Settings.getInstance();
+        s.getEu4().ifPresent(p -> GameInstallation.EU4 = new Eu4Installation(p));
+        s.getHoi4().ifPresent(p -> GameInstallation.HOI4 = new Hoi4Installation(p));
+        s.getCk3().ifPresent(p -> GameInstallation.CK3 = new Ck3Installation(p));
+        s.getStellaris().ifPresent(p -> GameInstallation.STELLARIS = new StellarisInstallation(p));
         ALL = Stream.of(EU4, HOI4, STELLARIS, CK3)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());

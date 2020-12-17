@@ -120,7 +120,7 @@ public class GuiGameCampaignEntry {
         main.getStyleClass().add(CLASS_ENTRY);
         main.setOnMouseClicked(event -> {
             if (e.infoProperty().isNotNull().get()) {
-                GameIntegration.<T, I>current().selectEntry(e);
+                GameIntegration.selectEntry(e);
             }
         });
         return main;
