@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -17,6 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.awt.*;
+import java.net.URI;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -120,12 +123,22 @@ public class GuiGameCampaignEntryList {
         v.getChildren().add(importB);
 
         v.getChildren().add(new Label());
-        Label text2 = new Label("Furthermore, you can use the status bar below to import the latest savegame at any time. " +
-                "Alternatively, can also drag and drop any savegame into " +
-                "this window or double click any savegame file if its extension is associated with the Pdx-Unlimiter.");
+        Label text2 = new Label("If you want to familiarize yourself with the Pdx-Unlimiter first, " +
+                "it is recommended to read the guide.");
         text2.setWrapText(true);
         text2.setTextAlignment(TextAlignment.CENTER);
         v.getChildren().add(text2);
+
+        Button guide = new Button("Read the guide");
+        guide.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(
+                        new URI("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+        v.getChildren().add(guide);
 
         v.getStyleClass().add(GuiStyle.CLASS_NO_CAMPAIGN);
         v.setFillWidth(true);

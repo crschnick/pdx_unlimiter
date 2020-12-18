@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -73,7 +74,7 @@ public abstract class SavegameCache<
         addChangeListeners();
     }
 
-    public static void init() throws IOException {
+    public static void init() {
         if (GameInstallation.EU4 != null) {
             EU4 = new Eu4SavegameCache();
         }
@@ -91,13 +92,21 @@ public abstract class SavegameCache<
                 .collect(Collectors.toSet());
 
         for (SavegameCache<?,?,?,?> cache : ALL) {
-            cache.start();
+            try {
+                cache.loadData();
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
         }
     }
 
-    public static void reset() throws IOException {
+    public static void reset() {
         for (SavegameCache<?,?,?,?> cache : ALL) {
-            cache.shutdown();
+            try {
+                cache.saveData();
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
         }
 
         EU4 = null;
@@ -105,23 +114,6 @@ public abstract class SavegameCache<
         STELLARIS = null;
         CK3 = null;
         ALL = Set.of();
-    }
-
-    private void saveData() throws IOException {
-        FailableFunction<Path, OutputStream, IOException> f =
-                (p) -> Files.newOutputStream(getPath().resolve(p));
-        exportDataToConfig(f);
-    }
-
-    private void start() throws IOException {
-        FileUtils.forceMkdir(getPath().toFile());
-        if (Files.exists(getPath().resolve(getDataFile()))) {
-            importDataFromConfig(p -> Files.newInputStream(getPath().resolve(p)));
-        }
-    }
-
-    private void shutdown() throws IOException {
-        saveData();
     }
 
     private void addChangeListeners() {
@@ -151,9 +143,10 @@ public abstract class SavegameCache<
                 .ifPresent(e -> c.tagProperty().setValue(e.getInfo().getTag()));
     }
 
-    public void importDataFromConfig(FailableFunction<Path, InputStream, IOException> in) throws IOException {
+    public void loadData() throws IOException {
+        InputStream in = Files.newInputStream(getDataFile());
         ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(in.apply(Path.of("campaigns.json")).readAllBytes());
+        JsonNode node = o.readTree(in.readAllBytes());
 
         JsonNode c = node.required("campaigns");
         for (int i = 0; i < c.size(); i++) {
@@ -170,9 +163,9 @@ public abstract class SavegameCache<
 
         for (GameCampaign<T, I> campaign : campaigns) {
             try {
-                JsonNode campaignNode = o.readTree(in.apply(
-                        Path.of(campaign.getCampaignId().toString()).resolve("campaign.json"))
-                        .readAllBytes());
+                InputStream campaignIn = Files.newInputStream(
+                        getPath().resolve(campaign.getCampaignId().toString()).resolve("campaign.json"));
+                JsonNode campaignNode = o.readTree(campaignIn.readAllBytes());
                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
                     UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
@@ -190,10 +183,10 @@ public abstract class SavegameCache<
 
     protected abstract GameCampaign<T, I> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date);
 
-    public void exportDataToConfig(FailableFunction<Path, OutputStream, IOException> out) throws IOException {
+    private void saveData() throws IOException {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ArrayNode c = n.putArray("campaigns");
-        ;
+
         for (GameCampaign<T, I> campaign : getCampaigns()) {
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
@@ -208,8 +201,14 @@ public abstract class SavegameCache<
                         return node;
                     })
                     .forEach(entries::add);
-            JsonHelper.write(campaignFileNode,
-                    out.apply(Path.of(campaign.getCampaignId().toString(), "campaign.json")));
+
+            Path cFile = getPath()
+                    .resolve(campaign.getCampaignId().toString()).resolve("campaign.json");
+            Path backupCFile = getPath()
+                    .resolve(campaign.getCampaignId().toString()).resolve("campaign_old.json");
+            Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
+            OutputStream out = Files.newOutputStream(cFile);
+            JsonHelper.write(campaignFileNode, out);
 
             ObjectNode campaignNode = JsonNodeFactory.instance.objectNode()
                     .put("name", campaign.getName())
@@ -220,7 +219,9 @@ public abstract class SavegameCache<
             c.add(campaignNode);
         }
 
-        JsonHelper.write(n, out.apply(Path.of("campaigns.json")));
+        Files.copy(getDataFile(), getBackupDataFile(), StandardCopyOption.REPLACE_EXISTING);
+        OutputStream out = Files.newOutputStream(getDataFile());
+        JsonHelper.write(n, out);
     }
 
     protected abstract void writeEntry(ObjectNode node, GameCampaignEntry<T, I> e);
@@ -423,17 +424,7 @@ public abstract class SavegameCache<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-
-    public synchronized void importSavegameAsync(Path file, Runnable onFinish) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            boolean r = importSavegame(file);
-            if (r) {
-                onFinish.run();
-            }
-        }, true);
-    }
-
-    private synchronized boolean importSavegame(Path file) {
+    synchronized boolean importSavegame(Path file) {
         try {
             importSavegameData(file);
             saveData();
@@ -494,7 +485,11 @@ public abstract class SavegameCache<
     }
 
     public Path getDataFile() {
-        return Path.of("campaigns.json");
+        return getPath().resolve("campaigns.json");
+    }
+
+    public Path getBackupDataFile() {
+        return getPath().resolve("campaigns_old.json");
     }
 
     public int indexOf(GameCampaign<?, ?> c) {
@@ -517,5 +512,9 @@ public abstract class SavegameCache<
 
     public String getFileEnding() {
         return fileEnding;
+    }
+
+    public String getName() {
+        return name;
     }
 }

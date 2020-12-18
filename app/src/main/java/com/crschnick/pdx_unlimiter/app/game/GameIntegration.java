@@ -123,6 +123,13 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
         var e = selectedEntry.get();
 
+        if (!isEntryCompatible(e)) {
+            boolean startAnyway = getGuiFactory().displayIncompatibleWarning(e);
+            if (!startAnyway) {
+                return;
+            }
+        }
+
         Optional<Path> p = exportCampaignEntry();
         if (p.isPresent()) {
             try {
@@ -251,10 +258,11 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     }
 
     public static <T,I extends SavegameInfo<T>> void selectCampaign(GameCampaign<T, I> c) {
+        if (current.isNotNull().get()) {
+            unselectCampaignAndEntry();
+        }
+
         if (c == null) {
-            if (current.isNotNull().get()) {
-                unselectCampaignAndEntry();
-            }
             LoggerFactory.getLogger(GameIntegration.class).debug("Unselected campaign");
             return;
         }

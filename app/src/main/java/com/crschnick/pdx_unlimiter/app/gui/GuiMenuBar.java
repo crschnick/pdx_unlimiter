@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCacheIO;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -34,31 +35,17 @@ public class GuiMenuBar {
 
         Menu savegames = new Menu("Storage");
 
-        MenuItem menuItem1 = new MenuItem("Import storage...");
-        menuItem1.setOnAction((a) -> {
-            Optional<Path> path = DialogHelper.showImportArchiveDialog();
-            //path.ifPresent(SavegameCache::importSavegameCache);
-        });
-        savegames.getItems().add(menuItem1);
-
         MenuItem menuItem2 = new MenuItem("Export storage...");
         menuItem2.setOnAction((a) -> {
-            Optional<Path> path = DialogHelper.showExportDialog(true);
-            //path.ifPresent(SavegameCache::exportSavegameCache);
+            Optional<Path> path = GuiSavegameIO.showExportDialog();
+            path.ifPresent(SavegameCacheIO::exportSavegameCaches);
         });
         savegames.getItems().add(menuItem2);
-
-        MenuItem exportSg = new MenuItem("Export savegames...");
-        exportSg.setOnAction((a) -> {
-            Optional<Path> path = DialogHelper.showExportDialog(false);
-            //path.ifPresent(SavegameCache::exportSavegameDirectory);
-        });
-        savegames.getItems().add(exportSg);
 
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
             try {
-                Desktop.getDesktop().open(GameIntegration.current().getSavegameCache().getPath().toFile());
+                Desktop.getDesktop().open(PdxuInstallation.getInstance().getSavegameLocation().toFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -98,6 +85,17 @@ public class GuiMenuBar {
 
 
         Menu about = new Menu("About");
+
+        MenuItem guide = new MenuItem("Guide");
+        guide.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(
+                        new URI("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+
         MenuItem src = new MenuItem("Contribute");
         src.setOnAction((a) -> {
             try {
@@ -122,6 +120,7 @@ public class GuiMenuBar {
         tc.setOnAction((a) -> {
             DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
         });
+        about.getItems().add(guide);
         about.getItems().add(src);
         about.getItems().add(is);
         about.getItems().add(lc);
@@ -152,7 +151,7 @@ public class GuiMenuBar {
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
-        menuBar.getMenus().add(achievements);
+        //menuBar.getMenus().add(achievements);
         menuBar.getMenus().add(about);
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
             menuBar.getMenus().add(dev);

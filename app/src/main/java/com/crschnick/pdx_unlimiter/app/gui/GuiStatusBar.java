@@ -115,7 +115,7 @@ public class GuiStatusBar {
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
         javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
-            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getName() : "None"));
+            Platform.runLater(() -> latest.setText("Latest: " + (n.size() > 0 ? n.get(0).getName() : "None")));
         };
         GameIntegration.current().getSavegameWatcher().savegamesProperty().addListener(l);
         l.changed(null, null, GameIntegration.current().getSavegameWatcher().savegamesProperty().get());
@@ -166,6 +166,7 @@ public class GuiStatusBar {
         } else {
             barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
             name.getStyleClass().add(CLASS_ALERT);
+            name.setText(name.getText() + " (Incompatible)");
         }
 
         Button e = new JFXButton("Export");

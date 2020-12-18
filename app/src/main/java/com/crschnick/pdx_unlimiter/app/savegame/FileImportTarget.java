@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
@@ -121,6 +122,10 @@ public abstract class FileImportTarget {
 
         @Override
         public void importTarget(Runnable onFinish) {
+            if (GameInstallation.EU4 == null) {
+                return;
+            }
+
             TaskExecutor.getInstance().submitTask(() -> {
                 try {
                     byte[] data = HttpHelper.executeGet(url);
@@ -131,8 +136,9 @@ public abstract class FileImportTarget {
                     FileUtils.forceMkdirParent(downloadedFile.toFile());
                     Files.write(downloadedFile, data);
 
-                    SavegameCache.EU4.importSavegameAsync(downloadedFile, onFinish);
-                    onFinish.run();
+                    if (SavegameCache.EU4.importSavegame(downloadedFile)) {
+                        onFinish.run();
+                    }
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -146,15 +152,17 @@ public abstract class FileImportTarget {
 
         @Override
         public void delete() {
-            if (!Files.exists(downloadedFile)) {
-                throw new IllegalStateException("File not downloaded yet");
-            }
+            TaskExecutor.getInstance().submitTask(() -> {
+                if (!Files.exists(downloadedFile)) {
+                    return;
+                }
 
-            try {
-                Files.delete(downloadedFile);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+                try {
+                    Files.delete(downloadedFile);
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
+            }, false);
         }
 
         @Override
@@ -179,7 +187,11 @@ public abstract class FileImportTarget {
         }
 
         public void importTarget(Runnable onFinish) {
-            savegameCache.importSavegameAsync(path, onFinish);
+            TaskExecutor.getInstance().submitTask(() -> {
+                if (savegameCache.importSavegame(path)) {
+                    onFinish.run();
+                }
+            }, true);
         }
 
         public Instant getLastModified() {
@@ -193,11 +205,17 @@ public abstract class FileImportTarget {
 
         @Override
         public void delete() {
-            try {
-                Files.delete(path);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+            TaskExecutor.getInstance().submitTask(() -> {
+                if (!Files.exists(path)) {
+                    return;
+                }
+
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
+            }, false);
         }
 
         @Override

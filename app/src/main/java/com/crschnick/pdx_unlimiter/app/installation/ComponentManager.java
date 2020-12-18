@@ -87,7 +87,7 @@ public class ComponentManager {
             FileWatchManager.init();
 
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-                GlobalScreen.unregisterNativeHook();
+                GlobalScreen.registerNativeHook();
             }
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
