@@ -211,10 +211,12 @@ public class GuiSettings {
     private static Node misc(Settings s) {
         GridPane grid = new GridPane();
 
+
         var t = new Text("Miscellaneous");
         t.setStyle("-fx-font-weight: bold");
         TextFlow name = new TextFlow(t);
         grid.add(name, 0, 0, 2, 1);
+
 
         grid.add(help("""
                 The font size within the app.
@@ -229,40 +231,70 @@ public class GuiSettings {
         grid.add(slider, 2, 1);
         GridPane.setHgrow(slider, Priority.ALWAYS);
 
+
+        grid.add(help("""
+                Specifies whether to automatically update the Pdx-Unlimiter when launching it."""),
+                0, 2);
+        grid.add(new Label("Enable auto update:"), 1, 2);
+        JFXCheckBox eau = new JFXCheckBox();
+        eau.setSelected(s.enableAutoUpdate());
+        eau.selectedProperty().addListener((c, o, n) -> {
+            s.setEnableAutoUpdate(n);
+        });
+        grid.add(eau, 2, 2);
+        GridPane.setHgrow(eau, Priority.ALWAYS);
+
+
+        grid.add(help("""
+                Specifies whether to ask for confirmation when deleting a campaign or savegame."""),
+                0, 3);
+        grid.add(new Label("Confirm deletion:"), 1, 3);
+        JFXCheckBox cd = new JFXCheckBox();
+        cd.setSelected(s.confirmDeletion());
+        cd.selectedProperty().addListener((c, o, n) -> {
+            s.setConfirmDeletion(n);
+        });
+        grid.add(cd, 2, 3);
+        GridPane.setHgrow(cd, Priority.ALWAYS);
+
+
         grid.add(help("""
                 Specifies whether to start Steam when launching a game through the Pdx-Unlimiter.
 
                 If you disable this, Steam might not register your achievements while playing."""),
-                0, 2);
-        grid.add(new Label("Start steam:"), 1, 2);
+                0, 4);
+        grid.add(new Label("Start steam:"), 1, 4);
         JFXCheckBox cb = new JFXCheckBox();
         cb.setSelected(s.startSteam());
         cb.selectedProperty().addListener((c, o, n) -> {
             s.setStartSteam(n);
         });
-        grid.add(cb, 2, 2);
+        grid.add(cb, 2, 4);
         GridPane.setHgrow(cb, Priority.ALWAYS);
+
 
         grid.add(help("""
                 Specifies whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
                               
-                Recommended to keep this disabled while the Pdx-Unlimiter is in beta."""), 0, 3);
-        grid.add(new Label("Delete on import:"), 1, 3);
+                Recommended to keep this disabled while the Pdx-Unlimiter is in beta."""), 0, 5);
+        grid.add(new Label("Delete on import:"), 1, 5);
         JFXCheckBox doi = new JFXCheckBox();
         doi.setSelected(s.deleteOnImport());
         doi.selectedProperty().addListener((c, o, n) -> {
             s.setDeleteOnImport(n);
         });
-        grid.add(doi, 2, 3);
+        grid.add(doi, 2, 5);
         GridPane.setHgrow(doi, Priority.ALWAYS);
+
 
         grid.add(help("""
                 The directory where the Pdx-Unlimiter stores all imported savegames.
-                """), 0, 4);
-        grid.add(new Label("Storage directory:"), 1, 4);
+                """), 0, 6);
+        grid.add(new Label("Storage directory:"), 1, 6);
         Node loc = storageLocationNode(s);
-        grid.add(loc, 2, 4);
+        grid.add(loc, 2, 6);
         GridPane.setHgrow(loc, Priority.ALWAYS);
+
 
         grid.setHgap(10);
         grid.setVgap(10);

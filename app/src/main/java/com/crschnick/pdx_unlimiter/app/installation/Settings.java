@@ -89,11 +89,11 @@ public class Settings {
         s.storageDirectory = Optional.ofNullable(sNode.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
 
         Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
-        s.enableAutoUpdate = true;
         try {
             s.enableAutoUpdate = !Files.exists(updateFile) || Boolean.parseBoolean(Files.readString(updateFile));
         } catch (IOException e) {
             ErrorHandler.handleException(e);
+            s.enableAutoUpdate = true;
         }
 
         return s;
@@ -152,6 +152,18 @@ public class Settings {
         c.rakalyApiKey = rakalyApiKey;
         c.storageDirectory = storageDirectory;
         return c;
+    }
+
+    public void setConfirmDeletion(boolean confirmDeletion) {
+        this.confirmDeletion = confirmDeletion;
+    }
+
+    public boolean enableAutoUpdate() {
+        return enableAutoUpdate;
+    }
+
+    public void setEnableAutoUpdate(boolean enableAutoUpdate) {
+        this.enableAutoUpdate = enableAutoUpdate;
     }
 
     public Optional<Path> getEu4() {

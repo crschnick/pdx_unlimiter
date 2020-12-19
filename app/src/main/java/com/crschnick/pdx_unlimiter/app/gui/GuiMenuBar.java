@@ -86,6 +86,30 @@ public class GuiMenuBar {
 
         Menu about = new Menu("About");
 
+        MenuItem src = new MenuItem("Contribute");
+        src.setOnAction((a) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/"));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+
+        MenuItem lc = new MenuItem("License");
+        lc.setOnAction((a) -> {
+            DialogHelper.showText("License", "License", "license.txt");
+        });
+        MenuItem tc = new MenuItem("Third party software");
+        tc.setOnAction((a) -> {
+            DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
+        });
+        about.getItems().add(src);
+        about.getItems().add(lc);
+        about.getItems().add(tc);
+
+
+        Menu help = new Menu("Help");
+
         MenuItem guide = new MenuItem("Guide");
         guide.setOnAction((a) -> {
             try {
@@ -95,15 +119,8 @@ public class GuiMenuBar {
                 ErrorHandler.handleException(e);
             }
         });
+        help.getItems().add(guide);
 
-        MenuItem src = new MenuItem("Contribute");
-        src.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
         MenuItem is = new MenuItem("Report an issue");
         is.setOnAction((a) -> {
             try {
@@ -112,20 +129,7 @@ public class GuiMenuBar {
                 ErrorHandler.handleException(e);
             }
         });
-        MenuItem lc = new MenuItem("License");
-        lc.setOnAction((a) -> {
-            DialogHelper.showText("License", "License", "license.txt");
-        });
-        MenuItem tc = new MenuItem("Third party software");
-        tc.setOnAction((a) -> {
-            DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
-        });
-        about.getItems().add(guide);
-        about.getItems().add(src);
-        about.getItems().add(is);
-        about.getItems().add(lc);
-        about.getItems().add(tc);
-
+        help.getItems().add(is);
 
         Menu dev = new Menu("Developer");
         MenuItem ns = new MenuItem("Namespace creator");
@@ -151,8 +155,8 @@ public class GuiMenuBar {
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(settings);
         menuBar.getMenus().add(savegames);
-        //menuBar.getMenus().add(achievements);
         menuBar.getMenus().add(about);
+        menuBar.getMenus().add(help);
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
             menuBar.getMenus().add(dev);
         }

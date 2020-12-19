@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
@@ -75,7 +74,7 @@ public class ComponentManager {
             PdxuApp.getApp().setupWindowState();
 
             GameImage.init();
-            AchievementManager.init();
+            //AchievementManager.init();
             SavegameCache.init();
             SavegameWatcher.init();
 
