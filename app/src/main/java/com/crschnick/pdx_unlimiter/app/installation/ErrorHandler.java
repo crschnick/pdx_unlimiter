@@ -96,7 +96,7 @@ public class ErrorHandler {
         }
 
         LoggerFactory.getLogger(ErrorHandler.class).error("Terminal Error", ex);
-        if (PdxuInstallation.getInstance().isProduction()) {
+        if (PdxuInstallation.getInstance() == null || PdxuInstallation.getInstance().isProduction()) {
             if (GuiErrorReporter.showException(ex)) {
                 Sentry.captureException(ex);
             }

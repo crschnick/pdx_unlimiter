@@ -144,6 +144,11 @@ public abstract class SavegameCache<
     }
 
     public void loadData() throws IOException {
+        Files.createDirectories(getPath());
+        if (!Files.exists(getDataFile())) {
+            return;
+        }
+
         InputStream in = Files.newInputStream(getDataFile());
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(in.readAllBytes());
@@ -219,7 +224,9 @@ public abstract class SavegameCache<
             c.add(campaignNode);
         }
 
-        Files.copy(getDataFile(), getBackupDataFile(), StandardCopyOption.REPLACE_EXISTING);
+        if (Files.exists(getDataFile())) {
+            Files.copy(getDataFile(), getBackupDataFile(), StandardCopyOption.REPLACE_EXISTING);
+        }
         OutputStream out = Files.newOutputStream(getDataFile());
         JsonHelper.write(n, out);
     }

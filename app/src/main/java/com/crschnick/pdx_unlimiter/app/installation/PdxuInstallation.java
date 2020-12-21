@@ -73,7 +73,7 @@ public class PdxuInstallation {
 
             dataDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute() && Files.exists(val))
+                    .filter(val -> val.isAbsolute())
                     .orElseThrow(() -> new NoSuchElementException("Invalid dataDir for dev build"));
 
             prod = Optional.ofNullable(props.get("simulateProduction"))

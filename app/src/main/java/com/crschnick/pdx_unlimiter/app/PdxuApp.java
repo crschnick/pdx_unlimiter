@@ -40,6 +40,8 @@ public class PdxuApp extends Application {
         Platform.runLater(() -> {
             Scene scene = getScene();
             Window w = getScene().getWindow();
+            ((Stage) w).show();
+
             w.setX(SavedState.getInstance().getWindowX());
             w.setY(SavedState.getInstance().getWindowY());
             w.setWidth(SavedState.getInstance().getWindowWidth());
@@ -50,7 +52,6 @@ public class PdxuApp extends Application {
             scene.getWindow().widthProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowWidth(n.intValue()));
             scene.getWindow().heightProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowHeight(n.intValue()));
 
-            ((Stage) w).show();
         });
     }
 

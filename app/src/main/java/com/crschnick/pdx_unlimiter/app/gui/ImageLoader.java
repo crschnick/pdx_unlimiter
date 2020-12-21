@@ -1,7 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import org.slf4j.LoggerFactory;
@@ -66,8 +64,6 @@ public class ImageLoader {
             }
         }
 
-        WritableImage w = new WritableImage(image.getWidth(), image.getHeight());
-        w = SwingFXUtils.toFXImage(image, w);
-        return w;
+        return new WritableImage(image.getWidth(), image.getHeight());
     }
 }

@@ -20,7 +20,6 @@ java {
 }
 
 List<String> runArgs = [
-        "-Djdk.gtk.version=2",
         "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
         "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix"]
@@ -33,7 +32,7 @@ application {
 
 javafx {
     version = '15'
-    modules = [ 'javafx.controls', 'javafx.base', 'javafx.graphics', 'javafx.swing' ]
+    modules = [ 'javafx.controls', 'javafx.base', 'javafx.graphics']
 }
 
 repositories {

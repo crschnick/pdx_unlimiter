@@ -10,7 +10,6 @@ module com.crschnick.pdx_unlimiter.app {
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
-    requires javafx.swing;
     requires org.jnativehook;
     requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
