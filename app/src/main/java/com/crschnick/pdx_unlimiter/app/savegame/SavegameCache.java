@@ -211,7 +211,9 @@ public abstract class SavegameCache<
                     .resolve(campaign.getCampaignId().toString()).resolve("campaign.json");
             Path backupCFile = getPath()
                     .resolve(campaign.getCampaignId().toString()).resolve("campaign_old.json");
-            Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
+            if (Files.exists(cFile)) {
+                Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
+            }
             OutputStream out = Files.newOutputStream(cFile);
             JsonHelper.write(campaignFileNode, out);
 
