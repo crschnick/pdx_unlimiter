@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
@@ -11,6 +12,7 @@ import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegame;
 import com.crschnick.pdx_unlimiter.core.savegame.Savegame;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.LoggerFactory;

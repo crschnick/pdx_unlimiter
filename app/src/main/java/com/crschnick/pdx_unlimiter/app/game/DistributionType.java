@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.SteamHelper;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.awt.*;
@@ -37,20 +38,12 @@ public abstract class DistributionType {
 
         @Override
         public void onDirectStart() {
-            try {
-                Desktop.getDesktop().browse(new URI("steam:"));
-            } catch (IOException | URISyntaxException e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.browse("steam:");
         }
 
         @Override
         public void launch() {
-            try {
-                Desktop.getDesktop().browse(new URI("steam://run/" + appId + "//"));
-            } catch (IOException | URISyntaxException e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.browse("steam://run/" + appId + "//");
         }
 
         @Override
