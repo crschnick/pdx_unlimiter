@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +56,15 @@ public class ImageLoader {
         BufferedImage image = ImageIO.read(in);
         in.close();
 
-        if (pixelSelector != null) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    int rgb = image.getRGB(x, y);
-                    image.setRGB(x, y, pixelSelector.apply(rgb));
-                }
+        WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                int rgb = image.getRGB(x, y);
+                img.getPixelWriter().setArgb(x, y, pixelSelector != null ? pixelSelector.apply(rgb) : rgb);
             }
         }
 
-        return new WritableImage(image.getWidth(), image.getHeight());
+
+        return img;
     }
 }

@@ -40,18 +40,20 @@ public class PdxuApp extends Application {
         Platform.runLater(() -> {
             Scene scene = getScene();
             Window w = getScene().getWindow();
+
+            var s = SavedState.getInstance();
+
+            if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
+            if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
+            if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
+            if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
+
+            scene.getWindow().xProperty().addListener((c, o, n) -> s.setWindowX(n.intValue()));
+            scene.getWindow().yProperty().addListener((c, o, n) -> s.setWindowY(n.intValue()));
+            scene.getWindow().widthProperty().addListener((c, o, n) -> s.setWindowWidth(n.intValue()));
+            scene.getWindow().heightProperty().addListener((c, o, n) -> s.setWindowHeight(n.intValue()));
+
             ((Stage) w).show();
-
-            w.setX(SavedState.getInstance().getWindowX());
-            w.setY(SavedState.getInstance().getWindowY());
-            w.setWidth(SavedState.getInstance().getWindowWidth());
-            w.setHeight(SavedState.getInstance().getWindowHeight());
-
-            scene.getWindow().xProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowX(n.intValue()));
-            scene.getWindow().yProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowY(n.intValue()));
-            scene.getWindow().widthProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowWidth(n.intValue()));
-            scene.getWindow().heightProperty().addListener((c, o, n) -> SavedState.getInstance().setWindowHeight(n.intValue()));
-
         });
     }
 

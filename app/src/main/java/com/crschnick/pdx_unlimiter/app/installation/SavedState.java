@@ -28,10 +28,11 @@ public class SavedState {
     private int windowHeight;
     private GameInstallation activeGame;
 
+    public static final int INVALID = Integer.MIN_VALUE;
+
     public static void init() {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("state.json");
         INSTANCE = loadConfig(file);
-        INSTANCE.apply();
     }
 
     public static SavedState getInstance() {
@@ -52,13 +53,11 @@ public class SavedState {
             sNode = JsonNodeFactory.instance.objectNode();
         }
 
-        Window window = PdxuApp.getApp().getScene().getWindow();
-
         SavedState s = new SavedState();
-        s.windowX = Optional.ofNullable(sNode.get("windowX")).map(JsonNode::intValue).orElse((int) window.getX());
-        s.windowY = Optional.ofNullable(sNode.get("windowY")).map(JsonNode::intValue).orElse((int) window.getY());
-        s.windowWidth = Optional.ofNullable(sNode.get("windowWidth")).map(JsonNode::intValue).orElse((int) window.getWidth());
-        s.windowHeight = Optional.ofNullable(sNode.get("windowHeight")).map(JsonNode::intValue).orElse((int) window.getHeight());
+        s.windowX = Optional.ofNullable(sNode.get("windowX")).map(JsonNode::intValue).orElse(INVALID);
+        s.windowY = Optional.ofNullable(sNode.get("windowY")).map(JsonNode::intValue).orElse(INVALID);
+        s.windowWidth = Optional.ofNullable(sNode.get("windowWidth")).map(JsonNode::intValue).orElse(INVALID);
+        s.windowHeight = Optional.ofNullable(sNode.get("windowHeight")).map(JsonNode::intValue).orElse(INVALID);
 
         var active = Optional.ofNullable(sNode.get("activeGame"));
         active.map(JsonNode::textValue).ifPresent(n -> {
@@ -73,14 +72,6 @@ public class SavedState {
         }
 
         return s;
-    }
-
-    private void apply() {
-        var w = PdxuApp.getApp().getScene().getWindow();
-        w.setX(windowX);
-        w.setY(windowY);
-        w.setWidth(windowWidth);
-        w.setHeight(windowHeight);
     }
 
     public void saveConfig() {
