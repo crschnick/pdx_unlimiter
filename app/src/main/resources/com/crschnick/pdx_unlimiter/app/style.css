@@ -3,7 +3,7 @@
 }
 
 .import-dialog {
- -fx-padding: 1em;
+ -fx-padding: 0 1em 0 1em;
 }
 
 .entry-list {
