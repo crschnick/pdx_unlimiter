@@ -40,34 +40,32 @@ public class TextFormatParser extends FormatParser {
 
         var chars = s.toCharArray();
         for (int i = 0; i < s.length(); i++) {
+            char c = chars[i];
             Token t = null;
-            if (isInQuotes && chars[i] != '"') {
+            if (isInQuotes && c != '"') {
                 continue;
-            } else if (chars[i] == '"') {
+            } else if (c == '"') {
                 isInQuotes = !isInQuotes;
-            } else if (chars[i] == '{') {
+            } else if (c == '{') {
                 t = new OpenGroupToken();
-            } else if (chars[i] == '}') {
+            } else if (c == '}') {
                 t = new CloseGroupToken();
-            } else if (chars[i] == '=') {
+            } else if (c == '=') {
                 t = new EqualsToken();
-            }
-
-            boolean isNewLine = chars[i] == '\n';
-            if (isInComment) {
-                if (isNewLine) {
+            } else if (isInComment) {
+                if (c == '\n') {
                     isInComment = false;
                 }
                 prev = i + 1;
                 continue;
             }
 
-            boolean isWhitespace = !isInQuotes && (isNewLine || chars[i] == '\r' || chars[i] == ' ' || chars[i] == '\t');
+            boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
             boolean marksEndOfPreviousToken =
-                    (chars[i] == '\0' && prev < i)               // EOF
-                            || (t != null && prev < i)           // New token finishes old token
-                            || (isWhitespace && prev < i)        // Whitespace finishes old token
-                            || (chars[i] == '#' && prev < i);    // New comment finishes old token
+                    (c == '\0' && prev < i)               // EOF
+                            || (t != null && prev < i)    // New token finishes old token
+                            || (isWhitespace && prev < i) // Whitespace finishes old token
+                            || (c == '#' && prev < i);    // New comment finishes old token
             if (marksEndOfPreviousToken) {
                 String sub = s.substring(prev, i);
                 if (sub.charAt(0) == '"' && sub.charAt(sub.length() - 1) == '"') {
@@ -82,7 +80,7 @@ public class TextFormatParser extends FormatParser {
             } else if (t != null) {
                 tokens.add(t);
                 prev = i + 1;
-            } else if (chars[i] == '#') {
+            } else if (c == '#') {
                 isInComment = true;
             }
         }
