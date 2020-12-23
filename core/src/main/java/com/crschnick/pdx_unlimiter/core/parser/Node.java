@@ -3,186 +3,134 @@ package com.crschnick.pdx_unlimiter.core.parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public abstract class Node {
 
-    public static List<Node> copyOfArrayNode(Node node) {
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
-        }
+    private static final Pattern LONG = Pattern.compile("-?[0-9]+");
+    private static final Pattern DOUBLE = Pattern.compile("([0-9]+)\\.([0-9]+)");
 
-        ArrayNode a = (ArrayNode) node;
-        return new ArrayList<>(a.getNodes());
+    public static Node combine(Node... nodes) {
+        ArrayNode a = new ArrayNode();
+        for (Node n : nodes) {
+            a.getNodes().addAll(n.getNodeArray());
+        }
+        return a;
     }
 
-    public static void addNodeToArray(Node node, Node toAdd) {
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
-        }
-
-        ArrayNode a = (ArrayNode) node;
-        a.addNode(toAdd);
-    }
-
-    public static void removeNodeFromArray(Node node, Node toRemove) {
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
-        }
-
-        ArrayNode a = (ArrayNode) node;
-        a.removeNode(toRemove);
-    }
-
-    public static Optional<Node> getNodeForKeyIfExistent(Node node, String key) {
-        var list = getNodesForKey(node, key);
+    public Optional<Node> getNodeForKeyIfExistent(Node this, String key) {
+        var list = getNodesForKey(key);
         return list.size() == 0 ? Optional.empty() : Optional.of(list.get(0));
     }
 
-    public static boolean getBoolean(Node node) {
-        if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString());
+    public boolean getBoolean() {
+        if (!(this instanceof ValueNode)) {
+            throw new NodeFormatException("Not a value this:\n" + this.toString());
         }
 
-        return (Boolean) ((ValueNode) node).getValue();
+        String v = getString();
+        if (!v.equals("yes") && !v.equals("no")) {
+            throw new NodeFormatException("Not a boolean this:\n" + this.toString());
+        }
+
+        return v.equals("yes");
     }
 
-    public static String getString(Node node) {
-        if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString());
+    public String getString() {
+        if (!(this instanceof ValueNode)) {
+            throw new NodeFormatException("Not a value this:\n" + this.toString());
         }
 
-        return (String) ((ValueNode) node).getValue();
+        return (String) ((ValueNode) this).getValue();
     }
 
-    public static int getInteger(Node node) {
-        if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString());
-        }
-
-        if (((ValueNode) node).getValue() instanceof Long) {
-            long v = (long) ((ValueNode) node).getValue();
+    public int getInteger() {
+        String sv = getString();
+        if (LONG.matcher(sv).matches()) {
+            long v = Long.parseLong(sv);
             if (v >= Integer.MIN_VALUE && v <= Integer.MAX_VALUE) {
                 return (int) v;
             } else {
                 throw new NodeFormatException("Cannot cast long to int");
             }
+        } else {
+            throw new NodeFormatException("Not a int node:\n" + this.toString());
         }
-        return (int) ((ValueNode) node).getValue();
     }
 
-    public static long getLong(Node node) {
-        if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString());
-        }
-
-        if (((ValueNode) node).getValue() instanceof Long) {
-            long v = (long) ((ValueNode) node).getValue();
+    public long getLong() {
+        String sv = getString();
+        if (LONG.matcher(sv).matches()) {
+            long v = Long.parseLong(sv);
             return v;
+        } else {
+            throw new NodeFormatException("Not a long node:\n" + this.toString());
         }
-        throw new NodeFormatException("Cannot cast to int");
     }
 
-    public static double getDouble(Node node) {
-        if (!(node instanceof ValueNode)) {
-            throw new NodeFormatException("Not a value node:\n" + node.toString());
-        }
-
-        if (((ValueNode) node).getValue() instanceof Double) {
-            double v = (double) ((ValueNode) node).getValue();
+    public double getDouble() {
+        String sv = getString();
+        if (DOUBLE.matcher(sv).matches()) {
+            double v = Double.parseDouble(sv);
             return v;
+        } else {
+            throw new NodeFormatException("Not a double node:\n" + this.toString());
         }
-
-        if (((ValueNode) node).getValue() instanceof Long) {
-            long v = (long) ((ValueNode) node).getValue();
-            return v;
-        }
-
-        throw new NodeFormatException("Not a double value node:\n" + node.toString());
     }
 
 
-    public static List<Node> getNodeArray(Node node) {
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
+    public List<Node> getNodeArray() {
+        if (!(this instanceof ArrayNode)) {
+            throw new NodeFormatException("Not an array this:\n" + this.toString());
         }
 
-        return ((ArrayNode) node).getNodes();
+        return ((ArrayNode) this).getNodes();
     }
 
-    public static boolean hasKey(Node node, String key) {
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
+    public boolean hasKey(String key) {
+        if (!(this instanceof ArrayNode)) {
+            throw new NodeFormatException("Not an array this:\n" + this.toString());
         }
 
-        var list = getNodesForKey(node, key);
+        var list = getNodesForKey(key);
         return list.size() > 0;
     }
 
-    public static KeyValueNode getKeyValueNode(Node node) {
-        if (!(node instanceof KeyValueNode)) {
-            throw new NodeFormatException("Not a key-value node:\n" + node.toString());
+    public KeyValueNode getKeyValueNode() {
+        if (!(this instanceof KeyValueNode)) {
+            throw new NodeFormatException("Not a key-value this:\n" + this.toString());
         }
 
-        return (KeyValueNode) node;
+        return (KeyValueNode) this;
     }
 
-    public static Node getNodeForKey(Node node, String key) {
-        var list = getNodesForKey(node, key);
+    public Node getNodeForKey(String key) {
+        var list = getNodesForKey(key);
         if (list.size() > 1) {
-            throw new NodeFormatException("Too many entries for key " + key + " for node:\n" + node.toString());
+            throw new NodeFormatException("Too many entries for key " + key + " for this:\n" + this.toString());
         }
         if (list.size() == 0) {
-            throw new NodeFormatException("Invalid key " + key + " for node:\n" + node.toString());
+            throw new NodeFormatException("Invalid key " + key + " for this:\n" + this.toString());
         }
         return list.get(0);
     }
 
-    public static KeyValueNode getKeyValueNodeForKey(Node node, String key) {
-        var list = getKeyValueNodesForKey(node, key);
-        if (list.size() > 1) {
-            throw new NodeFormatException("Too many entries for key " + key + " for node:\n" + node.toString());
-        }
-        if (list.size() == 0) {
-            throw new NodeFormatException("Invalid key " + key + " for node:\n" + node.toString());
-        }
-        return list.get(0);
-    }
-
-    public static List<KeyValueNode> getKeyValueNodesForKey(Node node, String key) {
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
+    public List<Node> getNodesForKey(String key) {
+        List<Node> thiss = new ArrayList<>();
+        if (!(this instanceof ArrayNode)) {
+            throw new NodeFormatException("Not an array this:\n" + this.toString());
         }
 
-        List<KeyValueNode> nodes = new ArrayList<>();
-        ArrayNode array = (ArrayNode) node;
+        ArrayNode array = (ArrayNode) this;
         for (Node sub : array.getNodes()) {
             if (sub instanceof KeyValueNode) {
                 KeyValueNode kvNode = (KeyValueNode) sub;
                 if (key.equals("*") || kvNode.getKeyName().equals(key)) {
-                    nodes.add(kvNode);
+                    thiss.add(kvNode.getNode());
                 }
             }
         }
 
-        return nodes;
-    }
-
-    public static List<Node> getNodesForKey(Node node, String key) {
-        List<Node> nodes = new ArrayList<>();
-        if (!(node instanceof ArrayNode)) {
-            throw new NodeFormatException("Not an array node:\n" + node.toString());
-        }
-
-        ArrayNode array = (ArrayNode) node;
-        for (Node sub : array.getNodes()) {
-            if (sub instanceof KeyValueNode) {
-                KeyValueNode kvNode = (KeyValueNode) sub;
-                if (key.equals("*") || kvNode.getKeyName().equals(key)) {
-                    nodes.add(kvNode.getNode());
-                }
-            }
-        }
-
-        return nodes;
+        return thiss;
     }
 }

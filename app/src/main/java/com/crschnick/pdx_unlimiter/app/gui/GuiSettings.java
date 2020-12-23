@@ -219,9 +219,9 @@ public class GuiSettings {
 
 
         grid.add(help("""
-                The font size within the app.
+                        The font size within the app.
 
-                If you have a high display resolution, you can turn this up to increase readability."""),
+                        If you have a high display resolution, you can turn this up to increase readability."""),
                 0, 1);
         grid.add(new Label("Font size:"), 1, 1);
         JFXSlider slider = new JFXSlider(10, 24, s.getFontSize());
@@ -233,7 +233,7 @@ public class GuiSettings {
 
 
         grid.add(help("""
-                Specifies whether to automatically update the Pdx-Unlimiter when launching it."""),
+                        Specifies whether to automatically update the Pdx-Unlimiter when launching it."""),
                 0, 2);
         grid.add(new Label("Enable auto update:"), 1, 2);
         JFXCheckBox eau = new JFXCheckBox();
@@ -246,7 +246,7 @@ public class GuiSettings {
 
 
         grid.add(help("""
-                Specifies whether to ask for confirmation when deleting a campaign or savegame."""),
+                        Specifies whether to ask for confirmation when deleting a campaign or savegame."""),
                 0, 3);
         grid.add(new Label("Confirm deletion:"), 1, 3);
         JFXCheckBox cd = new JFXCheckBox();
@@ -259,9 +259,9 @@ public class GuiSettings {
 
 
         grid.add(help("""
-                Specifies whether to start Steam when launching a game through the Pdx-Unlimiter.
+                        Specifies whether to start Steam when launching a game through the Pdx-Unlimiter.
 
-                If you disable this, Steam might not register your achievements while playing."""),
+                        If you disable this, Steam might not register your achievements while playing."""),
                 0, 4);
         grid.add(new Label("Start steam:"), 1, 4);
         JFXCheckBox cb = new JFXCheckBox();

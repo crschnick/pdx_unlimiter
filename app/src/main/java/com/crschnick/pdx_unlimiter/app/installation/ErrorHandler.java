@@ -1,15 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
-import io.sentry.*;
-import io.sentry.transport.StdoutTransport;
+import io.sentry.Attachment;
+import io.sentry.Sentry;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.nio.file.Path;
-import java.util.Map;
 
 public class ErrorHandler {
 
@@ -44,7 +41,7 @@ public class ErrorHandler {
     }
 
     public static void registerThread(Thread thread) {
-        thread.setUncaughtExceptionHandler((t,e) -> {
+        thread.setUncaughtExceptionHandler((t, e) -> {
             ErrorHandler.handleException(e);
         });
     }

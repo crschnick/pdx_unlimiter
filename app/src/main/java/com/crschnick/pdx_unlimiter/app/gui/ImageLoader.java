@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import org.slf4j.LoggerFactory;
 

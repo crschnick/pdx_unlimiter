@@ -14,22 +14,25 @@ import java.util.stream.Collectors;
 public class PdxuInstallation {
 
     private static PdxuInstallation INSTANCE;
+
+    private String rakalyVersion;
     private Path dataLocation;
     private String version;
     private boolean production;
-    private Path officialAchievementsLocation;
+    private Path rakalyDir;
     private boolean developerMode;
     private boolean nativeHookEnabled;
     private boolean image;
 
     public PdxuInstallation(Path dataLocation, String version, boolean production,
-                            Path officialAchievementsLocation, boolean developerMode,
+                            Path rakalyDir, String rakalyVersion, boolean developerMode,
                             boolean nativeHookEnabled, boolean image) {
         this.dataLocation = dataLocation;
         this.version = version;
         this.production = production;
-        this.officialAchievementsLocation = officialAchievementsLocation;
         this.developerMode = developerMode;
+        this.rakalyVersion = rakalyVersion;
+        this.rakalyDir = rakalyDir;
         this.nativeHookEnabled = nativeHookEnabled;
         this.image = image;
     }
@@ -41,7 +44,7 @@ public class PdxuInstallation {
         boolean prod = image;
         String v = "unknown";
         Path dataDir;
-        Path achievementsLocation = null;
+        Path rakalyDir = null;
         boolean developerMode = false;
         boolean nativeHook = true;
 
@@ -63,6 +66,7 @@ public class PdxuInstallation {
                     ErrorHandler.handleException(e);
                 }
             }
+            rakalyDir = Path.of(System.getProperty("java.home")).getParent().resolve("Rakaly");
         } else {
             v = "dev";
             try {
@@ -79,10 +83,21 @@ public class PdxuInstallation {
             prod = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
+
+            rakalyDir = Optional.ofNullable(props.get("rakalyDir"))
+                    .map(val -> Path.of(val.toString()))
+                    .filter(val -> val.isAbsolute() && Files.exists(val))
+                    .orElseThrow(() -> new NoSuchElementException("Invalid rakalyDir for dev build"));
         }
-        achievementsLocation = Optional.ofNullable(props.get("achievementDir"))
-                .map(val -> Path.of(val.toString()))
-                .filter(val -> val.isAbsolute() && Files.exists(val)).orElse(null);
+
+        String rakalyVersion;
+        try {
+            rakalyVersion = Files.readString(rakalyDir.resolve("version"));
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            rakalyVersion = "Unknown";
+        }
+
         developerMode = Optional.ofNullable(props.get("developerMode"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(false);
@@ -90,9 +105,8 @@ public class PdxuInstallation {
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
 
-        INSTANCE = new PdxuInstallation(dataDir, v, prod, achievementsLocation, developerMode, nativeHook, image);
+        INSTANCE = new PdxuInstallation(dataDir, v, prod, rakalyDir, rakalyVersion, developerMode, nativeHook, image);
     }
-
 
     public static boolean shouldStart() {
         if (INSTANCE.isImage() && INSTANCE.isProduction() && INSTANCE.isAlreadyRunning()) {
@@ -145,12 +159,19 @@ public class PdxuInstallation {
         }
     }
 
-    public Path getOfficialAchievementsLocation() {
-        return officialAchievementsLocation != null ? officialAchievementsLocation : dataLocation.resolve("achievements");
+    public Path getRakalyExecutable() {
+        Path dir = rakalyDir;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return dir.resolve("bin").resolve("rakaly_windows.exe");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            return dir.resolve("bin").resolve("rakaly_linux");
+        } else {
+            return dir.resolve("bin").resolve("rakaly_mac");
+        }
     }
 
-    public Path getUserAchievementsLocation() {
-        return getDataLocation().resolve("user_achievements");
+    public String getRakalyVersion() {
+        return rakalyVersion;
     }
 
     public Path getSettingsLocation() {

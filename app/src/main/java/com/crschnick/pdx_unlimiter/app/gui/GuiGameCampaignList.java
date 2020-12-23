@@ -9,7 +9,6 @@ import javafx.collections.SetChangeListener;
 import javafx.scene.Node;
 import javafx.scene.layout.Border;
 
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CAMPAIGN_LIST;

@@ -1,18 +1,26 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class TaskExecutor {
 
     private static final TaskExecutor INSTANCE = new TaskExecutor();
+    private boolean active = false;
+    private BooleanProperty busy = new SimpleBooleanProperty(false);
+    private ExecutorService executorService;
+
+    public static TaskExecutor getInstance() {
+        return INSTANCE;
+    }
 
     public void start() {
         active = true;
@@ -45,10 +53,6 @@ public class TaskExecutor {
         executorService.shutdown();
     }
 
-    private boolean active = false;
-    private BooleanProperty busy = new SimpleBooleanProperty(false);
-    private ExecutorService executorService;
-
     public void submitLoop(Runnable r) {
         Runnable loopRunner = new Runnable() {
             @Override
@@ -70,7 +74,8 @@ public class TaskExecutor {
         submitTask(() -> {
             r.run();
             return null;
-        }, v -> {}, isBlocking);
+        }, v -> {
+        }, isBlocking);
     }
 
     public <T> void submitTask(Callable<T> r, Consumer<T> onFinish, boolean isBlocking) {
@@ -92,10 +97,6 @@ public class TaskExecutor {
                 busy.setValue(false);
             }
         });
-    }
-
-    public static TaskExecutor getInstance() {
-        return INSTANCE;
     }
 
     public boolean isBusy() {

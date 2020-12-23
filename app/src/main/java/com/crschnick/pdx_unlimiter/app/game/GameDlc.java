@@ -31,14 +31,14 @@ public class GameDlc {
             return Optional.empty();
         }
 
-        Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(filePath)).get();
+        Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(filePath));
         GameDlc dlc = new GameDlc();
-        dlc.expansion = Node.getString(Node.getNodeForKey(node, "category")).equals("expansion");
+        dlc.expansion = node.getNodeForKey("category").getString().equals("expansion");
         dlc.filePath = p.getParent().relativize(filePath);
         dlc.dataPath = p.getParent().relativize(dataPath);
-        dlc.name = Node.getString(Node.getNodeForKey(node, "name"));
-        dlc.affectsChecksum = Node.getBoolean(Node.getNodeForKey(node, "affects_checksum"));
-        dlc.affectsCompatability = Node.getBoolean(Node.getNodeForKey(node, "affects_compatability"));
+        dlc.name = node.getNodeForKey("name").getString();
+        dlc.affectsChecksum = node.getNodeForKey("affects_checksum").getBoolean();
+        dlc.affectsCompatability = node.getNodeForKey("affects_compatability").getBoolean();
         return Optional.of(dlc);
     }
 

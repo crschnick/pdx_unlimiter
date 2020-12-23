@@ -4,11 +4,8 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.jfoenix.controls.JFXSpinner;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
@@ -19,7 +16,6 @@ import javafx.scene.layout.StackPane;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 
 public class GuiLayout {
 

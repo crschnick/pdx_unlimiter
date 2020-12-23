@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.Objects;

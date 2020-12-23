@@ -16,6 +16,36 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class FileWatchManager {
 
+    private static FileWatchManager INSTANCE = new FileWatchManager();
+    private Set<WatchedDirectory> watchedDirectories = new CopyOnWriteArraySet<>();
+
+    public static FileWatchManager getInstance() {
+        return INSTANCE;
+    }
+
+    public static void init() {
+        INSTANCE.startWatcher();
+    }
+
+    public static void reset() {
+        INSTANCE.watchedDirectories.forEach(WatchedDirectory::stop);
+        INSTANCE.watchedDirectories.clear();
+    }
+
+    public void startWatchersInDirectories(
+            List<Path> dirs,
+            Consumer<Path> listener) {
+        dirs.forEach(d -> watchedDirectories.add(WatchedDirectory.create(d, listener)));
+    }
+
+    private void startWatcher() {
+        TaskExecutor.getInstance().submitLoop(() -> {
+            for (var wd : new HashSet<>(watchedDirectories)) {
+                wd.update();
+            }
+        });
+    }
+
     private static class WatchedDirectory {
         private Path directory;
         private Consumer<Path> listener;
@@ -127,36 +157,5 @@ public class FileWatchManager {
         public Consumer<Path> getListener() {
             return listener;
         }
-    }
-
-    private static FileWatchManager INSTANCE = new FileWatchManager();
-
-    private Set<WatchedDirectory> watchedDirectories = new CopyOnWriteArraySet<>();
-
-    public static FileWatchManager getInstance() {
-        return INSTANCE;
-    }
-
-    public static void init() {
-        INSTANCE.startWatcher();
-    }
-
-    public static void reset() {
-        INSTANCE.watchedDirectories.forEach(WatchedDirectory::stop);
-        INSTANCE.watchedDirectories.clear();
-    }
-
-    public void startWatchersInDirectories(
-            List<Path> dirs,
-            Consumer<Path> listener) {
-        dirs.forEach(d -> watchedDirectories.add(WatchedDirectory.create(d, listener)));
-    }
-
-    private void startWatcher() {
-        TaskExecutor.getInstance().submitLoop(() -> {
-            for (var wd : new HashSet<>(watchedDirectories)) {
-                wd.update();
-            }
-        });
     }
 }

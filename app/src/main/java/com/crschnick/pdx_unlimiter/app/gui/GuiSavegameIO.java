@@ -51,9 +51,9 @@ public class GuiSavegameIO {
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Export storage");
         alert.setHeaderText("""
-        Do you want to export all stored savegames to a directory?
-        
-        This allows you to import the savegames into a Pdx-Unlimiter running on a different computer.""");
+                Do you want to export all stored savegames to a directory?
+                        
+                This allows you to import the savegames into a Pdx-Unlimiter running on a different computer.""");
 
         HBox dialogPaneContent = new HBox();
         Label label = new Label("Export location: ");

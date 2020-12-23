@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Hoi4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.Hoi4SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
@@ -22,11 +21,6 @@ public class Hoi4Integration extends GameIntegration<Hoi4Tag, Hoi4SavegameInfo> 
     @Override
     public SavegameWatcher getSavegameWatcher() {
         return SavegameWatcher.HOI4;
-    }
-
-    @Override
-    public AchievementManager getAchievementManager() {
-        return AchievementManager.HOI4;
     }
 
     @Override

@@ -2,25 +2,23 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisRawSavegame;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegame;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.UUID;
 
-public class StellarisSavegameCache extends SavegameCache<StellarisRawSavegame, StellarisSavegame,
+public class StellarisSavegameCache extends SavegameCache<
         StellarisTag,
         StellarisSavegameInfo> {
     public StellarisSavegameCache() {
-        super("stellaris", "sav", GameDateType.STELLARIS);
+        super("stellaris", "sav", GameDateType.STELLARIS, new StellarisSavegameParser());
     }
 
     @Override
@@ -93,36 +91,7 @@ public class StellarisSavegameCache extends SavegameCache<StellarisRawSavegame, 
     }
 
     @Override
-    protected boolean needsUpdate(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> stellarisCampaignEntry) {
-        Path p = getPath(stellarisCampaignEntry);
-        int v = 0;
-        try {
-            v = p.toFile().exists() ? StellarisSavegame.getVersion(p.resolve("data.zip")) : 0;
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
-            return true;
-        }
-
-        return v < StellarisSavegame.VERSION;
-    }
-
-    @Override
-    protected StellarisSavegameInfo loadInfo(StellarisSavegame data) throws Exception {
-        return StellarisSavegameInfo.fromSavegame(data);
-    }
-
-    @Override
-    protected StellarisRawSavegame loadRaw(Path p) throws Exception {
-        return StellarisRawSavegame.fromFile(p);
-    }
-
-    @Override
-    protected StellarisSavegame loadDataFromFile(Path p) throws Exception {
-        return StellarisSavegame.fromFile(p);
-    }
-
-    @Override
-    protected StellarisSavegame loadDataFromRaw(StellarisRawSavegame raw) throws Exception {
-        return StellarisSavegame.fromSavegame(raw);
+    protected StellarisSavegameInfo loadInfo(Node n) throws Exception {
+        return StellarisSavegameInfo.fromSavegame(n);
     }
 }

@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
 import com.crschnick.pdx_unlimiter.app.gui.Eu4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameCache;
@@ -34,10 +33,5 @@ public class Eu4Integration extends GameIntegration<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public SavegameWatcher getSavegameWatcher() {
         return SavegameWatcher.EU4;
-    }
-
-    @Override
-    public AchievementManager getAchievementManager() {
-        return AchievementManager.EU4;
     }
 }

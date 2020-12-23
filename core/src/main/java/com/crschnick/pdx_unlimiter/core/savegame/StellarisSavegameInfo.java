@@ -14,41 +14,40 @@ import java.util.stream.Collectors;
 
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
-    public static StellarisSavegameInfo fromSavegame(StellarisSavegame sg) throws SavegameParseException {
+    public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameParseException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
         try {
-            i.ironman = Node.getBoolean(Node.getNodeForKey(
-                    Node.getNodeForKey(sg.getNodes().get("gamestate"), "galaxy"), "ironman"));
+            i.ironman = n.getNodeForKey("galaxy").getNodeForKey("ironman").getBoolean();
 
-            i.date = GameDateType.STELLARIS.fromNode(Node.getNodeForKey(sg.getNodes().get("meta"), "date"));
+            i.date = GameDateType.STELLARIS.fromString(n.getNodeForKey("date").getString());
 
             i.campaignUuid = UUID.randomUUID();
 
-            int seed = Node.getInteger(Node.getNodeForKey(sg.getNodes().get("gamestate"), "random_seed"));
+            int seed = n.getNodeForKey("random_seed").getInteger();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
             i.campaignUuid = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new HashSet<>();
-            for (Node country : Node.getNodeArray(sg.getNodes().get("countries"))) {
-                KeyValueNode kv = Node.getKeyValueNode(country);
+            for (Node country : n.getNodeForKey("countries").getNodeArray()) {
+                KeyValueNode kv = country.getKeyValueNode();
 
                 // Invalid country node
                 if (kv.getNode() instanceof ValueNode && ((ValueNode) kv.getNode()).getValue() instanceof String) {
                     continue;
                 }
 
-                Node flag = Node.getNodeForKey(kv.getNode(), "flag");
-                Node icon = Node.getNodeForKey(flag, "icon");
-                Node bg = Node.getNodeForKey(flag, "background");
+                Node flag = kv.getNode().getNodeForKey("flag");
+                Node icon = flag.getNodeForKey("icon");
+                Node bg = flag.getNodeForKey("background");
                 var tag = new StellarisTag(
-                        Node.getString(Node.getNodeForKey(kv.getNode(), "name")),
-                        Node.getString(Node.getNodeForKey(icon, "category")),
-                        Node.getString(Node.getNodeForKey(icon, "file")),
-                        Node.getString(Node.getNodeForKey(bg, "category")),
-                        Node.getString(Node.getNodeForKey(bg, "file")),
-                        Node.getString(Node.getNodeArray(Node.getNodeForKey(flag, "colors")).get(0)),
-                        Node.getString(Node.getNodeArray(Node.getNodeForKey(flag, "colors")).get(1)));
+                        kv.getNode().getNodeForKey("name").getString(),
+                        icon.getNodeForKey("category").getString(),
+                        icon.getNodeForKey("file").getString(),
+                        bg.getNodeForKey("category").getString(),
+                        bg.getNodeForKey("file").getString(),
+                        flag.getNodeForKey("colors").getNodeArray().get(0).getString(),
+                        flag.getNodeForKey("colors").getNodeArray().get(1).getString());
 
                 if (i.allTags.size() == 0) {
                     i.tag = tag;
@@ -59,12 +58,12 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
             i.mods = List.of();
 
-            i.dlcs = Node.getNodeArray(Node.getNodeForKey(sg.getNodes().get("meta"), "required_dlcs"))
+            i.dlcs = n.getNodeForKey("required_dlcs").getNodeArray()
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
             Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)");
-            Matcher m = p.matcher(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "version")));
+            Matcher m = p.matcher(n.getNodeForKey("version").getString());
             m.matches();
             i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
 

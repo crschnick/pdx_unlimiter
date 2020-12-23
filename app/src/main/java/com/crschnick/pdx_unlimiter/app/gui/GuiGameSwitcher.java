@@ -8,8 +8,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.HBox;
 
-import java.util.Optional;
-
 public class GuiGameSwitcher {
 
     public static void showGameSwitchDialog() {

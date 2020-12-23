@@ -1,10 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.achievement.AchievementManager;
-import com.crschnick.pdx_unlimiter.app.game.*;
-import com.crschnick.pdx_unlimiter.app.gui.GameImage;
-import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.game.Ck3Installation;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.game.Hoi4Installation;
+import com.crschnick.pdx_unlimiter.app.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;

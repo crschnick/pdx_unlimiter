@@ -1,34 +1,13 @@
-package com.crschnick.pdx_unlimiter.core.format;
+package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 
-public class ColorTransformer extends NodeTransformer {
+public class ColorNodeTransformer {
 
-    public static final NodeTransformer RECURSIVE_TRANSFORMER = new NodeTransformer() {
-        @Override
-        public void transform(Node node) {
-            new ColorTransformer().transform(node);
-
-            if (node instanceof KeyValueNode) {
-                transform(Node.getKeyValueNode(node).getNode());
-            } else if (node instanceof ArrayNode) {
-                for (Node n : Node.getNodeArray(node)) {
-                    transform(n);
-                }
-            }
-        }
-
-        @Override
-        public void reverse(Node node) {
-
-        }
-    };
-
-    @Override
-    public void transform(Node n) {
+    public static void transform(Node n) {
         if (!(n instanceof ArrayNode)) {
             return;
         }
@@ -61,11 +40,6 @@ public class ColorTransformer extends NodeTransformer {
                     ((KeyValueNode) typeKvNode).getKeyName() : null;
             a.getNodes().add(i, key != null ? KeyValueNode.create(key, replacement) : replacement);
         }
-
-    }
-
-    @Override
-    public void reverse(Node node) {
 
     }
 }

@@ -24,24 +24,25 @@ public class StellarisTag {
         this.backgroundSecondaryColor = backgroundSecondaryColor;
     }
 
-    private StellarisTag() {}
+    private StellarisTag() {
+    }
 
     public static StellarisTag fromNode(Node node) {
-        Node flagNode = Node.getNodeForKey(node, "flag");
+        Node flagNode = node.getNodeForKey("flag");
         StellarisTag tag = new StellarisTag();
-        tag.name = Node.getString(Node.getNodeForKey(node, "name"));
+        tag.name = node.getNodeForKey("name").getString();
 
-        Node icon = Node.getNodeForKey(flagNode, "icon");
-        tag.iconCategory = Node.getString(Node.getNodeForKey(icon, "category"));
-        tag.iconFile = Node.getString(Node.getNodeForKey(icon, "file"));
+        Node icon = flagNode.getNodeForKey("icon");
+        tag.iconCategory = icon.getNodeForKey("category").getString();
+        tag.iconFile = icon.getNodeForKey("file").getString();
 
-        Node bg = Node.getNodeForKey(flagNode, "background");
-        tag.backgroundCategory = Node.getString(Node.getNodeForKey(bg, "category"));
-        tag.backgroundFile = Node.getString(Node.getNodeForKey(bg, "file"));
+        Node bg = flagNode.getNodeForKey("background");
+        tag.backgroundCategory = bg.getNodeForKey("category").getString();
+        tag.backgroundFile = bg.getNodeForKey("file").getString();
 
-        var colors = Node.getNodeArray(Node.getNodeForKey(flagNode, "colors"));
-        tag.backgroundPrimaryColor = Node.getString(colors.get(0));
-        tag.backgroundSecondaryColor = Node.getString(colors.get(1));
+        var colors = flagNode.getNodeForKey("colors").getNodeArray();
+        tag.backgroundPrimaryColor = colors.get(0).getString();
+        tag.backgroundSecondaryColor = colors.get(1).getString();
         return tag;
     }
 

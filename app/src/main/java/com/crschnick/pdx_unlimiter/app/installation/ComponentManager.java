@@ -13,7 +13,6 @@ import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 

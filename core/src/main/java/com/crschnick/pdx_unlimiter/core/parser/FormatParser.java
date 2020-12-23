@@ -1,44 +1,32 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
-import com.crschnick.pdx_unlimiter.core.format.Namespace;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
 public abstract class FormatParser {
 
-    public static final int TOKEN_SLEEP_INTERVAL = 10000;
-    public static final int SLEEP_TIME = 2;
-
     private byte[] header;
-    private Namespace namespace;
-    private int lastSleep = 0;
 
-    public FormatParser(byte[] header, Namespace namespace) {
+    public FormatParser(byte[] header) {
         this.header = header;
-        this.namespace = namespace;
     }
 
-    public boolean validateHeader(InputStream stream) throws IOException {
+    public static boolean validateHeader(byte[] header, InputStream stream) throws IOException {
         byte[] first = new byte[header.length];
         stream.readNBytes(first, 0, header.length);
-        if (!Arrays.equals(first, header)) {
-            stream.close();
-            return false;
-        }
-
-        return true;
+        stream.close();
+        return Arrays.equals(first, header);
     }
 
     public abstract List<Token> tokenize(InputStream stream) throws IOException;
 
-    public final Optional<Node> parse(InputStream stream) throws IOException {
+    public final Node parse(InputStream stream) throws IOException {
         byte[] first = new byte[header.length];
         stream.readNBytes(first, 0, header.length);
         if (!Arrays.equals(first, header)) {
             stream.close();
-            return Optional.empty();
+            throw new IllegalArgumentException("Invalid header");
         }
 
         List<Token> tokens = tokenize(stream);
@@ -46,26 +34,15 @@ public abstract class FormatParser {
         stream.close();
         tokens.add(0, new OpenGroupToken());
         tokens.add(new CloseGroupToken());
-        Node result = hierachiseTokens(tokens);
-        return Optional.of(result);
+        return hierachiseTokens(tokens);
     }
 
     private Node hierachiseTokens(List<Token> tokens) {
-        lastSleep = 0;
         Map.Entry<Node, Integer> node = createNode(tokens, 0);
         return node.getKey();
     }
 
     private Map.Entry<Node, Integer> createNode(List<Token> tokens, int index) {
-        if (tokens.size() - lastSleep > TOKEN_SLEEP_INTERVAL) {
-            try {
-                Thread.sleep(SLEEP_TIME);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            lastSleep = tokens.size();
-        }
-
         if (tokens.get(index).getType() == TokenType.VALUE) {
             Object obj = ((ValueToken) tokens.get(index)).value;
             return new AbstractMap.SimpleEntry<>(new ValueNode(obj), index + 1);
@@ -93,11 +70,8 @@ public abstract class FormatParser {
             boolean isKeyValue = tokens.get(currentIndex + 1).getType() == TokenType.EQUALS;
             if (isKeyValue) {
                 String realKey = null;
-                if (!(((ValueToken) tokens.get(currentIndex)).value instanceof String)) {
-                    realKey = ((ValueToken) tokens.get(currentIndex)).value.toString();
-                } else {
-                    realKey = namespace.getKeyName(((ValueToken) tokens.get(currentIndex)).value.toString());
-                }
+                Object value = ((ValueToken) tokens.get(currentIndex)).value;
+                realKey = value.toString();
 
                 Map.Entry<Node, Integer> result = createNode(tokens, currentIndex + 2);
                 childs.add(KeyValueNode.create(realKey, result.getKey()));

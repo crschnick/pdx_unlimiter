@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;

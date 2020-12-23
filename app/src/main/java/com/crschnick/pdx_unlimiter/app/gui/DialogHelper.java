@@ -4,38 +4,14 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.core.format.NamespaceCreator;
-import com.crschnick.pdx_unlimiter.core.savegame.*;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DialogHelper {
 
@@ -76,70 +52,6 @@ public class DialogHelper {
         alert.getDialogPane().setContent(p);
 
         alert.showAndWait();
-    }
-
-    public static void createNamespaceDialog() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select non-binary save file");
-        File named = fileChooser.showOpenDialog(PdxuApp.getApp().getScene().getWindow());
-        if (named == null) {
-            return;
-        }
-
-        fileChooser = new FileChooser();
-        fileChooser.setTitle("Select binary save file");
-        File unnamed = fileChooser.showOpenDialog(PdxuApp.getApp().getScene().getWindow());
-        if (unnamed == null) {
-            return;
-        }
-
-        RawSavegameVisitor.vist(unnamed.toPath(), new RawSavegameVisitor() {
-            @Override
-            public void visitEu4(Path file) {
-                try {
-                    Eu4RawSavegame un = Eu4RawSavegame.fromFile(unnamed.toPath());
-                    Eu4RawSavegame n = Eu4RawSavegame.fromFile(named.toPath());
-                    System.out.println(NamespaceCreator.createNamespace(
-                            Eu4Savegame.fromSavegame(un).getNodes(), Eu4Savegame.fromSavegame(n).getNodes()));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            }
-
-            @Override
-            public void visitHoi4(Path file) {
-                try {
-                    Hoi4RawSavegame un = Hoi4RawSavegame.fromFile(unnamed.toPath());
-                    Hoi4RawSavegame n = Hoi4RawSavegame.fromFile(named.toPath());
-                    System.out.println(NamespaceCreator.createNamespace(
-                            Hoi4Savegame.fromSavegame(un).getNodes(), Hoi4Savegame.fromSavegame(n).getNodes()));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            }
-
-            @Override
-            public void visitStellaris(Path file) {
-                throw new IllegalArgumentException("No need to create namespace");
-            }
-
-            @Override
-            public void visitCk3(Path file) {
-                try {
-                    Ck3RawSavegame un = Ck3RawSavegame.fromFile(unnamed.toPath());
-                    Ck3RawSavegame n = Ck3RawSavegame.fromFile(named.toPath());
-                    System.out.println(NamespaceCreator.createNamespace(
-                            Ck3Savegame.fromSavegame(un).getNodes(), Ck3Savegame.fromSavegame(n).getNodes()));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            }
-
-            @Override
-            public void visitOther(Path file) {
-
-            }
-        });
     }
 
     public static Alert createAlert() {

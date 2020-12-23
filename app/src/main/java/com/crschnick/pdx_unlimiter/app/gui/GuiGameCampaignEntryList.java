@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class GuiGameCampaignEntryList {
 
     private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
-        Consumer<Set<? extends GameCampaign<?,?>>> update = (s) -> {
+        Consumer<Set<? extends GameCampaign<?, ?>>> update = (s) -> {
             Platform.runLater(() -> {
                 if (s.size() > 0) {
                     pane.getChildren().set(0, listNode);
@@ -37,7 +36,7 @@ public class GuiGameCampaignEntryList {
             });
         };
 
-        SetChangeListener<GameCampaign<?,?>> campaignListListener = (change) -> {
+        SetChangeListener<GameCampaign<?, ?>> campaignListListener = (change) -> {
             update.accept(change.getSet());
         };
 

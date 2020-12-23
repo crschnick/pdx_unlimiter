@@ -1,12 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;

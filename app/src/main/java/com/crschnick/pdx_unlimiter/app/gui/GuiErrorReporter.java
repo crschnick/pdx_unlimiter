@@ -4,11 +4,9 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.awt.*;
@@ -77,12 +75,12 @@ public class GuiErrorReporter {
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Error reporter");
         alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
-"""
+                """
 
-If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
+                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
 
-Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
-This will send some diagnostics data""" : ""));
+                        Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
+                        This will send some diagnostics data""" : ""));
 
         VBox dialogPaneContent = new VBox();
 

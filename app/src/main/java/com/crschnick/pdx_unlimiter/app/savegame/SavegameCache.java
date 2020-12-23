@@ -1,53 +1,44 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.RawSavegame;
-import com.crschnick.pdx_unlimiter.core.savegame.Savegame;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.lang3.Streams;
-import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class SavegameCache<
-        R extends RawSavegame,
-        S extends Savegame,
         T,
         I extends SavegameInfo<T>> {
 
@@ -55,19 +46,20 @@ public abstract class SavegameCache<
     public static Hoi4SavegameCache HOI4;
     public static StellarisSavegameCache STELLARIS;
     public static Ck3SavegameCache CK3;
-    public static Set<SavegameCache<?, ?, ?, ?>> ALL;
+    public static Set<SavegameCache<?, ?>> ALL;
 
 
     private String fileEnding;
     private String name;
     private GameDateType dateType;
     private Path path;
+    private SavegameParser parser;
     private volatile ObservableSet<GameCampaign<T, I>> campaigns = FXCollections.synchronizedObservableSet(
             FXCollections.observableSet(new HashSet<>()));
-    private volatile Map<GameCampaignEntry<T, I>, S> loadedSavegames = Collections.synchronizedMap(new LinkedHashMap<>());
 
-    public SavegameCache(String name, String fileEnding, GameDateType dateType) {
+    public SavegameCache(String name, String fileEnding, GameDateType dateType, SavegameParser parser) {
         this.name = name;
+        this.parser = parser;
         this.fileEnding = fileEnding;
         this.dateType = dateType;
         this.path = PdxuInstallation.getInstance().getSavegameLocation().resolve(name);
@@ -91,7 +83,7 @@ public abstract class SavegameCache<
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        for (SavegameCache<?,?,?,?> cache : ALL) {
+        for (SavegameCache<?, ?> cache : ALL) {
             try {
                 cache.loadData();
             } catch (IOException e) {
@@ -101,7 +93,7 @@ public abstract class SavegameCache<
     }
 
     public static void reset() {
-        for (SavegameCache<?,?,?,?> cache : ALL) {
+        for (SavegameCache<?, ?> cache : ALL) {
             try {
                 cache.saveData();
             } catch (IOException e) {
@@ -256,7 +248,7 @@ public abstract class SavegameCache<
         this.campaigns.remove(c);
     }
 
-    public synchronized GameCampaignEntry<T, I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i, S savegame) {
+    public synchronized GameCampaignEntry<T, I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i) {
         GameCampaignEntry<T, I> e = createEntry(entryUuid, checksum, i);
         if (this.getCampaign(campainUuid).isEmpty()) {
             var newCampaign = createNewCampaignForEntry(e);
@@ -268,7 +260,6 @@ public abstract class SavegameCache<
 
         GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
         GameIntegration.selectEntry(e);
-        updateLoadedSavegames(e, savegame);
         return e;
     }
 
@@ -280,14 +271,14 @@ public abstract class SavegameCache<
         Path p = getPath(e);
         Path s = p.resolve("savegame." + name);
         try {
-            PathUtils.delete(p.resolve("data.zip"));
+            PathUtils.delete(p.resolve("data." + fileEnding));
         } catch (IOException ioException) {
             ErrorHandler.handleException(ioException);
             return false;
         }
 
         try {
-            writeSavegameData(s, p.resolve("data.zip"));
+            writeSavegameData(s, p.resolve("data." + fileEnding));
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return false;
@@ -296,9 +287,8 @@ public abstract class SavegameCache<
     }
 
     private void writeSavegameData(Path savegame, Path out) throws Exception {
-        R save = loadRaw(savegame);
-        S sg = loadDataFromRaw(save);
-        sg.write(out, true);
+        byte[] melted = RakalyHelper.meltSavegame(savegame);
+        Files.write(out, melted);
     }
 
     public synchronized boolean contains(GameCampaignEntry<?, ?> e) {
@@ -335,37 +325,6 @@ public abstract class SavegameCache<
         }
     }
 
-    public final Optional<S> loadDataForEntry(GameCampaignEntry<T, I> entry) {
-        if (loadedSavegames.containsKey(entry)) {
-            return Optional.ofNullable(loadedSavegames.get(entry));
-        }
-
-        try {
-            return Optional.ofNullable(updateLoadedSavegames(entry));
-        } catch (Exception e) {
-            ErrorHandler.handleException(e);
-            return Optional.empty();
-        }
-    }
-
-
-    private S updateLoadedSavegames(GameCampaignEntry<T, I> entry) throws Exception {
-        S s = loadDataFromFile(getPath(entry).resolve("data.zip"));
-        updateLoadedSavegames(entry, s);
-        return s;
-    }
-
-    private void updateLoadedSavegames(GameCampaignEntry<T, I> entry, S savegame) {
-        if (loadedSavegames.size() >= Settings.getInstance().getMaxLoadedSavegames()) {
-            GameCampaignEntry<T, I> first = loadedSavegames.keySet().iterator().next();
-            loadedSavegames.remove(first);
-            LoggerFactory.getLogger(SavegameCache.class).debug("Unloaded savegame data of entry " + getEntryName(first));
-        }
-        ;
-        loadedSavegames.put(entry, savegame);
-        LoggerFactory.getLogger(SavegameCache.class).debug("Loaded savegame data of entry " + getEntryName(entry));
-    }
-
     public void loadEntryAsync(GameCampaignEntry<T, I> e) {
         if (e.infoProperty().isNull().get()) {
             TaskExecutor.getInstance().submitTask(() -> {
@@ -382,31 +341,21 @@ public abstract class SavegameCache<
         }
 
         try {
-            if (needsUpdate(e)) {
-                LoggerFactory.getLogger(SavegameCache.class).debug("Updating entry " + getEntryName(e));
-                if (!updateSavegameData(e)) {
-                    LoggerFactory.getLogger(SavegameCache.class).debug("Update failed for entry " + getEntryName(e));
-                    return;
-                }
+            var file = getPath(e).resolve("savegame." + fileEnding);
+            byte[] content = Files.readAllBytes(file);
+            if (parser.isBinaryFormat(content)) {
+                content = RakalyHelper.meltSavegame(file);
             }
-            S savegame = updateLoadedSavegames(e);
-            I info = loadInfo(savegame);
+            var node = parser.parse(content);
+            I info = loadInfo(node);
             e.infoProperty().set(info);
             LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
-        } catch (Exception exception) {
-            ErrorHandler.handleException(exception);
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
         }
     }
 
-    protected abstract boolean needsUpdate(GameCampaignEntry<T, I> e);
-
-    protected abstract I loadInfo(S data) throws Exception;
-
-    protected abstract R loadRaw(Path p) throws Exception;
-
-    protected abstract S loadDataFromFile(Path p) throws Exception;
-
-    protected abstract S loadDataFromRaw(R raw) throws Exception;
+    protected abstract I loadInfo(Node n) throws Exception;
 
     public synchronized Path getPath(GameCampaignEntry<T, I> e) {
         Path campaignPath = path.resolve(getCampaign(e).getCampaignId().toString());
@@ -444,43 +393,34 @@ public abstract class SavegameCache<
         }
     }
 
-    private String getDataFileName() {
-        return "data.zip";
-    }
-
     private String getSaveFileName() {
         return "savegame." + fileEnding;
     }
 
     private void importSavegameData(Path file) throws Exception {
-        R rawSavegame = loadRaw(file);
-        S savegame = loadDataFromRaw(rawSavegame);
-        I info = loadInfo(savegame);
+        byte[] content = Files.readAllBytes(file);
 
-        UUID uuid = info.getCampaignUuid();
-
-        final Optional<GameCampaignEntry<T, I>>[] exists = new Optional[]{Optional.empty()};
-        getCampaigns().stream()
-                .filter(c -> c.getCampaignId().equals(uuid))
-                .findAny().ifPresent(c -> {
-            exists[0] = (c.getEntries().stream()
-                    .filter(ch -> ch.getChecksum().equals(rawSavegame.getFileChecksum())))
-                    .findAny();
-        });
-        if (exists[0].isPresent()) {
-            loadEntry(exists[0].get());
-            GameIntegration.selectEntry(exists[0].get());
+        var checksum = parser.checksum(content);
+        var exists = getCampaigns().stream().flatMap(GameCampaign::entryStream)
+                .filter(ch -> ch.getChecksum().equals(checksum))
+                .findAny();
+        if (exists.isPresent()) {
+            loadEntry(exists.get());
+            GameIntegration.selectEntry(exists.get());
             return;
         }
+
+        Node node = parser.parse(content);
+        I info = loadInfo(node);
+        UUID uuid = info.getCampaignUuid();
 
         UUID saveUuid = UUID.randomUUID();
         Path campaignPath = getPath().resolve(uuid.toString());
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
         FileUtils.forceMkdir(entryPath.toFile());
-        savegame.write(entryPath.resolve(getDataFileName()), true);
         FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-        this.addNewEntry(uuid, saveUuid, rawSavegame.getFileChecksum(), info, savegame);
+        this.addNewEntry(uuid, saveUuid, checksum, info);
     }
 
     public String getEntryName(GameCampaignEntry<T, I> e) {

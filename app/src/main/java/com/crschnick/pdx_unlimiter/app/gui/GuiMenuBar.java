@@ -12,7 +12,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.awt.*;
@@ -51,37 +53,6 @@ public class GuiMenuBar {
             }
         });
         savegames.getItems().add(sd);
-
-        Menu achievements = new Menu("Achievements");
-        MenuItem asrc = new MenuItem("Achievement source");
-        asrc.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdxu_achievements/"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
-        MenuItem oa = new MenuItem("Official achievements directory");
-        oa.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().open(PdxuInstallation.getInstance().getOfficialAchievementsLocation().toFile());
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
-
-        MenuItem ua = new MenuItem("User achievements directory");
-        ua.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().open(PdxuInstallation.getInstance().getUserAchievementsLocation().toFile());
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
-
-        achievements.getItems().add(asrc);
-        achievements.getItems().add(oa);
-        achievements.getItems().add(ua);
 
 
         Menu about = new Menu("About");
@@ -132,11 +103,6 @@ public class GuiMenuBar {
         help.getItems().add(is);
 
         Menu dev = new Menu("Developer");
-        MenuItem ns = new MenuItem("Namespace creator");
-        ns.setOnAction((a) -> {
-            DialogHelper.createNamespaceDialog();
-        });
-        dev.getItems().add(ns);
 
         MenuItem log = new MenuItem("Show log");
         log.setOnAction((a) -> {
@@ -195,7 +161,7 @@ public class GuiMenuBar {
 
         StackPane spacer = new StackPane();
         Label game = new Label();
-        GameIntegration.currentGameProperty().addListener((c,o,n) -> {
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
             var current = GameIntegration.current();
             var name = current != null ? GameIntegration.current().getName() : "None";
             Platform.runLater(() -> game.setText(name));

@@ -5,10 +5,7 @@ import com.crschnick.pdx_unlimiter.app.util.SteamHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.awt.*;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;

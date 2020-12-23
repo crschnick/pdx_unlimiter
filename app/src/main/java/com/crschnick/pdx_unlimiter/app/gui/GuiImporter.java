@@ -1,17 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.skins.JFXListViewSkin;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;

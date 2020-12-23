@@ -1,34 +1,36 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.concurrent.Task;
-import org.apache.commons.io.FileUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 public class RakalyHelper {
+
+    public static byte[] meltSavegame(Path file) throws IOException {
+        var proc = new ProcessBuilder(
+                PdxuInstallation.getInstance().getRakalyExecutable().toString(),
+                "melt",
+                "--unknown-key", "stringify",
+                "--to-stdout",
+                file.toString()).start();
+        return proc.getInputStream().readAllBytes();
+    }
 
     public static void uploadSavegame(SavegameCache cache, GameCampaignEntry<?, ?> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {

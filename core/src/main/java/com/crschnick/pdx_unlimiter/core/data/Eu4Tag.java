@@ -22,12 +22,13 @@ public class Eu4Tag {
     }
 
     public static Eu4Tag fromNode(Node n) {
-        KeyValueNode kv = Node.getKeyValueNode(n);
-        List<Node> mc = Node.getNodeArray(Node.getNodeForKey(Node.getNodeForKey(kv.getNode(), "colors"), "map_color"));
-        int mColor = (Node.getInteger(mc.get(0)) << 24) + (Node.getInteger(mc.get(1)) << 16) + (Node.getInteger(mc.get(2)) << 8);
-        List<Node> cc = Node.getNodeArray(Node.getNodeForKey(Node.getNodeForKey(kv.getNode(), "colors"), "country_color"));
-        int cColor = (Node.getInteger(mc.get(0)) << 24) + (Node.getInteger(cc.get(1)) << 16) + (Node.getInteger(cc.get(2)) << 8);
-        Optional<String> name = Node.hasKey(kv.getNode(), "name") ? Optional.of(Node.getString(Node.getNodeForKey(kv.getNode(), "name"))) : Optional.empty();
+        KeyValueNode kv = n.getKeyValueNode();
+        List<Node> mc = kv.getNode().getNodeForKey("colors").getNodeForKey("map_color").getNodeArray();
+        int mColor = (mc.get(0).getInteger() << 24) + (mc.get(1).getInteger() << 16) + (mc.get(2).getInteger() << 8);
+        List<Node> cc = kv.getNode().getNodeForKey("colors").getNodeForKey("country_color").getNodeArray();
+        int cColor = (cc.get(0).getInteger() << 24) + (cc.get(1).getInteger() << 16) + (cc.get(2).getInteger() << 8);
+        Optional<String> name = kv.getNode().hasKey("name") ?
+                Optional.of(kv.getNode().getNodeForKey("name").getString()) : Optional.empty();
         return new Eu4Tag(kv.getKeyName(), mColor, cColor, name);
     }
 

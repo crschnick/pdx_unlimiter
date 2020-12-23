@@ -2,16 +2,12 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
@@ -54,10 +50,6 @@ public abstract class GameInstallation {
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
     public static void init() throws Exception {
         Settings s = Settings.getInstance();
         s.getEu4().ifPresent(p -> GameInstallation.EU4 = new Eu4Installation(p));
@@ -85,6 +77,10 @@ public abstract class GameInstallation {
         CK3 = null;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
         savegameDirs.add(getSavegamesPath());
@@ -108,7 +104,7 @@ public abstract class GameInstallation {
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
-            SavegameCache<?, ?, T, I> cache, GameCampaignEntry<T, I> e) {
+            SavegameCache<T, I> cache, GameCampaignEntry<T, I> e) {
         Path file = getSavegamesPath().resolve(cache.getFileName(e));
         return file;
     }

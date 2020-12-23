@@ -4,14 +4,12 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
-import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -179,9 +177,9 @@ public abstract class FileImportTarget {
     public static class StandardImportTarget extends FileImportTarget {
 
         protected Path path;
-        private SavegameCache<?, ?, ?, ?> savegameCache;
+        private SavegameCache<?, ?> savegameCache;
 
-        public StandardImportTarget(SavegameCache<?, ?, ?, ?> savegameCache, Path path) {
+        public StandardImportTarget(SavegameCache<?, ?> savegameCache, Path path) {
             this.savegameCache = savegameCache;
             this.path = path;
         }

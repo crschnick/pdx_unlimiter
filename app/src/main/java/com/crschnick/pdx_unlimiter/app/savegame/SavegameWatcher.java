@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -18,6 +17,12 @@ public class SavegameWatcher {
     public static SavegameWatcher HOI4;
     public static SavegameWatcher STELLARIS;
     public static SavegameWatcher CK3;
+    private GameInstallation install;
+    private ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
+
+    private SavegameWatcher(GameInstallation install) {
+        this.install = install;
+    }
 
     public static void init() {
         if (GameInstallation.EU4 != null) {
@@ -43,13 +48,6 @@ public class SavegameWatcher {
         HOI4 = null;
         STELLARIS = null;
         CK3 = null;
-    }
-
-    private GameInstallation install;
-    private ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
-
-    private SavegameWatcher(GameInstallation install) {
-        this.install = install;
     }
 
     private void initSavegames() {

@@ -5,7 +5,6 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.format.ColorTransformer;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
@@ -32,30 +31,30 @@ public class ColorHelper {
 
     private static javafx.scene.paint.Color colorFromNodes(List<Node> c, boolean hsv) {
         if (hsv) {
-            return Color.hsb(Node.getDouble(c.get(0)), Node.getDouble(c.get(1)), Node.getDouble(c.get(2)));
+            return Color.hsb(c.get(0).getDouble(), c.get(1).getDouble(), c.get(2).getDouble());
         } else {
 
-            return Color.color(Node.getDouble(c.get(0)), Node.getDouble(c.get(1)), Node.getDouble(c.get(2)));
+            return Color.color(c.get(0).getDouble(), c.get(1).getDouble(), c.get(2).getDouble());
         }
     }
 
     private static Map<String, Color> loadPredefinedColors(List<Node> nodes) {
         Map<String, Color> map = new HashMap<>();
         for (Node n : nodes) {
-            var kv = Node.getKeyValueNode(n);
+            var kv = n.getKeyValueNode();
             Node data = kv.getNode();
             List<Node> color;
 
             boolean isHsv = false;
 
-            var colorData = Node.getNodeForKey(data, "flag");
+            var colorData = data.getNodeForKey("flag");
             if (colorData instanceof ValueNode) {
-                if (Node.getString(colorData).equals("hsv")) {
+                if (colorData.getString().equals("hsv")) {
                     isHsv = true;
                 }
-                color = Node.getNodeArray(Node.getNodeArray(data).get(3));
+                color = data.getNodeArray().get(3).getNodeArray();
             } else {
-                color = Node.getNodeArray(colorData);
+                color = colorData.getNodeArray();
             }
 
             map.put(kv.getKeyName(), colorFromNodes(color, isHsv));
@@ -66,19 +65,19 @@ public class ColorHelper {
     private static Map<String, Color> loadPredefinedCk3Colors(List<Node> nodes) {
         Map<String, Color> map = new HashMap<>();
         for (Node n : nodes) {
-            var kv = Node.getKeyValueNode(n);
+            var kv = n.getKeyValueNode();
             Node data = kv.getNode();
 
             boolean isHsv = false;
 
-            var colorData = Node.getNodeArray(Node.getNodeForKey(data, "values"));
-            if (Node.getString(Node.getNodeForKey(data, "type")).equals("hsv")) {
+            var colorData = data.getNodeForKey("values").getNodeArray();
+            if (data.getNodeForKey("type").getString().equals("hsv")) {
                 isHsv = true;
             }
-            if (Node.getString(Node.getNodeForKey(data, "type")).equals("hsv360")) {
+            if (data.getNodeForKey("type").getString().equals("hsv360")) {
                 isHsv = true;
                 colorData = colorData.stream()
-                        .map(v -> new ValueNode(Node.getDouble(v) / 360D))
+                        .map(v -> new ValueNode(v.getDouble() / 360D))
                         .collect(Collectors.toList());
             }
 
@@ -91,9 +90,9 @@ public class ColorHelper {
         try {
             InputStream in = CascadeDirectoryHelper.openFile(
                     Path.of("common").resolve("named_colors").resolve("default_colors.txt"), e, GameInstallation.CK3).get();
-            Node node = TextFormatParser.textFileParser().parse(in).get();
-            new ColorTransformer().transform(Node.getNodeForKey(node, "colors"));
-            return loadPredefinedCk3Colors(Node.getNodeArray(Node.getNodeForKey(node, "colors")));
+            Node node = TextFormatParser.textFileParser().parse(in);
+            ColorNodeTransformer.transform(node.getNodeForKey("colors"));
+            return loadPredefinedCk3Colors(node.getNodeForKey("colors").getNodeArray());
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();
@@ -103,8 +102,8 @@ public class ColorHelper {
     public static Map<String, Color> loadStellarisColors(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> e) {
         try {
             InputStream in = CascadeDirectoryHelper.openFile(Path.of("flags").resolve("colors.txt"), e, GameInstallation.STELLARIS).get();
-            Node node = TextFormatParser.textFileParser().parse(in).get();
-            return loadPredefinedColors(Node.getNodeArray(Node.getNodeForKey(node, "colors")));
+            Node node = TextFormatParser.textFileParser().parse(in);
+            return loadPredefinedColors(node.getNodeForKey("colors").getNodeArray());
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();

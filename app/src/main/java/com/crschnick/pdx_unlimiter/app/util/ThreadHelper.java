@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.util;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 
 import java.awt.*;
-import java.io.IOException;
 import java.net.URI;
 
 public class ThreadHelper {

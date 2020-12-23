@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
@@ -19,9 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
@@ -212,7 +209,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
 
-    private Pane eu4TagNode(GameCampaign<Eu4Tag,Eu4SavegameInfo> campaign, String styleClass) {
+    private Pane eu4TagNode(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign, String styleClass) {
         return eu4TagNode(GameImage.getEu4TagPath(campaign.getTag().getTag()), null);
     }
 

@@ -1,34 +1,27 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 public class SavedState {
 
+    public static final int INVALID = Integer.MIN_VALUE;
     private static SavedState INSTANCE;
-
     private int windowX;
     private int windowY;
     private int windowWidth;
     private int windowHeight;
     private GameInstallation activeGame;
-
-    public static final int INVALID = Integer.MIN_VALUE;
 
     public static void init() {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("state.json");
@@ -96,43 +89,43 @@ public class SavedState {
         }
     }
 
-    public void setWindowX(int windowX) {
-        this.windowX = windowX;
-    }
-
-    public void setWindowY(int windowY) {
-        this.windowY = windowY;
-    }
-
-    public void setWindowWidth(int windowWidth) {
-        this.windowWidth = windowWidth;
-    }
-
-    public void setWindowHeight(int windowHeight) {
-        this.windowHeight = windowHeight;
-    }
-
-    public void setActiveGame(GameInstallation activeGame) {
-        this.activeGame = activeGame;
-    }
-
     public int getWindowX() {
         return windowX;
+    }
+
+    public void setWindowX(int windowX) {
+        this.windowX = windowX;
     }
 
     public int getWindowY() {
         return windowY;
     }
 
+    public void setWindowY(int windowY) {
+        this.windowY = windowY;
+    }
+
     public int getWindowWidth() {
         return windowWidth;
+    }
+
+    public void setWindowWidth(int windowWidth) {
+        this.windowWidth = windowWidth;
     }
 
     public int getWindowHeight() {
         return windowHeight;
     }
 
+    public void setWindowHeight(int windowHeight) {
+        this.windowHeight = windowHeight;
+    }
+
     public GameInstallation getActiveGame() {
         return activeGame;
+    }
+
+    public void setActiveGame(GameInstallation activeGame) {
+        this.activeGame = activeGame;
     }
 }

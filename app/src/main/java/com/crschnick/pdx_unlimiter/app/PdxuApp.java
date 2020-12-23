@@ -2,11 +2,12 @@ package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
-import com.crschnick.pdx_unlimiter.app.installation.*;
+import com.crschnick.pdx_unlimiter.app.installation.ComponentManager;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.SavedState;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;

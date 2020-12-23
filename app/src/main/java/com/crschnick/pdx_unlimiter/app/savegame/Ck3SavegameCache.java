@@ -2,18 +2,16 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3RawSavegame;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3Savegame;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -21,10 +19,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class Ck3SavegameCache extends SavegameCache<Ck3RawSavegame, Ck3Savegame, Ck3Tag, Ck3SavegameInfo> {
+public class Ck3SavegameCache extends SavegameCache<Ck3Tag, Ck3SavegameInfo> {
 
     public Ck3SavegameCache() {
-        super("ck3", "ck3", GameDateType.CK3);
+        super("ck3", "ck3", GameDateType.CK3, new Ck3SavegameParser());
     }
 
     private Ck3Tag.CoatOfArms readCoa(JsonNode node) {
@@ -102,36 +100,7 @@ public class Ck3SavegameCache extends SavegameCache<Ck3RawSavegame, Ck3Savegame,
     }
 
     @Override
-    protected boolean needsUpdate(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e) {
-        Path p = getPath(e);
-        int v = 0;
-        try {
-            v = p.toFile().exists() ? Ck3Savegame.getVersion(p.resolve("data.zip")) : 0;
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
-            return true;
-        }
-
-        return v < Ck3Savegame.VERSION;
-    }
-
-    @Override
-    protected Ck3SavegameInfo loadInfo(Ck3Savegame data) throws Exception {
-        return Ck3SavegameInfo.fromSavegame(data);
-    }
-
-    @Override
-    protected Ck3RawSavegame loadRaw(Path p) throws Exception {
-        return Ck3RawSavegame.fromFile(p);
-    }
-
-    @Override
-    protected Ck3Savegame loadDataFromFile(Path p) throws Exception {
-        return Ck3Savegame.fromFile(p);
-    }
-
-    @Override
-    protected Ck3Savegame loadDataFromRaw(Ck3RawSavegame raw) throws Exception {
-        return Ck3Savegame.fromSavegame(raw);
+    protected Ck3SavegameInfo loadInfo(Node n) throws Exception {
+        return Ck3SavegameInfo.fromSavegame(n);
     }
 }

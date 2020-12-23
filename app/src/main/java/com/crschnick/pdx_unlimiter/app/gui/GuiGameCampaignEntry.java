@@ -50,16 +50,6 @@ public class GuiGameCampaignEntry {
         open.getStyleClass().add("open-button");
         Tooltip.install(open, new Tooltip("Open stored savegame location"));
 
-
-        Button achievements = new JFXButton();
-        achievements.setGraphic(new FontIcon());
-        achievements.setOnMouseClicked((m) -> {
-            AchievementWindow.showAchievementList(e);
-        });
-        achievements.getStyleClass().add("achievement-button");
-        Tooltip.install(achievements, new Tooltip("Show achievements (Experimental)"));
-
-
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());
         del.setOnMouseClicked((m) -> {

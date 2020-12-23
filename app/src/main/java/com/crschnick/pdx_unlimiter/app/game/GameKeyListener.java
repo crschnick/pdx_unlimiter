@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import javafx.scene.control.Tooltip;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 

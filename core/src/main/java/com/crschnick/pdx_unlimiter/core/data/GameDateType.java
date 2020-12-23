@@ -1,14 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.data;
 
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
-
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -84,8 +77,11 @@ public abstract class GameDateType {
     };
 
     public abstract boolean hasHours();
+
     public abstract int getDaysInMonth(int month);
+
     public abstract String toShortString(GameDate date);
+
     public abstract String toLongString(GameDate date);
 
     private int getDay(int m, long days) {
@@ -114,33 +110,6 @@ public abstract class GameDateType {
 
     private int getYear(long days) {
         return (int) Math.floor(days / 365f);
-    }
-
-    public Node toNode(GameDate date) {
-        List<Node> nodes = new ArrayList<>();
-        if (hasHours()) {
-            nodes.add(KeyValueNode.create("hour", new ValueNode((long) date.getHour())));
-        }
-        nodes.add(KeyValueNode.create("day", new ValueNode((long) date.getDay())));
-        nodes.add(KeyValueNode.create("month", new ValueNode((long) date.getMonth())));
-        nodes.add(KeyValueNode.create("year", new ValueNode((long) date.getYear())));
-        if (hasHours()) {
-            nodes.add(KeyValueNode.create("hours_since_beginning", new ValueNode(toHoursSinceBeginning(date))));
-        } else {
-            nodes.add(KeyValueNode.create("days_since_beginning", new ValueNode(toHoursSinceBeginning(date) / 24)));
-        }
-        return new ArrayNode(nodes);
-    }
-
-    public GameDate fromNode(Node node) {
-        int hours = 0;
-        if (hasHours()) {
-hours = Node.getInteger(Node.getNodeForKey(node, "hour"));
-        }
-        int day = Node.getInteger(Node.getNodeForKey(node, "day"));
-        int month = Node.getInteger(Node.getNodeForKey(node, "month"));
-        int year = Node.getInteger(Node.getNodeForKey(node, "year"));
-        return new GameDate(hours, day, month, year, this);
     }
 
     public long toHoursSinceBeginning(GameDate date) {

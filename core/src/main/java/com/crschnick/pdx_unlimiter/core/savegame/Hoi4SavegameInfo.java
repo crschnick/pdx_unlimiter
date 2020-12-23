@@ -13,15 +13,14 @@ import java.util.stream.Collectors;
 
 public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
 
-    public static Hoi4SavegameInfo fromSavegame(Hoi4Savegame sg) throws SavegameParseException {
+    public static Hoi4SavegameInfo fromSavegame(Node n) throws SavegameParseException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
         try {
-            i.tag = new Hoi4Tag(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "player")),
-                    Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "ideology")));
-            i.date = GameDateType.HOI4.fromNode(Node.getNodeForKey(sg.getNodes().get("gamestate"), "date"));
-            i.campaignUuid = UUID.fromString(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "game_unique_id")));
+            i.tag = new Hoi4Tag(n.getNodeForKey("player").getString(), n.getNodeForKey("ideology").getString());
+            i.date = GameDateType.HOI4.fromString(n.getNodeForKey("date").getString());
+            i.campaignUuid = UUID.fromString(n.getNodeForKey("game_unique_id").getString());
 
-            i.mods = Node.getNodeForKeyIfExistent(sg.getNodes().get("gamestate"), "mods")
+            i.mods = n.getNodeForKeyIfExistent("mods")
                     .map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
@@ -29,7 +28,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
             i.dlcs = List.of();
 
             Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)\\s+.*");
-            Matcher m = p.matcher(Node.getString(Node.getNodeForKey(sg.getNodes().get("gamestate"), "version")));
+            Matcher m = p.matcher(n.getNodeForKey("version").getString());
             m.matches();
             i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
 
