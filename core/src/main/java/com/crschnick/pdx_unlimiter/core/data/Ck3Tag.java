@@ -2,9 +2,7 @@ package com.crschnick.pdx_unlimiter.core.data;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ck3Tag {
@@ -32,13 +30,14 @@ public class Ck3Tag {
                 .map(n -> Title.fromNode(n, coas))
                 .collect(Collectors.toList());
 
+        Map<Integer,Title> titleIds = titles.stream().collect(Collectors.toMap(t -> t.id, t -> t));
         var tags = living.getNodeArray().stream()
                 .filter(n -> n.getKeyValueNode().getNode().hasKey("landed_data"))
                 .map(n -> {
                     var domain = n.getKeyValueNode().getNode().getNodeForKey("landed_data").getNodeForKey("domain");
 
                     var tagTitles = domain.getNodeArray().stream()
-                            .map(id -> titles.stream().filter(t -> t.id == id.getInteger()).findFirst().get())
+                            .map(id -> titleIds.get(id.getInteger()))
                             .collect(Collectors.toList());
                     var ruler = Person.fromNode(n);
                     return new Ck3Tag(ruler, tagTitles);
