@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
@@ -29,7 +30,14 @@ public class RakalyHelper {
                 "--unknown-key", "stringify",
                 "--to-stdout",
                 file.toString()).start();
-        return proc.getInputStream().readAllBytes();
+        var b = proc.getInputStream().readAllBytes();
+        int returnCode = proc.exitValue();
+
+        if (returnCode != 0) {
+            String errorMsg = new String(proc.getErrorStream().readAllBytes());
+            throw new IOException(errorMsg);
+        }
+        return b;
     }
 
     public static void uploadSavegame(SavegameCache cache, GameCampaignEntry<?, ?> entry) {

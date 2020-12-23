@@ -94,8 +94,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     private Pane ck3TagNode(
             Ck3Tag.CoatOfArms coa, GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, String styleClass) {
         Image pattern = null;
-
-        {
+        if (coa.getPatternFile() != null) {
             int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
                     .getOrDefault(coa.getColors().get(0), Color.TRANSPARENT)) : 0;
             int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
@@ -158,14 +157,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                     ImageLoader.loadImageOptional(inputStream, customFilter).orElse(null))
                     .orElse(null);
         }
-
-        var in = CascadeDirectoryHelper.openFile(
-                Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getEmblemFile()),
-                entry,
-                GameInstallation.CK3);
-        in.map(inputStream ->
-                ImageLoader.loadImageOptional(inputStream, null).orElse(null))
-                .orElse(null);
 
         ImageView v = new ImageView(pattern);
         ImageView iconV = new ImageView(emblem);

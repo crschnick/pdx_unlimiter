@@ -70,7 +70,7 @@ public abstract class Node {
 
     public double getDouble() {
         String sv = getString();
-        if (DOUBLE.matcher(sv).matches()) {
+        if (LONG.matcher(sv).matches() || DOUBLE.matcher(sv).matches()) {
             double v = Double.parseDouble(sv);
             return v;
         } else {

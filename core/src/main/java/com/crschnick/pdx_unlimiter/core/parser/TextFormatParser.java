@@ -52,7 +52,9 @@ public class TextFormatParser extends FormatParser {
                 t = new CloseGroupToken();
             } else if (c == '=') {
                 t = new EqualsToken();
-            } else if (isInComment) {
+            }
+
+            if (isInComment) {
                 if (c == '\n') {
                     isInComment = false;
                 }
@@ -88,8 +90,8 @@ public class TextFormatParser extends FormatParser {
     }
 
     @Override
-    public List<FormatParser.Token> tokenize(InputStream stream) throws IOException {
-        String s = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+    public List<FormatParser.Token> tokenize(byte[] data) throws IOException {
+        String s = new String(data, StandardCharsets.UTF_8);
         s += "\0";
         return tokenize(s);
     }

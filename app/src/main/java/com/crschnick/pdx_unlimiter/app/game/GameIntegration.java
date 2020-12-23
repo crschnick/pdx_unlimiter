@@ -103,13 +103,13 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
                 current.set(EU4);
             }
         }
-        if (GameInstallation.HOI4 != null) {
-            HOI4 = new Hoi4Integration();
-            ALL.add(HOI4);
-            if (s.getActiveGame().equals(GameInstallation.HOI4)) {
-                current.set(HOI4);
-            }
-        }
+//        if (GameInstallation.HOI4 != null) {
+//            HOI4 = new Hoi4Integration();
+//            ALL.add(HOI4);
+//            if (s.getActiveGame().equals(GameInstallation.HOI4)) {
+//                current.set(HOI4);
+//            }
+//        }
 
         if (GameInstallation.STELLARIS != null) {
             STELLARIS = new StellarisIntegration();
@@ -164,12 +164,13 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     }
 
     public static <T, I extends SavegameInfo<T>> void selectCampaign(GameCampaign<T, I> c) {
-        if (current.isNotNull().get()) {
+        if (c == null) {
             unselectCampaignAndEntry();
+            LoggerFactory.getLogger(GameIntegration.class).debug("Unselected campaign");
+            return;
         }
 
-        if (c == null) {
-            LoggerFactory.getLogger(GameIntegration.class).debug("Unselected campaign");
+        if (globalSelectedCampaign.isNotNull().get() && globalSelectedCampaign.get().equals(c)) {
             return;
         }
 

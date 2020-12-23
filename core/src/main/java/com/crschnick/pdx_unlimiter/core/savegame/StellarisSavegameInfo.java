@@ -17,9 +17,10 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameParseException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
         try {
-            i.ironman = n.getNodeForKey("galaxy").getNodeForKey("ironman").getBoolean();
+            i.ironman = n.getNodeForKey("galaxy").getNodeForKeyIfExistent("ironman")
+                    .map(Node::getBoolean).orElse(false);
 
-            i.date = GameDateType.STELLARIS.fromString(n.getNodeForKey("date").getString());
+            i.date = GameDateType.STELLARIS.fromString(n.getNodesForKey("date").get(0).getString());
 
             i.campaignUuid = UUID.randomUUID();
 
@@ -29,7 +30,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.campaignUuid = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new HashSet<>();
-            for (Node country : n.getNodeForKey("countries").getNodeArray()) {
+            for (Node country : n.getNodeForKey("country").getNodeArray()) {
                 KeyValueNode kv = country.getKeyValueNode();
 
                 // Invalid country node
@@ -58,12 +59,12 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
             i.mods = List.of();
 
-            i.dlcs = n.getNodeForKey("required_dlcs").getNodeArray()
+            i.dlcs = n.getNodeForKeyIfExistent("required_dlcs").map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
             Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)");
-            Matcher m = p.matcher(n.getNodeForKey("version").getString());
+            Matcher m = p.matcher(n.getNodesForKey("version").get(0).getString());
             m.matches();
             i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
 

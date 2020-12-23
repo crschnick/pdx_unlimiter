@@ -19,19 +19,31 @@ public abstract class FormatParser {
         return Arrays.equals(first, header);
     }
 
-    public abstract List<Token> tokenize(InputStream stream) throws IOException;
+    public abstract List<Token> tokenize(byte[] data) throws IOException;
 
     public final Node parse(InputStream stream) throws IOException {
         byte[] first = new byte[header.length];
         stream.readNBytes(first, 0, header.length);
         if (!Arrays.equals(first, header)) {
             stream.close();
-            throw new IllegalArgumentException("Invalid header");
+            throw new IOException("Invalid header");
         }
 
-        List<Token> tokens = tokenize(stream);
-
+        List<Token> tokens = tokenize(stream.readAllBytes());
         stream.close();
+        tokens.add(0, new OpenGroupToken());
+        tokens.add(new CloseGroupToken());
+        return hierachiseTokens(tokens);
+    }
+
+    public final Node parse(byte[] input) throws IOException {
+        byte[] first = Arrays.copyOfRange(input, 0, header.length);
+        if (!Arrays.equals(first, header)) {
+            throw new IOException("Invalid header");
+        }
+
+        List<Token> tokens = tokenize(input);
+
         tokens.add(0, new OpenGroupToken());
         tokens.add(new CloseGroupToken());
         return hierachiseTokens(tokens);

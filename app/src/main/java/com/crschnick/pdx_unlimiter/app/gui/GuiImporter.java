@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.HashSet;
@@ -109,6 +110,7 @@ public class GuiImporter {
         box.getChildren().add(createBottomNode(selected, cb));
 
         Alert alert = DialogHelper.createEmptyAlert();
+        alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import savegames");
         alert.getDialogPane().setContent(box);
         alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
@@ -119,6 +121,6 @@ public class GuiImporter {
         });
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
         alert.getDialogPane().requestFocus();
-        alert.showAndWait();
+        alert.show();
     }
 }

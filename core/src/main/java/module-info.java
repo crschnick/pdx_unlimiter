@@ -1,7 +1,5 @@
 module com.crschnick.pdx_unlimiter.core {
     requires java.se;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.core;
 
     exports com.crschnick.pdx_unlimiter.core.parser;
     exports com.crschnick.pdx_unlimiter.core.savegame;

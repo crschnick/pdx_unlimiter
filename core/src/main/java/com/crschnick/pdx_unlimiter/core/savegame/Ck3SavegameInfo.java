@@ -17,7 +17,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     public static Ck3SavegameInfo fromSavegame(Node n) throws SavegameParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
-            i.ironman = n.getNodeForKey("meta").getNodeForKey("ironman").getBoolean();
+            i.ironman = n.getNodeForKey("meta_data").getNodeForKey("ironman").getBoolean();
             i.date = GameDateType.CK3.fromString(n.getNodeForKey("date").getString());
 
             long seed = n.getNodeForKey("random_seed").getLong();
@@ -31,13 +31,13 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
                     n.getNodeForKey("coat_of_arms"));
             i.tag = Ck3Tag.getPlayerTag(n, i.allTags);
 
-            i.mods = n.getNodeForKey("mods").getNodeArray()
+            i.mods = n.getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
             i.dlcs = List.of();
 
             Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
-            Matcher m = p.matcher(n.getNodeForKey("version").getString());
+            Matcher m = p.matcher(n.getNodeForKey("meta_data").getNodeForKey("version").getString());
             m.matches();
             i.version = new GameVersion(
                     Integer.parseInt(m.group(1)),

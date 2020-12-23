@@ -26,7 +26,9 @@ public class GuiGameCampaignList {
                 var button = GuiGameCampaign.createCampaignButton(
                         c.getElementAdded(), GameIntegration.current().getGuiFactory());
                 int index = GameIntegration.current().getSavegameCache().indexOf(c.getElementAdded());
-                Platform.runLater(() -> grid.getItems().add(index, button));
+                Platform.runLater(() -> {
+                    grid.getItems().add(index, button);
+                });
             } else {
                 Platform.runLater(() -> grid.getItems().remove(grid.getItems().stream()
                         .filter(n -> !c.getSet().contains(n.getProperties().get("campaign"))).findAny().get()));

@@ -4,6 +4,8 @@ import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -12,6 +14,14 @@ public class StellarisSavegameParser extends SavegameParser {
     @Override
     public boolean isBinaryFormat(byte[] content) throws Exception {
         return false;
+    }
+
+    public class ZippedInputStream extends InputStream {
+
+        @Override
+        public int read() throws IOException {
+            return 0;
+        }
     }
 
     @Override
@@ -24,10 +34,10 @@ public class StellarisSavegameParser extends SavegameParser {
         ZipEntry entry;
         while ((entry = zipFile.getNextEntry()) != null) {
             if (entry.getName().equals("gamestate")) {
-                gamestate = TextFormatParser.eu4SavegameParser().parse(zipFile);
+                gamestate = TextFormatParser.stellarisSavegameParser().parse(zipFile.readAllBytes());
             }
             if (entry.getName().equals("meta")) {
-                meta = TextFormatParser.eu4SavegameParser().parse(zipFile);
+                meta = TextFormatParser.stellarisSavegameParser().parse(zipFile.readAllBytes());
             }
             zipFile.closeEntry();
         }

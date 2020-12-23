@@ -51,13 +51,13 @@ public class Eu4SavegameParser extends SavegameParser {
             ZipEntry entry;
             while ((entry = zipFile.getNextEntry()) != null) {
                 if (entry.getName().equals("gamestate")) {
-                    gamestate = TextFormatParser.eu4SavegameParser().parse(zipFile);
+                    gamestate = TextFormatParser.eu4SavegameParser().parse(zipFile.readAllBytes());
                 }
                 if (entry.getName().equals("meta")) {
-                    meta = TextFormatParser.eu4SavegameParser().parse(zipFile);
+                    meta = TextFormatParser.eu4SavegameParser().parse(zipFile.readAllBytes());
                 }
                 if (entry.getName().equals("ai")) {
-                    ai = TextFormatParser.eu4SavegameParser().parse(zipFile);
+                    ai = TextFormatParser.eu4SavegameParser().parse(zipFile.readAllBytes());
                 }
             }
             zipFile.close();

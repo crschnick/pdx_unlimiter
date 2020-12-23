@@ -18,33 +18,32 @@ public class Ck3SavegameParser extends SavegameParser {
         return binary;
     }
 
+    private static final int MAX_SEARCH = 100000;
+
     public Node parse(byte[] content) throws Exception {
         var contentString = new String(content, StandardCharsets.UTF_8);
-        String first = contentString.lines().findFirst().get();
-        int metaStart = first.length() + 1;
-        boolean binary = !contentString.startsWith("meta", metaStart);
-        int metaEnd = binary ? indexOf(content, "PK".getBytes()) : (indexOf(content, "}\nPK".getBytes()) + 2);
-        byte[] zipContent = Arrays.copyOfRange(content, metaEnd, content.length);
-        var zipIn = new ZipInputStream(new ByteArrayInputStream(zipContent));
-        var gamestateEntry = zipIn.getNextEntry();
+        String first = contentString.lines().findFirst()
+                .orElseThrow(() -> new SavegameParseException("Empty savegame content"));
 
-        boolean isZipped = gamestateEntry != null;
-        if (!isZipped) {
-            throw new SavegameParseException("Ck3 gamestate must be zipped");
+        byte[] data;
+        int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH) + 2;
+        boolean compressed = zipContentStart != 1;
+        if (compressed) {
+            byte[] zipContent = Arrays.copyOfRange(content, zipContentStart, content.length);
+            var zipIn = new ZipInputStream(new ByteArrayInputStream(zipContent));
+            zipIn.getNextEntry();
+            data = zipIn.readAllBytes();
+            zipIn.close();
+        } else {
+            data = content;
         }
 
         var parser = TextFormatParser.textFileParser();
-        Node node = parser.parse(zipIn);
-        zipIn.close();
-
-        var duplicateMeta = node.getNodeForKey("meta_data");
-        node.getNodeArray().remove(duplicateMeta);
-
-        return node;
+        return parser.parse(data);
     }
 
-    private int indexOf(byte[] array, byte[] toFind) {
-        for (int i = 0; i < array.length - toFind.length + 1; ++i) {
+    private int indexOf(byte[] array, byte[] toFind, int maxSearch) {
+        for (int i = 0; i < maxSearch; ++i) {
             boolean found = true;
             for (int j = 0; j < toFind.length; ++j) {
                 if (array[i + j] != toFind[j]) {
@@ -56,6 +55,6 @@ public class Ck3SavegameParser extends SavegameParser {
                 return i;
             }
         }
-        throw new IllegalArgumentException("Array not found");
+        return -1;
     }
 }

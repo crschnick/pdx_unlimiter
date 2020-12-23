@@ -329,30 +329,30 @@ public abstract class SavegameCache<
         if (e.infoProperty().isNull().get()) {
             TaskExecutor.getInstance().submitTask(() -> {
                 LoggerFactory.getLogger(SavegameCache.class).debug("Loading entry " + getEntryName(e));
-                loadEntry(e);
+                try {
+                    loadEntry(e);
+                } catch (Exception exception) {
+                    ErrorHandler.handleException(exception);
+                }
             }, false);
         }
     }
 
-    private synchronized void loadEntry(GameCampaignEntry<T, I> e) {
+    private synchronized void loadEntry(GameCampaignEntry<T, I> e) throws Exception {
         LoggerFactory.getLogger(SavegameCache.class).debug("Starting to load entry " + getEntryName(e));
         if (e.infoProperty().isNotNull().get()) {
             return;
         }
 
-        try {
-            var file = getPath(e).resolve("savegame." + fileEnding);
-            byte[] content = Files.readAllBytes(file);
-            if (parser.isBinaryFormat(content)) {
-                content = RakalyHelper.meltSavegame(file);
-            }
-            var node = parser.parse(content);
-            I info = loadInfo(node);
-            e.infoProperty().set(info);
-            LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
+        var file = getPath(e).resolve("savegame." + fileEnding);
+        byte[] content = Files.readAllBytes(file);
+        if (parser.isBinaryFormat(content)) {
+            content = RakalyHelper.meltSavegame(file);
         }
+        var node = parser.parse(content);
+        I info = loadInfo(node);
+        e.infoProperty().set(info);
+        LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
     }
 
     protected abstract I loadInfo(Node n) throws Exception;
@@ -408,6 +408,10 @@ public abstract class SavegameCache<
             loadEntry(exists.get());
             GameIntegration.selectEntry(exists.get());
             return;
+        }
+
+        if (parser.isBinaryFormat(content)) {
+            content = RakalyHelper.meltSavegame(file);
         }
 
         Node node = parser.parse(content);
