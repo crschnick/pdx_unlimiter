@@ -194,7 +194,11 @@ task copyOutput(type: Copy) {
 
 jlink {
     imageDir = file("$buildDir/image")
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    options = [
+            // '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages']
     launcher {
         name = 'pdxu'
         jvmArgs = runArgs
