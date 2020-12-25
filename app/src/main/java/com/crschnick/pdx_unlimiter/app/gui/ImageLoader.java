@@ -12,10 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class ImageLoader {
+
+    private static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
@@ -26,7 +27,7 @@ public class ImageLoader {
         return loadImage(p, null);
     }
 
-    static Image loadImage(Path p, Function<Integer, Integer> pixelSelector)  {
+    static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
         if (!Files.isRegularFile(p)) {
             LoggerFactory.getLogger(ImageLoader.class).error("Image file " + p.toString() + " not found.");
             return DEFAULT_IMAGE;
@@ -39,8 +40,6 @@ public class ImageLoader {
             return DEFAULT_IMAGE;
         }
     }
-
-    private static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
 
     static BufferedImage loadAwtImage(InputStream in, Function<Integer, Integer> pixelSelector) {
         try {

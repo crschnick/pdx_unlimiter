@@ -80,7 +80,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         throw new IllegalArgumentException();
     }
 
-    public static <T,I extends SavegameInfo<T>> GameIntegration<T,I> getForSavegameCache(SavegameCache<T,I> c) {
+    public static <T, I extends SavegameInfo<T>> GameIntegration<T, I> getForSavegameCache(SavegameCache<T, I> c) {
         for (var g : ALL) {
             if (g.getSavegameCache().equals(c)) {
                 return (GameIntegration<T, I>) g;

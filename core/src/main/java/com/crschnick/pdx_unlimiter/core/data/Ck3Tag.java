@@ -2,7 +2,10 @@ package com.crschnick.pdx_unlimiter.core.data;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Ck3Tag {
@@ -30,7 +33,7 @@ public class Ck3Tag {
                 .map(n -> Title.fromNode(n, coas))
                 .collect(Collectors.toList());
 
-        Map<Integer,Title> titleIds = titles.stream().collect(Collectors.toMap(t -> t.id, t -> t));
+        Map<Integer, Title> titleIds = titles.stream().collect(Collectors.toMap(t -> t.id, t -> t));
         var tags = living.getNodeArray().stream()
                 .filter(n -> n.getKeyValueNode().getNode().hasKey("landed_data"))
                 .map(n -> {
@@ -119,6 +122,54 @@ public class Ck3Tag {
 
     public static class CoatOfArms {
 
+        private int id;
+        private String patternFile;
+        private List<String> colors;
+        private List<Emblem> emblems;
+        public CoatOfArms(int id, String patternFile, List<String> colors, List<Emblem> emblems) {
+            this.id = id;
+            this.patternFile = patternFile;
+            this.colors = colors;
+            this.emblems = emblems;
+        }
+
+        public static CoatOfArms fromNode(Node kv) {
+            var kvn = kv.getKeyValueNode();
+            var n = kvn.getNode();
+
+            var id = Integer.parseInt(kvn.getKeyName());
+            var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
+
+            List<String> colors = new ArrayList<>();
+            n.getNodeForKeyIfExistent("color1").map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color3").map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color4").map(Node::getString).ifPresent(colors::add);
+
+            List<Emblem> emblems = new ArrayList<>();
+            emblems.addAll(n.getNodesForKey("colored_emblem").stream()
+                    .map(Emblem::fromColoredEmblemNode)
+                    .collect(Collectors.toList()));
+
+            emblems.addAll(n.getNodesForKey("textured_emblem").stream()
+                    .map(Emblem::fromTexturedEmblemNode)
+                    .collect(Collectors.toList()));
+
+            return new CoatOfArms(id, patternFile, colors, emblems);
+        }
+
+        public String getPatternFile() {
+            return patternFile;
+        }
+
+        public List<String> getColors() {
+            return colors;
+        }
+
+        public List<Emblem> getEmblems() {
+            return emblems;
+        }
+
         public static final class Instance {
             private double x = 0.0;
             private double y = 0.0;
@@ -203,55 +254,6 @@ public class Ck3Tag {
             public List<Instance> getInstances() {
                 return instances;
             }
-        }
-
-        private int id;
-        private String patternFile;
-        private List<String> colors;
-        private List<Emblem> emblems;
-
-        public CoatOfArms(int id, String patternFile, List<String> colors, List<Emblem> emblems) {
-            this.id = id;
-            this.patternFile = patternFile;
-            this.colors = colors;
-            this.emblems = emblems;
-        }
-
-        public static CoatOfArms fromNode(Node kv) {
-            var kvn = kv.getKeyValueNode();
-            var n = kvn.getNode();
-
-            var id = Integer.parseInt(kvn.getKeyName());
-            var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
-
-            List<String> colors = new ArrayList<>();
-            n.getNodeForKeyIfExistent("color1").map(Node::getString).ifPresent(colors::add);
-            n.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(colors::add);
-            n.getNodeForKeyIfExistent("color3").map(Node::getString).ifPresent(colors::add);
-            n.getNodeForKeyIfExistent("color4").map(Node::getString).ifPresent(colors::add);
-
-            List<Emblem> emblems = new ArrayList<>();
-            emblems.addAll(n.getNodesForKey("colored_emblem").stream()
-                    .map(Emblem::fromColoredEmblemNode)
-                    .collect(Collectors.toList()));
-
-            emblems.addAll(n.getNodesForKey("textured_emblem").stream()
-                    .map(Emblem::fromTexturedEmblemNode)
-                    .collect(Collectors.toList()));
-
-            return new CoatOfArms(id, patternFile, colors, emblems);
-        }
-
-        public String getPatternFile() {
-            return patternFile;
-        }
-
-        public List<String> getColors() {
-            return colors;
-        }
-
-        public List<Emblem> getEmblems() {
-            return emblems;
         }
     }
 }

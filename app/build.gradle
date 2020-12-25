@@ -32,7 +32,7 @@ application {
 
 javafx {
     version = '15'
-    modules = [ 'javafx.controls', 'javafx.base', 'javafx.graphics']
+    modules = ['javafx.controls', 'javafx.base', 'javafx.graphics']
 }
 
 repositories {

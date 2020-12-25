@@ -60,43 +60,43 @@ public class GuiGameCampaignEntryList {
         grid.prefWidthProperty().bind(pane.widthProperty());
         grid.prefHeightProperty().bind(pane.heightProperty());
 
-        SetChangeListener<GameCampaignEntry<?,?>> l = (c) -> {
-                if (c.wasAdded()) {
-                    int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(
-                            (GameCampaignEntry<Object, SavegameInfo<Object>>) c.getElementAdded());
-                    Platform.runLater(() -> {
-                        grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        grid.getItems().remove(grid.getItems().stream()
-                                .filter(n -> !c.getSet().contains(n.getProperties().get("entry"))).findAny().get());
-                    });
-                }
+        SetChangeListener<GameCampaignEntry<?, ?>> l = (c) -> {
+            if (c.wasAdded()) {
+                int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(
+                        (GameCampaignEntry<Object, SavegameInfo<Object>>) c.getElementAdded());
+                Platform.runLater(() -> {
+                    grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
+                });
+            } else {
+                Platform.runLater(() -> {
+                    grid.getItems().remove(grid.getItems().stream()
+                            .filter(n -> !c.getSet().contains(n.getProperties().get("entry"))).findAny().get());
+                });
+            }
         };
 
         GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
-                if (o != null) {
-                    o.getEntries().removeListener(l);
-                }
+            if (o != null) {
+                o.getEntries().removeListener(l);
+            }
 
-                if (n != null) {
-                    Platform.runLater(() -> {
-                        n.getEntries().addListener(l);
-                        grid.setItems(FXCollections.observableArrayList(n.entryStream()
-                                .map(GuiGameCampaignEntry::createCampaignEntryNode)
-                                .collect(Collectors.toList())));
+            if (n != null) {
+                Platform.runLater(() -> {
+                    n.getEntries().addListener(l);
+                    grid.setItems(FXCollections.observableArrayList(n.entryStream()
+                            .map(GuiGameCampaignEntry::createCampaignEntryNode)
+                            .collect(Collectors.toList())));
 
-                        // Bug in JFoenix? We have to set this everytime we update the list view
-                        grid.setExpanded(true);
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        grid.setItems(FXCollections.observableArrayList());
-                    });
+                    // Bug in JFoenix? We have to set this everytime we update the list view
+                    grid.setExpanded(true);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    grid.setItems(FXCollections.observableArrayList());
+                });
 
-                }
-            });
+            }
+        });
 
         GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {

@@ -61,19 +61,17 @@ public class GuiLayout {
 
         StackPane stack = new StackPane(new Pane(), layout, loadingBg);
 
-        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                if (n != null) {
-                    stack.getChildren().set(0, n.getGuiFactory().background());
-                    try {
-                        menu.setOpacity(0.95);
-                        stack.styleProperty().set("-fx-font-family: " + n.getGuiFactory().font().getName() + ";");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> Platform.runLater(() -> {
+            if (n != null) {
+                stack.getChildren().set(0, n.getGuiFactory().background());
+                try {
+                    menu.setOpacity(0.95);
+                    stack.styleProperty().set("-fx-font-family: " + n.getGuiFactory().font().getName() + ";");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            });
-        });
+            }
+        }));
 
         return stack;
     }

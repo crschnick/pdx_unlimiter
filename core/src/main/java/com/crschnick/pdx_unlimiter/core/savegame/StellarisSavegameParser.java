@@ -16,14 +16,6 @@ public class StellarisSavegameParser extends SavegameParser {
         return false;
     }
 
-    public class ZippedInputStream extends InputStream {
-
-        @Override
-        public int read() throws IOException {
-            return 0;
-        }
-    }
-
     @Override
     public Node parse(byte[] content) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(content);

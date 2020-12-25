@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
@@ -8,19 +7,14 @@ import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -33,15 +27,14 @@ import java.util.function.Function;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.CK3_BACKGROUND;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
+
+    private static final int IMG_SIZE = 256;
 
     public Ck3GuiFactory() {
         super(GameInstallation.CK3);
     }
-
-    private static final int IMG_SIZE = 256;
 
     @Override
     public Image tagImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, Ck3Tag tag) {
@@ -97,7 +90,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 if ((rgb & 0xFF00FF00) == 0xFF00FF00) {
                     return eColor2;
                 }
-                return alpha +  (int) (c1 * (eColor1 & 0x00FFFFFF)) + (int) (c2 * (eColor2 & 0x00FFFFFF));
+                return alpha + (int) (c1 * (eColor1 & 0x00FFFFFF)) + (int) (c2 * (eColor2 & 0x00FFFFFF));
             };
 
             boolean hasColor = emblem.getColors().size() > 0;

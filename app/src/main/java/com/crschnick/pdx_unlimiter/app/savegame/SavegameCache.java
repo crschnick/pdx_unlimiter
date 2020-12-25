@@ -164,7 +164,7 @@ public abstract class SavegameCache<
 
             Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
             Image image = ImageLoader.loadImage(getPath().resolve(id.toString()).resolve("campaign.png"));
-            campaigns.add(new GameCampaign<T,I>(lastDate, name, id, date, image));
+            campaigns.add(new GameCampaign<T, I>(lastDate, name, id, date, image));
         }
 
         for (GameCampaign<T, I> campaign : campaigns) {
@@ -177,7 +177,7 @@ public abstract class SavegameCache<
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
                     GameDate date = dateType.fromString(entryNode.required("date").textValue());
                     String checksum = entryNode.required("checksum").textValue();
-                    campaign.add(new GameCampaignEntry<T,I>(name, eId, null, checksum, date));
+                    campaign.add(new GameCampaignEntry<T, I>(name, eId, null, checksum, date));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName(), null);
@@ -279,7 +279,7 @@ public abstract class SavegameCache<
                 checksum,
                 info.getDate());
         if (this.getCampaign(campainUuid).isEmpty()) {
-            GameCampaign<T,I> newCampaign = new GameCampaign<>(
+            GameCampaign<T, I> newCampaign = new GameCampaign<>(
                     Instant.now(),
                     getDefaultCampaignName(e),
                     campainUuid,
@@ -298,7 +298,7 @@ public abstract class SavegameCache<
 
     protected abstract String getDefaultEntryName(I info);
 
-    protected abstract String getDefaultCampaignName(GameCampaignEntry<T,I> latest);
+    protected abstract String getDefaultCampaignName(GameCampaignEntry<T, I> latest);
 
     public synchronized boolean contains(GameCampaignEntry<?, ?> e) {
         return campaigns.stream()

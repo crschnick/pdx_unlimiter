@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
@@ -8,18 +7,14 @@ import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -31,9 +26,10 @@ import java.nio.file.Path;
 import java.util.function.Function;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisSavegameInfo> {
+
+    private static final int IMG_SIZE = 256;
 
     public StellarisGuiFactory() {
         super(GameInstallation.STELLARIS);
@@ -75,8 +71,6 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);
     }
-
-    private static final int IMG_SIZE = 256;
 
     private Image stellarisTagNode(
             Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {

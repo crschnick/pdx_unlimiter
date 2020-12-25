@@ -10,6 +10,8 @@ import java.util.zip.ZipInputStream;
 
 public class Ck3SavegameParser extends SavegameParser {
 
+    private static final int MAX_SEARCH = 100000;
+
     public boolean isBinaryFormat(byte[] content) {
         var contentString = new String(content, StandardCharsets.UTF_8);
         String first = contentString.lines().findFirst().get();
@@ -17,8 +19,6 @@ public class Ck3SavegameParser extends SavegameParser {
         boolean binary = !contentString.startsWith("meta", metaStart);
         return binary;
     }
-
-    private static final int MAX_SEARCH = 100000;
 
     public Node parse(byte[] content) throws Exception {
         var contentString = new String(content, StandardCharsets.UTF_8);
