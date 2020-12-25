@@ -22,72 +22,13 @@ public class StellarisSavegameCache extends SavegameCache<
     }
 
     @Override
-    protected GameCampaignEntry<StellarisTag, StellarisSavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
-        StellarisTag tag = new StellarisTag(
-                name,
-                node.required("iconCategory").textValue(),
-                node.required("iconFile").textValue(),
-                node.required("backgroundCategory").textValue(),
-                node.required("backgroundFile").textValue(),
-                node.required("backgroundPrimaryColor").textValue(),
-                node.required("backgroundSecondaryColor").textValue());
-        return new GameCampaignEntry<>(name, uuid, null, checksum, date, tag);
+    protected String getDefaultEntryName(StellarisSavegameInfo info) {
+        return info.getDate().toDisplayString();
     }
 
     @Override
-    protected GameCampaign<StellarisTag, StellarisSavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
-        StellarisTag tag = new StellarisTag(
-                name,
-                node.required("iconCategory").textValue(),
-                node.required("iconFile").textValue(),
-                node.required("backgroundCategory").textValue(),
-                node.required("backgroundFile").textValue(),
-                node.required("backgroundPrimaryColor").textValue(),
-                node.required("backgroundSecondaryColor").textValue());
-        return new GameCampaign<>(lastPlayed, name, uuid, date, tag);
-    }
-
-    @Override
-    protected void writeEntry(ObjectNode node, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> stellarisCampaignEntry) {
-        StellarisTag tag = stellarisCampaignEntry.getTag();
-        node.put("iconCategory", tag.getIconCategory());
-        node.put("iconFile", tag.getIconFile());
-        node.put("backgroundCategory", tag.getBackgroundCategory());
-        node.put("backgroundFile", tag.getBackgroundFile());
-        node.put("backgroundPrimaryColor", tag.getBackgroundPrimaryColor());
-        node.put("backgroundSecondaryColor", tag.getBackgroundSecondaryColor());
-    }
-
-    @Override
-    protected void writeCampaign(ObjectNode node, GameCampaign<StellarisTag, StellarisSavegameInfo> c) {
-        StellarisTag tag = c.getTag();
-        node.put("iconCategory", tag.getIconCategory());
-        node.put("iconFile", tag.getIconFile());
-        node.put("backgroundCategory", tag.getBackgroundCategory());
-        node.put("backgroundFile", tag.getBackgroundFile());
-        node.put("backgroundPrimaryColor", tag.getBackgroundPrimaryColor());
-        node.put("backgroundSecondaryColor", tag.getBackgroundSecondaryColor());
-    }
-
-    @Override
-    protected GameCampaign<StellarisTag, StellarisSavegameInfo> createNewCampaignForEntry(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
-        return new GameCampaign<>(
-                Instant.now(),
-                entry.getInfo().getTag().getName(),
-                entry.getInfo().getCampaignUuid(),
-                entry.getInfo().getDate(),
-                entry.getInfo().getTag());
-    }
-
-    @Override
-    protected GameCampaignEntry<StellarisTag, StellarisSavegameInfo> createEntry(UUID uuid, String checksum, StellarisSavegameInfo info) {
-        return new GameCampaignEntry<>(
-                info.getDate().toDisplayString(),
-                uuid,
-                info,
-                checksum,
-                info.getDate(),
-                info.getTag());
+    protected String getDefaultCampaignName(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> latest) {
+        return latest.getInfo().getTag().getName();
     }
 
     @Override

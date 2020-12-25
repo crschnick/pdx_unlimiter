@@ -14,6 +14,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,6 +24,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +39,86 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     public Ck3GuiFactory() {
         super(GameInstallation.CK3);
+    }
+
+    private static final int IMG_SIZE = 256;
+
+    @Override
+    public Image tagImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, Ck3Tag tag) {
+        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = i.getGraphics();
+        Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
+
+        if (coa.getPatternFile() != null) {
+            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getColors().get(0), Color.TRANSPARENT)) : 0;
+            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getColors().get(1), Color.TRANSPARENT)) : 0;
+            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(coa.getColors().get(2), Color.TRANSPARENT)) : 0;
+            Function<Integer, Integer> patternFunction = (Integer rgb) -> {
+                if (rgb == 0xFFFF0000) {
+                    return pColor1;
+                }
+                if (rgb == 0xFFFFFF00) {
+                    return pColor2;
+                }
+                if (rgb == 0xFFFFFFFF) {
+                    return pColor3;
+                }
+
+                return rgb;
+            };
+            var in = CascadeDirectoryHelper.openFile(
+                    Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
+                    entry,
+                    GameInstallation.CK3);
+            BufferedImage pattern = in.map(stream -> ImageLoader.loadAwtImage(stream, patternFunction)).orElse(null);
+            g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE, null);
+        }
+
+
+        for (var emblem : coa.getEmblems()) {
+            int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(emblem.getColors().get(0), Color.TRANSPARENT)) : 0;
+            int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(emblem.getColors().get(1), Color.TRANSPARENT)) : 0;
+            int eColor3 = emblem.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+                    .getOrDefault(emblem.getColors().get(2), Color.TRANSPARENT)) : 0;
+            Function<Integer, Integer> customFilter = (Integer rgb) -> {
+                int alpha = rgb & 0xFF000000;
+                double c1 = ((0x00FF0000 & rgb) >> 16) / (double) 0xFF;
+                double c2 = ((0x0000FF00 & rgb) >> 8) / (double) 0xFF;
+                double c3 = ((0x000000FF & rgb)) / (double) 0xFF;
+
+                if ((rgb & 0xFF000080) == 0xFF000080) {
+                    return eColor1;
+                }
+                if ((rgb & 0xFF00FF00) == 0xFF00FF00) {
+                    return eColor2;
+                }
+                return alpha +  (int) (c1 * (eColor1 & 0x00FFFFFF)) + (int) (c2 * (eColor2 & 0x00FFFFFF));
+            };
+
+            boolean hasColor = emblem.getColors().size() > 0;
+            var in = CascadeDirectoryHelper.openFile(
+                    Path.of("gfx", "coat_of_arms",
+                            (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
+                    entry,
+                    GameInstallation.CK3);
+            var img = in.map(inputStream -> ImageLoader.loadAwtImage(inputStream, customFilter))
+                    .orElse(null);
+            for (var instance : emblem.getInstances()) {
+                g.drawImage(img,
+                        (int) instance.getX() * IMG_SIZE,
+                        (int) instance.getY() * IMG_SIZE,
+                        (int) instance.getScaleX() * IMG_SIZE,
+                        (int) instance.getScaleY() * IMG_SIZE,
+                        new java.awt.Color(0, 0, 0, 0),
+                        null);
+            }
+        }
+        return ImageLoader.toFXImage(i);
     }
 
     @Override
@@ -62,111 +147,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Node> createImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(ck3TagNode(entry.getTag(), CLASS_TAG_ICON));
-        entry.infoProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(ck3TagNode(entry.getTag(), CLASS_TAG_ICON)));
-        });
-        return prop;
-    }
-
-    @Override
-    public ObservableValue<Node> createImage(GameCampaign<Ck3Tag, Ck3SavegameInfo> campaign) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(ck3TagNode(campaign.getTag(), CLASS_TAG_ICON));
-        campaign.tagProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(ck3TagNode(campaign.getTag(), CLASS_TAG_ICON)));
-        });
-        return prop;
-    }
-
-    @Override
     public void fillNodeContainer(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, JFXMasonryPane grid) {
         super.fillNodeContainer(entry, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);
-    }
-
-    private Pane ck3TagNode(Ck3Tag tag, String styleClass) {
-        return ck3TagNode(tag.getPrimaryTitle().getCoatOfArms(), null, styleClass);
-    }
-
-    private Pane ck3TagNode(
-            Ck3Tag.CoatOfArms coa, GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, String styleClass) {
-        Image pattern = null;
-        if (coa.getPatternFile() != null) {
-            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getColors().get(0), Color.TRANSPARENT)) : 0;
-            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getColors().get(1), Color.TRANSPARENT)) : 0;
-            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getColors().get(2), Color.TRANSPARENT)) : 0;
-            Function<Integer, Integer> patternFunction = (Integer rgb) -> {
-                if (rgb == 0xFFFF0000) {
-                    return pColor1;
-                }
-                if (rgb == 0xFFFFFF00) {
-                    return pColor2;
-                }
-                if (rgb == 0xFFFFFFFF) {
-                    return pColor3;
-                }
-
-                return rgb;
-            };
-            var in = CascadeDirectoryHelper.openFile(
-                    Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
-                    entry,
-                    GameInstallation.CK3);
-            pattern = in.map(inputStream ->
-                    ImageLoader.loadImageOptional(inputStream, patternFunction).orElse(null))
-                    .orElse(null);
-        }
-
-
-        Image emblem = null;
-        if (coa.getEmblemFile() != null) {
-            boolean hasColor = coa.getEmblemColors().size() > 0;
-            int eColor1 = coa.getEmblemColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getEmblemColors().get(0), Color.TRANSPARENT)) : 0;
-            int eColor2 = coa.getEmblemColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getEmblemColors().get(1), Color.TRANSPARENT)) : 0;
-            int eColor3 = coa.getEmblemColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
-                    .getOrDefault(coa.getEmblemColors().get(2), Color.TRANSPARENT)) : 0;
-            Function<Integer, Integer> customFilter = (Integer rgb) -> {
-                if (hasColor) {
-                    if (rgb == 0xFF800000) {
-                        return eColor1;
-                    }
-                    if (rgb == 0xFF00007F) {
-                        return eColor2;
-                    }
-                    if (rgb == 0xFFFFFFFF) {
-                        return eColor3;
-                    }
-                }
-                return rgb;
-            };
-
-            var in = CascadeDirectoryHelper.openFile(
-                    Path.of("gfx", "coat_of_arms",
-                            (hasColor ? "colored" : "textured") + "_emblems").resolve(coa.getEmblemFile()),
-                    entry,
-                    GameInstallation.CK3);
-            emblem = in.map(inputStream ->
-                    ImageLoader.loadImageOptional(inputStream, customFilter).orElse(null))
-                    .orElse(null);
-        }
-
-        ImageView v = new ImageView(pattern);
-        ImageView iconV = new ImageView(emblem);
-        StackPane pane = new StackPane(v, iconV);
-        v.setPreserveRatio(true);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        iconV.fitWidthProperty().bind(pane.widthProperty());
-        iconV.fitHeightProperty().bind(pane.heightProperty());
-        pane.getStyleClass().add(styleClass);
-        return pane;
     }
 }

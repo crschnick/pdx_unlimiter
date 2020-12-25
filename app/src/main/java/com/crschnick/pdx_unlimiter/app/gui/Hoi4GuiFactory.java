@@ -64,21 +64,8 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public ObservableValue<Node> createImage(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(hoi4TagNode(entry));
-        entry.infoProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(hoi4TagNode(entry)));
-        });
-        return prop;
-    }
-
-    @Override
-    public ObservableValue<Node> createImage(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(hoi4TagNode(campaign));
-        campaign.tagProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> prop.set(hoi4TagNode(campaign)));
-        });
-        return prop;
+    public Image tagImage(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry, Hoi4Tag tag) {
+        return null;
     }
 
     @Override
@@ -96,24 +83,5 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);
-    }
-
-    private Pane hoi4TagNode(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
-        return hoi4TagNode(GameImage.getEu4TagPath(campaign.getTag().getTag()), null);
-    }
-
-    private Pane hoi4TagNode(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-        return hoi4TagNode(GameImage.getEu4TagPath(entry.getTag().getTag()), entry);
-    }
-
-    private Pane hoi4TagNode(Path path, GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-        var in = CascadeDirectoryHelper.openFile(
-                path, entry, GameInstallation.EU4);
-        Image img = in.flatMap(inputStream -> ImageLoader.loadImageOptional(inputStream, null)).orElse(null);
-        if (img == null) {
-            return unknownTag();
-        }
-
-        return GameImage.imageNode(img, CLASS_TAG_ICON);
     }
 }

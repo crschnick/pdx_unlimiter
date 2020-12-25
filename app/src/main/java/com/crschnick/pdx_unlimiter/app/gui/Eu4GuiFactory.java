@@ -15,6 +15,7 @@ import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -82,7 +83,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.setAlignment(Pos.CENTER);
         box.getChildren().add(icon);
         for (Eu4Tag tag : tags) {
-            Node n = eu4TagNode(entry, tag);
+            Node n = GameImage.imageNode(eu4TagNode(entry, tag), CLASS_TAG_ICON);
             box.getChildren().add(n);
         }
         box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
@@ -90,6 +91,11 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.setSpacing(6);
         Tooltip.install(box, new Tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none)));
         addNode(pane, box);
+    }
+
+    @Override
+    public Image tagImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
     }
 
     @Override
@@ -113,30 +119,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         return new Background(new BackgroundFill(
                 ColorHelper.colorFromInt(entry.getInfo().getTag().getMapColor(), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
-    }
-
-    @Override
-    public ObservableValue<Node> createImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(eu4TagNode(entry, entry.getTag()));
-        entry.infoProperty().addListener((c, o, n) -> {
-            prop.set(eu4TagNode(entry, entry.getTag()));
-            Tooltip.install(prop.get(), new Tooltip());
-        });
-        return prop;
-    }
-
-    @Override
-    public ObservableValue<Node> createImage(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(eu4TagNode(campaign, CLASS_TAG_ICON));
-        if (campaign.getEntries().size() > 0) {
-            prop.bind(createImage(campaign.getLatestEntry()));
-        }
-        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>>) c -> {
-            if (c.getSet().size() > 0) {
-                prop.bind(createImage(campaign.getLatestEntry()));
-            }
-        });
-        return prop;
     }
 
     @Override
@@ -208,23 +190,13 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         super.fillNodeContainer(entry, grid);
     }
 
-
-    private Pane eu4TagNode(GameCampaign<Eu4Tag, Eu4SavegameInfo> campaign, String styleClass) {
-        return eu4TagNode(GameImage.getEu4TagPath(campaign.getTag().getTag()), null);
-    }
-
-    private Pane eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+    private Image eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
         return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
     }
 
-    private Pane eu4TagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
+    private Image eu4TagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         var in = CascadeDirectoryHelper.openFile(
                 path, entry, GameInstallation.EU4);
-        Image img = in.flatMap(inputStream -> ImageLoader.loadImageOptional(inputStream, null)).orElse(null);
-        if (img == null) {
-            return unknownTag();
-        }
-
-        return GameImage.imageNode(img, CLASS_TAG_ICON);
+        return in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
     }
 }

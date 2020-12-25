@@ -25,78 +25,14 @@ public class Ck3SavegameCache extends SavegameCache<Ck3Tag, Ck3SavegameInfo> {
         super("ck3", "ck3", GameDateType.CK3, new Ck3SavegameParser());
     }
 
-    private Ck3Tag.CoatOfArms readCoa(JsonNode node) {
-        Ck3Tag.CoatOfArms coa = new Ck3Tag.CoatOfArms(
-                0,
-                node.required("pattern").textValue(),
-                StreamSupport.stream(node.required("patternColors").spliterator(), false)
-                        .map(JsonNode::textValue).collect(Collectors.toList()),
-
-                node.required("emblem").textValue(),
-                StreamSupport.stream(node.required("emblemColors").spliterator(), false)
-                        .map(JsonNode::textValue).collect(Collectors.toList()));
-        return coa;
+    @Override
+    protected String getDefaultEntryName(Ck3SavegameInfo info) {
+        return info.getDate().toDisplayString();
     }
 
     @Override
-    protected GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
-        Ck3Tag.Title title = new Ck3Tag.Title(0, "", readCoa(node));
-        return new GameCampaignEntry<>(name, uuid, null, checksum, date, new Ck3Tag(null, List.of(title)));
-    }
-
-    @Override
-    protected GameCampaign<Ck3Tag, Ck3SavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
-        Ck3Tag.Title title = new Ck3Tag.Title(0, "", readCoa(node));
-        return new GameCampaign<>(lastPlayed, name, uuid, date, new Ck3Tag(null, List.of(title)));
-    }
-
-    private void writeCoa(ObjectNode node, Ck3Tag.CoatOfArms coa) {
-        node.put("pattern", coa.getPatternFile());
-        node.putArray("patternColors").addAll(coa.getColors().stream()
-                .filter(Objects::nonNull)
-                .map(TextNode::new)
-                .collect(Collectors.toList()));
-
-        node.put("emblem", coa.getEmblemFile());
-        node.putArray("emblemColors").addAll(coa.getEmblemColors().stream()
-                .filter(Objects::nonNull)
-                .map(TextNode::new)
-                .collect(Collectors.toList()));
-    }
-
-    @Override
-    protected void writeEntry(ObjectNode node, GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e) {
-        Ck3Tag tag = e.getTag();
-        Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
-        writeCoa(node, coa);
-    }
-
-    @Override
-    protected void writeCampaign(ObjectNode node, GameCampaign<Ck3Tag, Ck3SavegameInfo> c) {
-        Ck3Tag tag = c.getTag();
-        Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
-        writeCoa(node, coa);
-    }
-
-    @Override
-    protected GameCampaign<Ck3Tag, Ck3SavegameInfo> createNewCampaignForEntry(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
-        return new GameCampaign<>(
-                Instant.now(),
-                entry.getInfo().getTag().getPrimaryTitle().getName(),
-                entry.getInfo().getCampaignUuid(),
-                entry.getInfo().getDate(),
-                entry.getInfo().getTag());
-    }
-
-    @Override
-    protected GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> createEntry(UUID uuid, String checksum, Ck3SavegameInfo info) {
-        return new GameCampaignEntry<Ck3Tag, Ck3SavegameInfo>(
-                info.getDate().toDisplayString(),
-                uuid,
-                info,
-                checksum,
-                info.getDate(),
-                info.getTag());
+    protected String getDefaultCampaignName(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> latest) {
+        return latest.getInfo().getTag().getPrimaryTitle().getName();
     }
 
     @Override

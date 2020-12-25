@@ -17,17 +17,15 @@ public final class GameCampaignEntry<T, I extends SavegameInfo<T>> implements Co
     private String checksum;
     private boolean persistent;
     private GameDate date;
-    private ObjectProperty<T> tag;
 
     public GameCampaignEntry(String name, UUID uuid, I info,
-                             String checksum, GameDate date, T tag) {
+                             String checksum, GameDate date) {
         this.checksum = checksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
         this.info = new SimpleObjectProperty<>(info);
         this.persistent = true;
         this.date = date;
-        this.tag = new SimpleObjectProperty<>(tag);
     }
 
     @Override
@@ -65,13 +63,5 @@ public final class GameCampaignEntry<T, I extends SavegameInfo<T>> implements Co
 
     public GameDate getDate() {
         return date;
-    }
-
-    public T getTag() {
-        return tag.get();
-    }
-
-    public ObjectProperty<T> tagProperty() {
-        return tag;
     }
 }

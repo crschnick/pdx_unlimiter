@@ -312,7 +312,7 @@ public class GuiSettings {
         grid.add(help("""
                 Your Rakaly.com User ID.
 
-                You can find this by going to 'My Saves' on Rakaly.com and looking at the url that looks like this: 'https://rakaly.com/users/<User ID>
+                You can find this by going to the 'Account' page on Rakaly.com.
                 """), 0, 1);
         grid.add(new Label("User ID:"), 1, 1);
         TextField userId = new TextField();
@@ -326,7 +326,7 @@ public class GuiSettings {
         grid.add(help("""
                 Your Rakaly.com API key.
 
-                To obtain this, you currently have to ask for it on the Rakaly Discord.
+                You can generate an API key by going to the 'Account' page on Rakaly.com.
                 """), 0, 2);
         grid.add(new Label("API key:"), 1, 2);
         TextField apikey = new TextField();

@@ -8,7 +8,9 @@ import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +19,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -99,6 +102,38 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return alert.showAndWait().orElse(ButtonType.CLOSE).equals(launch);
     }
 
+
+    public ObservableValue<Node> createImage(GameCampaignEntry<T, I> entry) {
+        SimpleObjectProperty<Node> prop;
+        if (entry.getInfo() == null) {
+            prop = new SimpleObjectProperty<>(GameImage.imageNode(
+                    GameIntegration.<T,I>getForInstallation(installation).getSavegameCache().getCampaign(entry).getImage(), CLASS_TAG_ICON));
+            entry.infoProperty().addListener((c, o, n) -> {
+                prop.set(tagNode(entry));
+                Tooltip.install(prop.get(), new Tooltip());
+            });
+        } else {
+            prop = new SimpleObjectProperty<>(
+                    GameImage.imageNode(tagImage(entry, entry.getInfo().getTag()), CLASS_TAG_ICON));
+        }
+        return prop;
+    }
+
+    public ObservableValue<Node> createImage(GameCampaign<T, I> campaign) {
+        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(
+                GameImage.imageNode(campaign.getImage(), CLASS_TAG_ICON));
+        campaign.imageProperty().addListener((ChangeListener<? super Image>) (c, o, n) -> {
+            prop.set(GameImage.imageNode(n, CLASS_TAG_ICON));
+        });
+        return prop;
+    }
+
+    public Node tagNode(GameCampaignEntry<T, I> entry) {
+        return GameImage.imageNode(tagImage(entry, entry.getInfo().getTag()), CLASS_TAG_ICON);
+    }
+
+    public abstract Image tagImage(GameCampaignEntry<T, I> entry, T tag);
+
     public abstract Font font() throws IOException;
 
     public abstract Pane background();
@@ -106,10 +141,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     public abstract Pane createIcon();
 
     public abstract Background createEntryInfoBackground(GameCampaignEntry<T, I> entry);
-
-    public abstract ObservableValue<Node> createImage(GameCampaignEntry<T, I> entry);
-
-    public abstract ObservableValue<Node> createImage(GameCampaign<T, I> campaign);
 
     public ObservableValue<String> createInfoString(GameCampaign<T, I> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());

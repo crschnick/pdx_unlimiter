@@ -118,20 +118,103 @@ public class Ck3Tag {
     }
 
     public static class CoatOfArms {
-        private int id;
 
+        public static final class Instance {
+            private double x = 0.0;
+            private double y = 0.0;
+
+            private double scaleX = 1.0;
+            private double scaleY = 1.0;
+
+            private int rotation = 0;
+
+            public double getX() {
+                return x;
+            }
+
+            public double getY() {
+                return y;
+            }
+
+            public double getScaleX() {
+                return scaleX;
+            }
+
+            public double getScaleY() {
+                return scaleY;
+            }
+
+            public int getRotation() {
+                return rotation;
+            }
+        }
+
+        public static class Emblem {
+
+            private String file;
+            private List<String> colors;
+            private List<Instance> instances;
+
+            private static Emblem fromTexturedEmblemNode(Node n) {
+                Emblem c = new Emblem();
+                c.file = n.getNodeForKey("texture").getString();
+                c.colors = new ArrayList<>();
+                c.instances = List.of(new Instance());
+                return c;
+            }
+
+            private static Emblem fromColoredEmblemNode(Node n) {
+                Emblem c = new Emblem();
+                c.file = n.getNodeForKey("texture").getString();
+
+                c.colors = new ArrayList<>();
+                c.colors.add(n.getNodeForKey("color1").getString());
+                n.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(c.colors::add);
+
+                c.instances = n.getNodesForKey("instance").stream().map(i -> {
+                    Instance instance = new Instance();
+                    i.getNodeForKeyIfExistent("position").ifPresent(p -> {
+                        instance.x = p.getNodeArray().get(0).getDouble();
+                        instance.y = p.getNodeArray().get(1).getDouble();
+                    });
+                    i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
+                        instance.scaleX = s.getNodeArray().get(0).getDouble();
+                        instance.scaleY = s.getNodeArray().get(1).getDouble();
+                    });
+                    i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
+                        instance.rotation = r.getInteger();
+                    });
+                    return instance;
+                }).collect(Collectors.toList());
+                if (c.instances.size() == 0) {
+                    c.instances.add(new Instance());
+                }
+                return c;
+            }
+
+            public String getFile() {
+                return file;
+            }
+
+            public List<String> getColors() {
+                return colors;
+            }
+
+            public List<Instance> getInstances() {
+                return instances;
+            }
+        }
+
+        private int id;
         private String patternFile;
         private List<String> colors;
+        private List<Emblem> emblems;
 
-        private String emblemFile;
-        private List<String> emblemColors;
-
-        public CoatOfArms(int id, String patternFile, List<String> colors, String emblemFile, List<String> emblemColors) {
+        public CoatOfArms(int id, String patternFile, List<String> colors, List<Emblem> emblems) {
             this.id = id;
             this.patternFile = patternFile;
             this.colors = colors;
-            this.emblemFile = emblemFile;
-            this.emblemColors = emblemColors;
+            this.emblems = emblems;
         }
 
         public static CoatOfArms fromNode(Node kv) {
@@ -147,18 +230,16 @@ public class Ck3Tag {
             n.getNodeForKeyIfExistent("color3").map(Node::getString).ifPresent(colors::add);
             n.getNodeForKeyIfExistent("color4").map(Node::getString).ifPresent(colors::add);
 
-            List<String> emblemColors = new ArrayList<>();
-            String emblemFile = null;
-            boolean isColoredEmblem = n.hasKey("colored_emblem");
-            if (isColoredEmblem) {
-                var e = n.getNodesForKey("colored_emblem").get(0);
-                emblemFile = e.getNodeForKey("texture").getString();
-                emblemColors.add(e.getNodeForKey("color1").getString());
-                e.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(emblemColors::add);
-            } else if (n.hasKey("textured_emblem")) {
-                emblemFile = n.getNodeForKey("textured_emblem").getNodeForKey("texture").getString();
-            }
-            return new CoatOfArms(id, patternFile, colors, emblemFile, emblemColors);
+            List<Emblem> emblems = new ArrayList<>();
+            emblems.addAll(n.getNodesForKey("colored_emblem").stream()
+                    .map(Emblem::fromColoredEmblemNode)
+                    .collect(Collectors.toList()));
+
+            emblems.addAll(n.getNodesForKey("textured_emblem").stream()
+                    .map(Emblem::fromTexturedEmblemNode)
+                    .collect(Collectors.toList()));
+
+            return new CoatOfArms(id, patternFile, colors, emblems);
         }
 
         public String getPatternFile() {
@@ -169,12 +250,8 @@ public class Ck3Tag {
             return colors;
         }
 
-        public String getEmblemFile() {
-            return emblemFile;
-        }
-
-        public List<String> getEmblemColors() {
-            return emblemColors;
+        public List<Emblem> getEmblems() {
+            return emblems;
         }
     }
 }

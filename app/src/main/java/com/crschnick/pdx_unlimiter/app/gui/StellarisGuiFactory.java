@@ -14,6 +14,7 @@ import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -22,6 +23,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,27 +64,8 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public ObservableValue<Node> createImage(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(stellarisTagNode(entry, CLASS_TAG_ICON));
-        entry.infoProperty().addListener((c, o, n) -> {
-            prop.set(stellarisTagNode(entry, CLASS_TAG_ICON));
-            Tooltip.install(prop.get(), new Tooltip());
-        });
-        return prop;
-    }
-
-    @Override
-    public ObservableValue<Node> createImage(GameCampaign<StellarisTag, StellarisSavegameInfo> campaign) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(stellarisTagNode(campaign.getTag(), CLASS_TAG_ICON));
-        if (campaign.getEntries().size() > 0) {
-            prop.bind(createImage(campaign.getLatestEntry()));
-        }
-        campaign.getEntries().addListener((SetChangeListener<? super GameCampaignEntry<StellarisTag, StellarisSavegameInfo>>) c -> {
-            if (campaign.getEntries().size() > 0) {
-                prop.bind(createImage(campaign.getLatestEntry()));
-            }
-        });
-        return prop;
+    public Image tagImage(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, StellarisTag tag) {
+        return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, entry);
     }
 
     @Override
@@ -92,17 +76,12 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
         grid.getChildren().add(l);
     }
 
-    private Pane stellarisTagNode(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
-        return stellarisTagNode(Path.of(entry.getTag().getBackgroundFile()), entry.getTag(), entry, styleClass);
-    }
+    private static final int IMG_SIZE = 256;
 
-    private Pane stellarisTagNode(StellarisTag tag, String styleClass) {
-        return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, null, styleClass);
-    }
-
-    private Pane stellarisTagNode(
-            Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, String styleClass) {
-        Image img = null;
+    private Image stellarisTagNode(
+            Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
+        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = i.getGraphics();
 
         int bgPrimary = ColorHelper.intFromColor(ColorHelper.loadStellarisColors(entry)
                 .getOrDefault(tag.getBackgroundPrimaryColor(), Color.TRANSPARENT));
@@ -115,34 +94,17 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
 
         var in = CascadeDirectoryHelper.openFile(
                 Path.of("flags", "backgrounds").resolve(path), entry, GameInstallation.STELLARIS);
-        img = in.map(inputStream ->
-                ImageLoader.loadImageOptional(inputStream, customFilter).orElse(null)).orElse(null);
-
-        if (img == null) {
-            return GameImage.unknownTag();
-        }
+        in.map(stream -> ImageLoader.loadAwtImage(stream, customFilter))
+                .ifPresent(pattern -> g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE, null));
 
         Image icon = null;
-        var in2 = CascadeDirectoryHelper.openFile(
+        var iconIn = CascadeDirectoryHelper.openFile(
                 Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile()),
                 entry, GameInstallation.STELLARIS);
-        icon = in2.map(inputStream ->
-                ImageLoader.loadImageOptional(inputStream, null).orElse(null)).orElse(null);
+        iconIn.map(stream -> ImageLoader.loadAwtImage(stream, null))
+                .ifPresent(pattern -> g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE,
+                        new java.awt.Color(0, 0, 0, 0), null));
 
-        if (icon == null) {
-            return GameImage.unknownTag();
-        }
-
-        ImageView v = new ImageView(img);
-        ImageView iconV = new ImageView(icon);
-        StackPane pane = new StackPane(v, iconV);
-        v.fitWidthProperty().bind(pane.widthProperty());
-        v.fitHeightProperty().bind(pane.heightProperty());
-        iconV.fitWidthProperty().bind(pane.widthProperty());
-        iconV.fitHeightProperty().bind(pane.heightProperty());
-        pane.getStyleClass().add(styleClass);
-        pane.setMaxWidth(Region.USE_PREF_SIZE);
-        pane.setMaxHeight(Region.USE_PREF_SIZE);
-        return pane;
+        return ImageLoader.toFXImage(i);
     }
 }

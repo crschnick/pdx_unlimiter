@@ -21,7 +21,7 @@ public class GuiGameCampaignList {
         grid.setBorder(Border.EMPTY);
         grid.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
-        SetChangeListener<GameCampaign> l = (c) -> {
+        SetChangeListener<GameCampaign<?,?>> l = (c) -> {
             if (c.wasAdded()) {
                 var button = GuiGameCampaign.createCampaignButton(
                         c.getElementAdded(), GameIntegration.current().getGuiFactory());

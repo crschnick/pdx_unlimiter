@@ -25,48 +25,14 @@ public class Eu4SavegameCache extends SavegameCache<
     }
 
     @Override
-    protected GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
-        String tag = node.required("tag").textValue();
-        return new GameCampaignEntry<>(name, uuid, null, checksum, date, new Eu4Tag(tag, 0, 0, Optional.empty()));
+    protected String getDefaultEntryName(Eu4SavegameInfo info) {
+        return info.getDate().toDisplayString();
     }
 
     @Override
-    protected GameCampaign<Eu4Tag, Eu4SavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
-        String tag = node.required("tag").textValue();
-        return new GameCampaign<>(lastPlayed, name, uuid, date, new Eu4Tag(tag, 0, 0, Optional.empty()));
+    protected String getDefaultCampaignName(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> latest) {
+        return GameLocalisation.getTagNameForEntry(latest, latest.getInfo().getTag());
     }
-
-    @Override
-    protected void writeEntry(ObjectNode node, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> e) {
-        node.put("tag", e.getTag().getTag());
-    }
-
-    @Override
-    protected void writeCampaign(ObjectNode node, GameCampaign<Eu4Tag, Eu4SavegameInfo> c) {
-        node.put("tag", c.getTag().getTag());
-    }
-
-    @Override
-    protected GameCampaign<Eu4Tag, Eu4SavegameInfo> createNewCampaignForEntry(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
-        return new GameCampaign<>(
-                Instant.now(),
-                GameLocalisation.getTagNameForEntry(entry, entry.getInfo().getTag()),
-                entry.getInfo().getCampaignUuid(),
-                entry.getInfo().getDate(),
-                entry.getInfo().getTag());
-    }
-
-    @Override
-    protected GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> createEntry(UUID uuid, String checksum, Eu4SavegameInfo info) {
-        return new GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>(
-                info.getDate().toDisplayString(),
-                uuid,
-                info,
-                checksum,
-                info.getDate(),
-                info.getTag());
-    }
-
 
     @Override
     protected Eu4SavegameInfo loadInfo(Node n) throws Exception {

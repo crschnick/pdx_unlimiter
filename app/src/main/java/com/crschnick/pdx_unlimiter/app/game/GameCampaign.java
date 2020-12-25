@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.scene.image.Image;
 
 import java.time.Instant;
 import java.util.*;
@@ -23,22 +24,26 @@ public final class GameCampaign<T, I extends SavegameInfo<T>> {
     private volatile ObservableSet<GameCampaignEntry<T, I>> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
     private volatile ObjectProperty<GameDate> date;
-    private ObjectProperty<T> tag;
+    private ObjectProperty<Image> image;
 
-    public GameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, T tag) {
+    public GameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, Image image) {
         this.lastPlayed = new SimpleObjectProperty<>(lastPlayed);
         this.name = new SimpleStringProperty(name);
         this.campaignId = campaignId;
         this.date = new SimpleObjectProperty<>(date);
-        this.tag = new SimpleObjectProperty<>(tag);
+        this.image = new SimpleObjectProperty<>(image);
     }
 
-    public T getTag() {
-        return tag.get();
+    public ObservableSet<GameCampaignEntry<T, I>> getSavegames() {
+        return savegames;
     }
 
-    public ObjectProperty<T> tagProperty() {
-        return tag;
+    public Image getImage() {
+        return image.get();
+    }
+
+    public ObjectProperty<Image> imageProperty() {
+        return image;
     }
 
     public void add(GameCampaignEntry<T, I> e) {

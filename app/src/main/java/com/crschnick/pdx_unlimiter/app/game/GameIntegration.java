@@ -71,19 +71,19 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         return (SimpleObjectProperty<G>) current;
     }
 
-    public static GameIntegration<?, ?> getForInstallation(GameInstallation i) {
+    public static <T, I extends SavegameInfo<T>> GameIntegration<T, I> getForInstallation(GameInstallation i) {
         for (var g : ALL) {
             if (g.getInstallation().equals(i)) {
-                return g;
+                return (GameIntegration<T, I>) g;
             }
         }
         throw new IllegalArgumentException();
     }
 
-    public static GameIntegration<?, ?> getForSavegameCache(SavegameCache c) {
+    public static <T,I extends SavegameInfo<T>> GameIntegration<T,I> getForSavegameCache(SavegameCache<T,I> c) {
         for (var g : ALL) {
             if (g.getSavegameCache().equals(c)) {
-                return g;
+                return (GameIntegration<T, I>) g;
             }
         }
         throw new IllegalArgumentException();

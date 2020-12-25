@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public abstract class Node {
 
     private static final Pattern LONG = Pattern.compile("-?[0-9]+");
-    private static final Pattern DOUBLE = Pattern.compile("([0-9]+)\\.([0-9]+)");
+    private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
 
     public static Node combine(Node... nodes) {
         ArrayNode a = new ArrayNode();

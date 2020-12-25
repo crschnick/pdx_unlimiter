@@ -21,45 +21,13 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Tag, Hoi4SavegameInfo> 
     }
 
     @Override
-    protected GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date) {
-        Hoi4Tag tag = new Hoi4Tag(node.required("tag").textValue(), node.required("ideology").textValue());
-        return new GameCampaignEntry<>(name, uuid, null, checksum, date, tag);
+    protected String getDefaultEntryName(Hoi4SavegameInfo info) {
+        return info.getDate().toDisplayString();
     }
 
     @Override
-    protected GameCampaign<Hoi4Tag, Hoi4SavegameInfo> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date) {
-        Hoi4Tag tag = new Hoi4Tag(node.required("tag").textValue(), node.required("ideology").textValue());
-        return new GameCampaign<>(lastPlayed, name, uuid, date, tag);
-    }
-
-    @Override
-    protected void writeEntry(ObjectNode node, GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-
-
-        node.put("tag", entry.getTag().getTag())
-                .put("ideology", entry.getTag().getIdeology());
-    }
-
-    @Override
-    protected void writeCampaign(ObjectNode node, GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
-        node.put("tag", campaign.getTag().getTag())
-                .put("ideology", campaign.getTag().getIdeology());
-    }
-
-    @Override
-    protected GameCampaign<Hoi4Tag, Hoi4SavegameInfo> createNewCampaignForEntry(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-        return new GameCampaign<>(Instant.now(),
-                entry.getInfo().getTag().getTag(),
-                entry.getInfo().getCampaignUuid(),
-                entry.getInfo().getDate(),
-                entry.getInfo().getTag());
-    }
-
-    @Override
-    protected GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> createEntry(UUID uuid, String checksum, Hoi4SavegameInfo info) {
-        return new GameCampaignEntry<>(
-                info.getDate().toDisplayString(), uuid,
-                info, checksum, info.getDate(), info.getTag());
+    protected String getDefaultCampaignName(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> latest) {
+        return "Unknown";
     }
 
     @Override

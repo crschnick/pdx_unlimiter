@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.gui.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
@@ -22,8 +23,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.PathUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -84,21 +85,13 @@ public abstract class SavegameCache<
                 .collect(Collectors.toSet());
 
         for (SavegameCache<?, ?> cache : ALL) {
-            try {
-                cache.loadData();
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+            cache.loadData();
         }
     }
 
     public static void reset() {
         for (SavegameCache<?, ?> cache : ALL) {
-            try {
-                cache.saveData();
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+            cache.saveData();
         }
 
         EU4 = null;
@@ -132,18 +125,33 @@ public abstract class SavegameCache<
         c.getEntries().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
                 .min(Comparator.naturalOrder())
-                .ifPresent(e -> c.tagProperty().setValue(e.getInfo().getTag()));
+                .ifPresent(e -> c.imageProperty().set(
+                        GameIntegration.getForSavegameCache(this).getGuiFactory().tagImage(e, e.getInfo().getTag())));
     }
 
-    public void loadData() throws IOException {
-        Files.createDirectories(getPath());
-        if (!Files.exists(getDataFile())) {
+    private void loadData() {
+        try {
+            Files.createDirectories(getPath());
+        } catch (IOException e) {
+            ErrorHandler.handleTerminalException(e);
             return;
         }
 
-        InputStream in = Files.newInputStream(getDataFile());
-        ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(in.readAllBytes());
+        JsonNode node = null;
+        try {
+            if (Files.exists(getDataFile())) {
+                InputStream in = Files.newInputStream(getDataFile());
+                ObjectMapper o = new ObjectMapper();
+                node = o.readTree(in.readAllBytes());
+            }
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return;
+        }
+
+        if (node == null) {
+            return;
+        }
 
         JsonNode c = node.required("campaigns");
         for (int i = 0; i < c.size(); i++) {
@@ -155,20 +163,21 @@ public abstract class SavegameCache<
             }
 
             Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
-            campaigns.add(readCampaign(c.get(i), name, id, lastDate, date));
+            Image image = ImageLoader.loadImage(getPath().resolve(id.toString()).resolve("campaign.png"));
+            campaigns.add(new GameCampaign<T,I>(lastDate, name, id, date, image));
         }
 
         for (GameCampaign<T, I> campaign : campaigns) {
             try {
                 InputStream campaignIn = Files.newInputStream(
                         getPath().resolve(campaign.getCampaignId().toString()).resolve("campaign.json"));
-                JsonNode campaignNode = o.readTree(campaignIn.readAllBytes());
+                JsonNode campaignNode = new ObjectMapper().readTree(campaignIn.readAllBytes());
                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
                     UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
                     GameDate date = dateType.fromString(entryNode.required("date").textValue());
                     String checksum = entryNode.required("checksum").textValue();
-                    campaign.add(readEntry(entryNode, name, eId, checksum, date));
+                    campaign.add(new GameCampaignEntry<T,I>(name, eId, null, checksum, date));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Could not load campaign config of " + campaign.getName(), null);
@@ -176,11 +185,7 @@ public abstract class SavegameCache<
         }
     }
 
-    protected abstract GameCampaignEntry<T, I> readEntry(JsonNode node, String name, UUID uuid, String checksum, GameDate date);
-
-    protected abstract GameCampaign<T, I> readCampaign(JsonNode node, String name, UUID uuid, Instant lastPlayed, GameDate date);
-
-    private void saveData() throws IOException {
+    private void saveData() {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ArrayNode c = n.putArray("campaigns");
 
@@ -188,46 +193,64 @@ public abstract class SavegameCache<
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
             campaign.getEntries().stream()
-                    .map(entry -> {
-                        ObjectNode node = JsonNodeFactory.instance.objectNode()
-                                .put("name", entry.getName())
-                                .put("date", entry.getDate().toString())
-                                .put("checksum", entry.getChecksum())
-                                .put("uuid", entry.getUuid().toString());
-                        writeEntry(node, entry);
-                        return node;
-                    })
+                    .map(entry -> JsonNodeFactory.instance.objectNode()
+                            .put("name", entry.getName())
+                            .put("date", entry.getDate().toString())
+                            .put("checksum", entry.getChecksum())
+                            .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
             Path cFile = getPath()
                     .resolve(campaign.getCampaignId().toString()).resolve("campaign.json");
             Path backupCFile = getPath()
                     .resolve(campaign.getCampaignId().toString()).resolve("campaign_old.json");
-            if (Files.exists(cFile)) {
-                Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
+
+            try {
+                if (Files.exists(cFile)) {
+                    Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
             }
-            OutputStream out = Files.newOutputStream(cFile);
-            JsonHelper.write(campaignFileNode, out);
+
+            try {
+                OutputStream out = Files.newOutputStream(cFile);
+                JsonHelper.write(campaignFileNode, out);
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+                continue;
+            }
+
+            try {
+                ImageLoader.writePng(campaign.getImage(), getPath()
+                        .resolve(campaign.getCampaignId().toString()).resolve("campaign.png"));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
 
             ObjectNode campaignNode = JsonNodeFactory.instance.objectNode()
                     .put("name", campaign.getName())
                     .put("date", campaign.getDate().toString())
                     .put("lastPlayed", campaign.getLastPlayed().toString())
                     .put("uuid", campaign.getCampaignId().toString());
-            writeCampaign(campaignNode, campaign);
             c.add(campaignNode);
         }
 
-        if (Files.exists(getDataFile())) {
-            Files.copy(getDataFile(), getBackupDataFile(), StandardCopyOption.REPLACE_EXISTING);
+        try {
+            if (Files.exists(getDataFile())) {
+                Files.copy(getDataFile(), getBackupDataFile(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
         }
-        OutputStream out = Files.newOutputStream(getDataFile());
-        JsonHelper.write(n, out);
+
+        try {
+            OutputStream out = Files.newOutputStream(getDataFile());
+            JsonHelper.write(n, out);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
-
-    protected abstract void writeEntry(ObjectNode node, GameCampaignEntry<T, I> e);
-
-    protected abstract void writeCampaign(ObjectNode node, GameCampaign<T, I> c);
 
     public synchronized void delete(GameCampaign<T, I> c) {
         if (!this.campaigns.contains(c)) {
@@ -248,10 +271,20 @@ public abstract class SavegameCache<
         this.campaigns.remove(c);
     }
 
-    public synchronized GameCampaignEntry<T, I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I i) {
-        GameCampaignEntry<T, I> e = createEntry(entryUuid, checksum, i);
+    public synchronized GameCampaignEntry<T, I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I info) {
+        GameCampaignEntry<T, I> e = new GameCampaignEntry<>(
+                getDefaultEntryName(info),
+                entryUuid,
+                info,
+                checksum,
+                info.getDate());
         if (this.getCampaign(campainUuid).isEmpty()) {
-            var newCampaign = createNewCampaignForEntry(e);
+            GameCampaign<T,I> newCampaign = new GameCampaign<>(
+                    Instant.now(),
+                    getDefaultCampaignName(e),
+                    campainUuid,
+                    e.getDate(),
+                    GameIntegration.getForSavegameCache(this).getGuiFactory().tagImage(e, info.getTag()));
             this.campaigns.add(newCampaign);
         }
 
@@ -263,33 +296,9 @@ public abstract class SavegameCache<
         return e;
     }
 
-    protected abstract GameCampaign<T, I> createNewCampaignForEntry(GameCampaignEntry<T, I> entry);
+    protected abstract String getDefaultEntryName(I info);
 
-    protected abstract GameCampaignEntry<T, I> createEntry(UUID uuid, String checksum, I info);
-
-    public synchronized boolean updateSavegameData(GameCampaignEntry<T, I> e) {
-        Path p = getPath(e);
-        Path s = p.resolve("savegame." + name);
-        try {
-            PathUtils.delete(p.resolve("data." + fileEnding));
-        } catch (IOException ioException) {
-            ErrorHandler.handleException(ioException);
-            return false;
-        }
-
-        try {
-            writeSavegameData(s, p.resolve("data." + fileEnding));
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
-            return false;
-        }
-        return true;
-    }
-
-    private void writeSavegameData(Path savegame, Path out) throws Exception {
-        byte[] melted = RakalyHelper.meltSavegame(savegame);
-        Files.write(out, melted);
-    }
+    protected abstract String getDefaultCampaignName(GameCampaignEntry<T,I> latest);
 
     public synchronized boolean contains(GameCampaignEntry<?, ?> e) {
         return campaigns.stream()
