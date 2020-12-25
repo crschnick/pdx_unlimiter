@@ -2,9 +2,9 @@ package com.crschnick.pdx_unlimiter.core.parser;
 
 public class ValueNode extends Node {
 
-    private Object value;
+    private String value;
 
-    public ValueNode(Object value) {
+    public ValueNode(String value) {
         this.value = value;
     }
 
@@ -12,7 +12,7 @@ public class ValueNode extends Node {
         return "ValueNode(" + getValue().toString() + ")";
     }
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 }

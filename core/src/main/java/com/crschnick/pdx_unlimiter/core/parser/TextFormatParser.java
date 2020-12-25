@@ -1,9 +1,10 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TextFormatParser extends FormatParser {
@@ -11,36 +12,38 @@ public class TextFormatParser extends FormatParser {
     public static final byte[] EU4_MAGIC = new byte[]{0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
     public static final byte[] HOI_MAGIC = new byte[]{0x48, 0x4F, 0x49, 0x34, 0x74, 0x78, 0x74};
 
-    private TextFormatParser(byte[] magic) {
+    private Charset charset;
+
+    private TextFormatParser(byte[] magic, Charset charset) {
         super(magic);
+        this.charset = charset;
     }
 
     public static TextFormatParser textFileParser() {
-        return new TextFormatParser(new byte[0]);
+        return new TextFormatParser(new byte[0], StandardCharsets.UTF_8);
     }
 
     public static TextFormatParser eu4SavegameParser() {
-        return new TextFormatParser(EU4_MAGIC);
+        return new TextFormatParser(EU4_MAGIC, StandardCharsets.ISO_8859_1);
     }
 
     public static TextFormatParser stellarisSavegameParser() {
-        return new TextFormatParser(new byte[0]);
+        return new TextFormatParser(new byte[0], StandardCharsets.UTF_8);
     }
 
     public static TextFormatParser hoi4SavegameParser() {
-        return new TextFormatParser(HOI_MAGIC);
+        return new TextFormatParser(HOI_MAGIC, StandardCharsets.UTF_8);
     }
 
-    private List<Token> tokenize(String s) {
+    private List<Token> tokenizeInternal(byte[] chars) {
         // Approx amount of needed tokens
-        List<Token> tokens = new ArrayList<>(s.length() / 5);
+        List<Token> tokens = new ArrayList<>(chars.length / 5);
         int prev = 0;
         boolean isInQuotes = false;
         boolean isInComment = false;
 
-        var chars = s.toCharArray();
-        for (int i = 0; i < s.length(); i++) {
-            char c = chars[i];
+        for (int i = 0; i < chars.length; i++) {
+            char c = (char) chars[i];
             Token t = null;
             if (isInQuotes && c != '"') {
                 continue;
@@ -64,16 +67,16 @@ public class TextFormatParser extends FormatParser {
 
             boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
             boolean marksEndOfPreviousToken =
-                    (c == '\0' && prev < i)               // EOF
+                               (i == chars.length - 1 && prev < i)        // EOF
                             || (t != null && prev < i)    // New token finishes old token
                             || (isWhitespace && prev < i) // Whitespace finishes old token
                             || (c == '#' && prev < i);    // New comment finishes old token
             if (marksEndOfPreviousToken) {
-                String sub = s.substring(prev, i);
-                if (sub.charAt(0) == '"' && sub.charAt(sub.length() - 1) == '"') {
-                    tokens.add(new ValueToken(sub.substring(1, sub.length() - 1)));
+                var sub = Arrays.copyOfRange(chars, prev, i);
+                if (sub[0] == '"' && sub[sub.length - 1] == '"') {
+                    tokens.add(new ValueToken(new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
                 } else {
-                    tokens.add(new ValueToken(sub));
+                    tokens.add(new ValueToken(new String(sub, StandardCharsets.UTF_8)));
                 }
             }
 
@@ -91,8 +94,6 @@ public class TextFormatParser extends FormatParser {
 
     @Override
     public List<FormatParser.Token> tokenize(byte[] data) throws IOException {
-        String s = new String(data, StandardCharsets.UTF_8);
-        s += "\0";
-        return tokenize(s);
+        return tokenizeInternal(data);
     }
 }
