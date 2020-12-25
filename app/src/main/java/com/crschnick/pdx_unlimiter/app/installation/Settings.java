@@ -146,6 +146,7 @@ public class Settings {
         c.stellaris = stellaris;
         c.fontSize = fontSize;
         c.startSteam = startSteam;
+        c.enableAutoUpdate = enableAutoUpdate;
         c.deleteOnImport = deleteOnImport;
         c.rakalyUserId = rakalyUserId;
         c.rakalyApiKey = rakalyApiKey;
