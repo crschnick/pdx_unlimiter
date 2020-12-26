@@ -35,15 +35,15 @@ public class TextFormatParser extends FormatParser {
         return new TextFormatParser(HOI_MAGIC, StandardCharsets.UTF_8);
     }
 
-    private List<Token> tokenizeInternal(byte[] chars) {
+    private List<Token> tokenizeInternal(byte[] bytes) {
         // Approx amount of needed tokens
-        List<Token> tokens = new ArrayList<>(chars.length / 5);
+        List<Token> tokens = new ArrayList<>(bytes.length / 5);
         int prev = 0;
         boolean isInQuotes = false;
         boolean isInComment = false;
 
-        for (int i = 0; i < chars.length; i++) {
-            char c = (char) chars[i];
+        for (int i = 0; i < bytes.length; i++) {
+            char c = (char) bytes[i];
             Token t = null;
             if (isInQuotes && c != '"') {
                 continue;
@@ -67,12 +67,12 @@ public class TextFormatParser extends FormatParser {
 
             boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
             boolean marksEndOfPreviousToken =
-                               (i == chars.length - 1 && prev < i)        // EOF
-                            || (t != null && prev < i)    // New token finishes old token
-                            || (isWhitespace && prev < i) // Whitespace finishes old token
-                            || (c == '#' && prev < i);    // New comment finishes old token
+                               (i == bytes.length - 1 && prev < i) // EOF
+                            || (t != null && prev < i)             // New token finishes old token
+                            || (isWhitespace && prev < i)          // Whitespace finishes old token
+                            || (c == '#' && prev < i);             // New comment finishes old token
             if (marksEndOfPreviousToken) {
-                var sub = Arrays.copyOfRange(chars, prev, i);
+                var sub = Arrays.copyOfRange(bytes, prev, i);
                 if (sub[0] == '"' && sub[sub.length - 1] == '"') {
                     tokens.add(new ValueToken(new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
                 } else {

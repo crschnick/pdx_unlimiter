@@ -66,7 +66,7 @@ public class PdxuInstallation {
                     ErrorHandler.handleException(e);
                 }
             }
-            rakalyDir = Path.of(System.getProperty("java.home")).getParent().resolve("Rakaly");
+            rakalyDir = Path.of(System.getProperty("java.home")).getParent().resolve("rakaly");
         } else {
             v = "dev";
             try {
@@ -77,7 +77,7 @@ public class PdxuInstallation {
 
             dataDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute())
+                    .filter(Path::isAbsolute)
                     .orElseThrow(() -> new NoSuchElementException("Invalid dataDir for dev build"));
 
             prod = Optional.ofNullable(props.get("simulateProduction"))
