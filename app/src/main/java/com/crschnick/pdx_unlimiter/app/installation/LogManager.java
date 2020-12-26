@@ -19,12 +19,10 @@ public class LogManager {
 
     private Path logFile;
     private boolean debugInstallations;
-    private boolean debugAchievements;
 
-    private LogManager(Path logFile, boolean debugInstallations, boolean debugAchievements) {
+    private LogManager(Path logFile, boolean debugInstallations) {
         this.logFile = logFile;
         this.debugInstallations = debugInstallations;
-        this.debugAchievements = debugAchievements;
     }
 
     public static void init() {
@@ -47,7 +45,7 @@ public class LogManager {
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
 
-        INSTANCE = new LogManager(logFile, true, false);
+        INSTANCE = new LogManager(logFile, true);
         INSTANCE.setLogLevels(i.isDeveloperMode());
 
         Logger l = LoggerFactory.getLogger(LogManager.class);
@@ -66,16 +64,9 @@ public class LogManager {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
 
-        if (!debugAchievements) {
-            System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.achievement", "info");
-        }
-
         if (!debugInstallations) {
             System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
         }
-
-        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.CompiledPath", "warn");
-        System.setProperty("org.slf4j.simpleLogger.log.com.jayway.jsonpath.internal.path.PredicateContextImpl", "warn");
 
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
             java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());

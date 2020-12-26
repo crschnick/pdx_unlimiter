@@ -48,7 +48,6 @@ public class ErrorHandler {
 
     private static void handleExcetionWithoutInit(Throwable ex) {
         ex.printStackTrace();
-        LoggerFactory.getLogger(ErrorHandler.class).error("Init error", ex);
         if (PdxuInstallation.getInstance() == null || PdxuInstallation.getInstance().isProduction()) {
             Sentry.init(sentryOptions -> {
                 sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262");
