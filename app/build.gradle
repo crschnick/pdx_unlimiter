@@ -7,7 +7,7 @@ plugins {
     id 'org.beryx.jlink' version '2.22.3'
 }
 
-setVersion '2.1-beta2'
+setVersion '2.1-beta3'
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
@@ -58,9 +58,6 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
     implementation files("$buildDir/generated-modules/sentry-4.0.0-alpha.2.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
-    implementation files("$buildDir/generated-modules/json-path-master-SNAPSHOT.jar")
-    implementation files("$buildDir/generated-modules/json-smart-2.3.jar")
-    implementation files("$buildDir/generated-modules/accessors-smart-1.2.jar")
     implementation project(':core')
 }
 
@@ -69,37 +66,6 @@ addDependenciesModuleInfo {
     jdepsExtraArgs = ['-q']
     outputDirectory = file("$buildDir/generated-modules")
     modules {
-        module {
-            artifact group: 'net.minidev', name: 'json-smart', version: '2.3'
-            moduleInfoSource = '''
-                module net.minidev.json {
-                    exports net.minidev.json;
-                    exports net.minidev.json.parser;
-                    requires net.minidev.asm;
-                }
-            '''
-        }
-        module {
-            artifact group: 'net.minidev', name: 'accessors-smart', version: '1.2'
-            moduleInfoSource = '''
-                module net.minidev.asm {
-                    exports net.minidev.asm;
-                }
-            '''
-        }
-        module {
-            artifact 'com.github.json-path.JsonPath:json-path:master-SNAPSHOT'
-            moduleInfoSource = '''
-                module com.jayway.jsonpath {
-                    exports com.jayway.jsonpath;
-                    exports com.jayway.jsonpath.spi.json;
-                    exports com.jayway.jsonpath.spi.mapper;
-                    requires com.fasterxml.jackson.databind;
-                    requires org.slf4j;
-                    requires net.minidev.json;
-                }
-            '''
-        }
         module {
             artifact group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
             moduleInfoSource = '''

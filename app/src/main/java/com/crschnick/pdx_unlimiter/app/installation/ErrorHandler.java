@@ -64,6 +64,7 @@ public class ErrorHandler {
     public static void handleException(Throwable ex, String msg, Path attachFile) {
         if (!startupCompleted) {
             handleExcetionWithoutInit(ex);
+            return;
         }
 
         Runnable run = () -> {

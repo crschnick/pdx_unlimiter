@@ -1,8 +1,10 @@
+Rakaly (https://github.com/rakaly/cli) (MIT License)
+
+Elevate (https://github.com/jpassing/elevate) (MIT License)
+
 Apache Commons IO (https://commons.apache.org/proper/commons-io/) (Apache License v2.0)
 
 Apache Commons Lang3 (https://commons.apache.org/proper/commons-lang/) (Apache License v2.0)
-
-Json-Path (https://github.com/json-path/JsonPath/) (Apache License v2.0)
 
 JNativeHook (https://github.com/kwhat/jnativehook) (GPL v3)
 
@@ -20,13 +22,9 @@ SLF4J (http://www.slf4j.org) (MIT License)
 
 jackson-databind (https://github.com/FasterXML/jackson-databind) (Apache License v2.0)
 
-json-smart-v2 (https://github.com/netplex/json-smart-v2) (Apache License v2.0)
-
 ikonli-javafx (https://kordamp.org/ikonli/) (Apache License v2.0)
 
 ikonli-materialdesign-pack (https://github.com/Templarian/MaterialDesign) (Pictogrammers Free License)
-
-accessors-smart (https://github.com/netplex/json-smart-v2) (Apache License v2.0)
 
 JFoenix (http://jfoenix.com/) (Apache License v2.0)
 
