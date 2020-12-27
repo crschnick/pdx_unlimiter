@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
@@ -136,12 +137,7 @@ public class GuiGameCampaignEntryList {
 
         Button guide = new Button("Read the guide");
         guide.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(
-                        new URI("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md");
         });
         v.getChildren().add(guide);
 

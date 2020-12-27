@@ -80,7 +80,7 @@ public class Settings {
         s.stellaris = Optional.ofNullable(sNode.get("stellaris")).map(n -> Paths.get(n.textValue()))
                 .orElse(InstallLocationHelper.getInstallPath("Stellaris").orElse(null));
 
-        s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(12);
+        s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(11);
         s.startSteam = Optional.ofNullable(sNode.get("startSteam")).map(JsonNode::booleanValue).orElse(true);
         s.deleteOnImport = Optional.ofNullable(sNode.get("deleteOnImport")).map(JsonNode::booleanValue).orElse(false);
         s.rakalyUserId = Optional.ofNullable(sNode.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);

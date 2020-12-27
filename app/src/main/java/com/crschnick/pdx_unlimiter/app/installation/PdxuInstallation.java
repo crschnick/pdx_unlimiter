@@ -61,7 +61,6 @@ public class PdxuInstallation {
             if (Files.exists(propsFile)) {
                 try {
                     props.load(Files.newInputStream(propsFile));
-
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }

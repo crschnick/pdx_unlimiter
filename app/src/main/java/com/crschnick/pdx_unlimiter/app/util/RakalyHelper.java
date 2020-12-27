@@ -50,7 +50,7 @@ public class RakalyHelper {
             try {
                 byte[] body = Files.readAllBytes(cache.getPath(entry).resolve("savegame.eu4"));
                 String saveId = executePost(cache.getFileName(entry), new URL("https://rakaly.com/api/saves"), body);
-                Desktop.getDesktop().browse(new URL("https://rakaly.com/eu4/saves/" + saveId).toURI());
+                ThreadHelper.browse("https://rakaly.com/eu4/saves/" + saveId);
             } catch (Exception e) {
                 GuiErrorReporter.showErrorMessage(e.getMessage(), null, false);
             }

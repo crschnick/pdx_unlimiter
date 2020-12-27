@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCacheIO;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -46,11 +47,7 @@ public class GuiMenuBar {
 
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().open(PdxuInstallation.getInstance().getSavegameLocation().toFile());
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.open(PdxuInstallation.getInstance().getSavegameLocation());
         });
         savegames.getItems().add(sd);
 
@@ -59,11 +56,7 @@ public class GuiMenuBar {
 
         MenuItem src = new MenuItem("Contribute");
         src.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/");
         });
 
         MenuItem lc = new MenuItem("License");
@@ -83,22 +76,13 @@ public class GuiMenuBar {
 
         MenuItem guide = new MenuItem("Guide");
         guide.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(
-                        new URI("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md");
         });
         help.getItems().add(guide);
 
         MenuItem is = new MenuItem("Report an issue");
         is.setOnAction((a) -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues"));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
+            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/issues");
         });
         help.getItems().add(is);
 

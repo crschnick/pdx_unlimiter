@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -63,11 +64,7 @@ public class GuiErrorReporter {
 
             Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
             reportButton.addEventFilter(ActionEvent.ACTION, event -> {
-                try {
-                    Desktop.getDesktop().browse(new URI("https://github.com/crschnick/pdx_unlimiter/issues/new"));
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                }
+                ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/issues/new");
                 event.consume();
             });
         }

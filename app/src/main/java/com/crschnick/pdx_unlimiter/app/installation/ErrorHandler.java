@@ -33,16 +33,14 @@ public class ErrorHandler {
             });
         });
 
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            handleException(e);
-        });
+        registerThread(Thread.currentThread());
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
     }
 
     public static void registerThread(Thread thread) {
         thread.setUncaughtExceptionHandler((t, e) -> {
-            ErrorHandler.handleException(e);
+            handleException(e, "An uncaught exception was thrown", null);
         });
     }
 

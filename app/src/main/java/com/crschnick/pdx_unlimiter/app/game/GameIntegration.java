@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.SavedState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -296,10 +297,6 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     public abstract SavegameCache<T, I> getSavegameCache();
 
     public void openCampaignEntry(GameCampaignEntry<T, I> entry) {
-        try {
-            Desktop.getDesktop().open(getSavegameCache().getPath(entry).toFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ThreadHelper.open(getSavegameCache().getPath(entry));
     }
 }

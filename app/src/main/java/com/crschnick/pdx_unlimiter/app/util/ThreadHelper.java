@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 
 import java.awt.*;
 import java.net.URI;
+import java.nio.file.Path;
 
 public class ThreadHelper {
 
@@ -19,6 +20,18 @@ public class ThreadHelper {
         var t = new Thread(() -> {
             try {
                 Desktop.getDesktop().browse(URI.create(uri));
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
+    public static void open(Path p) {
+        var t = new Thread(() -> {
+            try {
+                Desktop.getDesktop().open(p.toFile());
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
