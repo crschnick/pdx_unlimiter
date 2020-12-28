@@ -1,4 +1,5 @@
 import org.beryx.jlink.JlinkTask
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     id 'application'
@@ -7,7 +8,7 @@ plugins {
     id 'org.beryx.jlink' version '2.22.3'
 }
 
-setVersion '2.1-beta4'
+setVersion '2.1-beta5'
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
@@ -32,7 +33,7 @@ application {
 
 javafx {
     version = '15'
-    modules = ['javafx.controls', 'javafx.base', 'javafx.graphics']
+    modules = ['javafx.controls', 'javafx.base']
 }
 
 repositories {
@@ -193,11 +194,11 @@ task writeVersion(type: DefaultTask) {
 
 createImage.finalizedBy(writeVersion)
 
+OperatingSystem os = DefaultNativePlatform.currentOperatingSystem;
 task createDist(type: Zip, dependsOn: createImage) {
     destinationDirectory = buildDir
     archivesBaseName = "pdx_unlimiter"
-    archiveAppendix = "windows"
+    archiveAppendix = os.windows ? "windows" : "linux"
     archiveVersion = ""
     from "${buildDir}/image"
 }
-

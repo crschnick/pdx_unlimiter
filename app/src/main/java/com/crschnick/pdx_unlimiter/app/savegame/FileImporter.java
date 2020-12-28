@@ -24,7 +24,7 @@ public class FileImporter {
 
     public static void init() throws IOException {
         INSTANCE = new FileImporter();
-        var path = PdxuInstallation.getInstance().getSavegameLocation().resolve("import");
+        var path = PdxuInstallation.getInstance().getImportQueueLocation();
         FileUtils.forceMkdir(path.toFile());
 
         Consumer<Path> importFunc = p -> {
@@ -66,14 +66,13 @@ public class FileImporter {
 
     public static void addToImportQueue(String toImport) {
         try {
-            FileUtils.forceMkdir(PdxuInstallation.getInstance().getSavegameLocation().resolve("import").toFile());
+            FileUtils.forceMkdir(PdxuInstallation.getInstance().getImportQueueLocation().toFile());
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             return;
         }
 
-        var path = PdxuInstallation.getInstance().getSavegameLocation()
-                .resolve("import")
+        var path = PdxuInstallation.getInstance().getImportQueueLocation()
                 .resolve(UUID.randomUUID().toString());
 
         logger.debug("Creating queue file at " + path + " for import target " + toImport);

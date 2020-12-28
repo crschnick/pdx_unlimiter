@@ -123,6 +123,10 @@ public class PdxuInstallation {
         return dataLocation;
     }
 
+    public Path getImportQueueLocation() {
+        return dataLocation.resolve("import");
+    }
+
     private boolean isAlreadyRunning() {
         var procs = ProcessHandle.allProcesses()
                 .map(h -> h.info().command().orElse(""))
@@ -149,13 +153,7 @@ public class PdxuInstallation {
     }
 
     public Path getLogsLocation() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return dataLocation.resolve("logs");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return Path.of("var", "logs", "Pdx-Unlimiter");
-        } else {
-            return dataLocation.resolve("logs");
-        }
+        return dataLocation.resolve("logs");
     }
 
     public Path getRakalyExecutable() {
