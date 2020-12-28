@@ -22,6 +22,16 @@ import java.util.List;
 public abstract class FileImportTarget {
 
     public static List<FileImportTarget> createTargets(String toImport) {
+        if (SavegameCache.EU4 != null && toImport.startsWith("pdxu") ) {
+            try {
+                URL url = new URL(toImport.replace("pdxu", "https"));
+                String id = Path.of(url.getPath()).getFileName().toString();
+                URL fileUrl = new URL("https://rakaly.com/api/saves/" + id + "/file");
+                return List.of(new DownloadImportTarget(fileUrl));
+            } catch (Exception ignored) {
+            }
+        }
+
         try {
             List<FileImportTarget> targets = new ArrayList<>();
             Path p = Path.of(toImport);
@@ -79,20 +89,6 @@ public abstract class FileImportTarget {
             });
             return targets;
         } catch (InvalidPathException ignored) {
-        }
-
-
-        if (SavegameCache.EU4 == null) {
-            return List.of();
-        }
-
-        try {
-            URL url = new URL(toImport.startsWith("pdxu") ?
-                    toImport.replace("pdxu", "https") : toImport);
-            String id = Path.of(url.getPath()).getFileName().toString();
-            URL fileUrl = new URL("https://rakaly.com/api/saves/" + id + "/file");
-            return List.of(new DownloadImportTarget(fileUrl));
-        } catch (Exception ignored) {
         }
 
         LoggerFactory.getLogger(FileImportTarget.class).warn("Unable to determine import target for " + toImport);
