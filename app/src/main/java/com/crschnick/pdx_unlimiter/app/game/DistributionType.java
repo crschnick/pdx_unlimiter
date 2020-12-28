@@ -62,6 +62,9 @@ public abstract class DistributionType {
                         .resolve("Paradox Interactive")
                         .resolve("bootstrapper-v2.exe");
             } else if (SystemUtils.IS_OS_LINUX) {
+                bootstrapper = Path.of(System.getProperty("user.home"))
+                        .resolve(".paradoxlauncher")
+                        .resolve("bootstrapper-v2");
             }
 
             try {
