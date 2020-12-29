@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,7 +40,7 @@ public class RakalyHelper {
         return b;
     }
 
-    public static void uploadSavegame(SavegameCache cache, GameCampaignEntry<?, ?> entry) {
+    public static <T,I extends SavegameInfo<T>>void uploadSavegame(SavegameCache<T,I> cache, GameCampaignEntry<T,I> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
             GuiErrorReporter.showErrorMessage("Missing rakaly.com User ID or API key. " +
                     "To use this functionality, set both in the settings menu.", null, false);

@@ -6,6 +6,8 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -75,10 +77,11 @@ public class GuiGameCampaignEntry {
         HBox buttonBar = new HBox();
         buttonBar.setAlignment(Pos.CENTER);
         if (SavegameCache.EU4.contains(e)) {
+            GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>) e;
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
-                RakalyHelper.uploadSavegame(SavegameCache.EU4, e);
+                RakalyHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
             });
             upload.getStyleClass().add(CLASS_UPLOAD);
             Tooltip.install(upload, new Tooltip("Upload to Rakaly.com"));

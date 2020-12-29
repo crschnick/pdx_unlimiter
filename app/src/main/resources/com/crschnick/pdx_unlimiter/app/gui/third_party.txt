@@ -1,3 +1,5 @@
+JDK 15 (http://jdk.java.net/15/) (GPL2 with the Classpath Exception)
+
 Rakaly (https://github.com/rakaly/cli) (MIT License)
 
 Elevate (https://github.com/jpassing/elevate) (MIT License)

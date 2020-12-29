@@ -50,7 +50,8 @@ public class PdxuInstallation {
 
         Properties props = new Properties();
         if (prod) {
-            dataDir = Path.of(System.getProperty("user.home"), ".Pdx-Unlimiter");
+            dataDir = Path.of(System.getProperty("user.home"),
+                    SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
             try {
                 v = Files.readString(appPath.resolve("version"));
             } catch (IOException e) {
