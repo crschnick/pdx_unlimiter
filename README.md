@@ -8,10 +8,22 @@ after the installation.
 
 #### Windows
 
-Download the [windows installer](https://github.com/crschnick/pdx_unlimiter/raw/master/installers/Pdx-Unlimiter-2.0.msi).
+Download the
+[windows installer](https://github.com/crschnick/pdxu_installer/raw/master/pdxu_installer-windows.msi).
 
 Note that there might be some issues with Windows SmartScreen blocking the installer.
 If you are facing these issues, click on "More info" and then "Run anyway".
+
+#### Linux
+
+Download the
+[.deb installer](https://github.com/crschnick/pdxu_installer/raw/master/pdxu_installer-linux.deb)
+
+Note that the Linux version is relatively new and has only been tested on a few systems.
+Please report any issues that you are having with it.
+
+There is currently no .rpm installer for Fedora/CentOS/RHEL.
+However, if there is a need for it, it should be possible to create one.
 
 ## Savegame management for Paradox games
 
@@ -58,7 +70,7 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/afErBW9Z).
 You can also help the project by reporting issues, fixing bugs and making the planned issues a reality.
 Contributing guidelines are coming soon. 
 
-## Building and running
+## Development
 
 To build this project, [JDK 15](https://openjdk.java.net/projects/jdk/15/) is required.
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
@@ -68,3 +80,6 @@ To correctly run the Pdx-Unlimiter in a development environment,
 you need to set the property `dataDir=<installation directory>`
 in the `pdxu.properties` file. This is needed for a dev build to
 specify where to save data such as savegames and settings.
+
+Any contribution is welcomed!
+There are no real formal contribution guidelines right now, they will maybe come later.
