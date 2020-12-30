@@ -23,7 +23,7 @@ public class GameAppManager {
                         .filter(Objects::nonNull)
                         .map(g -> new GameApp(ProcessHandle.allProcesses()
                                 .filter(p -> p.info().command()
-                                        .map(cs -> cs.contains(g.getExecutable().toString())).orElse(false))
+                                        .map(cs -> isInstanceOfGame(cs, g)).orElse(false))
                                 .findAny().orElse(null), g)
                         )
                         .filter(ga -> ga.getProcess() != null)
@@ -40,6 +40,19 @@ public class GameAppManager {
                 }
             }
         });
+    }
+
+    private static boolean isInstanceOfGame(String cmd, GameInstallation install) {
+        if (cmd.contains(install.getExecutable().toString())) {
+            return true;
+        }
+
+        // Games are started this way on linux
+        if (cmd.startsWith("/bin/sh -c ./" + install.getExecutable().getFileName().toString())) {
+            return true;
+        }
+
+        return false;
     }
 
     public static GameAppManager getInstance() {
