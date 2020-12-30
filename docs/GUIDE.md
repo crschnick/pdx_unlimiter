@@ -6,7 +6,7 @@ The Pdx-Unlimiter will try to automatically detect any of those game installatio
 If any installation is not detected, you can set them manually in the settings menu.
 
 Furthermore, the Pdx-Unlimiter has an internal savegame storage independent of the savegame directories of installed games.
-The default location is `<User Home>\Pdx-Unlimiter\savegames` on windows and `~/.Pdx-Unlimiter/savegames` on Linux.
+The default location is `<User Home>\Pdx-Unlimiter\savegames` on windows and `~/.pdx-unlimiter/savegames` on Linux.
 You can however change this location in the settings menu.
 To prevent the storage from bloating, you have to explicitly
 import any savegame that you want to manage.

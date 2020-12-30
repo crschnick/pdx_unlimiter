@@ -1,10 +1,17 @@
 # Pdx-Unlimiter
 
+The Pdx-Unlimiter is a tool aimed at improving your gameplay experience for various Paradox Games.
+It does that by providing a powerful savegame manager that allows
+you to organize, upload, play and delete all of your savegames.
+It also comes with full mod support, paradox game integration
+and support for interacting with [Rakaly](https://rakaly.com).
+
+It you want to familiarize yourself with the features, you can
+read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
+
 ## Download
 
 Below you can find installers for all supported platforms.
-It is recommended to read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md)
-after the installation.
 
 #### Windows
 
@@ -29,15 +36,15 @@ However, if there is a need for it, it should be possible to create one.
 
 Since keeping track of all your savegames is getting more complicated
 with every new savegame you start or backup you revert to,
-the Pdx-Unlimiter provides you with an easy to use interface for choosing the right save file.
+the Pdx-Unlimiter provides you with an easy-to-use interface for choosing the right save file.
 This is done by collecting all savegames and creating a browsable and editable
 savegame history so you can load any prior saved version of a campaign. 
 This works for both Ironman and Non-Ironman savegames.
 All savegames can be also launched directly from
-within the Pdx-Unlimiter without needing to vist the main menu.
+within the Pdx-Unlimiter without needing to visit the main menu.
 
-f you want to revert to a previously imported savegame,
-you can kill the currenty running Paradox game and load the latest save.
+If you want to revert to a previously imported savegame,
+you can also kill the currently running Paradox game and load the latest save.
 This kind of manual savegame management for ironman games allows you to easily revert to previous saves,
 i.e. to savescum, which is kinda necessary for hard achievements.
 
