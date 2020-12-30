@@ -72,7 +72,7 @@ public class LogManager {
             java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
             logger.setLevel(Level.OFF);
             logger.setUseParentHandlers(false);
-            GlobalScreen.getAutoRepeatDelay();
+            GlobalScreen.isNativeHookRegistered();
         }
     }
 

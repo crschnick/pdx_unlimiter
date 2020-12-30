@@ -40,6 +40,9 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    maven {
         url = 'https://maven.nikr.net/'
     }
     maven { url "https://jitpack.io" }
@@ -58,7 +61,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
     implementation files("$buildDir/generated-modules/sentry-4.0.0-alpha.2.jar")
-    implementation files("$buildDir/generated-modules/jnativehook-2.1.0.jar")
+    implementation files("$buildDir/generated-modules/jnativehook-2.0.2.jar")
     implementation project(':core')
 }
 
@@ -68,13 +71,13 @@ addDependenciesModuleInfo {
     outputDirectory = file("$buildDir/generated-modules")
     modules {
         module {
-            artifact group: 'com.1stleg', name: 'jnativehook', version: '2.1.0'
+            artifact 'com.1stleg:jnativehook:2.0.2'
             moduleInfoSource = '''
                 module org.jnativehook {
                     exports org.jnativehook;
                     exports org.jnativehook.keyboard;
-                   requires java.logging;
-                   requires java.desktop;
+                    requires java.logging;
+                    requires java.desktop;
                 }
             '''
         }
