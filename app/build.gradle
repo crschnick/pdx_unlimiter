@@ -71,6 +71,17 @@ addDependenciesModuleInfo {
     outputDirectory = file("$buildDir/generated-modules")
     modules {
         module {
+            artifact 'com.1stleg:jnativehook:2.0.2'
+            moduleInfoSource = '''
+                module org.jnativehook {
+                    exports org.jnativehook;
+                    exports org.jnativehook.keyboard;
+                    requires java.logging;
+                    requires java.desktop;
+                }
+            '''
+        }
+        module {
             artifact 'io.sentry:sentry:4.0.0-alpha.2'
             moduleInfoSource = '''
                 module io.sentry {
