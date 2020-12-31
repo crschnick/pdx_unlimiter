@@ -33,12 +33,16 @@ public class GameDlc {
 
         Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(filePath));
         GameDlc dlc = new GameDlc();
-        dlc.expansion = node.getNodeForKey("category").getString().equals("expansion");
+        dlc.expansion = node.getNodeForKeyIfExistent("category")
+                .map(n -> n.getString().equals("expansion"))
+                .orElse(false);
         dlc.filePath = p.getParent().relativize(filePath);
         dlc.dataPath = p.getParent().relativize(dataPath);
         dlc.name = node.getNodeForKey("name").getString();
         dlc.affectsChecksum = node.getNodeForKey("affects_checksum").getBoolean();
-        dlc.affectsCompatability = node.getNodeForKey("affects_compatability").getBoolean();
+        dlc.affectsCompatability = node.getNodeForKeyIfExistent("affects_compatability")
+                .map(Node::getBoolean)
+                .orElse(false);
         return Optional.of(dlc);
     }
 
