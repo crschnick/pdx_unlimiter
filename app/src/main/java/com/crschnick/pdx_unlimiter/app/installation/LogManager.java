@@ -55,34 +55,36 @@ public class LogManager {
         l.info("Initializing LogManager");
         if (logFile != null) {
             l.info("Writing to log file " + logFile.toString());
-        }
 
-        System.setOut(new PrintStream(new OutputStream() {
-            private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
-            @Override
-            public void write(int b)  {
-                if (b == '\n') {
-                    String line = baos.toString();
-                    LoggerFactory.getLogger("stdout").info(line.strip());
-                    baos.reset();
-                } else {
-                    baos.write(b);
+            System.setOut(new PrintStream(new OutputStream() {
+                private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
+
+                @Override
+                public void write(int b) {
+                    if (b == '\n') {
+                        String line = baos.toString();
+                        LoggerFactory.getLogger("stdout").info(line.strip());
+                        baos.reset();
+                    } else {
+                        baos.write(b);
+                    }
                 }
-            }
-        }));
-        System.setErr(new PrintStream(new OutputStream() {
-            private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
-            @Override
-            public void write(int b)  {
-                if (b == '\n') {
-                    String line = baos.toString();
-                    LoggerFactory.getLogger("stderr").error(line.strip());
-                    baos.reset();
-                } else {
-                    baos.write(b);
+            }));
+            System.setErr(new PrintStream(new OutputStream() {
+                private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
+
+                @Override
+                public void write(int b) {
+                    if (b == '\n') {
+                        String line = baos.toString();
+                        LoggerFactory.getLogger("stderr").error(line.strip());
+                        baos.reset();
+                    } else {
+                        baos.write(b);
+                    }
                 }
-            }
-        }));
+            }));
+        }
     }
 
     public static LogManager getInstance() {

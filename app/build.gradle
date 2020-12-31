@@ -8,7 +8,7 @@ plugins {
     id 'org.beryx.jlink' version '2.22.3'
 }
 
-setVersion '2.1-beta10'
+setVersion '2.1-beta11'
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
@@ -23,7 +23,8 @@ java {
 List<String> runArgs = [
         "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
         "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
-        "--add-opens", "java.base/java.lang.reflect=com.jfoenix"]
+        "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
+        "-Xmx4g"]
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
