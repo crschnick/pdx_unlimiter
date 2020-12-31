@@ -29,7 +29,6 @@ public class PdxuApp extends Application {
     }
 
     public static void main(String[] args) {
-        ComponentManager.initialSetup(args);
         launch(args);
     }
 

@@ -5,7 +5,10 @@ import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -53,6 +56,33 @@ public class LogManager {
         if (logFile != null) {
             l.info("Writing to log file " + logFile.toString());
         }
+
+        System.setOut(new PrintStream(new OutputStream() {
+            private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
+            @Override
+            public void write(int b)  {
+                if (b == '\n') {
+                    String line = baos.toString();
+                    LoggerFactory.getLogger("stdout").info(line.strip());
+                    baos.reset();
+                } else {
+                    baos.write(b);
+                }
+            }
+        }));
+        System.setErr(new PrintStream(new OutputStream() {
+            private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
+            @Override
+            public void write(int b)  {
+                if (b == '\n') {
+                    String line = baos.toString();
+                    LoggerFactory.getLogger("stderr").error(line.strip());
+                    baos.reset();
+                } else {
+                    baos.write(b);
+                }
+            }
+        }));
     }
 
     public static LogManager getInstance() {
@@ -63,6 +93,8 @@ public class LogManager {
         if (true) { //if (debug) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
+
+        System.setProperty("prism.verbose", "true");
 
         if (!debugInstallations) {
             System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
