@@ -13,8 +13,6 @@ public class ErrorHandler {
     private static boolean startupCompleted = false;
 
     public static void init() {
-        startupCompleted = true;
-
         if (!PdxuInstallation.getInstance().isProduction()) {
             return;
         }
@@ -36,6 +34,10 @@ public class ErrorHandler {
         registerThread(Thread.currentThread());
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
+    }
+
+    public static void setPlatformInitialized() {
+        startupCompleted = true;
     }
 
     public static void registerThread(Thread thread) {

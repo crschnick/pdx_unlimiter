@@ -25,8 +25,7 @@ public class ComponentManager {
             ErrorHandler.init();
 
             LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
-            Arrays.stream(args)
-                    .forEach(FileImporter::addToImportQueue);
+            Arrays.stream(args).forEach(FileImporter::addToImportQueue);
 
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
@@ -37,6 +36,7 @@ public class ComponentManager {
     }
 
     public static void additionalSetup() {
+        ErrorHandler.setPlatformInitialized();
         Platform.setImplicitExit(false);
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
 
@@ -73,7 +73,6 @@ public class ComponentManager {
             PdxuApp.getApp().setupWindowState();
 
             GameImage.init();
-            //AchievementManager.init();
             SavegameCache.init();
             SavegameWatcher.init();
 
