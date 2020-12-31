@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Optional;
 
 public class RakalyHelper {
 
@@ -88,14 +89,15 @@ public class RakalyHelper {
 
             ObjectMapper o = new ObjectMapper();
             JsonNode node = o.readTree(is.readAllBytes());
-            String msg = node.get("msg").textValue();
 
             if (responseCode != 200) {
+                String msg = Optional.of(node.get("msg"))
+                        .map(JsonNode::textValue).orElse("Rakaly returned http " + responseCode);
                 throw new IOException(msg);
+            } else {
+                String saveId = node.required("save_id").textValue();
+                return saveId;
             }
-
-            String saveId = node.get("save_id").textValue();
-            return saveId;
         } finally {
             if (connection != null) {
                 connection.disconnect();

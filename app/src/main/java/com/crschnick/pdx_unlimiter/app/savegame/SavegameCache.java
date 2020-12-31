@@ -25,6 +25,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -48,6 +49,8 @@ public abstract class SavegameCache<
     public static StellarisSavegameCache STELLARIS;
     public static Ck3SavegameCache CK3;
     public static Set<SavegameCache<?, ?>> ALL;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
 
     private String fileEnding;
@@ -279,6 +282,7 @@ public abstract class SavegameCache<
                 checksum,
                 info.getDate());
         if (this.getCampaign(campainUuid).isEmpty()) {
+            logger.debug("Adding new campaign " + getDefaultCampaignName(e));
             GameCampaign<T, I> newCampaign = new GameCampaign<>(
                     Instant.now(),
                     getDefaultCampaignName(e),
@@ -289,6 +293,7 @@ public abstract class SavegameCache<
         }
 
         GameCampaign<T, I> c = this.getCampaign(campainUuid).get();
+        logger.debug("Adding new entry " + e.getName());
         c.add(e);
 
         GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
@@ -407,27 +412,40 @@ public abstract class SavegameCache<
     }
 
     private void importSavegameData(Path file) throws Exception {
+        logger.debug("Reading file " + file.toString());
         byte[] content = Files.readAllBytes(file);
+        logger.debug("Read " + content.length + " bytes");
 
         var checksum = parser.checksum(content);
+        logger.debug("Checksum is " + checksum);
         var exists = getCampaigns().stream().flatMap(GameCampaign::entryStream)
                 .filter(ch -> ch.getChecksum().equals(checksum))
                 .findAny();
         if (exists.isPresent()) {
+            logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
             loadEntry(exists.get());
             GameIntegration.selectEntry(exists.get());
             return;
+        } else {
+            logger.debug("No entry with checksum found");
         }
 
         if (parser.isBinaryFormat(content)) {
+            logger.debug("Detected binary format. Invoking Rakaly ...");
             content = RakalyHelper.meltSavegame(file);
+            logger.debug("Rakaly finished melting");
         }
 
+        logger.debug("Parsing savegame info ...");
         Node node = parser.parse(content);
+        logger.debug("Parsed savegame info");
         I info = loadInfo(node);
+        logger.debug("Loaded info");
         UUID uuid = info.getCampaignUuid();
+        logger.debug("Campaign UUID is " + uuid.toString());
 
         UUID saveUuid = UUID.randomUUID();
+        logger.debug("Generated savegame UUID " + uuid.toString());
         Path campaignPath = getPath().resolve(uuid.toString());
         Path entryPath = campaignPath.resolve(saveUuid.toString());
 
