@@ -47,11 +47,6 @@ public class GameAppManager {
             return true;
         }
 
-        // Games are started this way on linux
-        if (cmd.startsWith("/bin/sh -c ./" + install.getExecutable().getFileName().toString())) {
-            return true;
-        }
-
         return false;
     }
 
