@@ -214,7 +214,7 @@ public abstract class FileImportTarget {
 
         @Override
         public String getName() {
-            return FilenameUtils.getBaseName(path.getFileName().toString());
+            return FilenameUtils.getBaseName(path.toString());
         }
 
         @Override

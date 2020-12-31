@@ -1,9 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
+import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,6 +16,33 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SteamHelper {
+
+    public static void openSteamURI(String uri) {
+        if (SystemUtils.IS_OS_LINUX) {
+            if (!isSteamRunning()) {
+                GuiErrorReporter.showErrorMessage("Steam is not started. " +
+                        "Please start Steam first before launching the game", null, false);
+            } else {
+                TaskExecutor.getInstance().submitTask(() -> {
+                    try {
+                        var p = new ProcessBuilder("steam", uri).start();
+                        p.getInputStream().readAllBytes();
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e);
+                    }
+                }, true);
+            }
+        } else {
+            ThreadHelper.browse(uri);
+        }
+    }
+
+    public static boolean isSteamRunning() {
+        return ProcessHandle.allProcesses()
+                .map(p -> p.info().command())
+                .flatMap(Optional::stream)
+                .anyMatch(c -> c.contains("steam") && c.contains("Steam"));
+    }
 
     public static List<Path> getRemoteDataPaths(int appId) {
         var p = getSteamPath();

@@ -33,7 +33,7 @@ public abstract class DistributionType {
 
         @Override
         public void launch() {
-            ThreadHelper.browse("steam://run/" + appId + "//");
+            SteamHelper.openSteamURI("steam://run/" + appId + "//");
         }
 
         @Override
