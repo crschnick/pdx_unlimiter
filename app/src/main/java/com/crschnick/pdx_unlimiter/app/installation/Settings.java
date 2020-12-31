@@ -26,7 +26,6 @@ public class Settings {
     private Path hoi4;
     private Path ck3;
     private Path stellaris;
-    private int maxLoadedSavegames = 1;
     private int fontSize;
     private boolean deleteOnImport;
     private boolean startSteam;
@@ -283,9 +282,5 @@ public class Settings {
 
     public boolean deleteOnImport() {
         return deleteOnImport;
-    }
-
-    public int getMaxLoadedSavegames() {
-        return maxLoadedSavegames;
     }
 }
