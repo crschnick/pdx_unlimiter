@@ -89,7 +89,7 @@ addDependenciesModuleInfo {
                     exports io.sentry;
                     opens io.sentry to com.google.gson;
                     
-                    exports io.sentry.protocol to com.google.gson;
+                    exports io.sentry.protocol;
                     opens io.sentry.protocol to com.google.gson;
                     
                     exports io.sentry.adapters;

@@ -82,17 +82,18 @@ public class GuiMenuBar {
 
         MenuItem is = new MenuItem("Report an issue");
         is.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/issues");
+            ErrorHandler.reportIssue();
         });
         help.getItems().add(is);
-
-        Menu dev = new Menu("Developer");
 
         MenuItem log = new MenuItem("Show log");
         log.setOnAction((a) -> {
             DialogHelper.showLogDialog();
         });
-        dev.getItems().add(log);
+        help.getItems().add(log);
+
+
+        Menu dev = new Menu("Developer");
 
         MenuItem error = new MenuItem("Throw exception");
         error.setOnAction((a) -> {

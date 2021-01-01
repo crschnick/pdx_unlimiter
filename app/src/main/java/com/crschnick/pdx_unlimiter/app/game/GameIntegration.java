@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
     public static Eu4Integration EU4;
@@ -28,7 +29,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     public static StellarisIntegration STELLARIS;
     public static Ck3Integration CK3;
 
-    private static SimpleObjectProperty<GameIntegration<?, ? extends SavegameInfo>> current = new SimpleObjectProperty<>();
+    private static SimpleObjectProperty<GameIntegration<?, ? extends SavegameInfo<?>>> current = new SimpleObjectProperty<>();
 
     private static List<GameIntegration<?, ? extends SavegameInfo<?>>> ALL;
 

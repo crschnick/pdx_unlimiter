@@ -110,8 +110,9 @@ If you want to disable this feature, you can do so in the settings menu.
 In case of any problems, you can do the following:
 
 - Use the automatic error reporter if it comes up
+- You can also open the issue reporter at 'Help' -> 'Report issue' in the menu bar
 - Alternatively, you can also open an issue on GitHub and describe the error in more detail
 - If the application does not even start or you want to dig deeper into the error cause,
   you can find the different log files at `<user home>\Pdx-Unlimiter\logs`
-  on Windows and `~/Pdx-Unlimiter/logs` on Linux.
+  on Windows and `~/.pdx-unlimiter/logs` on Linux.
   

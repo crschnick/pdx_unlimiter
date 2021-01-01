@@ -96,4 +96,28 @@ public class GuiErrorReporter {
         Optional<ButtonType> r = alert.showAndWait();
         return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
     }
+
+    public static Optional<String> showIssueDialog() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        DialogHelper.setIcon(alert);
+
+        alert.getButtonTypes().clear();
+        ButtonType report = new ButtonType("Send", ButtonBar.ButtonData.APPLY);
+        alert.getButtonTypes().addAll(report);
+        alert.setTitle("Issue reporter");
+        alert.setHeaderText("""
+If you encountered an issue, please describe it here.
+
+By clicking 'Send', you send this report and additional log information to the developers.""");
+
+        VBox dialogPaneContent = new VBox();
+        javafx.scene.control.TextArea textArea = new TextArea();
+        textArea.autosize();
+        dialogPaneContent.getChildren().addAll(textArea);
+        alert.getDialogPane().setContent(dialogPaneContent);
+
+        Optional<ButtonType> r = alert.showAndWait();
+        return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
+                Optional.ofNullable(textArea.getText()) : Optional.empty();
+    }
 }
