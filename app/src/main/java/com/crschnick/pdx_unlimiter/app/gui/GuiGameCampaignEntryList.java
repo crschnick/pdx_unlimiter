@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXListView;
@@ -19,8 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.awt.*;
-import java.net.URI;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;

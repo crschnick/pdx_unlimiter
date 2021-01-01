@@ -22,7 +22,7 @@ import java.util.List;
 public abstract class FileImportTarget {
 
     public static List<FileImportTarget> createTargets(String toImport) {
-        if (SavegameCache.EU4 != null && toImport.startsWith("pdxu") ) {
+        if (SavegameCache.EU4 != null && toImport.startsWith("pdxu")) {
             try {
                 URL url = new URL(toImport.replace("pdxu", "https"));
                 String id = Path.of(url.getPath()).getFileName().toString();

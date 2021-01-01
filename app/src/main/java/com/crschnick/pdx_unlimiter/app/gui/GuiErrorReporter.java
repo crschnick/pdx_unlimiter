@@ -1,19 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import java.awt.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -106,9 +101,9 @@ public class GuiErrorReporter {
         alert.getButtonTypes().addAll(report);
         alert.setTitle("Issue reporter");
         alert.setHeaderText("""
-If you encountered an issue, please describe it here.
+                If you encountered an issue, please describe it here.
 
-By clicking 'Send', you send this report and additional log information to the developers.""");
+                By clicking 'Send', you send this report and additional log information to the developers.""");
 
         VBox dialogPaneContent = new VBox();
         javafx.scene.control.TextArea textArea = new TextArea();

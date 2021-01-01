@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Optional;
 

@@ -18,9 +18,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 

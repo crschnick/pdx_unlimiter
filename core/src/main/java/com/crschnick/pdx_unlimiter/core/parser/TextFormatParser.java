@@ -67,7 +67,7 @@ public class TextFormatParser extends FormatParser {
 
             boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
             boolean marksEndOfPreviousToken =
-                               (i == bytes.length - 1 && prev < i) // EOF
+                    (i == bytes.length - 1 && prev < i) // EOF
                             || (t != null && prev < i)             // New token finishes old token
                             || (isWhitespace && prev < i)          // Whitespace finishes old token
                             || (c == '#' && prev < i);             // New comment finishes old token

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.awt.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +40,7 @@ public class RakalyHelper {
         return b;
     }
 
-    public static <T,I extends SavegameInfo<T>>void uploadSavegame(SavegameCache<T,I> cache, GameCampaignEntry<T,I> entry) {
+    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
             GuiErrorReporter.showErrorMessage("Missing rakaly.com User ID or API key. " +
                     "To use this functionality, set both in the settings menu.", null, false);

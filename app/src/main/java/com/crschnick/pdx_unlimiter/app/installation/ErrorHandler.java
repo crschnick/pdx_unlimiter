@@ -3,15 +3,11 @@ package com.crschnick.pdx_unlimiter.app.installation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import io.sentry.Attachment;
 import io.sentry.Sentry;
-import io.sentry.SentryEvent;
 import io.sentry.UserFeedback;
-import io.sentry.protocol.SentryId;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.UUID;
 
 public class ErrorHandler {
 

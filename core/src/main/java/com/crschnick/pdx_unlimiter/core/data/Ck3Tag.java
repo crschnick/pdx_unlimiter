@@ -126,6 +126,7 @@ public class Ck3Tag {
         private String patternFile;
         private List<String> colors;
         private List<Emblem> emblems;
+
         public CoatOfArms(int id, String patternFile, List<String> colors, List<Emblem> emblems) {
             this.id = id;
             this.patternFile = patternFile;
