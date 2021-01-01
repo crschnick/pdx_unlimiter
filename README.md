@@ -24,7 +24,7 @@ If you are facing these issues, click on "More info" and then "Run anyway".
 #### Linux
 
 Download the
-[.deb installer](https://github.com/crschnick/pdxu_installer/raw/master/pdxu_installer-linux.deb)
+[.deb installer](https://github.com/crschnick/pdxu_installer/releases/latest/download/pdxu_installer-linux.deb)
 
 Note that the Linux version is relatively new and has only been tested on a few systems.
 Please report any issues that you are having with it.
