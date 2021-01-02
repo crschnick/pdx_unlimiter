@@ -34,6 +34,14 @@
     -fx-icon-code: "mdi-upload"
 }
 
+.analyze-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-magnify"
+}
+
+.map-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-map"
+}
+
 .export-button .ikonli-font-icon {
     -fx-icon-code: "mdi-export";
 }

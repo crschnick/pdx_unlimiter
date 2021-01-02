@@ -36,7 +36,7 @@ public class GuiLayout {
         BorderPane.setAlignment(pane, Pos.CENTER);
 
         layout.setOnDragOver(event -> {
-            if (event.getGestureSource() != layout
+            if (event.getGestureSource() == null
                     && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
             }

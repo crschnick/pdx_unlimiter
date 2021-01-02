@@ -371,6 +371,10 @@ public abstract class SavegameCache<
 
     protected abstract I loadInfo(Node n) throws Exception;
 
+    public synchronized Path getSavegameFile(GameCampaignEntry<T, I> e) {
+        return getPath(e).resolve("savegame." + fileEnding);
+    }
+
     public synchronized Path getPath(GameCampaignEntry<T, I> e) {
         Path campaignPath = path.resolve(getCampaign(e).getCampaignId().toString());
         return campaignPath.resolve(e.getUuid().toString());
@@ -386,7 +390,7 @@ public abstract class SavegameCache<
     }
 
     public synchronized String getFileName(GameCampaignEntry<T, I> e) {
-        return getCampaign(e).getName() + " " + e.getName().replace(":", ".") + "." + fileEnding;
+        return getCampaign(e).getName() + " (" + e.getName().replace(":", ".") + ")." + fileEnding;
     }
 
     public synchronized void exportSavegame(GameCampaignEntry<T, I> e, Path destPath) throws IOException {

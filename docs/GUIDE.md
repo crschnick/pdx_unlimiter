@@ -69,6 +69,9 @@ By clicking the export button **(9)** in the status bar,
 you can copy the savegame into the savegame directory of the current game.
 This will however not launch the game automatically.
 
+If you want to export a savegame into any other directory,
+you can simple drag it from within the Pdx-Unlimiter and drop it where you want.
+
 You can also export the entire storage of the Pdx-Unlimiter into a directory,
 by clicking *Storage* -> *Export storage...* in the menu bar **(5)**.
 This can be useful to backup your savegame collection or transfer it between different computers.

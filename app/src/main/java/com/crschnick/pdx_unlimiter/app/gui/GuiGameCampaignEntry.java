@@ -3,9 +3,12 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -16,14 +19,30 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import org.apache.commons.io.FileUtils;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeInputEvent;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -43,14 +62,6 @@ public class GuiGameCampaignEntry {
         name.getStyleClass().add(CLASS_TEXT_FIELD);
         name.setAlignment(Pos.CENTER);
         name.textProperty().bindBidirectional(e.nameProperty());
-
-        Button open = new JFXButton();
-        open.setOnMouseClicked((m) -> {
-            GameIntegration.<T, I>current().openCampaignEntry(e);
-        });
-        open.setGraphic(new FontIcon());
-        open.getStyleClass().add("open-button");
-        Tooltip.install(open, new Tooltip("Open stored savegame location"));
 
         Button del = new JFXButton();
         del.setGraphic(new FontIcon());
@@ -86,11 +97,39 @@ public class GuiGameCampaignEntry {
             upload.getStyleClass().add(CLASS_UPLOAD);
             Tooltip.install(upload, new Tooltip("Upload to Rakaly.com"));
             buttonBar.getChildren().add(upload);
+
+
+            Button analyze = new JFXButton();
+            analyze.setGraphic(new FontIcon());
+            analyze.setOnMouseClicked((m) -> {
+                RakalyHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
+            });
+            analyze.getStyleClass().add(CLASS_ANALYZE);
+            Tooltip.install(analyze, new Tooltip("Analyze with Rakaly.com"));
+            buttonBar.getChildren().add(analyze);
+
+
+            Button uploadSkanderbeg = new JFXButton();
+            uploadSkanderbeg.setGraphic(new FontIcon());
+            uploadSkanderbeg.setOnMouseClicked((m) -> {
+                SkanderbegHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
+            });
+            uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
+            Tooltip.install(uploadSkanderbeg, new Tooltip("Upload to Skanderbeg.pm"));
+            buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
+            Button open = new JFXButton();
+            open.setGraphic(new FontIcon());
+            open.getStyleClass().add("open-button");
+            Tooltip.install(open, new Tooltip("Open stored savegame location"));
             buttonBar.getChildren().add(open);
+            open.setOnMouseClicked((m) -> {
+                GameIntegration.<T, I>current().openCampaignEntry(e);
+            });
         }
+
 
         buttonBar.getChildren().add(del);
 
@@ -123,6 +162,24 @@ public class GuiGameCampaignEntry {
             if (e.infoProperty().isNotNull().get()) {
                 GameIntegration.selectEntry(e);
             }
+        });
+
+        main.setOnDragDetected(me -> {
+            Dragboard db = main.startDragAndDrop(TransferMode.COPY);
+            var sc = GameIntegration.<T,I>current().getSavegameCache();
+            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
+            try {
+                sc.exportSavegame(e, out);
+            } catch (IOException ioException) {
+                ErrorHandler.handleException(ioException);
+                me.consume();
+                return;
+            }
+
+            var cc = new ClipboardContent();
+            cc.putFiles(List.of(out.toFile()));
+            db.setContent(cc);
+            me.consume();
         });
         return main;
     }

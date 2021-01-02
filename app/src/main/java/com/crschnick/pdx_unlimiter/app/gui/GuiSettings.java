@@ -342,6 +342,34 @@ public class GuiSettings {
         return grid;
     }
 
+    private static Node skanderbeg(Settings s) {
+        GridPane grid = new GridPane();
+
+        var t = new Text("Skanderbeg.pm");
+        t.setStyle("-fx-font-weight: bold");
+        TextFlow name = new TextFlow(t);
+        grid.add(name, 0, 0, 3, 1);
+
+        grid.add(help("""
+                Your Skanderbeg.pm API key.
+
+                You can find this by going to the 'API' page on Skanderbeg.pm.
+                """), 0, 1);
+        grid.add(new Label("API key:"), 1, 1);
+        TextField apiKey = new TextField();
+        apiKey.textProperty().addListener((change, o, n) -> {
+            s.setSkanderbegApiKey(n.equals("") ? null : n);
+        });
+        apiKey.setText(s.getSkanderbegApiKey().orElse(""));
+        grid.add(apiKey, 2, 1);
+        GridPane.setHgrow(apiKey, Priority.ALWAYS);
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        return grid;
+    }
+
     public static void showSettings() {
         Alert alert = DialogHelper.createAlert();
         alert.getButtonTypes().add(ButtonType.APPLY);
@@ -355,7 +383,9 @@ public class GuiSettings {
                 new Separator(),
                 misc(s),
                 new Separator(),
-                rakaly(s));
+                rakaly(s),
+                new Separator(),
+                skanderbeg(s));
         vbox.setSpacing(10);
         alert.getDialogPane().setContent(vbox);
 

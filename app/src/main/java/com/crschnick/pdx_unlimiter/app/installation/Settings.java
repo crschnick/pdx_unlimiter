@@ -32,6 +32,7 @@ public class Settings {
     private boolean confirmDeletion = true;
     private String rakalyUserId;
     private String rakalyApiKey;
+    private String skanderbegApiKey;
     private Path storageDirectory;
     private boolean enableAutoUpdate;
 
@@ -84,6 +85,7 @@ public class Settings {
         s.deleteOnImport = Optional.ofNullable(sNode.get("deleteOnImport")).map(JsonNode::booleanValue).orElse(false);
         s.rakalyUserId = Optional.ofNullable(sNode.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
         s.rakalyApiKey = Optional.ofNullable(sNode.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
+        s.skanderbegApiKey = Optional.ofNullable(sNode.get("skanderbegApiKey")).map(JsonNode::textValue).orElse(null);
         s.storageDirectory = Optional.ofNullable(sNode.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
 
         Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
@@ -126,6 +128,9 @@ public class Settings {
         if (s.rakalyApiKey != null) {
             i.put("rakalyApiKey", s.rakalyApiKey);
         }
+        if (s.skanderbegApiKey != null) {
+            i.put("skanderbegApiKey", s.skanderbegApiKey);
+        }
         if (s.storageDirectory != null) {
             i.put("storageDirectory", s.storageDirectory.toString());
         }
@@ -149,8 +154,17 @@ public class Settings {
         c.deleteOnImport = deleteOnImport;
         c.rakalyUserId = rakalyUserId;
         c.rakalyApiKey = rakalyApiKey;
+        c.skanderbegApiKey = skanderbegApiKey;
         c.storageDirectory = storageDirectory;
         return c;
+    }
+
+    public Optional<String> getSkanderbegApiKey() {
+        return Optional.ofNullable(skanderbegApiKey);
+    }
+
+    public void setSkanderbegApiKey(String skanderbegApiKey) {
+        this.skanderbegApiKey = skanderbegApiKey;
     }
 
     public void setConfirmDeletion(boolean confirmDeletion) {
