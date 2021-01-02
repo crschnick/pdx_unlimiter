@@ -1,0 +1,22 @@
+<html>
+    <body>
+        <script>
+        function createFile() {
+          var create = ["<savegame data>"];
+          var blob = new Blob([create], {"type" : "application/zip"});
+          return ( blob.size > 0 ? blob : "file creation error" )
+        };
+
+        var file = createFile()
+        var newWindow = window.open('http://rakaly.com/eu4/analyze')
+
+        // TODO: Replace with window load listener
+        setTimeout(dropFile, 3000);
+        function dropFile() {
+            var dragElements = newWindow.document.getElementsByClassName('ant-upload-drag')
+            console.log(dragElements)
+            dragElements[0].onDrop(file)
+        }
+        </script>
+    </body>
+</html>
