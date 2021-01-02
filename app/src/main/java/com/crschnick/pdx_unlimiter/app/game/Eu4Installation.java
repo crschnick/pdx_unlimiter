@@ -56,7 +56,7 @@ public class Eu4Installation extends GameInstallation {
         return super.replaceVariablesInPath(value);
     }
 
-    public void loadSettings() throws IOException {
+    public void loadSettings() throws Exception {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
         super.userDir = determineUserDirectory(node);
