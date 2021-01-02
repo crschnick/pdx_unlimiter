@@ -71,7 +71,7 @@ public class ErrorHandler {
         Runnable run = () -> {
             LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
             if (PdxuInstallation.getInstance().isProduction()) {
-                if (GuiErrorReporter.showException(ex)) {
+                if (GuiErrorReporter.showException(ex, false)) {
                     Sentry.withScope(scope -> {
                         if (attachFile != null) {
                             scope.addAttachment(new Attachment(attachFile.toString()));
@@ -95,7 +95,7 @@ public class ErrorHandler {
 
         LoggerFactory.getLogger(ErrorHandler.class).error("Terminal Error", ex);
         if (PdxuInstallation.getInstance() == null || PdxuInstallation.getInstance().isProduction()) {
-            if (GuiErrorReporter.showException(ex)) {
+            if (GuiErrorReporter.showException(ex, true)) {
                 Sentry.captureException(ex);
             }
         }

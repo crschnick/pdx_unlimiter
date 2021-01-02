@@ -42,8 +42,8 @@ public class GuiMenuBar {
             Optional<Path> path = GuiSavegameIO.showExportDialog();
             path.ifPresent(p -> {
                 if (FileUtils.listFiles(p.toFile(), null, false).size() > 0) {
-                    GuiErrorReporter.showErrorMessage("Selected directory is not empty!" +
-                            " You can only export the storage into an empty directory", null, false);
+                    GuiErrorReporter.showSimpleErrorMessage("Selected directory is not empty!" +
+                            " You can only export the storage into an empty directory");
                     return;
                 }
                 SavegameCacheIO.exportSavegameCaches(p);

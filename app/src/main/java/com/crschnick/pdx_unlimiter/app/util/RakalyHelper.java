@@ -42,8 +42,8 @@ public class RakalyHelper {
 
     public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
-            GuiErrorReporter.showErrorMessage("Missing rakaly.com User ID or API key. " +
-                    "To use this functionality, set both in the settings menu.", null, false);
+            GuiErrorReporter.showSimpleErrorMessage("Missing rakaly.com User ID or API key. " +
+                    "To use this functionality, set both in the settings menu.");
             return;
         }
 
@@ -53,7 +53,7 @@ public class RakalyHelper {
                 String saveId = executePost(cache.getFileName(entry), new URL("https://rakaly.com/api/saves"), body);
                 ThreadHelper.browse("https://rakaly.com/eu4/saves/" + saveId);
             } catch (Exception e) {
-                GuiErrorReporter.showErrorMessage(e.getMessage(), null, false);
+                GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
             }
         }, true);
     }

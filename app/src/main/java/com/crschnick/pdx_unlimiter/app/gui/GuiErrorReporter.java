@@ -15,20 +15,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuiErrorReporter {
 
-    public static boolean showException(Throwable e) {
+    public static boolean showException(Throwable e, boolean terminal) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         String stackTrace = sw.toString();
-        return showErrorMessage(e.getMessage(), stackTrace, true);
+        return showErrorMessage(e.getMessage(), stackTrace, true, terminal);
     }
 
-    public static boolean showErrorMessage(String msg, String details, boolean reportable) {
+    public static boolean showSimpleErrorMessage(String msg) {
+        return showErrorMessage(msg, null, false, false);
+    }
+
+    public static boolean showErrorMessage(String msg, String details, boolean reportable, boolean terminal) {
         AtomicBoolean shouldSend = new AtomicBoolean(false);
         if (!Platform.isFxApplicationThread()) {
             CountDownLatch latch = new CountDownLatch(1);
             Platform.runLater(() -> {
-                shouldSend.set(showErrorMessageInternal(msg, details, reportable));
+                shouldSend.set(showErrorMessageInternal(msg, details, reportable, terminal));
                 latch.countDown();
             });
             try {
@@ -36,12 +40,12 @@ public class GuiErrorReporter {
             } catch (InterruptedException ignored) {
             }
         } else {
-            shouldSend.set(showErrorMessageInternal(msg, details, reportable));
+            shouldSend.set(showErrorMessageInternal(msg, details, reportable, terminal));
         }
         return shouldSend.get();
     }
 
-    private static boolean showErrorMessageInternal(String msg, String details, boolean reportable) {
+    private static boolean showErrorMessageInternal(String msg, String details, boolean reportable, boolean terminal) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         // Create Alert without icon since it may not have loaded yet
         if (PdxuApp.getApp() != null && PdxuApp.getApp().getIcon() != null) {
@@ -67,12 +71,13 @@ public class GuiErrorReporter {
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Error reporter");
         alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
-                """
+"""
 
-                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
 
-                        Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
-                        This will send some diagnostics data""" : ""));
+If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
+Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
+This will send some diagnostics data.
+"""  + (!terminal ? "\n Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
 
         VBox dialogPaneContent = new VBox();
 

@@ -18,8 +18,8 @@ public class SteamHelper {
     public static void openSteamURI(String uri) {
         if (SystemUtils.IS_OS_LINUX) {
             if (!isSteamRunning()) {
-                GuiErrorReporter.showErrorMessage("Steam is not started. " +
-                        "Please start Steam first before launching the game", null, false);
+                GuiErrorReporter.showSimpleErrorMessage("Steam is not started. " +
+                        "Please start Steam first before launching the game");
             } else {
                 TaskExecutor.getInstance().submitTask(() -> {
                     try {
