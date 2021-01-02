@@ -20,7 +20,11 @@ public class GuiErrorReporter {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         String stackTrace = sw.toString();
-        return showErrorMessage(e.getMessage(), stackTrace, true, terminal);
+        boolean r = showErrorMessage(e.getMessage(), stackTrace, true, terminal);
+        if (r) {
+            DialogHelper.showReportSent();
+        }
+        return r;
     }
 
     public static boolean showSimpleErrorMessage(String msg) {
@@ -117,6 +121,7 @@ This will send some diagnostics data.
         alert.getDialogPane().setContent(dialogPaneContent);
 
         Optional<ButtonType> r = alert.showAndWait();
+        r.ifPresent(b -> DialogHelper.showReportSent());
         return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
                 Optional.ofNullable(textArea.getText()) : Optional.empty();
     }

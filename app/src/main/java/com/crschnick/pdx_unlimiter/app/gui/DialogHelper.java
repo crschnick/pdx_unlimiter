@@ -75,6 +75,15 @@ public class DialogHelper {
         ((Stage) a.getDialogPane().getScene().getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
     }
 
+    public static void showReportSent() {
+        Alert a = createAlert();
+        a.initModality(Modality.WINDOW_MODAL);
+        a.setAlertType(Alert.AlertType.CONFIRMATION);
+        a.setTitle("Report sent");
+        a.setHeaderText("Your report has been succesfully sent! Thank you");
+        a.show();
+    }
+
     public static void showText(String title, String header, String file) {
         String text = null;
         try {
