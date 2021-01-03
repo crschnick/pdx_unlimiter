@@ -104,4 +104,14 @@ public class RakalyHelper {
         }
 
     }
+
+    public static <T, I extends SavegameInfo<T>> void analyzeEntry(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            try {
+                ThreadHelper.browse("https://rakaly.com/eu4/analyze");
+            } catch (Exception e) {
+                GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
+            }
+        }, true);
+    }
 }

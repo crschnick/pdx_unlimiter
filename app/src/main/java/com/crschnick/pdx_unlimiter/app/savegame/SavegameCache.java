@@ -404,6 +404,7 @@ public abstract class SavegameCache<
         try {
             importSavegameData(file);
             saveData();
+            System.gc();
             return true;
         } catch (Exception e) {
             ErrorHandler.handleException(e, "Could not import " + name + " savegame", file);

@@ -192,6 +192,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     private Image eu4TagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         var in = CascadeDirectoryHelper.openFile(
                 path, entry, GameInstallation.EU4);
-        return in.map(inputStream -> ImageLoader.loadImage(inputStream, null)).orElse(null);
+        return ImageLoader.loadImage(in.orElse(null), null);
     }
 }

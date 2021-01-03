@@ -83,6 +83,10 @@ For this to work, you first have to set your Rakaly.com *User ID* and *API key* 
 After this is done, you can click the upload button **(3)** and the selected savegame will be uploaded to Rakaly.
 If any error occurs or your savegame is not eligible for any achievement, an error message will be shown.
 
+There is also support to upload savegames to [https://skanderbeg.pm](https://skanderbeg.pm),
+a website for savegame maps and statistics.
+For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
+
 #### Reverting
 
 In case of any unfortunate ingame event that you want to revert,

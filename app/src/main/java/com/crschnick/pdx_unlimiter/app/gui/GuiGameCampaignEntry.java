@@ -102,7 +102,7 @@ public class GuiGameCampaignEntry {
             Button analyze = new JFXButton();
             analyze.setGraphic(new FontIcon());
             analyze.setOnMouseClicked((m) -> {
-                RakalyHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
+                RakalyHelper.analyzeEntry(SavegameCache.EU4, eu4Entry);
             });
             analyze.getStyleClass().add(CLASS_ANALYZE);
             Tooltip.install(analyze, new Tooltip("Analyze with Rakaly.com"));
