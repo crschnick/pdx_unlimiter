@@ -70,6 +70,10 @@ public class ImageLoader {
     }
 
     static Image loadImage(InputStream in, Function<Integer, Integer> pixelSelector) {
+        if (in == null) {
+            return DEFAULT_IMAGE;
+        }
+
         BufferedImage image;
         try {
             image = ImageIO.read(in);

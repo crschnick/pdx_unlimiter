@@ -215,10 +215,6 @@ public class GameImage {
         return Path.of("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga");
     }
 
-    public static Pane imageNode(Image i) {
-        return imageNode(i, null, null);
-    }
-
     public static Pane imageNode(Image i, String styleClass) {
         return imageNode(i, styleClass, null);
     }
