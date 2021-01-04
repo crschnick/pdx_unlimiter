@@ -24,7 +24,7 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Tag, Hoi4SavegameInfo> 
     }
 
     @Override
-    protected Hoi4SavegameInfo loadInfo(Node n) throws Exception {
+    protected Hoi4SavegameInfo loadInfo(boolean melted, Node n) throws Exception {
         return Hoi4SavegameInfo.fromSavegame(n);
     }
 }

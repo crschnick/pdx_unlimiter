@@ -31,7 +31,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Map<Eu4Tag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
-    public static Eu4SavegameInfo fromSavegame(Node n) throws SavegameParseException {
+    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         try {
             GameDate date = GameDateType.EU4.fromString(n.getNodeForKey("date").getString());
             String tag = n.getNodeForKey("player").getString();
@@ -56,7 +56,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             }
             e.observer = !n.getNodeForKey("not_observer").getBoolean();
             e.randomNewWorld = n.getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
-            e.ironman = n.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
+            e.ironman = melted;
             e.releasedVassal = n.getNodeForKey("countries").getNodeForKey(tag)
                     .getNodeForKeyIfExistent("has_switched_nation").map(Node::getBoolean).orElse(false);
             e.date = date;

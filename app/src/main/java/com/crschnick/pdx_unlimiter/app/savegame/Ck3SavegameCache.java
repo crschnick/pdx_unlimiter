@@ -24,7 +24,7 @@ public class Ck3SavegameCache extends SavegameCache<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    protected Ck3SavegameInfo loadInfo(Node n) throws Exception {
+    protected Ck3SavegameInfo loadInfo(boolean melted, Node n) throws Exception {
         return Ck3SavegameInfo.fromSavegame(n);
     }
 }

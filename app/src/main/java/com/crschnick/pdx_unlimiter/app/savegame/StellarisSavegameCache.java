@@ -25,7 +25,7 @@ public class StellarisSavegameCache extends SavegameCache<
     }
 
     @Override
-    protected StellarisSavegameInfo loadInfo(Node n) throws Exception {
+    protected StellarisSavegameInfo loadInfo(boolean melted, Node n) throws Exception {
         return StellarisSavegameInfo.fromSavegame(n);
     }
 }

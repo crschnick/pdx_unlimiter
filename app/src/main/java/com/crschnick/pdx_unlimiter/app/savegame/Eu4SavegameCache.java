@@ -27,7 +27,7 @@ public class Eu4SavegameCache extends SavegameCache<
     }
 
     @Override
-    protected Eu4SavegameInfo loadInfo(Node n) throws Exception {
-        return Eu4SavegameInfo.fromSavegame(n);
+    protected Eu4SavegameInfo loadInfo(boolean melted, Node n) throws Exception {
+        return Eu4SavegameInfo.fromSavegame(melted, n);
     }
 }

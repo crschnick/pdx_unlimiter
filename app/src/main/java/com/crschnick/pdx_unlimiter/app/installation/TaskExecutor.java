@@ -96,6 +96,7 @@ public class TaskExecutor {
             if (isBlocking) {
                 busy.setValue(false);
             }
+            ThreadHelper.sleep(50);
         });
     }
 

@@ -360,16 +360,17 @@ public abstract class SavegameCache<
 
         var file = getPath(e).resolve("savegame." + fileEnding);
         byte[] content = Files.readAllBytes(file);
-        if (parser.isBinaryFormat(content)) {
+        boolean melt = parser.isBinaryFormat(content);
+        if (melt) {
             content = RakalyHelper.meltSavegame(file);
         }
         var node = parser.parse(content);
-        I info = loadInfo(node);
+        I info = loadInfo(melt, node);
         e.infoProperty().set(info);
         LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
     }
 
-    protected abstract I loadInfo(Node n) throws Exception;
+    protected abstract I loadInfo(boolean melted, Node n) throws Exception;
 
     public synchronized Path getSavegameFile(GameCampaignEntry<T, I> e) {
         return getPath(e).resolve("savegame." + fileEnding);
@@ -435,7 +436,8 @@ public abstract class SavegameCache<
             logger.debug("No entry with checksum found");
         }
 
-        if (parser.isBinaryFormat(content)) {
+        boolean melt = parser.isBinaryFormat(content);
+        if (melt) {
             logger.debug("Detected binary format. Invoking Rakaly ...");
             content = RakalyHelper.meltSavegame(file);
             logger.debug("Rakaly finished melting");
@@ -444,7 +446,7 @@ public abstract class SavegameCache<
         logger.debug("Parsing savegame info ...");
         Node node = parser.parse(content);
         logger.debug("Parsed savegame info");
-        I info = loadInfo(node);
+        I info = loadInfo(melt, node);
         logger.debug("Loaded info");
         UUID uuid = info.getCampaignUuid();
         logger.debug("Campaign UUID is " + uuid.toString());
