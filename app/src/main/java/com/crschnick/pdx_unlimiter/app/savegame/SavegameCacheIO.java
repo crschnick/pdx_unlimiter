@@ -30,10 +30,13 @@ public class SavegameCacheIO {
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameCache<T, I> cache, Path out) throws IOException {
         for (GameCampaign<T, I> c : cache.getCampaigns()) {
-            String cName = c.getName();
             for (GameCampaignEntry<T, I> e : c.getEntries()) {
-                String name = cache.getEntryName(e);
-                Path fileOut = out.resolve(cache.getName() + "/" + cName + " (" + name + ")." + cache.getFileEnding());
+                Path fileOut = out.resolve(cache.getFileName(e));
+                int counter = 2;
+                while (Files.exists(fileOut)) {
+                    fileOut = fileOut.resolveSibling("(" + counter + ") " + cache.getFileName(e));
+                    counter++;
+                }
                 cache.exportSavegame(e, fileOut);
             }
         }

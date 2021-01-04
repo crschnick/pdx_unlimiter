@@ -59,6 +59,7 @@ public class GuiSavegameIO {
         Label label = new Label("Export location: ");
         label.setAlignment(Pos.BOTTOM_CENTER);
         TextField textArea = new TextField();
+        textArea.setEditable(false);
         Button b = new Button();
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
@@ -75,6 +76,7 @@ public class GuiSavegameIO {
         HBox.setHgrow(textArea, Priority.ALWAYS);
         alert.getDialogPane().setContent(dialogPaneContent);
         Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton() ? Optional.of(Paths.get(textArea.getText())) : Optional.empty();
+        return result.get().getButtonData().isDefaultButton() && textArea.getText().length() > 0 ?
+                Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
 }
