@@ -41,7 +41,7 @@ There are several ways of importing savegames into the Pdx-Unlimiter storage:
   This also works if the game is in fullscreen mode
   If the key combination is pressed, a confirmation sound will play
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
-  This includes `.eu4` `.hoi4`, `.ck3` and `sav` files.
+  This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
 - Opening an URL using the `pdxu` protocol. For example, opening
   [pdxu://rakaly.com/eu4/saves/_k7SRqT-1C7TQz3bD6EzR](pdxu://rakaly.com/eu4/saves/_k7SRqT-1C7TQz3bD6EzR)
   will automatically download and import the savegame from Rakaly

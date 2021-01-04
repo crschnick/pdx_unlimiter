@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
@@ -57,8 +58,14 @@ public class Eu4Installation extends GameInstallation {
     }
 
     public void loadSettings() throws Exception {
+        var ls = getPath().resolve("launcher-settings.json");
+        if (!Files.exists(ls)) {
+            throw new IOException("Missing EU4 Paradox launcher settings. " +
+                    "Only EU4 installations using the Paradox Launcher are supported");
+        }
+
         ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
+        JsonNode node = o.readTree(Files.readAllBytes(ls));
         super.userDir = determineUserDirectory(node);
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)\\.\\w+\\s.+").matcher(v);

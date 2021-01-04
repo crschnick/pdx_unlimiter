@@ -99,10 +99,6 @@ public abstract class GameInstallation {
         getDistType().launch();
     }
 
-    public void startDirect() {
-        getDistType().launch();
-    }
-
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
             SavegameCache<T, I> cache, GameCampaignEntry<T, I> e) {
         Path file = getSavegamesPath().resolve(cache.getFileName(e));
