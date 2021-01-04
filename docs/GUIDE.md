@@ -4,14 +4,13 @@ Upon installation, you probably have a lot of savegames of different Paradox gam
 either saved in your documents directories or your Steam cloudsave directories.
 The Pdx-Unlimiter will try to automatically detect any of those game installation and save game directories.
 If any installation is not detected, you can set them manually in the settings menu.
+Note that only installations of Paradox games with installed Paradox Launcher are supported!
 
 Furthermore, the Pdx-Unlimiter has an internal savegame storage independent of the savegame directories of installed games.
 The default location is `<User Home>\Pdx-Unlimiter\savegames` on windows and `~/.pdx-unlimiter/savegames` on Linux.
 You can however change this location in the settings menu.
-To prevent the storage from bloating, you have to explicitly
+For performance reasons and to prevent the storage from bloating, you have to explicitly
 import any savegame that you want to manage.
-There are however many different ways of importing savegames, as you will see later.
-
 
 ## Savegame management
 
@@ -51,7 +50,7 @@ In the settings menu you can also enable the option `Delete on import` which spe
 whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
 
 
-#### Playing
+### Playing
 
 You can launch a selected savegame directly by clicking the launch button **(10)** in the bottom status bar.
 This direct launch will automatically attempt to enable every required mod and dlc.
@@ -63,7 +62,7 @@ without selecting a savegame by clicking the `Launch` button in menu bar **(5)**
 This will start the Paradox Launcher and Steam if needed. If you don't want
 to start Steam as well, you can disable this feature in the settings.
 
-#### Exporting
+### Exporting
 
 By clicking the export button **(9)** in the status bar,
 you can copy the savegame into the savegame directory of the current game.
@@ -87,7 +86,7 @@ There is also support to upload savegames to [https://skanderbeg.pm](https://ska
 a website for savegame maps and statistics.
 For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
 
-#### Reverting
+### Reverting
 
 In case of any unfortunate ingame event that you want to revert,
 the Pdx-Unlimiter gives you the ability to savescum, i.e. reverting to the previous save when playing in ironman.

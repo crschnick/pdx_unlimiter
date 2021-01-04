@@ -4,9 +4,9 @@ The Pdx-Unlimiter is a tool aimed at improving your gameplay experience for vari
 It does that by providing a powerful savegame manager that allows
 you to organize, upload, play and delete all of your savegames.
 It also comes with full mod support, paradox game integration
-and support for interacting with [Rakaly](https://rakaly.com).
+and support for interacting with [Rakaly](https://rakaly.com) and [Skanderbeg](https://skanderbeg.pm).
 
-It you want to familiarize yourself with the features, you can
+It you want to familiarize yourself with all the features, you can
 read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
 
 ## Download
@@ -62,13 +62,15 @@ enabled without having to use Paradox launcher configurations.
 It is also checked whether a mod is missing or incompatible with the current version,
 so that nothing can potentially corrupt your savegames.
 
-## Achievements and challenges
+## Third party integration
 
 The Pdx-Unlimiter has built-in support for [Rakaly](https://rakaly.com),
 a website to analyze and share your eu4 achievements and compete against other players.
-It is possible to upload savegames to Rakaly to share your achievements and compete with others.
-You can also download savegames of others to inspect their campaign.
 If you are interested in Rakaly, you can also join the [Rakaly Discord](https://discord.gg/WMJPnvSe).
+
+It is also possible to upload your savegames to [Skanderbeg](https://skanderbeg.pm),
+a website to generate maps and statistics for your savegames.
+If you are interested in Skanderbeg, you can also join the [Skanderbeg Discord](https://discord.gg/uzkMPjc).
 
 ## Community and Support
 
