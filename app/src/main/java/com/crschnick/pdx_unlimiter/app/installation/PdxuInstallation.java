@@ -43,15 +43,22 @@ public class PdxuInstallation {
                 || appPath.toFile().getName().equals("image");
         boolean prod = image;
         String v = "unknown";
-        Path dataDir;
-        Path rakalyDir = null;
+        Path dataDir = Path.of(System.getProperty("user.home"),
+                SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
         boolean developerMode = false;
         boolean nativeHook = true;
 
+        Path appInstallPath;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
+                    .resolve("Programs").resolve("Pdx-Unlimiter");
+        } else {
+            appInstallPath = Path.of(System.getProperty("user.home"), ".pdx-unlimiter");
+        }
+        Path rakalyDir = appInstallPath.resolve("rakaly");
+
         Properties props = new Properties();
         if (prod) {
-            dataDir = Path.of(System.getProperty("user.home"),
-                    SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
             try {
                 v = Files.readString(appPath.resolve("version"));
             } catch (IOException e) {
@@ -66,7 +73,6 @@ public class PdxuInstallation {
                     ErrorHandler.handleException(e);
                 }
             }
-            rakalyDir = Path.of(System.getProperty("java.home")).getParent().resolve("rakaly");
         } else {
             v = "dev";
             try {
@@ -75,19 +81,29 @@ public class PdxuInstallation {
                 ErrorHandler.handleException(e);
             }
 
-            dataDir = Optional.ofNullable(props.get("dataDir"))
+            var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
-                    .filter(Path::isAbsolute)
-                    .orElseThrow(() -> new NoSuchElementException("Invalid dataDir for dev build"));
+                    .filter(Path::isAbsolute);
+            if (customDir.isPresent()) {
+                dataDir = customDir.get();
+            }
 
             prod = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
 
-            rakalyDir = Optional.ofNullable(props.get("rakalyDir"))
+            var altRakalyDir = Optional.ofNullable(props.get("rakalyDir"))
                     .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute() && Files.exists(val))
-                    .orElseThrow(() -> new NoSuchElementException("Invalid rakalyDir for dev build"));
+                    .filter(val -> val.isAbsolute() && Files.exists(val));
+            if (altRakalyDir.isPresent()) {
+                rakalyDir = altRakalyDir.get();
+            } else {
+                if (!Files.exists(rakalyDir)) {
+                    throw new NoSuchElementException("Invalid rakalyDir for dev build. " +
+                            "Please clone https://github.com/crschnick/pdxu_rakaly and point " +
+                            "the property rakalyDir to repo directory");
+                }
+            }
         }
 
         String rakalyVersion;
