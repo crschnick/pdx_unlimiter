@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -39,6 +40,8 @@ public abstract class GameInstallation {
     private Path path;
     private Path executable;
     private List<GameDlc> dlcs = new ArrayList<>();
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public GameInstallation(String id, Path path, Path executable) {
         this.id = id;
@@ -89,7 +92,7 @@ public abstract class GameInstallation {
     }
 
     public void initOptional() throws Exception {
-        LoggerFactory.getLogger(getClass()).debug("Initializing optional data");
+        LoggerFactory.getLogger(getClass()).debug("Initializing optional data ...");
         loadDlcs();
         loadMods();
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");

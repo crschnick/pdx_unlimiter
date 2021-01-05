@@ -45,6 +45,7 @@ public class Eu4Installation extends GameInstallation {
         try {
             String userdir = Files.readString(getPath().resolve("userdir.txt"));
             if (!userdir.isEmpty()) {
+                logger.debug("Found custom userdir " + userdir);
                 return Path.of(userdir);
             }
         } catch (IOException e) {
@@ -76,7 +77,9 @@ public class Eu4Installation extends GameInstallation {
                 Integer.parseInt(m.group(3)),
                 Integer.parseInt(m.group(4)),
                 m.group(5));
+        logger.debug("EU4 version: " + v);
         String platform = node.required("distPlatform").textValue();
+        logger.debug("Distribution platform: " + platform);
         if (platform.equals("steam") && Settings.getInstance().startSteam()) {
             this.distType = new DistributionType.Steam(Integer.parseInt(Files.readString(getPath().resolve("steam_appid.txt"))));
         } else {

@@ -25,6 +25,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +123,8 @@ public abstract class SavegameCache<
     private void updateCampaignProperties(GameCampaign<T, I> c) {
         c.getEntries().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
-                .map(s -> s.getInfo().getDate()).min(Comparator.naturalOrder())
+                .min(Comparator.naturalOrder())
+                .map(s -> s.getInfo().getDate())
                 .ifPresent(d -> c.dateProperty().setValue(d));
 
         c.getEntries().stream()
