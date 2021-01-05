@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
@@ -41,6 +42,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -87,6 +89,37 @@ public class GuiGameCampaignEntry {
 
         HBox buttonBar = new HBox();
         buttonBar.setAlignment(Pos.CENTER);
+
+        Button melt = new JFXButton();
+        melt.setGraphic(new FontIcon());
+        melt.setOnMouseClicked((m) -> {
+            var out = GuiSavegameIO.showMeltDialog();
+            out.ifPresent(path -> {
+                TaskExecutor.getInstance().submitTask(() -> {
+                    try {
+                        var data = RakalyHelper.meltSavegame(
+                                GameIntegration.<T, I>current().getSavegameCache().getSavegameFile(e));
+                        Files.write(path, data);
+                    } catch (IOException ex) {
+                        ErrorHandler.handleException(ex);
+                    }
+                }, true);
+            });
+        });
+        melt.getStyleClass().add(CLASS_MELT);
+        Tooltip.install(melt, new Tooltip("Convert to non-ironman savegame"));
+        if (e.getInfo() != null && e.getInfo().isIronman()) {
+            buttonBar.getChildren().add(melt);
+        } else {
+            e.infoProperty().addListener((c,o,n) -> {
+                if (n.isIronman()) {
+                    Platform.runLater(() -> {
+                        buttonBar.getChildren().add(0, melt);
+                    });
+                }
+            });
+        }
+
         if (SavegameCache.EU4.contains(e)) {
             GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>) e;
             Button upload = new JFXButton();

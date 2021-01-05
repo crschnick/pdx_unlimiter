@@ -58,6 +58,7 @@ public class GuiStyle {
     public static String CLASS_UPLOAD = "upload-button";
     public static String CLASS_MAP = "map-button";
     public static String CLASS_ANALYZE = "analyze-button";
+    public static String CLASS_MELT = "melt-button";
     public static String CLASS_IMPORT_DIALOG = "import-dialog";
 
     public static void addStylesheets(Scene scene) {

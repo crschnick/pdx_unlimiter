@@ -38,6 +38,10 @@
     -fx-icon-code: "mdi-chart-bar"
 }
 
+.melt-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-shuffle-variant"
+}
+
 .map-button .ikonli-font-icon {
     -fx-icon-code: "mdi-map"
 }

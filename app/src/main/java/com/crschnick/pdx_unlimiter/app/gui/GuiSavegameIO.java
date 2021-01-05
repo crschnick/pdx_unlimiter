@@ -79,4 +79,38 @@ public class GuiSavegameIO {
         return result.get().getButtonData().isDefaultButton() && textArea.getText().length() > 0 ?
                 Optional.of(Paths.get(textArea.getText())) : Optional.empty();
     }
+
+    public static Optional<Path> showMeltDialog() {
+        Alert alert = DialogHelper.createAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Export storage");
+        alert.setHeaderText("""
+                Do you want to convert the selected savegame into a non-ironman savegame?
+                        
+                The original savegame will not get modified.""");
+
+        HBox dialogPaneContent = new HBox();
+        Label label = new Label("New savegame location: ");
+        label.setAlignment(Pos.BOTTOM_CENTER);
+        TextField textArea = new TextField();
+        textArea.setEditable(false);
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
+        b.setOnMouseClicked((m) -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select export location");
+            File file = fileChooser.showSaveDialog(((Node) m.getTarget()).getScene().getWindow());
+            if (file != null) {
+                textArea.setText(file.toString());
+            }
+        });
+
+        dialogPaneContent.getChildren().addAll(label, textArea, b);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
+        alert.getDialogPane().setContent(dialogPaneContent);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.get().getButtonData().isDefaultButton() && textArea.getText().length() > 0 ?
+                Optional.of(Paths.get(textArea.getText())) : Optional.empty();
+    }
 }
