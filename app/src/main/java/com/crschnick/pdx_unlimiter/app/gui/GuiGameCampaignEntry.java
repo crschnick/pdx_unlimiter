@@ -107,7 +107,7 @@ public class GuiGameCampaignEntry {
             });
         });
         melt.getStyleClass().add(CLASS_MELT);
-        Tooltip.install(melt, new Tooltip("Convert to non-ironman savegame"));
+        Tooltip.install(melt, new Tooltip("Melt savegame (convert to non-ironman)"));
         if (e.getInfo() != null && e.getInfo().isIronman()) {
             buttonBar.getChildren().add(melt);
         } else {
