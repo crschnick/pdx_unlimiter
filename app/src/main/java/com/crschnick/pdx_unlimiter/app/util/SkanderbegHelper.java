@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameParser;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,10 @@ public class SkanderbegHelper {
         TaskExecutor.getInstance().submitTask(() -> {
             try {
                 byte[] body = Files.readAllBytes(cache.getSavegameFile(entry));
+                if (new Eu4SavegameParser().isBinaryFormat(body)) {
+                    body = RakalyHelper.meltSavegame(cache.getSavegameFile(entry));
+                }
+
                 String saveId = uploadContent(body, cache.getFileName(entry));
                 ThreadHelper.browse("https://skanderbeg.pm/browse.php?id=" + saveId);
             } catch (Exception e) {
