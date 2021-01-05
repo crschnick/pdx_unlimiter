@@ -8,6 +8,8 @@ and support for interacting with [Rakaly](https://rakaly.com) and [Skanderbeg](h
 
 It you want to familiarize yourself with all the features, you can
 read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
+There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/faq.md)
+to answer some of your questions.
 
 ## Download
 
