@@ -16,7 +16,7 @@ Below you can find installers for all supported platforms.
 #### Windows
 
 Download the
-[windows installer](https://github.com/crschnick/pdxu_installer/raw/master/pdxu_installer-windows.msi).
+[windows installer](https://github.com/crschnick/pdxu_installer/releases/latest/download/pdxu_installer-windows.msi).
 
 Note that there might be some issues with Windows SmartScreen blocking the installer.
 If you are facing these issues, click on "More info" and then "Run anyway".
