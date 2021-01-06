@@ -94,6 +94,13 @@ By pressing either `CTRL+SHIFT+K` or `Kill` in the status bar,
 you can kill the currently running game without it overriding the latest savegame.
 You can simply select your latest imported savegame in the Pdx-Unlimiter and launch it again.
 
+### Converting
+
+You can convert ironman savegames into non-ironman savegames by using the 'melt' functionality.
+The melt button can be found left to the upload button **(3)** for ironman savegames only and looks like an oven.
+From there, you can select the output file name.
+Note that you should include the file ending, e.g. `.eu4` in the file name!
+
 
 ## Automatic updates
 
