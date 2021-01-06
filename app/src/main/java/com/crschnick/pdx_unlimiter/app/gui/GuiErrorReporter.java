@@ -110,12 +110,15 @@ This will send some diagnostics data.
         alert.getButtonTypes().addAll(report);
         alert.setTitle("Issue reporter");
         alert.setHeaderText("""
-                If you encountered an issue, please describe it here.
+If you encountered an issue, please describe it here.
 
-                By clicking 'Send', you send this report and additional log information to the developers.""");
+By clicking 'Send', you send this report and additional log information to the developers.
+If you want to get notified of a fix or help the devs in case of any questions,
+please include some sort of contact information, like a reddit/discord/github username or an email
+                """);
 
         VBox dialogPaneContent = new VBox();
-        javafx.scene.control.TextArea textArea = new TextArea();
+        TextArea textArea = new TextArea();
         textArea.autosize();
         dialogPaneContent.getChildren().addAll(textArea);
         alert.getDialogPane().setContent(dialogPaneContent);
