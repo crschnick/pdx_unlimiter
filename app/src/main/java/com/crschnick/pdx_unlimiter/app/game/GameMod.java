@@ -28,8 +28,10 @@ public class GameMod {
             return Optional.empty();
         }
 
-        mod.path = Path.of(path.get().getString());
-        mod.supportedVersion = node.getNodeForKey("supported_version").getString();
+        // Sometimes, mod paths are messed up with a missing end quote
+        mod.path = Path.of(path.get().getString().replace("\"", ""));
+        
+        mod.supportedVersion = node.getNodeForKeyIfExistent("supported_version").map(Node::getString).orElse("*");
         return Optional.of(mod);
     }
 
