@@ -347,7 +347,7 @@ public class Settings {
             }
         }
 
-        if (eu4 == null && ck3 == null && hoi4 == null && stellaris == null) {
+        if (eu4.getPath() == null && ck3.getPath() == null && hoi4.getPath() == null && stellaris.getPath() == null) {
             GuiErrorReporter.showSimpleErrorMessage("""
 No supported or compatible Paradox game has been detected.
 To fix this, you can set the installation directories of games manually in the settings menu.

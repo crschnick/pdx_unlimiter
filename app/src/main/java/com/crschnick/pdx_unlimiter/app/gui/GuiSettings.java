@@ -5,8 +5,10 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -17,6 +19,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class GuiSettings {
 
@@ -48,128 +53,43 @@ public class GuiSettings {
         return hbox;
     }
 
-    private static Region eu4InstallLocationNode(Settings s) {
+    private static Node installLocationNode(String game, Supplier<Optional<Path>> getDir, Consumer<Path> setDir) {
         TextField textArea = new TextField();
         textArea.setEditable(false);
         Button b = new Button();
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
-        if (s.getEu4().isPresent()) {
+        if (getDir.get().isPresent()) {
             b.setDisable(true);
         }
 
-        b.setOnMouseClicked((m) -> {
+        EventHandler<MouseEvent> click = (m) -> {
             DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Select EU4 installation directory");
+            fileChooser.setTitle("Select " + game + " installation directory");
             File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
                 textArea.setText(file.toString());
             }
-        });
+        };
+        b.setOnMouseClicked(click);
+        textArea.setOnMouseClicked(click);
 
         textArea.textProperty().addListener((change, o, n) -> {
             if (!n.equals("")) {
-                s.setEu4(Path.of(n));
+                setDir.accept(Path.of(n));
             }
         });
-        textArea.setText(s.getEu4().map(Path::toString).orElse(""));
+        textArea.setText(getDir.get().map(Path::toString).orElse(""));
 
         HBox hbox = new HBox(textArea, b);
         HBox.setHgrow(textArea, Priority.ALWAYS);
         return hbox;
     }
 
-    private static Node hoi4InstallLocationNode(Settings s) {
-        TextField textArea = new TextField();
-        textArea.setEditable(false);
-        Button b = new Button();
-        b.setGraphic(new FontIcon());
-        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
-        if (s.getHoi4().isPresent()) {
-            b.setDisable(true);
-        }
-
-        b.setOnMouseClicked((m) -> {
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Select HOI4 installation directory");
-            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
-            if (file != null && file.exists()) {
-                textArea.setText(file.toString());
-            }
-        });
-
-        textArea.textProperty().addListener((change, o, n) -> {
-            if (!n.equals("")) {
-                s.setHoi4(Path.of(n));
-            }
-        });
-        textArea.setText(s.getHoi4().map(Path::toString).orElse(""));
-
-        HBox hbox = new HBox(textArea, b);
-        HBox.setHgrow(textArea, Priority.ALWAYS);
-        return hbox;
-    }
-
-    private static Node ck3InstallLocationNode(Settings s) {
-        TextField textArea = new TextField();
-        textArea.setEditable(false);
-        Button b = new Button();
-        b.setGraphic(new FontIcon());
-        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
-        if (s.getCk3().isPresent()) {
-            b.setDisable(true);
-        }
-
-        b.setOnMouseClicked((m) -> {
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Select CK3 installation directory");
-            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
-            if (file != null && file.exists()) {
-                textArea.setText(file.toString());
-            }
-        });
-
-        textArea.textProperty().addListener((change, o, n) -> {
-            if (!n.equals("")) {
-                s.setCk3(Path.of(n));
-            }
-        });
-        textArea.setText(s.getCk3().map(Path::toString).orElse(""));
-
-        HBox hbox = new HBox(textArea, b);
-        HBox.setHgrow(textArea, Priority.ALWAYS);
-        return hbox;
-    }
-
-    private static Node stellarisInstallLocationNode(Settings s) {
-        TextField textArea = new TextField();
-        textArea.setEditable(false);
-        Button b = new Button();
-        b.setGraphic(new FontIcon());
-        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
-        if (s.getStellaris().isPresent()) {
-            b.setDisable(true);
-        }
-
-        b.setOnMouseClicked((m) -> {
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Select Stellaris installation directory");
-            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
-            if (file != null && file.exists()) {
-                textArea.setText(file.toString());
-            }
-        });
-
-        textArea.textProperty().addListener((change, o, n) -> {
-            if (!n.equals("")) {
-                s.setStellaris(Path.of(n));
-            }
-        });
-        textArea.setText(s.getStellaris().map(Path::toString).orElse(""));
-
-        HBox hbox = new HBox(textArea, b);
-        HBox.setHgrow(textArea, Priority.ALWAYS);
-        return hbox;
+    private static Node installHelpNode(String game) {
+        return help("The " + game + " installation directory.\n\n" +
+                "Note that this should be the installation directory that contains the game executable and assets.\n" +
+                "NOT the user directory that contains your savegames and mods.");
     }
 
     private static Node installationLocations(Settings s) {
@@ -180,24 +100,28 @@ public class GuiSettings {
         TextFlow name = new TextFlow(t);
         grid.add(name, 0, 0, 2, 1);
 
-        grid.add(new Label("EU4:"), 0, 1);
-        var eu4 = eu4InstallLocationNode(s);
-        grid.add(eu4, 1, 1);
+        grid.add(installHelpNode("EU4"), 0, 1);
+        grid.add(new Label("EU4:"), 1, 1);
+        var eu4 = installLocationNode("EU4", s::getEu4, s::setEu4);
+        grid.add(eu4, 2, 1);
         GridPane.setHgrow(eu4, Priority.ALWAYS);
 
-        grid.add(new Label("HOI4:"), 0, 2);
-        var hoi4 = hoi4InstallLocationNode(s);
-        grid.add(hoi4, 1, 2);
+        grid.add(installHelpNode("HOI4"), 0, 2);
+        grid.add(new Label("HOI4:"), 1, 2);
+        var hoi4 = installLocationNode("HOI4", s::getHoi4, s::setHoi4);
+        grid.add(hoi4, 2, 2);
         GridPane.setHgrow(hoi4, Priority.ALWAYS);
 
-        grid.add(new Label("CK3:"), 0, 3);
-        var ck3 = ck3InstallLocationNode(s);
-        grid.add(ck3, 1, 3);
+        grid.add(installHelpNode("CK3"), 0, 3);
+        grid.add(new Label("CK3:"), 1, 3);
+        var ck3 = installLocationNode("CK3", s::getCk3, s::setCk3);
+        grid.add(ck3, 2, 3);
         GridPane.setHgrow(ck3, Priority.ALWAYS);
 
-        grid.add(new Label("Stellaris:"), 0, 4);
-        var stellaris = stellarisInstallLocationNode(s);
-        grid.add(stellaris, 1, 4);
+        grid.add(installHelpNode("Stellaris"), 0, 4);
+        grid.add(new Label("Stellaris:"), 1, 4);
+        var stellaris = installLocationNode("Stellaris", s::getStellaris, s::setStellaris);
+        grid.add(stellaris, 2, 4);
         GridPane.setHgrow(stellaris, Priority.ALWAYS);
 
         grid.setHgap(10);
