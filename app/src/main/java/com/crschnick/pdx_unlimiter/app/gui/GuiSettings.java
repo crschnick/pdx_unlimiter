@@ -59,9 +59,6 @@ public class GuiSettings {
         Button b = new Button();
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
-        if (getDir.get().isPresent()) {
-            b.setDisable(true);
-        }
 
         EventHandler<MouseEvent> click = (m) -> {
             DirectoryChooser fileChooser = new DirectoryChooser();

@@ -125,6 +125,10 @@ public class GuiMenuBar {
         m.setGraphic(new FontIcon());
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
+        m.setDisable(GameIntegration.current() == null);
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> m.setDisable(n == null));
+        });
 
         JFXButton importB = new JFXButton("Import");
         importB.setOnAction(e -> {
