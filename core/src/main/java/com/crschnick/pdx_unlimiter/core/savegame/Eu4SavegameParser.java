@@ -32,7 +32,8 @@ public class Eu4SavegameParser extends SavegameParser {
             zipFile.closeEntry();
         }
         zipFile.close();
-        return false;
+        throw new SavegameParseException("Gamestate not found in savegame. " +
+                "This might be a very old savegame, which is not supported");
     }
 
     @Override
