@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -77,18 +78,23 @@ public class GuiImporter {
             return;
         }
 
-        VBox box = new VBox();
-        box.setSpacing(5);
-
+        VBox targets = new VBox();
+        targets.setSpacing(5);
         JFXCheckBox cb = new JFXCheckBox();
         Set<FileImportTarget> selected = new HashSet<>();
+        createTargetList(targets, selected, watcher.getSavegames(), cb);
 
-        createTargetList(box, selected, watcher.getSavegames(), cb);
-        box.getChildren().add(new Separator());
-        box.getChildren().add(createBottomNode(cb));
+        VBox layout = new VBox();
+        layout.setSpacing(8);
+        var sp = new ScrollPane(targets);
+        sp.setFitToWidth(true);
+        sp.setPrefViewportWidth(250);
+        sp.setPrefViewportHeight(500);
+        layout.getChildren().add(sp);
+        layout.getChildren().add(new Separator());
+        layout.getChildren().add(createBottomNode(cb));
 
         Alert alert = DialogHelper.createEmptyAlert();
-
         var importType = new ButtonType("Import", ButtonBar.ButtonData.LEFT);
         alert.getButtonTypes().add(importType);
         Button importB = (Button) alert.getDialogPane().lookupButton(importType);
@@ -112,11 +118,11 @@ public class GuiImporter {
 
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import");
-        alert.getDialogPane().setContent(box);
+        alert.getDialogPane().setContent(layout);
         alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
         watcher.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                createTargetList(box, selected, n, cb);
+                createTargetList(targets, selected, n, cb);
             });
         });
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
