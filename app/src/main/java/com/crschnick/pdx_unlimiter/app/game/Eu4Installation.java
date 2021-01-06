@@ -59,6 +59,10 @@ public class Eu4Installation extends GameInstallation {
     }
 
     public void loadSettings() throws Exception {
+        if (!Files.isRegularFile(getExecutable())) {
+            throw new IllegalArgumentException("EU4 executable " + getExecutable() + " not found");
+        }
+
         var ls = getPath().resolve("launcher-settings.json");
         if (!Files.exists(ls)) {
             throw new IOException("Missing EU4 Paradox launcher settings. " +
@@ -68,6 +72,11 @@ public class Eu4Installation extends GameInstallation {
         ObjectMapper o = new ObjectMapper();
         JsonNode node = o.readTree(Files.readAllBytes(ls));
         super.userDir = determineUserDirectory(node);
+        if (!Files.exists(userDir)) {
+            throw new IllegalArgumentException("EU4 user directory " + userDir +
+                    " does not exist. To fix this problem, please run EU4 once to generate it");
+        }
+
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)\\.\\w+\\s.+").matcher(v);
         m.find();

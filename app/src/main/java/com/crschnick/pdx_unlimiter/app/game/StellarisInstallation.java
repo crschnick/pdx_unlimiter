@@ -62,17 +62,23 @@ public class StellarisInstallation extends GameInstallation {
     @Override
     public void loadData() throws Exception {
         if (!Files.isRegularFile(getExecutable())) {
-            throw new IllegalArgumentException("Executable not found");
+            throw new IllegalArgumentException("Stellaris executable " + getExecutable() + " not found");
+        }
+
+        var ls = getPath().resolve("launcher-settings.json");
+        if (!Files.exists(ls)) {
+            throw new IOException("Missing Stellaris Paradox launcher settings. " +
+                    "Only Stellaris installations using the Paradox Launcher are supported");
         }
 
         ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
+        JsonNode node = o.readTree(Files.readAllBytes(ls));
         String value = Optional.ofNullable(node.get("gameDataPath"))
                 .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in Stellaris launcher config file"))
                 .textValue();
         this.userDir = super.replaceVariablesInPath(value);
         if (!Files.exists(userDir)) {
-            throw new IllegalArgumentException("User directory not found");
+            throw new IllegalArgumentException("Stellaris user directory " + userDir + " not found");
         }
 
         String v = node.required("version").textValue();

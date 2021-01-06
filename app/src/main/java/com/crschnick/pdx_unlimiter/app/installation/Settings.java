@@ -1,9 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.game.Ck3Installation;
-import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.game.Hoi4Installation;
-import com.crschnick.pdx_unlimiter.app.game.StellarisInstallation;
+import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -255,12 +253,20 @@ public class Settings {
         this.deleteOnImport = deleteOnImport;
     }
 
+    private void showInstallErrorMessage(Exception e, String game) {
+        String msg = e.getMessage() + ".\n\n" + game + " support has been disabled.\n" +
+                "If you believe that your installation is valid, " +
+                "please check in the settings menu whether the installation directory was correctly set.";
+        GuiErrorReporter.showSimpleErrorMessage(
+                "An error occured while loading your " + game + " installation:\n" +  msg);
+    }
+
     public void validate() {
         if (eu4 != null) {
             try {
                 new Eu4Installation(eu4).loadData();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                showInstallErrorMessage(e, "EU4");
                 eu4 = null;
             }
         }
@@ -268,7 +274,7 @@ public class Settings {
             try {
                 new Hoi4Installation(hoi4).loadData();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                showInstallErrorMessage(e, "HOI4");
                 hoi4 = null;
             }
         }
@@ -276,7 +282,7 @@ public class Settings {
             try {
                 new Ck3Installation(ck3).loadData();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                showInstallErrorMessage(e, "CK3");
                 ck3 = null;
             }
         }
@@ -284,7 +290,7 @@ public class Settings {
             try {
                 new StellarisInstallation(stellaris).loadData();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                showInstallErrorMessage(e, "Stellaris");
                 stellaris = null;
             }
         }
