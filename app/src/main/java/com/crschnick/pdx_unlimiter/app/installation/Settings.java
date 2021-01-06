@@ -20,10 +20,10 @@ import java.util.Optional;
 public class Settings {
 
     private static Settings INSTANCE;
-    private Path eu4;
-    private Path hoi4;
-    private Path ck3;
-    private Path stellaris;
+    private GameDirectory eu4;
+    private GameDirectory hoi4;
+    private GameDirectory ck3;
+    private GameDirectory stellaris;
     private int fontSize;
     private boolean deleteOnImport;
     private boolean startSteam;
@@ -38,6 +38,11 @@ public class Settings {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
         INSTANCE = loadConfig(file);
         INSTANCE.validate();
+        try {
+            saveConfig();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     public static Settings getInstance() {
@@ -51,6 +56,57 @@ public class Settings {
             saveConfig();
         } catch (IOException e) {
             ErrorHandler.handleException(e);
+        }
+    }
+
+    private static abstract class GameDirectory {
+
+        abstract boolean isDisabled();
+        abstract Path getPath();
+
+        private static Optional<TextNode> toNode(GameDirectory d) {
+            if (d.isDisabled()) {
+                return Optional.of(new TextNode("disabled"));
+            }
+            return Optional.ofNullable(d.getPath()).map(Path::toString).map(TextNode::new);
+        }
+
+        private static GameDirectory disabled() {
+            return new GameDirectory() {
+                @Override
+                boolean isDisabled() {
+                    return true;
+                }
+
+                @Override
+                Path getPath() {
+                    return null;
+                }
+            };
+        }
+
+        private static GameDirectory ofPath(Path p) {
+            return new GameDirectory() {
+                @Override
+                boolean isDisabled() {
+                    return false;
+                }
+
+                @Override
+                Path getPath() {
+                    return p;
+                }
+            };
+        }
+
+        private static GameDirectory fromNode(JsonNode node, String name) {
+            if (node != null && node.textValue().equals("disabled")) {
+                return disabled();
+            }
+
+            var r = Optional.ofNullable(node).map(n -> Paths.get(n.textValue()))
+                    .orElse(InstallLocationHelper.getInstallPath(name).orElse(null));;
+            return ofPath(r);
         }
     }
 
@@ -69,14 +125,10 @@ public class Settings {
         }
 
         Settings s = new Settings();
-        s.eu4 = Optional.ofNullable(sNode.get("eu4")).map(n -> Paths.get(n.textValue()))
-                .orElse(InstallLocationHelper.getInstallPath("Europa Universalis IV").orElse(null));
-        s.hoi4 = Optional.ofNullable(sNode.get("hoi4")).map(n -> Paths.get(n.textValue()))
-                .orElse(InstallLocationHelper.getInstallPath("Hearts of Iron IV").orElse(null));
-        s.ck3 = Optional.ofNullable(sNode.get("ck3")).map(n -> Paths.get(n.textValue()))
-                .orElse(InstallLocationHelper.getInstallPath("Crusader Kings III").orElse(null));
-        s.stellaris = Optional.ofNullable(sNode.get("stellaris")).map(n -> Paths.get(n.textValue()))
-                .orElse(InstallLocationHelper.getInstallPath("Stellaris").orElse(null));
+        s.eu4 = GameDirectory.fromNode(sNode.get("eu4"), "Europa Universalis IV");
+        s.hoi4 = GameDirectory.fromNode(sNode.get("hoi4"), "Hearts of Iron IV");
+        s.ck3 =  GameDirectory.fromNode(sNode.get("ck3"), "Crusader Kings III");
+        s.stellaris = GameDirectory.fromNode(sNode.get("stellaris"), "Stellaris");
 
         s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(11);
         s.startSteam = Optional.ofNullable(sNode.get("startSteam")).map(JsonNode::booleanValue).orElse(true);
@@ -104,18 +156,18 @@ public class Settings {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ObjectNode i = n.putObject("settings");
         Settings s = Settings.INSTANCE;
-        if (s.eu4 != null) {
-            i.set("eu4", new TextNode(s.eu4.toString()));
-        }
-        if (s.hoi4 != null) {
-            i.set("hoi4", new TextNode(s.hoi4.toString()));
-        }
-        if (s.ck3 != null) {
-            i.set("ck3", new TextNode(s.ck3.toString()));
-        }
-        if (s.stellaris != null) {
-            i.set("stellaris", new TextNode(s.stellaris.toString()));
-        }
+        GameDirectory.toNode(s.eu4).ifPresent(dir -> {
+            i.set("eu4", dir);
+        });
+        GameDirectory.toNode(s.hoi4).ifPresent(dir -> {
+            i.set("hoi4", dir);
+        });
+        GameDirectory.toNode(s.ck3).ifPresent(dir -> {
+            i.set("ck3", dir);
+        });
+        GameDirectory.toNode(s.stellaris).ifPresent(dir -> {
+            i.set("stellaris", dir);
+        });
 
         i.put("deleteOnImport", s.deleteOnImport);
         i.put("fontSize", s.fontSize);
@@ -178,35 +230,35 @@ public class Settings {
     }
 
     public Optional<Path> getEu4() {
-        return Optional.ofNullable(eu4);
+        return Optional.ofNullable(eu4.getPath());
     }
 
     public void setEu4(Path eu4) {
-        this.eu4 = eu4;
+        this.eu4 = GameDirectory.ofPath(eu4);
     }
 
     public Optional<Path> getHoi4() {
-        return Optional.ofNullable(hoi4);
+        return Optional.ofNullable(hoi4.getPath());
     }
 
     public void setHoi4(Path hoi4) {
-        this.hoi4 = hoi4;
+        this.hoi4 = GameDirectory.ofPath(hoi4);
     }
 
     public Optional<Path> getCk3() {
-        return Optional.ofNullable(ck3);
+        return Optional.ofNullable(ck3.getPath());
     }
 
     public void setCk3(Path ck3) {
-        this.ck3 = ck3;
+        this.ck3 = GameDirectory.ofPath(ck3);
     }
 
     public Optional<Path> getStellaris() {
-        return Optional.ofNullable(stellaris);
+        return Optional.ofNullable(stellaris.getPath());
     }
 
     public void setStellaris(Path stellaris) {
-        this.stellaris = stellaris;
+        this.stellaris = GameDirectory.ofPath(stellaris);
     }
 
     public Optional<String> getRakalyApiKey() {
@@ -262,37 +314,46 @@ public class Settings {
     }
 
     public void validate() {
-        if (eu4 != null) {
+        if (eu4.getPath() != null) {
             try {
-                new Eu4Installation(eu4).loadData();
+                new Eu4Installation(eu4.getPath()).loadData();
             } catch (Exception e) {
                 showInstallErrorMessage(e, "EU4");
-                eu4 = null;
+                eu4 = GameDirectory.disabled();
             }
         }
-        if (hoi4 != null) {
+        if (hoi4.getPath() != null) {
             try {
-                new Hoi4Installation(hoi4).loadData();
+                new Hoi4Installation(hoi4.getPath()).loadData();
             } catch (Exception e) {
                 showInstallErrorMessage(e, "HOI4");
-                hoi4 = null;
+                hoi4 = GameDirectory.disabled();
             }
         }
-        if (ck3 != null) {
+        if (ck3.getPath() != null) {
             try {
-                new Ck3Installation(ck3).loadData();
+                new Ck3Installation(ck3.getPath()).loadData();
             } catch (Exception e) {
                 showInstallErrorMessage(e, "CK3");
-                ck3 = null;
+                ck3 = GameDirectory.disabled();
             }
         }
-        if (stellaris != null) {
+        if (stellaris.getPath() != null) {
             try {
-                new StellarisInstallation(stellaris).loadData();
+                new StellarisInstallation(stellaris.getPath()).loadData();
             } catch (Exception e) {
                 showInstallErrorMessage(e, "Stellaris");
-                stellaris = null;
+                stellaris = GameDirectory.disabled();
             }
+        }
+
+        if (eu4 == null && ck3 == null && hoi4 == null && stellaris == null) {
+            GuiErrorReporter.showSimpleErrorMessage("""
+No supported or compatible Paradox game has been detected.
+To fix this, you can set the installation directories of games manually in the settings menu.
+
+Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
+                            """);
         }
     }
 

@@ -68,7 +68,9 @@ public class GuiSettings {
         });
 
         textArea.textProperty().addListener((change, o, n) -> {
-            s.setEu4(n.equals("") ? null : Path.of(n));
+            if (!n.equals("")) {
+                s.setEu4(Path.of(n));
+            }
         });
         textArea.setText(s.getEu4().map(Path::toString).orElse(""));
 
@@ -97,7 +99,9 @@ public class GuiSettings {
         });
 
         textArea.textProperty().addListener((change, o, n) -> {
-            s.setHoi4(n.equals("") ? null : Path.of(n));
+            if (!n.equals("")) {
+                s.setHoi4(Path.of(n));
+            }
         });
         textArea.setText(s.getHoi4().map(Path::toString).orElse(""));
 
@@ -126,7 +130,9 @@ public class GuiSettings {
         });
 
         textArea.textProperty().addListener((change, o, n) -> {
-            s.setCk3(n.equals("") ? null : Path.of(n));
+            if (!n.equals("")) {
+                s.setCk3(Path.of(n));
+            }
         });
         textArea.setText(s.getCk3().map(Path::toString).orElse(""));
 
@@ -155,7 +161,9 @@ public class GuiSettings {
         });
 
         textArea.textProperty().addListener((change, o, n) -> {
-            s.setStellaris(n.equals("") ? null : Path.of(n));
+            if (!n.equals("")) {
+                s.setStellaris(Path.of(n));
+            }
         });
         textArea.setText(s.getStellaris().map(Path::toString).orElse(""));
 
