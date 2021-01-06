@@ -73,6 +73,7 @@
  -jfx-label-float: true;
 -fx-padding: 0.4em 0.4em 0.4em 0.4em;
 -jfx-unfocus-color: transparent;
+-fx-background-color: #AAAAAA44;
 }
 
 .entry-bar .button-bar {

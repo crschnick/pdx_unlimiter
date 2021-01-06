@@ -22,11 +22,16 @@
 -fx-focus-color: transparent;
 }
 
+.campaign-list-entry {
+-fx-spacing: 0.3em;
+}
+
 
 .campaign-list-entry .text-field {
 -fx-font-size: 1.15em;
 -fx-padding: 0.3em 0.3em 0.3em 0.3em;
 -jfx-unfocus-color: transparent;
+-fx-background-color: #AAAAAA44;
 }
 
 .campaign-list-entry .date {
