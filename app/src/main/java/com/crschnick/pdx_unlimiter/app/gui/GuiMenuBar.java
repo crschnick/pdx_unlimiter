@@ -133,6 +133,10 @@ public class GuiMenuBar {
         });
         importB.setGraphic(new FontIcon());
         importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
+        importB.setDisable(GameIntegration.current() == null);
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> importB.setDisable(n == null));
+        });
 
         JFXButton launch = new JFXButton("Launch");
         launch.setOnAction(e -> {
@@ -141,6 +145,10 @@ public class GuiMenuBar {
         });
         launch.setGraphic(new FontIcon());
         launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
+        launch.setDisable(GameIntegration.current() == null);
+        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> launch.setDisable(n == null));
+        });
 
         var box = new HBox(m, importB, launch);
         box.setAlignment(Pos.CENTER);
