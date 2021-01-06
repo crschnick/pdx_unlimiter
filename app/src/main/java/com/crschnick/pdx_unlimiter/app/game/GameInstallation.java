@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -154,10 +156,10 @@ public abstract class GameInstallation {
     protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_WINDOWS) {
             value = value.replace("%USER_DOCUMENTS%",
-                    Paths.get(System.getProperty("user.home"), "Documents").toString());
+                    InstallLocationHelper.getUserDocumentsPath().toString());
         } else if (SystemUtils.IS_OS_LINUX) {
             value = value.replace("$LINUX_DATA_HOME",
-                    Paths.get(System.getProperty("user.home"), ".local", "share").toString());
+                    InstallLocationHelper.getUserDocumentsPath().toString());
         }
         return Path.of(value);
     }
