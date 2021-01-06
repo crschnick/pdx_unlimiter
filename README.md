@@ -87,10 +87,11 @@ To build this project, [JDK 15](https://openjdk.java.net/projects/jdk/15/) is re
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
 To create a jlink image, use `gradlew createDist`.
 For running, you can use `gradlew run`.
+
 To correctly run the Pdx-Unlimiter in a development environment,
-you need to set the property `dataDir=<installation directory>`
-in the `pdxu.properties` file. This is needed for a dev build to
-specify where to save data such as savegames and settings.
+you can set the property `dataDir` in the `pdxu.properties` file to any directory such that your development
+environment does not interfere with your Pdx-Unlimiter installation data.
+If not set, the data directory of your Pdx-Unlimiter installation is used.
 
 Any contribution is welcomed!
 There are no real formal contribution guidelines right now, they will maybe come later.
