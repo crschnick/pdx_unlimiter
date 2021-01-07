@@ -132,4 +132,19 @@ public class DialogHelper {
         return result.get().getButtonData().isDefaultButton();
 
     }
+
+    public static boolean showLowMemoryDialog() {
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.WARNING);
+        alert.getButtonTypes().add(ButtonType.CANCEL);
+        alert.setTitle("Low memory warning");
+        alert.setHeaderText(
+                """
+It seems like the Pdx-Unlimiter is running low on memory.
+
+It is recommended to restart it, to avoid any crashes. If you click on OK, the Pdx-Unlimiter will exit.""");
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.get().getButtonData().isDefaultButton();
+
+    }
 }

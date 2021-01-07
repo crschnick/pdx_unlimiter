@@ -66,11 +66,11 @@ public class PdxuApp extends Application {
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
-                    ComponentManager.finalTeardown();
                     Stage.getWindows().stream()
                             .filter(w -> !w.equals(getScene().getWindow()))
                             .collect(Collectors.toList())
                             .forEach(w -> w.fireEvent(event));
+                    ComponentManager.finalTeardown();
                 }
             });
 

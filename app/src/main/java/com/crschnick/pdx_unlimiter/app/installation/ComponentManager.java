@@ -57,6 +57,10 @@ public class ComponentManager {
         TaskExecutor.getInstance().stop(() -> {
             ComponentManager.reset();
             Platform.exit();
+
+            // Explicitly exit, because in case of an OOM error some Thread might always be blocking the exit
+            // Somehow causes weird javafx errors, so its disabled
+            // System.exit(0);
         });
     }
 
@@ -82,7 +86,6 @@ public class ComponentManager {
             GameIntegration.init();
 
             FileWatchManager.init();
-
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }

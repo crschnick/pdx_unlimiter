@@ -9,6 +9,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
@@ -355,6 +356,10 @@ public abstract class SavegameCache<
     }
 
     private synchronized void loadEntry(GameCampaignEntry<T, I> e) throws Exception {
+        if (!MemoryChecker.checkForEnoughMemory()) {
+            return;
+        }
+
         LoggerFactory.getLogger(SavegameCache.class).debug("Starting to load entry " + getEntryName(e));
         if (e.infoProperty().isNotNull().get()) {
             return;
@@ -404,6 +409,10 @@ public abstract class SavegameCache<
     }
 
     synchronized boolean importSavegame(Path file) {
+        if (!MemoryChecker.checkForEnoughMemory()) {
+            return false;
+        }
+
         try {
             importSavegameData(file);
             saveData();
