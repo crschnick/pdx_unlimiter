@@ -153,15 +153,16 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         }
     }
 
-    public static void selectIntegration(GameIntegration<?, ?> newInt) {
+    public static boolean selectIntegration(GameIntegration<?, ?> newInt) {
         if (current.get() == newInt) {
-            return;
+            return false;
         }
 
         unselectCampaignAndEntry();
 
         current.set(newInt);
         LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " + (newInt != null ? newInt.getName() : "null"));
+        return true;
     }
 
     public static <T, I extends SavegameInfo<T>> void selectCampaign(GameCampaign<T, I> c) {
@@ -180,7 +181,12 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v);
         gi.ifPresentOrElse(v -> {
-            selectIntegration(v);
+            // If we didn't change the game and an entry is already selected, unselect it
+            if (!selectIntegration(v) && globalSelectedEntryProperty().isNotNull().get()) {
+                v.selectedEntry.set(null);
+                globalSelectedEntryPropertyInternal().set(null);
+            }
+
             v.selectedCampaign.set(c);
             globalSelectedCampaignPropertyInternal().set((GameCampaign<Object, SavegameInfo<Object>>) c);
             LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign " + c.getName());

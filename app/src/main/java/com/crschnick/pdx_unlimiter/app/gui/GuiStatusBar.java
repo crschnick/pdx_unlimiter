@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.jfoenix.controls.JFXButton;
@@ -45,7 +44,7 @@ public class GuiStatusBar {
             if (n != null) {
                 bar.setRunning();
             } else {
-                bar.showImport();
+                bar.stopRunning();
             }
         });
 
@@ -54,48 +53,6 @@ public class GuiStatusBar {
         });
 
         return pane;
-    }
-
-    private static Region createImportBar() {
-
-        BorderPane barPane = new BorderPane();
-        barPane.getStyleClass().add(CLASS_STATUS_BAR);
-        barPane.getStyleClass().add(CLASS_STATUS_IMPORT);
-
-        Label text = new Label(GameIntegration.current().getName(),
-                GameIntegration.current().getGuiFactory().createIcon());
-        text.getStyleClass().add(CLASS_TEXT);
-        barPane.setLeft(text);
-        BorderPane.setAlignment(text, Pos.CENTER);
-
-        Label latest = new Label();
-        latest.setGraphic(new FontIcon());
-        latest.getStyleClass().add(CLASS_TEXT);
-        latest.getStyleClass().add(CLASS_SAVEGAME);
-        javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
-            Platform.runLater(() -> latest.setText(n.size() > 0 ? n.get(0).getName() : "None"));
-        };
-        GameIntegration.current().getSavegameWatcher().savegamesProperty().addListener(l);
-        l.changed(null, null, GameIntegration.current().getSavegameWatcher().savegamesProperty().get());
-        barPane.setCenter(latest);
-
-        Button importLatest = new JFXButton("Import");
-        importLatest.setGraphic(new FontIcon());
-        importLatest.getStyleClass().add(CLASS_IMPORT);
-        importLatest.setOnAction(event -> {
-            FileImporter.importLatestSavegame();
-            if (!Settings.getInstance().deleteOnImport()) {
-                getStatusBar().hide();
-            }
-            event.consume();
-        });
-
-        HBox buttons = new HBox(importLatest);
-        buttons.setFillHeight(true);
-        buttons.setAlignment(Pos.CENTER);
-
-        barPane.setRight(buttons);
-        return barPane;
     }
 
     private static Region createRunningBar() {
@@ -228,12 +185,12 @@ public class GuiStatusBar {
             });
         }
 
-        public void showImport() {
-            Platform.runLater(() -> {
-                Region bar = createImportBar();
-                show(bar);
-                status = Status.IMPORT;
-            });
+        public void stopRunning() {
+            hide();
+            status = Status.NONE;
+            if (GameIntegration.globalSelectedEntryProperty().isNotNull().get()) {
+                select();
+            }
         }
 
         private void select() {
@@ -264,8 +221,7 @@ public class GuiStatusBar {
         private enum Status {
             NONE,
             SELECTED,
-            RUNNING,
-            IMPORT
+            RUNNING
         }
     }
 }
