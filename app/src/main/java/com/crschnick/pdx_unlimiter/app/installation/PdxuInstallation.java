@@ -39,8 +39,7 @@ public class PdxuInstallation {
 
     public static void init() {
         Path appPath = Path.of(System.getProperty("java.home"));
-        boolean image = appPath.toFile().getName().equals("app")
-                || appPath.toFile().getName().equals("image");
+        boolean image = Files.exists(appPath.resolve("version"));
         boolean prod = image;
         String v = "unknown";
         Path dataDir = Path.of(System.getProperty("user.home"),
