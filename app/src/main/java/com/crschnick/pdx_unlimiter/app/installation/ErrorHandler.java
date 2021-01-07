@@ -8,9 +8,12 @@ import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Queue;
+import java.util.concurrent.SynchronousQueue;
 
 public class ErrorHandler {
 
+    private static boolean errorReporterShowing = false;
     private static boolean startupCompleted = false;
 
     public static void init() {
@@ -70,7 +73,8 @@ public class ErrorHandler {
 
         Runnable run = () -> {
             LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
-            if (PdxuInstallation.getInstance().isProduction()) {
+            if (PdxuInstallation.getInstance().isProduction() && !errorReporterShowing) {
+                errorReporterShowing = true;
                 if (GuiErrorReporter.showException(ex, false)) {
                     Sentry.withScope(scope -> {
                         if (attachFile != null) {
@@ -79,6 +83,7 @@ public class ErrorHandler {
                         Sentry.captureException(ex);
                     });
                 }
+                errorReporterShowing = false;
             }
         };
         if (Platform.isFxApplicationThread()) {
