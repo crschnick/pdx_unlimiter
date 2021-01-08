@@ -76,7 +76,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             }
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
-            e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "monarch").get();
+            e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "monarch", "queen").get();
             e.heir = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "heir");
             for (Node dep : n.getNodeForKey("diplomacy").getNodesForKey("dependency")) {
                 String first = dep.getNodeForKey("first").getString();
@@ -240,17 +240,19 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             this.mil = mil;
         }
 
-        public static Optional<Ruler> fromCountryNode(Node n, String type) {
+        public static Optional<Ruler> fromCountryNode(Node n, String... types) {
             Optional<Ruler> current = Optional.empty();
             for (Node e : n.getNodeForKey("history").getNodeArray()) {
                 var kv = e.getKeyValueNode();
-                if (GameDateType.EU4.isDate(kv.getKeyName()) && kv.getNode().hasKey(type)) {
-                    // Sometimes there are multiple monarchs in one event Node ... wtf?
-                    Node r = kv.getNode().getNodesForKey(type).get(0);
-                    current = Optional.of(new Ruler(r.getNodeForKey("name").getString(),
-                            r.getNodeForKey("ADM").getInteger(),
-                            r.getNodeForKey("DIP").getInteger(),
-                            r.getNodeForKey("MIL").getInteger()));
+                for (String type : types) {
+                    if (GameDateType.EU4.isDate(kv.getKeyName()) && kv.getNode().hasKey(type)) {
+                        // Sometimes there are multiple monarchs in one event Node ... wtf?
+                        Node r = kv.getNode().getNodesForKey(type).get(0);
+                        current = Optional.of(new Ruler(r.getNodeForKey("name").getString(),
+                                r.getNodeForKey("ADM").getInteger(),
+                                r.getNodeForKey("DIP").getInteger(),
+                                r.getNodeForKey("MIL").getInteger()));
+                    }
                 }
             }
             return current;
