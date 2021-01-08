@@ -66,11 +66,13 @@ public class PdxuApp extends Application {
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
+                    ComponentManager.finalTeardown();
+
+                    // Close windows after teardown, otherwise saved window coordinates will be invalid!
                     Stage.getWindows().stream()
                             .filter(w -> !w.equals(getScene().getWindow()))
                             .collect(Collectors.toList())
                             .forEach(w -> w.fireEvent(event));
-                    ComponentManager.finalTeardown();
                 }
             });
 
