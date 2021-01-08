@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -82,14 +83,5 @@ public class FileImporter {
             ErrorHandler.handleException(e);
         }
 
-    }
-
-    public static void importLatestSavegame() {
-        var savegames = GameIntegration.current().getSavegameWatcher().getSavegames();
-        if (savegames.size() == 0) {
-            return;
-        }
-
-        addToImportQueue(savegames.get(0).toImportString());
     }
 }

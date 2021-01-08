@@ -3,13 +3,14 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -20,30 +21,18 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeInputEvent;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -69,14 +58,15 @@ public class GuiGameCampaignEntry {
         del.setGraphic(new FontIcon());
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showSavegameDeleteDialog()) {
-                GameIntegration.<T, I>current().getSavegameCache().delete(e);
+                SavegameManagerState.get().<T,I>current().getSavegameCache().delete(e);
             }
         });
         del.getStyleClass().add("delete-button");
         Tooltip.install(del, new Tooltip("Delete savegame"));
 
 
-        var tagImage = GameIntegration.<T, I>current().getGuiFactory().createImage(e);
+        var tagImage =
+                SavegameManagerState.get().<T, I>current().getGuiFactory().createImage(e);
         Pane tagPane = new Pane(tagImage.getValue());
         tagPane.setMaxWidth(80);
         HBox tagBar = new HBox(tagPane, l);
@@ -98,7 +88,7 @@ public class GuiGameCampaignEntry {
                 TaskExecutor.getInstance().submitTask(() -> {
                     try {
                         var data = RakalyHelper.meltSavegame(
-                                GameIntegration.<T, I>current().getSavegameCache().getSavegameFile(e));
+                                SavegameManagerState.get().<T, I>current().getSavegameCache().getSavegameFile(e));
                         Files.write(path, data);
                     } catch (IOException ex) {
                         ErrorHandler.handleException(ex);
@@ -159,7 +149,7 @@ public class GuiGameCampaignEntry {
             Tooltip.install(open, new Tooltip("Open stored savegame location"));
             buttonBar.getChildren().add(open);
             open.setOnMouseClicked((m) -> {
-                GameIntegration.<T, I>current().openCampaignEntry(e);
+                SavegameActions.openCampaignEntry(e);
             });
         }
 
@@ -181,7 +171,8 @@ public class GuiGameCampaignEntry {
 
         InvalidationListener lis = (change) -> {
             Platform.runLater(() -> {
-                layout.setBackground(GameIntegration.<T, I>current().getGuiFactory().createEntryInfoBackground(e));
+                layout.setBackground(
+                        SavegameManagerState.get().<T, I>current().getGuiFactory().createEntryInfoBackground(e));
             });
         };
         e.infoProperty().addListener(lis);
@@ -193,13 +184,13 @@ public class GuiGameCampaignEntry {
         main.getStyleClass().add(CLASS_ENTRY);
         main.setOnMouseClicked(event -> {
             if (e.infoProperty().isNotNull().get()) {
-                GameIntegration.selectEntry(e);
+                SavegameManagerState.get().selectEntry(e);
             }
         });
 
         main.setOnDragDetected(me -> {
             Dragboard db = main.startDragAndDrop(TransferMode.COPY);
-            var sc = GameIntegration.<T,I>current().getSavegameCache();
+            var sc = SavegameManagerState.get().<T,I>current().getSavegameCache();
             var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
             try {
                 sc.exportSavegame(e, out);
@@ -232,7 +223,7 @@ public class GuiGameCampaignEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(grid);
         if (entry.infoProperty().isNotNull().get()) {
-            GameIntegration.<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
+            SavegameManagerState.get().<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
         } else {
             stack.getChildren().add(loading);
         }
@@ -245,14 +236,14 @@ public class GuiGameCampaignEntry {
 
             if (stack.localToScreen(0, 0).getY() < PdxuApp.getApp().getScene().getWindow().getHeight() && !load.get()) {
                 load.set(true);
-                GameIntegration.<T, I>current().getSavegameCache().loadEntryAsync(entry);
+                SavegameManagerState.get().<T, I>current().getSavegameCache().loadEntryAsync(entry);
             }
         });
 
         entry.infoProperty().addListener((change) -> {
             Platform.runLater(() -> {
                 loading.setVisible(false);
-                GameIntegration.<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
+                SavegameManagerState.get().<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
             });
         });
 

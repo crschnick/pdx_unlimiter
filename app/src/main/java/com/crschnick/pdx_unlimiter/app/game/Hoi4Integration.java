@@ -24,11 +24,6 @@ public class Hoi4Integration extends GameIntegration<Hoi4Tag, Hoi4SavegameInfo> 
     }
 
     @Override
-    public boolean isVersionCompatible(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
-        return true;
-    }
-
-    @Override
     public Hoi4GuiFactory getGuiFactory() {
         return new Hoi4GuiFactory();
     }

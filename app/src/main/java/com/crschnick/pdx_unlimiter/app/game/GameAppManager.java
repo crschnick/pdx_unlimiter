@@ -31,7 +31,8 @@ public class GameAppManager {
                 if (process.isPresent()) {
                     INSTANCE.activeGame.set(process.get());
                     INSTANCE.activeGame.get().onStart();
-                    GameIntegration.selectIntegration(GameIntegration.getForInstallation(process.get().getInstallation()));
+                    SavegameManagerState.get().selectIntegration(
+                            GameIntegration.getForInstallation(process.get().getInstallation()));
                 }
             } else {
                 if (!INSTANCE.activeGame.get().isAlive()) {

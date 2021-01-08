@@ -1,7 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
@@ -10,6 +12,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Glow;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -25,7 +30,7 @@ public class GuiGameCampaign {
         del.getStyleClass().add("delete-button");
         del.setOnMouseClicked((m) -> {
             if (DialogHelper.showCampaignDeleteDialog()) {
-                GameIntegration.current().getSavegameCache().delete(c);
+                SavegameManagerState.get().current().getSavegameCache().delete(c);
             }
         });
         del.setAlignment(Pos.CENTER);
@@ -60,10 +65,33 @@ public class GuiGameCampaign {
             });
         });
 
-        btn.setOnMouseClicked((m) -> GameIntegration.selectCampaign(c));
+        btn.setOnMouseClicked((m) -> SavegameManagerState.get().selectCampaign(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
         btn.getProperties().put("campaign", c);
+
+        btn.setOnDragOver(event -> {
+            /* data is dragged over the target */
+            /* accept it only if it is not dragged from the same node
+             * and if it has a string data */
+            if (event.getGestureSource() != btn && event.getSource() instanceof Node) {
+                /* allow for both copying and moving, whatever user chooses */
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                btn.getChildren().get(0).setEffect(new Glow(1));
+            }
+
+            event.consume();
+        });
+
+        btn.setOnDragExited(event -> {
+            btn.getChildren().get(0).setEffect(null);
+        });
+
+        btn.setOnDragDropped(de -> {
+            Node src = (Node) de.getGestureSource();
+            GameCampaignEntry<?,?> entry = (GameCampaignEntry<?, ?>) src.getProperties().get("entry");
+            SavegameActions.moveCampaignEntry(c, entry);
+        });
         return btn;
     }
 

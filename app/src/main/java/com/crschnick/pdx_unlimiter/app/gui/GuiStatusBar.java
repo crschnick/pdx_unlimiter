@@ -2,8 +2,10 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -30,7 +32,7 @@ public class GuiStatusBar {
     public static Pane createStatusBar() {
         Pane pane = new Pane();
         bar = new StatusBar(pane);
-        GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().globalSelectedEntryProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 if (n != null) {
                     bar.select();
@@ -48,7 +50,7 @@ public class GuiStatusBar {
             }
         });
 
-        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             bar.hide();
         });
 
@@ -61,8 +63,8 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(GameIntegration.current().getName() + " (Running)",
-                GameIntegration.current().getGuiFactory().createIcon());
+        Label text = new Label(SavegameManagerState.get().current().getName() + " (Running)",
+                SavegameManagerState.get().current().getGuiFactory().createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
@@ -74,15 +76,16 @@ public class GuiStatusBar {
         javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> latest.setText("Latest: " + (n.size() > 0 ? n.get(0).getName() : "None")));
         };
-        GameIntegration.current().getSavegameWatcher().savegamesProperty().addListener(l);
-        l.changed(null, null, GameIntegration.current().getSavegameWatcher().savegamesProperty().get());
+        SavegameManagerState.get().current().getSavegameWatcher().savegamesProperty().addListener(l);
+        l.changed(null, null,
+                SavegameManagerState.get().current().getSavegameWatcher().savegamesProperty().get());
         barPane.setCenter(latest);
 
         Button importLatest = new JFXButton("Import");
         importLatest.setGraphic(new FontIcon());
         importLatest.getStyleClass().add(CLASS_IMPORT);
         importLatest.setOnAction(event -> {
-            FileImporter.importLatestSavegame();
+            SavegameActions.importLatestSavegame();
             event.consume();
         });
 
@@ -107,18 +110,21 @@ public class GuiStatusBar {
     private static Region createEntryStatusBar() {
         BorderPane barPane = new BorderPane();
 
-        Label text = new Label(GameIntegration.current().getName(), GameIntegration.current().getGuiFactory().createIcon());
+        Label text = new Label(
+                SavegameManagerState.get().current().getName(),
+                SavegameManagerState.get().current().getGuiFactory().createIcon());
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
 
-        Label name = new Label(GameIntegration.globalSelectedCampaignProperty().get().getName() +
-                ", " + GameIntegration.globalSelectedEntryProperty().get().getName());
+        Label name = new Label(
+                SavegameManagerState.get().globalSelectedCampaignProperty().get().getName() +
+                ", " + SavegameManagerState.get().globalSelectedEntryProperty().get().getName());
         name.setGraphic(new FontIcon());
         name.getStyleClass().add(CLASS_TEXT);
         barPane.setCenter(name);
 
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
-        if (GameIntegration.current().isEntryCompatible(GameIntegration.globalSelectedEntryProperty().get())) {
+        if (SavegameActions.isEntryCompatible(SavegameManagerState.get().globalSelectedEntryProperty().get())) {
             name.getStyleClass().add(CLASS_SAVEGAME);
         } else {
             barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
@@ -130,7 +136,7 @@ public class GuiStatusBar {
         e.setGraphic(new FontIcon());
         e.getStyleClass().add(CLASS_EXPORT);
         e.setOnAction(event -> {
-            GameIntegration.current().exportCampaignEntry();
+            SavegameActions.exportCampaignEntry();
 
             event.consume();
             getStatusBar().hide();
@@ -140,7 +146,7 @@ public class GuiStatusBar {
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(CLASS_LAUNCH);
         b.setOnAction(event -> {
-            GameIntegration.current().launchCampaignEntry();
+            SavegameActions.launchCampaignEntry();
 
             event.consume();
             getStatusBar().hide();
@@ -188,7 +194,7 @@ public class GuiStatusBar {
         public void stopRunning() {
             hide();
             status = Status.NONE;
-            if (GameIntegration.globalSelectedEntryProperty().isNotNull().get()) {
+            if (SavegameManagerState.get().globalSelectedEntryProperty().isNotNull().get()) {
                 select();
             }
         }

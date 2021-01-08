@@ -1,9 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
@@ -66,7 +64,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         alert.setTitle("Incompatible savegame");
 
         StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
-        if (!GameIntegration.<T, I>current().isVersionCompatible(entry)) {
+        if (!SavegameActions.isVersionCompatible(entry)) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: " + installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: " + entry.getInfo().getVersion().toString());
@@ -152,7 +150,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public void fillNodeContainer(GameCampaignEntry<T, I> entry, JFXMasonryPane grid) {
         Label version;
-        if (GameIntegration.<T, I>current().isVersionCompatible(entry)) {
+        if (SavegameActions.isVersionCompatible(entry)) {
             version = new Label(entry.getInfo().getVersion().toString());
             Tooltip.install(version, new Tooltip("Compatible version"));
             version.getStyleClass().add(CLASS_COMPATIBLE);

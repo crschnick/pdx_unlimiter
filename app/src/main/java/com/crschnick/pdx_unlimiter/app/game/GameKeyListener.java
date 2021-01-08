@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class GameKeyListener implements NativeKeyListener {
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
-                FileImporter.importLatestSavegame();
+                SavegameActions.importLatestSavegame();
                 Toolkit.getDefaultToolkit().beep();
             }
         }

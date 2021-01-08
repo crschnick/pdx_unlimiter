@@ -1,9 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.gui.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -26,7 +23,6 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -270,8 +266,8 @@ public abstract class SavegameCache<
             e.printStackTrace();
         }
 
-        if (GameIntegration.globalSelectedCampaignProperty().get() == c) {
-            GameIntegration.selectCampaign(null);
+        if (SavegameManagerState.get().globalSelectedCampaignProperty().get() == c) {
+            SavegameManagerState.get().selectCampaign(null);
         }
 
         this.campaigns.remove(c);
@@ -299,8 +295,7 @@ public abstract class SavegameCache<
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
 
-        GameIntegration.selectIntegration(GameIntegration.getForSavegameCache(this));
-        GameIntegration.selectEntry(e);
+        SavegameManagerState.get().selectEntry(e);
         return e;
     }
 
@@ -320,6 +315,36 @@ public abstract class SavegameCache<
         return campaign.orElseThrow(() -> new IllegalArgumentException("Could not find campaign for entry " + e.getName()));
     }
 
+    public synchronized void moveEntry(
+            GameCampaign<T,I> campaign, GameCampaignEntry<T,I> entry) {
+        var fromCampaign = getCampaign(entry);
+        if (fromCampaign == campaign) {
+            return;
+        }
+
+        var srcDir = getPath(entry).toFile();
+        try {
+            FileUtils.copyDirectory(
+                    srcDir,
+                    getPath().resolve(campaign.getCampaignId().toString()).resolve(entry.getUuid().toString()).toFile());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return;
+        }
+
+        fromCampaign.getEntries().remove(entry);
+        campaign.getEntries().add(entry);
+
+        try {
+            FileUtils.deleteDirectory(srcDir);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+        if (fromCampaign.getEntries().size() == 0) {
+            delete(fromCampaign);
+        }
+    }
+
     public synchronized void delete(GameCampaignEntry<T, I> e) {
         GameCampaign<T, I> c = getCampaign(e);
         if (!this.campaigns.contains(c) || !c.getEntries().contains(e)) {
@@ -333,8 +358,8 @@ public abstract class SavegameCache<
             ErrorHandler.handleException(ex);
         }
 
-        if (GameIntegration.globalSelectedEntryProperty().get() == e) {
-            GameIntegration.selectEntry(null);
+        if (SavegameManagerState.get().globalSelectedEntryProperty().get() == e) {
+            SavegameManagerState.get().selectEntry(null);
         }
         c.getEntries().remove(e);
         if (c.getEntries().size() == 0) {
@@ -441,7 +466,7 @@ public abstract class SavegameCache<
         if (exists.isPresent()) {
             logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
             loadEntry(exists.get());
-            GameIntegration.selectEntry(exists.get());
+            SavegameManagerState.get().selectEntry(exists.get());
             return;
         } else {
             logger.debug("No entry with checksum found");

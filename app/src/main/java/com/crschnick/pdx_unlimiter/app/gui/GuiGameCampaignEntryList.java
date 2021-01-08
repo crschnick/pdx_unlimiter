@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXListView;
@@ -39,7 +40,7 @@ public class GuiGameCampaignEntryList {
             update.accept(change.getSet());
         };
 
-        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegameCache().getCampaigns().removeListener(campaignListListener);
             }
@@ -60,7 +61,7 @@ public class GuiGameCampaignEntryList {
 
         SetChangeListener<GameCampaignEntry<?, ?>> l = (c) -> {
             if (c.wasAdded()) {
-                int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(
+                int index = SavegameManagerState.get().globalSelectedCampaignProperty().get().indexOf(
                         (GameCampaignEntry<Object, SavegameInfo<Object>>) c.getElementAdded());
                 Platform.runLater(() -> {
                     grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
@@ -73,7 +74,7 @@ public class GuiGameCampaignEntryList {
             }
         };
 
-        GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().globalSelectedCampaignProperty().addListener((c, o, n) -> {
             if (o != null) {
                 o.getEntries().removeListener(l);
             }
@@ -96,11 +97,11 @@ public class GuiGameCampaignEntryList {
             }
         });
 
-        GameIntegration.globalSelectedEntryProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().globalSelectedEntryProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 grid.getSelectionModel().clearSelection();
                 if (n != null) {
-                    int index = GameIntegration.globalSelectedCampaignProperty().get().indexOf(n);
+                    int index = SavegameManagerState.get().globalSelectedCampaignProperty().get().indexOf(n);
                     grid.getSelectionModel().clearSelection();
                     grid.getSelectionModel().select(index);
                 }
@@ -113,12 +114,12 @@ public class GuiGameCampaignEntryList {
     private static Node createNoCampaignNode(Pane pane) {
         VBox v = new VBox();
         Label text = new Label("It seems like there are no imported savegames for " +
-                GameIntegration.current().getName() + " yet.\n");
+                SavegameManagerState.get().current().getName() + " yet.\n");
         v.getChildren().add(text);
 
         Button importB = new Button("Import savegames");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(GameIntegration.current().getSavegameWatcher());
+            GuiImporter.createImporterDialog(SavegameManagerState.get().current().getSavegameWatcher());
             e.consume();
         });
         importB.setGraphic(new FontIcon());

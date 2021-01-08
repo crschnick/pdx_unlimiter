@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.SavedState;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -15,7 +16,7 @@ public class GuiGameSwitcher {
         alert.setTitle("Select game");
 
         HBox games = new HBox();
-        for (var integ : GameIntegration.getAvailable()) {
+        for (var integ : GameIntegration.ALL) {
             var icon = integ.getGuiFactory().createIcon();
             ColorAdjust desaturate = new ColorAdjust();
             desaturate.setSaturation(-1);
@@ -23,7 +24,7 @@ public class GuiGameSwitcher {
 
             Tooltip.install(icon, new Tooltip(integ.getName()));
             icon.setOnMouseClicked(e -> {
-                GameIntegration.selectIntegration(integ);
+                SavegameManagerState.get().selectIntegration(integ);
                 SavedState.getInstance().setActiveGame(integ.getInstallation());
                 alert.setResult(ButtonType.CLOSE);
             });

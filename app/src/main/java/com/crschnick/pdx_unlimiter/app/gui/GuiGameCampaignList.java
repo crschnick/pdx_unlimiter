@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -24,8 +25,8 @@ public class GuiGameCampaignList {
         SetChangeListener<GameCampaign<?, ?>> l = (c) -> {
             if (c.wasAdded()) {
                 var button = GuiGameCampaign.createCampaignButton(
-                        c.getElementAdded(), GameIntegration.current().getGuiFactory());
-                int index = GameIntegration.current().getSavegameCache().indexOf(c.getElementAdded());
+                        c.getElementAdded(), SavegameManagerState.get().current().getGuiFactory());
+                int index = SavegameManagerState.get().current().getSavegameCache().indexOf(c.getElementAdded());
                 Platform.runLater(() -> {
                     grid.getItems().add(index, button);
                 });
@@ -35,7 +36,7 @@ public class GuiGameCampaignList {
             }
         };
 
-        GameIntegration.currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 if (o != null) {
                     o.getSavegameCache().getCampaigns().removeListener(l);
@@ -52,11 +53,11 @@ public class GuiGameCampaignList {
             });
         });
 
-        GameIntegration.globalSelectedCampaignProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().globalSelectedCampaignProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 grid.getSelectionModel().clearSelection();
                 if (n != null) {
-                    int index = GameIntegration.current().getSavegameCache().indexOf(n);
+                    int index = SavegameManagerState.get().current().getSavegameCache().indexOf(n);
                     grid.getSelectionModel().select(index);
                 }
             });

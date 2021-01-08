@@ -4,7 +4,9 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.GameImage;
+import com.crschnick.pdx_unlimiter.app.gui.GuiGameSwitcher;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
@@ -84,6 +86,7 @@ public class ComponentManager {
             FileImporter.init();
 
             GameIntegration.init();
+            SavegameManagerState.init();
 
             FileWatchManager.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
@@ -101,6 +104,7 @@ public class ComponentManager {
             SavedState.getInstance().saveConfig();
 
             FileWatchManager.reset();
+            SavegameManagerState.reset();
             GameIntegration.reset();
 
             LoggerFactory.getLogger(ComponentManager.class).debug("Waiting for platform thread");
