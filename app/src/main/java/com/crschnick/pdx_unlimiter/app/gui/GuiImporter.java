@@ -5,9 +5,9 @@ import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -31,7 +31,7 @@ public class GuiImporter {
         return box;
     }
 
-    public static Region createTargetNode(Set<FileImportTarget> selected, CheckBox all, FileImportTarget target) {
+    private static Region createTargetNode(Set<FileImportTarget> selected, CheckBox all, FileImportTarget target) {
         Label name = new Label(target.getName());
         name.setTextOverrun(OverrunStyle.ELLIPSIS);
         JFXCheckBox cb = new JFXCheckBox();
@@ -56,14 +56,6 @@ public class GuiImporter {
         return new HBox(cb, new Label("  "), name);
     }
 
-    public static void createTargetList(VBox box, Set<FileImportTarget> selected, List<FileImportTarget> targets, CheckBox all) {
-        box.getChildren().clear();
-        for (var t : targets) {
-            var n = createTargetNode(selected, all, t);
-            box.getChildren().add(n);
-        }
-    }
-
     private static void showNoSavegamesDialog() {
         Alert alert = DialogHelper.createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
@@ -78,23 +70,22 @@ public class GuiImporter {
             return;
         }
 
-        VBox targets = new VBox();
-        targets.setSpacing(5);
-        JFXCheckBox cb = new JFXCheckBox();
         Set<FileImportTarget> selected = new HashSet<>();
-        createTargetList(targets, selected, watcher.getSavegames(), cb);
-
-        VBox layout = new VBox();
-        layout.setSpacing(8);
-        var sp = new ScrollPane(targets);
-        sp.setFitToWidth(true);
-        sp.setPrefViewportWidth(250);
-        sp.setPrefViewportHeight(500);
-        layout.getChildren().add(sp);
-        layout.getChildren().add(new Separator());
-        layout.getChildren().add(createBottomNode(cb));
 
         Alert alert = DialogHelper.createEmptyAlert();
+        alert.initModality(Modality.WINDOW_MODAL);
+        alert.setTitle("Import");
+        alert.getDialogPane().setContent(create(watcher.getSavegames(), selected));
+        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
+        watcher.savegamesProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> {
+                // Clear the selected savegames!!
+                selected.clear();
+                alert.getDialogPane().setContent(create(n, selected));
+            });
+        });
+        alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
+
         var importType = new ButtonType("Import", ButtonBar.ButtonData.LEFT);
         alert.getButtonTypes().add(importType);
         Button importB = (Button) alert.getDialogPane().lookupButton(importType);
@@ -116,17 +107,28 @@ public class GuiImporter {
                 }
         );
 
-        alert.initModality(Modality.WINDOW_MODAL);
-        alert.setTitle("Import");
-        alert.getDialogPane().setContent(layout);
-        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
-        watcher.savegamesProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                createTargetList(targets, selected, n, cb);
-            });
-        });
-        alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
-        alert.getDialogPane().requestFocus();
         alert.show();
+    }
+
+    private static Node create(List<FileImportTarget> savegames, Set<FileImportTarget> selected) {
+        VBox targets = new VBox();
+        targets.setSpacing(5);
+        JFXCheckBox cbAll = new JFXCheckBox();
+
+        for (var t : savegames) {
+            var n = createTargetNode(selected, cbAll, t);
+            targets.getChildren().add(n);
+        }
+
+        VBox layout = new VBox();
+        layout.setSpacing(8);
+        var sp = new ScrollPane(targets);
+        sp.setFitToWidth(true);
+        sp.setPrefViewportWidth(250);
+        sp.setPrefViewportHeight(500);
+        layout.getChildren().add(sp);
+        layout.getChildren().add(new Separator());
+        layout.getChildren().add(createBottomNode(cbAll));
+        return layout;
     }
 }
