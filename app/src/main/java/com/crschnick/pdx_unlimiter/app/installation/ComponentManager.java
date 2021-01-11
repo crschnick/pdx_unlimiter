@@ -45,11 +45,12 @@ public class ComponentManager {
         TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
     }
 
-    public static void reloadSettings() {
+    public static void reloadSettings(Settings newS) {
         TaskExecutor.getInstance().stopAndWait();
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(() -> {
             reset();
+            Settings.updateSettings(newS);
             init();
         }, true);
     }

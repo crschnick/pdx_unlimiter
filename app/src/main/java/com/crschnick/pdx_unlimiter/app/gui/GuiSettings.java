@@ -319,8 +319,7 @@ public class GuiSettings {
 
         Optional<ButtonType> r = alert.showAndWait();
         if (r.isPresent() && r.get().equals(ButtonType.APPLY)) {
-            Settings.updateSettings(s);
-            ComponentManager.reloadSettings();
+            ComponentManager.reloadSettings(s);
         }
     }
 

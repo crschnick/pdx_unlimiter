@@ -51,20 +51,26 @@ public class Settings {
     }
 
     public static void updateSettings(Settings newS) {
+        var oldValue = INSTANCE.getStorageDirectory();
         var oldDir = PdxuInstallation.getInstance().getSavegamesLocation();
 
         INSTANCE = newS;
         INSTANCE.validate();
 
-        newS.getStorageDirectory().ifPresent(dir -> {
-            if (!oldDir.equals(dir)) {
+        var newDir = PdxuInstallation.getInstance().getSavegamesLocation();
+        if (!oldDir.equals(newDir)) {
+            if (FileUtils.listFiles(newDir.toFile(), null, false).size() > 0) {
+                GuiErrorReporter.showSimpleErrorMessage("New storage directory " + newDir + " must be empty!");
+                INSTANCE.setStorageDirectory(oldValue.orElse(null));
+            } else {
                 try {
-                    FileUtils.moveDirectory(oldDir.toFile(), dir.toFile());
+                    Files.delete(newDir);
+                    FileUtils.moveDirectory(oldDir.toFile(), newDir.toFile());
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
             }
-        });
+        }
 
         try {
             saveConfig();
