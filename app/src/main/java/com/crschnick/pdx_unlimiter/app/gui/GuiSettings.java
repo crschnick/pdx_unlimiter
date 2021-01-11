@@ -19,7 +19,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -43,10 +42,10 @@ public class GuiSettings {
 
         textArea.textProperty().addListener((change, o, n) -> {
             s.setStorageDirectory(
-                    n.equals(PdxuInstallation.getInstance().getDefaultSavegameLocation().toString()) ? null : Path.of(n));
+                    n.equals(PdxuInstallation.getInstance().getDefaultSavegamesLocation().toString()) ? null : Path.of(n));
         });
         textArea.setText(s.getStorageDirectory().map(Path::toString)
-                .orElse(PdxuInstallation.getInstance().getDefaultSavegameLocation().toString()));
+                .orElse(PdxuInstallation.getInstance().getDefaultSavegamesLocation().toString()));
 
         HBox hbox = new HBox(textArea, b);
         HBox.setHgrow(textArea, Priority.ALWAYS);

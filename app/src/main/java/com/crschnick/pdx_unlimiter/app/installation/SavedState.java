@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,12 +82,7 @@ public class SavedState {
         i.put("windowWidth", s.windowWidth);
         i.put("windowHeight", s.windowHeight);
 
-        try {
-            FileUtils.forceMkdirParent(file.toFile());
-            JsonHelper.write(n, Files.newOutputStream(file));
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+        ConfigHelper.writeConfig(file, n);
     }
 
     public int getWindowX() {

@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.gui.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
@@ -63,7 +64,7 @@ public abstract class SavegameCache<
         this.parser = parser;
         this.fileEnding = fileEnding;
         this.dateType = dateType;
-        this.path = PdxuInstallation.getInstance().getSavegameLocation().resolve(name);
+        this.path = PdxuInstallation.getInstance().getSavegamesLocation().resolve(name);
     }
 
     public static void init() {
@@ -109,18 +110,9 @@ public abstract class SavegameCache<
         }
 
         JsonNode node = null;
-        try {
-            if (Files.exists(getDataFile())) {
-                InputStream in = Files.newInputStream(getDataFile());
-                ObjectMapper o = new ObjectMapper();
-                node = o.readTree(in.readAllBytes());
-            }
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return;
-        }
-
-        if (node == null) {
+        if (Files.exists(getDataFile())) {
+            node = ConfigHelper.readConfig(getDataFile());
+        } else {
             return;
         }
 
@@ -191,26 +183,8 @@ public abstract class SavegameCache<
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
-            Path cFile = getPath()
-                    .resolve(campaign.getUuid().toString()).resolve("campaign.json");
-            Path backupCFile = getPath()
-                    .resolve(campaign.getUuid().toString()).resolve("campaign_old.json");
-
-            try {
-                if (Files.exists(cFile)) {
-                    Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
-                }
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-
-            try {
-                OutputStream out = Files.newOutputStream(cFile);
-                JsonHelper.write(campaignFileNode, out);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-                return;
-            }
+            ConfigHelper.writeConfig(getPath()
+                    .resolve(campaign.getUuid().toString()).resolve("campaign.json"), campaignFileNode);
 
             try {
                 ImageLoader.writePng(campaign.getImage(), getPath()
@@ -231,8 +205,8 @@ public abstract class SavegameCache<
         ArrayNode f = n.putArray("folders");
         getCollections().stream().filter(col -> col instanceof SavegameFolder).forEach(col -> {
             SavegameFolder<T,I> folder = (SavegameFolder<T, I>) col;
-            ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
-            ArrayNode entries = campaignFileNode.putArray("entries");
+            ObjectNode folderFileNode = JsonNodeFactory.instance.objectNode();
+            ArrayNode entries = folderFileNode.putArray("entries");
             folder.getSavegames().stream()
                     .map(entry -> JsonNodeFactory.instance.objectNode()
                             .put("name", entry.getName())
@@ -241,26 +215,8 @@ public abstract class SavegameCache<
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
-            Path cFile = getPath()
-                    .resolve(folder.getUuid().toString()).resolve("folder.json");
-            Path backupCFile = getPath()
-                    .resolve(folder.getUuid().toString()).resolve("folder_old.json");
-
-            try {
-                if (Files.exists(cFile)) {
-                    Files.copy(cFile, backupCFile, StandardCopyOption.REPLACE_EXISTING);
-                }
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-
-            try {
-                OutputStream out = Files.newOutputStream(cFile);
-                JsonHelper.write(campaignFileNode, out);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-                return;
-            }
+            ConfigHelper.writeConfig(getPath()
+                    .resolve(folder.getUuid().toString()).resolve("folder.json"), folderFileNode);
 
             ObjectNode folderNode = JsonNodeFactory.instance.objectNode()
                     .put("name", folder.getName())
@@ -268,22 +224,8 @@ public abstract class SavegameCache<
                     .put("uuid", folder.getUuid().toString());
             f.add(folderNode);
         });
-        
 
-        try {
-            if (Files.exists(getDataFile())) {
-                Files.copy(getDataFile(), getBackupDataFile(), StandardCopyOption.REPLACE_EXISTING);
-            }
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-
-        try {
-            OutputStream out = Files.newOutputStream(getDataFile());
-            JsonHelper.write(n, out);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+        ConfigHelper.writeConfig(getDataFile(), n);
     }
 
     public synchronized void delete(SavegameCollection<T, I> c) {
@@ -554,10 +496,6 @@ public abstract class SavegameCache<
 
     public Path getDataFile() {
         return getPath().resolve("campaigns.json");
-    }
-
-    public Path getBackupDataFile() {
-        return getPath().resolve("campaigns_old.json");
     }
 
     public int indexOf(SavegameCollection<?, ?> c) {

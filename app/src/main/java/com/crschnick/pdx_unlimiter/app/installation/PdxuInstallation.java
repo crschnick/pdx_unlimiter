@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +43,18 @@ public class PdxuInstallation {
         boolean image = Files.exists(appPath.resolve("version"));
         boolean prod = image;
         String v = "unknown";
-        Path dataDir = Path.of(System.getProperty("user.home"),
+
+        Path dataDir;
+        // Legacy support
+        var legacyDataDir = Path.of(System.getProperty("user.home"),
                 SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
+        if (Files.exists(legacyDataDir)) {
+            dataDir = legacyDataDir;
+        } else {
+            dataDir = InstallLocationHelper.getUserDocumentsPath().resolve(
+                    SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
+        }
+
         boolean developerMode = false;
         boolean nativeHook = true;
 
@@ -52,7 +63,7 @@ public class PdxuInstallation {
             appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
                     .resolve("Programs").resolve("Pdx-Unlimiter");
         } else {
-            appInstallPath = Path.of(System.getProperty("user.home"), ".pdx-unlimiter");
+            appInstallPath = dataDir;
         }
         Path rakalyDir = appInstallPath.resolve("rakaly");
 
@@ -191,12 +202,12 @@ public class PdxuInstallation {
         return getDataLocation().resolve("settings");
     }
 
-    public Path getDefaultSavegameLocation() {
+    public Path getDefaultSavegamesLocation() {
         return getDataLocation().resolve("savegames");
     }
 
-    public Path getSavegameLocation() {
-        return Settings.getInstance().getStorageDirectory().orElse(getDefaultSavegameLocation());
+    public Path getSavegamesLocation() {
+        return Settings.getInstance().getStorageDirectory().orElse(getDefaultSavegamesLocation());
     }
 
     public String getVersion() {

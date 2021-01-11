@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.game.*;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,8 +51,21 @@ public class Settings {
     }
 
     public static void updateSettings(Settings newS) {
+        var oldDir = PdxuInstallation.getInstance().getSavegamesLocation();
+
         INSTANCE = newS;
         INSTANCE.validate();
+
+        newS.getStorageDirectory().ifPresent(dir -> {
+            if (!oldDir.equals(dir)) {
+                try {
+                    FileUtils.moveDirectory(oldDir.toFile(), dir.toFile());
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
+            }
+        });
+
         try {
             saveConfig();
         } catch (IOException e) {
@@ -185,9 +199,7 @@ public class Settings {
             i.put("storageDirectory", s.storageDirectory.toString());
         }
 
-        JsonHelper.write(n, Files.newOutputStream(file));
-
-
+        ConfigHelper.writeConfig(file, n);
         Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
         Files.writeString(updateFile, Boolean.toString(s.enableAutoUpdate));
     }

@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -20,7 +19,6 @@ import javafx.scene.layout.StackPane;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -54,7 +52,7 @@ public class GuiMenuBar {
 
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
-            ThreadHelper.open(PdxuInstallation.getInstance().getSavegameLocation());
+            ThreadHelper.open(PdxuInstallation.getInstance().getSavegamesLocation());
         });
         savegames.getItems().add(sd);
 
