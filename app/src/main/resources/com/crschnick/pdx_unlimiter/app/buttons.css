@@ -30,8 +30,21 @@
     -fx-icon-code: "mdi-play";
 }
 
+.folder {
+    -fx-icon-code: "mdi-folder";
+-fx-font-size: 4em;
+}
+
+.new-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-folder-plus"
+}
+
+.recursive-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-sort-descending"
+}
+
 .upload-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-upload"
+    -fx-icon-code: "mdi-trophy"
 }
 
 .analyze-button .ikonli-font-icon {

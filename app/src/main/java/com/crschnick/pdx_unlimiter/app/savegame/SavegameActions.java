@@ -2,11 +2,13 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import javafx.scene.image.Image;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -57,11 +59,20 @@ public class SavegameActions {
         }
     }
 
-    public static <T, I extends SavegameInfo<T>> void moveCampaignEntry(
-            GameCampaign<T,I> campaign, GameCampaignEntry<T,I> entry) {
+    public static <T, I extends SavegameInfo<T>> void moveEntry(
+            SavegameCollection<T,I> collection, GameCampaignEntry<T,I> entry) {
         SavegameManagerState s = SavegameManagerState.get();
-        s.<T,I>current().getSavegameCache().moveEntry(campaign, entry);
+        s.<T,I>current().getSavegameCache().moveEntry(collection, entry);
         SavegameManagerState.get().selectEntry(entry);
+    }
+
+    public static <T, I extends SavegameInfo<T>> Image createImageForEntry(GameCampaignEntry<T,I> entry) {
+        Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
+                .filter(i -> i.getSavegameCache().contains(entry))
+                .findFirst()
+                .map(v -> (GameIntegration<T, I>) v);
+        var g = gi.orElseThrow(() -> new IllegalArgumentException());
+        return g.getGuiFactory().tagImage(entry, entry.getInfo().getTag());
     }
 
     public static void launchCampaignEntry() {
@@ -107,7 +118,6 @@ public class SavegameActions {
         }
     }
 
-
     public static void importLatestSavegame() {
         var savegames = SavegameManagerState.get().current().getSavegameWatcher().getSavegames();
         if (savegames.size() == 0) {
@@ -115,5 +125,14 @@ public class SavegameActions {
         }
 
         FileImporter.addToImportQueue(savegames.get(0).toImportString());
+    }
+
+    public static void importLatestSavegameDirectly(Runnable r) {
+        var savegames = SavegameManagerState.get().current().getSavegameWatcher().getSavegames();
+        if (savegames.size() == 0) {
+            return;
+        }
+
+        savegames.get(0).importTarget(r);
     }
 }

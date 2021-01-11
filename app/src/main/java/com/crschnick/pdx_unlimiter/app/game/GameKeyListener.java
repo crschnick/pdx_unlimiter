@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -26,6 +28,14 @@ public class GameKeyListener implements NativeKeyListener {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
                 SavegameActions.importLatestSavegame();
                 Toolkit.getDefaultToolkit().beep();
+            }
+            if (e.getKeyCode() == NativeKeyEvent.VC_R) {
+                TaskExecutor.getInstance().submitTask(() -> {
+                    LoggerFactory.getLogger(GameKeyListener.class).debug("Reloading latest save");
+                    Toolkit.getDefaultToolkit().beep();
+                    handle.kill();
+                    SavegameActions.importLatestSavegameDirectly(SavegameActions::launchCampaignEntry);
+                }, true);
             }
         }
     }

@@ -29,8 +29,8 @@ public class SavegameCacheIO {
     }
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameCache<T, I> cache, Path out) throws IOException {
-        for (GameCampaign<T, I> c : cache.getCampaigns()) {
-            for (GameCampaignEntry<T, I> e : c.getEntries()) {
+        for (SavegameCollection<T, I> c : cache.getCollections()) {
+            for (GameCampaignEntry<T, I> e : c.getSavegames()) {
                 Path fileOut = out.resolve(cache.getFileName(e));
                 int counter = 2;
                 while (Files.exists(fileOut)) {

@@ -104,8 +104,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     public ObservableValue<Node> createImage(GameCampaignEntry<T, I> entry) {
         SimpleObjectProperty<Node> prop;
         if (entry.getInfo() == null) {
-            prop = new SimpleObjectProperty<>(GameImage.imageNode(
-                    GameIntegration.<T, I>getForInstallation(installation).getSavegameCache().getCampaign(entry).getImage(), CLASS_TAG_ICON));
+            prop = new SimpleObjectProperty<>(new Region());
             entry.infoProperty().addListener((c, o, n) -> {
                 prop.set(tagNode(entry));
                 Tooltip.install(prop.get(), new Tooltip());

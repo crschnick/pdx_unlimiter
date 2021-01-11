@@ -1,4 +1,17 @@
+.campaign-top-bar {
+-fx-padding: 0.5em;
+-fx-font-size: 1.15em;
+-fx-background-color: white;
+-fx-border-color: #EEEEEEFF;
+-fx-border-width: 0 0 0.1em 0;
+}
 
+.campaign-top-bar .text-field {
+ -jfx-label-float: true;
+-fx-padding: 0.2em 0.4em 0.2em 0.4em;
+-jfx-unfocus-color: transparent;
+-fx-background-color: #AAAAAA44;
+}
 
 .campaign-list-entry .tag-icon {
 -fx-min-width: 4em;

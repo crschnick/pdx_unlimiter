@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXListView;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class GuiGameCampaignEntryList {
 
     private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
-        Consumer<Set<? extends GameCampaign<?, ?>>> update = (s) -> {
+        Consumer<Set<? extends SavegameCollection<?, ?>>> update = (s) -> {
             Platform.runLater(() -> {
                 if (s.size() > 0) {
                     pane.getChildren().set(0, listNode);
@@ -36,18 +36,18 @@ public class GuiGameCampaignEntryList {
             });
         };
 
-        SetChangeListener<GameCampaign<?, ?>> campaignListListener = (change) -> {
+        SetChangeListener<SavegameCollection<?, ?>> campaignListListener = (change) -> {
             update.accept(change.getSet());
         };
 
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             if (o != null) {
-                o.getSavegameCache().getCampaigns().removeListener(campaignListListener);
+                o.getSavegameCache().getCollections().removeListener(campaignListListener);
             }
 
             if (n != null) {
-                n.getSavegameCache().getCampaigns().addListener(campaignListListener);
-                update.accept(n.getSavegameCache().getCampaigns());
+                n.getSavegameCache().getCollections().addListener(campaignListListener);
+                update.accept(n.getSavegameCache().getCollections());
             }
         });
     }
@@ -76,12 +76,12 @@ public class GuiGameCampaignEntryList {
 
         SavegameManagerState.get().globalSelectedCampaignProperty().addListener((c, o, n) -> {
             if (o != null) {
-                o.getEntries().removeListener(l);
+                o.getSavegames().removeListener(l);
             }
 
             if (n != null) {
                 Platform.runLater(() -> {
-                    n.getEntries().addListener(l);
+                    n.getSavegames().addListener(l);
                     grid.setItems(FXCollections.observableArrayList(n.entryStream()
                             .map(GuiGameCampaignEntry::createCampaignEntryNode)
                             .collect(Collectors.toList())));
