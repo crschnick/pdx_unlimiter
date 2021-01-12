@@ -26,6 +26,10 @@
     -fx-icon-code: "mdi-import";
 }
 
+.convert-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-step-forward-2";
+}
+
 .launch-button .ikonli-font-icon {
     -fx-icon-code: "mdi-play";
 }

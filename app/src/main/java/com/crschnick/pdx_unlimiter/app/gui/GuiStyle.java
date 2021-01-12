@@ -56,6 +56,7 @@ public class GuiStyle {
     public static String CLASS_NO_CAMPAIGN = "no-campaign";
     public static String CLASS_LOADING = "loading";
     public static String CLASS_UPLOAD = "upload-button";
+    public static String CLASS_CONVERT = "convert-button";
     public static String CLASS_MAP = "map-button";
     public static String CLASS_ANALYZE = "analyze-button";
     public static String CLASS_MELT = "melt-button";

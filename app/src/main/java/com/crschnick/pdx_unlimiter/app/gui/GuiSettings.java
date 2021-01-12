@@ -24,6 +24,33 @@ import java.util.function.Supplier;
 
 public class GuiSettings {
 
+    private static Region ck3toeu4LocationNode(Settings s) {
+        TextField textArea = new TextField();
+        textArea.setEditable(false);
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
+
+        b.setOnMouseClicked((m) -> {
+            DirectoryChooser fileChooser = new DirectoryChooser();
+            fileChooser.setTitle("Select CK3 to EU4 converter directory");
+            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
+            if (file != null && file.exists()) {
+                textArea.setText(file.toString());
+            }
+        });
+
+        textArea.setText(s.getCk3toEu4Dir().map(Path::toString)
+                .orElse(""));
+        textArea.textProperty().addListener((change, o, n) -> {
+            s.setCk3toEu4Dir(Path.of(n));
+        });
+
+        HBox hbox = new HBox(textArea, b);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
+        return hbox;
+    }
+
     private static Region storageLocationNode(Settings s) {
         TextField textArea = new TextField();
         textArea.setEditable(false);
@@ -298,6 +325,28 @@ public class GuiSettings {
         return grid;
     }
 
+    private static Node converters(Settings s) {
+        GridPane grid = new GridPane();
+
+        var t = new Text("Paradox Converters");
+        t.setStyle("-fx-font-weight: bold");
+        TextFlow name = new TextFlow(t);
+        grid.add(name, 0, 0, 3, 1);
+
+        grid.add(help("""
+                The path to the CK3ToEU4 converter.
+                """), 0, 1);
+        grid.add(new Label("CK3 to EU4 converter location:"), 1, 1);
+        var lc = ck3toeu4LocationNode(s);
+        grid.add(lc, 2, 1);
+        GridPane.setHgrow(lc, Priority.ALWAYS);
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        return grid;
+    }
+
     public static void showSettings() {
         Alert alert = DialogHelper.createAlert();
         alert.getButtonTypes().add(ButtonType.APPLY);
@@ -313,7 +362,9 @@ public class GuiSettings {
                 new Separator(),
                 rakaly(s),
                 new Separator(),
-                skanderbeg(s));
+                skanderbeg(s),
+                new Separator(),
+                converters(s));
         vbox.setSpacing(10);
         alert.getDialogPane().setContent(vbox);
 

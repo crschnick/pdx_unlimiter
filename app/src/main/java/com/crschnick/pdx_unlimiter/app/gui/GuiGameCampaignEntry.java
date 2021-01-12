@@ -9,9 +9,12 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
+import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
@@ -140,6 +143,18 @@ public class GuiGameCampaignEntry {
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
             Tooltip.install(uploadSkanderbeg, new Tooltip("Upload to Skanderbeg.pm"));
             buttonBar.getChildren().add(uploadSkanderbeg);
+        }
+
+        if (SavegameCache.CK3.contains(e)) {
+            GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (GameCampaignEntry<Ck3Tag, Ck3SavegameInfo>) e;
+            Button convert = new JFXButton();
+            convert.setGraphic(new FontIcon());
+            convert.setOnMouseClicked((m) -> {
+                ConverterHelper.convertCk3ToEu4(ck3Entry);
+            });
+            convert.getStyleClass().add(CLASS_CONVERT);
+            Tooltip.install(convert, new Tooltip("Convert to EU4 savegame"));
+            buttonBar.getChildren().add(convert);
         }
 
         if (PdxuInstallation.getInstance().isDeveloperMode()) {

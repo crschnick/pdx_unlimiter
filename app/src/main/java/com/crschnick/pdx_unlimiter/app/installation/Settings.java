@@ -33,6 +33,7 @@ public class Settings {
     private String rakalyApiKey;
     private String skanderbegApiKey;
     private Path storageDirectory;
+    private Path ck3toeu4Dir;
     private boolean enableAutoUpdate;
 
     public static void init() {
@@ -157,6 +158,7 @@ public class Settings {
         s.rakalyApiKey = Optional.ofNullable(sNode.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
         s.skanderbegApiKey = Optional.ofNullable(sNode.get("skanderbegApiKey")).map(JsonNode::textValue).orElse(null);
         s.storageDirectory = Optional.ofNullable(sNode.get("storageDirectory")).map(n -> Paths.get(n.textValue())).orElse(null);
+        s.ck3toeu4Dir = Optional.ofNullable(sNode.get("ck3toeu4Dir")).map(n -> Paths.get(n.textValue())).orElse(null);
 
         Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
         try {
@@ -204,6 +206,9 @@ public class Settings {
         if (s.storageDirectory != null) {
             i.put("storageDirectory", s.storageDirectory.toString());
         }
+        if (s.ck3toeu4Dir != null) {
+            i.put("ck3toeu4Dir", s.ck3toeu4Dir.toString());
+        }
 
         ConfigHelper.writeConfig(file, n);
         Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
@@ -224,6 +229,7 @@ public class Settings {
         c.rakalyApiKey = rakalyApiKey;
         c.skanderbegApiKey = skanderbegApiKey;
         c.storageDirectory = storageDirectory;
+        c.ck3toeu4Dir = ck3toeu4Dir;
         return c;
     }
 
@@ -373,6 +379,21 @@ To fix this, you can set the installation directories of games manually in the s
 Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
                             """);
         }
+
+        if (ck3toeu4Dir != null) {
+            if (!Files.exists(ck3toeu4Dir.resolve("CK3toEU4"))) {
+                GuiErrorReporter.showSimpleErrorMessage("Invalid converter directory");
+                ck3toeu4Dir = null;
+            }
+        }
+    }
+
+    public void setCk3toEu4Dir(Path ck3toeu4Dir) {
+        this.ck3toeu4Dir = ck3toeu4Dir;
+    }
+
+    public Optional<Path> getCk3toEu4Dir() {
+        return Optional.ofNullable(ck3toeu4Dir);
     }
 
     public boolean confirmDeletion() {

@@ -16,66 +16,52 @@ public class PdxuInstallation {
 
     private static PdxuInstallation INSTANCE;
 
-    private String rakalyVersion;
-    private Path dataLocation;
+    private Path dataDir;
     private String version;
     private boolean production;
     private Path rakalyDir;
+    private Path ck3ToEu4Dir;
     private boolean developerMode;
     private boolean nativeHookEnabled;
     private boolean image;
 
-    public PdxuInstallation(Path dataLocation, String version, boolean production,
-                            Path rakalyDir, String rakalyVersion, boolean developerMode,
-                            boolean nativeHookEnabled, boolean image) {
-        this.dataLocation = dataLocation;
-        this.version = version;
-        this.production = production;
-        this.developerMode = developerMode;
-        this.rakalyVersion = rakalyVersion;
-        this.rakalyDir = rakalyDir;
-        this.nativeHookEnabled = nativeHookEnabled;
-        this.image = image;
-    }
-
     public static void init() {
-        Path appPath = Path.of(System.getProperty("java.home"));
-        boolean image = Files.exists(appPath.resolve("version"));
-        boolean prod = image;
-        String v = "unknown";
+        INSTANCE = new PdxuInstallation();
 
-        Path dataDir;
+        Path appPath = Path.of(System.getProperty("java.home"));
+        INSTANCE.image = Files.exists(appPath.resolve("version"));
+        INSTANCE.production = INSTANCE.image;
+        INSTANCE.version = "unknown";
+
         // Legacy support
         var legacyDataDir = Path.of(System.getProperty("user.home"),
                 SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
         if (Files.exists(legacyDataDir)) {
-            dataDir = legacyDataDir;
+            INSTANCE.dataDir = legacyDataDir;
         } else {
-            dataDir = InstallLocationHelper.getUserDocumentsPath().resolve(
+            INSTANCE.dataDir = InstallLocationHelper.getUserDocumentsPath().resolve(
                     SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
         }
-
-        boolean developerMode = false;
-        boolean nativeHook = true;
 
         Path appInstallPath;
         if (SystemUtils.IS_OS_WINDOWS) {
             appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
                     .resolve("Programs").resolve("Pdx-Unlimiter");
         } else {
-            appInstallPath = dataDir;
+            appInstallPath = INSTANCE.dataDir;
         }
-        Path rakalyDir = appInstallPath.resolve("rakaly");
+        INSTANCE.rakalyDir = appInstallPath.resolve("rakaly");
+        INSTANCE.ck3ToEu4Dir = appInstallPath.resolve("ck3toeu4");
 
         Properties props = new Properties();
-        if (prod) {
+        if (INSTANCE.production) {
             try {
-                v = Files.readString(appPath.resolve("version"));
+                INSTANCE.version = Files.readString(appPath.resolve("version"));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
 
-            Path propsFile = dataDir.resolve("settings").resolve("pdxu.properties");
+            Path propsFile = INSTANCE.dataDir.resolve("settings").resolve("pdxu.properties");
             if (Files.exists(propsFile)) {
                 try {
                     props.load(Files.newInputStream(propsFile));
@@ -84,7 +70,7 @@ public class PdxuInstallation {
                 }
             }
         } else {
-            v = "dev";
+            INSTANCE.version = "dev";
             try {
                 props.load(Files.newInputStream(Path.of("pdxu.properties")));
             } catch (IOException e) {
@@ -94,44 +80,29 @@ public class PdxuInstallation {
             var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
                     .filter(Path::isAbsolute);
-            if (customDir.isPresent()) {
-                dataDir = customDir.get();
-            }
+            customDir.ifPresent(path -> INSTANCE.dataDir = path);
 
-            prod = Optional.ofNullable(props.get("simulateProduction"))
+            INSTANCE.production = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
 
-            var altRakalyDir = Optional.ofNullable(props.get("rakalyDir"))
+            Optional.ofNullable(props.get("rakalyDir"))
                     .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute() && Files.exists(val));
-            if (altRakalyDir.isPresent()) {
-                rakalyDir = altRakalyDir.get();
-            } else {
-                if (!Files.exists(rakalyDir)) {
-                    throw new NoSuchElementException("Invalid rakalyDir for dev build. " +
-                            "Please clone https://github.com/crschnick/pdxu_rakaly and point " +
-                            "the property rakalyDir to repo directory");
-                }
-            }
+                    .filter(val -> val.isAbsolute() && Files.exists(val))
+                    .ifPresent(path -> INSTANCE.rakalyDir = path);
+
+            Optional.ofNullable(props.get("ck3toeu4Dir"))
+                    .map(val -> Path.of(val.toString()))
+                    .filter(val -> val.isAbsolute() && Files.exists(val))
+                    .ifPresent(path -> INSTANCE.ck3ToEu4Dir = path);
         }
 
-        String rakalyVersion;
-        try {
-            rakalyVersion = Files.readString(rakalyDir.resolve("version"));
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            rakalyVersion = "Unknown";
-        }
-
-        developerMode = Optional.ofNullable(props.get("developerMode"))
+        INSTANCE.developerMode = Optional.ofNullable(props.get("developerMode"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(false);
-        nativeHook = Optional.ofNullable(props.get("enableJNativeHook"))
+        INSTANCE.nativeHookEnabled = Optional.ofNullable(props.get("enableJNativeHook"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
-
-        INSTANCE = new PdxuInstallation(dataDir, v, prod, rakalyDir, rakalyVersion, developerMode, nativeHook, image);
     }
 
     public static boolean shouldStart() {
@@ -146,12 +117,12 @@ public class PdxuInstallation {
         return INSTANCE;
     }
 
-    private Path getDataLocation() {
-        return dataLocation;
+    private Path getDataDir() {
+        return dataDir;
     }
 
     public Path getImportQueueLocation() {
-        return dataLocation.resolve("import");
+        return dataDir.resolve("import");
     }
 
     private boolean isAlreadyRunning() {
@@ -180,7 +151,7 @@ public class PdxuInstallation {
     }
 
     public Path getLogsLocation() {
-        return dataLocation.resolve("logs");
+        return dataDir.resolve("logs");
     }
 
     public Path getRakalyExecutable() {
@@ -194,16 +165,16 @@ public class PdxuInstallation {
         }
     }
 
-    public String getRakalyVersion() {
-        return rakalyVersion;
+    public Path getCk3ToEu4Executable() {
+        return ck3ToEu4Dir.resolve("CK3ToEU4Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : ""));
     }
 
     public Path getSettingsLocation() {
-        return getDataLocation().resolve("settings");
+        return getDataDir().resolve("settings");
     }
 
     public Path getDefaultSavegamesLocation() {
-        return getDataLocation().resolve("savegames");
+        return getDataDir().resolve("savegames");
     }
 
     public Path getSavegamesLocation() {
