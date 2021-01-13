@@ -20,6 +20,11 @@ public class GameMod {
         }
 
         Node node = TextFormatParser.textFileParser().parse(Files.newInputStream(p));
+        // Quick check if mod data seems valid
+        if (node.getNodeForKeyIfExistent("name").isEmpty()) {
+            return Optional.empty();
+        }
+
         GameMod mod = new GameMod();
         mod.modFile = p;
         mod.name = node.getNodeForKey("name").getString();
