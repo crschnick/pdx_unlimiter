@@ -247,19 +247,27 @@ public abstract class SavegameCache<
         this.collections.remove(c);
     }
 
+    private synchronized Optional<SavegameFolder<T,I>> getOrCreateFolder(String name) {
+        return this.collections.stream()
+                .filter(f -> f instanceof SavegameFolder && f.getName().equals(name))
+                .map(f -> (SavegameFolder<T,I>) f)
+                .findAny()
+                .or(() -> addNewFolder(name));
+    }
 
-    public synchronized void addNewFolder(String name) {
+    public synchronized Optional<SavegameFolder<T,I>> addNewFolder(String name) {
         var col = new SavegameFolder<T,I>(Instant.now(), name, UUID.randomUUID());
         try {
             Files.createDirectory(getPath().resolve(col.getUuid().toString()));
         } catch (IOException e) {
             ErrorHandler.handleException(e);
-            return;
+            return Optional.empty();
         }
         this.collections.add(col);
+        return Optional.of(col);
     }
 
-    public synchronized GameCampaignEntry<T, I> addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I info) {
+    public synchronized void addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I info) {
         GameCampaignEntry<T, I> e = new GameCampaignEntry<>(
                 getDefaultEntryName(info),
                 entryUuid,
@@ -282,7 +290,6 @@ public abstract class SavegameCache<
         c.add(e);
 
         SavegameManagerState.get().selectEntry(e);
-        return e;
     }
 
     protected abstract String getDefaultEntryName(I info);
@@ -438,6 +445,39 @@ public abstract class SavegameCache<
 
     private String getSaveFileName() {
         return "savegame." + fileEnding;
+    }
+
+    public void meltSavegame(GameCampaignEntry<T,I> e) {
+        logger.debug("Melting savegame");
+        byte[] data;
+        I info;
+        try {
+            data = RakalyHelper.meltSavegame(getSavegameFile(e));
+
+            logger.debug("Parsing savegame info ...");
+            Node node = parser.parse(data);
+            logger.debug("Parsed savegame info");
+            info = loadInfo(false, node);
+            logger.debug("Loaded info");
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
+            return;
+        }
+        var checksum = parser.checksum(data);
+
+        UUID saveUuid = UUID.randomUUID();
+        logger.debug("Generated savegame UUID " + saveUuid.toString());
+        var folder = getOrCreateFolder("Melted savegames");
+        folder.ifPresent(f -> {
+            try {
+                Path entryPath = getPath().resolve(f.getUuid().toString()).resolve(saveUuid.toString());
+                FileUtils.forceMkdir(entryPath.toFile());
+                Files.write(entryPath.resolve(getSaveFileName()), data);
+                this.addNewEntry(f.getUuid(), saveUuid, checksum, info);
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+        });
     }
 
     private void importSavegameData(Path file) throws Exception {

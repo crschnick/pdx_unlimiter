@@ -119,6 +119,20 @@ public class DialogHelper {
         alert.showAndWait();
     }
 
+    public static boolean showMeltDialog() {
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Melt savegame");
+        alert.setHeaderText("""
+                Do you want to convert the selected savegame into a non-ironman savegame?
+                """);
+        alert.setContentText("""
+                The original savegame will not get modified.""");
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get().getButtonData().isDefaultButton();
+
+    }
+
     public static boolean showSavegameDeleteDialog() {
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.CONFIRMATION);

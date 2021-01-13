@@ -86,18 +86,7 @@ public class GuiGameCampaignEntry {
         Button melt = new JFXButton();
         melt.setGraphic(new FontIcon());
         melt.setOnMouseClicked((m) -> {
-            var out = GuiSavegameIO.showMeltDialog();
-            out.ifPresent(path -> {
-                TaskExecutor.getInstance().submitTask(() -> {
-                    try {
-                        var data = RakalyHelper.meltSavegame(
-                                SavegameManagerState.get().<T, I>current().getSavegameCache().getSavegameFile(e));
-                        Files.write(path, data);
-                    } catch (IOException ex) {
-                        ErrorHandler.handleException(ex);
-                    }
-                }, true);
-            });
+            SavegameActions.meltSavegame(e);
         });
         melt.getStyleClass().add(CLASS_MELT);
         Tooltip.install(melt, new Tooltip("Melt savegame (convert to non-ironman)"));

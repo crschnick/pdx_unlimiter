@@ -4,13 +4,17 @@ import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.GuiSavegameIO;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
@@ -134,5 +138,14 @@ public class SavegameActions {
         }
 
         savegames.get(0).importTarget(r);
+    }
+
+    public static <T, I extends SavegameInfo<T>> void meltSavegame(GameCampaignEntry<T,I> e) {
+        if (!DialogHelper.showMeltDialog()) {
+            return;
+        }
+
+        SavegameManagerState s = SavegameManagerState.get();
+        s.<T,I>current().getSavegameCache().meltSavegame(e);
     }
 }

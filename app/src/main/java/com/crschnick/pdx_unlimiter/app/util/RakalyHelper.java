@@ -26,18 +26,6 @@ import java.util.Optional;
 
 public class RakalyHelper {
 
-    public static void meltSavegameToFile(Path in) {
-            var out = GuiSavegameIO.showMeltDialog();
-            out.ifPresent(path -> {
-                try {
-                    var data = RakalyHelper.meltSavegame(in);
-                    Files.write(path, data);
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
-            });
-    }
-
     public static byte[] meltSavegame(Path file) throws IOException {
         var proc = new ProcessBuilder(
                 PdxuInstallation.getInstance().getRakalyExecutable().toString(),
