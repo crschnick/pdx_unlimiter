@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
 version '1.0-rc6'
@@ -8,4 +9,31 @@ java {
     modularity.inferModulePath = true
     sourceCompatibility = JavaVersion.VERSION_15
     targetCompatibility = JavaVersion.VERSION_15
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation files("$buildDir/generated-modules/commons-compress-1.20.jar")
+}
+
+addDependenciesModuleInfo {
+    overwriteExistingFiles = true
+    jdepsExtraArgs = ['-q']
+    outputDirectory = file("$buildDir/generated-modules")
+    modules {
+        module {
+            artifact 'org.apache.commons:commons-compress:1.20'
+            moduleInfoSource = '''
+                module org.apache.commons.compress {
+                    exports org.apache.commons.compress;
+                    exports org.apache.commons.compress.archivers;
+                    exports org.apache.commons.compress.archivers.zip;
+                    exports org.apache.commons.compress.utils;
+                }
+            '''
+        }
+    }
 }

@@ -6,13 +6,13 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,10 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,7 +53,7 @@ public abstract class SavegameCache<
     private String name;
     private GameDateType dateType;
     private Path path;
-    private SavegameParser parser;
+    private SavegameParser<I> parser;
     private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.synchronizedObservableSet(
             FXCollections.observableSet(new HashSet<>()));
 
@@ -267,7 +265,7 @@ public abstract class SavegameCache<
         return Optional.of(col);
     }
 
-    public synchronized void addNewEntry(UUID campainUuid, UUID entryUuid, String checksum, I info) {
+    public synchronized void addNewEntryToCampaign(UUID campainUuid, UUID entryUuid, String checksum, I info) {
         GameCampaignEntry<T, I> e = new GameCampaignEntry<>(
                 getDefaultEntryName(info),
                 entryUuid,
@@ -288,6 +286,19 @@ public abstract class SavegameCache<
         SavegameCollection<T, I> c = this.getSavegameCollection(campainUuid).get();
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
+
+        SavegameManagerState.get().selectEntry(e);
+    }
+
+    public synchronized void addNewEntryToFolder(SavegameFolder<T,I> folder, UUID entryUuid, String checksum, I info) {
+        GameCampaignEntry<T, I> e = new GameCampaignEntry<>(
+                getDefaultEntryName(info),
+                entryUuid,
+                info,
+                checksum,
+                info.getDate());
+        logger.debug("Adding new entry " + e.getName());
+        folder.getSavegames().add(e);
 
         SavegameManagerState.get().selectEntry(e);
     }
@@ -365,16 +376,12 @@ public abstract class SavegameCache<
         if (e.infoProperty().isNull().get()) {
             TaskExecutor.getInstance().submitTask(() -> {
                 LoggerFactory.getLogger(SavegameCache.class).debug("Loading entry " + getEntryName(e));
-                try {
-                    loadEntry(e);
-                } catch (Exception exception) {
-                    ErrorHandler.handleException(exception);
-                }
+                loadEntry(e);
             }, false);
         }
     }
 
-    private synchronized void loadEntry(GameCampaignEntry<T, I> e) throws Exception {
+    private synchronized void loadEntry(GameCampaignEntry<T, I> e) {
         if (!MemoryChecker.checkForEnoughMemory()) {
             return;
         }
@@ -384,19 +391,30 @@ public abstract class SavegameCache<
             return;
         }
 
-        var file = getPath(e).resolve("savegame." + fileEnding);
-        byte[] content = Files.readAllBytes(file);
-        boolean melt = parser.isBinaryFormat(content);
-        if (melt) {
-            content = RakalyHelper.meltSavegame(file);
-        }
-        var node = parser.parse(content);
-        I info = loadInfo(melt, node);
-        e.infoProperty().set(info);
-        LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
-    }
+        var file = getSavegameFile(e);
+        var status = parser.parse(file, RakalyHelper::meltSavegame);
+        status.visit(new SavegameParser.StatusVisitor<I>() {
+            @Override
+            public void success(SavegameParser.Success<I> s) {
+                try {
+                    e.infoProperty().set(s.info);
+                    LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e, null, file);
+                }
+            }
 
-    protected abstract I loadInfo(boolean melted, Node n) throws Exception;
+            @Override
+            public void error(SavegameParser.Error e) {
+                ErrorHandler.handleException(e.error, null, file);
+            }
+
+            @Override
+            public void invalid(SavegameParser.Invalid iv) {
+                ErrorHandler.handleException(new SavegameParseException(iv.message), null, file);
+            }
+        });
+    }
 
     public synchronized Path getSavegameFile(GameCampaignEntry<T, I> e) {
         return getPath(e).resolve("savegame." + fileEnding);
@@ -427,20 +445,15 @@ public abstract class SavegameCache<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    synchronized boolean importSavegame(Path file) {
+    synchronized SavegameParser.Status importSavegame(Path file, SavegameFolder<T,I> folder) {
         if (!MemoryChecker.checkForEnoughMemory()) {
-            return false;
+            return new SavegameParser.Error(null);
         }
 
-        try {
-            importSavegameData(file);
-            saveData();
-            System.gc();
-            return true;
-        } catch (Exception e) {
-            ErrorHandler.handleException(e, "Could not import " + name + " savegame", file);
-            return false;
-        }
+        var status = importSavegameData(file, folder);
+        saveData();
+        System.gc();
+        return status;
     }
 
     private String getSaveFileName() {
@@ -449,79 +462,76 @@ public abstract class SavegameCache<
 
     public void meltSavegame(GameCampaignEntry<T,I> e) {
         logger.debug("Melting savegame");
-        byte[] data;
-        I info;
+        Path meltedFile;
         try {
-            data = RakalyHelper.meltSavegame(getSavegameFile(e));
-
-            logger.debug("Parsing savegame info ...");
-            Node node = parser.parse(data);
-            logger.debug("Parsed savegame info");
-            info = loadInfo(false, node);
-            logger.debug("Loaded info");
+            meltedFile = RakalyHelper.meltSavegame(getSavegameFile(e));
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return;
         }
-        var checksum = parser.checksum(data);
-
-        UUID saveUuid = UUID.randomUUID();
-        logger.debug("Generated savegame UUID " + saveUuid.toString());
         var folder = getOrCreateFolder("Melted savegames");
         folder.ifPresent(f -> {
-            try {
-                Path entryPath = getPath().resolve(f.getUuid().toString()).resolve(saveUuid.toString());
-                FileUtils.forceMkdir(entryPath.toFile());
-                Files.write(entryPath.resolve(getSaveFileName()), data);
-                this.addNewEntry(f.getUuid(), saveUuid, checksum, info);
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
-            }
+            importSavegame(meltedFile, f);
         });
     }
 
-    private void importSavegameData(Path file) throws Exception {
-        logger.debug("Reading file " + file.toString());
-        byte[] content = Files.readAllBytes(file);
-        logger.debug("Read " + content.length + " bytes");
+    private SavegameParser.Status importSavegameData(Path file, SavegameFolder<T,I> folder) {
+        logger.debug("Parsing file " + file.toString());
+        var status = parser.parse(file, RakalyHelper::meltSavegame);
+        status.visit(new SavegameParser.StatusVisitor<I>() {
+            @Override
+            public void success(SavegameParser.Success<I> s) {
+                logger.debug("Checksum is " + s.checksum);
+                var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
+                        .filter(ch -> ch.getChecksum().equals(s.checksum))
+                        .findAny();
+                if (exists.isPresent()) {
+                    logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
+                    loadEntry(exists.get());
+                    SavegameManagerState.get().selectEntry(exists.get());
+                    return;
+                } else {
+                    logger.debug("No entry with checksum found");
+                }
 
-        var checksum = parser.checksum(content);
-        logger.debug("Checksum is " + checksum);
-        var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
-                .filter(ch -> ch.getChecksum().equals(checksum))
-                .findAny();
-        if (exists.isPresent()) {
-            logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
-            loadEntry(exists.get());
-            SavegameManagerState.get().selectEntry(exists.get());
-            return;
-        } else {
-            logger.debug("No entry with checksum found");
-        }
+                UUID collectionUuid;
+                if (folder == null) {
+                    collectionUuid = s.info.getCampaignUuid();
+                    logger.debug("Campaign UUID is " + collectionUuid.toString());
+                } else {
+                    collectionUuid = folder.getUuid();
+                    logger.debug("Folder UUID is " + collectionUuid.toString());
+                }
+                UUID saveUuid = UUID.randomUUID();
+                logger.debug("Generated savegame UUID " + saveUuid.toString());
 
-        boolean melt = parser.isBinaryFormat(content);
-        if (melt) {
-            logger.debug("Detected binary format. Invoking Rakaly ...");
-            content = RakalyHelper.meltSavegame(file);
-            logger.debug("Rakaly finished melting");
-        }
+                Path entryPath = getPath().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
+                try {
+                    FileUtils.forceMkdir(entryPath.toFile());
+                    FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                    return;
+                }
 
-        logger.debug("Parsing savegame info ...");
-        Node node = parser.parse(content);
-        logger.debug("Parsed savegame info");
-        I info = loadInfo(melt, node);
-        logger.debug("Loaded info");
-        UUID uuid = info.getCampaignUuid();
-        logger.debug("Campaign UUID is " + uuid.toString());
+                if (folder == null) {
+                    addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info);
+                } else {
+                    addNewEntryToFolder(folder, saveUuid, s.checksum, s.info);
+                }
+            }
 
-        UUID saveUuid = UUID.randomUUID();
-        logger.debug("Generated savegame UUID " + uuid.toString());
-        Path campaignPath = getPath().resolve(uuid.toString());
-        Path entryPath = campaignPath.resolve(saveUuid.toString());
+            @Override
+            public void error(SavegameParser.Error e) {
+                logger.error("An error occured during parsing: " + e.error.getMessage());
+            }
 
-        FileUtils.forceMkdir(entryPath.toFile());
-        FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-        this.addNewEntry(uuid, saveUuid, checksum, info);
+            @Override
+            public void invalid(SavegameParser.Invalid iv) {
+                logger.error("Savegame is invalid: " + iv.message);
+            }
+        });
+        return status;
     }
 
     public String getEntryName(GameCampaignEntry<T, I> e) {

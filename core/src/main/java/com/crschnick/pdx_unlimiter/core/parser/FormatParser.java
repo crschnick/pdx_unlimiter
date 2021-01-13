@@ -12,36 +12,28 @@ public abstract class FormatParser {
         this.header = header;
     }
 
+    public static boolean validateHeader(byte[] header, byte[] data) {
+        if (data.length < header.length) {
+            return false;
+        }
+
+        byte[] first = Arrays.copyOfRange(data, 0, header.length);
+        return Arrays.equals(first, header);
+    }
+
     public static boolean validateHeader(byte[] header, InputStream stream) throws IOException {
         byte[] first = new byte[header.length];
         stream.readNBytes(first, 0, header.length);
-        stream.close();
         return Arrays.equals(first, header);
     }
 
     public abstract List<Token> tokenize(byte[] data) throws IOException;
 
     public final Node parse(InputStream stream) throws IOException {
-        byte[] first = new byte[header.length];
-        stream.readNBytes(first, 0, header.length);
-        if (!Arrays.equals(first, header)) {
-            stream.close();
-            throw new IOException("Invalid header");
-        }
-
-        List<Token> tokens = tokenize(stream.readAllBytes());
-        stream.close();
-        tokens.add(0, new OpenGroupToken());
-        tokens.add(new CloseGroupToken());
-        return hierachiseTokens(tokens);
+        return parse(stream.readAllBytes());
     }
 
     public final Node parse(byte[] input) throws IOException {
-        byte[] first = Arrays.copyOfRange(input, 0, header.length);
-        if (!Arrays.equals(first, header)) {
-            throw new IOException("Invalid header");
-        }
-
         List<Token> tokens = tokenize(input);
 
         tokens.add(0, new OpenGroupToken());

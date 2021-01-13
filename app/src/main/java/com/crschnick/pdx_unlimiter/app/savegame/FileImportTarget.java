@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class FileImportTarget {
 
@@ -95,7 +97,7 @@ public abstract class FileImportTarget {
         return List.of();
     }
 
-    public abstract void importTarget(Runnable onFinish);
+    public abstract void importTarget(Consumer<SavegameParser.Status> onFinish);
 
     public abstract Instant getLastModified();
 
@@ -104,6 +106,8 @@ public abstract class FileImportTarget {
     public abstract String getName();
 
     public abstract String toImportString();
+
+    public abstract Path getPath();
 
     public static final class DownloadImportTarget extends FileImportTarget {
 
@@ -115,7 +119,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public void importTarget(Runnable onFinish) {
+        public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             if (GameInstallation.EU4 == null) {
                 return;
             }
@@ -130,9 +134,7 @@ public abstract class FileImportTarget {
                     FileUtils.forceMkdirParent(downloadedFile.toFile());
                     Files.write(downloadedFile, data);
 
-                    if (SavegameCache.EU4.importSavegame(downloadedFile)) {
-                        onFinish.run();
-                    }
+                    onFinish.accept(SavegameCache.EU4.importSavegame(downloadedFile, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -168,6 +170,11 @@ public abstract class FileImportTarget {
         public String toImportString() {
             return url.toString();
         }
+
+        @Override
+        public Path getPath() {
+            return downloadedFile;
+        }
     }
 
     public static class StandardImportTarget extends FileImportTarget {
@@ -180,11 +187,9 @@ public abstract class FileImportTarget {
             this.path = path;
         }
 
-        public void importTarget(Runnable onFinish) {
+        public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
-                if (savegameCache.importSavegame(path)) {
-                    onFinish.run();
-                }
+                onFinish.accept(savegameCache.importSavegame(path, null));
             }, true);
         }
 

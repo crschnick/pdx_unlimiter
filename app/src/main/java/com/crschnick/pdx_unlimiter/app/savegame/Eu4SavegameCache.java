@@ -25,9 +25,4 @@ public class Eu4SavegameCache extends SavegameCache<
     protected String getDefaultCampaignName(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> latest) {
         return GameLocalisation.getTagNameForEntry(latest, latest.getInfo().getTag());
     }
-
-    @Override
-    protected Eu4SavegameInfo loadInfo(boolean melted, Node n) throws Exception {
-        return Eu4SavegameInfo.fromSavegame(melted, n);
-    }
 }

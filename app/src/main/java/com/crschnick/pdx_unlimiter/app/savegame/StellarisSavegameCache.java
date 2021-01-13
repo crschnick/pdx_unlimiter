@@ -23,9 +23,4 @@ public class StellarisSavegameCache extends SavegameCache<
     protected String getDefaultCampaignName(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> latest) {
         return latest.getInfo().getTag().getName();
     }
-
-    @Override
-    protected StellarisSavegameInfo loadInfo(boolean melted, Node n) throws Exception {
-        return StellarisSavegameInfo.fromSavegame(n);
-    }
 }

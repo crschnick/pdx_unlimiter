@@ -1,37 +1,47 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-public class StellarisSavegameParser extends SavegameParser {
+public class StellarisSavegameParser extends SavegameParser<StellarisSavegameInfo> {
 
     @Override
-    public boolean isBinaryFormat(byte[] content) throws Exception {
-        return false;
-    }
+    public Status parse(Path input, Melter melter) {
+        try {
+            String checksum = checksum(Files.readAllBytes(input));
 
-    @Override
-    public Node parse(byte[] content) throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(content);
-        var zipFile = new ZipInputStream(in);
-        Node gamestate = null;
-        Node meta = null;
+            var zipFile = new ZipFile(input.toFile());
+            Node gamestateNode = null;
+            Node metaNode = null;
 
-        ZipEntry entry;
-        while ((entry = zipFile.getNextEntry()) != null) {
-            if (entry.getName().equals("gamestate")) {
-                gamestate = TextFormatParser.stellarisSavegameParser().parse(zipFile.readAllBytes());
+            var gs = zipFile.getEntry("gamestate");
+            if (gs == null) {
+                return new Invalid("Missing gamestate");
             }
-            if (entry.getName().equals("meta")) {
-                meta = TextFormatParser.stellarisSavegameParser().parse(zipFile.readAllBytes());
+            var gsIn = zipFile.getInputStream(gs);
+            gamestateNode = TextFormatParser.textFileParser().parse(gsIn);
+
+            var mt = zipFile.getEntry("meta");
+            if (mt == null) {
+                return new Invalid("Missing meta");
             }
-            zipFile.closeEntry();
+            var mtIn = zipFile.getInputStream(mt);
+            metaNode = TextFormatParser.textFileParser().parse(mtIn);
+
+            zipFile.close();
+
+            var node = Node.combine(gamestateNode, metaNode);
+            return new Success<>(true, checksum, node, StellarisSavegameInfo.fromSavegame(node));
+        } catch (Exception e) {
+            return new Error(e);
         }
-        zipFile.close();
-        return Node.combine(gamestate, meta);
     }
 }

@@ -1,11 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.GuiImporter;
+import com.crschnick.pdx_unlimiter.app.installation.*;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class FileImporter {
@@ -34,7 +32,7 @@ public class FileImporter {
             }
             try {
                 String toImport = Files.readString(p);
-                importFileInternal(p, toImport);
+                importSingleFile(p, toImport);
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -44,7 +42,7 @@ public class FileImporter {
         FileWatchManager.getInstance().startWatchersInDirectories(List.of(path), importFunc);
     }
 
-    private static void importFileInternal(Path queueFile, String input) {
+    private static void importSingleFile(Path queueFile, String input) {
         logger.debug("Starting to import " + input + " from queue file " + queueFile);
         var targets = FileImportTarget.createTargets(input);
         if (targets.size() == 0) {
@@ -52,7 +50,7 @@ public class FileImporter {
         } else {
             for (FileImportTarget t : targets) {
                 logger.debug("Starting to import target " + t.getName() + " from " + input);
-                t.importTarget(() -> {
+                t.importTarget(s -> {
                     if (Settings.getInstance().deleteOnImport()) {
                         logger.debug("Deleting import target " + t.getName());
                         t.delete();
@@ -63,6 +61,28 @@ public class FileImporter {
 
         logger.debug("Deleting queue file " + queueFile);
         FileUtils.deleteQuietly(queueFile.toFile());
+    }
+
+    public static void importBatch(Set<FileImportTarget> targets) {
+        Map<FileImportTarget, SavegameParser.Status> statusMap = new HashMap<>();
+        targets.forEach(t -> t.importTarget(s -> {
+            statusMap.put(t, s);
+        }));
+        TaskExecutor.getInstance().submitTask(
+                () -> {
+                    // Report errors
+                    statusMap.entrySet().stream()
+                            .filter(e -> e.getValue() instanceof SavegameParser.Error)
+                            .findFirst()
+                            .ifPresent(e -> {
+                                ErrorHandler.handleException(
+                                        ((SavegameParser.Error) e.getValue()).error,
+                                        null,
+                                        e.getKey().getPath());
+                            });
+
+                    Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
+                }, false);
     }
 
     public static void addToImportQueue(String toImport) {

@@ -12,6 +12,8 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.DataOutputStream;
@@ -26,7 +28,7 @@ import java.util.Optional;
 
 public class RakalyHelper {
 
-    public static byte[] meltSavegame(Path file) throws IOException {
+    public static Path meltSavegame(Path file) throws IOException {
         var proc = new ProcessBuilder(
                 PdxuInstallation.getInstance().getRakalyExecutable().toString(),
                 "melt",
@@ -40,7 +42,10 @@ public class RakalyHelper {
             String errorMsg = new String(proc.getErrorStream().readAllBytes());
             throw new IOException(errorMsg);
         }
-        return b;
+        Path temp = FileUtils.getTempDirectory().toPath()
+                .resolve("pdxu").resolve("melted." + FilenameUtils.getExtension(file.toString()));
+        Files.write(temp, b);
+        return temp;
     }
 
     public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {

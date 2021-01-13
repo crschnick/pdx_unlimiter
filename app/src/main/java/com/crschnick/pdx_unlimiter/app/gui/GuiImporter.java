@@ -1,8 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,11 +19,31 @@ import javafx.stage.Modality;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMPORT_DIALOG;
 
 public class GuiImporter {
+
+    public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
+        Alert alert = DialogHelper.createEmptyAlert();
+        alert.initModality(Modality.WINDOW_MODAL);
+        alert.setTitle("Import results");
+        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
+
+        VBox list = new VBox();
+        for (var e : statusMap.entrySet()) {
+            e.getValue().visit(new SavegameParser.StatusVisitor<>() {
+                @Override
+                public void invalid(SavegameParser.Invalid iv) {
+                    list.getChildren().add(new Label(e.getKey().getName() + ": " + e.getValue()));
+                }
+            });
+        }
+        alert.getDialogPane().setContent(list);
+        alert.show();
+    }
 
     private static Region createBottomNode(CheckBox cb) {
         Label name = new Label("Select all");
@@ -90,7 +113,7 @@ public class GuiImporter {
         alert.getButtonTypes().add(importType);
         Button importB = (Button) alert.getDialogPane().lookupButton(importType);
         importB.setOnAction(e -> {
-            selected.forEach(t -> FileImporter.addToImportQueue(t.toImportString()));
+            FileImporter.importBatch(selected);
             e.consume();
         });
 

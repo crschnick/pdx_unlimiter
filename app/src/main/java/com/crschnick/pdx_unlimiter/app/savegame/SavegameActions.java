@@ -11,6 +11,7 @@ import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SavegameActions {
@@ -131,7 +133,7 @@ public class SavegameActions {
         FileImporter.addToImportQueue(savegames.get(0).toImportString());
     }
 
-    public static void importLatestSavegameDirectly(Runnable r) {
+    public static void importLatestSavegameDirectly(Consumer<SavegameParser.Status> r) {
         var savegames = SavegameManagerState.get().current().getSavegameWatcher().getSavegames();
         if (savegames.size() == 0) {
             return;

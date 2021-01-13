@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 
 public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
-    public static Ck3SavegameInfo fromSavegame(Node n) throws SavegameParseException {
+    public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
-            i.ironman = n.getNodeForKey("meta_data").getNodeForKey("ironman").getBoolean();
+            i.ironman = melted;
             i.date = GameDateType.CK3.fromString(n.getNodeForKey("date").getString());
 
             long seed = n.getNodeForKey("random_seed").getLong();

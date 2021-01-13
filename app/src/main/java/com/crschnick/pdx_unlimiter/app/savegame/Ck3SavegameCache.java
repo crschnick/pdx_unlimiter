@@ -22,9 +22,4 @@ public class Ck3SavegameCache extends SavegameCache<Ck3Tag, Ck3SavegameInfo> {
     protected String getDefaultCampaignName(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> latest) {
         return latest.getInfo().getTag().getPrimaryTitle().getName();
     }
-
-    @Override
-    protected Ck3SavegameInfo loadInfo(boolean melted, Node n) throws Exception {
-        return Ck3SavegameInfo.fromSavegame(n);
-    }
 }

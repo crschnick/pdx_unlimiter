@@ -30,8 +30,8 @@ public class SkanderbegHelper {
         TaskExecutor.getInstance().submitTask(() -> {
             try {
                 byte[] body = Files.readAllBytes(cache.getSavegameFile(entry));
-                if (new Eu4SavegameParser().isBinaryFormat(body)) {
-                    body = RakalyHelper.meltSavegame(cache.getSavegameFile(entry));
+                if (entry.getInfo().isIronman()) {
+                    body = Files.readAllBytes(RakalyHelper.meltSavegame(cache.getSavegameFile(entry)));
                 }
 
                 String saveId = uploadContent(body, cache.getFileName(entry));

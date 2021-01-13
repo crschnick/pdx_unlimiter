@@ -22,9 +22,4 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Tag, Hoi4SavegameInfo> 
     protected String getDefaultCampaignName(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> latest) {
         return "Unknown";
     }
-
-    @Override
-    protected Hoi4SavegameInfo loadInfo(boolean melted, Node n) throws Exception {
-        return Hoi4SavegameInfo.fromSavegame(n);
-    }
 }
