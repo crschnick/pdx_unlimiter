@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.installation.*;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -66,7 +67,11 @@ public class FileImporter {
     public static void importBatch(Set<FileImportTarget> targets) {
         Map<FileImportTarget, SavegameParser.Status> statusMap = new HashMap<>();
         targets.forEach(t -> t.importTarget(s -> {
-            statusMap.put(t, s);
+            // Only save non success results
+            // This is done to gc the success and improve memory usage
+            if (!(s instanceof SavegameParser.Success)) {
+                statusMap.put(t, s);
+            }
         }));
         TaskExecutor.getInstance().submitTask(
                 () -> {

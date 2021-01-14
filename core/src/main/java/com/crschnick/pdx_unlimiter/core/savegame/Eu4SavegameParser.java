@@ -79,7 +79,7 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
 
                 var gs = zipFile.getEntry("gamestate");
                 if (gs == null) {
-                    return new Invalid("Missing gamestate");
+                    return new Invalid("Missing gamestate. This might be a very old savegame, which is not supported");
                 }
                 var gsIn = zipFile.getInputStream(gs);
                 if (FormatParser.validateHeader(EU4_TEXT_HEADER, gsIn)) {

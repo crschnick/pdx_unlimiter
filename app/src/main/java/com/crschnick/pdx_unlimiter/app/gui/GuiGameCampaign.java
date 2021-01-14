@@ -11,6 +11,7 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -29,7 +30,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class GuiGameCampaign {
 
 
-    static HBox createCampaignButton(SavegameCollection c, GameGuiFactory gf) {
+    static HBox createCampaignButton(SavegameCollection<?,?> c, GameGuiFactory<?,?> gf) {
         HBox btn = new HBox();
         btn.setOnMouseClicked((m) -> SavegameManagerState.get().selectCollection(c));
         btn.setAlignment(Pos.CENTER);
@@ -72,7 +73,8 @@ public class GuiGameCampaign {
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showCampaignDeleteDialog()) {
-                    SavegameManagerState.get().current().getSavegameCache().delete(c);
+                    SavegameManagerState.get().current().getSavegameCache().delete(
+                            (SavegameCollection<Object, SavegameInfo<Object>>) c);
                 }
             });
             del.setAlignment(Pos.CENTER);
@@ -98,8 +100,11 @@ public class GuiGameCampaign {
             Label count = new Label();
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
-            count.textProperty().bind(Bindings.createStringBinding(
-                    () -> "[" + c.getSavegames().size() + "]", c.getSavegames()));
+            c.getSavegames().addListener((SetChangeListener<GameCampaignEntry<?,?>>) change -> {
+                Platform.runLater(() -> {
+                    count.setText("[" + change.getSet().size() + "]");
+                });
+            });
             bottom.getChildren().add(count);
 
             info.getChildren().add(bottom);

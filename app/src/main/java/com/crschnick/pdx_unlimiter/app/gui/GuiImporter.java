@@ -28,16 +28,11 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
-        if (statusMap.values().stream()
-                .noneMatch(s -> s instanceof SavegameParser.Error || s instanceof SavegameParser.Invalid)) {
-            return;
-        }
-
         Alert alert = DialogHelper.createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
-        alert.setHeaderText("The import of " + statusMap.size() + " savegames has finished.");
+        alert.setHeaderText("The import of the selected savegames has finished.");
         alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
 
         VBox list = new VBox();
@@ -60,7 +55,7 @@ public class GuiImporter {
         alert.getDialogPane().setContent(list);
 
         // Only show dialog if there were issues
-        if (list.getChildren().size() > 0) {
+        if (statusMap.size() > 0) {
             alert.show();
         }
     }
