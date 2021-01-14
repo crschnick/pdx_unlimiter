@@ -28,7 +28,7 @@ public class LocalisationHelper {
         Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.id +
                 "." + FilenameUtils.getExtension(file.toString()));
         Map<String,String> map = new HashMap<>();
-        Pattern p = Pattern.compile("\\s+([A-Za-z0-9_]+):(\\d*) \"(.+)\"");
+        Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_]+):(\\d*) \"(.+)\"$");
         try {
             Files.lines(langFile).forEach(s -> {
                 Matcher m = p.matcher(s);

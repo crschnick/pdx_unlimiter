@@ -2,8 +2,8 @@
 -fx-background-color: #AAAAAA55;
 }
 
-.import-dialog {
- -fx-padding: 0 1em 0 1em;
+.content-dialog {
+ -fx-padding: 1em 0 0 0.7em;
 }
 
 .entry-list {

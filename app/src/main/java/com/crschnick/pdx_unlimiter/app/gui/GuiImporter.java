@@ -22,17 +22,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMPORT_DIALOG;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
+
 
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
+        if (statusMap.values().stream()
+                .noneMatch(s -> s instanceof SavegameParser.Error || s instanceof SavegameParser.Invalid)) {
+            return;
+        }
+
         Alert alert = DialogHelper.createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
         alert.setHeaderText("The import of " + statusMap.size() + " savegames has finished.");
-        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
+        alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
 
         VBox list = new VBox();
         list.setSpacing(5);
@@ -113,7 +119,7 @@ public class GuiImporter {
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import");
         alert.getDialogPane().setContent(create(watcher.getSavegames(), selected));
-        alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
+        alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
         watcher.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 // Clear the selected savegames!!

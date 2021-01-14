@@ -64,7 +64,7 @@ public class GuiStyle {
     public static String CLASS_RECURSIVE = "recursive-button";
     public static String CLASS_FOLDER = "folder";
     public static String CLASS_CAMPAIGN_TOP_BAR = "campaign-top-bar";
-    public static String CLASS_IMPORT_DIALOG = "import-dialog";
+    public static String CLASS_CONTENT_DIALOG = "content-dialog";
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",

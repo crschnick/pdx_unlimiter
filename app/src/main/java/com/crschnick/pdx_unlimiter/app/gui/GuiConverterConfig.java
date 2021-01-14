@@ -9,12 +9,12 @@ import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.jfoenix.controls.JFXRadioButton;
+import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 
 public class GuiConverterConfig {
 
@@ -123,12 +124,12 @@ public class GuiConverterConfig {
             return grid;
         }
 
-        grid.add(help(translations.get(n.getNodeForKey("tooltip").getString())), 0, 0);
+        var h = help(translations.get(n.getNodeForKey("tooltip").getString()));
+        grid.add(h, 0, 0);
 
         var t = new Text(translations.get(n.getNodeForKey("displayName").getString()));
         t.setStyle("-fx-font-weight: bold");
-        TextFlow name = new TextFlow(t);
-        grid.add(name, 1, 0, 2, 1);
+        grid.add(t, 1, 0, 3, 1);
 
         ToggleGroup tg = new ToggleGroup();
         int row = 1;
@@ -174,17 +175,32 @@ public class GuiConverterConfig {
         }
 
         Alert alert = createAlert();
+
+        ButtonType open = new ButtonType("Open configs");
         alert.getButtonTypes().add(ButtonType.APPLY);
+        alert.getButtonTypes().add(open);
         alert.getButtonTypes().add(ButtonType.CANCEL);
+        Button val = (Button) alert.getDialogPane().lookupButton(open);
+        val.addEventFilter(
+                ActionEvent.ACTION,
+                e -> {
+            ThreadHelper.open(Settings.getInstance().getCk3toEu4Dir().get()
+                    .resolve("CK3toEU4").resolve("configurables"));
+            e.consume();
+        });
+
         alert.setTitle("Converter settings");
         alert.initModality(Modality.NONE);
-        alert.getDialogPane().setMinWidth(600);
+        alert.getDialogPane().setMinWidth(500);
+        alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
 
         VBox options = new VBox();
         for (var node : configNode.getNodesForKey("option")) {
             options.getChildren().add(createOptionNode(node, translations, values));
             options.getChildren().add(new Separator());
         }
+        // Remove last separator
+        options.getChildren().remove(options.getChildren().size() - 1);
         options.setSpacing(10);
 
         var sp = new ScrollPane(options);

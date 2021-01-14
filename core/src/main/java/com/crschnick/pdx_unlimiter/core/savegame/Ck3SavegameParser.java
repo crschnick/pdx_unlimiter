@@ -34,13 +34,16 @@ public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
     @Override
     public Status parse(Path input, Melter melter) {
         try {
-            String checksum = checksum(Files.readAllBytes(input));
+            var content = Files.readAllBytes(input);
+            String checksum = checksum(content);
 
-            var reader = Files.newBufferedReader(input);
-            reader.readLine();
-            var secondLine = reader.readLine();
-            reader.close();
-            var binary = !secondLine.startsWith("meta");
+            var contentString = new String(content, StandardCharsets.UTF_8);
+            var first = contentString.lines().findFirst();
+            if (first.isEmpty()) {
+                return new Invalid("Empty savegame content");
+            }
+            int metaStart = first.get().length() + 1;
+            boolean binary = !contentString.startsWith("meta", metaStart);
 
             boolean melted = false;
             var fileToParse = input;
@@ -49,7 +52,7 @@ public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
                 melted = true;
             }
 
-            byte[] content = Files.readAllBytes(fileToParse);
+            content = Files.readAllBytes(fileToParse);
             byte[] savegameText;
             int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH) + 2;
             boolean compressed = zipContentStart != 1;
