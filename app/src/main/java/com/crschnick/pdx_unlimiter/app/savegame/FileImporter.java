@@ -20,10 +20,8 @@ public class FileImporter {
 
     private static final Logger logger = LoggerFactory.getLogger(FileImporter.class);
 
-    private static FileImporter INSTANCE;
 
     public static void init() throws IOException {
-        INSTANCE = new FileImporter();
         var path = PdxuInstallation.getInstance().getImportQueueLocation();
         FileUtils.forceMkdir(path.toFile());
 
@@ -31,19 +29,23 @@ public class FileImporter {
             if (!Files.exists(p)) {
                 return;
             }
-            try {
-                String toImport = Files.readString(p);
-                importSingleFile(p, toImport);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
+
+            importFromQueue(p);
         };
 
         Files.list(path).forEach(importFunc);
         FileWatchManager.getInstance().startWatchersInDirectories(List.of(path), importFunc);
     }
 
-    private static void importSingleFile(Path queueFile, String input) {
+    private static void importFromQueue(Path queueFile) {
+        String input = null;
+        try {
+            input = Files.readString(queueFile);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return;
+        }
+
         logger.debug("Starting to import " + input + " from queue file " + queueFile);
         var targets = FileImportTarget.createTargets(input);
         if (targets.size() == 0) {
@@ -64,13 +66,18 @@ public class FileImporter {
         FileUtils.deleteQuietly(queueFile.toFile());
     }
 
-    public static void importBatch(Set<FileImportTarget> targets) {
+    public static void importTargets(Collection<FileImportTarget> targets) {
         Map<FileImportTarget, SavegameParser.Status> statusMap = new HashMap<>();
         targets.forEach(t -> t.importTarget(s -> {
             // Only save non success results
-            // This is done to gc the success and improve memory usage
+            // This is done to gc the success objects and improve memory usage
             if (!(s instanceof SavegameParser.Success)) {
                 statusMap.put(t, s);
+            }
+
+            if (Settings.getInstance().deleteOnImport()) {
+                logger.debug("Deleting import target " + t.getName());
+                t.delete();
             }
         }));
         TaskExecutor.getInstance().submitTask(

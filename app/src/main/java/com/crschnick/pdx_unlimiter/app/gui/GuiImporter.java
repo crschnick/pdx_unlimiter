@@ -1,10 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
@@ -128,7 +126,7 @@ public class GuiImporter {
         alert.getButtonTypes().add(importType);
         Button importB = (Button) alert.getDialogPane().lookupButton(importType);
         importB.setOnAction(e -> {
-            FileImporter.importBatch(selected);
+            FileImporter.importTargets(selected);
             e.consume();
         });
 

@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
@@ -20,6 +21,9 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GuiLayout {
 
@@ -50,11 +54,14 @@ public class GuiLayout {
         layout.setOnDragDropped(event -> {
             // Only accept drops from outside the app window
             if (event.getGestureSource() == null && event.getDragboard().hasFiles()) {
-                Dragboard db = event.getDragboard();
-                db.getFiles().stream()
-                        .map(File::toString)
-                        .forEach(FileImporter::addToImportQueue);
                 event.setDropCompleted(true);
+                Dragboard db = event.getDragboard();
+                var importTargets = db.getFiles().stream()
+                        .map(File::toString)
+                        .map(FileImportTarget::createTargets)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+                FileImporter.importTargets(importTargets);
             }
             event.consume();
         });

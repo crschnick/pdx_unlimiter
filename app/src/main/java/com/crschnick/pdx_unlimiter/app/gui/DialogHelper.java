@@ -124,7 +124,7 @@ public class DialogHelper {
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Melt savegame");
         alert.setHeaderText("""
-                Do you want to convert the selected savegame into a non-ironman savegame?
+                Do you want to convert the selected savegame into a non-ironman savegame using the Rakaly melter?
                 """);
         alert.setContentText("""
                 The original savegame will not get modified.""");

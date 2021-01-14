@@ -1,13 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.gui.GuiSavegameIO;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -15,10 +13,10 @@ import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -73,11 +71,12 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(GameCampaignEntry<T,I> entry) {
+        @SuppressWarnings("unchecked")
         Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
                 .filter(i -> i.getSavegameCache().contains(entry))
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v);
-        var g = gi.orElseThrow(() -> new IllegalArgumentException());
+        var g = gi.orElseThrow(IllegalArgumentException::new);
         return g.getGuiFactory().tagImage(entry, entry.getInfo().getTag());
     }
 
@@ -129,7 +128,7 @@ public class SavegameActions {
             return;
         }
 
-        FileImporter.addToImportQueue(savegames.get(0).toImportString());
+        FileImporter.importTargets(Set.of(savegames.get(0)));
     }
 
     public static void importLatestSavegameDirectly(Consumer<SavegameParser.Status> r) {
@@ -147,6 +146,8 @@ public class SavegameActions {
         }
 
         SavegameManagerState s = SavegameManagerState.get();
-        s.<T,I>current().getSavegameCache().meltSavegame(e);
+        TaskExecutor.getInstance().submitTask(() -> {
+            s.<T, I>current().getSavegameCache().meltSavegame(e);
+        }, true);
     }
 }

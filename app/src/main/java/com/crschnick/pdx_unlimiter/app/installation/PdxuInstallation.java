@@ -39,8 +39,7 @@ public class PdxuInstallation {
         if (Files.exists(legacyDataDir)) {
             INSTANCE.dataDir = legacyDataDir;
         } else {
-            INSTANCE.dataDir = InstallLocationHelper.getUserDocumentsPath().resolve(
-                    SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
+            INSTANCE.dataDir = InstallLocationHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
         }
 
         Path appInstallPath;

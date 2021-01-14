@@ -396,12 +396,9 @@ public abstract class SavegameCache<
         status.visit(new SavegameParser.StatusVisitor<I>() {
             @Override
             public void success(SavegameParser.Success<I> s) {
-                try {
-                    e.infoProperty().set(s.info);
-                    LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e, null, file);
-                }
+                logger.debug("Parsing was successful");
+                e.infoProperty().set(s.info);
+                LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
             }
 
             @Override
@@ -481,6 +478,7 @@ public abstract class SavegameCache<
         status.visit(new SavegameParser.StatusVisitor<I>() {
             @Override
             public void success(SavegameParser.Success<I> s) {
+                logger.debug("Parsing was successful");
                 logger.debug("Checksum is " + s.checksum);
                 var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
                         .filter(ch -> ch.getChecksum().equals(s.checksum))
