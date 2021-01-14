@@ -27,22 +27,36 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMPORT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = DialogHelper.createAlert();
+        alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
+        alert.setHeaderText("The import of " + statusMap.size() + " savegames has finished.");
         alert.getDialogPane().getStyleClass().add(CLASS_IMPORT_DIALOG);
 
         VBox list = new VBox();
+        list.setSpacing(5);
+        list.getChildren().add(new Label("However, there have been some issues with the savegames listed below:"));
         for (var e : statusMap.entrySet()) {
             e.getValue().visit(new SavegameParser.StatusVisitor<>() {
                 @Override
                 public void invalid(SavegameParser.Invalid iv) {
-                    list.getChildren().add(new Label(e.getKey().getName() + ": " + e.getValue()));
+                    list.getChildren().add(new Label("- " + e.getKey().getName() + ": " + iv.message));
+                }
+
+                @Override
+                public void error(SavegameParser.Error er) {
+                    list.getChildren().add(new Label("- " + e.getKey().getName() + ": " +
+                            er.error.getMessage() + " (error)"));
                 }
             });
         }
         alert.getDialogPane().setContent(list);
-        alert.show();
+
+        // Only show dialog if there were issues
+        if (list.getChildren().size() > 0) {
+            alert.show();
+        }
     }
 
     private static Region createBottomNode(CheckBox cb) {

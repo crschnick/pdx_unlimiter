@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ public class PdxuInstallation {
     private String version;
     private boolean production;
     private Path rakalyDir;
-    private Path ck3ToEu4Dir;
     private boolean developerMode;
     private boolean nativeHookEnabled;
     private boolean image;
@@ -51,7 +51,6 @@ public class PdxuInstallation {
             appInstallPath = INSTANCE.dataDir;
         }
         INSTANCE.rakalyDir = appInstallPath.resolve("rakaly");
-        INSTANCE.ck3ToEu4Dir = appInstallPath.resolve("ck3toeu4");
 
         Properties props = new Properties();
         if (INSTANCE.production) {
@@ -68,6 +67,13 @@ public class PdxuInstallation {
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
+            }
+
+            if (!Files.exists(INSTANCE.rakalyDir)) {
+                GuiErrorReporter.showErrorMessage(
+                        "The rakaly installation seems to be invalid.",
+                        "This can be caused by a failed update." +
+                                "Please try restarting the Pdx-Unlimiter", true, false);
             }
         } else {
             INSTANCE.version = "dev";
@@ -90,11 +96,6 @@ public class PdxuInstallation {
                     .map(val -> Path.of(val.toString()))
                     .filter(val -> val.isAbsolute() && Files.exists(val))
                     .ifPresent(path -> INSTANCE.rakalyDir = path);
-
-            Optional.ofNullable(props.get("ck3toeu4Dir"))
-                    .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute() && Files.exists(val))
-                    .ifPresent(path -> INSTANCE.ck3ToEu4Dir = path);
         }
 
         INSTANCE.developerMode = Optional.ofNullable(props.get("developerMode"))
@@ -163,10 +164,6 @@ public class PdxuInstallation {
         } else {
             return dir.resolve("bin").resolve("rakaly_mac");
         }
-    }
-
-    public Path getCk3ToEu4Executable() {
-        return ck3ToEu4Dir.resolve("CK3ToEU4Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : ""));
     }
 
     public Path getSettingsLocation() {

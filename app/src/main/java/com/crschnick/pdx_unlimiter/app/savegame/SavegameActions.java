@@ -119,7 +119,6 @@ public class SavegameActions {
                 s.current().getInstallation().startDirectly();
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
-                return;
             }
         }
     }

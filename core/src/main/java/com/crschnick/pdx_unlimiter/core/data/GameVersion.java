@@ -3,7 +3,7 @@ package com.crschnick.pdx_unlimiter.core.data;
 
 import java.util.Comparator;
 
-public class GameVersion implements Comparator<GameVersion> {
+public class GameVersion implements Comparable<GameVersion> {
 
     private int first;
     private int second;
@@ -45,10 +45,10 @@ public class GameVersion implements Comparator<GameVersion> {
     }
 
     @Override
-    public int compare(GameVersion o1, GameVersion o2) {
-        return (o1.first - o2.first) != 0 ? (o1.first - o2.first) :
-                (o1.second - o2.second) != 0 ? (o1.second - o2.second) :
-                        (o1.third - o2.third) != 0 ? (o1.third - o2.third) :
-                                (o1.fourth - o2.fourth);
+    public int compareTo(GameVersion o) {
+        return (first - o.first) != 0 ? (first - o.first) :
+                (second - o.second) != 0 ? (second - o.second) :
+                        (third - o.third) != 0 ? (third - o.third) :
+                                (fourth - o.fourth);
     }
 }

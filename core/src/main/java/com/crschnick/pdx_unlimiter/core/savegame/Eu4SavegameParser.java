@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -23,6 +24,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
+
+    private static final GameVersion MIN_VERSION = new GameVersion(1,28,0,0, null);
 
     private static final byte[] EU4_TEXT_HEADER = "EU4txt".getBytes(StandardCharsets.UTF_8);
     private static final byte[] EU4_BINARY_HEADER = new byte[]{0x45, 0x55, 0x34, 0x62, 0x69, 0x6E};
@@ -63,7 +66,11 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
 
                 var content = in.readAllBytes();
                 var node = TextFormatParser.eu4SavegameParser().parse(content);
-                return new Success<>(false, checksum, node, Eu4SavegameInfo.fromSavegame(melted, node));
+                var info = Eu4SavegameInfo.fromSavegame(melted, node);
+                if (info.version.compareTo(MIN_VERSION) < 0) {
+                    return new Invalid("Savegame version " + info.version + " is not supported");
+                }
+                return new Success<>(false, checksum, node, info);
             } else {
                 var zipFile = new ZipFile(fileToParse.toFile());
                 Node gamestateNode = null;
@@ -106,7 +113,11 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
                 zipFile.close();
 
                 var node = Node.combine(gamestateNode, metaNode, aiNode);
-                return new Success<>(true, checksum, node, Eu4SavegameInfo.fromSavegame(melted, node));
+                var info = Eu4SavegameInfo.fromSavegame(melted, node);
+                if (info.version.compareTo(MIN_VERSION) < 0) {
+                    return new Invalid("Savegame version " + info.version + " is not supported");
+                }
+                return new Success<>(true, checksum, node, info);
             }
         } catch (Exception e) {
             return new Error(e);
