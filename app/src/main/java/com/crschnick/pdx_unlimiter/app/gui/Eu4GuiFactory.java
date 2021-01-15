@@ -12,7 +12,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -84,7 +83,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         box.getStyleClass().add(style);
         box.setSpacing(6);
-        Tooltip.install(box, new Tooltip(tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none)));
+        GuiTooltips.install(box, tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none));
         addNode(pane, box);
     }
 
@@ -132,28 +131,28 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         if (entry.getInfo().isIronman()) {
             var ironman = new StackPane(imageNode(EU4_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
             ironman.setAlignment(Pos.CENTER);
-            Tooltip.install(ironman, new Tooltip("Ironman savegame"));
+            GuiTooltips.install(ironman, "Ironman savegame");
             addNode(grid, ironman);
         }
 
         if (entry.getInfo().isRandomNewWorld()) {
             var rnw = new StackPane(imageNode(EU4_ICON_RANDOM_NEW_WORLD, CLASS_IMAGE_ICON, null));
             rnw.setAlignment(Pos.CENTER);
-            Tooltip.install(rnw, new Tooltip("Random new world enabled"));
+            GuiTooltips.install(rnw, "Random new world enabled");
             addNode(grid, rnw);
         }
 
         if (entry.getInfo().isCustomNationInWorld()) {
             var cn = new StackPane(imageNode(EU4_ICON_CUSTOM_NATION, CLASS_IMAGE_ICON, null));
             cn.setAlignment(Pos.CENTER);
-            Tooltip.install(cn, new Tooltip("A custom nation exists in the world"));
+            GuiTooltips.install(cn, "A custom nation exists in the world");
             addNode(grid, cn);
         }
 
         if (entry.getInfo().isReleasedVassal()) {
             var rv = new StackPane(imageNode(EU4_ICON_RELEASED_VASSAL, CLASS_IMAGE_ICON, null));
             rv.setAlignment(Pos.CENTER);
-            Tooltip.install(rv, new Tooltip("Is playing as a released vassal"));
+            GuiTooltips.install(rv, "Is playing as a released vassal");
             addNode(grid, rv);
         }
 

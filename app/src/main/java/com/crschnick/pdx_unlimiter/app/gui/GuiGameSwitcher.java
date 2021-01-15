@@ -22,7 +22,7 @@ public class GuiGameSwitcher {
             desaturate.setSaturation(-1);
             icon.getStyleClass().add(GuiStyle.CLASS_GAME_ICON);
 
-            Tooltip.install(icon, new Tooltip(integ.getName()));
+            GuiTooltips.install(icon, integ.getName());
             icon.setOnMouseClicked(e -> {
                 SavegameManagerState.get().selectIntegration(integ);
                 SavedState.getInstance().setActiveGame(integ.getInstallation());

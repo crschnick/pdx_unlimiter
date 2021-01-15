@@ -110,7 +110,7 @@ public class GuiSettings {
     }
 
     private static Node installHelpNode(String game) {
-        return help("The " + game + " installation directory.\n\n" +
+        return GuiTooltips.helpNode("The " + game + " installation directory.\n\n" +
                 "Note that this should be the installation directory that contains the game executable and assets.\n" +
                 "NOT the user directory that contains your savegames and mods.");
     }
@@ -120,8 +120,7 @@ public class GuiSettings {
 
         var t = new Text("Installations");
         t.setStyle("-fx-font-weight: bold");
-        TextFlow name = new TextFlow(t);
-        grid.add(name, 0, 0, 2, 1);
+        grid.add(t, 0, 0, 2, 1);
 
         grid.add(installHelpNode("EU4"), 0, 1);
         grid.add(new Label("EU4:"), 1, 1);
@@ -152,17 +151,6 @@ public class GuiSettings {
         return grid;
     }
 
-
-    private static Node help(String text) {
-        Label q = new Label(" ? ");
-        q.setStyle("-fx-border-color: black;");
-        var t = new Tooltip(text);
-        t.setShowDelay(Duration.ZERO);
-        t.setShowDuration(Duration.INDEFINITE);
-        q.setTooltip(t);
-        return q;
-    }
-
     private static Node misc(Settings s) {
         GridPane grid = new GridPane();
 
@@ -173,7 +161,7 @@ public class GuiSettings {
         grid.add(name, 0, 0, 2, 1);
 
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                         The font size within the app.
 
                         If you have a high display resolution, you can turn this up to increase readability."""),
@@ -187,7 +175,7 @@ public class GuiSettings {
         GridPane.setHgrow(slider, Priority.ALWAYS);
 
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                         Specifies whether to automatically update the Pdx-Unlimiter when launching it."""),
                 0, 2);
         grid.add(new Label("Enable auto update:"), 1, 2);
@@ -200,7 +188,7 @@ public class GuiSettings {
         GridPane.setHgrow(eau, Priority.ALWAYS);
 
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                         Specifies whether to ask for confirmation when deleting a campaign or savegame."""),
                 0, 3);
         grid.add(new Label("Confirm deletion:"), 1, 3);
@@ -213,7 +201,7 @@ public class GuiSettings {
         GridPane.setHgrow(cd, Priority.ALWAYS);
 
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                         Specifies whether to start Steam when launching a game through the Pdx-Unlimiter.
 
                         If you disable this, Steam might not register your achievements while playing."""),
@@ -228,7 +216,7 @@ public class GuiSettings {
         GridPane.setHgrow(cb, Priority.ALWAYS);
 
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                 Specifies whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
                               
                 Recommended to keep this disabled while the Pdx-Unlimiter is in beta."""), 0, 5);
@@ -242,7 +230,7 @@ public class GuiSettings {
         GridPane.setHgrow(doi, Priority.ALWAYS);
 
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                 The directory where the Pdx-Unlimiter stores all imported savegames.
                 """), 0, 6);
         grid.add(new Label("Storage directory:"), 1, 6);
@@ -264,7 +252,7 @@ public class GuiSettings {
         TextFlow name = new TextFlow(t);
         grid.add(name, 0, 0, 3, 1);
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                 Your Rakaly.com User ID.
 
                 You can find this by going to the 'Account' page on Rakaly.com.
@@ -278,7 +266,7 @@ public class GuiSettings {
         grid.add(userId, 2, 1);
         GridPane.setHgrow(userId, Priority.ALWAYS);
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                 Your Rakaly.com API key.
 
                 You can generate an API key by going to the 'Account' page on Rakaly.com.
@@ -305,7 +293,7 @@ public class GuiSettings {
         TextFlow name = new TextFlow(t);
         grid.add(name, 0, 0, 3, 1);
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                 Your Skanderbeg.pm API key.
 
                 You can find this by going to the 'API' page on Skanderbeg.pm.
@@ -333,7 +321,7 @@ public class GuiSettings {
         TextFlow name = new TextFlow(t);
         grid.add(name, 0, 0, 3, 1);
 
-        grid.add(help("""
+        grid.add(GuiTooltips.helpNode("""
                 The path to the CK3ToEU4 converter.
                 """), 0, 1);
         grid.add(new Label("CK3 to EU4 converter location:"), 1, 1);

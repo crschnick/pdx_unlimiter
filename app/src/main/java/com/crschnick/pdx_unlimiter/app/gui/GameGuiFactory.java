@@ -107,7 +107,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             prop = new SimpleObjectProperty<>(new Region());
             entry.infoProperty().addListener((c, o, n) -> {
                 prop.set(tagNode(entry));
-                Tooltip.install(prop.get(), new Tooltip());
             });
         } else {
             prop = new SimpleObjectProperty<>(
@@ -151,11 +150,11 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         Label version;
         if (SavegameActions.isVersionCompatible(entry)) {
             version = new Label(entry.getInfo().getVersion().toString());
-            Tooltip.install(version, new Tooltip("Compatible version"));
+            GuiTooltips.install(version, "Compatible version");
             version.getStyleClass().add(CLASS_COMPATIBLE);
         } else {
             version = new Label(entry.getInfo().getVersion().toString());
-            Tooltip.install(version, new Tooltip("Incompatible savegame version"));
+            GuiTooltips.install(version, "Incompatible savegame version");
             version.getStyleClass().add(CLASS_INCOMPATIBLE);
         }
         version.setAlignment(Pos.CENTER);
@@ -165,14 +164,14 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             Label mods = new Label("Mods");
             mods.setGraphic(new FontIcon());
             mods.getStyleClass().add(CLASS_CONTENT);
-            Tooltip.install(mods, new Tooltip(
+            GuiTooltips.install(mods,
                     "Requires the following " + entry.getInfo().getMods().size() + " mods:\n" +
                             entry.getInfo().getMods().stream()
                                     .map(s -> {
                                         var m = installation.getModForName(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
-                                    .collect(Collectors.joining("\n"))));
+                                    .collect(Collectors.joining("\n")));
 
             boolean missing = entry.getInfo().getMods().stream()
                     .map(m -> installation.getModForName(m))
@@ -186,14 +185,14 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             Label dlcs = new Label("DLCs");
             dlcs.setGraphic(new FontIcon());
             dlcs.getStyleClass().add(CLASS_CONTENT);
-            Tooltip.install(dlcs, new Tooltip(
+            GuiTooltips.install(dlcs,
                     "Requires the following " + entry.getInfo().getDlcs().size() + " DLCs:\n" +
                             entry.getInfo().getDlcs().stream()
                                     .map(s -> {
                                         var m = installation.getDlcForName(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
-                                    .collect(Collectors.joining("\n"))));
+                                    .collect(Collectors.joining("\n")));
             boolean missing = entry.getInfo().getDlcs().stream()
                     .map(m -> installation.getDlcForName(m))
                     .anyMatch(Optional::isEmpty);

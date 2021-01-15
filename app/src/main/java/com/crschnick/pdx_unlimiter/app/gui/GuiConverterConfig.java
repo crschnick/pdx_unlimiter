@@ -103,18 +103,6 @@ public class GuiConverterConfig {
         alert.showAndWait();
     }
 
-
-
-    private static javafx.scene.Node help(String text) {
-        Label q = new Label(" ? ");
-        q.setStyle("-fx-border-color: black;");
-        var t = new Tooltip(text);
-        t.setShowDelay(Duration.ZERO);
-        t.setShowDuration(Duration.INDEFINITE);
-        q.setTooltip(t);
-        return q;
-    }
-
     private static javafx.scene.Node createOptionNode(
             Node n,
             Map<String,String> translations,
@@ -124,7 +112,7 @@ public class GuiConverterConfig {
             return grid;
         }
 
-        var h = help(translations.get(n.getNodeForKey("tooltip").getString()));
+        var h = GuiTooltips.helpNode(translations.get(n.getNodeForKey("tooltip").getString()));
         grid.add(h, 0, 0);
 
         var t = new Text(translations.get(n.getNodeForKey("displayName").getString()));
@@ -148,7 +136,7 @@ public class GuiConverterConfig {
                 btn.setSelected(true);
             }
 
-            grid.add(help(translations.get(ro.getNodeForKeyIfExistent("tooltip")
+            grid.add(GuiTooltips.helpNode(translations.get(ro.getNodeForKeyIfExistent("tooltip")
                     .map(Node::getString).orElse(""))), 0, row);
             grid.add(btn, 1, row);
             row++;

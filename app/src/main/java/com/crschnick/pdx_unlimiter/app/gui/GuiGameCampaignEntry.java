@@ -2,11 +2,9 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
@@ -35,7 +33,6 @@ import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -65,7 +62,7 @@ public class GuiGameCampaignEntry {
             }
         });
         del.getStyleClass().add("delete-button");
-        Tooltip.install(del, new Tooltip("Delete savegame"));
+        GuiTooltips.install(del, "Delete savegame");
 
 
         var tagImage =
@@ -89,7 +86,7 @@ public class GuiGameCampaignEntry {
             SavegameActions.meltSavegame(e);
         });
         melt.getStyleClass().add(CLASS_MELT);
-        Tooltip.install(melt, new Tooltip("Melt savegame (convert to non-ironman)"));
+        GuiTooltips.install(melt, "Melt savegame (convert to non-ironman)");
         if (e.getInfo() != null && e.getInfo().isIronman()) {
             buttonBar.getChildren().add(melt);
         } else {
@@ -110,7 +107,7 @@ public class GuiGameCampaignEntry {
                 RakalyHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
             });
             upload.getStyleClass().add(CLASS_UPLOAD);
-            Tooltip.install(upload, new Tooltip("Upload to Rakaly.com"));
+            GuiTooltips.install(upload, "Upload to Rakaly.com");
             buttonBar.getChildren().add(upload);
 
 
@@ -120,7 +117,7 @@ public class GuiGameCampaignEntry {
                 RakalyHelper.analyzeEntry(SavegameCache.EU4, eu4Entry);
             });
             analyze.getStyleClass().add(CLASS_ANALYZE);
-            Tooltip.install(analyze, new Tooltip("Analyze with Rakaly.com"));
+            GuiTooltips.install(analyze, "Analyze with Rakaly.com");
             buttonBar.getChildren().add(analyze);
 
 
@@ -130,7 +127,7 @@ public class GuiGameCampaignEntry {
                 SkanderbegHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
-            Tooltip.install(uploadSkanderbeg, new Tooltip("Upload to Skanderbeg.pm"));
+            GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
@@ -142,7 +139,7 @@ public class GuiGameCampaignEntry {
                 ConverterHelper.convertCk3ToEu4(ck3Entry);
             });
             convert.getStyleClass().add(CLASS_CONVERT);
-            Tooltip.install(convert, new Tooltip("Convert to EU4 savegame"));
+            GuiTooltips.install(convert, "Convert to EU4 savegame");
             buttonBar.getChildren().add(convert);
         }
 
@@ -150,7 +147,7 @@ public class GuiGameCampaignEntry {
             Button open = new JFXButton();
             open.setGraphic(new FontIcon());
             open.getStyleClass().add("open-button");
-            Tooltip.install(open, new Tooltip("Open stored savegame location"));
+            GuiTooltips.install(open, "Open stored savegame location");
             buttonBar.getChildren().add(open);
             open.setOnMouseClicked((m) -> {
                 SavegameActions.openCampaignEntry(e);
