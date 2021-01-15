@@ -240,7 +240,9 @@ public class GameImage {
             pane.getStyleClass().add(styleClass);
         }
 
-        GuiTooltips.install(pane, tt);
+        if (tt != null) {
+            GuiTooltips.install(pane, tt);
+        }
         return pane;
     }
 
