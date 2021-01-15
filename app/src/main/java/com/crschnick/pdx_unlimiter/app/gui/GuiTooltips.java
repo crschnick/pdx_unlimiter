@@ -10,8 +10,7 @@ public class GuiTooltips {
 
     public static Tooltip createTooltip(String text) {
         var tt = new Tooltip(text);
-        tt.styleProperty().setValue("-fx-font-size: " + (Settings.getInstance().getFontSize() - 1) +
-                "pt; -fx-background-color: #333333FF;");
+        tt.styleProperty().setValue("-fx-font-size: 1em; -fx-background-color: #333333FF;");
         return tt;
     }
 

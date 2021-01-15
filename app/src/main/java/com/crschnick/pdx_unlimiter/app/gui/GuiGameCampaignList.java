@@ -76,6 +76,7 @@ public class GuiGameCampaignList {
             SavegameManagerState.get().current().getSavegameCache().addNewFolder("New Folder");
             e.consume();
         });
+        GuiTooltips.install(create, "Create new folder");
         box.getChildren().add(create);
 
         box.getChildren().add(new Separator(Orientation.VERTICAL));
@@ -91,6 +92,7 @@ public class GuiGameCampaignList {
         deepSearch.getStyleClass().add(GuiStyle.CLASS_RECURSIVE);
         deepSearch.setGraphic(new FontIcon());
         deepSearch.selectedProperty().bindBidirectional(SavegameManagerState.get().getFilter().deepSearchProperty());
+        GuiTooltips.install(deepSearch, "Include individual savegame names in search");
         box.getChildren().add(deepSearch);
         return box;
     }
