@@ -36,13 +36,8 @@ public class SavedState {
     private static SavedState loadConfig(Path file) {
         JsonNode sNode;
         if (Files.exists(file)) {
-            try {
-                JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
-                sNode = node.required("state");
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-                sNode = JsonNodeFactory.instance.objectNode();
-            }
+            JsonNode node = ConfigHelper.readConfig(file);
+            sNode = Optional.ofNullable(node.get("state")).orElse(JsonNodeFactory.instance.objectNode());
         } else {
             sNode = JsonNodeFactory.instance.objectNode();
         }

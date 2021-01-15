@@ -8,8 +8,10 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +38,7 @@ public class ConfigHelper {
         GuiErrorReporter.showSimpleErrorMessage("The config file " + in.toString() +
                 " could not be read. Trying to revert to a backup");
         var backupFile = in.resolveSibling(
-                FilenameUtils.getBaseName(in.toString()) + "_old" + FilenameUtils.getExtension(in.toString()));
+                FilenameUtils.getBaseName(in.toString()) + "_old." + FilenameUtils.getExtension(in.toString()));
         if (Files.exists(backupFile)) {
             ObjectMapper o = new ObjectMapper();
             try {
@@ -44,14 +46,18 @@ public class ConfigHelper {
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
+        } else {
+            GuiErrorReporter.showSimpleErrorMessage("Backup config does not exist. Using blank config");
+            return JsonNodeFactory.instance.objectNode();
         }
+
         if (node != null) {
             return node;
         }
 
-        ErrorHandler.handleTerminalException(new IOException("The backup config file " + backupFile.toString() +
-                " could also not be read."));
-        return null;
+        GuiErrorReporter.showSimpleErrorMessage("The backup config file " + backupFile.toString() +
+                " could also not be read.");
+        return JsonNodeFactory.instance.objectNode();
     }
 
     public static void writeConfig(Path out, JsonNode node) {
@@ -82,7 +88,7 @@ public class ConfigHelper {
 
             if (!newContent.equals(currentContent)) {
                 var backupFile = out.resolveSibling(
-                        FilenameUtils.getBaseName(out.toString()) + "_old" + FilenameUtils.getExtension(out.toString()));
+                        FilenameUtils.getBaseName(out.toString()) + "_old." + FilenameUtils.getExtension(out.toString()));
                 Files.writeString(backupFile, currentContent);
                 Files.writeString(out, newContent);
             }

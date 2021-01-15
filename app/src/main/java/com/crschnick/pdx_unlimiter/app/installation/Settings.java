@@ -134,13 +134,8 @@ public class Settings {
     private static Settings loadConfig(Path file) {
         JsonNode sNode;
         if (Files.exists(file)) {
-            try {
-                JsonNode node = new ObjectMapper().readTree(Files.readAllBytes(file));
-                sNode = node.required("settings");
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-                sNode = JsonNodeFactory.instance.objectNode();
-            }
+            JsonNode node = ConfigHelper.readConfig(file);
+            sNode = Optional.ofNullable(node.get("settings")).orElse(JsonNodeFactory.instance.objectNode());
         } else {
             sNode = JsonNodeFactory.instance.objectNode();
         }
