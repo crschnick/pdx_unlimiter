@@ -76,7 +76,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             }
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
-            e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "monarch", "queen").get();
+            e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag),
+                    "monarch_heir", "monarch", "queen").get();
             e.heir = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "heir");
             for (Node dep : n.getNodeForKey("diplomacy").getNodesForKey("dependency")) {
                 String first = dep.getNodeForKey("first").getString();
@@ -229,12 +230,14 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     public static class Ruler {
 
         private String name;
+        private String fullName;
         private int adm;
         private int dip;
         private int mil;
 
-        public Ruler(String name, int adm, int dip, int mil) {
+        public Ruler(String name, String fullName, int adm, int dip, int mil) {
             this.name = name;
+            this.fullName = fullName;
             this.adm = adm;
             this.dip = dip;
             this.mil = mil;
@@ -248,7 +251,21 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     if (GameDateType.EU4.isDate(kv.getKeyName()) && kv.getNode().hasKey(type)) {
                         // Sometimes there are multiple monarchs in one event Node ... wtf?
                         Node r = kv.getNode().getNodesForKey(type).get(0);
-                        current = Optional.of(new Ruler(r.getNodeForKey("name").getString(),
+
+                        // Exclude queen consorts
+                        if (r.hasKey("consort")) {
+                            continue;
+                        }
+
+                        String name = r.getNodeForKey("name").getString();
+                        String fullName = name;
+                        if (r.hasKey("dynasty")) {
+                            fullName = name + " " + r.getNodeForKey("dynasty").getString();
+                        }
+
+                        current = Optional.of(new Ruler(
+                                name,
+                                fullName,
                                 r.getNodeForKey("ADM").getInteger(),
                                 r.getNodeForKey("DIP").getInteger(),
                                 r.getNodeForKey("MIL").getInteger()));
@@ -260,6 +277,10 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
         public String getName() {
             return name;
+        }
+
+        public String getFullName() {
+            return fullName;
         }
 
         public int getAdm() {

@@ -41,6 +41,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.alignmentProperty().set(Pos.CENTER);
         box.getChildren().add(createRulerStatsNode(ruler));
         box.getStyleClass().add(CLASS_RULER);
+        GuiTooltips.install(box, ruler.getFullName());
         return box;
     }
 
