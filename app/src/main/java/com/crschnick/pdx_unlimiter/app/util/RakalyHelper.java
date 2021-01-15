@@ -44,6 +44,7 @@ public class RakalyHelper {
         }
         Path temp = FileUtils.getTempDirectory().toPath()
                 .resolve("pdxu").resolve("melted." + FilenameUtils.getExtension(file.toString()));
+        FileUtils.forceMkdirParent(temp.toFile());
         Files.write(temp, b);
         return temp;
     }
