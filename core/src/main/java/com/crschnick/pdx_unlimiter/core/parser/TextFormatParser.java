@@ -74,9 +74,9 @@ public class TextFormatParser extends FormatParser {
             if (marksEndOfPreviousToken) {
                 var sub = Arrays.copyOfRange(bytes, prev, i);
                 if (sub[0] == '"' && sub[sub.length - 1] == '"') {
-                    tokens.add(new ValueToken(new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
+                    tokens.add(new ValueToken(true, new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
                 } else {
-                    tokens.add(new ValueToken(new String(sub, StandardCharsets.UTF_8)));
+                    tokens.add(new ValueToken(false, new String(sub, StandardCharsets.UTF_8)));
                 }
             }
 

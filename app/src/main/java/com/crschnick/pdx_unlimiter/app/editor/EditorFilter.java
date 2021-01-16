@@ -3,28 +3,46 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
+import javafx.beans.Observable;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EditorFilter {
 
-    private enum Scope {
+    public enum Scope {
         KEY,
         VALUE,
         BOTH
     }
 
-    private String filterString;
-    private boolean recursive;
-    private boolean caseSensitive;
-    private Scope scope;
+    private EditorState state;
+    private StringProperty filterString;
+    private BooleanProperty deep;
+    private BooleanProperty caseSensitive;
+    private ObjectProperty<Scope> scope;
+
+    EditorFilter(EditorState state) {
+        this.state = state;
+
+        filterString = new SimpleStringProperty("");
+        filterString.addListener((c, o, n) -> state.update());
+        deep = new SimpleBooleanProperty();
+        deep.addListener((c, o, n) -> state.update());
+        caseSensitive = new SimpleBooleanProperty();
+        caseSensitive.addListener((c, o, n) -> state.update());
+        scope = new SimpleObjectProperty<>(Scope.KEY);
+        scope.addListener((c, o, n) -> state.update());
+    }
 
     private boolean contains(String s) {
-        if (caseSensitive) {
-            return s.contains(filterString);
+        if (caseSensitive.get()) {
+            return s.contains(filterString.get());
         } else {
-            return s.toLowerCase().contains(filterString.toLowerCase());
+            return s.toLowerCase().contains(filterString.get().toLowerCase());
         }
     }
 
@@ -32,15 +50,18 @@ public class EditorFilter {
         return input.stream().filter(n -> {
             if (n instanceof KeyValueNode) {
                 var kv = n.getKeyValueNode();
-                if ((scope == Scope.KEY || scope == Scope.BOTH) && contains(kv.getKeyName())) {
+                if ((scope.get() == Scope.KEY || scope.get()  == Scope.BOTH) && contains(kv.getKeyName())) {
                     return true;
                 }
-                if (filter(List.of(kv.getNode())).size() > 0) {
+                else if ((scope.get() == Scope.VALUE || scope.get()  == Scope.BOTH) &&
+                        filter(List.of(kv.getNode())).size() > 0) {
                     return true;
+                } else {
+                    return false;
                 }
             }
 
-            if (n instanceof ValueNode && (scope == Scope.VALUE || scope == Scope.BOTH)) {
+            if (n instanceof ValueNode && (scope.get()  == Scope.VALUE || scope.get()  == Scope.BOTH)) {
                 var v = n.getString();
                 return contains(v);
             }
@@ -49,22 +70,34 @@ public class EditorFilter {
     }
 
     public String getFilterString() {
+        return filterString.get();
+    }
+
+    public StringProperty filterStringProperty() {
         return filterString;
     }
 
-    public void setFilterString(String filterString) {
-        this.filterString = filterString;
+    public boolean isDeep() {
+        return deep.get();
     }
 
-    public void setRecursive(boolean recursive) {
-        this.recursive = recursive;
+    public BooleanProperty deepProperty() {
+        return deep;
     }
 
-    public void setCaseSensitive(boolean caseSensitive) {
-        this.caseSensitive = caseSensitive;
+    public boolean isCaseSensitive() {
+        return caseSensitive.get();
     }
 
-    public void setScope(Scope scope) {
-        this.scope = scope;
+    public BooleanProperty caseSensitiveProperty() {
+        return caseSensitive;
+    }
+
+    public Scope getScope() {
+        return scope.get();
+    }
+
+    public ObjectProperty<Scope> scopeProperty() {
+        return scope;
     }
 }

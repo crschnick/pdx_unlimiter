@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.editor.EditorExternalState;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
@@ -89,6 +90,7 @@ public class ComponentManager {
             SavegameManagerState.init();
 
             FileWatchManager.init();
+            EditorExternalState.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }

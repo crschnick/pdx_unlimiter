@@ -9,5 +9,6 @@ public class GuiEditorFactory {
         if (n instanceof ArrayNode) {
 
         }
+        return null;
     }
 }

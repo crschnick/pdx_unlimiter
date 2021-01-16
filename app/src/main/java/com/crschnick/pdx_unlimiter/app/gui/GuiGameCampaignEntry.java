@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
@@ -12,9 +13,7 @@ import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
 import com.jfoenix.controls.JFXSpinner;
@@ -49,20 +48,27 @@ public class GuiGameCampaignEntry {
         Label l = new Label(e.getDate().toDisplayString());
         l.getStyleClass().add(CLASS_DATE);
 
+
+        HBox buttonBar = new HBox();
+        buttonBar.setAlignment(Pos.CENTER);
+
         JFXTextField name = new JFXTextField();
         name.getStyleClass().add(CLASS_TEXT_FIELD);
         name.setAlignment(Pos.CENTER);
         name.textProperty().bindBidirectional(e.nameProperty());
 
-        Button del = new JFXButton();
-        del.setGraphic(new FontIcon());
-        del.setOnMouseClicked((m) -> {
-            if (DialogHelper.showSavegameDeleteDialog()) {
-                SavegameManagerState.get().<T,I>current().getSavegameCache().delete(e);
-            }
-        });
-        del.getStyleClass().add("delete-button");
-        GuiTooltips.install(del, "Delete savegame");
+        {
+            Button del = new JFXButton();
+            del.setGraphic(new FontIcon());
+            del.setOnMouseClicked((m) -> {
+                if (DialogHelper.showSavegameDeleteDialog()) {
+                    SavegameManagerState.get().<T, I>current().getSavegameCache().delete(e);
+                }
+            });
+            del.getStyleClass().add("delete-button");
+            GuiTooltips.install(del, "Delete savegame");
+            buttonBar.getChildren().add(del);
+        }
 
 
         var tagImage =
@@ -76,9 +82,6 @@ public class GuiGameCampaignEntry {
                 tagPane.getChildren().set(0, n);
             });
         });
-
-        HBox buttonBar = new HBox();
-        buttonBar.setAlignment(Pos.CENTER);
 
         Button melt = new JFXButton();
         melt.setGraphic(new FontIcon());
@@ -154,8 +157,28 @@ public class GuiGameCampaignEntry {
             });
         }
 
+        {
+            Button edit = new JFXButton();
+            edit.setGraphic(new FontIcon());
+            edit.setOnMouseClicked((m) -> {
+                Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
+                        SavegameManagerState.get().<T,I>current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
+            });
+            edit.getStyleClass().add(CLASS_MELT);
+            GuiTooltips.install(edit, "Edit savegame");
 
-        buttonBar.getChildren().add(del);
+            if (e.getInfo() != null) {
+                buttonBar.getChildren().add(edit);
+            } else {
+                e.infoProperty().addListener((c, o, n) -> {
+                    if (n.isIronman()) {
+                        Platform.runLater(() -> {
+                            buttonBar.getChildren().add(edit);
+                        });
+                    }
+                });
+            }
+        }
 
 
         BorderPane layout = new BorderPane();

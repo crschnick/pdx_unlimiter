@@ -48,8 +48,9 @@ public abstract class FormatParser {
 
     private Map.Entry<Node, Integer> createNode(List<Token> tokens, int index) {
         if (tokens.get(index).getType() == TokenType.VALUE) {
-            String obj = ((ValueToken) tokens.get(index)).value;
-            return new AbstractMap.SimpleEntry<>(new ValueNode(obj), index + 1);
+            var valToken = ((ValueToken) tokens.get(index));
+            String obj = valToken.value;
+            return new AbstractMap.SimpleEntry<>(new ValueNode(valToken.quoted, obj), index + 1);
         }
 
         List<Node> childs = new ArrayList<>();
@@ -101,10 +102,12 @@ public abstract class FormatParser {
 
     public class ValueToken extends Token {
 
+        boolean quoted;
         String value;
 
-        public ValueToken(String v) {
-            value = v;
+        public ValueToken(boolean quoted, String value) {
+            this.quoted = quoted;
+            this.value = value;
         }
 
         @Override
