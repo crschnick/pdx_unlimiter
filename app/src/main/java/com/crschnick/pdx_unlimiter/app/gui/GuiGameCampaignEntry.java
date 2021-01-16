@@ -131,7 +131,7 @@ public class GuiGameCampaignEntry {
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
-        if (SavegameCache.CK3.contains(e)) {
+        if (SavegameCache.CK3 != null && SavegameCache.CK3.contains(e)) {
             GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (GameCampaignEntry<Ck3Tag, Ck3SavegameInfo>) e;
             Button convert = new JFXButton();
             convert.setGraphic(new FontIcon());
