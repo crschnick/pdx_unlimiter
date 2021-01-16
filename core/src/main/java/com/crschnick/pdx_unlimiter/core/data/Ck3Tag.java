@@ -1,11 +1,9 @@
 package com.crschnick.pdx_unlimiter.core.data;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ck3Tag {
@@ -31,6 +29,7 @@ public class Ck3Tag {
 
         var titles = landedTitles.getNodeForKey("landed_titles").getNodeArray().stream()
                 .map(n -> Title.fromNode(n, coas))
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
         Map<Integer, Title> titleIds = titles.stream().collect(Collectors.toMap(t -> t.id, t -> t));
@@ -96,15 +95,18 @@ public class Ck3Tag {
             this.coatOfArms = coatOfArms;
         }
 
-        public static Title fromNode(Node kv, List<CoatOfArms> coas) {
+        public static Optional<Title> fromNode(Node kv, List<CoatOfArms> coas) {
             var kvn = kv.getKeyValueNode();
             var n = kvn.getNode();
+            if (n instanceof ValueNode && n.getString().equals("none")) {
+                return Optional.empty();
+            }
 
             var id = Integer.parseInt(kvn.getKeyName());
             var name = n.getNodeForKey("name").getString();
             var coaId = n.getNodeForKey("coat_of_arms_id").getInteger();
             var coatOfArms = coas.stream().filter(c -> c.id == coaId).findFirst().get();
-            return new Title(id, name, coatOfArms);
+            return Optional.of(new Title(id, name, coatOfArms));
         }
 
         public int getId() {
