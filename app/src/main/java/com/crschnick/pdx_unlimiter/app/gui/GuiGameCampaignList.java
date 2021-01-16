@@ -87,13 +87,6 @@ public class GuiGameCampaignList {
         });
         filter.textProperty().bindBidirectional(SavegameManagerState.get().getFilter().filterProperty());
         box.getChildren().add(filter);
-
-        ToggleButton deepSearch = new ToggleButton();
-        deepSearch.getStyleClass().add(GuiStyle.CLASS_RECURSIVE);
-        deepSearch.setGraphic(new FontIcon());
-        deepSearch.selectedProperty().bindBidirectional(SavegameManagerState.get().getFilter().deepSearchProperty());
-        GuiTooltips.install(deepSearch, "Include individual savegame names in search");
-        box.getChildren().add(deepSearch);
         return box;
     }
 }

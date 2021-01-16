@@ -18,13 +18,9 @@ public class SavegameManagerState {
 
     public class Filter {
         private StringProperty filter = new SimpleStringProperty("");
-        private BooleanProperty deepSearch = new SimpleBooleanProperty(false);
 
         private Filter() {
             filter.addListener((c,o,n) -> {
-                SavegameManagerState.this.updateShownCollections();
-            });
-            deepSearch.addListener((c,o,n) -> {
                 SavegameManagerState.this.updateShownCollections();
             });
         }
@@ -37,20 +33,12 @@ public class SavegameManagerState {
             return filter;
         }
 
-        public boolean isDeepSearch() {
-            return deepSearch.get();
-        }
-
-        public BooleanProperty deepSearchProperty() {
-            return deepSearch;
-        }
-
         public boolean shouldShow(SavegameCollection<?,?> col) {
             if (col.getName().toLowerCase().contains(filter.get().toLowerCase())) {
                 return true;
             }
 
-            return deepSearch.get() && col.getSavegames().stream()
+            return col.getSavegames().stream()
                     .anyMatch(e -> e.getName().toLowerCase().contains(filter.get().toLowerCase()));
         }
     }
