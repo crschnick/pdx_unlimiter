@@ -66,7 +66,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T,I> collection, GameCampaignEntry<T,I> entry) {
         SavegameManagerState s = SavegameManagerState.get();
-        s.<T,I>current().getSavegameCache().moveEntry(collection, entry);
+        s.<T,I>current().getSavegameCache().moveEntryAsync(collection, entry);
         SavegameManagerState.get().selectEntry(entry);
     }
 

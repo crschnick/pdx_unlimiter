@@ -320,7 +320,14 @@ public abstract class SavegameCache<
                 "Could not find savegame collection for entry " + e.getName()));
     }
 
-    public synchronized void moveEntry(
+    public synchronized void moveEntryAsync(
+            SavegameCollection<T,I> to, GameCampaignEntry<T,I> entry) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            moveEntry(to, entry);
+        }, true);
+    }
+
+    private synchronized void moveEntry(
             SavegameCollection<T,I> to, GameCampaignEntry<T,I> entry) {
         var from = getSavegameCollection(entry);
         if (from == to) {
