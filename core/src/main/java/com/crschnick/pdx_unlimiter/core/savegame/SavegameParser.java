@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
 import java.io.IOException;
@@ -8,9 +7,33 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.function.UnaryOperator;
 
 public abstract class SavegameParser<I extends SavegameInfo<?>> {
+
+    public abstract Status parse(Path input, Melter melter);
+
+    public String checksum(byte[] content) {
+        MessageDigest d = null;
+        try {
+            d = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("MD5 missing!");
+        }
+        d.update(content);
+        StringBuilder c = new StringBuilder();
+        ByteBuffer b = ByteBuffer.wrap(d.digest());
+        for (int i = 0; i < 16; i++) {
+            var hex = String.format("%02x", b.get());
+            c.append(hex);
+        }
+        String checksum = c.toString();
+        return checksum;
+    }
+
+    @FunctionalInterface
+    public static interface Melter {
+        Path melt(Path input) throws IOException;
+    }
 
     public static abstract class Status {
 
@@ -62,33 +85,13 @@ public abstract class SavegameParser<I extends SavegameInfo<?>> {
 
     public static abstract class StatusVisitor<I extends SavegameInfo<?>> {
 
-        public void success(Success<I> s) {}
-        public void error(Error e) {}
-        public void invalid(Invalid iv) {}
-    }
-
-    @FunctionalInterface
-    public static interface Melter {
-        Path melt(Path input) throws IOException;
-    }
-
-    public abstract Status parse(Path input, Melter melter);
-
-    public String checksum(byte[] content) {
-        MessageDigest d = null;
-        try {
-            d = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("MD5 missing!");
+        public void success(Success<I> s) {
         }
-        d.update(content);
-        StringBuilder c = new StringBuilder();
-        ByteBuffer b = ByteBuffer.wrap(d.digest());
-        for (int i = 0; i < 16; i++) {
-            var hex = String.format("%02x", b.get());
-            c.append(hex);
+
+        public void error(Error e) {
         }
-        String checksum = c.toString();
-        return checksum;
+
+        public void invalid(Invalid iv) {
+        }
     }
 }

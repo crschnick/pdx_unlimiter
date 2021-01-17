@@ -1,14 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
-import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,9 +17,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-public class GuiGameCampaignEntryList {
+public class GuiSavegameList {
 
     private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
         Consumer<Set<? extends SavegameCollection<?, ?>>> update = (s) -> {
@@ -56,7 +50,7 @@ public class GuiGameCampaignEntryList {
     public static void createCampaignEntryList(Pane pane) {
         ListView<Node> grid = GuiListView.createViewOfList(
                 SavegameManagerState.get().getShownEntries(),
-                GuiGameCampaignEntry::createCampaignEntryNode,
+                GuiSavegame::createCampaignEntryNode,
                 SavegameManagerState.get().globalSelectedEntryProperty());
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);

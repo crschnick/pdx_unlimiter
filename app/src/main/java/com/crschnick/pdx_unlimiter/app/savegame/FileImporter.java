@@ -2,10 +2,8 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.installation.*;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

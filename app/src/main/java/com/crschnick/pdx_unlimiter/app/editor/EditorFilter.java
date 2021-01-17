@@ -3,28 +3,18 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
-import javafx.beans.Observable;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EditorFilter {
 
-    public enum Scope {
-        KEY,
-        VALUE,
-        BOTH
-    }
-
     private EditorState state;
     private StringProperty filterString;
     private BooleanProperty deep;
     private BooleanProperty caseSensitive;
     private ObjectProperty<Scope> scope;
-
     EditorFilter(EditorState state) {
         this.state = state;
 
@@ -50,10 +40,9 @@ public class EditorFilter {
         return input.stream().filter(n -> {
             if (n instanceof KeyValueNode) {
                 var kv = n.getKeyValueNode();
-                if ((scope.get() == Scope.KEY || scope.get()  == Scope.BOTH) && contains(kv.getKeyName())) {
+                if ((scope.get() == Scope.KEY || scope.get() == Scope.BOTH) && contains(kv.getKeyName())) {
                     return true;
-                }
-                else if ((scope.get() == Scope.VALUE || scope.get()  == Scope.BOTH) &&
+                } else if ((scope.get() == Scope.VALUE || scope.get() == Scope.BOTH) &&
                         filter(List.of(kv.getNode())).size() > 0) {
                     return true;
                 } else {
@@ -61,7 +50,7 @@ public class EditorFilter {
                 }
             }
 
-            if (n instanceof ValueNode && (scope.get()  == Scope.VALUE || scope.get()  == Scope.BOTH)) {
+            if (n instanceof ValueNode && (scope.get() == Scope.VALUE || scope.get() == Scope.BOTH)) {
                 var v = n.getString();
                 return contains(v);
             }
@@ -99,5 +88,11 @@ public class EditorFilter {
 
     public ObjectProperty<Scope> scopeProperty() {
         return scope;
+    }
+
+    public enum Scope {
+        KEY,
+        VALUE,
+        BOTH
     }
 }

@@ -65,6 +65,7 @@ public class GuiStyle {
     public static String CLASS_FOLDER = "folder";
     public static String CLASS_CAMPAIGN_TOP_BAR = "campaign-top-bar";
     public static String CLASS_CONTENT_DIALOG = "content-dialog";
+    public static String CLASS_EDIT = "edit-button";
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",

@@ -1,14 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -17,13 +15,11 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class GuiLayout {
 
@@ -37,10 +33,10 @@ public class GuiLayout {
 
         Pane pane = new Pane(new Label());
         layout.setCenter(pane);
-        GuiGameCampaignEntryList.createCampaignEntryList(pane);
+        GuiSavegameList.createCampaignEntryList(pane);
         layout.setCenter(pane);
 
-        layout.setLeft(GuiGameCampaignList.createCampaignList());
+        layout.setLeft(GuiSavegameCollectionList.createCampaignList());
         BorderPane.setAlignment(pane, Pos.CENTER);
 
         layout.setOnDragOver(event -> {

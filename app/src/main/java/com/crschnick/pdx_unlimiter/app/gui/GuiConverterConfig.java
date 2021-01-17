@@ -1,8 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.installation.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -10,20 +8,14 @@ import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.jfoenix.controls.JFXRadioButton;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
-import javafx.geometry.VPos;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -105,8 +97,8 @@ public class GuiConverterConfig {
 
     private static javafx.scene.Node createOptionNode(
             Node n,
-            Map<String,String> translations,
-            Map<String,String> values) {
+            Map<String, String> translations,
+            Map<String, String> values) {
         GridPane grid = new GridPane();
         if (n.getNodeForKeyIfExistent("radioSelector").isEmpty()) {
             return grid;
@@ -148,9 +140,9 @@ public class GuiConverterConfig {
         return grid;
     }
 
-    public static boolean showConfig(Map<String,String> values) {
+    public static boolean showConfig(Map<String, String> values) {
         Node configNode;
-        Map<String,String> translations;
+        Map<String, String> translations;
         try {
             configNode = TextFormatParser.textFileParser().parse(Files.readAllBytes(
                     Settings.getInstance().getCk3toEu4Dir().get()
@@ -172,10 +164,10 @@ public class GuiConverterConfig {
         val.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-            ThreadHelper.open(Settings.getInstance().getCk3toEu4Dir().get()
-                    .resolve("CK3toEU4").resolve("configurables"));
-            e.consume();
-        });
+                    ThreadHelper.open(Settings.getInstance().getCk3toEu4Dir().get()
+                            .resolve("CK3toEU4").resolve("configurables"));
+                    e.consume();
+                });
 
         alert.setTitle("Converter settings");
         alert.initModality(Modality.NONE);

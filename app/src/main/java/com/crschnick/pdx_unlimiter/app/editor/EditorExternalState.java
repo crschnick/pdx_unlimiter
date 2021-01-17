@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -17,37 +16,9 @@ import java.util.*;
 
 public class EditorExternalState {
 
-    public static class Entry {
-        private Path file;
-        private EditorNode editorNode;
-        private EditorState state;
-
-        public Entry(Path file, EditorNode editorNode, EditorState state) {
-            this.file = file;
-            this.editorNode = editorNode;
-            this.state = state;
-        }
-
-        public void update(Node newNode) {
-            if (editorNode.isSynthetic()) {
-                editorNode.getParent().getNode().getNodeArray().removeIf(n -> n instanceof KeyValueNode &&
-                        n.getKeyValueNode().getKeyName().equals(editorNode.getKeyName().get()));
-
-                editorNode.getParent().getNode().getNodeArray().addAll(newNode.getNodeArray());
-                return;
-            }
-
-            editorNode.getKeyName().ifPresentOrElse(s -> {
-                editorNode.getParent().getNode().getNodeArray().set(editorNode.getKeyIndex(),
-                        KeyValueNode.create(s, newNode));
-            }, () -> {
-                editorNode.getParent().getNode().getNodeArray().set(editorNode.getKeyIndex(), newNode);
-            });
-        }
-    }
-
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
+    private Set<Entry> openEntries = new HashSet<>();
 
     public static void init() {
         try {
@@ -91,8 +62,6 @@ public class EditorExternalState {
         return Optional.empty();
     }
 
-    private Set<Entry> openEntries = new HashSet<>();
-
     public void startEdit(EditorState state, EditorNode node) {
         Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
 
@@ -102,6 +71,35 @@ public class EditorExternalState {
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
+        }
+    }
+
+    public static class Entry {
+        private Path file;
+        private EditorNode editorNode;
+        private EditorState state;
+
+        public Entry(Path file, EditorNode editorNode, EditorState state) {
+            this.file = file;
+            this.editorNode = editorNode;
+            this.state = state;
+        }
+
+        public void update(Node newNode) {
+            if (editorNode.isSynthetic()) {
+                editorNode.getParent().getNode().getNodeArray().removeIf(n -> n instanceof KeyValueNode &&
+                        n.getKeyValueNode().getKeyName().equals(editorNode.getKeyName().get()));
+
+                editorNode.getParent().getNode().getNodeArray().addAll(newNode.getNodeArray());
+                return;
+            }
+
+            editorNode.getKeyName().ifPresentOrElse(s -> {
+                editorNode.getParent().getNode().getNodeArray().set(editorNode.getKeyIndex(),
+                        KeyValueNode.create(s, newNode));
+            }, () -> {
+                editorNode.getParent().getNode().getNodeArray().set(editorNode.getKeyIndex(), newNode);
+            });
         }
     }
 }

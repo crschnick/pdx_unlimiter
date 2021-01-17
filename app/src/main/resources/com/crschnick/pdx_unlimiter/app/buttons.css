@@ -14,6 +14,10 @@
     -fx-icon-code: "mdi-delete";
 }
 
+.edit-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-table-edit";
+}
+
 .achievement-button .ikonli-font-icon {
     -fx-icon-code: "mdi-trophy";
 }

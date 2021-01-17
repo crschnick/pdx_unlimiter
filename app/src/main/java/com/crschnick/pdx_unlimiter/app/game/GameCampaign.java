@@ -6,19 +6,18 @@ import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.image.Image;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class GameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T,I> {
+public final class GameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
     private volatile ObjectProperty<GameDate> date;
     private ObjectProperty<Image> image;

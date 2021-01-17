@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.Objects;

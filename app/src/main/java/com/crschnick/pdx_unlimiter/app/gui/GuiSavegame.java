@@ -3,11 +3,11 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
@@ -23,10 +23,11 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -37,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
-public class GuiGameCampaignEntry {
+public class GuiSavegame {
 
 
     public static <T, I extends SavegameInfo<T>> Node createCampaignEntryNode(GameCampaignEntry<T, I> e) {
@@ -48,27 +49,10 @@ public class GuiGameCampaignEntry {
         Label l = new Label(e.getDate().toDisplayString());
         l.getStyleClass().add(CLASS_DATE);
 
-
-        HBox buttonBar = new HBox();
-        buttonBar.setAlignment(Pos.CENTER);
-
         JFXTextField name = new JFXTextField();
         name.getStyleClass().add(CLASS_TEXT_FIELD);
         name.setAlignment(Pos.CENTER);
         name.textProperty().bindBidirectional(e.nameProperty());
-
-        {
-            Button del = new JFXButton();
-            del.setGraphic(new FontIcon());
-            del.setOnMouseClicked((m) -> {
-                if (DialogHelper.showSavegameDeleteDialog()) {
-                    SavegameManagerState.<T, I>get().current().getSavegameCache().delete(e);
-                }
-            });
-            del.getStyleClass().add("delete-button");
-            GuiTooltips.install(del, "Delete savegame");
-            buttonBar.getChildren().add(del);
-        }
 
 
         var tagImage =
@@ -83,23 +67,82 @@ public class GuiGameCampaignEntry {
             });
         });
 
-        Button melt = new JFXButton();
-        melt.setGraphic(new FontIcon());
-        melt.setOnMouseClicked((m) -> {
-            SavegameActions.meltSavegame(e);
-        });
-        melt.getStyleClass().add(CLASS_MELT);
-        GuiTooltips.install(melt, "Melt savegame (convert to non-ironman)");
-        if (e.getInfo() != null && e.getInfo().isIronman()) {
-            buttonBar.getChildren().add(melt);
-        } else {
-            e.infoProperty().addListener((c,o,n) -> {
-                if (n.isIronman()) {
-                    Platform.runLater(() -> {
-                        buttonBar.getChildren().add(0, melt);
-                    });
-                }
+
+        BorderPane layout = new BorderPane();
+        layout.setLeft(tagBar);
+        layout.setCenter(name);
+
+
+        HBox buttonBar = new HBox();
+        buttonBar.setAlignment(Pos.CENTER);
+        createButtonBar(e, buttonBar);
+        buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
+        layout.setRight(buttonBar);
+
+        tagBar.setAlignment(Pos.CENTER);
+        layout.getStyleClass().add(CLASS_ENTRY_BAR);
+        main.getChildren().add(layout);
+        Node content = createSavegameInfoNode(e);
+
+        InvalidationListener lis = (change) -> {
+            Platform.runLater(() -> {
+                layout.setBackground(
+                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e));
             });
+        };
+        e.infoProperty().addListener(lis);
+        if (e.infoProperty().isNotNull().get()) {
+            lis.invalidated(null);
+        }
+
+        main.getChildren().add(content);
+        main.getStyleClass().add(CLASS_ENTRY);
+        main.setOnMouseClicked(event -> {
+            if (e.infoProperty().isNotNull().get()) {
+                SavegameManagerState.<T, I>get().selectEntry(e);
+            }
+        });
+
+        main.setOnDragDetected(me -> {
+            Dragboard db = main.startDragAndDrop(TransferMode.COPY);
+            var sc = SavegameManagerState.<T, I>get().current().getSavegameCache();
+            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
+            try {
+                sc.exportSavegame(e, out);
+            } catch (IOException ioException) {
+                ErrorHandler.handleException(ioException);
+                me.consume();
+                return;
+            }
+
+            var cc = new ClipboardContent();
+            cc.putFiles(List.of(out.toFile()));
+            db.setContent(cc);
+            me.consume();
+        });
+        return main;
+    }
+
+    private static <T, I extends SavegameInfo<T>> void createButtonBar(GameCampaignEntry<T, I> e, HBox buttonBar) {
+        {
+            Button melt = new JFXButton();
+            melt.setGraphic(new FontIcon());
+            melt.setOnMouseClicked((m) -> {
+                SavegameActions.meltSavegame(e);
+            });
+            melt.getStyleClass().add(CLASS_MELT);
+            GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
+            if (e.getInfo() != null && e.getInfo().isIronman()) {
+                buttonBar.getChildren().add(melt);
+            } else {
+                e.infoProperty().addListener((c, o, n) -> {
+                    if (n.isIronman()) {
+                        Platform.runLater(() -> {
+                            buttonBar.getChildren().add(0, melt);
+                        });
+                    }
+                });
+            }
         }
 
         if (SavegameCache.EU4.contains(e)) {
@@ -164,7 +207,7 @@ public class GuiGameCampaignEntry {
                 Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
                         SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
             });
-            edit.getStyleClass().add(CLASS_MELT);
+            edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
 
             if (e.getInfo() != null) {
@@ -173,63 +216,25 @@ public class GuiGameCampaignEntry {
                 e.infoProperty().addListener((c, o, n) -> {
                     if (!n.isIronman()) {
                         Platform.runLater(() -> {
-                            buttonBar.getChildren().add(edit);
+                            buttonBar.getChildren().add(0, edit);
                         });
                     }
                 });
             }
         }
 
-
-        BorderPane layout = new BorderPane();
-        layout.setLeft(tagBar);
-        layout.setCenter(name);
-
-        buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
-        layout.setRight(buttonBar);
-
-        tagBar.setAlignment(Pos.CENTER);
-        layout.getStyleClass().add(CLASS_ENTRY_BAR);
-        main.getChildren().add(layout);
-        Node content = createSavegameInfoNode(e);
-
-        InvalidationListener lis = (change) -> {
-            Platform.runLater(() -> {
-                layout.setBackground(
-                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e));
+        {
+            Button del = new JFXButton();
+            del.setGraphic(new FontIcon());
+            del.setOnMouseClicked((m) -> {
+                if (DialogHelper.showSavegameDeleteDialog()) {
+                    SavegameManagerState.<T, I>get().current().getSavegameCache().delete(e);
+                }
             });
-        };
-        e.infoProperty().addListener(lis);
-        if (e.infoProperty().isNotNull().get()) {
-            lis.invalidated(null);
+            del.getStyleClass().add(CLASS_DELETE);
+            GuiTooltips.install(del, "Delete savegame");
+            buttonBar.getChildren().add(del);
         }
-
-        main.getChildren().add(content);
-        main.getStyleClass().add(CLASS_ENTRY);
-        main.setOnMouseClicked(event -> {
-            if (e.infoProperty().isNotNull().get()) {
-                SavegameManagerState.<T,I>get().selectEntry(e);
-            }
-        });
-
-        main.setOnDragDetected(me -> {
-            Dragboard db = main.startDragAndDrop(TransferMode.COPY);
-            var sc = SavegameManagerState.<T, I>get().current().getSavegameCache();
-            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
-            try {
-                sc.exportSavegame(e, out);
-            } catch (IOException ioException) {
-                ErrorHandler.handleException(ioException);
-                me.consume();
-                return;
-            }
-
-            var cc = new ClipboardContent();
-            cc.putFiles(List.of(out.toFile()));
-            db.setContent(cc);
-            me.consume();
-        });
-        return main;
     }
 
     private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(GameCampaignEntry<T, I> entry) {

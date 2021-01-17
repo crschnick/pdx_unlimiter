@@ -1,34 +1,32 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
-import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.SetChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CAMPAIGN_LIST;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CAMPAIGN_TOP_BAR;
 
-public class GuiGameCampaignList {
+public class GuiSavegameCollectionList {
 
 
     public static <T, I extends SavegameInfo<T>> Node createCampaignList() {
         ListView<Node> list = GuiListView.createViewOfList(
-                SavegameManagerState.<T,I>get().getShownCollections(),
-                GuiGameCampaign::createCampaignButton,
-                SavegameManagerState.<T,I>get().globalSelectedCampaignProperty());
+                SavegameManagerState.<T, I>get().getShownCollections(),
+                GuiSavegameCollection::createCampaignButton,
+                SavegameManagerState.<T, I>get().globalSelectedCampaignProperty());
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
         var top = createTopBar();

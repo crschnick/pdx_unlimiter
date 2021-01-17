@@ -3,14 +3,13 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
@@ -25,15 +24,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-
-import java.util.Optional;
-
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
-public class GuiGameCampaign {
+public class GuiSavegameCollection {
 
     public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
-            SavegameCollection<T,I> c) {
+            SavegameCollection<T, I> c) {
         GameIntegration<T, I> gi = GameIntegration.ALL.stream()
                 .filter(i -> i.getSavegameCache().getCollections().contains(c))
                 .findFirst()
@@ -41,13 +37,13 @@ public class GuiGameCampaign {
                 .get();
 
         HBox btn = new HBox();
-        btn.setOnMouseClicked((m) -> SavegameManagerState.<T,I>get().selectCollection(c));
+        btn.setOnMouseClicked((m) -> SavegameManagerState.<T, I>get().selectCollection(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         {
             if (c instanceof GameCampaign) {
-                GameCampaign<T,I> ca = (GameCampaign<T,I>) c;
+                GameCampaign<T, I> ca = (GameCampaign<T, I>) c;
                 ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
                 prop.addListener((change, o, n) -> {
                     Platform.runLater(() -> {
@@ -81,7 +77,7 @@ public class GuiGameCampaign {
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showCampaignDeleteDialog()) {
-                    SavegameManagerState.<T,I>get().current().getSavegameCache().delete(c);
+                    SavegameManagerState.<T, I>get().current().getSavegameCache().delete(c);
                 }
             });
             del.setAlignment(Pos.CENTER);
@@ -94,7 +90,7 @@ public class GuiGameCampaign {
             HBox bottom = new HBox();
 
             if (c instanceof GameCampaign) {
-                GameCampaign<T,I> ca = (GameCampaign<T,I>) c;
+                GameCampaign<T, I> ca = (GameCampaign<T, I>) c;
                 Label date = new Label();
                 date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
                 date.getStyleClass().add(CLASS_DATE);
@@ -108,7 +104,7 @@ public class GuiGameCampaign {
             Label count = new Label("[" + c.getSavegames().size() + "]");
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
-            c.getSavegames().addListener((SetChangeListener<GameCampaignEntry<?,?>>) change -> {
+            c.getSavegames().addListener((SetChangeListener<GameCampaignEntry<?, ?>>) change -> {
                 Platform.runLater(() -> {
                     count.setText("[" + change.getSet().size() + "]");
                 });
@@ -123,7 +119,7 @@ public class GuiGameCampaign {
         return btn;
     }
 
-    private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(SavegameCollection<T,I> c, HBox btn) {
+    private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(SavegameCollection<T, I> c, HBox btn) {
         btn.setOnDragOver(event -> {
             if (event.getGestureSource() != btn && event.getSource() instanceof Node) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
@@ -140,7 +136,7 @@ public class GuiGameCampaign {
         btn.setOnDragDropped(de -> {
             Node src = (Node) de.getGestureSource();
             @SuppressWarnings("unchecked")
-            GameCampaignEntry<T,I> entry = (GameCampaignEntry<T,I>) src.getProperties().get("list-item");
+            GameCampaignEntry<T, I> entry = (GameCampaignEntry<T, I>) src.getProperties().get("list-item");
             SavegameActions.moveEntry(c, entry);
         });
     }

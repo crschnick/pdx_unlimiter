@@ -1,12 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.Ck3Installation;
+import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.game.Hoi4Installation;
+import com.crschnick.pdx_unlimiter.app.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -80,57 +81,6 @@ public class Settings {
         }
     }
 
-    private static abstract class GameDirectory {
-
-        abstract boolean isDisabled();
-        abstract Path getPath();
-
-        private static Optional<TextNode> toNode(GameDirectory d) {
-            if (d.isDisabled()) {
-                return Optional.of(new TextNode("disabled"));
-            }
-            return Optional.ofNullable(d.getPath()).map(Path::toString).map(TextNode::new);
-        }
-
-        private static GameDirectory disabled() {
-            return new GameDirectory() {
-                @Override
-                boolean isDisabled() {
-                    return true;
-                }
-
-                @Override
-                Path getPath() {
-                    return null;
-                }
-            };
-        }
-
-        private static GameDirectory ofPath(Path p) {
-            return new GameDirectory() {
-                @Override
-                boolean isDisabled() {
-                    return false;
-                }
-
-                @Override
-                Path getPath() {
-                    return p;
-                }
-            };
-        }
-
-        private static GameDirectory fromNode(JsonNode node, String name) {
-            if (node != null && node.textValue().equals("disabled")) {
-                return disabled();
-            }
-
-            var r = Optional.ofNullable(node).map(n -> Paths.get(n.textValue()))
-                    .orElse(InstallLocationHelper.getInstallPath(name).orElse(null));;
-            return ofPath(r);
-        }
-    }
-
     private static Settings loadConfig(Path file) {
         JsonNode sNode;
         if (Files.exists(file)) {
@@ -143,7 +93,7 @@ public class Settings {
         Settings s = new Settings();
         s.eu4 = GameDirectory.fromNode(sNode.get("eu4"), "Europa Universalis IV");
         s.hoi4 = GameDirectory.fromNode(sNode.get("hoi4"), "Hearts of Iron IV");
-        s.ck3 =  GameDirectory.fromNode(sNode.get("ck3"), "Crusader Kings III");
+        s.ck3 = GameDirectory.fromNode(sNode.get("ck3"), "Crusader Kings III");
         s.stellaris = GameDirectory.fromNode(sNode.get("stellaris"), "Stellaris");
 
         s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(11);
@@ -329,7 +279,7 @@ public class Settings {
                 "If you believe that your installation is valid, " +
                 "please check in the settings menu whether the installation directory was correctly set.";
         GuiErrorReporter.showSimpleErrorMessage(
-                "An error occured while loading your " + game + " installation:\n" +  msg);
+                "An error occured while loading your " + game + " installation:\n" + msg);
     }
 
     public void validate() {
@@ -368,11 +318,11 @@ public class Settings {
 
         if (eu4.getPath() == null && ck3.getPath() == null && hoi4.getPath() == null && stellaris.getPath() == null) {
             GuiErrorReporter.showSimpleErrorMessage("""
-No supported or compatible Paradox game has been detected.
-To fix this, you can set the installation directories of games manually in the settings menu.
+                    No supported or compatible Paradox game has been detected.
+                    To fix this, you can set the installation directories of games manually in the settings menu.
 
-Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
-                            """);
+                    Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
+                                                """);
         }
 
         if (ck3toeu4Dir != null) {
@@ -383,12 +333,12 @@ Note that you can't do anything useful with the Pdx-Unlimiter until at least one
         }
     }
 
-    public void setCk3toEu4Dir(Path ck3toeu4Dir) {
-        this.ck3toeu4Dir = ck3toeu4Dir;
-    }
-
     public Optional<Path> getCk3toEu4Dir() {
         return Optional.ofNullable(ck3toeu4Dir);
+    }
+
+    public void setCk3toEu4Dir(Path ck3toeu4Dir) {
+        this.ck3toeu4Dir = ck3toeu4Dir;
     }
 
     public boolean confirmDeletion() {
@@ -397,5 +347,58 @@ Note that you can't do anything useful with the Pdx-Unlimiter until at least one
 
     public boolean deleteOnImport() {
         return deleteOnImport;
+    }
+
+    private static abstract class GameDirectory {
+
+        private static Optional<TextNode> toNode(GameDirectory d) {
+            if (d.isDisabled()) {
+                return Optional.of(new TextNode("disabled"));
+            }
+            return Optional.ofNullable(d.getPath()).map(Path::toString).map(TextNode::new);
+        }
+
+        private static GameDirectory disabled() {
+            return new GameDirectory() {
+                @Override
+                boolean isDisabled() {
+                    return true;
+                }
+
+                @Override
+                Path getPath() {
+                    return null;
+                }
+            };
+        }
+
+        private static GameDirectory ofPath(Path p) {
+            return new GameDirectory() {
+                @Override
+                boolean isDisabled() {
+                    return false;
+                }
+
+                @Override
+                Path getPath() {
+                    return p;
+                }
+            };
+        }
+
+        private static GameDirectory fromNode(JsonNode node, String name) {
+            if (node != null && node.textValue().equals("disabled")) {
+                return disabled();
+            }
+
+            var r = Optional.ofNullable(node).map(n -> Paths.get(n.textValue()))
+                    .orElse(InstallLocationHelper.getInstallPath(name).orElse(null));
+            ;
+            return ofPath(r);
+        }
+
+        abstract boolean isDisabled();
+
+        abstract Path getPath();
     }
 }

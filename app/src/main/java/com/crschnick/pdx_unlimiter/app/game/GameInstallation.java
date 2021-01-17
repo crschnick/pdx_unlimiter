@@ -14,11 +14,9 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,18 +30,15 @@ public abstract class GameInstallation {
     public static StellarisInstallation STELLARIS = null;
 
     public static Set<GameInstallation> ALL;
-
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected DistributionType distType;
     protected Path userDir;
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
-
     private String id;
     private Path path;
     private Path executable;
     private List<GameDlc> dlcs = new ArrayList<>();
-
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public GameInstallation(String id, Path path, Path executable) {
         this.id = id;

@@ -75,13 +75,13 @@ public class GuiErrorReporter {
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Error reporter");
         alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
-"""
+                """
 
 
-If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
-Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
-This will send some diagnostics data.
-"""  + (!terminal ? "\n Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
+                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
+                        Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
+                        This will send some diagnostics data.
+                        """ + (!terminal ? "\n Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
 
         VBox dialogPaneContent = new VBox();
 
@@ -110,12 +110,12 @@ This will send some diagnostics data.
         alert.getButtonTypes().addAll(report);
         alert.setTitle("Issue reporter");
         alert.setHeaderText("""
-If you encountered an issue, please describe it here.
+                If you encountered an issue, please describe it here.
 
-By clicking 'Send', you send this report and additional log information to the developers.
-If you want to get notified of a fix or help the devs in case of any questions,
-please include some sort of contact information, like a reddit/discord/github username or an email
-                """);
+                By clicking 'Send', you send this report and additional log information to the developers.
+                If you want to get notified of a fix or help the devs in case of any questions,
+                please include some sort of contact information, like a reddit/discord/github username or an email
+                                """);
 
         VBox dialogPaneContent = new VBox();
         TextArea textArea = new TextArea();

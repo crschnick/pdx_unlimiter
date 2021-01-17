@@ -1,60 +1,52 @@
-package com.crschnick.pdx_unlimiter.app.game;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.SavedState;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameFolder;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
-import javafx.beans.property.*;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.logging.Handler;
-import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.Optional;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
-    public class Filter {
-        private StringProperty filter = new SimpleStringProperty("");
+    private static SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<Object, SavegameInfo<Object>>();
+    private SimpleObjectProperty<GameIntegration<?, ? extends SavegameInfo<?>>> current = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaign =
+            new SimpleObjectProperty<>();
+    private SimpleObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntry =
+            new SimpleObjectProperty<>();
+    private Filter filter = new Filter();
+    private ObservableList<SavegameCollection<T, I>> shownCollections = FXCollections.synchronizedObservableList(
+            FXCollections.observableArrayList());
+    private ObservableList<GameCampaignEntry<T, I>> shownEntries = FXCollections.synchronizedObservableList(
+            FXCollections.observableArrayList());
 
-        private Filter() {
-            filter.addListener((c,o,n) -> {
-                SavegameManagerState.this.updateShownCollections();
-            });
-        }
+    private SavegameManagerState() {
+        var cl = (SetChangeListener<? super GameCampaignEntry<T, I>>) ch -> {
+            updateShownEntries();
+        };
 
-        public String getFilter() {
-            return filter.get();
-        }
-
-        public StringProperty filterProperty() {
-            return filter;
-        }
-
-        public boolean shouldShow(SavegameCollection<?,?> col) {
-            if (col.getName().toLowerCase().contains(filter.get().toLowerCase())) {
-                return true;
+        globalSelectedCampaign.addListener((c, o, n) -> {
+            if (o != null) {
+                o.getSavegames().removeListener(cl);
             }
 
-            return col.getSavegames().stream()
-                    .anyMatch(e -> e.getName().toLowerCase().contains(filter.get().toLowerCase()));
-        }
-
-        public boolean shouldShow(GameCampaignEntry<?,?> entry) {
-            if (entry.getName().toLowerCase().contains(filter.get().toLowerCase())) {
-                return true;
+            if (n != null) {
+                n.getSavegames().addListener(cl);
             }
-
-            return false;
-        }
+        });
     }
 
-    private static SavegameManagerState<?,?> INSTANCE = new SavegameManagerState<Object, SavegameInfo<Object>>();
-
-    public static <T, I extends SavegameInfo<T>> SavegameManagerState<T,I> get() {
+    public static <T, I extends SavegameInfo<T>> SavegameManagerState<T, I> get() {
         return (SavegameManagerState<T, I>) INSTANCE;
     }
 
@@ -78,14 +70,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
     }
 
-    private SimpleObjectProperty<GameIntegration<?, ? extends SavegameInfo<?>>> current = new SimpleObjectProperty<>();
-
-    private SimpleObjectProperty<SavegameCollection<T,I>> globalSelectedCampaign =
-            new SimpleObjectProperty<>();
-
-    private SimpleObjectProperty<GameCampaignEntry<T,I>> globalSelectedEntry =
-            new SimpleObjectProperty<>();
-
     public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignProperty() {
         return globalSelectedCampaign;
     }
@@ -94,36 +78,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return globalSelectedCampaign;
     }
 
-    public
-    ReadOnlyObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntryProperty() {
+    public ReadOnlyObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntryProperty() {
         return (SimpleObjectProperty<GameCampaignEntry<T, I>>) globalSelectedEntry;
     }
 
-    private
-    SimpleObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntryPropertyInternal() {
+    private SimpleObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntryPropertyInternal() {
         return (SimpleObjectProperty<GameCampaignEntry<T, I>>) globalSelectedEntry;
-    }
-
-    private Filter filter = new Filter();
-    private ObservableList<SavegameCollection<T,I>> shownCollections = FXCollections.synchronizedObservableList(
-            FXCollections.observableArrayList());
-    private ObservableList<GameCampaignEntry<T,I>> shownEntries = FXCollections.synchronizedObservableList(
-            FXCollections.observableArrayList());
-
-    private SavegameManagerState() {
-        var cl = (SetChangeListener<? super GameCampaignEntry<T, I>>) ch -> {
-            updateShownEntries();
-        };
-
-        globalSelectedCampaign.addListener((c,o,n) -> {
-            if (o != null) {
-                o.getSavegames().removeListener(cl);
-            }
-
-            if (n != null) {
-                n.getSavegames().addListener(cl);
-            }
-        });
     }
 
     public Filter getFilter() {
@@ -175,11 +135,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         shownCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
     }
 
-    public ObservableList<GameCampaignEntry<T,I>> getShownEntries() {
+    public ObservableList<GameCampaignEntry<T, I>> getShownEntries() {
         return shownEntries;
     }
 
-    public ObservableList<SavegameCollection<T,I>> getShownCollections() {
+    public ObservableList<SavegameCollection<T, I>> getShownCollections() {
         return shownCollections;
     }
 
@@ -211,9 +171,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         updateShownCollections();
         if (newInt != null) {
             newInt.getSavegameCache().getCollections().addListener(
-                    (SetChangeListener<? super SavegameCollection<?,?>>) c -> {
-                updateShownCollections();
-            });
+                    (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
+                        updateShownCollections();
+                    });
         }
         return true;
     }
@@ -272,5 +232,40 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }, () -> {
             LoggerFactory.getLogger(GameIntegration.class).debug("No game integration found for campaign entry " + e.getName());
         });
+    }
+
+    public class Filter {
+        private StringProperty filter = new SimpleStringProperty("");
+
+        private Filter() {
+            filter.addListener((c, o, n) -> {
+                SavegameManagerState.this.updateShownCollections();
+            });
+        }
+
+        public String getFilter() {
+            return filter.get();
+        }
+
+        public StringProperty filterProperty() {
+            return filter;
+        }
+
+        public boolean shouldShow(SavegameCollection<?, ?> col) {
+            if (col.getName().toLowerCase().contains(filter.get().toLowerCase())) {
+                return true;
+            }
+
+            return col.getSavegames().stream()
+                    .anyMatch(e -> e.getName().toLowerCase().contains(filter.get().toLowerCase()));
+        }
+
+        public boolean shouldShow(GameCampaignEntry<?, ?> entry) {
+            if (entry.getName().toLowerCase().contains(filter.get().toLowerCase())) {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

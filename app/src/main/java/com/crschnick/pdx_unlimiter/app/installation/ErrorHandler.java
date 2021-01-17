@@ -8,8 +8,6 @@ import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
 
 public class ErrorHandler {
 
