@@ -59,6 +59,10 @@ public abstract class EditorNode {
         this.keyName = keyName;
     }
 
+    public abstract String displayKeyName();
+
+    public abstract String navigationName();
+
     public abstract boolean isReal();
 
     public abstract SimpleNode getRealParent();
@@ -74,10 +78,6 @@ public abstract class EditorNode {
     }
 
     public Optional<String> getKeyName() {
-        return Optional.ofNullable(keyName);
-    }
-
-    public Optional<String> getDisplayKey() {
         return Optional.ofNullable(keyName);
     }
 }

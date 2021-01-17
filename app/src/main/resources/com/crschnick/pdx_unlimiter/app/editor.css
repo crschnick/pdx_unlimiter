@@ -4,6 +4,19 @@
   -fx-padding: 1em;
   -fx-alignment: center;
   -fx-font-size: 12pt;
+  -fx-font-family: "monospaced";
+}
+
+.editor-filter-bar {
+  -fx-padding: 1em;
+  -fx-font-size: 11pt;
+  -fx-background-color: white;
+}
+
+.editor-nav-bar {
+  -fx-padding: 1em;
+  -fx-font-size: 11pt;
+  -fx-background-color: white;
 }
 
 .editor-grid .jfx-button {

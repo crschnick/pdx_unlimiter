@@ -18,6 +18,16 @@ public class CollectorNode extends EditorNode {
     }
 
     @Override
+    public String displayKeyName() {
+        return keyName + "(s)";
+    }
+
+    @Override
+    public String navigationName() {
+        return keyName;
+    }
+
+    @Override
     public boolean isReal() {
         return false;
     }
@@ -46,10 +56,6 @@ public class CollectorNode extends EditorNode {
 
         getRealParent().getBackingNode().getNodeArray().addAll(newNode.getNodeArray().stream()
                 .map(node -> KeyValueNode.create(keyName, node)).collect(Collectors.toList()));
-    }
-
-    public Optional<String> getDisplayKey() {
-        return Optional.of(keyName + "(s)");
     }
 
     public List<Node> getNodes() {

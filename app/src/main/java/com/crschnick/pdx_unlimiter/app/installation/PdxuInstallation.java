@@ -66,13 +66,6 @@ public class PdxuInstallation {
                     ErrorHandler.handleException(e);
                 }
             }
-
-            if (!Files.exists(INSTANCE.rakalyDir)) {
-                GuiErrorReporter.showErrorMessage(
-                        "The rakaly installation seems to be invalid.",
-                        "This can be caused by a failed update." +
-                                "Please try restarting the Pdx-Unlimiter", true, false);
-            }
         } else {
             INSTANCE.version = "dev";
             try {

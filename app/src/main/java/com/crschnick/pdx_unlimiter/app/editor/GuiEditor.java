@@ -8,20 +8,24 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GuiEditor {
 
     public static Region create(EditorState state) {
         BorderPane layout = new BorderPane();
         layout.setTop(createNavigationBar(state));
-        layout.setCenter(createNodeList(state));
+        var grid = createNodeList(state);
+        layout.setCenter(grid);
         layout.setBottom(createFilterBar(state.getFilter()));
         return layout;
     }
@@ -29,51 +33,61 @@ public class GuiEditor {
 
     private static Region createNavigationBar(EditorState edState) {
         HBox bar = new HBox();
+        bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
 
-        edState.getNodePath().forEach(en -> {
-            bar.getChildren().add(new JFXButton(en.getKeyName().orElse("<root>")));
-        });
-        edState.nodePathProperty().addListener((c, o, n) -> {
+        Consumer<List<EditorNode>> updateBar = l -> {
             bar.getChildren().clear();
-            n.forEach(en -> {
-                var btn = new JFXButton(en.getKeyName().orElse("<root>"));
+            l.forEach(en -> {
+                var btn = new JFXButton(en.navigationName());
+                if (!en.equals(l.get(0))) {
+                    var sep = new Label(">");
+                    sep.setAlignment(Pos.CENTER);
+                    bar.getChildren().add(sep);
+                }
                 btn.setOnAction(e -> {
                     edState.navigateTo(en);
                 });
                 bar.getChildren().add(btn);
             });
+        };
+        updateBar.accept(edState.getNodePath());
+        edState.nodePathProperty().addListener((c, o, n) -> {
+            updateBar.accept(n);
         });
+
         return bar;
     }
 
 
     private static Region createNodeList(EditorState edState) {
-        VBox nodes = new VBox();
-        nodes.getChildren().setAll(createNodeList(edState, edState.getContent()));
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
+        var cc = new ColumnConstraints();
+        cc.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().addAll(
+                new ColumnConstraints(), new ColumnConstraints(), cc, new ColumnConstraints());
+
+        ScrollPane sp = new ScrollPane(grid);
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        grid.prefWidthProperty().bind(sp.widthProperty());
+        createNodeList(grid, edState, edState.getContent());
         edState.contentProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                nodes.getChildren().setAll(createNodeList(edState, n));
+                createNodeList(grid, edState, n);
             });
         });
 
-        ScrollPane sp = new ScrollPane(nodes);
         return sp;
     }
 
-    private static Region createNodeList(EditorState state, List<EditorNode> nodes) {
-        GridPane grid = new GridPane();
-        grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
+    private static void createNodeList(GridPane grid, EditorState state, List<EditorNode> nodes) {
+        grid.getChildren().clear();
 
         for (int i = 0; i < nodes.size(); i++) {
             var n = nodes.get(i);
-            HBox k = new HBox();
-            HBox eq = new HBox();
-            if (n.getDisplayKey().isPresent()) {
-                k.getChildren().add(new Label(n.getDisplayKey().get()));
-                eq.getChildren().add(new Label("="));
-                grid.add(k, 0, i);
-                grid.add(eq, 1, i);
-            }
+            grid.add(new Label(n.displayKeyName()), 0, i);
+            grid.add(new Label("="), 1, i);
+
 
             Region valueDisplay = null;
             if (n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode) {
@@ -88,11 +102,7 @@ public class GuiEditor {
                 });
                 valueDisplay = btn;
             }
-
-            HBox v = new HBox(valueDisplay);
-            HBox.setHgrow(valueDisplay, Priority.ALWAYS);
-            grid.add(v, 2, i);
-            GridPane.setHgrow(v, Priority.ALWAYS);
+            grid.add(valueDisplay, 2, i);
 
             HBox btns = new HBox();
             Button edit = new JFXButton();
@@ -101,25 +111,19 @@ public class GuiEditor {
             edit.setOnAction(e -> {
                 state.getExternalState().startEdit(state, n);
             });
+
             Button del = new JFXButton();
             del.setGraphic(new FontIcon());
             del.getStyleClass().add(GuiStyle.CLASS_DELETE);
             btns.getChildren().add(edit);
             btns.getChildren().add(del);
             grid.add(btns, 3, i);
-
-            var binding = Bindings.createBooleanBinding(() -> {
-                return k.isHover() || eq.isHover() || v.isHover() || btns.isHover();
-            }, k.hoverProperty(), eq.hoverProperty(), v.hoverProperty(), btns.hoverProperty());
-            edit.visibleProperty().bind(binding);
-            del.visibleProperty().bind(binding);
         }
-
-        return grid;
     }
 
     private static Region createFilterBar(EditorFilter edFilter) {
         HBox box = new HBox();
+        box.getStyleClass().add(GuiStyle.CLASS_EDITOR_FILTER);
         box.setSpacing(8);
 
         {

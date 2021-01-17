@@ -21,7 +21,7 @@ public class EditorState {
     public EditorState(ArrayNode node) {
         externalState = new EditorExternalState();
         nodePath = new SimpleListProperty<>(FXCollections.observableArrayList());
-        nodePath.add(new SimpleNode(null, null, 0, node));
+        nodePath.add(new SimpleNode(null, "<root>", 0, node));
         filter = new EditorFilter(this);
         content = new SimpleListProperty<>(FXCollections.observableArrayList());
         update();

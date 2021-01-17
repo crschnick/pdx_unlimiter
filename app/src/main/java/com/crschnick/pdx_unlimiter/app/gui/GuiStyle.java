@@ -68,6 +68,8 @@ public class GuiStyle {
     public static String CLASS_CASE_SENSITIVE = "case-sensitive-button";
     public static String CLASS_DEEP_SEARCH = "deep-search-button";
     public static String CLASS_EDITOR_GRID = "editor-grid";
+    public static String CLASS_EDITOR_FILTER = "editor-filter-bar";
+    public static String CLASS_EDITOR_NAVIGATION = "editor-nav-bar";
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",

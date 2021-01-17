@@ -19,6 +19,16 @@ public class SimpleNode extends EditorNode {
     }
 
     @Override
+    public String displayKeyName() {
+        return getKeyName().orElse("[" + keyIndex + "]");
+    }
+
+    @Override
+    public String navigationName() {
+        return getKeyName().orElseGet(() -> getDirectParent().navigationName() + "[" + keyIndex + "]");
+    }
+
+    @Override
     public boolean isReal() {
         return true;
     }
