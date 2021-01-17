@@ -29,11 +29,11 @@ public abstract class FormatParser {
 
     public abstract List<Token> tokenize(byte[] data) throws IOException;
 
-    public final Node parse(InputStream stream) throws IOException {
+    public final ArrayNode parse(InputStream stream) throws IOException {
         return parse(stream.readAllBytes());
     }
 
-    public final Node parse(byte[] input) throws IOException {
+    public final ArrayNode parse(byte[] input) throws IOException {
         List<Token> tokens = tokenize(input);
 
         tokens.add(0, new OpenGroupToken());
@@ -41,9 +41,9 @@ public abstract class FormatParser {
         return hierachiseTokens(tokens);
     }
 
-    private Node hierachiseTokens(List<Token> tokens) {
+    private ArrayNode hierachiseTokens(List<Token> tokens) {
         Map.Entry<Node, Integer> node = createNode(tokens, 0);
-        return node.getKey();
+        return (ArrayNode) node.getKey();
     }
 
     private Map.Entry<Node, Integer> createNode(List<Token> tokens, int index) {

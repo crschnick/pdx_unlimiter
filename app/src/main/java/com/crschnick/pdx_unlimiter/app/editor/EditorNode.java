@@ -1,44 +1,83 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class EditorNode {
+public abstract class EditorNode {
 
-    private EditorNode parent;
+    public static List<EditorNode> create(EditorNode parent, List<Node> nodes) {
+        int realIndex = 0;
+        var result = new ArrayList<EditorNode>();
+        for (int i = 0; i < nodes.size(); i++) {
+            var n = nodes.get(i);
+            if (n instanceof KeyValueNode &&
+                    i + 1 < nodes.size() &&
+                    nodes.get(i + 1) instanceof KeyValueNode) {
+                var k = n.getKeyValueNode().getKeyName();
+                int end = i;
+                while (end + 1 < nodes.size() &&
+                        nodes.get(end + 1) instanceof KeyValueNode &&
+                        nodes.get(end + 1).getKeyValueNode().getKeyName().equals(k)) {
+                    end++;
+                }
 
-    private int keyIndex;
-    private String keyName;
+                if (end > i) {
+                    result.add(new CollectorNode(
+                            parent,
+                            k,
+                            nodes.subList(i, end).stream()
+                                    .map(node -> node.getKeyValueNode().getNode())
+                                    .collect(Collectors.toList())));
+                    i = end;
+                    realIndex++;
+                    continue;
+                }
+            }
 
-    private Node node;
-    private boolean synthetic;
+            result.add(new SimpleNode(
+                    parent,
+                    n instanceof KeyValueNode ? n.getKeyValueNode().getKeyName() : null,
+                    realIndex,
+                    n instanceof KeyValueNode ? n.getKeyValueNode().getNode() : n));
+            realIndex++;
+        }
 
-    public EditorNode(EditorNode parent, int keyIndex, String keyName, Node node, boolean synthetic) {
-        this.parent = parent;
-        this.keyIndex = keyIndex;
+        return result;
+    }
+
+    private EditorNode directParent;
+    protected String keyName;
+
+    public EditorNode(EditorNode directParent, String keyName) {
+        this.directParent = directParent;
         this.keyName = keyName;
-        this.node = node;
-        this.synthetic = synthetic;
+    }
+
+    public abstract boolean isReal();
+
+    public abstract SimpleNode getRealParent();
+
+    public abstract List<EditorNode> open();
+
+    public abstract Node toWritableNode();
+
+    public abstract void update(ArrayNode newNode);
+
+    public EditorNode getDirectParent() {
+        return directParent;
     }
 
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);
     }
 
-    public Node getNode() {
-        return node;
-    }
-
-    public boolean isSynthetic() {
-        return synthetic;
-    }
-
-    public EditorNode getParent() {
-        return parent;
-    }
-
-    public int getKeyIndex() {
-        return keyIndex;
+    public Optional<String> getDisplayKey() {
+        return Optional.ofNullable(keyName);
     }
 }

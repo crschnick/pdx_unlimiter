@@ -36,24 +36,18 @@ public class EditorFilter {
         }
     }
 
-    public List<Node> filter(List<Node> input) {
+    public List<EditorNode> filter(List<EditorNode> input) {
         return input.stream().filter(n -> {
-            if (n instanceof KeyValueNode) {
-                var kv = n.getKeyValueNode();
-                if ((scope.get() == Scope.KEY || scope.get() == Scope.BOTH) && contains(kv.getKeyName())) {
+            if (true) {
+                if ((scope.get() == Scope.KEY || scope.get() == Scope.BOTH) && contains("")) {
                     return true;
-                } else if ((scope.get() == Scope.VALUE || scope.get() == Scope.BOTH) &&
-                        filter(List.of(kv.getNode())).size() > 0) {
+                } else if ((scope.get() == Scope.VALUE || scope.get() == Scope.BOTH)) {
                     return true;
                 } else {
                     return false;
                 }
             }
 
-            if (n instanceof ValueNode && (scope.get() == Scope.VALUE || scope.get() == Scope.BOTH)) {
-                var v = n.getString();
-                return contains(v);
-            }
             return false;
         }).collect(Collectors.toList());
     }

@@ -61,15 +61,17 @@ public class GuiStyle {
     public static String CLASS_ANALYZE = "analyze-button";
     public static String CLASS_MELT = "melt-button";
     public static String CLASS_NEW = "new-button";
-    public static String CLASS_RECURSIVE = "recursive-button";
     public static String CLASS_FOLDER = "folder";
     public static String CLASS_CAMPAIGN_TOP_BAR = "campaign-top-bar";
     public static String CLASS_CONTENT_DIALOG = "content-dialog";
     public static String CLASS_EDIT = "edit-button";
+    public static String CLASS_CASE_SENSITIVE = "case-sensitive-button";
+    public static String CLASS_DEEP_SEARCH = "deep-search-button";
+    public static String CLASS_EDITOR_GRID = "editor-grid";
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",
-                "campaign.css", "status-bar.css", "game-switcher.css").stream()
+                "campaign.css", "status-bar.css", "game-switcher.css", "editor.css").stream()
                 .map(s -> PdxuApp.class.getResource(s).toExternalForm())
                 .forEach(s -> scene.getStylesheets().add(s));
     }

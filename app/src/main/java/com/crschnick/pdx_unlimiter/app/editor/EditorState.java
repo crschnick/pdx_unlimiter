@@ -21,31 +21,16 @@ public class EditorState {
     public EditorState(ArrayNode node) {
         externalState = new EditorExternalState();
         nodePath = new SimpleListProperty<>(FXCollections.observableArrayList());
-        nodePath.add(new EditorNode(null, 0, null, node, false));
+        nodePath.add(new SimpleNode(null, null, 0, node));
         filter = new EditorFilter(this);
         content = new SimpleListProperty<>(FXCollections.observableArrayList());
         update();
     }
 
     public List<EditorNode> createEditorNodes(EditorNode parent) {
-        var filtered = filter.filter(parent.getNode().getNodeArray());
-        var uniqueKeys = filtered.stream()
-                .filter(node -> node instanceof KeyValueNode)
-                .map(node -> node.getKeyValueNode().getKeyName())
-                .distinct()
-                .collect(Collectors.toMap(n -> n, n -> parent.getNode().getNodesForKey(n)));
-
-        var toShow = new ArrayList<EditorNode>();
-        int index = 0;
-        for (var e : uniqueKeys.entrySet()) {
-            if (e.getValue().size() == 1) {
-                toShow.add(new EditorNode(parent, index, e.getKey(), e.getValue().get(0), false));
-            } else {
-                toShow.add(new EditorNode(parent, index, e.getKey(), new ArrayNode(e.getValue()), true));
-            }
-            index++;
-        }
-        return toShow;
+        var editorNodes = parent.open();
+        var filtered = filter.filter(editorNodes);
+        return filtered;
     }
 
     public void update() {

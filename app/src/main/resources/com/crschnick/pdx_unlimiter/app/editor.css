@@ -1,0 +1,18 @@
+.editor-grid {
+  -fx-vgap: 0.3em;
+  -fx-hgap: 0.5em;
+  -fx-padding: 1em;
+  -fx-alignment: center;
+  -fx-font-size: 12pt;
+}
+
+.editor-grid .jfx-button {
+-fx-padding: 0 0.2em 0.05em 0.2em;
+}
+
+.editor-grid .jfx-text-field {
+ -jfx-label-float: true;
+-fx-padding: 0.05em 0.2em 0.05em 0.2em;
+-jfx-unfocus-color: transparent;
+-fx-background-color: #AAAAAA44;
+}

@@ -62,25 +62,27 @@ public class GuiEditor {
 
     private static Region createNodeList(EditorState state, List<EditorNode> nodes) {
         GridPane grid = new GridPane();
+        grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
 
         for (int i = 0; i < nodes.size(); i++) {
             var n = nodes.get(i);
             HBox k = new HBox();
             HBox eq = new HBox();
-            if (n.getKeyName().isPresent()) {
-                k.getChildren().add(new Label(n.getKeyName().get()));
+            if (n.getDisplayKey().isPresent()) {
+                k.getChildren().add(new Label(n.getDisplayKey().get()));
                 eq.getChildren().add(new Label("="));
                 grid.add(k, 0, i);
                 grid.add(eq, 1, i);
             }
 
             Region valueDisplay = null;
-            if (n.getNode() instanceof ValueNode) {
-                valueDisplay = new JFXTextField(n.getNode().getString());
-            }
-            if (n.getNode() instanceof ArrayNode) {
-                var btn = new JFXButton((n.isSynthetic() ?
-                        "(s) " : "") + "[... " + n.getNode().getNodeArray().size() + " ...]");
+            if (n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode) {
+                valueDisplay = new JFXTextField(((SimpleNode) n).getBackingNode().getString());
+            } else {
+                int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
+                        ((CollectorNode) n).getNodes().size();
+                var btn = new JFXButton("[... " + length + " ...]");
+                btn.setAlignment(Pos.CENTER);
                 btn.setOnAction(e -> {
                     state.navigateTo(n);
                 });
@@ -88,14 +90,20 @@ public class GuiEditor {
             }
 
             HBox v = new HBox(valueDisplay);
+            HBox.setHgrow(valueDisplay, Priority.ALWAYS);
             grid.add(v, 2, i);
+            GridPane.setHgrow(v, Priority.ALWAYS);
 
             HBox btns = new HBox();
-            Button edit = new JFXButton("EDIT");
+            Button edit = new JFXButton();
+            edit.setGraphic(new FontIcon());
+            edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
             edit.setOnAction(e -> {
                 state.getExternalState().startEdit(state, n);
             });
-            Button del = new JFXButton("DEl");
+            Button del = new JFXButton();
+            del.setGraphic(new FontIcon());
+            del.getStyleClass().add(GuiStyle.CLASS_DELETE);
             btns.getChildren().add(edit);
             btns.getChildren().add(del);
             grid.add(btns, 3, i);
@@ -113,7 +121,6 @@ public class GuiEditor {
     private static Region createFilterBar(EditorFilter edFilter) {
         HBox box = new HBox();
         box.setSpacing(8);
-        box.setAlignment(Pos.CENTER);
 
         {
             ToggleButton filterKeys = new ToggleButton();
@@ -172,7 +179,7 @@ public class GuiEditor {
 
         {
             ToggleButton cs = new ToggleButton();
-            cs.getStyleClass().add(GuiStyle.CLASS_RECURSIVE);
+            cs.getStyleClass().add(GuiStyle.CLASS_CASE_SENSITIVE);
             cs.setGraphic(new FontIcon());
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
             GuiTooltips.install(cs, "Case sensitive");
@@ -181,7 +188,7 @@ public class GuiEditor {
 
         {
             ToggleButton deepSearch = new ToggleButton();
-            deepSearch.getStyleClass().add(GuiStyle.CLASS_RECURSIVE);
+            deepSearch.getStyleClass().add(GuiStyle.CLASS_DEEP_SEARCH);
             deepSearch.setGraphic(new FontIcon());
             deepSearch.selectedProperty().bindBidirectional(edFilter.deepProperty());
             GuiTooltips.install(deepSearch, "Deep search");

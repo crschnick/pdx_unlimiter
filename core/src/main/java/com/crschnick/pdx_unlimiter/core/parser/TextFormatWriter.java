@@ -5,19 +5,23 @@ public class TextFormatWriter {
     public static String write(Node node) {
         StringBuilder s = new StringBuilder();
         if (node instanceof ArrayNode) {
-            node.getNodeArray().forEach(c -> s.append(node(c)).append("\n"));
+            node.getNodeArray().forEach(c -> s.append(node(0, c)).append("\n"));
         }
         return s.toString();
     }
 
-    private static String node(Node n) {
+    private static String node(int indent, Node n) {
         if (n instanceof KeyValueNode) {
-            return n.getKeyValueNode().getKeyName() + "=" + node(n.getKeyValueNode().getNode());
+            return n.getKeyValueNode().getKeyName() + "=" +
+                    node(indent, n.getKeyValueNode().getNode());
         }
 
         if (n instanceof ArrayNode) {
             StringBuilder s = new StringBuilder();
-            n.getNodeArray().forEach(c -> s.append(node(c)).append("\n"));
+            s.append("{\n");
+            n.getNodeArray().forEach(c ->
+                    s.append(" ".repeat(indent + 2)).append(node(indent + 2, c)).append("\n"));
+            s.append(" ".repeat(indent)).append("}");
             return s.toString();
         }
 

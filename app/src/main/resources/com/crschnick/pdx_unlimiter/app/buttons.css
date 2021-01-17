@@ -14,6 +14,10 @@
     -fx-icon-code: "mdi-delete";
 }
 
+.case-sensitive-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-case-sensitive-alt";
+}
+
 .edit-button .ikonli-font-icon {
     -fx-icon-code: "mdi-table-edit";
 }
@@ -47,7 +51,7 @@
     -fx-icon-code: "mdi-folder-plus"
 }
 
-.recursive-button .ikonli-font-icon {
+.deep-search-button .ikonli-font-icon {
     -fx-icon-code: "mdi-sort-descending"
 }
 

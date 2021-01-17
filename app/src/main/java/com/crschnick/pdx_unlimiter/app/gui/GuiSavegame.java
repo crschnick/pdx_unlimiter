@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
@@ -204,9 +205,11 @@ public class GuiSavegame {
             Button edit = new JFXButton();
             edit.setGraphic(new FontIcon());
             edit.setOnMouseClicked((m) -> {
-                Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
-                        SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
-            });
+                TaskExecutor.getInstance().submitTask(() -> {
+                    Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
+                            SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
+                }, true);
+                });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
 

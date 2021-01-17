@@ -3,10 +3,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
+import com.crschnick.pdx_unlimiter.core.parser.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -31,8 +28,8 @@ public class EditorExternalState {
                     // Files that are created initially are not yet added to entries (sometimes)
                     getForFile(changed).ifPresent(e -> {
                         try {
-                            Node newNode = TextFormatParser.textFileParser().parse(Files.newInputStream(changed));
-                            e.update(newNode);
+                            ArrayNode newNode = TextFormatParser.textFileParser().parse(Files.newInputStream(changed));
+                            e.editorNode.update(newNode);
                             e.state.update();
                         } catch (Exception ex) {
                             ErrorHandler.handleException(ex);
@@ -51,6 +48,17 @@ public class EditorExternalState {
         }
     }
 
+    private static Optional<Entry> getForNode(EditorNode node) {
+        for (var ed : Editor.getEditors().keySet()) {
+            for (var es : ed.getExternalState().openEntries) {
+                if (es.editorNode.equals(node)) {
+                    return Optional.of(es);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     private static Optional<Entry> getForFile(Path file) {
         for (var ed : Editor.getEditors().keySet()) {
             for (var es : ed.getExternalState().openEntries) {
@@ -63,10 +71,16 @@ public class EditorExternalState {
     }
 
     public void startEdit(EditorState state, EditorNode node) {
+        var ex = getForNode(node);
+        if (ex.isPresent()) {
+            ThreadHelper.open(ex.get().file);
+            return;
+        }
+
         Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
 
         try {
-            Files.writeString(file, TextFormatWriter.write(node.getNode()));
+            Files.writeString(file, TextFormatWriter.write(node.toWritableNode()));
             openEntries.add(new Entry(file, node, state));
             ThreadHelper.open(file);
         } catch (IOException e) {
@@ -83,23 +97,6 @@ public class EditorExternalState {
             this.file = file;
             this.editorNode = editorNode;
             this.state = state;
-        }
-
-        public void update(Node newNode) {
-            if (editorNode.isSynthetic()) {
-                editorNode.getParent().getNode().getNodeArray().removeIf(n -> n instanceof KeyValueNode &&
-                        n.getKeyValueNode().getKeyName().equals(editorNode.getKeyName().get()));
-
-                editorNode.getParent().getNode().getNodeArray().addAll(newNode.getNodeArray());
-                return;
-            }
-
-            editorNode.getKeyName().ifPresentOrElse(s -> {
-                editorNode.getParent().getNode().getNodeArray().set(editorNode.getKeyIndex(),
-                        KeyValueNode.create(s, newNode));
-            }, () -> {
-                editorNode.getParent().getNode().getNodeArray().set(editorNode.getKeyIndex(), newNode);
-            });
         }
     }
 }
