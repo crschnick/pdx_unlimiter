@@ -44,7 +44,7 @@ public class GuiGameCampaignEntry {
         VBox main = new VBox();
         main.setAlignment(Pos.CENTER);
         main.setFillWidth(true);
-        main.getProperties().put("entry", e);
+
         Label l = new Label(e.getDate().toDisplayString());
         l.getStyleClass().add(CLASS_DATE);
 
@@ -62,7 +62,7 @@ public class GuiGameCampaignEntry {
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showSavegameDeleteDialog()) {
-                    SavegameManagerState.get().<T, I>current().getSavegameCache().delete(e);
+                    SavegameManagerState.<T, I>get().current().getSavegameCache().delete(e);
                 }
             });
             del.getStyleClass().add("delete-button");
@@ -72,7 +72,7 @@ public class GuiGameCampaignEntry {
 
 
         var tagImage =
-                SavegameManagerState.get().<T, I>current().getGuiFactory().createImage(e);
+                SavegameManagerState.<T, I>get().current().getGuiFactory().createImage(e);
         Pane tagPane = new Pane(tagImage.getValue());
         tagPane.setMaxWidth(80);
         HBox tagBar = new HBox(tagPane, l);
@@ -162,7 +162,7 @@ public class GuiGameCampaignEntry {
             edit.setGraphic(new FontIcon());
             edit.setOnMouseClicked((m) -> {
                 Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
-                        SavegameManagerState.get().<T,I>current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
+                        SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
             });
             edit.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(edit, "Edit savegame");
@@ -171,7 +171,7 @@ public class GuiGameCampaignEntry {
                 buttonBar.getChildren().add(edit);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
-                    if (n.isIronman()) {
+                    if (!n.isIronman()) {
                         Platform.runLater(() -> {
                             buttonBar.getChildren().add(edit);
                         });
@@ -196,7 +196,7 @@ public class GuiGameCampaignEntry {
         InvalidationListener lis = (change) -> {
             Platform.runLater(() -> {
                 layout.setBackground(
-                        SavegameManagerState.get().<T, I>current().getGuiFactory().createEntryInfoBackground(e));
+                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e));
             });
         };
         e.infoProperty().addListener(lis);
@@ -208,13 +208,13 @@ public class GuiGameCampaignEntry {
         main.getStyleClass().add(CLASS_ENTRY);
         main.setOnMouseClicked(event -> {
             if (e.infoProperty().isNotNull().get()) {
-                SavegameManagerState.get().selectEntry(e);
+                SavegameManagerState.<T,I>get().selectEntry(e);
             }
         });
 
         main.setOnDragDetected(me -> {
             Dragboard db = main.startDragAndDrop(TransferMode.COPY);
-            var sc = SavegameManagerState.get().<T,I>current().getSavegameCache();
+            var sc = SavegameManagerState.<T, I>get().current().getSavegameCache();
             var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
             try {
                 sc.exportSavegame(e, out);
@@ -247,7 +247,7 @@ public class GuiGameCampaignEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(grid);
         if (entry.infoProperty().isNotNull().get()) {
-            SavegameManagerState.get().<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
+            SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry, grid);
         } else {
             stack.getChildren().add(loading);
         }
@@ -260,14 +260,14 @@ public class GuiGameCampaignEntry {
 
             if (stack.localToScreen(0, 0).getY() < PdxuApp.getApp().getScene().getWindow().getHeight() && !load.get()) {
                 load.set(true);
-                SavegameManagerState.get().<T, I>current().getSavegameCache().loadEntryAsync(entry);
+                SavegameManagerState.<T, I>get().current().getSavegameCache().loadEntryAsync(entry);
             }
         });
 
         entry.infoProperty().addListener((change) -> {
             Platform.runLater(() -> {
                 loading.setVisible(false);
-                SavegameManagerState.get().<T, I>current().getGuiFactory().fillNodeContainer(entry, grid);
+                SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry, grid);
             });
         });
 

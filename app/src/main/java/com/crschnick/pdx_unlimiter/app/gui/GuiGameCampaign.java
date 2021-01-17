@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
@@ -25,22 +26,29 @@ import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 
+import java.util.Optional;
+
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiGameCampaign {
 
+    public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
+            SavegameCollection<T,I> c) {
+        GameIntegration<T, I> gi = GameIntegration.ALL.stream()
+                .filter(i -> i.getSavegameCache().getCollections().contains(c))
+                .findFirst()
+                .map(v -> (GameIntegration<T, I>) v)
+                .get();
 
-    static HBox createCampaignButton(SavegameCollection<?,?> c, GameGuiFactory<?,?> gf) {
         HBox btn = new HBox();
-        btn.setOnMouseClicked((m) -> SavegameManagerState.get().selectCollection(c));
+        btn.setOnMouseClicked((m) -> SavegameManagerState.<T,I>get().selectCollection(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
-        btn.getProperties().put("campaign", c);
 
         {
             if (c instanceof GameCampaign) {
-                GameCampaign ca = (GameCampaign) c;
-                ObservableValue<Node> prop = gf.createImage(ca);
+                GameCampaign<T,I> ca = (GameCampaign<T,I>) c;
+                ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
                 prop.addListener((change, o, n) -> {
                     Platform.runLater(() -> {
                         btn.getChildren().set(0, prop.getValue());
@@ -73,8 +81,7 @@ public class GuiGameCampaign {
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showCampaignDeleteDialog()) {
-                    SavegameManagerState.get().current().getSavegameCache().delete(
-                            (SavegameCollection<Object, SavegameInfo<Object>>) c);
+                    SavegameManagerState.<T,I>get().current().getSavegameCache().delete(c);
                 }
             });
             del.setAlignment(Pos.CENTER);
@@ -82,13 +89,14 @@ public class GuiGameCampaign {
 
             info.getChildren().add(top);
         }
+
         {
             HBox bottom = new HBox();
 
             if (c instanceof GameCampaign) {
-                GameCampaign ca = (GameCampaign) c;
+                GameCampaign<T,I> ca = (GameCampaign<T,I>) c;
                 Label date = new Label();
-                date.textProperty().bind(gf.createInfoString(ca));
+                date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
                 date.getStyleClass().add(CLASS_DATE);
                 bottom.getChildren().add(date);
             }
@@ -97,7 +105,7 @@ public class GuiGameCampaign {
             bottom.getChildren().add(spacer);
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
-            Label count = new Label();
+            Label count = new Label("[" + c.getSavegames().size() + "]");
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
             c.getSavegames().addListener((SetChangeListener<GameCampaignEntry<?,?>>) change -> {
@@ -132,7 +140,7 @@ public class GuiGameCampaign {
         btn.setOnDragDropped(de -> {
             Node src = (Node) de.getGestureSource();
             @SuppressWarnings("unchecked")
-            GameCampaignEntry<T,I> entry = (GameCampaignEntry<T,I>) src.getProperties().get("entry");
+            GameCampaignEntry<T,I> entry = (GameCampaignEntry<T,I>) src.getProperties().get("list-item");
             SavegameActions.moveEntry(c, entry);
         });
     }

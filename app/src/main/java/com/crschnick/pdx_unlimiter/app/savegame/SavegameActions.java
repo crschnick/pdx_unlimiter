@@ -47,11 +47,11 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void openCampaignEntry(GameCampaignEntry<T, I> entry) {
-        ThreadHelper.open(SavegameManagerState.get().<T,I>current().getSavegameCache().getPath(entry));
+        ThreadHelper.open(SavegameManagerState.<T,I>get().current().getSavegameCache().getPath(entry));
     }
 
     public static Optional<Path> exportCampaignEntry() {
-        SavegameManagerState s = SavegameManagerState.get();
+        var s = SavegameManagerState.get();
         try {
             var path = s.current().getInstallation().getExportTarget(
                     s.current().getSavegameCache(), s.globalSelectedEntryProperty().get());
@@ -65,9 +65,8 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T,I> collection, GameCampaignEntry<T,I> entry) {
-        SavegameManagerState s = SavegameManagerState.get();
-        s.<T,I>current().getSavegameCache().moveEntryAsync(collection, entry);
-        SavegameManagerState.get().selectEntry(entry);
+        var s = SavegameManagerState.<T,I>get();
+        s.current().getSavegameCache().moveEntryAsync(collection, entry);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(GameCampaignEntry<T,I> entry) {
@@ -81,7 +80,7 @@ public class SavegameActions {
     }
 
     public static void launchCampaignEntry() {
-        SavegameManagerState s = SavegameManagerState.get();
+        var s = SavegameManagerState.get();
         if (s.globalSelectedEntryProperty().get() == null) {
             return;
         }

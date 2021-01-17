@@ -14,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -53,60 +54,14 @@ public class GuiGameCampaignEntryList {
     }
 
     public static void createCampaignEntryList(Pane pane) {
-        JFXListView<Node> grid = new JFXListView<>();
+        ListView<Node> grid = GuiListView.createViewOfList(
+                SavegameManagerState.get().getShownEntries(),
+                GuiGameCampaignEntry::createCampaignEntryNode,
+                SavegameManagerState.get().globalSelectedEntryProperty());
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);
         grid.prefWidthProperty().bind(pane.widthProperty());
         grid.prefHeightProperty().bind(pane.heightProperty());
-
-        SetChangeListener<GameCampaignEntry<?, ?>> l = (c) -> {
-            if (c.wasAdded()) {
-                int index = SavegameManagerState.get().globalSelectedCampaignProperty().get().indexOf(
-                        (GameCampaignEntry<Object, SavegameInfo<Object>>) c.getElementAdded());
-                Platform.runLater(() -> {
-                    grid.getItems().add(index, GuiGameCampaignEntry.createCampaignEntryNode(c.getElementAdded()));
-                });
-            } else {
-                Platform.runLater(() -> {
-                    grid.getItems().remove(grid.getItems().stream()
-                            .filter(n -> !c.getSet().contains(n.getProperties().get("entry"))).findAny().get());
-                });
-            }
-        };
-
-        SavegameManagerState.get().globalSelectedCampaignProperty().addListener((c, o, n) -> {
-            if (o != null) {
-                o.getSavegames().removeListener(l);
-            }
-
-            if (n != null) {
-                Platform.runLater(() -> {
-                    n.getSavegames().addListener(l);
-                    grid.setItems(FXCollections.observableArrayList(n.entryStream()
-                            .map(GuiGameCampaignEntry::createCampaignEntryNode)
-                            .collect(Collectors.toList())));
-
-                    // Bug in JFoenix? We have to set this everytime we update the list view
-                    grid.setExpanded(true);
-                });
-            } else {
-                Platform.runLater(() -> {
-                    grid.setItems(FXCollections.observableArrayList());
-                });
-
-            }
-        });
-
-        SavegameManagerState.get().globalSelectedEntryProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                grid.getSelectionModel().clearSelection();
-                if (n != null) {
-                    int index = SavegameManagerState.get().globalSelectedCampaignProperty().get().indexOf(n);
-                    grid.getSelectionModel().clearSelection();
-                    grid.getSelectionModel().select(index);
-                }
-            });
-        });
 
         addNoCampaignNodeListeners(pane, grid);
     }

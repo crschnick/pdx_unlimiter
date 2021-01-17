@@ -287,7 +287,7 @@ public abstract class SavegameCache<
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
 
-        SavegameManagerState.get().selectEntry(e);
+        SavegameManagerState.<T,I>get().selectEntry(e);
     }
 
     public synchronized void addNewEntryToFolder(SavegameFolder<T,I> folder, UUID entryUuid, String checksum, I info) {
@@ -300,7 +300,7 @@ public abstract class SavegameCache<
         logger.debug("Adding new entry " + e.getName());
         folder.getSavegames().add(e);
 
-        SavegameManagerState.get().selectEntry(e);
+        SavegameManagerState.<T,I>get().selectEntry(e);
     }
 
     protected abstract String getDefaultEntryName(I info);
@@ -493,7 +493,7 @@ public abstract class SavegameCache<
                 if (exists.isPresent()) {
                     logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                     loadEntry(exists.get());
-                    SavegameManagerState.get().selectEntry(exists.get());
+                    SavegameManagerState.<T,I>get().selectEntry(exists.get());
                     return;
                 } else {
                     logger.debug("No entry with checksum found");
