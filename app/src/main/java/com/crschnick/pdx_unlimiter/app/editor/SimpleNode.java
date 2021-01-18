@@ -6,7 +6,6 @@ import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 public class SimpleNode extends EditorNode {

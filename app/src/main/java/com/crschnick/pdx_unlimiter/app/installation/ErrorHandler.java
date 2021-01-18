@@ -7,7 +7,6 @@ import io.sentry.UserFeedback;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 

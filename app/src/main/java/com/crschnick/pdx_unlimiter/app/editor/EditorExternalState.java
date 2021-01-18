@@ -3,7 +3,9 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.parser.*;
+import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

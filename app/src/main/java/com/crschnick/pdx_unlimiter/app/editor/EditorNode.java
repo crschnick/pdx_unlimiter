@@ -12,6 +12,13 @@ import java.util.stream.Collectors;
 
 public abstract class EditorNode {
 
+    protected String keyName;
+    private EditorNode directParent;
+    public EditorNode(EditorNode directParent, String keyName) {
+        this.directParent = directParent;
+        this.keyName = keyName;
+    }
+
     public static List<EditorNode> create(EditorNode parent, List<Node> nodes) {
         var result = new ArrayList<EditorNode>();
         for (int i = 0; i < nodes.size(); ) {
@@ -48,14 +55,6 @@ public abstract class EditorNode {
         }
 
         return result;
-    }
-
-    private EditorNode directParent;
-    protected String keyName;
-
-    public EditorNode(EditorNode directParent, String keyName) {
-        this.directParent = directParent;
-        this.keyName = keyName;
     }
 
     public abstract boolean filterKey(Predicate<String> filter);

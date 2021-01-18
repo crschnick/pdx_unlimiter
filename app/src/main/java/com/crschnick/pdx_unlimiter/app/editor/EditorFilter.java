@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,10 +12,10 @@ public class EditorFilter {
 
     private EditorState state;
     private StringProperty filterString;
-    private BooleanProperty deep;
     private BooleanProperty caseSensitive;
     private BooleanProperty filterKeys;
     private BooleanProperty filterValues;
+
     EditorFilter(EditorState state) {
         this.state = state;
 
@@ -25,8 +25,6 @@ public class EditorFilter {
                 state.update(false);
             }
         });
-        deep = new SimpleBooleanProperty();
-        deep.addListener((c, o, n) -> state.update(false));
         caseSensitive = new SimpleBooleanProperty();
         caseSensitive.addListener((c, o, n) -> state.update(false));
         filterKeys = new SimpleBooleanProperty(true);
@@ -65,10 +63,6 @@ public class EditorFilter {
 
     public StringProperty filterStringProperty() {
         return filterString;
-    }
-
-    public BooleanProperty deepProperty() {
-        return deep;
     }
 
     public BooleanProperty caseSensitiveProperty() {

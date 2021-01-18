@@ -2,23 +2,16 @@ package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -106,7 +99,7 @@ public class GuiEditor {
             if (n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode) {
                 var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
                 valueDisplay = tf;
-                tf.textProperty().addListener((c,o,ne) -> {
+                tf.textProperty().addListener((c, o, ne) -> {
                     ((SimpleNode) n).updateText(ne);
                 });
             } else {
@@ -171,7 +164,7 @@ public class GuiEditor {
             filterValues.getStyleClass().add(GuiStyle.CLASS_VALUE);
             filterValues.setGraphic(new FontIcon());
             filterValues.selectedProperty().bindBidirectional(edFilter.filterValuesProperty());
-            edFilter.filterValuesProperty().addListener((c,o,n) -> {
+            edFilter.filterValuesProperty().addListener((c, o, n) -> {
                 filterValues.setSelected(n);
             });
             GuiTooltips.install(filterValues, "Include values in search");
@@ -198,15 +191,6 @@ public class GuiEditor {
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
             GuiTooltips.install(cs, "Case sensitive");
             box.getChildren().add(cs);
-        }
-
-        {
-            ToggleButton deepSearch = new ToggleButton();
-            deepSearch.getStyleClass().add(GuiStyle.CLASS_DEEP_SEARCH);
-            deepSearch.setGraphic(new FontIcon());
-            deepSearch.selectedProperty().bindBidirectional(edFilter.deepProperty());
-            GuiTooltips.install(deepSearch, "Deep search");
-            box.getChildren().add(deepSearch);
         }
 
         return box;

@@ -5,7 +5,6 @@ import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -61,9 +60,9 @@ public class CollectorNode extends EditorNode {
     public void update(ArrayNode newNode) {
         var ar = getRealParent().getBackingNode().getNodeArray();
         int firstIndex = ar.indexOf(ar.stream().filter(n -> n instanceof KeyValueNode &&
-                        n.getKeyValueNode().getKeyName().equals(keyName)).findFirst().get());
+                n.getKeyValueNode().getKeyName().equals(keyName)).findFirst().get());
         ar.removeIf(n -> n instanceof KeyValueNode &&
-                        n.getKeyValueNode().getKeyName().equals(keyName));
+                n.getKeyValueNode().getKeyName().equals(keyName));
 
         ar.addAll(firstIndex, newNode.getNodeArray().stream()
                 .map(node -> KeyValueNode.create(keyName, node)).collect(Collectors.toList()));
