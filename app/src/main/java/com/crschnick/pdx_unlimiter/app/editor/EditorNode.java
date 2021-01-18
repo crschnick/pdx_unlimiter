@@ -60,6 +60,8 @@ public abstract class EditorNode {
 
     public abstract boolean filterKey(Predicate<String> filter);
 
+    public abstract boolean filterValue(Predicate<String> filter);
+
     public abstract String displayKeyName();
 
     public abstract String navigationName();

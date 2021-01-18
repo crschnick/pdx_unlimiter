@@ -24,6 +24,11 @@ public class CollectorNode extends EditorNode {
     }
 
     @Override
+    public boolean filterValue(Predicate<String> filter) {
+        return false;
+    }
+
+    @Override
     public String displayKeyName() {
         return keyName + "(s)";
     }

@@ -28,7 +28,7 @@ public class ComponentManager {
 
             LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
-            
+
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
             }

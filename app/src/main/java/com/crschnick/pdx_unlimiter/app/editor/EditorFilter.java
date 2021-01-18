@@ -14,18 +14,25 @@ public class EditorFilter {
     private StringProperty filterString;
     private BooleanProperty deep;
     private BooleanProperty caseSensitive;
-    private ObjectProperty<Scope> scope;
+    private BooleanProperty filterKeys;
+    private BooleanProperty filterValues;
     EditorFilter(EditorState state) {
         this.state = state;
 
         filterString = new SimpleStringProperty("");
-        filterString.addListener((c, o, n) -> state.update(false));
+        filterString.addListener((c, o, n) -> {
+            if (filterKeys.get() || filterValues.get()) {
+                state.update(false);
+            }
+        });
         deep = new SimpleBooleanProperty();
         deep.addListener((c, o, n) -> state.update(false));
         caseSensitive = new SimpleBooleanProperty();
         caseSensitive.addListener((c, o, n) -> state.update(false));
-        scope = new SimpleObjectProperty<>(Scope.KEY);
-        scope.addListener((c, o, n) -> state.update(false));
+        filterKeys = new SimpleBooleanProperty(true);
+        filterKeys.addListener((c, o, n) -> state.update(false));
+        filterValues = new SimpleBooleanProperty(false);
+        filterValues.addListener((c, o, n) -> state.update(false));
     }
 
     private boolean contains(String s) {
@@ -38,55 +45,49 @@ public class EditorFilter {
 
     public List<EditorNode> filter(List<EditorNode> input) {
         return input.stream().filter(n -> {
-            if (true) {
-                if ((scope.get() == Scope.KEY || scope.get() == Scope.BOTH) && contains("")) {
-                    return true;
-                } else if ((scope.get() == Scope.VALUE || scope.get() == Scope.BOTH)) {
-                    return true;
-                } else {
-                    return false;
-                }
+            if (!filterKeys.get() && !filterValues.get()) {
+                return true;
             }
 
-            return false;
-        }).collect(Collectors.toList());
-    }
+            if (filterString.get().length() == 0) {
+                return true;
+            }
 
-    public String getFilterString() {
-        return filterString.get();
+            if (filterKeys.get() && n.filterKey(this::contains)) {
+                return true;
+            } else if (filterValues.get() && n.filterValue(this::contains)) {
+                return true;
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
     }
 
     public StringProperty filterStringProperty() {
         return filterString;
     }
 
-    public boolean isDeep() {
-        return deep.get();
-    }
-
     public BooleanProperty deepProperty() {
         return deep;
-    }
-
-    public boolean isCaseSensitive() {
-        return caseSensitive.get();
     }
 
     public BooleanProperty caseSensitiveProperty() {
         return caseSensitive;
     }
 
-    public Scope getScope() {
-        return scope.get();
+    public boolean isFilterKeys() {
+        return filterKeys.get();
     }
 
-    public ObjectProperty<Scope> scopeProperty() {
-        return scope;
+    public BooleanProperty filterKeysProperty() {
+        return filterKeys;
     }
 
-    public enum Scope {
-        KEY,
-        VALUE,
-        BOTH
+    public boolean isFilterValues() {
+        return filterValues.get();
+    }
+
+    public BooleanProperty filterValuesProperty() {
+        return filterValues;
     }
 }

@@ -50,6 +50,7 @@ public class GuiEditor {
 
                 l.forEach(en -> {
                     var btn = new JFXButton(en.navigationName());
+                    btn.setMnemonicParsing(false);
                     {
                         var sep = new Label(">");
                         sep.setAlignment(Pos.CENTER);
@@ -103,7 +104,11 @@ public class GuiEditor {
 
             Region valueDisplay = null;
             if (n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode) {
-                valueDisplay = new TextField(((SimpleNode) n).getBackingNode().getString());
+                var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
+                valueDisplay = tf;
+                tf.textProperty().addListener((c,o,ne) -> {
+                    ((SimpleNode) n).updateText(ne);
+                });
             } else {
                 int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
                         ((CollectorNode) n).getNodes().size();
@@ -147,10 +152,6 @@ public class GuiEditor {
         }
     }
 
-    private static Tooltip createTooltip(EditorNode en) {
-        return null;
-    }
-
     private static Region createFilterBar(EditorFilter edFilter) {
         HBox box = new HBox();
         box.getStyleClass().add(GuiStyle.CLASS_EDITOR_FILTER);
@@ -160,19 +161,7 @@ public class GuiEditor {
             ToggleButton filterKeys = new ToggleButton();
             filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
             filterKeys.setGraphic(new FontIcon());
-            filterKeys.selectedProperty().addListener((c, o, n) -> {
-                if (n) {
-                    if (edFilter.getScope() == EditorFilter.Scope.VALUE) {
-                        edFilter.scopeProperty().set(EditorFilter.Scope.BOTH);
-                    } else {
-                        edFilter.scopeProperty().set(EditorFilter.Scope.KEY);
-                    }
-                } else {
-                    if (edFilter.getScope() == EditorFilter.Scope.BOTH) {
-                        edFilter.scopeProperty().set(EditorFilter.Scope.VALUE);
-                    }
-                }
-            });
+            filterKeys.selectedProperty().bindBidirectional(edFilter.filterKeysProperty());
             GuiTooltips.install(filterKeys, "Include keys in search");
             box.getChildren().add(filterKeys);
         }
@@ -181,18 +170,9 @@ public class GuiEditor {
             ToggleButton filterValues = new ToggleButton();
             filterValues.getStyleClass().add(GuiStyle.CLASS_VALUE);
             filterValues.setGraphic(new FontIcon());
-            filterValues.selectedProperty().addListener((c, o, n) -> {
-                if (n) {
-                    if (edFilter.getScope() == EditorFilter.Scope.KEY) {
-                        edFilter.scopeProperty().set(EditorFilter.Scope.BOTH);
-                    } else {
-                        edFilter.scopeProperty().set(EditorFilter.Scope.VALUE);
-                    }
-                } else {
-                    if (edFilter.getScope() == EditorFilter.Scope.BOTH) {
-                        edFilter.scopeProperty().set(EditorFilter.Scope.KEY);
-                    }
-                }
+            filterValues.selectedProperty().bindBidirectional(edFilter.filterValuesProperty());
+            edFilter.filterValuesProperty().addListener((c,o,n) -> {
+                filterValues.setSelected(n);
             });
             GuiTooltips.install(filterValues, "Include values in search");
             box.getChildren().add(filterValues);
@@ -201,7 +181,7 @@ public class GuiEditor {
         box.getChildren().add(new Separator(Orientation.VERTICAL));
 
         {
-            TextField filter = new JFXTextField();
+            TextField filter = new TextField();
             filter.focusedProperty().addListener((c, o, n) -> {
                 if (n) {
                     filter.selectAll();

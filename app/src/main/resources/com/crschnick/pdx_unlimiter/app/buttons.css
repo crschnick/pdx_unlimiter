@@ -14,6 +14,14 @@
     -fx-icon-code: "mdi-delete";
 }
 
+.key-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-key";
+}
+
+.value-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-tag-text-outline";
+}
+
 .preview .ikonli-font-icon {
     -fx-icon-code: "mdi-tooltip";
 }

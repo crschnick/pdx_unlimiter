@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,11 @@ public class SimpleNode extends EditorNode {
         this.backingNode = backingNode;
     }
 
+    public void updateText(String text) {
+        ValueNode bn = (ValueNode) backingNode;
+        update(new ArrayNode(List.of(new ValueNode(bn.isStringValue(), text))));
+    }
+
     @Override
     public boolean filterKey(Predicate<String> filter) {
         if (getKeyName().isPresent() && filter.test(getKeyName().get())) {
@@ -30,6 +36,11 @@ public class SimpleNode extends EditorNode {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean filterValue(Predicate<String> filter) {
+        return backingNode instanceof ValueNode && filter.test(backingNode.getString());
     }
 
     @Override

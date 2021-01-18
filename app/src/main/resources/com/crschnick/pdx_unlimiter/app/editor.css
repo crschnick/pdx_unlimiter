@@ -12,11 +12,10 @@
 }
 
 .editor-filter-bar {
-  -fx-padding: 0.3em 1em 0.3em 1em;
-  -fx-font-size: 11pt;
+  -fx-padding: 0.5em 1em 0.5em 1em;
   -fx-background-color: white;
 -fx-border-color: #CCCCCCFF;
--fx-border-width: 0.1em 0 0 0;
+-fx-border-width: 0.15em 0 0 0;
 }
 
 .editor-nav-bar {
