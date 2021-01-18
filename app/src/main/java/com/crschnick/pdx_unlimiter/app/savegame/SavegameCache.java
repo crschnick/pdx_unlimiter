@@ -441,7 +441,9 @@ public abstract class SavegameCache<
     }
 
     public synchronized String getFileName(GameCampaignEntry<T, I> e) {
-        return getSavegameCollection(e).getName() + " (" + e.getName().replace(":", ".") + ")." + fileEnding;
+        var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
+        var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
+        return colName + " (" + sgName + ")." + fileEnding;
     }
 
     public synchronized void exportSavegame(GameCampaignEntry<T, I> e, Path destPath) throws IOException {

@@ -209,7 +209,7 @@ public class GuiSavegame {
                     Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
                             SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
                 }, true);
-                });
+            });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
 
