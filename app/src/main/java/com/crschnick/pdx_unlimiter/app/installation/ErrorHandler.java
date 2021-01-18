@@ -7,7 +7,9 @@ import io.sentry.UserFeedback;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.nio.file.Path;
+import java.util.concurrent.CountDownLatch;
 
 public class ErrorHandler {
 
@@ -94,6 +96,16 @@ public class ErrorHandler {
     public static void handleTerminalException(Exception ex) {
         if (!startupCompleted) {
             handleExcetionWithoutInit(ex);
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.startup(() -> {
+                latch.countDown();
+            });
+            try {
+                latch.await();
+                GuiErrorReporter.showException(ex, true);
+            } catch (InterruptedException e) {
+            }
+            System.exit(1);
         }
 
         LoggerFactory.getLogger(ErrorHandler.class).error("Terminal Error", ex);
