@@ -66,13 +66,16 @@ public class TextFormatParser extends FormatParser {
             }
 
             boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+            boolean eof = i == bytes.length - 1;
             boolean marksEndOfPreviousToken =
-                    (i == bytes.length - 1 && prev < i) // EOF
+                               (eof && prev < i)                   // EOF
                             || (t != null && prev < i)             // New token finishes old token
                             || (isWhitespace && prev < i)          // Whitespace finishes old token
                             || (c == '#' && prev < i);             // New comment finishes old token
             if (marksEndOfPreviousToken) {
-                var sub = Arrays.copyOfRange(bytes, prev, i);
+                // Special case for eof, since the end index is exclusive!
+                int endIndex = eof ? i + 1 : i;
+                var sub = Arrays.copyOfRange(bytes, prev, endIndex);
                 if (sub[0] == '"' && sub[sub.length - 1] == '"') {
                     tokens.add(new ValueToken(true, new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
                 } else {

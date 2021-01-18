@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.core.parser.Node;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CollectorNode extends EditorNode {
@@ -15,6 +16,11 @@ public class CollectorNode extends EditorNode {
     public CollectorNode(EditorNode parent, String keyName, List<Node> nodes) {
         super(parent, keyName);
         this.nodes = nodes;
+    }
+
+    @Override
+    public boolean filterKey(Predicate<String> filter) {
+        return filter.test(keyName);
     }
 
     @Override
@@ -43,18 +49,18 @@ public class CollectorNode extends EditorNode {
     }
 
     public Node toWritableNode() {
-        return new ArrayNode(nodes.stream()
-                .map(node -> KeyValueNode.create(keyName, node))
-                .collect(Collectors.toList()));
+        return new ArrayNode(nodes);
     }
 
     @Override
     public void update(ArrayNode newNode) {
-        getRealParent().getBackingNode().getNodeArray()
-                .removeIf(n -> n instanceof KeyValueNode &&
+        var ar = getRealParent().getBackingNode().getNodeArray();
+        int firstIndex = ar.indexOf(ar.stream().filter(n -> n instanceof KeyValueNode &&
+                        n.getKeyValueNode().getKeyName().equals(keyName)).findFirst().get());
+        ar.removeIf(n -> n instanceof KeyValueNode &&
                         n.getKeyValueNode().getKeyName().equals(keyName));
 
-        getRealParent().getBackingNode().getNodeArray().addAll(newNode.getNodeArray().stream()
+        ar.addAll(firstIndex, newNode.getNodeArray().stream()
                 .map(node -> KeyValueNode.create(keyName, node)).collect(Collectors.toList()));
     }
 

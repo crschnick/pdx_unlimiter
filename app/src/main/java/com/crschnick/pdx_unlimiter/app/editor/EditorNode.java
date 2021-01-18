@@ -7,14 +7,14 @@ import com.crschnick.pdx_unlimiter.core.parser.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public abstract class EditorNode {
 
     public static List<EditorNode> create(EditorNode parent, List<Node> nodes) {
-        int realIndex = 0;
         var result = new ArrayList<EditorNode>();
-        for (int i = 0; i < nodes.size(); i++) {
+        for (int i = 0; i < nodes.size(); ) {
             var n = nodes.get(i);
             if (n instanceof KeyValueNode &&
                     i + 1 < nodes.size() &&
@@ -31,11 +31,10 @@ public abstract class EditorNode {
                     result.add(new CollectorNode(
                             parent,
                             k,
-                            nodes.subList(i, end).stream()
+                            nodes.subList(i, end + 1).stream()
                                     .map(node -> node.getKeyValueNode().getNode())
                                     .collect(Collectors.toList())));
-                    i = end;
-                    realIndex++;
+                    i = end + 1;
                     continue;
                 }
             }
@@ -43,9 +42,9 @@ public abstract class EditorNode {
             result.add(new SimpleNode(
                     parent,
                     n instanceof KeyValueNode ? n.getKeyValueNode().getKeyName() : null,
-                    realIndex,
+                    i,
                     n instanceof KeyValueNode ? n.getKeyValueNode().getNode() : n));
-            realIndex++;
+            i++;
         }
 
         return result;
@@ -58,6 +57,8 @@ public abstract class EditorNode {
         this.directParent = directParent;
         this.keyName = keyName;
     }
+
+    public abstract boolean filterKey(Predicate<String> filter);
 
     public abstract String displayKeyName();
 

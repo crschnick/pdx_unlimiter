@@ -19,13 +19,13 @@ public class EditorFilter {
         this.state = state;
 
         filterString = new SimpleStringProperty("");
-        filterString.addListener((c, o, n) -> state.update());
+        filterString.addListener((c, o, n) -> state.update(false));
         deep = new SimpleBooleanProperty();
-        deep.addListener((c, o, n) -> state.update());
+        deep.addListener((c, o, n) -> state.update(false));
         caseSensitive = new SimpleBooleanProperty();
-        caseSensitive.addListener((c, o, n) -> state.update());
+        caseSensitive.addListener((c, o, n) -> state.update(false));
         scope = new SimpleObjectProperty<>(Scope.KEY);
-        scope.addListener((c, o, n) -> state.update());
+        scope.addListener((c, o, n) -> state.update(false));
     }
 
     private boolean contains(String s) {

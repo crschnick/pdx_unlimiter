@@ -7,25 +7,31 @@
   -fx-font-family: "monospaced";
 }
 
+.editor-grid .preview {
+  -fx-font-family: "monospaced";
+}
+
 .editor-filter-bar {
-  -fx-padding: 1em;
+  -fx-padding: 0.3em 1em 0.3em 1em;
   -fx-font-size: 11pt;
   -fx-background-color: white;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0.1em 0 0 0;
 }
 
 .editor-nav-bar {
-  -fx-padding: 1em;
+  -fx-padding: 0.3em 1em 0.3em 1em;
   -fx-font-size: 11pt;
-  -fx-background-color: white;
+  -fx-background-color: #EEEEEEFF;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0 0 0.1em 0;
 }
 
 .editor-grid .jfx-button {
--fx-padding: 0 0.2em 0.05em 0.2em;
+-fx-padding: 0.1 0.2em 0.05em 0.2em;
 }
 
-.editor-grid .jfx-text-field {
- -jfx-label-float: true;
+.editor-grid .text-field {
 -fx-padding: 0.05em 0.2em 0.05em 0.2em;
--jfx-unfocus-color: transparent;
 -fx-background-color: #AAAAAA44;
 }

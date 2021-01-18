@@ -3,11 +3,13 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -16,6 +18,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -33,21 +36,30 @@ public class GuiEditor {
 
     private static Region createNavigationBar(EditorState edState) {
         HBox bar = new HBox();
+        bar.setAlignment(Pos.CENTER_LEFT);
         bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
 
         Consumer<List<EditorNode>> updateBar = l -> {
-            bar.getChildren().clear();
-            l.forEach(en -> {
-                var btn = new JFXButton(en.navigationName());
-                if (!en.equals(l.get(0))) {
-                    var sep = new Label(">");
-                    sep.setAlignment(Pos.CENTER);
-                    bar.getChildren().add(sep);
-                }
-                btn.setOnAction(e -> {
-                    edState.navigateTo(en);
+            Platform.runLater(() -> {
+                bar.getChildren().clear();
+                var initBtn = new JFXButton("<file>");
+                initBtn.setOnAction(e -> {
+                    edState.navigateTo(null);
                 });
-                bar.getChildren().add(btn);
+                bar.getChildren().add(initBtn);
+
+                l.forEach(en -> {
+                    var btn = new JFXButton(en.navigationName());
+                    {
+                        var sep = new Label(">");
+                        sep.setAlignment(Pos.CENTER);
+                        bar.getChildren().add(sep);
+                    }
+                    btn.setOnAction(e -> {
+                        edState.navigateTo(en);
+                    });
+                    bar.getChildren().add(btn);
+                });
             });
         };
         updateBar.accept(edState.getNodePath());
@@ -91,16 +103,30 @@ public class GuiEditor {
 
             Region valueDisplay = null;
             if (n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode) {
-                valueDisplay = new JFXTextField(((SimpleNode) n).getBackingNode().getString());
+                valueDisplay = new TextField(((SimpleNode) n).getBackingNode().getString());
             } else {
                 int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
                         ((CollectorNode) n).getNodes().size();
-                var btn = new JFXButton("[... " + length + " ...]");
+                var lengthString = " ".repeat(4 - String.valueOf(length).length()) + String.valueOf(length);
+                var btn = new JFXButton("[... " + lengthString + " ...]");
                 btn.setAlignment(Pos.CENTER);
                 btn.setOnAction(e -> {
                     state.navigateTo(n);
                 });
-                valueDisplay = btn;
+
+                var preview = new Label();
+                preview.getStyleClass().add("preview");
+                preview.setGraphic(new FontIcon());
+                preview.setOnMouseEntered(e -> {
+                    var tt = new Tooltip(TextFormatWriter.write(n.toWritableNode(), 10));
+                    tt.setShowDelay(javafx.util.Duration.ZERO);
+                    Tooltip.install(preview, tt);
+                });
+
+                var hb = new HBox(btn, preview);
+                hb.setAlignment(Pos.CENTER);
+                hb.setSpacing(5);
+                valueDisplay = hb;
             }
             grid.add(valueDisplay, 2, i);
 
@@ -121,6 +147,10 @@ public class GuiEditor {
         }
     }
 
+    private static Tooltip createTooltip(EditorNode en) {
+        return null;
+    }
+
     private static Region createFilterBar(EditorFilter edFilter) {
         HBox box = new HBox();
         box.getStyleClass().add(GuiStyle.CLASS_EDITOR_FILTER);
@@ -128,7 +158,7 @@ public class GuiEditor {
 
         {
             ToggleButton filterKeys = new ToggleButton();
-            filterKeys.getStyleClass().add(GuiStyle.CLASS_NEW);
+            filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
             filterKeys.setGraphic(new FontIcon());
             filterKeys.selectedProperty().addListener((c, o, n) -> {
                 if (n) {
@@ -149,7 +179,7 @@ public class GuiEditor {
 
         {
             ToggleButton filterValues = new ToggleButton();
-            filterValues.getStyleClass().add(GuiStyle.CLASS_NEW);
+            filterValues.getStyleClass().add(GuiStyle.CLASS_VALUE);
             filterValues.setGraphic(new FontIcon());
             filterValues.selectedProperty().addListener((c, o, n) -> {
                 if (n) {

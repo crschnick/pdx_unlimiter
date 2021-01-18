@@ -14,6 +14,10 @@
     -fx-icon-code: "mdi-delete";
 }
 
+.preview .ikonli-font-icon {
+    -fx-icon-code: "mdi-tooltip";
+}
+
 .case-sensitive-button .ikonli-font-icon {
     -fx-icon-code: "mdi-case-sensitive-alt";
 }

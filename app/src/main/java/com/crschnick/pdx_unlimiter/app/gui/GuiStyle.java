@@ -70,6 +70,8 @@ public class GuiStyle {
     public static String CLASS_EDITOR_GRID = "editor-grid";
     public static String CLASS_EDITOR_FILTER = "editor-filter-bar";
     public static String CLASS_EDITOR_NAVIGATION = "editor-nav-bar";
+    public static String CLASS_KEY = "key-button";
+    public static String CLASS_VALUE = "value-button";
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",

@@ -30,7 +30,7 @@ public class EditorExternalState {
                         try {
                             ArrayNode newNode = TextFormatParser.textFileParser().parse(Files.newInputStream(changed));
                             e.editorNode.update(newNode);
-                            e.state.update();
+                            e.state.onFileChanged();
                         } catch (Exception ex) {
                             ErrorHandler.handleException(ex);
                         }
@@ -80,7 +80,7 @@ public class EditorExternalState {
         Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
 
         try {
-            Files.writeString(file, TextFormatWriter.write(node.toWritableNode()));
+            Files.writeString(file, TextFormatWriter.write(node.toWritableNode(), Integer.MAX_VALUE));
             openEntries.add(new Entry(file, node, state));
             ThreadHelper.open(file);
         } catch (IOException e) {

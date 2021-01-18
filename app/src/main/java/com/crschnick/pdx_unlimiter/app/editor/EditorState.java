@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class EditorState {
 
+    private EditorNode root;
     private EditorExternalState externalState;
     private ListProperty<EditorNode> nodePath;
     private EditorFilter filter;
@@ -21,10 +22,10 @@ public class EditorState {
     public EditorState(ArrayNode node) {
         externalState = new EditorExternalState();
         nodePath = new SimpleListProperty<>(FXCollections.observableArrayList());
-        nodePath.add(new SimpleNode(null, "<root>", 0, node));
         filter = new EditorFilter(this);
         content = new SimpleListProperty<>(FXCollections.observableArrayList());
-        update();
+        root = new SimpleNode(null, "root", 0, node);
+        update(false);
     }
 
     public List<EditorNode> createEditorNodes(EditorNode parent) {
@@ -33,20 +34,54 @@ public class EditorState {
         return filtered;
     }
 
-    public void update() {
-        var selected = nodePath.get(nodePath.size() - 1);
-        content.set(FXCollections.observableArrayList(createEditorNodes(selected)));
+    private void rebuildPath() {
+        EditorNode current = null;
+        List<EditorNode> newPath = new ArrayList<>();
+        for (var pathEl : nodePath) {
+            if (current == null) {
+                current = root;
+                newPath.add(root);
+                continue;
+            }
+
+            var newEl = current.open().stream()
+                    .filter(en -> en.displayKeyName().equals(pathEl.displayKeyName()))
+                    .findFirst();
+            if (newEl.isPresent()) {
+                current = newEl.get();
+                newPath.add(newEl.get());
+            } else {
+                break;
+            }
+        }
+        nodePath.set(FXCollections.observableList(newPath));
+    }
+
+    public void onFileChanged() {
+        update(true);
+    }
+
+    void update(boolean updatePath) {
+        if (updatePath) {
+            rebuildPath();
+        }
+        var selected = nodePath.size() > 0 ? nodePath.get(nodePath.size() - 1) : null;
+        content.set(FXCollections.observableArrayList(selected != null ? createEditorNodes(selected) : List.of(root)));
     }
 
     public void navigateTo(EditorNode newNode) {
-        int index = nodePath.indexOf(newNode);
-        if (index == -1) {
-            nodePath.add(newNode);
+        if (newNode == null) {
+            nodePath.clear();
         } else {
-            nodePath.removeIf(n -> nodePath.indexOf(n) > index);
+            int index = nodePath.indexOf(newNode);
+            if (index == -1) {
+                nodePath.add(newNode);
+            } else {
+                nodePath.removeIf(n -> nodePath.indexOf(n) > index);
+            }
         }
 
-        update();
+        update(false);
     }
 
     public ObservableList<EditorNode> getNodePath() {
