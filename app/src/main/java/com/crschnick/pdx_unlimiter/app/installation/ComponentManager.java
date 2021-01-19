@@ -22,7 +22,6 @@ public class ComponentManager {
 
     public static void initialSetup(String[] args) {
         try {
-            if (true) throw new IllegalArgumentException();
             PdxuInstallation.init();
             LogManager.init();
             ErrorHandler.init();
