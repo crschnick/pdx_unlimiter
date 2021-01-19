@@ -1,8 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.data;
 
 
-import java.util.Comparator;
-
 public class GameVersion implements Comparable<GameVersion> {
 
     private int first;

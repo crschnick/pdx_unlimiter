@@ -2,9 +2,11 @@ package com.crschnick.pdx_unlimiter.core.parser;
 
 public class ValueNode extends Node {
 
+    private boolean string;
     private String value;
 
-    public ValueNode(String value) {
+    public ValueNode(boolean string, String value) {
+        this.string = string;
         this.value = value;
     }
 
@@ -14,5 +16,9 @@ public class ValueNode extends Node {
 
     public String getValue() {
         return value;
+    }
+
+    public boolean isStringValue() {
+        return string;
     }
 }

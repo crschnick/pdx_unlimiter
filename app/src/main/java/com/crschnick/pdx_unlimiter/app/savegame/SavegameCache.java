@@ -1,6 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.*;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
+import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
@@ -10,7 +13,6 @@ import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
@@ -170,7 +172,7 @@ public abstract class SavegameCache<
 
         ArrayNode c = n.putArray("campaigns");
         getCollections().stream().filter(col -> col instanceof GameCampaign).forEach(col -> {
-            GameCampaign<T,I> campaign = (GameCampaign<T, I>) col;
+            GameCampaign<T, I> campaign = (GameCampaign<T, I>) col;
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
             campaign.getSavegames().stream()
@@ -202,7 +204,7 @@ public abstract class SavegameCache<
 
         ArrayNode f = n.putArray("folders");
         getCollections().stream().filter(col -> col instanceof SavegameFolder).forEach(col -> {
-            SavegameFolder<T,I> folder = (SavegameFolder<T, I>) col;
+            SavegameFolder<T, I> folder = (SavegameFolder<T, I>) col;
             ObjectNode folderFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = folderFileNode.putArray("entries");
             folder.getSavegames().stream()
@@ -245,16 +247,16 @@ public abstract class SavegameCache<
         this.collections.remove(c);
     }
 
-    private synchronized Optional<SavegameFolder<T,I>> getOrCreateFolder(String name) {
+    private synchronized Optional<SavegameFolder<T, I>> getOrCreateFolder(String name) {
         return this.collections.stream()
                 .filter(f -> f instanceof SavegameFolder && f.getName().equals(name))
-                .map(f -> (SavegameFolder<T,I>) f)
+                .map(f -> (SavegameFolder<T, I>) f)
                 .findAny()
                 .or(() -> addNewFolder(name));
     }
 
-    public synchronized Optional<SavegameFolder<T,I>> addNewFolder(String name) {
-        var col = new SavegameFolder<T,I>(Instant.now(), name, UUID.randomUUID());
+    public synchronized Optional<SavegameFolder<T, I>> addNewFolder(String name) {
+        var col = new SavegameFolder<T, I>(Instant.now(), name, UUID.randomUUID());
         try {
             Files.createDirectory(getPath().resolve(col.getUuid().toString()));
         } catch (IOException e) {
@@ -287,10 +289,10 @@ public abstract class SavegameCache<
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
 
-        SavegameManagerState.get().selectEntry(e);
+        SavegameManagerState.<T, I>get().selectEntry(e);
     }
 
-    public synchronized void addNewEntryToFolder(SavegameFolder<T,I> folder, UUID entryUuid, String checksum, I info) {
+    public synchronized void addNewEntryToFolder(SavegameFolder<T, I> folder, UUID entryUuid, String checksum, I info) {
         GameCampaignEntry<T, I> e = new GameCampaignEntry<>(
                 getDefaultEntryName(info),
                 entryUuid,
@@ -300,7 +302,7 @@ public abstract class SavegameCache<
         logger.debug("Adding new entry " + e.getName());
         folder.getSavegames().add(e);
 
-        SavegameManagerState.get().selectEntry(e);
+        SavegameManagerState.<T, I>get().selectEntry(e);
     }
 
     protected abstract String getDefaultEntryName(I info);
@@ -320,8 +322,15 @@ public abstract class SavegameCache<
                 "Could not find savegame collection for entry " + e.getName()));
     }
 
-    public synchronized void moveEntry(
-            SavegameCollection<T,I> to, GameCampaignEntry<T,I> entry) {
+    public void moveEntryAsync(
+            SavegameCollection<T, I> to, GameCampaignEntry<T, I> entry) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            moveEntry(to, entry);
+        }, true);
+    }
+
+    private synchronized void moveEntry(
+            SavegameCollection<T, I> to, GameCampaignEntry<T, I> entry) {
         var from = getSavegameCollection(entry);
         if (from == to) {
             return;
@@ -350,7 +359,13 @@ public abstract class SavegameCache<
         }
     }
 
-    public synchronized void delete(GameCampaignEntry<T, I> e) {
+    public void deleteAsync(GameCampaignEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            delete(e);
+        }, false);
+    }
+
+    private synchronized void delete(GameCampaignEntry<T, I> e) {
         SavegameCollection<T, I> c = getSavegameCollection(e);
         if (!this.collections.contains(c) || !c.getSavegames().contains(e)) {
             return;
@@ -432,7 +447,9 @@ public abstract class SavegameCache<
     }
 
     public synchronized String getFileName(GameCampaignEntry<T, I> e) {
-        return getSavegameCollection(e).getName() + " (" + e.getName().replace(":", ".") + ")." + fileEnding;
+        var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
+        var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
+        return colName + " (" + sgName + ")." + fileEnding;
     }
 
     public synchronized void exportSavegame(GameCampaignEntry<T, I> e, Path destPath) throws IOException {
@@ -442,7 +459,7 @@ public abstract class SavegameCache<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    synchronized SavegameParser.Status importSavegame(Path file, SavegameFolder<T,I> folder) {
+    synchronized SavegameParser.Status importSavegame(Path file, SavegameFolder<T, I> folder) {
         if (!MemoryChecker.checkForEnoughMemory()) {
             return new SavegameParser.Error(null);
         }
@@ -457,7 +474,7 @@ public abstract class SavegameCache<
         return "savegame." + fileEnding;
     }
 
-    public void meltSavegame(GameCampaignEntry<T,I> e) {
+    public synchronized void meltSavegame(GameCampaignEntry<T, I> e) {
         logger.debug("Melting savegame");
         Path meltedFile;
         try {
@@ -472,7 +489,7 @@ public abstract class SavegameCache<
         });
     }
 
-    private SavegameParser.Status importSavegameData(Path file, SavegameFolder<T,I> folder) {
+    private SavegameParser.Status importSavegameData(Path file, SavegameFolder<T, I> folder) {
         logger.debug("Parsing file " + file.toString());
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
@@ -486,7 +503,7 @@ public abstract class SavegameCache<
                 if (exists.isPresent()) {
                     logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                     loadEntry(exists.get());
-                    SavegameManagerState.get().selectEntry(exists.get());
+                    SavegameManagerState.<T, I>get().selectEntry(exists.get());
                     return;
                 } else {
                     logger.debug("No entry with checksum found");

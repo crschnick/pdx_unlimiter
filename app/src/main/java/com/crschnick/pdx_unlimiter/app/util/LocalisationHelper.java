@@ -13,21 +13,10 @@ import java.util.regex.Pattern;
 
 public class LocalisationHelper {
 
-    public static enum Language {
-        ENGLISH("l_english"),
-        GERMAN("l_german");
-
-        private String id;
-
-        Language(String id) {
-            this.id = id;
-        }
-    }
-
-    public static Map<String,String> loadTranslations(Path file, Language lang) {
+    public static Map<String, String> loadTranslations(Path file, Language lang) {
         Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.id +
                 "." + FilenameUtils.getExtension(file.toString()));
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_]+):(\\d*) \"(.+)\"$");
         try {
             Files.lines(langFile).forEach(s -> {
@@ -40,5 +29,16 @@ public class LocalisationHelper {
             ErrorHandler.handleException(e);
         }
         return map;
+    }
+
+    public static enum Language {
+        ENGLISH("l_english"),
+        GERMAN("l_german");
+
+        private String id;
+
+        Language(String id) {
+            this.id = id;
+        }
     }
 }

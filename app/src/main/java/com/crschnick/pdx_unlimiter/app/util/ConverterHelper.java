@@ -2,11 +2,8 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.GuiConverterConfig;
-import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
@@ -18,7 +15,6 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +24,8 @@ public class ConverterHelper {
         w.write(key + " = \"" + value.toString() + "\"\n");
     }
 
-    public static Map<String,String> loadConfig() {
-        Map<String,String> map = new HashMap<>();
+    public static Map<String, String> loadConfig() {
+        Map<String, String> map = new HashMap<>();
         try {
             var reader = Files.newBufferedReader(Settings.getInstance().getCk3toEu4Dir().get()
                     .resolve("CK3toEU4").resolve("configuration.txt"));
@@ -50,7 +46,7 @@ public class ConverterHelper {
         return map;
     }
 
-    public static void writeConfig(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String,String> values) {
+    public static void writeConfig(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) {
         var config = Settings.getInstance().getCk3toEu4Dir().get()
                 .resolve("CK3toEU4").resolve("configuration.txt");
         try {

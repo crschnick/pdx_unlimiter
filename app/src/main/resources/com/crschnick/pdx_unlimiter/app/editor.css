@@ -1,0 +1,36 @@
+.editor-grid {
+  -fx-vgap: 0.3em;
+  -fx-hgap: 0.5em;
+  -fx-padding: 1em;
+  -fx-alignment: center;
+  -fx-font-size: 12pt;
+  -fx-font-family: "monospaced";
+}
+
+.editor-grid .preview {
+  -fx-font-family: "monospaced";
+}
+
+.editor-filter-bar {
+  -fx-padding: 0.5em 1em 0.5em 1em;
+  -fx-background-color: white;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0.15em 0 0 0;
+}
+
+.editor-nav-bar {
+  -fx-padding: 0.3em 1em 0.3em 1em;
+  -fx-font-size: 11pt;
+  -fx-background-color: #EEEEEEFF;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0 0 0.1em 0;
+}
+
+.editor-grid .jfx-button {
+-fx-padding: 0.1 0.2em 0.05em 0.2em;
+}
+
+.editor-grid .text-field {
+-fx-padding: 0.05em 0.2em 0.05em 0.2em;
+-fx-background-color: #AAAAAA44;
+}

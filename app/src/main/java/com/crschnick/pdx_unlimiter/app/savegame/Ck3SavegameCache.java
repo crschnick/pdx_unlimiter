@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
 

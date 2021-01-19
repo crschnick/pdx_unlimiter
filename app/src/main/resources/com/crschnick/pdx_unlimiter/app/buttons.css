@@ -14,6 +14,26 @@
     -fx-icon-code: "mdi-delete";
 }
 
+.key-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-key";
+}
+
+.value-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-tag-text-outline";
+}
+
+.preview .ikonli-font-icon {
+    -fx-icon-code: "mdi-tooltip";
+}
+
+.case-sensitive-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-case-sensitive-alt";
+}
+
+.edit-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-table-edit";
+}
+
 .achievement-button .ikonli-font-icon {
     -fx-icon-code: "mdi-trophy";
 }
@@ -43,7 +63,7 @@
     -fx-icon-code: "mdi-folder-plus"
 }
 
-.recursive-button .ikonli-font-icon {
+.deep-search-button .ikonli-font-icon {
     -fx-icon-code: "mdi-sort-descending"
 }
 

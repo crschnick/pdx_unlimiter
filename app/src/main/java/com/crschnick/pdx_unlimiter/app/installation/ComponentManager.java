@@ -1,14 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.editor.EditorExternalState;
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.GameImage;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
@@ -21,13 +22,13 @@ public class ComponentManager {
 
     public static void initialSetup(String[] args) {
         try {
+            if (true) throw new IllegalArgumentException();
             PdxuInstallation.init();
             LogManager.init();
             ErrorHandler.init();
 
             LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
-
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
             }
@@ -89,6 +90,7 @@ public class ComponentManager {
             SavegameManagerState.init();
 
             FileWatchManager.init();
+            EditorExternalState.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }

@@ -29,11 +29,11 @@ public abstract class FormatParser {
 
     public abstract List<Token> tokenize(byte[] data) throws IOException;
 
-    public final Node parse(InputStream stream) throws IOException {
+    public final ArrayNode parse(InputStream stream) throws IOException {
         return parse(stream.readAllBytes());
     }
 
-    public final Node parse(byte[] input) throws IOException {
+    public final ArrayNode parse(byte[] input) throws IOException {
         List<Token> tokens = tokenize(input);
 
         tokens.add(0, new OpenGroupToken());
@@ -41,15 +41,16 @@ public abstract class FormatParser {
         return hierachiseTokens(tokens);
     }
 
-    private Node hierachiseTokens(List<Token> tokens) {
+    private ArrayNode hierachiseTokens(List<Token> tokens) {
         Map.Entry<Node, Integer> node = createNode(tokens, 0);
-        return node.getKey();
+        return (ArrayNode) node.getKey();
     }
 
     private Map.Entry<Node, Integer> createNode(List<Token> tokens, int index) {
         if (tokens.get(index).getType() == TokenType.VALUE) {
-            String obj = ((ValueToken) tokens.get(index)).value;
-            return new AbstractMap.SimpleEntry<>(new ValueNode(obj), index + 1);
+            var valToken = ((ValueToken) tokens.get(index));
+            String obj = valToken.value;
+            return new AbstractMap.SimpleEntry<>(new ValueNode(valToken.quoted, obj), index + 1);
         }
 
         List<Node> childs = new ArrayList<>();
@@ -101,10 +102,12 @@ public abstract class FormatParser {
 
     public class ValueToken extends Token {
 
+        boolean quoted;
         String value;
 
-        public ValueToken(String v) {
-            value = v;
+        public ValueToken(boolean quoted, String value) {
+            this.quoted = quoted;
+            this.value = value;
         }
 
         @Override

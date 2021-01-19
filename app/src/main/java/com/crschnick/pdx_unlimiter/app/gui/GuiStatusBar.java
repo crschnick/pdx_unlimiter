@@ -1,11 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
-import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -118,7 +116,7 @@ public class GuiStatusBar {
 
         Label name = new Label(
                 SavegameManagerState.get().globalSelectedCampaignProperty().get().getName() +
-                ", " + SavegameManagerState.get().globalSelectedEntryProperty().get().getName());
+                        ", " + SavegameManagerState.get().globalSelectedEntryProperty().get().getName());
         name.setGraphic(new FontIcon());
         name.getStyleClass().add(CLASS_TEXT);
         barPane.setCenter(name);

@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
@@ -8,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -66,13 +64,6 @@ public class PdxuInstallation {
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
-            }
-
-            if (!Files.exists(INSTANCE.rakalyDir)) {
-                GuiErrorReporter.showErrorMessage(
-                        "The rakaly installation seems to be invalid.",
-                        "This can be caused by a failed update." +
-                                "Please try restarting the Pdx-Unlimiter", true, false);
             }
         } else {
             INSTANCE.version = "dev";

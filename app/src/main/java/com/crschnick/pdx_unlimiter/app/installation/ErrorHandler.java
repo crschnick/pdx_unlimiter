@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import io.sentry.Attachment;
 import io.sentry.Sentry;
 import io.sentry.UserFeedback;
@@ -8,8 +9,7 @@ import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.CountDownLatch;
 
 public class ErrorHandler {
 
@@ -50,7 +50,7 @@ public class ErrorHandler {
         });
     }
 
-    private static void handleExcetionWithoutInit(Throwable ex) {
+    private static void unpreparedStartup(Throwable ex) {
         ex.printStackTrace();
         if (PdxuInstallation.getInstance() == null || PdxuInstallation.getInstance().isProduction()) {
             Sentry.init(sentryOptions -> {
@@ -59,6 +59,18 @@ public class ErrorHandler {
         }
         Sentry.setExtra("initError", "true");
         Sentry.captureException(ex);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.startup(latch::countDown);
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+        }
+        startupCompleted = true;
+    }
+
+    public static void handleTerminalException(Exception ex) {
+        handleException(ex, null, null, true);
     }
 
     public static void handleException(Throwable ex) {
@@ -66,16 +78,21 @@ public class ErrorHandler {
     }
 
     public static void handleException(Throwable ex, String msg, Path attachFile) {
+        handleException(ex, msg, attachFile, false);
+    }
+
+    private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
         if (!startupCompleted) {
-            handleExcetionWithoutInit(ex);
-            return;
+            unpreparedStartup(ex);
         }
 
+        CountDownLatch latch = new CountDownLatch(1);
         Runnable run = () -> {
             LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
-            if (PdxuInstallation.getInstance().isProduction() && !errorReporterShowing) {
+            if (PdxuInstallation.getInstance() == null ||
+                    PdxuInstallation.getInstance().isProduction() && !errorReporterShowing) {
                 errorReporterShowing = true;
-                if (GuiErrorReporter.showException(ex, false)) {
+                if (GuiErrorReporter.showException(ex, terminal)) {
                     Sentry.withScope(scope -> {
                         if (attachFile != null) {
                             scope.addAttachment(new Attachment(attachFile.toString()));
@@ -85,26 +102,24 @@ public class ErrorHandler {
                 }
                 errorReporterShowing = false;
             }
+
+            latch.countDown();
         };
         if (Platform.isFxApplicationThread()) {
             run.run();
         } else {
             Platform.runLater(run);
         }
-    }
 
-    public static void handleTerminalException(Exception ex) {
-        if (!startupCompleted) {
-            handleExcetionWithoutInit(ex);
-        }
-
-        LoggerFactory.getLogger(ErrorHandler.class).error("Terminal Error", ex);
-        if (PdxuInstallation.getInstance() == null || PdxuInstallation.getInstance().isProduction()) {
-            if (GuiErrorReporter.showException(ex, true)) {
-                Sentry.captureException(ex);
+        if (terminal) {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
             }
+            // Wait to send error report
+            ThreadHelper.sleep(1000);
+            System.exit(1);
         }
-        System.exit(1);
     }
 
     public static void reportIssue() {

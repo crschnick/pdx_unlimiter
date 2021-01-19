@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.game.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class SavegameActions {
 
-    public static boolean isEntryCompatible(GameCampaignEntry<?,?> entry) {
+    public static boolean isEntryCompatible(GameCampaignEntry<?, ?> entry) {
         SavegameManagerState s = SavegameManagerState.get();
         boolean missingMods = entry.getInfo().getMods().stream()
                 .map(m -> s.current().getInstallation().getModForName(m))
@@ -47,11 +46,11 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void openCampaignEntry(GameCampaignEntry<T, I> entry) {
-        ThreadHelper.open(SavegameManagerState.get().<T,I>current().getSavegameCache().getPath(entry));
+        ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameCache().getPath(entry));
     }
 
     public static Optional<Path> exportCampaignEntry() {
-        SavegameManagerState s = SavegameManagerState.get();
+        var s = SavegameManagerState.get();
         try {
             var path = s.current().getInstallation().getExportTarget(
                     s.current().getSavegameCache(), s.globalSelectedEntryProperty().get());
@@ -64,13 +63,12 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void moveEntry(
-            SavegameCollection<T,I> collection, GameCampaignEntry<T,I> entry) {
-        SavegameManagerState s = SavegameManagerState.get();
-        s.<T,I>current().getSavegameCache().moveEntry(collection, entry);
-        SavegameManagerState.get().selectEntry(entry);
+            SavegameCollection<T, I> collection, GameCampaignEntry<T, I> entry) {
+        var s = SavegameManagerState.<T, I>get();
+        s.current().getSavegameCache().moveEntryAsync(collection, entry);
     }
 
-    public static <T, I extends SavegameInfo<T>> Image createImageForEntry(GameCampaignEntry<T,I> entry) {
+    public static <T, I extends SavegameInfo<T>> Image createImageForEntry(GameCampaignEntry<T, I> entry) {
         @SuppressWarnings("unchecked")
         Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
                 .filter(i -> i.getSavegameCache().contains(entry))
@@ -81,7 +79,7 @@ public class SavegameActions {
     }
 
     public static void launchCampaignEntry() {
-        SavegameManagerState s = SavegameManagerState.get();
+        var s = SavegameManagerState.get();
         if (s.globalSelectedEntryProperty().get() == null) {
             return;
         }
@@ -140,7 +138,7 @@ public class SavegameActions {
         savegames.get(0).importTarget(r);
     }
 
-    public static <T, I extends SavegameInfo<T>> void meltSavegame(GameCampaignEntry<T,I> e) {
+    public static <T, I extends SavegameInfo<T>> void meltSavegame(GameCampaignEntry<T, I> e) {
         if (!DialogHelper.showMeltDialog()) {
             return;
         }

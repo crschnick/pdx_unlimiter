@@ -77,7 +77,7 @@ public class ColorHelper {
             if (data.getNodeForKey("type").getString().equals("hsv360")) {
                 isHsv = true;
                 colorData = colorData.stream()
-                        .map(v -> new ValueNode(String.valueOf(v.getDouble() / 360D)))
+                        .map(v -> new ValueNode(false, String.valueOf(v.getDouble() / 360D)))
                         .collect(Collectors.toList());
             }
 

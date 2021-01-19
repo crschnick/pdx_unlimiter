@@ -1,15 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.LogManager;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
@@ -62,7 +56,11 @@ public class DialogHelper {
 
     public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.getDialogPane().styleProperty().setValue("-fx-font-size: " + (Settings.getInstance().getFontSize() - 2) + "pt;");
+        // In case settings are not loaded yet
+        if (Settings.getInstance() != null) {
+            alert.getDialogPane().styleProperty().setValue(
+                    "-fx-font-size: " + (Settings.getInstance().getFontSize() - 2) + "pt;");
+        }
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
         return alert;
@@ -78,7 +76,9 @@ public class DialogHelper {
     }
 
     public static void setIcon(Alert a) {
-        ((Stage) a.getDialogPane().getScene().getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
+        if (PdxuApp.getApp() != null) {
+            ((Stage) a.getDialogPane().getScene().getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
+        }
     }
 
     public static void showReportSent() {
@@ -160,9 +160,9 @@ public class DialogHelper {
         alert.setTitle("Low memory warning");
         alert.setHeaderText(
                 """
-It seems like the Pdx-Unlimiter is running low on memory.
+                        It seems like the Pdx-Unlimiter is running low on memory.
 
-It is recommended to restart it, to avoid any crashes. If you click on OK, the Pdx-Unlimiter will exit.""");
+                        It is recommended to restart it, to avoid any crashes. If you click on OK, the Pdx-Unlimiter will exit.""");
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton();
 
