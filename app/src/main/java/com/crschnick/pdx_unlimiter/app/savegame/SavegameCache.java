@@ -322,7 +322,7 @@ public abstract class SavegameCache<
                 "Could not find savegame collection for entry " + e.getName()));
     }
 
-    public synchronized void moveEntryAsync(
+    public void moveEntryAsync(
             SavegameCollection<T, I> to, GameCampaignEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             moveEntry(to, entry);
@@ -359,7 +359,13 @@ public abstract class SavegameCache<
         }
     }
 
-    public synchronized void delete(GameCampaignEntry<T, I> e) {
+    public void deleteAsync(GameCampaignEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            delete(e);
+        }, false);
+    }
+
+    private synchronized void delete(GameCampaignEntry<T, I> e) {
         SavegameCollection<T, I> c = getSavegameCollection(e);
         if (!this.collections.contains(c) || !c.getSavegames().contains(e)) {
             return;
@@ -468,7 +474,7 @@ public abstract class SavegameCache<
         return "savegame." + fileEnding;
     }
 
-    public void meltSavegame(GameCampaignEntry<T, I> e) {
+    public synchronized void meltSavegame(GameCampaignEntry<T, I> e) {
         logger.debug("Melting savegame");
         Path meltedFile;
         try {

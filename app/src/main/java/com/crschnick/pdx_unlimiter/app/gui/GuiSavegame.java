@@ -231,7 +231,7 @@ public class GuiSavegame {
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showSavegameDeleteDialog()) {
-                    SavegameManagerState.<T, I>get().current().getSavegameCache().delete(e);
+                    SavegameManagerState.<T, I>get().current().getSavegameCache().deleteAsync(e);
                 }
             });
             del.getStyleClass().add(CLASS_DELETE);

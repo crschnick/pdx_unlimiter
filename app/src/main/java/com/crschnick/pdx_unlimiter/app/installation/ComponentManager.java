@@ -22,13 +22,13 @@ public class ComponentManager {
 
     public static void initialSetup(String[] args) {
         try {
+            if (true) throw new IllegalArgumentException();
             PdxuInstallation.init();
             LogManager.init();
             ErrorHandler.init();
 
             LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
-
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
             }
