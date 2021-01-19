@@ -14,6 +14,7 @@ public abstract class EditorNode {
 
     protected String keyName;
     private EditorNode directParent;
+
     public EditorNode(EditorNode directParent, String keyName) {
         this.directParent = directParent;
         this.keyName = keyName;
