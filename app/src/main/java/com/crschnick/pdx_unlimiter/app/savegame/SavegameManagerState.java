@@ -239,6 +239,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
         private Filter() {
             filter.addListener((c, o, n) -> {
+                SavegameManagerState.this.updateShownEntries();
                 SavegameManagerState.this.updateShownCollections();
             });
         }
