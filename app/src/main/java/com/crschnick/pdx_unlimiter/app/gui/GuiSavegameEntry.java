@@ -1,20 +1,20 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.editor.Editor;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.*;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
 import com.jfoenix.controls.JFXSpinner;
@@ -39,10 +39,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
-public class GuiSavegame {
+public class GuiSavegameEntry {
 
 
-    public static <T, I extends SavegameInfo<T>> Node createCampaignEntryNode(GameCampaignEntry<T, I> e) {
+    public static <T, I extends SavegameInfo<T>> Node createCampaignEntryNode(SavegameEntry<T, I> e) {
         VBox main = new VBox();
         main.setAlignment(Pos.CENTER);
         main.setFillWidth(true);
@@ -124,7 +124,7 @@ public class GuiSavegame {
         return main;
     }
 
-    private static <T, I extends SavegameInfo<T>> void createButtonBar(GameCampaignEntry<T, I> e, HBox buttonBar) {
+    private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {
         {
             Button melt = new JFXButton();
             melt.setGraphic(new FontIcon());
@@ -147,7 +147,7 @@ public class GuiSavegame {
         }
 
         if (SavegameCache.EU4.contains(e)) {
-            GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (GameCampaignEntry<Eu4Tag, Eu4SavegameInfo>) e;
+            SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
@@ -179,7 +179,7 @@ public class GuiSavegame {
         }
 
         if (SavegameCache.CK3 != null && SavegameCache.CK3.contains(e)) {
-            GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (GameCampaignEntry<Ck3Tag, Ck3SavegameInfo>) e;
+            SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
             Button convert = new JFXButton();
             convert.setGraphic(new FontIcon());
             convert.setOnMouseClicked((m) -> {
@@ -205,15 +205,12 @@ public class GuiSavegame {
             Button edit = new JFXButton();
             edit.setGraphic(new FontIcon());
             edit.setOnMouseClicked((m) -> {
-                TaskExecutor.getInstance().submitTask(() -> {
-                    Editor.createNewEditor(((SavegameParser.Success) new Eu4SavegameParser().parse(
-                            SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), RakalyHelper::meltSavegame)).content);
-                }, true);
+                SavegameActions.editSavegame(e);
             });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
 
-            if (e.getInfo() != null) {
+            if (e.getInfo() != null && !e.getInfo().isIronman()) {
                 buttonBar.getChildren().add(edit);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
@@ -240,7 +237,7 @@ public class GuiSavegame {
         }
     }
 
-    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(GameCampaignEntry<T, I> entry) {
+    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(SavegameEntry<T, I> entry) {
         StackPane stack = new StackPane();
         JFXMasonryPane grid = new JFXMasonryPane();
         grid.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);

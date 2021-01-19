@@ -42,8 +42,9 @@ public class TextFormatParser extends FormatParser {
         boolean isInQuotes = false;
         boolean isInComment = false;
 
-        for (int i = 0; i < bytes.length; i++) {
-            char c = (char) bytes[i];
+        for (int i = 0; i <= bytes.length; i++) {
+            // Add extra new line at the end to simulate end of token
+            char c = i == bytes.length ? '\n' : (char) bytes[i];
             Token t = null;
             if (isInQuotes && c != '"') {
                 continue;
@@ -66,16 +67,14 @@ public class TextFormatParser extends FormatParser {
             }
 
             boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+            boolean isComment = c == '#';
             boolean eof = i == bytes.length - 1;
             boolean marksEndOfPreviousToken =
-                               (eof && prev < i)                   // EOF
-                            || (t != null && prev < i)             // New token finishes old token
+                               (t != null && prev < i)             // New token finishes old token
                             || (isWhitespace && prev < i)          // Whitespace finishes old token
-                            || (c == '#' && prev < i);             // New comment finishes old token
+                            || (isComment && prev < i);            // New comment finishes old token
             if (marksEndOfPreviousToken) {
-                // Special case for eof, since the end index is exclusive!
-                int endIndex = eof ? i + 1 : i;
-                var sub = Arrays.copyOfRange(bytes, prev, endIndex);
+                var sub = Arrays.copyOfRange(bytes, prev, i);
                 if (sub[0] == '"' && sub[sub.length - 1] == '"') {
                     tokens.add(new ValueToken(true, new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
                 } else {
@@ -88,7 +87,7 @@ public class TextFormatParser extends FormatParser {
             } else if (t != null) {
                 tokens.add(t);
                 prev = i + 1;
-            } else if (c == '#') {
+            } else if (isComment) {
                 isInComment = true;
             }
         }

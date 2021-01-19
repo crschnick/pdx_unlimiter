@@ -1,7 +1,5 @@
-package com.crschnick.pdx_unlimiter.app.game;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
@@ -17,17 +15,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class GameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
+public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
     private volatile ObjectProperty<GameDate> date;
     private ObjectProperty<Image> image;
 
-    public GameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, Image image) {
+    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, Image image) {
         super(lastPlayed, name, campaignId);
         this.date = new SimpleObjectProperty<>(date);
         this.image = new SimpleObjectProperty<>(image);
 
-        getSavegames().addListener((SetChangeListener<? super GameCampaignEntry<T, I>>) (change) -> {
+        getSavegames().addListener((SetChangeListener<? super SavegameEntry<T, I>>) (change) -> {
             boolean isNewEntry = change.wasAdded() && change.getElementAdded().infoProperty().isNotNull().get();
             boolean wasRemoved = change.wasRemoved();
             if (isNewEntry || wasRemoved) {
@@ -53,17 +51,17 @@ public final class GameCampaign<T, I extends SavegameInfo<T>> extends SavegameCo
         return image;
     }
 
-    public GameCampaignEntry<T, I> getLatestEntry() {
+    public SavegameEntry<T, I> getLatestEntry() {
         return entryStream().findFirst().get();
     }
 
-    public int indexOf(GameCampaignEntry<T, I> e) {
+    public int indexOf(SavegameEntry<T, I> e) {
         return entryStream().collect(Collectors.toList()).indexOf(e);
     }
 
-    public Stream<GameCampaignEntry<T, I>> entryStream() {
-        var list = new ArrayList<GameCampaignEntry<T, I>>(getSavegames());
-        list.sort(Comparator.comparing(GameCampaignEntry::getDate));
+    public Stream<SavegameEntry<T, I>> entryStream() {
+        var list = new ArrayList<SavegameEntry<T, I>>(getSavegames());
+        list.sort(Comparator.comparing(SavegameEntry::getDate));
         Collections.reverse(list);
         return list.stream();
     }

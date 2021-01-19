@@ -1,10 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +19,7 @@ import java.nio.file.Files;
 
 public class SkanderbegHelper {
 
-    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, SavegameEntry<T, I> entry) {
         if (Settings.getInstance().getSkanderbegApiKey().isEmpty()) {
             GuiErrorReporter.showSimpleErrorMessage("Missing skanderbeg.pm API key. " +
                     "To use this functionality, set it in the settings menu.");

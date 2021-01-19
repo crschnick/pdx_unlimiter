@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
@@ -21,7 +20,7 @@ public class Eu4SavegameCache extends SavegameCache<
     }
 
     @Override
-    protected String getDefaultCampaignName(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> latest) {
+    protected String getDefaultCampaignName(SavegameEntry<Eu4Tag, Eu4SavegameInfo> latest) {
         return GameLocalisation.getTagNameForEntry(latest, latest.getInfo().getTag());
     }
 }

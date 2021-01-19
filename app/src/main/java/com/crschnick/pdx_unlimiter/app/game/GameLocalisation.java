@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
@@ -17,7 +18,7 @@ public class GameLocalisation {
 
     private static Map<Key, Map<String, String>> LOCALISATIONS = new HashMap<>();
 
-    public static String getTagNameForEntry(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+    public static String getTagNameForEntry(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
         if (tag.isCustom()) {
             return tag.getName();
         }

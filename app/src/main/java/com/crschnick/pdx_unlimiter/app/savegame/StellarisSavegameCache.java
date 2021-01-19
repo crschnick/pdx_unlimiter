@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
@@ -19,7 +18,7 @@ public class StellarisSavegameCache extends SavegameCache<
     }
 
     @Override
-    protected String getDefaultCampaignName(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> latest) {
+    protected String getDefaultCampaignName(SavegameEntry<StellarisTag, StellarisSavegameInfo> latest) {
         return latest.getInfo().getTag().getName();
     }
 }

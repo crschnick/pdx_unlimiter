@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -26,7 +27,7 @@ public class StellarisInstallation extends GameInstallation {
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
-            SavegameCache<T, I> cache, GameCampaignEntry<T, I> e) {
+            SavegameCache<T, I> cache, SavegameEntry<T, I> e) {
         Path file;
         Path dir = getSavegamesPath().resolve(cache.getEntryName(e));
         if (e.getInfo().isIronman()) {

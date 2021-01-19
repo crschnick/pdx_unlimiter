@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
@@ -86,7 +86,7 @@ public class ColorHelper {
         return map;
     }
 
-    public static Map<String, Color> loadCk3(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> e) {
+    public static Map<String, Color> loadCk3(SavegameEntry<Ck3Tag, Ck3SavegameInfo> e) {
         try {
             InputStream in = CascadeDirectoryHelper.openFile(
                     Path.of("common").resolve("named_colors").resolve("default_colors.txt"), e, GameInstallation.CK3).get();
@@ -99,7 +99,7 @@ public class ColorHelper {
         }
     }
 
-    public static Map<String, Color> loadStellarisColors(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> e) {
+    public static Map<String, Color> loadStellarisColors(SavegameEntry<StellarisTag, StellarisSavegameInfo> e) {
         try {
             InputStream in = CascadeDirectoryHelper.openFile(Path.of("flags").resolve("colors.txt"), e, GameInstallation.STELLARIS).get();
             Node node = TextFormatParser.textFileParser().parse(in);

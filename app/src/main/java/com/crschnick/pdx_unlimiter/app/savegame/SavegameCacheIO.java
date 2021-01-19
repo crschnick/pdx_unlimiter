@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -29,7 +28,7 @@ public class SavegameCacheIO {
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameCache<T, I> cache, Path out) throws IOException {
         for (SavegameCollection<T, I> c : cache.getCollections()) {
-            for (GameCampaignEntry<T, I> e : c.getSavegames()) {
+            for (SavegameEntry<T, I> e : c.getSavegames()) {
                 Path fileOut = out.resolve(cache.getFileName(e));
                 int counter = 2;
                 while (Files.exists(fileOut)) {

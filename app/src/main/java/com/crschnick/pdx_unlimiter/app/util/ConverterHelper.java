@@ -1,12 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiConverterConfig;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import javafx.application.Platform;
@@ -46,7 +46,7 @@ public class ConverterHelper {
         return map;
     }
 
-    public static void writeConfig(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) {
+    public static void writeConfig(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) {
         var config = Settings.getInstance().getCk3toEu4Dir().get()
                 .resolve("CK3toEU4").resolve("configuration.txt");
         try {
@@ -65,7 +65,7 @@ public class ConverterHelper {
         }
     }
 
-    public static void convertCk3ToEu4(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
+    public static void convertCk3ToEu4(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
         if (Settings.getInstance().getCk3toEu4Dir().isEmpty()) {
             GuiConverterConfig.showUsageDialog();
             return;

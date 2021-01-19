@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
@@ -18,7 +17,7 @@ public class Ck3SavegameCache extends SavegameCache<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    protected String getDefaultCampaignName(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> latest) {
+    protected String getDefaultCampaignName(SavegameEntry<Ck3Tag, Ck3SavegameInfo> latest) {
         return latest.getInfo().getTag().getPrimaryTitle().getName();
     }
 }

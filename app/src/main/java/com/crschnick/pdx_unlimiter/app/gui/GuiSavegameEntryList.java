@@ -18,7 +18,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class GuiSavegameList {
+public class GuiSavegameEntryList {
 
     private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
         Consumer<Set<? extends SavegameCollection<?, ?>>> update = (s) -> {
@@ -50,7 +50,7 @@ public class GuiSavegameList {
     public static void createCampaignEntryList(Pane pane) {
         ListView<Node> grid = GuiListView.createViewOfList(
                 SavegameManagerState.get().getShownEntries(),
-                GuiSavegame::createCampaignEntryNode,
+                GuiSavegameEntry::createCampaignEntryNode,
                 SavegameManagerState.get().globalSelectedEntryProperty());
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);

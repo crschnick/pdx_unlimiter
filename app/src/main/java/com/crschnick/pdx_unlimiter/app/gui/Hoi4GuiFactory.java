@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameInfo;
@@ -51,19 +51,19 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public Background createEntryInfoBackground(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
+    public Background createEntryInfoBackground(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
         return new Background(new BackgroundFill(
                 ColorHelper.colorFromInt(0, 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public Image tagImage(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry, Hoi4Tag tag) {
+    public Image tagImage(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> entry, Hoi4Tag tag) {
         return null;
     }
 
     @Override
-    public ObservableValue<String> createInfoString(GameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
+    public ObservableValue<String> createInfoString(SavegameCampaign<Hoi4Tag, Hoi4SavegameInfo> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
         campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
@@ -72,7 +72,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public void fillNodeContainer(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
         super.fillNodeContainer(entry, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);

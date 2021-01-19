@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,7 +18,7 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
     private volatile ObjectProperty<Instant> lastPlayed;
     private volatile StringProperty name;
     private UUID uuid;
-    private volatile ObservableSet<GameCampaignEntry<T, I>> savegames =
+    private volatile ObservableSet<SavegameEntry<T, I>> savegames =
             FXCollections.synchronizedObservableSet(FXCollections.observableSet(new HashSet<>()));
 
     public SavegameCollection(Instant lastPlayed, String name, UUID uuid) {
@@ -28,11 +27,11 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
         this.uuid = uuid;
     }
 
-    public ObservableSet<GameCampaignEntry<T, I>> getSavegames() {
+    public ObservableSet<SavegameEntry<T, I>> getSavegames() {
         return savegames;
     }
 
-    public void add(GameCampaignEntry<T, I> e) {
+    public void add(SavegameEntry<T, I> e) {
         this.savegames.add(e);
     }
 
@@ -48,13 +47,13 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
         return uuid;
     }
 
-    public int indexOf(GameCampaignEntry<T, I> e) {
+    public int indexOf(SavegameEntry<T, I> e) {
         return entryStream().collect(Collectors.toList()).indexOf(e);
     }
 
-    public Stream<GameCampaignEntry<T, I>> entryStream() {
-        var list = new ArrayList<GameCampaignEntry<T, I>>(getSavegames());
-        list.sort(Comparator.comparing(GameCampaignEntry::getDate));
+    public Stream<SavegameEntry<T, I>> entryStream() {
+        var list = new ArrayList<SavegameEntry<T, I>>(getSavegames());
+        list.sort(Comparator.comparing(SavegameEntry::getDate));
         Collections.reverse(list);
         return list.stream();
     }

@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
@@ -59,7 +59,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         return box;
     }
 
-    private static String getCountryTooltip(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Set<Eu4Tag> tags) {
+    private static String getCountryTooltip(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Set<Eu4Tag> tags) {
         StringBuilder b = new StringBuilder();
         for (Eu4Tag t : tags) {
             b.append(GameLocalisation.getTagNameForEntry(entry, t));
@@ -69,7 +69,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         return b.toString();
     }
 
-    private void createDiplomacyRow(JFXMasonryPane pane, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
+    private void createDiplomacyRow(JFXMasonryPane pane, SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
         if (tags.size() == 0) {
             return;
         }
@@ -89,7 +89,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public Image tagImage(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+    public Image tagImage(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
         return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
     }
 
@@ -110,14 +110,14 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public Background createEntryInfoBackground(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
+    public Background createEntryInfoBackground(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         return new Background(new BackgroundFill(
                 ColorHelper.colorFromInt(entry.getInfo().getTag().getMapColor(), 100),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public void fillNodeContainer(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, JFXMasonryPane grid) {
         Eu4SavegameInfo info = entry.getInfo();
         if (info.isObserver()) {
             super.fillNodeContainer(entry, grid);
@@ -185,11 +185,11 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         super.fillNodeContainer(entry, grid);
     }
 
-    private Image eu4TagNode(GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+    private Image eu4TagNode(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
         return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
     }
 
-    private Image eu4TagNode(Path path, GameCampaignEntry<Eu4Tag, Eu4SavegameInfo> entry) {
+    private Image eu4TagNode(Path path, SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry) {
         var in = CascadeDirectoryHelper.openFile(
                 path, entry, GameInstallation.EU4);
         return ImageLoader.loadImage(in.orElse(null), null);

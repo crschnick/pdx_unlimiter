@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameInfo;
@@ -18,7 +17,7 @@ public class Hoi4SavegameCache extends SavegameCache<Hoi4Tag, Hoi4SavegameInfo> 
     }
 
     @Override
-    protected String getDefaultCampaignName(GameCampaignEntry<Hoi4Tag, Hoi4SavegameInfo> latest) {
+    protected String getDefaultCampaignName(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> latest) {
         return "Unknown";
     }
 }

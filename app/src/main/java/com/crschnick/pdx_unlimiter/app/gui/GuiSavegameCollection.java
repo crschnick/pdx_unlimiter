@@ -1,11 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -42,8 +38,8 @@ public class GuiSavegameCollection {
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         {
-            if (c instanceof GameCampaign) {
-                GameCampaign<T, I> ca = (GameCampaign<T, I>) c;
+            if (c instanceof SavegameCampaign) {
+                SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
                 ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
                 prop.addListener((change, o, n) -> {
                     Platform.runLater(() -> {
@@ -89,8 +85,8 @@ public class GuiSavegameCollection {
         {
             HBox bottom = new HBox();
 
-            if (c instanceof GameCampaign) {
-                GameCampaign<T, I> ca = (GameCampaign<T, I>) c;
+            if (c instanceof SavegameCampaign) {
+                SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
                 Label date = new Label();
                 date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
                 date.getStyleClass().add(CLASS_DATE);
@@ -104,7 +100,7 @@ public class GuiSavegameCollection {
             Label count = new Label("[" + c.getSavegames().size() + "]");
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
-            c.getSavegames().addListener((SetChangeListener<GameCampaignEntry<?, ?>>) change -> {
+            c.getSavegames().addListener((SetChangeListener<SavegameEntry<?, ?>>) change -> {
                 Platform.runLater(() -> {
                     count.setText("[" + change.getSet().size() + "]");
                 });
@@ -136,7 +132,7 @@ public class GuiSavegameCollection {
         btn.setOnDragDropped(de -> {
             Node src = (Node) de.getGestureSource();
             @SuppressWarnings("unchecked")
-            GameCampaignEntry<T, I> entry = (GameCampaignEntry<T, I>) src.getProperties().get("list-item");
+            SavegameEntry<T, I> entry = (SavegameEntry<T, I>) src.getProperties().get("list-item");
             SavegameActions.moveEntry(c, entry);
         });
     }

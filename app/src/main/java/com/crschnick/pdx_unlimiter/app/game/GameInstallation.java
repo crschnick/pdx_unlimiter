@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
@@ -100,7 +101,7 @@ public abstract class GameInstallation {
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
-            SavegameCache<T, I> cache, GameCampaignEntry<T, I> e) {
+            SavegameCache<T, I> cache, SavegameEntry<T, I> e) {
         Path file = getSavegamesPath().resolve(cache.getFileName(e));
         return file;
     }

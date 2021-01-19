@@ -1,11 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +46,7 @@ public class RakalyHelper {
         return temp;
     }
 
-    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, SavegameEntry<T, I> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
             GuiErrorReporter.showSimpleErrorMessage("Missing rakaly.com User ID or API key. " +
                     "To use this functionality, set both in the settings menu.");
@@ -111,7 +111,7 @@ public class RakalyHelper {
 
     }
 
-    public static <T, I extends SavegameInfo<T>> void analyzeEntry(SavegameCache<T, I> cache, GameCampaignEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void analyzeEntry(SavegameCache<T, I> cache, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             try {
                 ThreadHelper.browse("https://rakaly.com/eu4/analyze");

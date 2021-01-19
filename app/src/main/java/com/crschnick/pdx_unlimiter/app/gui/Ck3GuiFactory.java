@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
@@ -37,7 +37,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public Image tagImage(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, Ck3Tag tag) {
+    public Image tagImage(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Ck3Tag tag) {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
         Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
@@ -133,14 +133,14 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public Background createEntryInfoBackground(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry) {
+    public Background createEntryInfoBackground(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
         return new Background(new BackgroundFill(
                 Color.CORAL,
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public void fillNodeContainer(GameCampaignEntry<Ck3Tag, Ck3SavegameInfo> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, JFXMasonryPane grid) {
         super.fillNodeContainer(entry, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);

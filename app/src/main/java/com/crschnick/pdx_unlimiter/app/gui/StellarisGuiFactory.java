@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
@@ -53,19 +53,19 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public Background createEntryInfoBackground(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
+    public Background createEntryInfoBackground(SavegameEntry<StellarisTag, StellarisSavegameInfo> entry) {
         return new Background(new BackgroundFill(
                 Color.GRAY,
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     @Override
-    public Image tagImage(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, StellarisTag tag) {
+    public Image tagImage(SavegameEntry<StellarisTag, StellarisSavegameInfo> entry, StellarisTag tag) {
         return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, entry);
     }
 
     @Override
-    public void fillNodeContainer(GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(SavegameEntry<StellarisTag, StellarisSavegameInfo> entry, JFXMasonryPane grid) {
         super.fillNodeContainer(entry, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
@@ -73,7 +73,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     private Image stellarisTagNode(
-            Path path, StellarisTag tag, GameCampaignEntry<StellarisTag, StellarisSavegameInfo> entry) {
+            Path path, StellarisTag tag, SavegameEntry<StellarisTag, StellarisSavegameInfo> entry) {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 

@@ -1,10 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameDlc;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameMod;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -28,7 +28,7 @@ public class CascadeDirectoryHelper {
 
     public static void traverseDirectory(
             Path dir,
-            GameCampaignEntry<?, ? extends SavegameInfo<?>> entry,
+            SavegameEntry<?, ? extends SavegameInfo<?>> entry,
             GameInstallation install,
             Consumer<InputStream> consumer) {
         traverseDir(dir, getCascadingDirectories(entry, install), consumer);
@@ -36,13 +36,13 @@ public class CascadeDirectoryHelper {
 
     public static Optional<InputStream> openFile(
             Path file,
-            GameCampaignEntry<?, ? extends SavegameInfo<?>> entry,
+            SavegameEntry<?, ? extends SavegameInfo<?>> entry,
             GameInstallation install) {
         return openFile(file, getCascadingDirectories(entry, install));
     }
 
     private static List<Path> getCascadingDirectories(
-            GameCampaignEntry<?, ? extends SavegameInfo<?>> entry, GameInstallation install) {
+            SavegameEntry<?, ? extends SavegameInfo<?>> entry, GameInstallation install) {
         boolean loaded = entry != null && entry.getInfo() != null;
         List<Path> dirs = new ArrayList<>();
         if (loaded) {

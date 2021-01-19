@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
+import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class SavegameActions {
 
-    public static boolean isEntryCompatible(GameCampaignEntry<?, ?> entry) {
+    public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
         SavegameManagerState s = SavegameManagerState.get();
         boolean missingMods = entry.getInfo().getMods().stream()
                 .map(m -> s.current().getInstallation().getModForName(m))
@@ -35,7 +36,7 @@ public class SavegameActions {
                 !missingMods && !missingDlc;
     }
 
-    public static boolean isVersionCompatible(GameCampaignEntry<?, ?> entry) {
+    public static boolean isVersionCompatible(SavegameEntry<?, ?> entry) {
         return areCompatible(
                 SavegameManagerState.get().current().getInstallation().getVersion(),
                 entry.getInfo().getVersion());
@@ -45,7 +46,7 @@ public class SavegameActions {
         return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
     }
 
-    public static <T, I extends SavegameInfo<T>> void openCampaignEntry(GameCampaignEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void openCampaignEntry(SavegameEntry<T, I> entry) {
         ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameCache().getPath(entry));
     }
 
@@ -63,12 +64,12 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void moveEntry(
-            SavegameCollection<T, I> collection, GameCampaignEntry<T, I> entry) {
+            SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         var s = SavegameManagerState.<T, I>get();
         s.current().getSavegameCache().moveEntryAsync(collection, entry);
     }
 
-    public static <T, I extends SavegameInfo<T>> Image createImageForEntry(GameCampaignEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         @SuppressWarnings("unchecked")
         Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
                 .filter(i -> i.getSavegameCache().contains(entry))
@@ -138,14 +139,37 @@ public class SavegameActions {
         savegames.get(0).importTarget(r);
     }
 
-    public static <T, I extends SavegameInfo<T>> void meltSavegame(GameCampaignEntry<T, I> e) {
+    public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
         if (!DialogHelper.showMeltDialog()) {
             return;
         }
 
-        SavegameManagerState s = SavegameManagerState.get();
+        SavegameManagerState<T, I> s = SavegameManagerState.get();
         TaskExecutor.getInstance().submitTask(() -> {
             s.<T, I>current().getSavegameCache().meltSavegame(e);
+        }, true);
+    }
+
+    public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            var r = SavegameCache.getForSavegame(e).getParser().parse(
+                    SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), null);
+            r.visit(new SavegameParser.StatusVisitor<I>() {
+                @Override
+                public void success(SavegameParser.Success<I> s) {
+                    Editor.createNewEditor(s.content);
+                }
+
+                @Override
+                public void error(SavegameParser.Error e) {
+                    ErrorHandler.handleException(e.error);
+                }
+
+                @Override
+                public void invalid(SavegameParser.Invalid iv) {
+                    ErrorHandler.handleException(new SavegameParseException(iv.message));
+                }
+            });
         }, true);
     }
 }

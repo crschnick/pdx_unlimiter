@@ -33,7 +33,7 @@ public class GuiLayout {
 
         Pane pane = new Pane(new Label());
         layout.setCenter(pane);
-        GuiSavegameList.createCampaignEntryList(pane);
+        GuiSavegameEntryList.createCampaignEntryList(pane);
         layout.setCenter(pane);
 
         layout.setLeft(GuiSavegameCollectionList.createCampaignList());

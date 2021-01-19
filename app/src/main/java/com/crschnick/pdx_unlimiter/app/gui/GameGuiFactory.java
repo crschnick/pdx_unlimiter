@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaign;
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
@@ -55,7 +55,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         p.setAlignment(Pos.CENTER);
     }
 
-    public boolean displayIncompatibleWarning(GameCampaignEntry<T, I> entry) {
+    public boolean displayIncompatibleWarning(SavegameEntry<T, I> entry) {
         var launch = new ButtonType("Launch anyway");
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.WARNING);
@@ -102,7 +102,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
 
-    public ObservableValue<Node> createImage(GameCampaignEntry<T, I> entry) {
+    public ObservableValue<Node> createImage(SavegameEntry<T, I> entry) {
         SimpleObjectProperty<Node> prop;
         if (entry.getInfo() == null) {
             prop = new SimpleObjectProperty<>(new Region());
@@ -116,7 +116,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-    public ObservableValue<Node> createImage(GameCampaign<T, I> campaign) {
+    public ObservableValue<Node> createImage(SavegameCampaign<T, I> campaign) {
         SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(
                 GameImage.imageNode(campaign.getImage(), CLASS_TAG_ICON));
         campaign.imageProperty().addListener((ChangeListener<? super Image>) (c, o, n) -> {
@@ -125,11 +125,11 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-    public Node tagNode(GameCampaignEntry<T, I> entry) {
+    public Node tagNode(SavegameEntry<T, I> entry) {
         return GameImage.imageNode(tagImage(entry, entry.getInfo().getTag()), CLASS_TAG_ICON);
     }
 
-    public abstract Image tagImage(GameCampaignEntry<T, I> entry, T tag);
+    public abstract Image tagImage(SavegameEntry<T, I> entry, T tag);
 
     public abstract Font font() throws IOException;
 
@@ -137,9 +137,9 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane createIcon();
 
-    public abstract Background createEntryInfoBackground(GameCampaignEntry<T, I> entry);
+    public abstract Background createEntryInfoBackground(SavegameEntry<T, I> entry);
 
-    public ObservableValue<String> createInfoString(GameCampaign<T, I> campaign) {
+    public ObservableValue<String> createInfoString(SavegameCampaign<T, I> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());
         campaign.dateProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> prop.set(n.toString()));
@@ -147,7 +147,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-    public void fillNodeContainer(GameCampaignEntry<T, I> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(SavegameEntry<T, I> entry, JFXMasonryPane grid) {
         Label version;
         if (SavegameActions.isVersionCompatible(entry)) {
             version = new Label(entry.getInfo().getVersion().toString());

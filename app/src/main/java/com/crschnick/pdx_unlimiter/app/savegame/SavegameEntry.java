@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.game;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
 
 import java.util.UUID;
 
-public final class GameCampaignEntry<T, I extends SavegameInfo<T>> implements Comparable<GameCampaignEntry<T, I>> {
+public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Comparable<SavegameEntry<T, I>> {
 
     private StringProperty name;
     private UUID uuid;
@@ -18,8 +18,8 @@ public final class GameCampaignEntry<T, I extends SavegameInfo<T>> implements Co
     private boolean persistent;
     private GameDate date;
 
-    public GameCampaignEntry(String name, UUID uuid, I info,
-                             String checksum, GameDate date) {
+    public SavegameEntry(String name, UUID uuid, I info,
+                         String checksum, GameDate date) {
         this.checksum = checksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
@@ -29,7 +29,7 @@ public final class GameCampaignEntry<T, I extends SavegameInfo<T>> implements Co
     }
 
     @Override
-    public int compareTo(GameCampaignEntry<T, I> o) {
+    public int compareTo(SavegameEntry<T, I> o) {
         return o.getDate().compareTo(getDate());
     }
 

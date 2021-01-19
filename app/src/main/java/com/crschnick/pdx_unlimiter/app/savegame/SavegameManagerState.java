@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameCampaignEntry;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.SavedState;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -22,16 +21,16 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private SimpleObjectProperty<GameIntegration<?, ? extends SavegameInfo<?>>> current = new SimpleObjectProperty<>();
     private SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaign =
             new SimpleObjectProperty<>();
-    private SimpleObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntry =
+    private SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntry =
             new SimpleObjectProperty<>();
     private Filter filter = new Filter();
     private ObservableList<SavegameCollection<T, I>> shownCollections = FXCollections.synchronizedObservableList(
             FXCollections.observableArrayList());
-    private ObservableList<GameCampaignEntry<T, I>> shownEntries = FXCollections.synchronizedObservableList(
+    private ObservableList<SavegameEntry<T, I>> shownEntries = FXCollections.synchronizedObservableList(
             FXCollections.observableArrayList());
 
     private SavegameManagerState() {
-        var cl = (SetChangeListener<? super GameCampaignEntry<T, I>>) ch -> {
+        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> {
             updateShownEntries();
         };
 
@@ -78,12 +77,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return globalSelectedCampaign;
     }
 
-    public ReadOnlyObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntryProperty() {
-        return (SimpleObjectProperty<GameCampaignEntry<T, I>>) globalSelectedEntry;
+    public ReadOnlyObjectProperty<SavegameEntry<T, I>> globalSelectedEntryProperty() {
+        return (SimpleObjectProperty<SavegameEntry<T, I>>) globalSelectedEntry;
     }
 
-    private SimpleObjectProperty<GameCampaignEntry<T, I>> globalSelectedEntryPropertyInternal() {
-        return (SimpleObjectProperty<GameCampaignEntry<T, I>>) globalSelectedEntry;
+    private SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntryPropertyInternal() {
+        return (SimpleObjectProperty<SavegameEntry<T, I>>) globalSelectedEntry;
     }
 
     public Filter getFilter() {
@@ -111,7 +110,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 shownEntries.remove(entry);
             }
         });
-        shownEntries.sort(Comparator.comparing(GameCampaignEntry::getDate, Comparator.reverseOrder()));
+        shownEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
     }
 
     private void updateShownCollections() {
@@ -135,7 +134,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         shownCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
     }
 
-    public ObservableList<GameCampaignEntry<T, I>> getShownEntries() {
+    public ObservableList<SavegameEntry<T, I>> getShownEntries() {
         return shownEntries;
     }
 
@@ -208,7 +207,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         });
     }
 
-    public void selectEntry(GameCampaignEntry<T, I> e) {
+    public void selectEntry(SavegameEntry<T, I> e) {
         if (globalSelectedEntryPropertyInternal().isEqualTo(e).get()) {
             return;
         }
@@ -261,7 +260,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                     .anyMatch(e -> e.getName().toLowerCase().contains(filter.get().toLowerCase()));
         }
 
-        public boolean shouldShow(GameCampaignEntry<?, ?> entry) {
+        public boolean shouldShow(SavegameEntry<?, ?> entry) {
             if (entry.getName().toLowerCase().contains(filter.get().toLowerCase())) {
                 return true;
             }
