@@ -12,9 +12,12 @@ public class Eu4Tag {
     private String tag;
     private int mapColor;
     private int countryColor;
-    private Optional<String> name;
+    private String name;
 
-    public Eu4Tag(String tag, int mapColor, int countryColor, Optional<String> name) {
+    public Eu4Tag() {
+    }
+
+    public Eu4Tag(String tag, int mapColor, int countryColor, String name) {
         this.tag = tag;
         this.mapColor = mapColor;
         this.countryColor = countryColor;
@@ -27,8 +30,8 @@ public class Eu4Tag {
         int mColor = (mc.get(0).getInteger() << 24) + (mc.get(1).getInteger() << 16) + (mc.get(2).getInteger() << 8);
         List<Node> cc = kv.getNode().getNodeForKey("colors").getNodeForKey("country_color").getNodeArray();
         int cColor = (cc.get(0).getInteger() << 24) + (cc.get(1).getInteger() << 16) + (cc.get(2).getInteger() << 8);
-        Optional<String> name = kv.getNode().hasKey("name") ?
-                Optional.of(kv.getNode().getNodeForKey("name").getString()) : Optional.empty();
+        String name = kv.getNode().hasKey("name") ?
+                kv.getNode().getNodeForKey("name").getString() : null;
         return new Eu4Tag(kv.getKeyName(), mColor, cColor, name);
     }
 
@@ -49,7 +52,7 @@ public class Eu4Tag {
     }
 
     public boolean isCustom() {
-        return name.isPresent();
+        return name != null;
     }
 
     public String getName() {
@@ -57,6 +60,6 @@ public class Eu4Tag {
             throw new IllegalStateException();
         }
 
-        return name.get();
+        return name;
     }
 }

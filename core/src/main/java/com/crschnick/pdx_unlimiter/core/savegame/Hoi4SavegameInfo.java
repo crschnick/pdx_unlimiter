@@ -1,17 +1,22 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
+
+    protected Hoi4Tag tag;
+    protected Set<Hoi4Tag> allTags;
 
     public static Hoi4SavegameInfo fromSavegame(Node n) throws SavegameParseException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
@@ -36,5 +41,15 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
             throw new SavegameParseException("Could not create savegame info of savegame", e);
         }
         return i;
+    }
+
+    @Override
+    public Hoi4Tag getTag() {
+        return tag;
+    }
+
+    @Override
+    public Set<Hoi4Tag> getAllTags() {
+        return allTags;
     }
 }

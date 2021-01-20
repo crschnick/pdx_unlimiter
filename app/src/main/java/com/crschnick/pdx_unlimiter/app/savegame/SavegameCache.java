@@ -4,13 +4,16 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.IntegrityManager;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
+import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
@@ -48,7 +51,7 @@ public abstract class SavegameCache<
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-
+    private Class<I> infoClass;
     private String fileEnding;
     private String name;
     private GameDateType dateType;
@@ -57,12 +60,18 @@ public abstract class SavegameCache<
     private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.synchronizedObservableSet(
             FXCollections.observableSet(new HashSet<>()));
 
-    public SavegameCache(String name, String fileEnding, GameDateType dateType, SavegameParser parser) {
+    public SavegameCache(
+            String name,
+            String fileEnding,
+            GameDateType dateType,
+            SavegameParser<I> parser,
+            Class<I> infoClass) {
         this.name = name;
         this.parser = parser;
         this.fileEnding = fileEnding;
         this.dateType = dateType;
         this.path = PdxuInstallation.getInstance().getSavegamesLocation().resolve(name);
+        this.infoClass = infoClass;
     }
 
     public static <T, I extends SavegameInfo<T>> SavegameCache<T, I> getForSavegame(SavegameEntry<T, I> e) {
@@ -412,9 +421,21 @@ public abstract class SavegameCache<
             return;
         }
 
-        LoggerFactory.getLogger(SavegameCache.class).debug("Starting to load entry " + getEntryName(e));
+        logger.debug("Starting to load entry " + getEntryName(e));
         if (e.infoProperty().isNotNull().get()) {
+            logger.debug("Entry is already loaded");
             return;
+        }
+
+        if (Files.exists(getSavegameInfoFile(e))) {
+            logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
+            try {
+                e.infoProperty().set(JsonHelper.readObject(infoClass,
+                        Files.newInputStream(getSavegameInfoFile(e))));
+                return;
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
         }
 
         var file = getSavegameFile(e);
@@ -424,7 +445,23 @@ public abstract class SavegameCache<
             public void success(SavegameParser.Success<I> s) {
                 logger.debug("Parsing was successful");
                 e.infoProperty().set(s.info);
-                LoggerFactory.getLogger(SavegameCache.class).debug("Loaded entry " + getEntryName(e));
+
+                try {
+                    // Clear old info files
+                    Files.list(getPath(e)).filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
+                        try {
+                            logger.debug("Deleting old info file " + p.toString());
+                            Files.delete(p);
+                        } catch (IOException ioException) {
+                            ErrorHandler.handleException(ioException);
+                        }
+                    });
+
+                    logger.debug("Writing new info to file " + getSavegameInfoFile(e));
+                    JsonHelper.writeObject(s.info, Files.newOutputStream(getSavegameInfoFile(e)));
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
             }
 
             @Override
@@ -441,6 +478,10 @@ public abstract class SavegameCache<
 
     public synchronized Path getSavegameFile(SavegameEntry<T, I> e) {
         return getPath(e).resolve("savegame." + fileEnding);
+    }
+
+    public synchronized Path getSavegameInfoFile(SavegameEntry<T, I> e) {
+        return getPath(e).resolve(getInfoFileName());
     }
 
     public synchronized Path getPath(SavegameEntry<T, I> e) {
@@ -483,6 +524,10 @@ public abstract class SavegameCache<
 
     private String getSaveFileName() {
         return "savegame." + fileEnding;
+    }
+
+    private String getInfoFileName() {
+        return "info_" + IntegrityManager.getInstance().getCoreChecksum() + ".json";
     }
 
     public synchronized void meltSavegame(SavegameEntry<T, I> e) {
@@ -535,7 +580,8 @@ public abstract class SavegameCache<
                 try {
                     FileUtils.forceMkdir(entryPath.toFile());
                     FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-                } catch (IOException e) {
+                    JsonHelper.writeObject(s.info, Files.newOutputStream(entryPath.resolve(getInfoFileName())));
+                } catch (Exception e) {
                     ErrorHandler.handleException(e);
                     return;
                 }
@@ -572,20 +618,6 @@ public abstract class SavegameCache<
 
     public Path getDataFile() {
         return getPath().resolve("campaigns.json");
-    }
-
-    public int indexOf(SavegameCollection<?, ?> c) {
-        var list = new ArrayList<SavegameCollection<T, I>>(getCollections());
-        list.sort(Comparator.comparing(SavegameCollection::getLastPlayed));
-        Collections.reverse(list);
-        return list.indexOf(c);
-    }
-
-    public Stream<SavegameCollection<T, I>> collectionStream() {
-        var list = new ArrayList<SavegameCollection<T, I>>(getCollections());
-        list.sort(Comparator.comparing(SavegameCollection::getLastPlayed));
-        Collections.reverse(list);
-        return list.stream();
     }
 
     public ObservableSet<SavegameCollection<T, I>> getCollections() {

@@ -17,19 +17,21 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private boolean releasedVassal;
     private boolean observer;
     private Ruler ruler;
-    private Optional<Ruler> heir;
+    private Ruler heir;
     private Set<Eu4Tag> vassals = new HashSet<>();
     private Set<Eu4Tag> allies = new HashSet<>();
     private Set<Eu4Tag> marches = new HashSet<>();
     private Set<Eu4Tag> marriages = new HashSet<>();
     private Set<Eu4Tag> guarantees = new HashSet<>();
-    private Optional<Eu4Tag> overlord = Optional.empty();
+    private Eu4Tag overlord = null;
     private Set<Eu4Tag> juniorPartners = new HashSet<>();
-    private Optional<Eu4Tag> seniorPartner = Optional.empty();
+    private Eu4Tag seniorPartner = null;
     private Set<Eu4Tag> tributaryJuniors = new HashSet<>();
-    private Optional<Eu4Tag> tributarySenior = Optional.empty();
-    private Map<Eu4Tag, GameDate> truces = new HashMap<>();
+    private Eu4Tag tributarySenior = null;
+    //private Map<Eu4Tag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
+    protected Eu4Tag tag;
+    protected Set<Eu4Tag> allTags;
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         try {
@@ -78,7 +80,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
             e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag),
                     "monarch_heir", "monarch", "queen").get();
-            e.heir = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "heir");
+            e.heir = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "heir").orElse(null);
             for (Node dep : n.getNodeForKey("diplomacy").getNodesForKey("dependency")) {
                 String first = dep.getNodeForKey("first").getString();
                 String second = dep.getNodeForKey("second").getString();
@@ -172,7 +174,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     }
 
     public Optional<Ruler> getHeir() {
-        return heir;
+        return Optional.ofNullable(heir);
     }
 
     public Set<Eu4Tag> getVassals() {
@@ -196,7 +198,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     }
 
     public Optional<Eu4Tag> getOverlord() {
-        return overlord;
+        return Optional.ofNullable(overlord);
     }
 
     public Set<Eu4Tag> getJuniorPartners() {
@@ -204,7 +206,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     }
 
     public Optional<Eu4Tag> getSeniorPartner() {
-        return seniorPartner;
+        return Optional.ofNullable(seniorPartner);
     }
 
     public Set<Eu4Tag> getTributaryJuniors() {
@@ -212,11 +214,11 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     }
 
     public Optional<Eu4Tag> getTributarySenior() {
-        return tributarySenior;
+        return Optional.ofNullable(tributarySenior);
     }
 
     public Map<Eu4Tag, GameDate> getTruces() {
-        return truces;
+        return Map.of();
     }
 
     public Set<War> getWars() {
@@ -227,6 +229,14 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return campaignUuid;
     }
 
+    public Eu4Tag getTag() {
+        return tag;
+    }
+
+    public Set<Eu4Tag> getAllTags() {
+        return allTags;
+    }
+
     public static class Ruler {
 
         private String name;
@@ -234,6 +244,9 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         private int adm;
         private int dip;
         private int mil;
+
+        public Ruler() {
+        }
 
         public Ruler(String name, String fullName, int adm, int dip, int mil) {
             this.name = name;
@@ -302,6 +315,9 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         private boolean attacker;
         private Set<Eu4Tag> allies;
         private Set<Eu4Tag> enemies;
+
+        public War() {
+        }
 
         public War(String title, boolean attacker, Set<Eu4Tag> allies, Set<Eu4Tag> enemies) {
             this.title = title;

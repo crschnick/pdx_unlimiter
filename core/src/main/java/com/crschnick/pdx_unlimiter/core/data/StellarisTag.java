@@ -24,7 +24,7 @@ public class StellarisTag {
         this.backgroundSecondaryColor = backgroundSecondaryColor;
     }
 
-    private StellarisTag() {
+    public StellarisTag() {
     }
 
     public static StellarisTag fromNode(Node node) {

@@ -9,7 +9,7 @@ public class StellarisSavegameCache extends SavegameCache<
         StellarisTag,
         StellarisSavegameInfo> {
     public StellarisSavegameCache() {
-        super("stellaris", "sav", GameDateType.STELLARIS, new StellarisSavegameParser());
+        super("stellaris", "sav", GameDateType.STELLARIS, new StellarisSavegameParser(), StellarisSavegameInfo.class);
     }
 
     @Override

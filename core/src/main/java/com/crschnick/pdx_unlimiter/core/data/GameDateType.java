@@ -1,13 +1,54 @@
 package com.crschnick.pdx_unlimiter.core.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
+import java.io.IOException;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@JsonDeserialize(using = GameDateType.Deserializer.class)
 public abstract class GameDateType {
 
+    public static class Deserializer extends StdDeserializer<GameDateType> {
+
+        public Deserializer() {
+            super(GameDateType.class);
+        }
+
+        @Override
+        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
+            JsonNode node = jp.getCodec().readTree(jp);
+            if (node.textValue().equals("eu4")) {
+                return EU4;
+            }
+            if (node.textValue().equals("hoi4")) {
+                return HOI4;
+            }
+            if (node.textValue().equals("stellaris")) {
+                return STELLARIS;
+            }
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static final GameDateType EU4 = new GameDateType() {
+
+        @Override
+        @JsonValue
+        public String name() {
+            return "eu4";
+        }
+
         @Override
         public boolean hasHours() {
             return false;
@@ -33,6 +74,12 @@ public abstract class GameDateType {
 
     public static final GameDateType STELLARIS = new GameDateType() {
         @Override
+        @JsonValue
+        public String name() {
+            return "stellaris";
+        }
+
+        @Override
         public boolean hasHours() {
             return false;
         }
@@ -55,6 +102,12 @@ public abstract class GameDateType {
 
     public static final GameDateType HOI4 = new GameDateType() {
         @Override
+        @JsonValue
+        public String name() {
+            return "hoi4";
+        }
+
+        @Override
         public boolean hasHours() {
             return true;
         }
@@ -75,6 +128,8 @@ public abstract class GameDateType {
                     Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + date.getYear();
         }
     };
+
+    public abstract String name();
 
     public abstract boolean hasHours();
 

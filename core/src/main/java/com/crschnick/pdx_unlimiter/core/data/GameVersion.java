@@ -9,6 +9,9 @@ public class GameVersion implements Comparable<GameVersion> {
     private int fourth;
     private String name;
 
+    public GameVersion() {
+    }
+
     public GameVersion(int first, int second, int third, int fourth, String name) {
         this.first = first;
         this.second = second;

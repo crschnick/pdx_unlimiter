@@ -1,18 +1,23 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
+
+    protected Ck3Tag tag;
+    protected Set<Ck3Tag> allTags;
 
     public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
@@ -50,5 +55,15 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             throw new SavegameParseException("Could not create savegame info of savegame", e);
         }
         return i;
+    }
+
+    @Override
+    public Ck3Tag getTag() {
+        return tag;
+    }
+
+    @Override
+    public Set<Ck3Tag> getAllTags() {
+        return allTags;
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class SavegameInfo<T> {
+public abstract class SavegameInfo<T> {
 
     protected List<String> mods;
     protected List<String> dlcs;
@@ -15,8 +15,6 @@ public class SavegameInfo<T> {
     protected boolean ironman;
     protected UUID campaignUuid;
     protected GameDate date;
-    protected T tag;
-    protected Set<T> allTags;
 
     public List<String> getMods() {
         return mods;
@@ -26,9 +24,7 @@ public class SavegameInfo<T> {
         return dlcs;
     }
 
-    public T getTag() {
-        return tag;
-    }
+    public abstract T getTag();
 
     public boolean isIronman() {
         return ironman;
@@ -46,7 +42,5 @@ public class SavegameInfo<T> {
         return version;
     }
 
-    public Set<T> getAllTags() {
-        return allTags;
-    }
+    public abstract Set<T> getAllTags();
 }

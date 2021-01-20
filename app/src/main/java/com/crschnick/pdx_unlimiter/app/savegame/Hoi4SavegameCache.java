@@ -8,7 +8,7 @@ import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameParser;
 public class Hoi4SavegameCache extends SavegameCache<Hoi4Tag, Hoi4SavegameInfo> {
 
     public Hoi4SavegameCache() {
-        super("hoi4", "hoi4", GameDateType.HOI4, new Hoi4SavegameParser());
+        super("hoi4", "hoi4", GameDateType.HOI4, new Hoi4SavegameParser(), Hoi4SavegameInfo.class);
     }
 
     @Override

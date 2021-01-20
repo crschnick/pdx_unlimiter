@@ -11,6 +11,9 @@ public class Ck3Tag {
     private Person ruler;
     private List<Title> titles;
 
+    public Ck3Tag() {
+    }
+
     public Ck3Tag(Person ruler, List<Title> titles) {
         this.ruler = ruler;
         this.titles = titles;
@@ -32,14 +35,14 @@ public class Ck3Tag {
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
-        Map<Integer, Title> titleIds = titles.stream().collect(Collectors.toMap(t -> t.id, t -> t));
+        Map<Long, Title> titleIds = titles.stream().collect(Collectors.toMap(t -> t.id, t -> t));
         var tags = living.getNodeArray().stream()
                 .filter(n -> n.getKeyValueNode().getNode().hasKey("landed_data"))
                 .map(n -> {
                     var domain = n.getKeyValueNode().getNode().getNodeForKey("landed_data").getNodeForKey("domain");
 
                     var tagTitles = domain.getNodeArray().stream()
-                            .map(id -> titleIds.get(id.getInteger()))
+                            .map(id -> titleIds.get(id.getLong()))
                             .collect(Collectors.toList());
                     var ruler = Person.fromNode(n);
                     return new Ck3Tag(ruler, tagTitles);
@@ -65,6 +68,9 @@ public class Ck3Tag {
         private int id;
         private String firstName;
 
+        public Person() {
+        }
+
         public static Person fromNode(Node kv) {
             var kvn = kv.getKeyValueNode();
             var n = kvn.getNode();
@@ -85,11 +91,14 @@ public class Ck3Tag {
     }
 
     public static class Title {
-        private int id;
+        private long id;
         private String name;
         private CoatOfArms coatOfArms;
 
-        public Title(int id, String name, CoatOfArms coatOfArms) {
+        public Title() {
+        }
+
+        public Title(long id, String name, CoatOfArms coatOfArms) {
             this.id = id;
             this.name = name;
             this.coatOfArms = coatOfArms;
@@ -102,14 +111,14 @@ public class Ck3Tag {
                 return Optional.empty();
             }
 
-            var id = Integer.parseInt(kvn.getKeyName());
+            var id = Long.parseLong(kvn.getKeyName());
             var name = n.getNodeForKey("name").getString();
             var coaId = n.getNodeForKey("coat_of_arms_id").getInteger();
             var coatOfArms = coas.stream().filter(c -> c.id == coaId).findFirst().get();
             return Optional.of(new Title(id, name, coatOfArms));
         }
 
-        public int getId() {
+        public long getId() {
             return id;
         }
 
@@ -124,12 +133,15 @@ public class Ck3Tag {
 
     public static class CoatOfArms {
 
-        private int id;
+        private long id;
         private String patternFile;
         private List<String> colors;
         private List<Emblem> emblems;
 
-        public CoatOfArms(int id, String patternFile, List<String> colors, List<Emblem> emblems) {
+        public CoatOfArms() {
+        }
+
+        public CoatOfArms(long id, String patternFile, List<String> colors, List<Emblem> emblems) {
             this.id = id;
             this.patternFile = patternFile;
             this.colors = colors;
@@ -140,7 +152,7 @@ public class Ck3Tag {
             var kvn = kv.getKeyValueNode();
             var n = kvn.getNode();
 
-            var id = Integer.parseInt(kvn.getKeyName());
+            var id = Long.parseLong(kvn.getKeyName());
             var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
 
             List<String> colors = new ArrayList<>();

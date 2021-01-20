@@ -8,7 +8,7 @@ import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
 public class Ck3SavegameCache extends SavegameCache<Ck3Tag, Ck3SavegameInfo> {
 
     public Ck3SavegameCache() {
-        super("ck3", "ck3", GameDateType.CK3, new Ck3SavegameParser());
+        super("ck3", "ck3", GameDateType.CK3, new Ck3SavegameParser(), Ck3SavegameInfo.class);
     }
 
     @Override

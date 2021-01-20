@@ -8,7 +8,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 public class GuiListView {
@@ -24,7 +26,9 @@ public class GuiListView {
                 listView.getItems().forEach(n -> map.put((T) n.getProperties().get("list-item"), n));
 
                 listView.getItems().clear();
-                list.forEach(li -> {
+
+                // Make copy in case the list changes during this loop
+                new ArrayList<>(list).forEach(li -> {
                     var item = map.getOrDefault(li, createForItem(li, nodeFactory));
                     listView.getItems().add(item);
                 });

@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
@@ -13,6 +14,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
+
+    protected StellarisTag tag;
+    protected Set<StellarisTag> allTags;
 
     public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameParseException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
@@ -72,6 +76,11 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             throw new SavegameParseException("Could not create savegame info of savegame", e);
         }
         return i;
+    }
+
+    @Override
+    public StellarisTag getTag() {
+        return tag;
     }
 
     public Set<StellarisTag> getAllTags() {

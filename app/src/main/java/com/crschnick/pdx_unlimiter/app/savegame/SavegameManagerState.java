@@ -24,10 +24,8 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntry =
             new SimpleObjectProperty<>();
     private Filter filter = new Filter();
-    private ObservableList<SavegameCollection<T, I>> shownCollections = FXCollections.synchronizedObservableList(
-            FXCollections.observableArrayList());
-    private ObservableList<SavegameEntry<T, I>> shownEntries = FXCollections.synchronizedObservableList(
-            FXCollections.observableArrayList());
+    private ObservableList<SavegameCollection<T, I>> shownCollections = FXCollections.observableArrayList();
+    private ObservableList<SavegameEntry<T, I>> shownEntries = FXCollections.observableArrayList();
 
     private SavegameManagerState() {
         var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> {
