@@ -1,9 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.core.parser.*;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -39,7 +36,7 @@ public class SimpleNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return backingNode instanceof ValueNode && filter.test(backingNode.getString());
+        return filter.test(TextFormatWriter.write(backingNode, Integer.MAX_VALUE));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,7 +25,7 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return false;
+        return nodes.stream().anyMatch(n -> filter.test(TextFormatWriter.write(n, Integer.MAX_VALUE)));
     }
 
     @Override

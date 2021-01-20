@@ -68,6 +68,19 @@ public abstract class Node {
         }
     }
 
+    public boolean isValue() {
+        return this instanceof ValueNode;
+    }
+
+    public boolean isDouble() {
+        if (!isValue()) {
+            return false;
+        }
+
+        String sv = getString();
+        return LONG.matcher(sv).matches() || DOUBLE.matcher(sv).matches();
+    }
+
     public double getDouble() {
         String sv = getString();
         if (LONG.matcher(sv).matches() || DOUBLE.matcher(sv).matches()) {

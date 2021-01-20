@@ -2,17 +2,22 @@ package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
+import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class GuiEditor {
@@ -89,43 +94,14 @@ public class GuiEditor {
     private static void createNodeList(GridPane grid, EditorState state, List<EditorNode> nodes) {
         grid.getChildren().clear();
 
-        for (int i = 0; i < nodes.size(); i++) {
+        int nodeCount = Math.min(nodes.size(), 300);
+        for (int i = 0; i < nodeCount; i++) {
             var n = nodes.get(i);
             grid.add(new Label(n.displayKeyName()), 0, i);
             grid.add(new Label("="), 1, i);
 
 
-            Region valueDisplay = null;
-            if (n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode) {
-                var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
-                valueDisplay = tf;
-                tf.textProperty().addListener((c, o, ne) -> {
-                    ((SimpleNode) n).updateText(ne);
-                });
-            } else {
-                int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
-                        ((CollectorNode) n).getNodes().size();
-                var lengthString = " ".repeat(4 - String.valueOf(length).length()) + String.valueOf(length);
-                var btn = new JFXButton("[... " + lengthString + " ...]");
-                btn.setAlignment(Pos.CENTER);
-                btn.setOnAction(e -> {
-                    state.navigateTo(n);
-                });
-
-                var preview = new Label();
-                preview.getStyleClass().add("preview");
-                preview.setGraphic(new FontIcon());
-                preview.setOnMouseEntered(e -> {
-                    var tt = new Tooltip(TextFormatWriter.write(n.toWritableNode(), 10));
-                    tt.setShowDelay(javafx.util.Duration.ZERO);
-                    Tooltip.install(preview, tt);
-                });
-
-                var hb = new HBox(btn, preview);
-                hb.setAlignment(Pos.CENTER);
-                hb.setSpacing(5);
-                valueDisplay = hb;
-            }
+            Region valueDisplay = createValueDisplay(n, state);
             grid.add(valueDisplay, 2, i);
 
             HBox btns = new HBox();
@@ -142,6 +118,45 @@ public class GuiEditor {
             btns.getChildren().add(edit);
             btns.getChildren().add(del);
             grid.add(btns, 3, i);
+        }
+    }
+
+    private static Region createValueDisplay(EditorNode n, EditorState state) {
+        boolean isText = n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode;
+        if (isText) {
+            var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
+            tf.textProperty().addListener((c, o, ne) -> {
+                ((SimpleNode) n).updateText(ne);
+            });
+            return tf;
+        } else {
+            var box = new HBox();
+            box.setAlignment(Pos.CENTER);
+            box.setSpacing(5);
+
+            int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
+                    ((CollectorNode) n).getNodes().size();
+            int stringSize = String.valueOf(length).length();
+            int spaceSize = 6 - stringSize;
+            var lengthString = " ".repeat(spaceSize / 2) + String.valueOf(length) + " ".repeat(spaceSize / 2);
+            var btn = new JFXButton("[... " + lengthString + " ...]");
+            btn.setAlignment(Pos.CENTER);
+            btn.setOnAction(e -> {
+                state.navigateTo(n);
+            });
+            box.getChildren().add(btn);
+
+            var preview = new Label();
+            preview.getStyleClass().add("preview");
+            preview.setGraphic(new FontIcon());
+            preview.setOnMouseEntered(e -> {
+                var tt = new Tooltip(TextFormatWriter.write(n.toWritableNode(), 10));
+                tt.setShowDelay(javafx.util.Duration.ZERO);
+                Tooltip.install(preview, tt);
+            });
+            box.getChildren().add(preview);
+
+            return box;
         }
     }
 
