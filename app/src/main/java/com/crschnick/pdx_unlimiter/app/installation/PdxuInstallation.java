@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
-import org.apache.commons.lang3.ClassLoaderUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 

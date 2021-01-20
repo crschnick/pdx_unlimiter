@@ -2,31 +2,6 @@ package com.crschnick.pdx_unlimiter.core.parser;
 
 public class TextFormatWriter {
 
-    private static class LimitedStringBuilder {
-        private int currentLines = 0;
-        private int maxLines;
-        private StringBuilder sb;
-
-        public LimitedStringBuilder(int maxLines) {
-            this.maxLines = maxLines;
-            this.sb = new StringBuilder();
-        }
-
-        private String value() {
-            return sb.toString();
-        }
-
-        private void append(String s) {
-            sb.append(s);
-        }
-
-        private boolean appendLine(String line) {
-            sb.append(line).append("\n");
-            currentLines++;
-            return currentLines < maxLines;
-        }
-    }
-
     public static String write(Node node, int maxLines) {
         var sb = new LimitedStringBuilder(maxLines);
         boolean hitMaxLines = false;
@@ -81,5 +56,30 @@ public class TextFormatWriter {
         }
 
         return true;
+    }
+
+    private static class LimitedStringBuilder {
+        private int currentLines = 0;
+        private int maxLines;
+        private StringBuilder sb;
+
+        public LimitedStringBuilder(int maxLines) {
+            this.maxLines = maxLines;
+            this.sb = new StringBuilder();
+        }
+
+        private String value() {
+            return sb.toString();
+        }
+
+        private void append(String s) {
+            sb.append(s);
+        }
+
+        private boolean appendLine(String line) {
+            sb.append(line).append("\n");
+            currentLines++;
+            return currentLines < maxLines;
+        }
     }
 }

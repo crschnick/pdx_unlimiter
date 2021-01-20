@@ -5,21 +5,18 @@ import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 public class IntegrityManager {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrityManager.class);
-    private static IntegrityManager INSTANCE;
-    private static final String[] DATA_COMPONENTS = new String[] {
+    private static final String[] DATA_COMPONENTS = new String[]{
             "Ck3Tag", "Eu4Tag", "GameDate", "GameDateType", "GameVersion", "Hoi4Tag", "StellarisTag"};
-    private static final String[] SAVEGAME_COMPONENTS = new String[] {
+    private static final String[] SAVEGAME_COMPONENTS = new String[]{
             "Ck3SavegameInfo", "Eu4SavegameInfo", "Hoi4SavegameInfo", "StellarisSavegameInfo", "SavegameInfo"};
-
+    private static IntegrityManager INSTANCE;
     private String coreChecksum = "none";
 
     public static void init() throws Exception {

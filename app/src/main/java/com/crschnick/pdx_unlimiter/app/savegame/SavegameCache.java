@@ -13,7 +13,6 @@ import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;

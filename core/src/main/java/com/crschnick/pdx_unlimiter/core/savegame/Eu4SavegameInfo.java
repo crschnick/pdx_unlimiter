@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
+    protected Eu4Tag tag;
+    protected Set<Eu4Tag> allTags;
     private boolean randomNewWorld;
     private boolean customNationInWorld;
     private boolean releasedVassal;
@@ -30,8 +32,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Eu4Tag tributarySenior = null;
     //private Map<Eu4Tag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
-    protected Eu4Tag tag;
-    protected Set<Eu4Tag> allTags;
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         try {

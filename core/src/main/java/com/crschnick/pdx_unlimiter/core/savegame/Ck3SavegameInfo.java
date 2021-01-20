@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.Node;

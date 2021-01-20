@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,29 +16,6 @@ import java.util.regex.Pattern;
 
 @JsonDeserialize(using = GameDateType.Deserializer.class)
 public abstract class GameDateType {
-
-    public static class Deserializer extends StdDeserializer<GameDateType> {
-
-        public Deserializer() {
-            super(GameDateType.class);
-        }
-
-        @Override
-        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
-            JsonNode node = jp.getCodec().readTree(jp);
-            if (node.textValue().equals("eu4")) {
-                return EU4;
-            }
-            if (node.textValue().equals("hoi4")) {
-                return HOI4;
-            }
-            if (node.textValue().equals("stellaris")) {
-                return STELLARIS;
-            }
-            throw new IllegalArgumentException();
-        }
-    }
 
     public static final GameDateType EU4 = new GameDateType() {
 
@@ -69,9 +45,7 @@ public abstract class GameDateType {
             return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + date.getYear();
         }
     };
-
     public static final GameDateType CK3 = EU4;
-
     public static final GameDateType STELLARIS = new GameDateType() {
         @Override
         @JsonValue
@@ -99,7 +73,6 @@ public abstract class GameDateType {
             return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + date.getYear();
         }
     };
-
     public static final GameDateType HOI4 = new GameDateType() {
         @Override
         @JsonValue
@@ -221,5 +194,28 @@ public abstract class GameDateType {
             return new GameDate(0, day, m, year, this);
         }
         throw new IllegalArgumentException("Invalid date string: " + s);
+    }
+
+    public static class Deserializer extends StdDeserializer<GameDateType> {
+
+        public Deserializer() {
+            super(GameDateType.class);
+        }
+
+        @Override
+        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
+            JsonNode node = jp.getCodec().readTree(jp);
+            if (node.textValue().equals("eu4")) {
+                return EU4;
+            }
+            if (node.textValue().equals("hoi4")) {
+                return HOI4;
+            }
+            if (node.textValue().equals("stellaris")) {
+                return STELLARIS;
+            }
+            throw new IllegalArgumentException();
+        }
     }
 }
