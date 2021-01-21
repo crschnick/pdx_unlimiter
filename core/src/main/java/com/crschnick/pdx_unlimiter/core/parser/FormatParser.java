@@ -2,24 +2,11 @@ package com.crschnick.pdx_unlimiter.core.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public abstract class FormatParser {
-
-    private byte[] header;
-
-    public FormatParser(byte[] header) {
-        this.header = header;
-    }
-
-    public static boolean validateHeader(byte[] header, byte[] data) {
-        if (data.length < header.length) {
-            return false;
-        }
-
-        byte[] first = Arrays.copyOfRange(data, 0, header.length);
-        return Arrays.equals(first, header);
-    }
 
     public static boolean validateHeader(byte[] header, InputStream stream) throws IOException {
         byte[] first = new byte[header.length];
@@ -29,8 +16,8 @@ public abstract class FormatParser {
 
     public abstract List<Token> tokenize(byte[] data) throws IOException;
 
-    public final ArrayNode parse(InputStream stream) throws IOException {
-        return parse(stream.readAllBytes());
+    public final ArrayNode parse(Path in) throws IOException {
+        return parse(Files.readAllBytes(in));
     }
 
     public final ArrayNode parse(byte[] input) throws IOException {

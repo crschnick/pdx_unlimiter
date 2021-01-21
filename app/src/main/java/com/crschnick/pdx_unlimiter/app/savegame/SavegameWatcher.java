@@ -54,7 +54,7 @@ public class SavegameWatcher {
         savegames.set(getLatestSavegames());
 
         List<Path> savegameDirs = install.getAllSavegameDirectories();
-        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p) -> {
+        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
             savegames.set(getLatestSavegames());
         });
     }

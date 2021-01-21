@@ -11,6 +11,8 @@ import org.apache.commons.io.FileUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.util.*;
 
 public class EditorExternalState {
@@ -23,14 +25,21 @@ public class EditorExternalState {
         try {
             FileUtils.forceMkdir(TEMP.toFile());
             FileUtils.cleanDirectory(TEMP.toFile());
-            FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), changed -> {
+            FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
                 if (!Files.exists(changed)) {
                     removeForFile(changed);
                 } else {
-                    // Files that are created initially are not yet added to entries (sometimes)
                     getForFile(changed).ifPresent(e -> {
                         try {
-                            ArrayNode newNode = TextFormatParser.textFileParser().parse(Files.newInputStream(changed));
+                            // Wait for first write
+                            if (!e.registered) {
+                                if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                                    e.registered = true;
+                                }
+                                return;
+                            }
+
+                            ArrayNode newNode = e.state.getParser().parse(changed);
                             e.editorNode.update(newNode);
                             e.state.onFileChanged();
                         } catch (Exception ex) {
@@ -82,8 +91,8 @@ public class EditorExternalState {
         Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
 
         try {
-            Files.writeString(file, TextFormatWriter.write(node.toWritableNode(), Integer.MAX_VALUE));
             openEntries.add(new Entry(file, node, state));
+            state.getWriter().write(node.toWritableNode(), Integer.MAX_VALUE, "  ", file);
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -94,6 +103,7 @@ public class EditorExternalState {
         private Path file;
         private EditorNode editorNode;
         private EditorState state;
+        private boolean registered;
 
         public Entry(Path file, EditorNode editorNode, EditorState state) {
             this.file = file;

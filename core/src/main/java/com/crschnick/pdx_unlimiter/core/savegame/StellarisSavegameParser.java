@@ -23,14 +23,14 @@ public class StellarisSavegameParser extends SavegameParser<StellarisSavegameInf
                 return new Invalid("Missing gamestate");
             }
             var gsIn = zipFile.getInputStream(gs);
-            gamestateNode = TextFormatParser.textFileParser().parse(gsIn);
+            gamestateNode = TextFormatParser.stellarisSavegameParser().parse(gsIn.readAllBytes());
 
             var mt = zipFile.getEntry("meta");
             if (mt == null) {
                 return new Invalid("Missing meta");
             }
             var mtIn = zipFile.getInputStream(mt);
-            metaNode = TextFormatParser.textFileParser().parse(mtIn);
+            metaNode = TextFormatParser.stellarisSavegameParser().parse(mtIn.readAllBytes());
 
             zipFile.close();
 

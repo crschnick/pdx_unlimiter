@@ -9,30 +9,30 @@ import java.util.List;
 
 public class TextFormatParser extends FormatParser {
 
-    public static final byte[] EU4_MAGIC = new byte[]{0x45, 0x55, 0x34, 0x74, 0x78, 0x74};
-    public static final byte[] HOI_MAGIC = new byte[]{0x48, 0x4F, 0x49, 0x34, 0x74, 0x78, 0x74};
-
     private Charset charset;
 
-    private TextFormatParser(byte[] magic, Charset charset) {
-        super(magic);
+    private TextFormatParser(Charset charset) {
         this.charset = charset;
     }
 
     public static TextFormatParser textFileParser() {
-        return new TextFormatParser(new byte[0], StandardCharsets.UTF_8);
+        return new TextFormatParser(StandardCharsets.UTF_8);
+    }
+
+    public static TextFormatParser ck3SavegameParser() {
+        return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
     public static TextFormatParser eu4SavegameParser() {
-        return new TextFormatParser(EU4_MAGIC, StandardCharsets.ISO_8859_1);
+        return new TextFormatParser(StandardCharsets.ISO_8859_1);
     }
 
     public static TextFormatParser stellarisSavegameParser() {
-        return new TextFormatParser(new byte[0], StandardCharsets.UTF_8);
+        return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
     public static TextFormatParser hoi4SavegameParser() {
-        return new TextFormatParser(HOI_MAGIC, StandardCharsets.UTF_8);
+        return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
     private List<Token> tokenizeInternal(byte[] bytes) {
@@ -70,7 +70,7 @@ public class TextFormatParser extends FormatParser {
             boolean isComment = c == '#';
             boolean eof = i == bytes.length - 1;
             boolean marksEndOfPreviousToken =
-                    (t != null && prev < i)             // New token finishes old token
+                               (t != null && prev < i)             // New token finishes old token
                             || (isWhitespace && prev < i)          // Whitespace finishes old token
                             || (isComment && prev < i);            // New comment finishes old token
             if (marksEndOfPreviousToken) {

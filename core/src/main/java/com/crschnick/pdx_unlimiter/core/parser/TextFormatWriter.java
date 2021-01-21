@@ -1,9 +1,45 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class TextFormatWriter {
 
-    public static String write(Node node, int maxLines) {
-        var sb = new LimitedStringBuilder(maxLines);
+    private Charset charset;
+
+    private TextFormatWriter(Charset charset) {
+        this.charset = charset;
+    }
+
+    public static TextFormatWriter textFileWriter() {
+        return new TextFormatWriter(StandardCharsets.UTF_8);
+    }
+
+    public static TextFormatWriter ck3SavegameWriter() {
+        return new TextFormatWriter(StandardCharsets.UTF_8);
+    }
+
+    public static TextFormatWriter eu4SavegameWriter() {
+        return new TextFormatWriter(StandardCharsets.ISO_8859_1);
+    }
+
+    public static TextFormatWriter stellarisSavegameWriter() {
+        return new TextFormatWriter(StandardCharsets.UTF_8);
+    }
+
+    public static TextFormatWriter hoi4SavegameWriter() {
+        return new TextFormatWriter(StandardCharsets.UTF_8);
+    }
+
+    public void write(Node node, int maxLines, String space, Path out) throws IOException {
+        Files.writeString(out, writeToString(node, maxLines, space), charset);
+    }
+
+    public static String writeToString(Node node, int maxLines, String space) {
+        var sb = new LimitedStringBuilder(maxLines, space);
         boolean hitMaxLines = false;
         if (node instanceof ArrayNode) {
             for (var c : node.getNodeArray()) {
@@ -34,8 +70,8 @@ public class TextFormatWriter {
                 return false;
             }
             for (var c : n.getNodeArray()) {
-                sb.append(" ".repeat(indent + 2));
-                if (!node(indent + 2, c, sb)) {
+                sb.space(indent + 1);
+                if (!node(indent + 1, c, sb)) {
                     return false;
                 }
                 if (!sb.appendLine("")) {
@@ -43,7 +79,8 @@ public class TextFormatWriter {
                 }
 
             }
-            sb.append(" ".repeat(indent) + "}");
+            sb.space(indent);
+            sb.append("}");
         }
 
         if (n instanceof ValueNode) {
@@ -62,14 +99,20 @@ public class TextFormatWriter {
         private int currentLines = 0;
         private int maxLines;
         private StringBuilder sb;
+        private String space;
 
-        public LimitedStringBuilder(int maxLines) {
+        public LimitedStringBuilder(int maxLines, String space) {
             this.maxLines = maxLines;
             this.sb = new StringBuilder();
+            this.space = space;
         }
 
         private String value() {
             return sb.toString();
+        }
+
+        private void space(int nTimes) {
+            sb.append(space.repeat(nTimes));
         }
 
         private void append(String s) {

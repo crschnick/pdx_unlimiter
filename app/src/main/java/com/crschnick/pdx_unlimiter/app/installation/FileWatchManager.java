@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -34,7 +35,7 @@ public class FileWatchManager {
 
     public void startWatchersInDirectories(
             List<Path> dirs,
-            Consumer<Path> listener) {
+            BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
         dirs.forEach(d -> watchedDirectories.add(WatchedDirectory.create(d, listener)));
     }
 
@@ -48,10 +49,10 @@ public class FileWatchManager {
 
     private static class WatchedDirectory {
         private Path directory;
-        private Consumer<Path> listener;
+        private BiConsumer<Path, WatchEvent.Kind<Path>> listener;
         private Map<Path, WatchService> watchers = new ConcurrentHashMap<>();
 
-        public static WatchedDirectory create(Path dir, Consumer<Path> listener) {
+        public static WatchedDirectory create(Path dir, BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
             var w = new WatchedDirectory();
             w.directory = dir;
             w.listener = listener;
@@ -133,7 +134,7 @@ public class FileWatchManager {
             }
 
             // Handle event
-            listener.accept(file);
+            listener.accept(file, ev.kind());
         }
 
         public void stop() {
@@ -148,14 +149,6 @@ public class FileWatchManager {
 
         public Path getDirectory() {
             return directory;
-        }
-
-        public Map<Path, WatchService> getWatchers() {
-            return watchers;
-        }
-
-        public Consumer<Path> getListener() {
-            return listener;
         }
     }
 }

@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.WatchEvent;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class FileImporter {
@@ -23,7 +25,7 @@ public class FileImporter {
         var path = PdxuInstallation.getInstance().getImportQueueLocation();
         FileUtils.forceMkdir(path.toFile());
 
-        Consumer<Path> importFunc = p -> {
+        BiConsumer<Path, WatchEvent.Kind<Path>> importFunc = (p, k) -> {
             if (!Files.exists(p)) {
                 return;
             }
@@ -31,7 +33,7 @@ public class FileImporter {
             importFromQueue(p);
         };
 
-        Files.list(path).forEach(importFunc);
+        Files.list(path).forEach(FileImporter::importFromQueue);
         FileWatchManager.getInstance().startWatchersInDirectories(List.of(path), importFunc);
     }
 

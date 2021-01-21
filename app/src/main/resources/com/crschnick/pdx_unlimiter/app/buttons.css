@@ -2,6 +2,14 @@
  -fx-icon-code: "mdi-content-save";
 }
 
+.save-button .ikonli-font-icon {
+ -fx-icon-code: "mdi-content-save";
+}
+
+.clear-button .ikonli-font-icon {
+ -fx-icon-code: "mdi-filter-remove";
+}
+
 .content .ikonli-font-icon {
  -fx-icon-code: "mdi-folder-multiple-outline";
 }
@@ -31,7 +39,7 @@
 }
 
 .edit-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-table-edit";
+    -fx-icon-code: "mdi-pencil";
 }
 
 .achievement-button .ikonli-font-icon {
@@ -63,8 +71,8 @@
     -fx-icon-code: "mdi-folder-plus"
 }
 
-.deep-search-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-sort-descending"
+.filter-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-filter"
 }
 
 .upload-button .ikonli-font-icon {

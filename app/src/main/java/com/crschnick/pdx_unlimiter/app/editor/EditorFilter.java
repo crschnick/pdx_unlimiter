@@ -10,15 +10,12 @@ import java.util.stream.Collectors;
 
 public class EditorFilter {
 
-    private EditorState state;
     private StringProperty filterString;
     private BooleanProperty caseSensitive;
     private BooleanProperty filterKeys;
     private BooleanProperty filterValues;
 
     EditorFilter(EditorState state) {
-        this.state = state;
-
         filterString = new SimpleStringProperty("");
         filterString.addListener((c, o, n) -> {
             if (filterKeys.get() || filterValues.get()) {
@@ -29,7 +26,7 @@ public class EditorFilter {
         caseSensitive.addListener((c, o, n) -> state.update(false));
         filterKeys = new SimpleBooleanProperty(true);
         filterKeys.addListener((c, o, n) -> state.update(false));
-        filterValues = new SimpleBooleanProperty(false);
+        filterValues = new SimpleBooleanProperty(true);
         filterValues.addListener((c, o, n) -> state.update(false));
     }
 

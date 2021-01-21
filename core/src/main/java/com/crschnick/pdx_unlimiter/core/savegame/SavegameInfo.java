@@ -15,6 +15,7 @@ public abstract class SavegameInfo<T> {
     protected boolean ironman;
     protected UUID campaignUuid;
     protected GameDate date;
+    protected boolean binary;
 
     public List<String> getMods() {
         return mods;
@@ -43,4 +44,8 @@ public abstract class SavegameInfo<T> {
     }
 
     public abstract Set<T> getAllTags();
+
+    public boolean isBinary() {
+        return binary;
+    }
 }

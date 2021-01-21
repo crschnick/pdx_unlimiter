@@ -25,7 +25,8 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return nodes.stream().anyMatch(n -> filter.test(TextFormatWriter.write(n, Integer.MAX_VALUE)));
+        return nodes.stream().anyMatch(n -> filter.test(
+                TextFormatWriter.writeToString(n, Integer.MAX_VALUE, "")));
     }
 
     @Override

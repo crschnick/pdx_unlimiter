@@ -133,11 +133,11 @@ public class GuiSavegameEntry {
             });
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            if (e.getInfo() != null && e.getInfo().isIronman()) {
+            if (e.getInfo() != null && e.getInfo().isBinary()) {
                 buttonBar.getChildren().add(melt);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
-                    if (n.isIronman()) {
+                    if (n.isBinary()) {
                         Platform.runLater(() -> {
                             buttonBar.getChildren().add(0, melt);
                         });
@@ -210,11 +210,11 @@ public class GuiSavegameEntry {
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
 
-            if (e.getInfo() != null && !e.getInfo().isIronman()) {
+            if (e.getInfo() != null && !e.getInfo().isBinary()) {
                 buttonBar.getChildren().add(edit);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
-                    if (!n.isIronman()) {
+                    if (!n.isBinary()) {
                         Platform.runLater(() -> {
                             buttonBar.getChildren().add(0, edit);
                         });

@@ -25,6 +25,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
             i.date = GameDateType.STELLARIS.fromString(n.getNodesForKey("date").get(0).getString());
 
+            i.binary = false;
             i.campaignUuid = UUID.randomUUID();
 
             int seed = n.getNodeForKey("random_seed").getInteger();

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +60,8 @@ public class Hoi4Installation extends GameInstallation {
 
     public void loadSettings() throws IOException {
         ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(getPath().resolve("launcher-settings.json")));
+        JsonNode node = o.readTree(Files.readAllBytes(
+                getPath().resolve("launcher-settings.json")));
         this.userDir = determineUserDirectory(node);
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);

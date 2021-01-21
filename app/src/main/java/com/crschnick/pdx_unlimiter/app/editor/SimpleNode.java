@@ -36,7 +36,7 @@ public class SimpleNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return filter.test(TextFormatWriter.write(backingNode, Integer.MAX_VALUE));
+        return filter.test(TextFormatWriter.writeToString(backingNode, Integer.MAX_VALUE, ""));
     }
 
     @Override
@@ -70,12 +70,16 @@ public class SimpleNode extends EditorNode {
 
     public void update(ArrayNode newNode) {
         Node nodeToUse = backingNode instanceof ArrayNode ? newNode : newNode.getNodes().get(0);
-        getKeyName().ifPresentOrElse(s -> {
-            getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(),
-                    KeyValueNode.create(s, nodeToUse));
-        }, () -> {
-            getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), nodeToUse);
-        });
+
+        // Update parent node to reflect change
+        if (getDirectParent() != null) {
+            getKeyName().ifPresentOrElse(s -> {
+                getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(),
+                        KeyValueNode.create(s, nodeToUse));
+            }, () -> {
+                getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), nodeToUse);
+            });
+        }
         this.backingNode = nodeToUse;
     }
 

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
@@ -62,7 +63,8 @@ public class Ck3Installation extends GameInstallation {
 
     public void loadSettings() throws IOException {
         ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(getLauncherDataPath().resolve("launcher-settings.json")));
+        JsonNode node = o.readTree(Files.readAllBytes(
+                getLauncherDataPath().resolve("launcher-settings.json")));
         this.userDir = determineUserDirectory(node);
         String v = node.required("version").textValue();
         Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)\\s+\\((\\w+)\\)").matcher(v);

@@ -22,6 +22,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
             i.ironman = melted;
+            i.binary = i.ironman;
             i.date = GameDateType.CK3.fromString(n.getNodeForKey("date").getString());
 
             long seed = n.getNodeForKey("random_seed").getLong();

@@ -105,8 +105,6 @@ public abstract class FileImportTarget {
 
     public abstract String getName();
 
-    public abstract String toImportString();
-
     public abstract Path getPath();
 
     public static final class DownloadImportTarget extends FileImportTarget {
@@ -167,11 +165,6 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public String toImportString() {
-            return url.toString();
-        }
-
-        @Override
         public Path getPath() {
             return downloadedFile;
         }
@@ -197,7 +190,8 @@ public abstract class FileImportTarget {
             try {
                 return Files.getLastModifiedTime(path).toInstant();
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                // In some conditions, the import target may already not exist anymore.
+                // If that happens, fail silently
                 return Instant.MIN;
             }
         }
@@ -220,11 +214,6 @@ public abstract class FileImportTarget {
         @Override
         public String getName() {
             return FilenameUtils.getBaseName(path.toString());
-        }
-
-        @Override
-        public String toImportString() {
-            return path.toString();
         }
 
         public Path getPath() {

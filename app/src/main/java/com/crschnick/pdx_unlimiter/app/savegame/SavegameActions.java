@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
@@ -152,24 +153,9 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            var r = SavegameCache.getForSavegame(e).getParser().parse(
-                    SavegameManagerState.<T, I>get().current().getSavegameCache().getSavegameFile(e), null);
-            r.visit(new SavegameParser.StatusVisitor<I>() {
-                @Override
-                public void success(SavegameParser.Success<I> s) {
-                    Editor.createNewEditor(s.content);
-                }
-
-                @Override
-                public void error(SavegameParser.Error e) {
-                    ErrorHandler.handleException(e.error);
-                }
-
-                @Override
-                public void invalid(SavegameParser.Invalid iv) {
-                    ErrorHandler.handleException(new SavegameParseException(iv.message));
-                }
-            });
+            var in = SavegameCache.getForSavegame(e).getSavegameFile(e);
+            var target = EditTarget.create(in);
+            target.ifPresent(Editor::createNewEditor);
         }, true);
     }
 }

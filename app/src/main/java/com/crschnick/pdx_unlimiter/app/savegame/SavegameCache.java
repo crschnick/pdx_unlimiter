@@ -166,9 +166,9 @@ public abstract class SavegameCache<
         for (SavegameCollection<T, I> collection : collections) {
             try {
                 String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
-                InputStream campaignIn = Files.newInputStream(
-                        getPath().resolve(collection.getUuid().toString()).resolve(typeName + ".json"));
-                JsonNode campaignNode = new ObjectMapper().readTree(campaignIn.readAllBytes());
+                var colFile = getPath().resolve(
+                        collection.getUuid().toString()).resolve(typeName + ".json");
+                JsonNode campaignNode =JsonHelper.read(colFile);
                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
                     UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
@@ -429,8 +429,7 @@ public abstract class SavegameCache<
         if (Files.exists(getSavegameInfoFile(e))) {
             logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
             try {
-                e.infoProperty().set(JsonHelper.readObject(infoClass,
-                        Files.newInputStream(getSavegameInfoFile(e))));
+                e.infoProperty().set(JsonHelper.readObject(infoClass, getSavegameInfoFile(e)));
                 return;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
@@ -457,7 +456,7 @@ public abstract class SavegameCache<
                     });
 
                     logger.debug("Writing new info to file " + getSavegameInfoFile(e));
-                    JsonHelper.writeObject(s.info, Files.newOutputStream(getSavegameInfoFile(e)));
+                    JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
                 } catch (Exception ex) {
                     ErrorHandler.handleException(ex);
                 }
@@ -579,7 +578,7 @@ public abstract class SavegameCache<
                 try {
                     FileUtils.forceMkdir(entryPath.toFile());
                     FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-                    JsonHelper.writeObject(s.info, Files.newOutputStream(entryPath.resolve(getInfoFileName())));
+                    JsonHelper.writeObject(s.info, entryPath.resolve(getInfoFileName()));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                     return;

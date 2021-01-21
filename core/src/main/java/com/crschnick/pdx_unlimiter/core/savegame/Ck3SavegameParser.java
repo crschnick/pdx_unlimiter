@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +29,13 @@ public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
             }
         }
         return -1;
+    }
+
+    public boolean isCompressed(Path file) throws IOException {
+        var content = Files.readAllBytes(file);
+        int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH);
+        boolean compressed = zipContentStart != 1;
+        return false;
     }
 
     @Override
@@ -65,7 +73,7 @@ public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
                 savegameText = content;
             }
 
-            Node node = TextFormatParser.textFileParser().parse(savegameText);
+            Node node = TextFormatParser.ck3SavegameParser().parse(savegameText);
             return new Success<>(binary, checksum, node, Ck3SavegameInfo.fromSavegame(melted, node));
         } catch (Exception e) {
             return new Error(e);

@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
@@ -11,9 +12,11 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
@@ -22,7 +25,24 @@ import java.util.function.Consumer;
 
 public class GuiEditor {
 
-    public static Region create(EditorState state) {
+    static Stage createStage(EditorState state) {
+        Stage stage = new Stage();
+
+        var icon = PdxuApp.getApp().getIcon();
+        stage.getIcons().add(icon);
+        var title = state.getFileName() + " - " + "Pdx-Unlimiter Editor";
+        stage.setTitle(title);
+        state.dirtyProperty().addListener((c,o,n) -> {
+            Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
+        });
+
+        stage.setScene(new Scene(GuiEditor.create(state), 720, 600));
+        GuiStyle.addStylesheets(stage.getScene());
+        stage.show();
+        return stage;
+    }
+
+    private static Region create(EditorState state) {
         BorderPane layout = new BorderPane();
         layout.setTop(createNavigationBar(state));
         var grid = createNodeList(state);
@@ -40,11 +60,28 @@ public class GuiEditor {
         Consumer<List<EditorNode>> updateBar = l -> {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
-                var initBtn = new JFXButton("<file>");
-                initBtn.setOnAction(e -> {
-                    edState.navigateTo(null);
-                });
-                bar.getChildren().add(initBtn);
+
+                {
+                    Button save = new Button();
+                    save.setDisable(!edState.dirtyProperty().get());
+                    edState.dirtyProperty().addListener((c,o,n) -> {
+                        save.setDisable(!n);
+                    });
+                    save.setGraphic(new FontIcon());
+                    save.getStyleClass().add(GuiStyle.CLASS_SAVE);
+                    save.setOnAction(e -> {
+                        edState.save();
+                    });
+                    bar.getChildren().add(save);
+                }
+
+                {
+                    var initBtn = new JFXButton(edState.getFileName());
+                    initBtn.setOnAction(e -> {
+                        edState.navigateTo(null);
+                    });
+                    bar.getChildren().add(initBtn);
+                }
 
                 l.forEach(en -> {
                     var btn = new JFXButton(en.navigationName());
@@ -59,6 +96,17 @@ public class GuiEditor {
                     });
                     bar.getChildren().add(btn);
                 });
+
+                if (l.size() > 0) {
+                    Button edit = new JFXButton();
+                    edit.setGraphic(new FontIcon());
+                    edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+                    edit.setOnAction(e -> {
+                        edState.getExternalState().startEdit(edState, l.get(l.size() - 1));
+                    });
+                    edit.setPadding(new Insets(4, 4, 2, 4));
+                    bar.getChildren().add(edit);
+                }
             });
         };
         updateBar.accept(edState.getNodePath());
@@ -84,6 +132,7 @@ public class GuiEditor {
         createNodeList(grid, edState, edState.getContent());
         edState.contentProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
+                sp.setVvalue(0);
                 createNodeList(grid, edState, n);
             });
         });
@@ -127,6 +176,7 @@ public class GuiEditor {
             var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
             tf.textProperty().addListener((c, o, ne) -> {
                 ((SimpleNode) n).updateText(ne);
+                state.onTextChanged();
             });
             return tf;
         } else {
@@ -137,8 +187,10 @@ public class GuiEditor {
             int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
                     ((CollectorNode) n).getNodes().size();
             int stringSize = String.valueOf(length).length();
-            int spaceSize = 6 - stringSize;
-            var lengthString = " ".repeat(spaceSize / 2) + String.valueOf(length) + " ".repeat(spaceSize / 2);
+            int spaceSize = 7 - stringSize;
+            var lengthString =
+                    " ".repeat(spaceSize / 2) + String.valueOf(length) +
+                    " ".repeat(spaceSize - (spaceSize / 2));
             var btn = new JFXButton("[... " + lengthString + " ...]");
             btn.setAlignment(Pos.CENTER);
             btn.setOnAction(e -> {
@@ -150,7 +202,8 @@ public class GuiEditor {
             preview.getStyleClass().add("preview");
             preview.setGraphic(new FontIcon());
             preview.setOnMouseEntered(e -> {
-                var tt = new Tooltip(TextFormatWriter.write(n.toWritableNode(), 10));
+                var tt = new Tooltip(
+                        TextFormatWriter.writeToString(n.toWritableNode(), 10, "  "));
                 tt.setShowDelay(javafx.util.Duration.ZERO);
                 Tooltip.install(preview, tt);
             });
@@ -188,16 +241,45 @@ public class GuiEditor {
 
         box.getChildren().add(new Separator(Orientation.VERTICAL));
 
+        HBox textBar = new HBox();
         {
             TextField filter = new TextField();
-            filter.focusedProperty().addListener((c, o, n) -> {
-                if (n) {
-                    filter.selectAll();
-                }
-            });
-            filter.textProperty().bindBidirectional(edFilter.filterStringProperty());
-            box.getChildren().add(filter);
+            {
+                filter.focusedProperty().addListener((c, o, n) -> {
+                    if (n) {
+                        filter.selectAll();
+                    }
+                });
+                filter.setOnAction(e -> {
+                    edFilter.filterStringProperty().set(filter.getText());
+                });
+                textBar.getChildren().add(filter);
+            }
+
+            {
+                Button search = new Button();
+                search.setOnAction(e -> {
+                    edFilter.filterStringProperty().set(filter.getText());
+                });
+                search.setGraphic(new FontIcon());
+                search.getStyleClass().add(GuiStyle.CLASS_FILTER);
+                textBar.getChildren().add(search);
+            }
+
+            {
+                Button clear = new Button();
+                clear.setOnAction(e -> {
+                    filter.setText("");
+                    edFilter.filterStringProperty().set("");
+                });
+                clear.setGraphic(new FontIcon());
+                clear.getStyleClass().add(GuiStyle.CLASS_CLEAR);
+                textBar.getChildren().add(clear);
+            }
         }
+        box.getChildren().add(textBar);
+
+        box.getChildren().add(new Separator(Orientation.VERTICAL));
 
         {
             ToggleButton cs = new ToggleButton();
@@ -206,6 +288,21 @@ public class GuiEditor {
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
             GuiTooltips.install(cs, "Case sensitive");
             box.getChildren().add(cs);
+        }
+
+        Region spacer = new Region();
+        box.getChildren().add(spacer);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        {
+            Button filterDisplay = new JFXButton();
+            edFilter.filterStringProperty().addListener((c, o, n) -> {
+                Platform.runLater(() -> filterDisplay.setText(
+                        n.equals("") ? "" : "Showing results for \"" + n + "\""));
+            });
+            filterDisplay.setAlignment(Pos.CENTER);
+            box.getChildren().add(filterDisplay);
+            //filterDisplay.prefHeightProperty().bind(box.prefHeightProperty());
         }
 
         return box;
