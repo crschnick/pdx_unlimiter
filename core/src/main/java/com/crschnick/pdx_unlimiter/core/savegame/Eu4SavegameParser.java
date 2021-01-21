@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,14 +48,10 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
             boolean melted = false;
             var fileToParse = input;
             if (isZipped) {
-                var zipFile = new ZipFile(input.toFile());
-                var gs = zipFile.getEntry("gamestate");
-                if (gs != null) {
-                    if (isBinary(input)) {
-                        fileToParse = melter.melt(input);
-                        melted = true;
-                        isZipped = false;
-                    }
+                if (isBinary(input)) {
+                    fileToParse = melter.melt(input);
+                    melted = true;
+                    isZipped = false;
                 }
             }
 
@@ -74,38 +71,38 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
                     return new Success<>(false, checksum, node, info);
                 }
             } else {
-                try (var zipFile = new ZipFile(fileToParse.toFile())) {
+                try (var fs = FileSystems.newFileSystem(fileToParse)) {
                     Node gamestateNode = null;
                     Node metaNode = null;
                     Node aiNode = null;
 
-                    var gs = zipFile.getEntry("gamestate");
-                    if (gs == null) {
+                    var gs = fs.getPath("gamestate");
+                    if (!Files.exists(gs)) {
                         return new Invalid("Missing gamestate. This might be a very old savegame, which is not supported");
                     }
-                    var gsIn = zipFile.getInputStream(gs);
+                    var gsIn = Files.newInputStream(gs);
                     if (FormatParser.validateHeader(EU4_TEXT_HEADER, gsIn)) {
                         gamestateNode = TextFormatParser.eu4SavegameParser().parse(gsIn.readAllBytes());
                     } else {
                         return new Invalid("Invalid header for gamestate");
                     }
 
-                    var mt = zipFile.getEntry("meta");
-                    if (mt == null) {
+                    var mt = fs.getPath("meta");
+                    if (!Files.exists(mt)) {
                         return new Invalid("Missing meta");
                     }
-                    var mtIn = zipFile.getInputStream(mt);
+                    var mtIn = Files.newInputStream(mt);
                     if (FormatParser.validateHeader(EU4_TEXT_HEADER, mtIn)) {
                         metaNode = TextFormatParser.eu4SavegameParser().parse(mtIn.readAllBytes());
                     } else {
                         return new Invalid("Invalid header for meta");
                     }
 
-                    var ai = zipFile.getEntry("ai");
-                    if (ai == null) {
+                    var ai = fs.getPath("ai");
+                    if (!Files.exists(ai)) {
                         return new Invalid("Missing ai");
                     }
-                    var aiIn = zipFile.getInputStream(ai);
+                    var aiIn = Files.newInputStream(ai);
                     if (FormatParser.validateHeader(EU4_TEXT_HEADER, aiIn)) {
                         aiNode = TextFormatParser.eu4SavegameParser().parse(aiIn.readAllBytes());
                     } else {
