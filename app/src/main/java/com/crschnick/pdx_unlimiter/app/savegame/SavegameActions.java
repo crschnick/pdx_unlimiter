@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
+import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
@@ -155,7 +156,10 @@ public class SavegameActions {
         TaskExecutor.getInstance().submitTask(() -> {
             var in = SavegameCache.getForSavegame(e).getSavegameFile(e);
             var target = EditTarget.create(in);
-            target.ifPresent(Editor::createNewEditor);
+            target.ifPresent(t -> {
+                var storageTarget = new StorageEditTarget<>(SavegameCache.getForSavegame(e), e, t);
+                Editor.createNewEditor(storageTarget);
+            });
         }, true);
     }
 }

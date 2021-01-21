@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
+import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
+import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.gui.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
@@ -49,7 +51,9 @@ public class FileImporter {
         logger.debug("Starting to import " + input + " from queue file " + queueFile);
         var targets = FileImportTarget.createTargets(input);
         if (targets.size() == 0) {
-            logger.debug("No targets to import");
+            logger.debug("No targets to import. Trying editor targets ...");
+            EditTarget.create(Path.of(input)).ifPresent(Editor::createNewEditor);
+
         } else {
             for (FileImportTarget t : targets) {
                 logger.debug("Starting to import target " + t.getName() + " from " + input);

@@ -107,7 +107,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         if (entry.getInfo() == null) {
             prop = new SimpleObjectProperty<>(new Region());
             entry.infoProperty().addListener((c, o, n) -> {
-                prop.set(tagNode(entry));
+                prop.set(n != null ? tagNode(entry) : new Region());
             });
         } else {
             prop = new SimpleObjectProperty<>(

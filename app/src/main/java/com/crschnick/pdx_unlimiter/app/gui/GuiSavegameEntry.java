@@ -22,6 +22,7 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -85,15 +86,16 @@ public class GuiSavegameEntry {
         main.getChildren().add(layout);
         Node content = createSavegameInfoNode(e);
 
-        InvalidationListener lis = (change) -> {
+        ChangeListener<I> lis = (c, o, n) -> {
             Platform.runLater(() -> {
-                layout.setBackground(
-                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e));
+                layout.setBackground(n != null ?
+                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e) : null);
             });
         };
         e.infoProperty().addListener(lis);
         if (e.infoProperty().isNotNull().get()) {
-            lis.invalidated(null);
+            layout.setBackground(
+                    SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e));
         }
 
         main.getChildren().add(content);
@@ -137,10 +139,10 @@ public class GuiSavegameEntry {
                 buttonBar.getChildren().add(melt);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
-                    if (n.isBinary()) {
-                        Platform.runLater(() -> {
-                            buttonBar.getChildren().add(0, melt);
-                        });
+                    if (n != null && n.isBinary()) {
+                        Platform.runLater(() -> buttonBar.getChildren().add(0, melt));
+                    } else {
+                        Platform.runLater(() -> buttonBar.getChildren().remove(melt));
                     }
                 });
             }
@@ -214,9 +216,13 @@ public class GuiSavegameEntry {
                 buttonBar.getChildren().add(edit);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
-                    if (!n.isBinary()) {
+                    if (n != null && !n.isBinary()) {
                         Platform.runLater(() -> {
                             buttonBar.getChildren().add(0, edit);
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            buttonBar.getChildren().remove(edit);
                         });
                     }
                 });
@@ -269,11 +275,18 @@ public class GuiSavegameEntry {
             }
         });
 
-        entry.infoProperty().addListener((change) -> {
-            Platform.runLater(() -> {
-                loading.setVisible(false);
-                SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry, grid);
-            });
+        entry.infoProperty().addListener((c, o, n) -> {
+            if (n != null) {
+                Platform.runLater(() -> {
+                    loading.setVisible(false);
+                    SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry, grid);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    loading.setVisible(true);
+                    grid.getChildren().clear();
+                });
+            }
         });
 
         return stack;

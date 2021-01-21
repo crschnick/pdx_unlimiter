@@ -13,6 +13,7 @@ import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
+import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
@@ -541,6 +542,36 @@ public abstract class SavegameCache<
         folder.ifPresent(f -> {
             importSavegame(meltedFile, f);
         });
+    }
+
+    public synchronized void reloadSavegameAsync(SavegameEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            logger.debug("Reloading savegame");
+            e.infoProperty().set(null);
+            var status = parser.parse(getSavegameFile(e), RakalyHelper::meltSavegame);
+            status.visit(new SavegameParser.StatusVisitor<I>() {
+                @Override
+                public void success(SavegameParser.Success<I> s) {
+                    logger.debug("Reloading was successful");
+                    try {
+                        JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
+                        e.infoProperty().set(s.info);
+                    } catch (IOException ioException) {
+                        ErrorHandler.handleException(ioException);
+                    }
+                }
+
+                @Override
+                public void error(SavegameParser.Error e) {
+                    ErrorHandler.handleException(e.error);
+                }
+
+                @Override
+                public void invalid(SavegameParser.Invalid iv) {
+                    ErrorHandler.handleException(new SavegameParseException(iv.message));
+                }
+            });
+        }, false);
     }
 
     private SavegameParser.Status importSavegameData(Path file, SavegameFolder<T, I> folder) {
