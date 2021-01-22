@@ -1,12 +1,13 @@
 # Pdx-Unlimiter
 
-The Pdx-Unlimiter is a tool that provides a powerful savegame manager that allows
+The Pdx-Unlimiter is a tool for various Paradox games that provides a powerful savegame manager that allows
 you to organize, filter, and play all of your savegames with ease.
 Furthermore, it also comes with the ability to convert savegames to a non-ironman version,
 a powerful savegame and game data file editor, savescumming tools, and integrations for various
 other great community-made tools like 
 [Rakaly](https://rakaly.com), [Skanderbeg](https://skanderbeg.pm) and the
 [CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
+Currently, EU4, CK3 and Stellaris are supported.
 
 ## Download
 
@@ -35,7 +36,7 @@ The main components of the Pdx-Unlimiter are:
 - [savegame reverter](#savegame-reverter-savescumming)
 - [Savegame converter](#savegame-converter)
 - [Savegame editor](#savegame-editor)
-- [Third party tool support](#third-party-integration)
+- [Third party tool integrations](#third-party-integration)
 
 It you want to know how to use a certain feature, you can just
 read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
@@ -53,8 +54,6 @@ savegame history so you can load any prior saved version of a campaign.
 This works for both Ironman and Non-Ironman savegames.
 All savegames can be also launched directly from
 within the Pdx-Unlimiter without needing to visit the main menu.
-
-You can also organize your savegames by renaming them or creating custom folders.
 
 ![Example](docs/screenshot.png)
 
@@ -78,7 +77,7 @@ create a non-ironman copy of an ironman savegame, but couldn't because the games
 
 ## Savegame editor
 
-The Pdx-Unlimiter also features a savegame editor.
+The Pdx-Unlimiter also comes with a savegame editor.
 With this editor you can edit any file that is saved in a Paradox text format.
 This includes EU4 and CK3 non-ironman savegames,
 any game data files for mods and other purposes, and all Stellaris savegames.

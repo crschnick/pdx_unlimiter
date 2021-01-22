@@ -1,11 +1,13 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -29,6 +31,16 @@ public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
             }
         }
         return -1;
+    }
+
+    public boolean isBinary(Path input) throws IOException {
+        var contentString = Files.readString(input);
+        var first = contentString.lines().findFirst();
+        if (first.isEmpty()) {
+            return false;
+        }
+        int metaStart = first.get().length() + 1;
+        return !contentString.startsWith("meta", metaStart);
     }
 
     public boolean isCompressed(Path file) throws IOException {

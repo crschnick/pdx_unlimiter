@@ -6,9 +6,9 @@ The Pdx-Unlimiter will try to automatically detect any of those game installatio
 If any installation is not detected, you can set them manually in the settings menu.
 Note that only installations of Paradox games with installed Paradox Launcher are supported!
 
-Furthermore, the Pdx-Unlimiter has an internal savegame storage independent of the savegame directories of installed games.
-The default location is `<User Home>\Pdx-Unlimiter\savegames` on windows and `~/.pdx-unlimiter/savegames` on Linux.
-You can however change this location in the settings menu.
+Furthermore, the Pdx-Unlimiter has an internal savegame
+storage independent of the savegame directories of installed games.
+You can change its location in the settings menu.
 For performance reasons and to prevent the storage from bloating, you have to explicitly
 import any savegame that you want to manage.
 
@@ -36,15 +36,11 @@ There are several ways of importing savegames into the Pdx-Unlimiter storage:
 
 - By clicking the import button in the menu bar **(5)** which will open a separate import dialog
 - Dragging and dropping the savegame files into the Pdx-Unlimiter. This also works for folders that contain savegames
-- Using the import status bar at the bottom that will open after you quit a Paradox game allows you to import the latest savegame
 - Pressing `CTRL+SHIFT+I` while a supported game is open will import the latest savegame.
   This also works if the game is in fullscreen mode
   If the key combination is pressed, a confirmation sound will play
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
   This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
-- Opening an URL using the `pdxu` protocol. For example, opening
-  [pdxu://rakaly.com/eu4/saves/_k7SRqT-1C7TQz3bD6EzR](pdxu://rakaly.com/eu4/saves/_k7SRqT-1C7TQz3bD6EzR)
-  will automatically download and import the savegame from Rakaly
   
 In the settings menu you can also enable the option `Delete on import` which specifies
 whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
@@ -122,10 +118,11 @@ If you want to disable this feature, you can do so in the settings menu.
 
 In case of any problems, you can do the following:
 
-- Use the automatic error reporter if it comes up
+- Use the automatic report functionality of the error reporter if it comes up
 - You can also open the issue reporter at 'Help' -> 'Report issue' in the menu bar
 - Alternatively, you can also open an issue on GitHub and describe the error in more detail
-- If the application does not even start or you want to dig deeper into the error cause,
-  you can find the different log files at `<user home>\Pdx-Unlimiter\logs`
-  on Windows and `~/.pdx-unlimiter/logs` on Linux.
+- If the application does not even start, or you want to dig deeper into the error cause,
+  you can find the different log files at `<documents directory>\Pdx-Unlimiter\logs`
+  on Windows and `~/.local/share/.pdx-unlimiter/logs` on Linux.
+  (If you are an older user, your install path may be your home directory instead of the documents directory)
   
