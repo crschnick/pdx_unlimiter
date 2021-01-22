@@ -1,13 +1,11 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
-import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;

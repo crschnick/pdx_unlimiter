@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
@@ -15,6 +14,15 @@ import java.util.Optional;
 import java.util.Set;
 
 public abstract class EditTarget {
+
+    protected final Path file;
+    protected final TextFormatParser parser;
+    protected final TextFormatWriter writer;
+    public EditTarget(Path file, TextFormatParser parser, TextFormatWriter writer) {
+        this.file = file;
+        this.parser = parser;
+        this.writer = writer;
+    }
 
     public static Optional<EditTarget> create(Path file) {
         final EditTarget[] toReturn = {null};
@@ -64,16 +72,6 @@ public abstract class EditTarget {
             }
         });
         return Optional.ofNullable(toReturn[0]);
-    }
-
-    protected final Path file;
-    protected final TextFormatParser parser;
-    protected final TextFormatWriter writer;
-
-    public EditTarget(Path file, TextFormatParser parser, TextFormatWriter writer) {
-        this.file = file;
-        this.parser = parser;
-        this.writer = writer;
     }
 
     public abstract Map<String, Node> parse() throws Exception;

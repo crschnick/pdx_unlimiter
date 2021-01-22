@@ -10,7 +10,6 @@ import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 

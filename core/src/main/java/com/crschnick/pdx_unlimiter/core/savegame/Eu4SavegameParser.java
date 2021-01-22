@@ -5,14 +5,11 @@ import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
@@ -25,7 +22,7 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
     public boolean isCompressed(Path file) throws IOException {
         boolean isZipped = false;
         try (var in = Files.newInputStream(file);
-             var zipIn = new ZipInputStream(in)){
+             var zipIn = new ZipInputStream(in)) {
             isZipped = zipIn.getNextEntry() != null;
         }
         return isZipped;
@@ -33,7 +30,7 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
 
     public boolean isBinary(Path input) throws IOException {
         try (var fs = FileSystems.newFileSystem(input);
-            var in = Files.newInputStream(fs.getPath("gamestate"))) {
+             var in = Files.newInputStream(fs.getPath("gamestate"))) {
             return FormatParser.validateHeader(EU4_BINARY_HEADER, in);
         }
     }
@@ -56,7 +53,7 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
             }
 
             if (!isZipped) {
-                try (var in = Files.newInputStream(fileToParse)){
+                try (var in = Files.newInputStream(fileToParse)) {
                     boolean valid = FormatParser.validateHeader(EU4_TEXT_HEADER, in);
                     if (!valid) {
                         return new Invalid("Invalid header");

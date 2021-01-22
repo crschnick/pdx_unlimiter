@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class FileImporter {
 

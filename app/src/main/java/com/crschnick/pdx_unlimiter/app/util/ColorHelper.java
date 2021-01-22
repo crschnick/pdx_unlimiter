@@ -88,7 +88,7 @@ public class ColorHelper {
 
     public static Map<String, Color> loadCk3(SavegameEntry<Ck3Tag, Ck3SavegameInfo> e) {
         try (InputStream in = CascadeDirectoryHelper.openFile(
-                    Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
+                Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
                 e,
                 GameInstallation.CK3).get();) {
             Node node = TextFormatParser.textFileParser().parse(in.readAllBytes());

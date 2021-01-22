@@ -13,12 +13,10 @@ import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -169,7 +166,7 @@ public abstract class SavegameCache<
                 String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
                 var colFile = getPath().resolve(
                         collection.getUuid().toString()).resolve(typeName + ".json");
-                JsonNode campaignNode =JsonHelper.read(colFile);
+                JsonNode campaignNode = JsonHelper.read(colFile);
                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
                     UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);

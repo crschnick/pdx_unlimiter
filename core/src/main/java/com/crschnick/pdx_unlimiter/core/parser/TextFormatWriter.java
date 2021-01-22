@@ -34,10 +34,6 @@ public class TextFormatWriter {
         return new TextFormatWriter(StandardCharsets.UTF_8);
     }
 
-    public void write(Node node, int maxLines, String space, Path out) throws IOException {
-        Files.writeString(out, writeToString(node, maxLines, space), charset);
-    }
-
     public static String writeToString(Node node, int maxLines, String space) {
         var sb = new LimitedStringBuilder(maxLines, space);
         boolean hitMaxLines = false;
@@ -93,6 +89,10 @@ public class TextFormatWriter {
         }
 
         return true;
+    }
+
+    public void write(Node node, int maxLines, String space, Path out) throws IOException {
+        Files.writeString(out, writeToString(node, maxLines, space), charset);
     }
 
     private static class LimitedStringBuilder {

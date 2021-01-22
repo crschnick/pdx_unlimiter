@@ -70,7 +70,7 @@ public class TextFormatParser extends FormatParser {
             boolean isComment = c == '#';
             boolean eof = i == bytes.length - 1;
             boolean marksEndOfPreviousToken =
-                               (t != null && prev < i)             // New token finishes old token
+                    (t != null && prev < i)             // New token finishes old token
                             || (isWhitespace && prev < i)          // Whitespace finishes old token
                             || (isComment && prev < i);            // New comment finishes old token
             if (marksEndOfPreviousToken) {

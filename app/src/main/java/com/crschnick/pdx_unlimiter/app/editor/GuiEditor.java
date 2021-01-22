@@ -3,8 +3,6 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
@@ -15,12 +13,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class GuiEditor {
@@ -32,7 +28,7 @@ public class GuiEditor {
         stage.getIcons().add(icon);
         var title = state.getFileName() + " - " + "Pdx-Unlimiter Editor";
         stage.setTitle(title);
-        state.dirtyProperty().addListener((c,o,n) -> {
+        state.dirtyProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
         });
 
@@ -64,7 +60,7 @@ public class GuiEditor {
                 {
                     Button save = new Button();
                     save.setDisable(!edState.dirtyProperty().get());
-                    edState.dirtyProperty().addListener((c,o,n) -> {
+                    edState.dirtyProperty().addListener((c, o, n) -> {
                         save.setDisable(!n);
                     });
                     save.setGraphic(new FontIcon());
@@ -199,7 +195,7 @@ public class GuiEditor {
             int spaceSize = 7 - stringSize;
             var lengthString =
                     " ".repeat(spaceSize / 2) + String.valueOf(length) +
-                    " ".repeat(spaceSize - (spaceSize / 2));
+                            " ".repeat(spaceSize - (spaceSize / 2));
             var btn = new JFXButton("[... " + lengthString + " ...]");
             btn.setAlignment(Pos.CENTER);
             btn.setOnAction(e -> {

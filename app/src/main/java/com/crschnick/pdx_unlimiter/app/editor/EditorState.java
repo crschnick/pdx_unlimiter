@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
@@ -24,7 +23,7 @@ public class EditorState {
     private TextFormatParser parser;
     private TextFormatWriter writer;
     private BooleanProperty dirty;
-    private Map<String,EditorNode> rootNodes;
+    private Map<String, EditorNode> rootNodes;
     private EditorExternalState externalState;
     private ListProperty<EditorNode> nodePath;
     private EditorFilter filter;
