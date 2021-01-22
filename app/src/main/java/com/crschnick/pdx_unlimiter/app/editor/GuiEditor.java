@@ -154,18 +154,27 @@ public class GuiEditor {
             grid.add(valueDisplay, 2, i);
 
             HBox btns = new HBox();
-            Button edit = new JFXButton();
-            edit.setGraphic(new FontIcon());
-            edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-            edit.setOnAction(e -> {
-                state.getExternalState().startEdit(state, n);
-            });
+            {
+                Button edit = new JFXButton();
+                edit.setGraphic(new FontIcon());
+                edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+                edit.setOnAction(e -> {
+                    state.getExternalState().startEdit(state, n);
+                });
+                btns.getChildren().add(edit);
+            }
 
-            Button del = new JFXButton();
-            del.setGraphic(new FontIcon());
-            del.getStyleClass().add(GuiStyle.CLASS_DELETE);
-            btns.getChildren().add(edit);
-            btns.getChildren().add(del);
+            if (n.getDirectParent() != null) {
+                Button del = new JFXButton();
+                del.setGraphic(new FontIcon());
+                del.getStyleClass().add(GuiStyle.CLASS_DELETE);
+                del.setOnAction(e -> {
+                    n.delete();
+                    state.onDelete();
+                });
+                btns.getChildren().add(del);
+            }
+
             grid.add(btns, 3, i);
         }
     }

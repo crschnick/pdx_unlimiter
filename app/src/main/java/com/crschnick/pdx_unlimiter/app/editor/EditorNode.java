@@ -58,6 +58,8 @@ public abstract class EditorNode {
         return result;
     }
 
+    public abstract void delete();
+
     public abstract boolean filterKey(Predicate<String> filter);
 
     public abstract boolean filterValue(Predicate<String> filter);

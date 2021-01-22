@@ -87,6 +87,11 @@ public class EditorState {
         nodePath.set(FXCollections.observableList(newPath));
     }
 
+    public void onDelete() {
+        update(true);
+        dirtyProperty().set(true);
+    }
+
     public void onTextChanged() {
         dirtyProperty().set(true);
     }

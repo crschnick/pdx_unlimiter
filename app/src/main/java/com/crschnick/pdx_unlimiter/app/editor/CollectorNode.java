@@ -19,6 +19,13 @@ public class CollectorNode extends EditorNode {
     }
 
     @Override
+    public void delete() {
+        var ar = getRealParent().getBackingNode().getNodeArray();
+        ar.removeIf(n -> n instanceof KeyValueNode &&
+                n.getKeyValueNode().getKeyName().equals(keyName));
+    }
+
+    @Override
     public boolean filterKey(Predicate<String> filter) {
         return filter.test(keyName);
     }

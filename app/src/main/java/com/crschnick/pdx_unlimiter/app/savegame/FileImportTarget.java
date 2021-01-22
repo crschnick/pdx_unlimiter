@@ -196,7 +196,7 @@ public abstract class FileImportTarget {
                 return Files.getLastModifiedTime(path).toInstant();
             } catch (IOException e) {
                 // In some conditions, the import target may already not exist anymore.
-                // If that happens, fail silently
+                ErrorHandler.handleException(e);
                 return Instant.MIN;
             }
         }

@@ -4,7 +4,6 @@
   -fx-padding: 1em;
   -fx-alignment: center;
   -fx-font-size: 12pt;
-  -fx-font-family: "monospaced";
 }
 
 .editor-grid .preview {

@@ -22,6 +22,13 @@ public class SimpleNode extends EditorNode {
     }
 
     @Override
+    public void delete() {
+        if (getDirectParent() != null) {
+            getRealParent().getBackingNode().getNodeArray().remove(getKeyIndex());
+        }
+    }
+
+    @Override
     public boolean filterKey(Predicate<String> filter) {
         if (getKeyName().isPresent() && filter.test(getKeyName().get())) {
             return true;
