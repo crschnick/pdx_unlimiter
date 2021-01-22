@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import org.apache.commons.io.FileUtils;
@@ -183,6 +184,10 @@ public abstract class FileImportTarget {
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
                 onFinish.accept(savegameCache.importSavegame(path, null));
+
+                // Wait for other threads to catch up again-
+                // Without this, ui is very laggy
+                ThreadHelper.sleep(2000);
             }, true);
         }
 
