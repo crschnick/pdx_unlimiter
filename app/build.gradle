@@ -184,7 +184,8 @@ jlink {
                 'org.slf4j',
                 'org.slf4j.simple',
                 'jdk.crypto.ec',
-                'org.kordamp.ikonli.materialdesign'
+                'org.kordamp.ikonli.materialdesign',
+                'jdk.zipfs'
         ]
     }
 }
