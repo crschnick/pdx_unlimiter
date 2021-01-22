@@ -26,6 +26,12 @@ public class ConverterHelper {
 
     public static Map<String, String> loadConfig() {
         Map<String, String> map = new HashMap<>();
+        var config = Settings.getInstance().getCk3toEu4Dir().get()
+                .resolve("CK3toEU4").resolve("configuration.txt");
+        if (!Files.exists(config)) {
+            return map;
+        }
+
         try {
             var reader = Files.newBufferedReader(Settings.getInstance().getCk3toEu4Dir().get()
                     .resolve("CK3toEU4").resolve("configuration.txt"));
