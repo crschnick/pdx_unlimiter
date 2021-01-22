@@ -33,8 +33,7 @@ public class ConverterHelper {
         }
 
         try {
-            var reader = Files.newBufferedReader(Settings.getInstance().getCk3toEu4Dir().get()
-                    .resolve("CK3toEU4").resolve("configuration.txt"));
+            var reader = Files.newBufferedReader(config);
             String line;
             while ((line = reader.readLine()) != null) {
                 var split = line.split(" = ");
