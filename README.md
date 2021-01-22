@@ -1,15 +1,12 @@
 # Pdx-Unlimiter
 
-The Pdx-Unlimiter is a tool aimed at improving your gameplay experience for various Paradox Games.
-It does that by providing a powerful savegame manager that allows
-you to organize, upload, play and delete all of your savegames.
-It also comes with full mod support, paradox game integration
-and support for interacting with [Rakaly](https://rakaly.com) and [Skanderbeg](https://skanderbeg.pm).
-
-It you want to familiarize yourself with all the features, you can
-read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
-There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/faq.md)
-to answer some of your questions.
+The Pdx-Unlimiter is a tool that provides a powerful savegame manager that allows
+you to organize, filter, and play all of your savegames with ease.
+Furthermore, it also comes with the ability to convert savegames to a non-ironman version,
+a powerful savegame and game data file editor, savescumming tools, and integrations for various
+other great community-made tools like 
+[Rakaly](https://rakaly.com), [Skanderbeg](https://skanderbeg.pm) and the
+[CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
 
 ## Download
 
@@ -31,10 +28,22 @@ Download the
 Note that the Linux version is relatively new and has only been tested on a few systems.
 Please report any issues that you are having with it.
 
-There is currently no .rpm installer for Fedora/CentOS/RHEL.
-However, if there is a need for it, it should be possible to create one.
+# Features
 
-## Savegame management for Paradox games
+The main components of the Pdx-Unlimiter are:
+- [Savegame manager](#savegame-management)
+- [savegame reverter](#savegame-reverter-savescumming)
+- [Savegame converter](#savegame-converter)
+- [Savegame editor](#savegame-editor)
+- [Third party tool support](#third-party-integration)
+
+It you want to know how to use a certain feature, you can just
+read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
+There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/faq.md)
+to answer some of your questions.
+
+
+## Savegame manager
 
 Since keeping track of all your savegames is getting more complicated
 with every new savegame you start or backup you revert to,
@@ -45,17 +54,9 @@ This works for both Ironman and Non-Ironman savegames.
 All savegames can be also launched directly from
 within the Pdx-Unlimiter without needing to visit the main menu.
 
-If you want to revert to a previously imported savegame,
-you can also kill the currently running Paradox game and load the latest save.
-This kind of manual savegame management for ironman games allows you to easily revert to previous saves,
-i.e. to savescum, which is kinda necessary for hard achievements.
-
-For a full explanation of all features, refer to the
-[Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
+You can also organize your savegames by renaming them or creating custom folders.
 
 ![Example](docs/screenshot.png)
-
-## Full Mod support
 
 Savegames that use mods are also fully supported.
 This includes displaying modded country information in the savegame manager and mod installation support.
@@ -64,15 +65,55 @@ enabled without having to use Paradox launcher configurations.
 It is also checked whether a mod is missing or incompatible with the current version,
 so that nothing can potentially corrupt your savegames.
 
-## Third party integration
 
-The Pdx-Unlimiter has built-in support for [Rakaly](https://rakaly.com),
-a website to analyze and share your eu4 achievements and compete against other players.
-If you are interested in Rakaly, you can also join the [Rakaly Discord](https://discord.gg/WMJPnvSe).
+## Savegame converter
 
-It is also possible to upload your savegames to [Skanderbeg](https://skanderbeg.pm),
-a website to generate maps and statistics for your savegames.
-If you are interested in Skanderbeg, you can also join the [Skanderbeg Discord](https://discord.gg/uzkMPjc).
+Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
+any ironman savegame into a text-based, non-ironman savegame.
+It also provides an easy-to-use interface to convert
+your own ironman savegames into playable non-ironman savegames.
+This is useful if you have ever encountered a situation in which you wanted to
+create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
+
+
+## Savegame editor
+
+The Pdx-Unlimiter also features a savegame editor.
+With this editor you can edit any file that is saved in a Paradox text format.
+This includes EU4 and CK3 non-ironman savegames,
+any game data files for mods and other purposes, and all Stellaris savegames.
+Note that you can use the included ironman converter
+to first create a non-ironman savegame and then edit it.
+
+![Editor](docs/editor.png)
+
+
+## Savegame reverter ("savescumming")
+
+The Pdx-Unlimiter allows you to create a sort of savegame checkpoints
+using keyboard shortcuts while being ingame that you can always revert back to.
+If you want to revert to a previous savegame checkpoint,
+you can also kill the currently running Paradox game and load the latest save using a keystroke.
+This feature allows you to easily savescum, which is kinda necessary for hard achievements.
+
+
+## Third party tool integration
+
+The Pdx-Unlimiter is also built as an application that gives you easy access to many
+other great community-made tools.
+The supported tools are:
+
+- [Rakaly](https://rakaly.com),
+  a website to analyze and share your eu4 achievements and compete against other players.
+  It is possible to upload your EU4 savegames to rakaly and analyze them from there.
+
+- [Skanderbeg](https://skanderbeg.pm),
+  a website to generate maps and statistics for your savegames.
+  It is possible to upload your EU4 savegames to skanderbeg with just one click.
+
+- The [CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
+  This means that you can interact with the converter from within the Pdx-Unlimiter
+  and basically convert any managed savegame with just one click as well.
 
 ## Community and Support
 
@@ -83,9 +124,8 @@ Contributing guidelines are coming soon.
 
 ## Development
 
-To build this project, [JDK 15](https://openjdk.java.net/projects/jdk/15/) is required.
+To build this project, [JDK 15](https://openjdk.java.net/projects/jdk/15/) and gradle is required.
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
-To create a jlink image, use `gradlew createDist`.
 For running, you can use `gradlew run`.
 
 To correctly run the Pdx-Unlimiter in a development environment,
