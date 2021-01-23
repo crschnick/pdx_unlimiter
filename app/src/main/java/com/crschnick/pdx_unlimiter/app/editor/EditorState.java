@@ -3,10 +3,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -19,13 +16,35 @@ import java.util.stream.Collectors;
 
 public class EditorState {
 
+    public class NavEntry {
+        private EditorNode editorNode;
+        private DoubleProperty scroll;
+
+        private NavEntry(EditorNode editorNode, double scroll) {
+            this.editorNode = editorNode;
+            this.scroll = new SimpleDoubleProperty(scroll);
+        }
+
+        public EditorNode getEditorNode() {
+            return editorNode;
+        }
+
+        public double getScroll() {
+            return scroll.get();
+        }
+
+        public DoubleProperty scrollProperty() {
+            return scroll;
+        }
+    }
+
     private String fileName;
     private TextFormatParser parser;
     private TextFormatWriter writer;
     private BooleanProperty dirty;
     private Map<String, EditorNode> rootNodes;
     private EditorExternalState externalState;
-    private ListProperty<EditorNode> nodePath;
+    private ListProperty<NavEntry> navPath;
     private EditorFilter filter;
     private ListProperty<EditorNode> content;
     private Consumer<Map<String, Node>> saveFunc;
@@ -38,17 +57,15 @@ public class EditorState {
 
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
-        nodePath = new SimpleListProperty<>(FXCollections.observableArrayList());
+        navPath = new SimpleListProperty<>(FXCollections.observableArrayList());
         filter = new EditorFilter(this);
         content = new SimpleListProperty<>(FXCollections.observableArrayList());
 
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
-            rootNodes.put(e.getKey(), new SimpleNode(null, e.getKey(), counter, e.getValue()));
+            rootNodes.put(e.getKey(), new SimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
-
-        update(false);
     }
 
     public void save() {
@@ -65,25 +82,26 @@ public class EditorState {
 
     private void rebuildPath() {
         EditorNode current = null;
-        List<EditorNode> newPath = new ArrayList<>();
-        for (var pathEl : nodePath) {
+        List<NavEntry> newPath = new ArrayList<>();
+        for (var navEl : navPath) {
             if (current == null) {
-                current = rootNodes.get(pathEl.getKeyName().get());
-                newPath.add(current);
+                current = rootNodes.get(navEl.editorNode.getKeyName().get());
+                newPath.add(new NavEntry(current, 0));
                 continue;
             }
 
-            var newEl = current.open().stream()
-                    .filter(en -> en.displayKeyName().equals(pathEl.displayKeyName()))
+            var newEditorNode = current.open().stream()
+                    .filter(en -> navEl.editorNode.getParentIndex() == en.getParentIndex() &&
+                            en.displayKeyName().equals(navEl.editorNode.displayKeyName()))
                     .findFirst();
-            if (newEl.isPresent()) {
-                current = newEl.get();
-                newPath.add(newEl.get());
+            if (newEditorNode.isPresent()) {
+                current = newEditorNode.get();
+                newPath.add(new NavEntry(newEditorNode.get(), navEl.getScroll()));
             } else {
                 break;
             }
         }
-        nodePath.set(FXCollections.observableList(newPath));
+        navPath.set(FXCollections.observableList(newPath));
     }
 
     public void onDelete() {
@@ -104,32 +122,35 @@ public class EditorState {
         if (updatePath) {
             rebuildPath();
         }
-        var selected = nodePath.size() > 0 ? nodePath.get(nodePath.size() - 1) : null;
+        var selected = navPath.size() > 0 ? navPath.get(navPath.size() - 1) : null;
         content.set(FXCollections.observableArrayList(
-                selected != null ? createEditorNodes(selected) : rootNodes.values()));
+                selected != null ? createEditorNodes(selected.editorNode) : rootNodes.values()));
     }
 
     public void navigateTo(EditorNode newNode) {
         if (newNode == null) {
-            nodePath.clear();
+            navPath.clear();
         } else {
-            int index = nodePath.indexOf(newNode);
+            int index = navPath.stream()
+                    .map(NavEntry::getEditorNode)
+                    .collect(Collectors.toList())
+                    .indexOf(newNode);
             if (index == -1) {
-                nodePath.add(newNode);
+                navPath.add(new NavEntry(newNode, 0));
             } else {
-                nodePath.removeIf(n -> nodePath.indexOf(n) > index);
+                navPath.removeIf(n -> navPath.indexOf(n) > index);
             }
         }
 
         update(false);
     }
 
-    public ObservableList<EditorNode> getNodePath() {
-        return nodePath.get();
+    public ObservableList<NavEntry> getNavPath() {
+        return navPath.get();
     }
 
-    public ListProperty<EditorNode> nodePathProperty() {
-        return nodePath;
+    public ListProperty<NavEntry> navPathProperty() {
+        return navPath;
     }
 
     public EditorFilter getFilter() {

@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -17,6 +18,7 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class GuiEditor {
@@ -41,8 +43,7 @@ public class GuiEditor {
     private static Region create(EditorState state) {
         BorderPane layout = new BorderPane();
         layout.setTop(createNavigationBar(state));
-        var grid = createNodeList(state);
-        layout.setCenter(grid);
+        createNodeList(layout, state);
         layout.setBottom(createFilterBar(state.getFilter()));
         return layout;
     }
@@ -53,7 +54,7 @@ public class GuiEditor {
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
 
-        Consumer<List<EditorNode>> updateBar = l -> {
+        Consumer<List<EditorState.NavEntry>> updateBar = l -> {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
 
@@ -80,7 +81,7 @@ public class GuiEditor {
                 }
 
                 l.forEach(en -> {
-                    var btn = new JFXButton(en.navigationName());
+                    var btn = new JFXButton(en.getEditorNode().navigationName());
                     btn.setMnemonicParsing(false);
                     {
                         var sep = new Label(">");
@@ -88,7 +89,7 @@ public class GuiEditor {
                         bar.getChildren().add(sep);
                     }
                     btn.setOnAction(e -> {
-                        edState.navigateTo(en);
+                        edState.navigateTo(en.getEditorNode());
                     });
                     bar.getChildren().add(btn);
                 });
@@ -98,15 +99,15 @@ public class GuiEditor {
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
                     edit.setOnAction(e -> {
-                        edState.getExternalState().startEdit(edState, l.get(l.size() - 1));
+                        edState.getExternalState().startEdit(edState, l.get(l.size() - 1).getEditorNode());
                     });
                     edit.setPadding(new Insets(4, 4, 2, 4));
                     bar.getChildren().add(edit);
                 }
             });
         };
-        updateBar.accept(edState.getNodePath());
-        edState.nodePathProperty().addListener((c, o, n) -> {
+        updateBar.accept(edState.getNavPath());
+        edState.navPathProperty().addListener((c, o, n) -> {
             updateBar.accept(n);
         });
 
@@ -114,30 +115,35 @@ public class GuiEditor {
     }
 
 
-    private static Region createNodeList(EditorState edState) {
+    private static void createNodeList(BorderPane pane, EditorState edState) {
+        edState.contentProperty().addListener((c, o, n) -> {
+            Platform.runLater(() -> {
+                var grid = createNodeList(edState, n);
+                ScrollPane sp = new ScrollPane(grid);
+                sp.sceneProperty().addListener((ch, ol, ne) -> {
+                    if (ne == null) {
+                        return;
+                    }
+                    if (edState.getNavPath().size() > 0) {
+                        sp.setVvalue(edState.getNavPath().get(edState.getNavPath().size() - 1).getScroll());
+                        edState.getNavPath().get(edState.getNavPath().size() - 1).scrollProperty().bind(sp.vvalueProperty());
+                    }
+                });
+                sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+                grid.prefWidthProperty().bind(sp.widthProperty());
+                pane.setCenter(sp);
+            });
+        });
+    }
+
+    private static GridPane createNodeList(EditorState state, List<EditorNode> nodes) {
         GridPane grid = new GridPane();
         grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
         var cc = new ColumnConstraints();
         cc.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(
                 new ColumnConstraints(), new ColumnConstraints(), cc, new ColumnConstraints());
-
-        ScrollPane sp = new ScrollPane(grid);
-        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        grid.prefWidthProperty().bind(sp.widthProperty());
-        createNodeList(grid, edState, edState.getContent());
-        edState.contentProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                sp.setVvalue(0);
-                createNodeList(grid, edState, n);
-            });
-        });
-
-        return sp;
-    }
-
-    private static void createNodeList(GridPane grid, EditorState state, List<EditorNode> nodes) {
-        grid.getChildren().clear();
 
         int nodeCount = Math.min(nodes.size(), 300);
         for (int i = 0; i < nodeCount; i++) {
@@ -173,6 +179,7 @@ public class GuiEditor {
 
             grid.add(btns, 3, i);
         }
+        return grid;
     }
 
     private static Region createValueDisplay(EditorNode n, EditorState state) {

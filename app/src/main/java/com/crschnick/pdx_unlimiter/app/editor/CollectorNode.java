@@ -11,18 +11,21 @@ import java.util.stream.Collectors;
 
 public class CollectorNode extends EditorNode {
 
+    private int firstNodeIndex;
     private List<Node> nodes;
 
-    public CollectorNode(EditorNode parent, String keyName, List<Node> nodes) {
-        super(parent, keyName);
+    public CollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
+        super(directParent, keyName, parentIndex);
+        this.firstNodeIndex = firstNodeIndex;
         this.nodes = nodes;
     }
 
     @Override
     public void delete() {
         var ar = getRealParent().getBackingNode().getNodeArray();
-        ar.removeIf(n -> n instanceof KeyValueNode &&
-                n.getKeyValueNode().getKeyName().equals(keyName));
+        for (int i = 0; i < nodes.size(); i++) {
+            ar.remove(firstNodeIndex);
+        }
     }
 
     @Override
@@ -68,12 +71,11 @@ public class CollectorNode extends EditorNode {
     @Override
     public void update(ArrayNode newNode) {
         var ar = getRealParent().getBackingNode().getNodeArray();
-        int firstIndex = ar.indexOf(ar.stream().filter(n -> n instanceof KeyValueNode &&
-                n.getKeyValueNode().getKeyName().equals(keyName)).findFirst().get());
-        ar.removeIf(n -> n instanceof KeyValueNode &&
-                n.getKeyValueNode().getKeyName().equals(keyName));
 
-        ar.addAll(firstIndex, newNode.getNodeArray().stream()
+        for (int i = 0; i < nodes.size(); i++) {
+            ar.remove(firstNodeIndex);
+        }
+        ar.addAll(firstNodeIndex, newNode.getNodeArray().stream()
                 .map(node -> KeyValueNode.create(keyName, node)).collect(Collectors.toList()));
     }
 

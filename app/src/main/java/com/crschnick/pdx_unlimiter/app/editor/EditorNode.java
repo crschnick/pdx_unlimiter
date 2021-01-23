@@ -4,29 +4,28 @@ import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public abstract class EditorNode {
 
     protected String keyName;
+    private int parentIndex;
     private EditorNode directParent;
 
-    public EditorNode(EditorNode directParent, String keyName) {
+    public EditorNode(EditorNode directParent, String keyName, int parentIndex) {
         this.directParent = directParent;
         this.keyName = keyName;
+        this.parentIndex = parentIndex;
     }
 
     public static List<EditorNode> create(EditorNode parent, List<Node> nodes) {
         var result = new ArrayList<EditorNode>();
+        int parentIndex = 0;
         for (int i = 0; i < nodes.size(); ) {
             var n = nodes.get(i);
-            if (n instanceof KeyValueNode &&
-                    i + 1 < nodes.size() &&
-                    nodes.get(i + 1) instanceof KeyValueNode) {
+            if (n instanceof KeyValueNode) {
                 var k = n.getKeyValueNode().getKeyName();
                 int end = i;
                 while (end + 1 < nodes.size() &&
@@ -39,10 +38,13 @@ public abstract class EditorNode {
                     result.add(new CollectorNode(
                             parent,
                             k,
+                            parentIndex,
+                            i,
                             nodes.subList(i, end + 1).stream()
                                     .map(node -> node.getKeyValueNode().getNode())
                                     .collect(Collectors.toList())));
                     i = end + 1;
+                    parentIndex++;
                     continue;
                 }
             }
@@ -50,8 +52,10 @@ public abstract class EditorNode {
             result.add(new SimpleNode(
                     parent,
                     n instanceof KeyValueNode ? n.getKeyValueNode().getKeyName() : null,
+                    parentIndex,
                     i,
                     n instanceof KeyValueNode ? n.getKeyValueNode().getNode() : n));
+            parentIndex++;
             i++;
         }
 
@@ -84,5 +88,9 @@ public abstract class EditorNode {
 
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);
+    }
+
+    public int getParentIndex() {
+        return parentIndex;
     }
 }

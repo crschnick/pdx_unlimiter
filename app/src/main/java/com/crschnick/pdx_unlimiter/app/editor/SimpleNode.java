@@ -10,8 +10,8 @@ public class SimpleNode extends EditorNode {
     private int keyIndex;
     private Node backingNode;
 
-    public SimpleNode(EditorNode parent, String keyName, int keyIndex, Node backingNode) {
-        super(parent, keyName);
+    public SimpleNode(EditorNode directParent, String keyName, int parentIndex, int keyIndex, Node backingNode) {
+        super(directParent, keyName, parentIndex);
         this.keyIndex = keyIndex;
         this.backingNode = backingNode;
     }

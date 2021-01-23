@@ -63,7 +63,7 @@ public abstract class EditTarget {
 
             @Override
             public void visitCk3(Path file) {
-
+                toReturn[0] = new FileEditTarget(file);
             }
 
             @Override
