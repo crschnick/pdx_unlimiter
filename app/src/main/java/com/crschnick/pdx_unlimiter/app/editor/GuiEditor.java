@@ -55,7 +55,6 @@ public class GuiEditor {
         return layout;
     }
 
-
     private static Region createNavigationBar(EditorState edState) {
         HBox bar = new HBox();
         bar.setAlignment(Pos.CENTER_LEFT);
@@ -144,7 +143,7 @@ public class GuiEditor {
         });
     }
 
-    private static Region createGridElement(Region child, int row) {
+    private static StackPane createGridElement(Region child, int row) {
         var s = new StackPane();
         s.getStyleClass().add("pane");
         if (row % 2 != 0) {
@@ -171,28 +170,13 @@ public class GuiEditor {
             boolean odd = i % 2 != 0;
 
             var n = nodes.get(i);
-            var k = new Label(n.displayKeyName());
-            var kn = new StackPane(k);
+            var kn = createGridElement(new Label(n.displayKeyName()), i);
             kn.setAlignment(Pos.CENTER_LEFT);
-            kn.getStyleClass().add("pane");
-            var eq = new StackPane(new Label("="));
-            eq.getStyleClass().add("pane");
-            eq.setAlignment(Pos.CENTER);
-            if (odd) {
-                kn.getStyleClass().add("odd");
-                eq.getStyleClass().add("odd");
-            }
+
             grid.add(kn, 0, i);
-            grid.add(eq, 1, i);
-
-
-            {
-                grid.add(createGridElement(GuiEditorNode.createTypeNode(n).orElse(null), i), 2, i);
-            }
-
-            {
-                grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
-            }
+            grid.add(createGridElement(new Label("="), i), 1, i);
+            grid.add(createGridElement(GuiEditorNode.createTypeNode(n).orElse(null), i), 2, i);
+            grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
 
             if (n.getDirectParent() != null) {
                 HBox actions = new HBox();

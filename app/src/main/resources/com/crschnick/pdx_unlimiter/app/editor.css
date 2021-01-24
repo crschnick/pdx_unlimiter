@@ -9,7 +9,7 @@
 }
 
 .editor-grid .odd {
-  -fx-background-color: #EEEEEEFF;
+  -fx-background-color: #EAEAEAFF;
 }
 
 .editor-grid .preview {
@@ -38,7 +38,6 @@
 
 .editor-grid .text-field {
 -fx-padding: 0.25em 0.2em 0.25em 0.2em;
--fx-background-color: #AAAAAA44;
 -fx-border-width: 0 1em 0 1em;
   -fx-font-family: "monospaced";
 }

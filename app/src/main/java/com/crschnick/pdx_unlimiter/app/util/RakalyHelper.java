@@ -9,6 +9,10 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -22,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
+
+import static com.crschnick.pdx_unlimiter.app.gui.DialogHelper.createAlert;
 
 public class RakalyHelper {
 
@@ -46,10 +52,32 @@ public class RakalyHelper {
         return temp;
     }
 
+    public static void showUsageDialog() {
+        Alert alert = createAlert();
+        alert.setAlertType(Alert.AlertType.INFORMATION);
+
+        var open = new ButtonType("Visit Rakaly", ButtonBar.ButtonData.APPLY);
+        alert.getButtonTypes().add(open);
+        Button val = (Button) alert.getDialogPane().lookupButton(open);
+        val.setOnAction(e -> {
+            ThreadHelper.browse("https://rakaly.com/eu4");
+        });
+
+        alert.setAlertType(Alert.AlertType.INFORMATION);
+        alert.setTitle("Rakaly.com upload functionality");
+        alert.setHeaderText("""
+                Rakaly.com is a website to analyze and share your eu4 achievements and compete against other players.
+                """);
+        alert.setContentText("""
+                You can upload saves with this button by signing into Rakaly.com through Steam and then setting your
+                Rakaly.com User ID and API key in the settings menu.
+                """);
+        alert.showAndWait();
+    }
+
     public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, SavegameEntry<T, I> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
-            GuiErrorReporter.showSimpleErrorMessage("Missing rakaly.com User ID or API key. " +
-                    "To use this functionality, set both in the settings menu.");
+            showUsageDialog();
             return;
         }
 

@@ -65,6 +65,7 @@ public class GuiStyle {
     public static String CLASS_CAMPAIGN_TOP_BAR = "campaign-top-bar";
     public static String CLASS_CONTENT_DIALOG = "content-dialog";
     public static String CLASS_EDIT = "edit-button";
+    public static String CLASS_COPY = "copy-button";
     public static String CLASS_CASE_SENSITIVE = "case-sensitive-button";
     public static String CLASS_FILTER = "filter-button";
     public static String CLASS_EDITOR_GRID = "editor-grid";

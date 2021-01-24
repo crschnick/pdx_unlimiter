@@ -127,6 +127,17 @@ public class GuiSavegameEntry {
 
     private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {
         {
+            Button copy = new JFXButton();
+            copy.setGraphic(new FontIcon());
+            copy.setOnMouseClicked((m) -> {
+                SavegameActions.copySavegame(e);
+            });
+            copy.getStyleClass().add(CLASS_COPY);
+            GuiTooltips.install(copy, "Make a copy of the savegame");
+            buttonBar.getChildren().add(copy);
+        }
+
+        {
             Button melt = new JFXButton();
             melt.setGraphic(new FontIcon());
             melt.setOnMouseClicked((m) -> {
@@ -159,14 +170,14 @@ public class GuiSavegameEntry {
             buttonBar.getChildren().add(upload);
 
 
-            Button analyze = new JFXButton();
-            analyze.setGraphic(new FontIcon());
-            analyze.setOnMouseClicked((m) -> {
-                RakalyHelper.analyzeEntry(SavegameCache.EU4, eu4Entry);
-            });
-            analyze.getStyleClass().add(CLASS_ANALYZE);
-            GuiTooltips.install(analyze, "Analyze with Rakaly.com");
-            buttonBar.getChildren().add(analyze);
+//            Button analyze = new JFXButton();
+//            analyze.setGraphic(new FontIcon());
+//            analyze.setOnMouseClicked((m) -> {
+//                RakalyHelper.analyzeEntry(SavegameCache.EU4, eu4Entry);
+//            });
+//            analyze.getStyleClass().add(CLASS_ANALYZE);
+//            GuiTooltips.install(analyze, "Analyze with Rakaly.com");
+//            buttonBar.getChildren().add(analyze);
 
 
             Button uploadSkanderbeg = new JFXButton();
@@ -212,7 +223,7 @@ public class GuiSavegameEntry {
             GuiTooltips.install(edit, "Edit savegame");
 
             if (e.getInfo() != null && !e.getInfo().isBinary()) {
-                buttonBar.getChildren().add(edit);
+                buttonBar.getChildren().add(0, edit);
             } else {
                 e.infoProperty().addListener((c, o, n) -> {
                     if (n != null && !n.isBinary()) {

@@ -46,6 +46,10 @@
     -fx-icon-code: "mdi-trophy";
 }
 
+.copy-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-content-copy";
+}
+
 .kill-button .ikonli-font-icon {
     -fx-icon-code: "mdi-stop";
 }

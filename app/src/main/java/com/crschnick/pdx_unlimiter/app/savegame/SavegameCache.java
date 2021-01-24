@@ -280,9 +280,9 @@ public abstract class SavegameCache<
         return Optional.of(col);
     }
 
-    public synchronized void addNewEntryToCampaign(UUID campainUuid, UUID entryUuid, String checksum, I info) {
+    public synchronized void addNewEntryToCampaign(UUID campainUuid, UUID entryUuid, String checksum, I info, String name) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
-                getDefaultEntryName(info),
+                name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 info,
                 checksum,
@@ -305,15 +305,15 @@ public abstract class SavegameCache<
         SavegameManagerState.<T, I>get().selectEntry(e);
     }
 
-    public synchronized void addNewEntryToFolder(SavegameFolder<T, I> folder, UUID entryUuid, String checksum, I info) {
+    public synchronized void addNewEntryToCollection(SavegameCollection<T, I> col, UUID entryUuid, String checksum, I info, String name) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
-                getDefaultEntryName(info),
+                name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 info,
                 checksum,
                 info.getDate());
         logger.debug("Adding new entry " + e.getName());
-        folder.getSavegames().add(e);
+        col.getSavegames().add(e);
 
         SavegameManagerState.<T, I>get().selectEntry(e);
     }
@@ -507,12 +507,12 @@ public abstract class SavegameCache<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    synchronized SavegameParser.Status importSavegame(Path file, SavegameFolder<T, I> folder) {
+    synchronized SavegameParser.Status importSavegame(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
         if (!MemoryChecker.checkForEnoughMemory()) {
             return new SavegameParser.Error(null);
         }
 
-        var status = importSavegameData(file, folder);
+        var status = importSavegameData(file, name, checkDuplicate, folder);
         saveData();
         System.gc();
         return status;
@@ -537,7 +537,7 @@ public abstract class SavegameCache<
         }
         var folder = getOrCreateFolder("Melted savegames");
         folder.ifPresent(f -> {
-            importSavegame(meltedFile, f);
+            importSavegame(meltedFile, null, true, f);
         });
     }
 
@@ -571,7 +571,7 @@ public abstract class SavegameCache<
         }, false);
     }
 
-    private SavegameParser.Status importSavegameData(Path file, SavegameFolder<T, I> folder) {
+    private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
         logger.debug("Parsing file " + file.toString());
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
@@ -579,16 +579,18 @@ public abstract class SavegameCache<
             public void success(SavegameParser.Success<I> s) {
                 logger.debug("Parsing was successful");
                 logger.debug("Checksum is " + s.checksum);
-                var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
-                        .filter(ch -> ch.getChecksum().equals(s.checksum))
-                        .findAny();
-                if (exists.isPresent()) {
-                    logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
-                    loadEntry(exists.get());
-                    SavegameManagerState.<T, I>get().selectEntry(exists.get());
-                    return;
-                } else {
-                    logger.debug("No entry with checksum found");
+                if (checkDuplicate) {
+                    var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
+                            .filter(ch -> ch.getChecksum().equals(s.checksum))
+                            .findAny();
+                    if (exists.isPresent()) {
+                        logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
+                        loadEntry(exists.get());
+                        SavegameManagerState.<T, I>get().selectEntry(exists.get());
+                        return;
+                    } else {
+                        logger.debug("No entry with checksum found");
+                    }
                 }
 
                 UUID collectionUuid;
@@ -613,9 +615,9 @@ public abstract class SavegameCache<
                 }
 
                 if (folder == null) {
-                    addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info);
+                    addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name);
                 } else {
-                    addNewEntryToFolder(folder, saveUuid, s.checksum, s.info);
+                    addNewEntryToCollection(folder, saveUuid, s.checksum, s.info, name);
                 }
             }
 

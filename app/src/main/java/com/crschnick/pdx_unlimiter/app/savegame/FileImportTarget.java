@@ -133,7 +133,7 @@ public abstract class FileImportTarget {
                     FileUtils.forceMkdirParent(downloadedFile.toFile());
                     Files.write(downloadedFile, data);
 
-                    onFinish.accept(SavegameCache.EU4.importSavegame(downloadedFile, null));
+                    onFinish.accept(SavegameCache.EU4.importSavegame(downloadedFile, null, true,null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -183,7 +183,7 @@ public abstract class FileImportTarget {
 
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
-                onFinish.accept(savegameCache.importSavegame(path, null));
+                onFinish.accept(savegameCache.importSavegame(path, null, true, null));
 
                 // Wait for other threads to catch up again-
                 // Without this, ui is very laggy

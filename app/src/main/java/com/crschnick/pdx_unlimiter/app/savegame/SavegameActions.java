@@ -161,4 +161,12 @@ public class SavegameActions {
             });
         }, true);
     }
+
+    public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            var sgs = SavegameCache.getForSavegame(e);
+            var in = sgs.getSavegameFile(e);
+            sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
+        }, true);
+    }
 }

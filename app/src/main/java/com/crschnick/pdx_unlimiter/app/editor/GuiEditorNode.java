@@ -55,7 +55,7 @@ public class GuiEditorNode {
             return createTypeNode(
                     new Color(0.2, 1, 0.2, 0.5),
                     'T',
-                    new Insets(0, 0.3, 0, 0),
+                    new Insets(1, 0, 0, 1),
                     "Text");
         }
         if (type == ValueNode.Type.INTEGER) {
@@ -70,7 +70,7 @@ public class GuiEditorNode {
             return createTypeNode(
                     new Color(0.4, 1, 1, 0.5),
                     'F',
-                    new Insets(0, 0.3, 0, 0),
+                    new Insets(1, 0.3, 0, 1),
                     "Floating point number");
         }
 
@@ -78,7 +78,7 @@ public class GuiEditorNode {
             return createTypeNode(
                     new Color(1, 0.8, 0.3, 0.5),
                     'V',
-                    new Insets(0, 0.3, 0, 1),
+                    new Insets(1, 0.3, 0, 1),
                     "Game specific value");
         }
         return null;
