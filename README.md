@@ -11,20 +11,12 @@ Currently, EU4, CK3 and Stellaris are supported.
 
 ## Download
 
-Below you can find installers for all supported platforms.
-
-#### Windows
-
-Download the
-[windows installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi).
+### [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi).
 
 Note that there might be some issues with Windows SmartScreen blocking the installer.
 If you are facing these issues, click on "More info" and then "Run anyway".
 
-#### Linux
-
-Download the
-[.deb installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
+### [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
 
 Note that the Linux version is relatively new and has only been tested on a few systems.
 Please report any issues that you are having with it.
@@ -36,7 +28,7 @@ The main components of the Pdx-Unlimiter are:
 - [savegame reverter](#savegame-reverter-savescumming)
 - [Savegame converter](#savegame-converter)
 - [Savegame editor](#savegame-editor)
-- [Third party tool integrations](#third-party-integration)
+- [Integrations for other Paradox tools](#third-party-integration)
 
 It you want to know how to use a certain feature, you can just
 read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
@@ -79,13 +71,22 @@ create a non-ironman copy of an ironman savegame, but couldn't because the games
 
 The Pdx-Unlimiter also comes with a savegame editor.
 With this editor you can edit any file that is saved in a Paradox text format.
-This includes EU4 and CK3 non-ironman savegames,
-any game data files for mods and other purposes, and all Stellaris savegames.
-Note that you can use the included ironman converter
-to first create a non-ironman savegame and then edit it.
+This includes EU4 and CK3 non-ironman savegames, all Stellaris savegames, and
+any game data files for mods and other purposes
+
+It is a text-based editor, but has the following
+advantages compared to editing savegames directly with a text-editor:
+
+- You don't have to deal compressed savegames, the editor does all
+  the extracting and repackaging of zipped savegame files for you
+  
+- You can still use your favourite text editor to edit parts of the savegame
+
 
 ![Editor](docs/editor.png)
 
+Note that you can use the included ironman converter
+to first create a non-ironman savegame and then edit it.
 
 ## Savegame reverter ("savescumming")
 
