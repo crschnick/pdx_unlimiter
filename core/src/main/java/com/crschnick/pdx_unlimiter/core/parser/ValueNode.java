@@ -21,4 +21,32 @@ public class ValueNode extends Node {
     public boolean isStringValue() {
         return string;
     }
+
+    public Type determineType() {
+        if (isStringValue()) {
+            return Type.TEXT;
+        }
+
+        if (isBoolean()) {
+            return Type.BOOLEAN;
+        }
+
+        if (isInteger()) {
+            return Type.INTEGER;
+        }
+
+        if (isDouble()) {
+            return Type.FLOATING_POINT;
+        }
+
+        return Type.GAME_VALUE;
+    }
+
+    public static enum Type {
+        TEXT,
+        BOOLEAN,
+        INTEGER,
+        FLOATING_POINT,
+        GAME_VALUE
+    }
 }

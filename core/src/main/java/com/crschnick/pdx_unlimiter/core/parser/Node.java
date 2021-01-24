@@ -72,6 +72,24 @@ public abstract class Node {
         return this instanceof ValueNode;
     }
 
+    public boolean isBoolean() {
+        if (!isValue()) {
+            return false;
+        }
+
+        String sv = getString();
+        return sv.equals("yes") || sv.equals("no");
+    }
+
+    public boolean isInteger() {
+        if (!isValue()) {
+            return false;
+        }
+
+        String sv = getString();
+        return LONG.matcher(sv).matches();
+    }
+
     public boolean isDouble() {
         if (!isValue()) {
             return false;

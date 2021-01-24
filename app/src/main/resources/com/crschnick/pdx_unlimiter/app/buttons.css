@@ -31,7 +31,7 @@
 }
 
 .preview .ikonli-font-icon {
-    -fx-icon-code: "mdi-tooltip";
+    -fx-icon-code: "mdi-tooltip-outline";
 }
 
 .case-sensitive-button .ikonli-font-icon {

@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
@@ -13,11 +14,17 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.Bloom;
+import javafx.scene.effect.Glow;
+import javafx.scene.effect.SepiaTone;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -137,36 +144,69 @@ public class GuiEditor {
         });
     }
 
+    private static Region createGridElement(Region child, int row) {
+        var s = new StackPane();
+        s.getStyleClass().add("pane");
+        if (row % 2 != 0) {
+            s.getStyleClass().add("odd");
+        }
+        s.setAlignment(Pos.CENTER);
+        if (child != null) {
+            s.getChildren().add(child);
+        }
+        return s;
+    }
+
     private static GridPane createNodeList(EditorState state, List<EditorNode> nodes) {
         GridPane grid = new GridPane();
         grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
         var cc = new ColumnConstraints();
         cc.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(
-                new ColumnConstraints(), new ColumnConstraints(), cc, new ColumnConstraints());
+                new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
+                new ColumnConstraints(), new ColumnConstraints());
 
         int nodeCount = Math.min(nodes.size(), 300);
         for (int i = 0; i < nodeCount; i++) {
+            boolean odd = i % 2 != 0;
+
             var n = nodes.get(i);
-            grid.add(new Label(n.displayKeyName()), 0, i);
-            grid.add(new Label("="), 1, i);
+            var k = new Label(n.displayKeyName());
+            var kn = new StackPane(k);
+            kn.setAlignment(Pos.CENTER_LEFT);
+            kn.getStyleClass().add("pane");
+            var eq = new StackPane(new Label("="));
+            eq.getStyleClass().add("pane");
+            eq.setAlignment(Pos.CENTER);
+            if (odd) {
+                kn.getStyleClass().add("odd");
+                eq.getStyleClass().add("odd");
+            }
+            grid.add(kn, 0, i);
+            grid.add(eq, 1, i);
 
 
-            Region valueDisplay = createValueDisplay(n, state);
-            grid.add(valueDisplay, 2, i);
-
-            HBox btns = new HBox();
             {
+                grid.add(createGridElement(GuiEditorNode.createTypeNode(n).orElse(null), i), 2, i);
+            }
+
+            {
+                grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
+            }
+
+            if (n.getDirectParent() != null) {
+                HBox actions = new HBox();
+                actions.setFillHeight(true);
+
                 Button edit = new JFXButton();
                 edit.setGraphic(new FontIcon());
                 edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
                 edit.setOnAction(e -> {
                     state.getExternalState().startEdit(state, n);
                 });
-                btns.getChildren().add(edit);
-            }
+                actions.getChildren().add(edit);
+                edit.prefHeightProperty().bind(actions.heightProperty());
 
-            if (n.getDirectParent() != null) {
                 Button del = new JFXButton();
                 del.setGraphic(new FontIcon());
                 del.getStyleClass().add(GuiStyle.CLASS_DELETE);
@@ -174,55 +214,15 @@ public class GuiEditor {
                     n.delete();
                     state.onDelete();
                 });
-                btns.getChildren().add(del);
+                actions.getChildren().add(del);
+                del.prefHeightProperty().bind(actions.heightProperty());
+
+                grid.add(createGridElement(actions, i), 4, i);
             }
 
-            grid.add(btns, 3, i);
+            grid.add(createGridElement(new Region(), i), 5, i);
         }
         return grid;
-    }
-
-    private static Region createValueDisplay(EditorNode n, EditorState state) {
-        boolean isText = n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode;
-        if (isText) {
-            var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
-            tf.textProperty().addListener((c, o, ne) -> {
-                ((SimpleNode) n).updateText(ne);
-                state.onTextChanged();
-            });
-            return tf;
-        } else {
-            var box = new HBox();
-            box.setAlignment(Pos.CENTER);
-            box.setSpacing(5);
-
-            int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
-                    ((CollectorNode) n).getNodes().size();
-            int stringSize = String.valueOf(length).length();
-            int spaceSize = 7 - stringSize;
-            var lengthString =
-                    " ".repeat(spaceSize / 2) + String.valueOf(length) +
-                            " ".repeat(spaceSize - (spaceSize / 2));
-            var btn = new JFXButton("[... " + lengthString + " ...]");
-            btn.setAlignment(Pos.CENTER);
-            btn.setOnAction(e -> {
-                state.navigateTo(n);
-            });
-            box.getChildren().add(btn);
-
-            var preview = new Label();
-            preview.getStyleClass().add("preview");
-            preview.setGraphic(new FontIcon());
-            preview.setOnMouseEntered(e -> {
-                var tt = new Tooltip(
-                        TextFormatWriter.writeToString(n.toWritableNode(), 10, "  "));
-                tt.setShowDelay(javafx.util.Duration.ZERO);
-                Tooltip.install(preview, tt);
-            });
-            box.getChildren().add(preview);
-
-            return box;
-        }
     }
 
     private static Region createFilterBar(EditorFilter edFilter) {
@@ -259,11 +259,15 @@ public class GuiEditor {
             {
                 filter.focusedProperty().addListener((c, o, n) -> {
                     if (n) {
-                        filter.selectAll();
+                        Platform.runLater(filter::selectAll);
                     }
+                });
+                filter.textProperty().addListener((c,o,n) -> {
+                    filter.setEffect(new SepiaTone(0.7));
                 });
                 filter.setOnAction(e -> {
                     edFilter.filterStringProperty().set(filter.getText());
+                    filter.setEffect(null);
                 });
                 textBar.getChildren().add(filter);
             }
@@ -272,6 +276,7 @@ public class GuiEditor {
                 Button search = new Button();
                 search.setOnAction(e -> {
                     edFilter.filterStringProperty().set(filter.getText());
+                    filter.setEffect(null);
                 });
                 search.setGraphic(new FontIcon());
                 search.getStyleClass().add(GuiStyle.CLASS_FILTER);
@@ -283,6 +288,7 @@ public class GuiEditor {
                 clear.setOnAction(e -> {
                     filter.setText("");
                     edFilter.filterStringProperty().set("");
+                    filter.setEffect(null);
                 });
                 clear.setGraphic(new FontIcon());
                 clear.getStyleClass().add(GuiStyle.CLASS_CLEAR);
