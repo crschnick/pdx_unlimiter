@@ -27,6 +27,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
             i.binary = false;
             i.campaignUuid = UUID.randomUUID();
+            i.campaignHeuristic = i.campaignUuid;
 
             int seed = n.getNodeForKey("random_seed").getInteger();
             byte[] b = new byte[20];

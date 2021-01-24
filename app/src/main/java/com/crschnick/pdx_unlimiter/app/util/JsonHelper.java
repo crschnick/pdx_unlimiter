@@ -32,9 +32,10 @@ public class JsonHelper {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         JsonFactory f = new JsonFactory();
-        JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
-                .setPrettyPrinter(new DefaultPrettyPrinter());
-        mapper.writeValue(g, obj);
+        try (JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
+                .setPrettyPrinter(new DefaultPrettyPrinter())) {
+            mapper.writeValue(g, obj);
+        }
     }
 
     public static JsonNode read(Path in) throws IOException {

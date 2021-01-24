@@ -23,6 +23,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
             i.tag = new Hoi4Tag(n.getNodeForKey("player").getString(), n.getNodeForKey("ideology").getString());
             i.date = GameDateType.HOI4.fromString(n.getNodeForKey("date").getString());
             i.campaignUuid = UUID.fromString(n.getNodeForKey("game_unique_id").getString());
+            i.campaignHeuristic = i.campaignUuid;
 
             i.mods = n.getNodeForKeyIfExistent("mods")
                     .map(Node::getNodeArray).orElse(List.of())

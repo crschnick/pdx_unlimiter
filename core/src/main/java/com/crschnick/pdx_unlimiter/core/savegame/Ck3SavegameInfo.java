@@ -29,6 +29,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
             i.campaignUuid = UUID.nameUUIDFromBytes(b);
+            i.campaignHeuristic = i.campaignUuid;
 
             i.allTags = Ck3Tag.fromNode(
                     n.getNodeForKey("living"),

@@ -165,7 +165,7 @@ public class GuiEditor {
                 new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
                 new ColumnConstraints(), new ColumnConstraints());
 
-        int nodeCount = Math.min(nodes.size(), 300);
+        int nodeCount = Math.min(nodes.size(), 100);
         for (int i = 0; i < nodeCount; i++) {
             boolean odd = i % 2 != 0;
 

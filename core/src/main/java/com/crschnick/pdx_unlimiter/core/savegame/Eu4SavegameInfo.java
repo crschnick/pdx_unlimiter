@@ -48,6 +48,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .collect(Collectors.toList());
 
             e.campaignUuid = UUID.fromString(n.getNodeForKey("campaign_id").getString());
+            e.campaignHeuristic = UUID.nameUUIDFromBytes(n.getNodeForKey("countries")
+                    .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
             e.allTags = new HashSet<>();
             for (Node countryNode : n.getNodeForKey("countries").getNodeArray()) {

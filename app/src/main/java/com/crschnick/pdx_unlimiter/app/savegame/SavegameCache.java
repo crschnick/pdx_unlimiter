@@ -595,7 +595,7 @@ public abstract class SavegameCache<
 
                 UUID collectionUuid;
                 if (folder == null) {
-                    collectionUuid = s.info.getCampaignUuid();
+                    collectionUuid = s.info.getCampaignHeuristic();
                     logger.debug("Campaign UUID is " + collectionUuid.toString());
                 } else {
                     collectionUuid = folder.getUuid();
