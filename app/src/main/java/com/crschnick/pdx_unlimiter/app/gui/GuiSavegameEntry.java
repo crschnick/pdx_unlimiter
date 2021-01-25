@@ -35,7 +35,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
@@ -273,15 +272,9 @@ public class GuiSavegameEntry {
             stack.getChildren().add(loading);
         }
 
-        AtomicBoolean load = new AtomicBoolean(false);
         stack.sceneProperty().addListener((c, o, n) -> {
-            if (stack.localToScreen(0, 0) == null) {
-                return;
-            }
-
-            if (stack.localToScreen(0, 0).getY() < PdxuApp.getApp().getScene().getWindow().getHeight() && !load.get()) {
-                load.set(true);
-                SavegameManagerState.<T, I>get().current().getSavegameCache().loadEntryAsync(entry);
+            if (n != null) {
+                SavegameCache.getForSavegame(entry).loadEntryAsync(entry);
             }
         });
 

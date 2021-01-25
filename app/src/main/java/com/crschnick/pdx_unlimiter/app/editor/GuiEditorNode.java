@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
@@ -8,10 +7,8 @@ import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;

@@ -133,11 +133,11 @@ public abstract class FileImportTarget {
                     FileUtils.forceMkdirParent(downloadedFile.toFile());
                     Files.write(downloadedFile, data);
 
-                    onFinish.accept(SavegameCache.EU4.importSavegame(downloadedFile, null, true,null));
+                    onFinish.accept(SavegameCache.EU4.importSavegame(downloadedFile, null, true, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
-            }, true);
+            }, true, true);
         }
 
         @Override
@@ -157,7 +157,7 @@ public abstract class FileImportTarget {
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
-            }, false);
+            }, false, false);
         }
 
         @Override
@@ -188,7 +188,7 @@ public abstract class FileImportTarget {
                 // Wait for other threads to catch up again-
                 // Without this, ui is very laggy
                 ThreadHelper.sleep(2000);
-            }, true);
+            }, true, true);
         }
 
         public Instant getLastModified() {
@@ -213,7 +213,7 @@ public abstract class FileImportTarget {
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
-            }, false);
+            }, false, false);
         }
 
         @Override

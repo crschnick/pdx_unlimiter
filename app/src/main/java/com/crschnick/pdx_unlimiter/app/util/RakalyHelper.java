@@ -89,7 +89,7 @@ public class RakalyHelper {
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
             }
-        }, true);
+        }, true, true);
     }
 
     private static String executePost(String sgName, URL targetURL, byte[] data) throws IOException {
@@ -146,6 +146,6 @@ public class RakalyHelper {
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
             }
-        }, true);
+        }, true, false);
     }
 }

@@ -21,7 +21,7 @@ public class Ck3Tag {
 
     public static Ck3Tag getPlayerTag(Node n, Set<Ck3Tag> tags) {
         return tags.stream().filter(t ->
-                t.ruler.id == n.getNodeForKey("played_character").getNodeForKey("character").getInteger())
+                t.ruler.id == n.getNodeForKey("played_character").getNodeForKey("character").getLong())
                 .findFirst().get();
     }
 
@@ -65,7 +65,7 @@ public class Ck3Tag {
     }
 
     public static class Person {
-        private int id;
+        private long id;
         private String firstName;
 
         public Person() {
@@ -76,12 +76,12 @@ public class Ck3Tag {
             var n = kvn.getNode();
 
             Person p = new Person();
-            p.id = Integer.parseInt(kvn.getKeyName());
+            p.id = Long.parseLong(kvn.getKeyName());
             p.firstName = n.getNodeForKey("first_name").getString();
             return p;
         }
 
-        public int getId() {
+        public long getId() {
             return id;
         }
 
@@ -113,7 +113,7 @@ public class Ck3Tag {
 
             var id = Long.parseLong(kvn.getKeyName());
             var name = n.getNodeForKey("name").getString();
-            var coaId = n.getNodeForKey("coat_of_arms_id").getInteger();
+            var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
             var coatOfArms = coas.stream().filter(c -> c.id == coaId).findFirst().get();
             return Optional.of(new Title(id, name, coatOfArms));
         }

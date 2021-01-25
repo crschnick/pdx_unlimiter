@@ -28,23 +28,36 @@ public class ImageLoader {
     }
 
     static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
+        if (p == null) {
+            return DEFAULT_IMAGE;
+        }
+
         if (!Files.isRegularFile(p)) {
             LoggerFactory.getLogger(ImageLoader.class).error("Image file " + p.toString() + " not found.");
             return DEFAULT_IMAGE;
         }
 
+        BufferedImage image;
         try {
-            return loadImage(Files.newInputStream(p), pixelSelector);
+            image = ImageIO.read(p.toFile());
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             return DEFAULT_IMAGE;
         }
+
+        WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                int rgb = image.getRGB(x, y);
+                img.getPixelWriter().setArgb(x, y, pixelSelector != null ? pixelSelector.apply(rgb) : rgb);
+            }
+        }
+        return img;
     }
 
-    static BufferedImage loadAwtImage(InputStream in, Function<Integer, Integer> pixelSelector) {
+    static BufferedImage loadAwtImage(Path input, Function<Integer, Integer> pixelSelector) {
         try {
-            BufferedImage image = ImageIO.read(in);
-            in.close();
+            BufferedImage image = ImageIO.read(input.toFile());
             for (int x = 0; x < image.getWidth(); x++) {
                 for (int y = 0; y < image.getHeight(); y++) {
                     int rgb = image.getRGB(x, y);
@@ -66,32 +79,6 @@ public class ImageLoader {
                 img.getPixelWriter().setArgb(x, y, rgb);
             }
         }
-        return img;
-    }
-
-    static Image loadImage(InputStream in, Function<Integer, Integer> pixelSelector) {
-        if (in == null) {
-            return DEFAULT_IMAGE;
-        }
-
-        BufferedImage image;
-        try {
-            image = ImageIO.read(in);
-            in.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return DEFAULT_IMAGE;
-        }
-
-        WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                int rgb = image.getRGB(x, y);
-                img.getPixelWriter().setArgb(x, y, pixelSelector != null ? pixelSelector.apply(rgb) : rgb);
-            }
-        }
-
-
         return img;
     }
 

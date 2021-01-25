@@ -3,29 +3,19 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
-import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.Bloom;
-import javafx.scene.effect.Glow;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class GuiEditor {
@@ -246,7 +236,7 @@ public class GuiEditor {
                         Platform.runLater(filter::selectAll);
                     }
                 });
-                filter.textProperty().addListener((c,o,n) -> {
+                filter.textProperty().addListener((c, o, n) -> {
                     filter.setEffect(new SepiaTone(0.7));
                 });
                 filter.setOnAction(e -> {

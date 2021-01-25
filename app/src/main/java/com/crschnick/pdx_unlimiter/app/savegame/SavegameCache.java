@@ -9,7 +9,6 @@ import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.MemoryChecker;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.data.GameDate;
 import com.crschnick.pdx_unlimiter.core.data.GameDateType;
@@ -75,6 +74,15 @@ public abstract class SavegameCache<
         @SuppressWarnings("unchecked")
         Optional<SavegameCache<T, I>> sg = ALL.stream()
                 .filter(i -> i.contains(e))
+                .findFirst()
+                .map(v -> (SavegameCache<T, I>) v);
+        return sg.orElseThrow(IllegalArgumentException::new);
+    }
+
+    public static <T, I extends SavegameInfo<T>> SavegameCache<T, I> getForSavegame(SavegameCollection<T, I> col) {
+        @SuppressWarnings("unchecked")
+        Optional<SavegameCache<T, I>> sg = ALL.stream()
+                .filter(i -> i.getCollections().contains(col))
                 .findFirst()
                 .map(v -> (SavegameCache<T, I>) v);
         return sg.orElseThrow(IllegalArgumentException::new);
@@ -339,7 +347,7 @@ public abstract class SavegameCache<
             SavegameCollection<T, I> to, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             moveEntry(to, entry);
-        }, true);
+        }, true, true);
     }
 
     private synchronized void moveEntry(
@@ -377,7 +385,7 @@ public abstract class SavegameCache<
     public void deleteAsync(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             delete(e);
-        }, false);
+        }, false, false);
     }
 
     private synchronized void delete(SavegameEntry<T, I> e) {
@@ -405,16 +413,27 @@ public abstract class SavegameCache<
     }
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
-        if (e.infoProperty().isNull().get()) {
-            TaskExecutor.getInstance().submitTask(() -> {
-                LoggerFactory.getLogger(SavegameCache.class).debug("Loading entry " + getEntryName(e));
-                loadEntry(e);
-            }, false);
-        }
+        TaskExecutor.getInstance().submitTask(() -> {
+            loadEntry(e);
+        }, false, false);
+    }
+
+    public void unloadCollectionAsync(SavegameCollection<T, I> col) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            boolean loaded = col.getSavegames().stream().anyMatch(e -> e.getInfo() != null);
+            if (!loaded) {
+                return;
+            }
+
+            logger.debug("Unloading collection " + col.getName());
+            for (var e : col.getSavegames()) {
+                e.infoProperty().set(null);
+            }
+        }, false, false);
     }
 
     private synchronized void loadEntry(SavegameEntry<T, I> e) {
-        if (!MemoryChecker.checkForEnoughMemory()) {
+        if (e.infoProperty().isNotNull().get()) {
             return;
         }
 
@@ -508,13 +527,8 @@ public abstract class SavegameCache<
     }
 
     synchronized SavegameParser.Status importSavegame(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
-        if (!MemoryChecker.checkForEnoughMemory()) {
-            return new SavegameParser.Error(null);
-        }
-
         var status = importSavegameData(file, name, checkDuplicate, folder);
         saveData();
-        System.gc();
         return status;
     }
 
@@ -568,7 +582,7 @@ public abstract class SavegameCache<
                     ErrorHandler.handleException(new SavegameParseException(iv.message));
                 }
             });
-        }, false);
+        }, false, true);
     }
 
     private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {

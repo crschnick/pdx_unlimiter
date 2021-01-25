@@ -26,8 +26,8 @@ List<String> runArgs = [
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
         "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.savegame=com.fasterxml.jackson.databind",
         "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.data=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.data=com.fasterxml.jackson.databind",
-        "-Xmx4g"]
+        "-Xmx6g",
+        "-XX:+ExitOnOutOfMemoryError"]
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
@@ -149,6 +149,7 @@ addDependenciesModuleInfo {
                     requires java.se;
                     exports org.apache.commons.io;
                     exports org.apache.commons.io.file;
+                    exports org.apache.commons.io.input;
                     exports org.apache.commons.io.filefilter;
                 }
             '''

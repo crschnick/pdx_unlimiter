@@ -18,6 +18,7 @@ public abstract class EditTarget {
     protected final Path file;
     protected final TextFormatParser parser;
     protected final TextFormatWriter writer;
+
     public EditTarget(Path file, TextFormatParser parser, TextFormatWriter writer) {
         this.file = file;
         this.parser = parser;

@@ -97,7 +97,7 @@ public class FileImporter {
                             });
 
                     Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
-                }, false);
+                }, false, false);
     }
 
     public static void addToImportQueue(String toImport) {

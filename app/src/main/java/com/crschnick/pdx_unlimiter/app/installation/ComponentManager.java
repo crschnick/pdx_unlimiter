@@ -43,7 +43,7 @@ public class ComponentManager {
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
 
         TaskExecutor.getInstance().start();
-        TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
+        TaskExecutor.getInstance().submitTask(ComponentManager::init, true, false);
     }
 
     public static void reloadSettings(Settings newS) {
@@ -53,7 +53,7 @@ public class ComponentManager {
             reset();
             Settings.updateSettings(newS);
             init();
-        }, true);
+        }, true, false);
     }
 
     public static void finalTeardown() {

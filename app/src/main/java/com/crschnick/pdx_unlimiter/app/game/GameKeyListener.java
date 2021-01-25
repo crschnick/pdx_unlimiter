@@ -35,7 +35,7 @@ public class GameKeyListener implements NativeKeyListener {
                     SavegameActions.importLatestSavegameDirectly(s -> {
                         SavegameActions.launchCampaignEntry();
                     });
-                }, true);
+                }, true, false);
             }
         }
     }

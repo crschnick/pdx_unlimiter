@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,11 +31,11 @@ public class CascadeDirectoryHelper {
             Path dir,
             SavegameEntry<?, ? extends SavegameInfo<?>> entry,
             GameInstallation install,
-            Consumer<InputStream> consumer) {
+            Consumer<Path> consumer) {
         traverseDir(dir, getCascadingDirectories(entry, install), consumer);
     }
 
-    public static Optional<InputStream> openFile(
+    public static Optional<Path> openFile(
             Path file,
             SavegameEntry<?, ? extends SavegameInfo<?>> entry,
             GameInstallation install) {
@@ -64,7 +65,7 @@ public class CascadeDirectoryHelper {
         return dirs;
     }
 
-    private static void traverseDir(Path traverseDir, List<Path> cascadingDirectories, Consumer<InputStream> consumer) {
+    private static void traverseDir(Path traverseDir, List<Path> cascadingDirectories, Consumer<Path> consumer) {
         for (Path dir : cascadingDirectories) {
             if (!Files.isDirectory(dir)) {
                 continue;
@@ -80,18 +81,14 @@ public class CascadeDirectoryHelper {
                     continue;
                 }
 
-                try {
-                    consumer.accept(Files.newInputStream(f.toPath()));
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
+                consumer.accept(f.toPath());
             }
         }
     }
 
-    private static Optional<InputStream> openFile(Path file, List<Path> cascadingDirectories) {
+    private static Optional<Path> openFile(Path file, List<Path> cascadingDirectories) {
         for (Path dir : cascadingDirectories) {
-            Optional<InputStream> r;
+            Optional<Path> r;
             if (Files.isRegularFile(dir)) {
                 r = fromZip(file, dir);
             } else {
@@ -104,11 +101,11 @@ public class CascadeDirectoryHelper {
         return Optional.empty();
     }
 
-    private static Optional<InputStream> fromDir(Path file, Path dir) {
+    private static Optional<Path> fromDir(Path file, Path dir) {
         var abs = dir.resolve(file);
         try {
             if (Files.isRegularFile(abs)) {
-                return Optional.of(Files.newInputStream(abs));
+                return Optional.of(abs);
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(CascadeDirectoryHelper.class)
@@ -117,16 +114,18 @@ public class CascadeDirectoryHelper {
         return Optional.empty();
     }
 
-    private static Optional<InputStream> fromZip(Path file, Path zip) {
+    private static Optional<Path> fromZip(Path file, Path zip) {
         try {
-            ZipFile z = new ZipFile(zip.toString());
-            ZipEntry e = z.getEntry(file.toString());
-            if (e != null) {
-                return Optional.ofNullable(z.getInputStream(e));
+            try (var fs = FileSystems.newFileSystem(zip)) {
+                var entry = fs.getRootDirectories().iterator().next().resolve(file);
+                if (Files.exists(entry)) {
+                    return Optional.of(entry);
+                }
+                return Optional.empty();
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(CascadeDirectoryHelper.class)
-                    .trace("Exception while loading file " + file + " from zip file " + zip.getFileName().toString(), e);
+                    .trace("Exception while loading zip file " + zip.getFileName().toString(), e);
         }
         return Optional.empty();
     }

@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;

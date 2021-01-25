@@ -16,28 +16,6 @@ import java.util.stream.Collectors;
 
 public class EditorState {
 
-    public class NavEntry {
-        private EditorNode editorNode;
-        private DoubleProperty scroll;
-
-        private NavEntry(EditorNode editorNode, double scroll) {
-            this.editorNode = editorNode;
-            this.scroll = new SimpleDoubleProperty(scroll);
-        }
-
-        public EditorNode getEditorNode() {
-            return editorNode;
-        }
-
-        public double getScroll() {
-            return scroll.get();
-        }
-
-        public DoubleProperty scrollProperty() {
-            return scroll;
-        }
-    }
-
     private String fileName;
     private TextFormatParser parser;
     private TextFormatWriter writer;
@@ -48,7 +26,6 @@ public class EditorState {
     private EditorFilter filter;
     private ListProperty<EditorNode> content;
     private Consumer<Map<String, Node>> saveFunc;
-
     public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, TextFormatWriter writer, Consumer<Map<String, Node>> saveFunc) {
         this.writer = writer;
         this.parser = parser;
@@ -183,5 +160,27 @@ public class EditorState {
 
     public TextFormatParser getParser() {
         return parser;
+    }
+
+    public class NavEntry {
+        private EditorNode editorNode;
+        private DoubleProperty scroll;
+
+        private NavEntry(EditorNode editorNode, double scroll) {
+            this.editorNode = editorNode;
+            this.scroll = new SimpleDoubleProperty(scroll);
+        }
+
+        public EditorNode getEditorNode() {
+            return editorNode;
+        }
+
+        public double getScroll() {
+            return scroll.get();
+        }
+
+        public DoubleProperty scrollProperty() {
+            return scroll;
+        }
     }
 }

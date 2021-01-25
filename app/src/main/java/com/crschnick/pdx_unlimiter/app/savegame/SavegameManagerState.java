@@ -35,6 +35,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         globalSelectedCampaign.addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegames().removeListener(cl);
+                SavegameCache.getForSavegame(o).unloadCollectionAsync(o);
             }
 
             if (n != null) {
