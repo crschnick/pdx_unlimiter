@@ -44,8 +44,8 @@ public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
     public boolean isCompressed(Path file) throws IOException {
         var content = Files.readAllBytes(file);
         int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH);
-        boolean compressed = zipContentStart != 1;
-        return false;
+        boolean compressed = zipContentStart != -1;
+        return compressed;
     }
 
     @Override

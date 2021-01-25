@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
+import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameParser;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 
@@ -64,7 +65,15 @@ public abstract class EditTarget {
 
             @Override
             public void visitCk3(Path file) {
-                toReturn[0] = new FileEditTarget(file);
+                try {
+                    if (new Ck3SavegameParser().isCompressed(file)) {
+                        toReturn[0] = new Ck3CompressedEditTarget(file);
+                    } else {
+                        toReturn[0] = new FileEditTarget(file);
+                    }
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
             }
 
             @Override
