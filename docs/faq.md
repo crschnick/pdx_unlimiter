@@ -1,7 +1,8 @@
-### Is this a replacement for the Paradox Launcher / Steam?
+### Is this a replacement for the Paradox Launcher?
 
 No, since it does not provide a user interface for enabling/disabling/installing
 mods or connecting your Paradox account. The primary focus lies on savegame management and editing.
+
 
 ### What games are supported?
 
@@ -13,6 +14,7 @@ mods or connecting your Paradox account. The primary focus lies on savegame mana
 
 Note that only installations using the Paradox Launcher are supported.
 I.e. old game versions do not work.
+
 
 ### Can I use this in combination with other launchers?
 

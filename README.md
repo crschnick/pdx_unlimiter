@@ -1,17 +1,18 @@
-# Pdx-Unlimiter
+![Logo](docs/pdxu.png)
 
 The Pdx-Unlimiter is a tool for various Paradox games that provides a powerful savegame manager that allows
 you to organize, filter, and play all of your savegames with ease.
 Furthermore, it also comes with the ability to convert savegames to a non-ironman version,
-a powerful savegame and game data file editor, savescumming tools, and integrations for various
+a powerful savegame and game data file editor, some savescumming tools, and integrations for various
 other great community-made tools like 
 [Rakaly](https://rakaly.com), [Skanderbeg](https://skanderbeg.pm) and the
 [CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
 Currently, EU4, CK3 and Stellaris are supported.
 
+
 ## Download
 
-### [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi).
+### [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi)
 
 Note that there might be some issues with Windows SmartScreen blocking the installer.
 If you are facing these issues, click on "More info" and then "Run anyway".
@@ -21,14 +22,15 @@ If you are facing these issues, click on "More info" and then "Run anyway".
 Note that the Linux version is relatively new and has only been tested on a few systems.
 Please report any issues that you are having with it.
 
+
 # Features
 
 The main components of the Pdx-Unlimiter are:
-- [Savegame manager](#savegame-management)
-- [savegame reverter](#savegame-reverter-savescumming)
-- [Savegame converter](#savegame-converter)
+- [Savegame manager](#savegame-manager)
+- [Ironman converter](#ironman-converter)
 - [Savegame editor](#savegame-editor)
-- [Integrations for other Paradox tools](#third-party-integration)
+- [Savescumming tools](#savescumming-tools)
+- [Integrations for other Paradox tools](#third-party-tool-integration)
 
 It you want to know how to use a certain feature, you can just
 read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
@@ -57,38 +59,50 @@ It is also checked whether a mod is missing or incompatible with the current ver
 so that nothing can potentially corrupt your savegames.
 
 
-## Savegame converter
-
-Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
-any ironman savegame into a text-based, non-ironman savegame.
-It also provides an easy-to-use interface to convert
-your own ironman savegames into playable non-ironman savegames.
-This is useful if you have ever encountered a situation in which you wanted to
-create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
-
-
 ## Savegame editor
 
 The Pdx-Unlimiter also comes with a savegame editor.
 With this editor you can edit any file that is saved in a Paradox text format.
 This includes EU4 and CK3 non-ironman savegames, all Stellaris savegames, and
-any game data files for mods and other purposes
+any game data files for mods and other purposes.
 
-It is a text-based editor, but has the following
-advantages compared to editing savegames directly with a text-editor:
+The editor supports two different styles of editing savegame files.
+The first one, the more simple version, allows you to edit already existing values for entries.
+It is meant for users that are new to savegame editing, is relatively user-friendly,
+and tries to prevent users from making savegames invalid or corrupt.
 
-- You don't have to deal compressed savegames, the editor does all
+The second editing style, a more advanced version, allows you to use your
+favourite text-editor to completely change the data structure if wanted.
+Even though as an advanced user you already edited Paradox text format files
+with a text editor, using the Pdx-Unlimiter editor has the following advantages:
+
+- You don't have to deal with compressed savegames, the editor does all
   the extracting and repackaging of zipped savegame files for you
   
-- You can still use your favourite text editor to edit parts of the savegame
+- The editing process is broken down into editing smaller parts of the savegame.
+  You can still use your favourite text editor to edit smaller parts of the savegame
+  and therefore don't have to open and edit >50 MB files in your text-editor
 
+- You can easily navigate the hierarchical data with filters compared to the
+  laborious process of locating a specific entry with a text editor search function
 
 ![Editor](docs/editor.png)
 
-Note that you can use the included ironman converter
-to first create a non-ironman savegame and then edit it.
 
-## Savegame reverter ("savescumming")
+## Ironman converter
+
+Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
+any ironman savegame into a text-based, non-ironman savegame.
+It also provides an easy-to-use interface to convert
+your own ironman savegames into playable non-ironman savegames.
+
+This is useful if you have ever encountered a situation in which you wanted to
+create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
+You can for example use the included ironman converter
+to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor).
+
+
+## Savescumming tools
 
 The Pdx-Unlimiter allows you to create a sort of savegame checkpoints
 using keyboard shortcuts while being ingame that you can always revert back to.
@@ -115,12 +129,13 @@ The supported tools are:
   This means that you can interact with the converter from within the Pdx-Unlimiter
   and basically convert any managed savegame with just one click as well.
 
+
 ## Community and Support
 
 If you have suggestions, need help, run into any issues or just want to talk to other friendly people,
-you can join the [Pdx-Unlimiter Discord](https://discord.gg/afErBW9Z).
+you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 You can also help the project by reporting issues, fixing bugs and making the planned issues a reality.
-Contributing guidelines are coming soon. 
+
 
 ## Development
 
