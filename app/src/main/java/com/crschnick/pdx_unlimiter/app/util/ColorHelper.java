@@ -2,17 +2,14 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import javafx.scene.paint.Color;
 
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -86,10 +83,10 @@ public class ColorHelper {
         return map;
     }
 
-    public static Map<String, Color> loadCk3(SavegameEntry<Ck3Tag, Ck3SavegameInfo> e) {
+    public static Map<String, Color> loadCk3(SavegameInfo<Ck3Tag> info) {
         var file = CascadeDirectoryHelper.openFile(
                 Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
-                e,
+                info,
                 GameInstallation.CK3).get();
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
@@ -101,9 +98,9 @@ public class ColorHelper {
         }
     }
 
-    public static Map<String, Color> loadStellarisColors(SavegameEntry<StellarisTag, StellarisSavegameInfo> e) {
+    public static Map<String, Color> loadStellarisColors(SavegameInfo<StellarisTag> info) {
         var file = CascadeDirectoryHelper.openFile(
-                Path.of("flags").resolve("colors.txt"), e, GameInstallation.STELLARIS).get();
+                Path.of("flags").resolve("colors.txt"), info, GameInstallation.STELLARIS).get();
 
         try {
             Node node = TextFormatParser.textFileParser().parse(file);

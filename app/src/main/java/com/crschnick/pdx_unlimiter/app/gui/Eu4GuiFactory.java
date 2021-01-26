@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -59,17 +60,24 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         return box;
     }
 
-    private static String getCountryTooltip(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Set<Eu4Tag> tags) {
+    private static String getCountryTooltip(SavegameInfo<Eu4Tag> info, Set<Eu4Tag> tags) {
         StringBuilder b = new StringBuilder();
         for (Eu4Tag t : tags) {
-            b.append(GameLocalisation.getTagNameForEntry(entry, t));
+            b.append(GameLocalisation.getTagNameForEntry(info, t));
             b.append(", ");
         }
         b.delete(b.length() - 2, b.length());
         return b.toString();
     }
 
-    private void createDiplomacyRow(JFXMasonryPane pane, SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Node icon, Set<Eu4Tag> tags, String tooltipStart, String none, String style) {
+    private void createDiplomacyRow(
+            JFXMasonryPane pane,
+            SavegameInfo<Eu4Tag> info,
+            Node icon,
+            Set<Eu4Tag> tags,
+            String tooltipStart,
+            String none,
+            String style) {
         if (tags.size() == 0) {
             return;
         }
@@ -78,19 +86,19 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.setAlignment(Pos.CENTER);
         box.getChildren().add(icon);
         for (Eu4Tag tag : tags) {
-            Node n = GameImage.imageNode(eu4TagNode(entry, tag), CLASS_TAG_ICON);
+            Node n = GameImage.imageNode(eu4TagNode(info, tag), CLASS_TAG_ICON);
             box.getChildren().add(n);
         }
         box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         box.getStyleClass().add(style);
         box.setSpacing(6);
-        GuiTooltips.install(box, tooltipStart + (tags.size() > 0 ? getCountryTooltip(entry, tags) : none));
+        GuiTooltips.install(box, tooltipStart + (tags.size() > 0 ? getCountryTooltip(info, tags) : none));
         addNode(pane, box);
     }
 
     @Override
-    public Image tagImage(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
-        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
+    public Image tagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), info);
     }
 
     @Override
@@ -117,10 +125,10 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public void fillNodeContainer(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, JFXMasonryPane grid) {
-        Eu4SavegameInfo info = entry.getInfo();
+    public void fillNodeContainer(SavegameInfo<Eu4Tag> i, JFXMasonryPane grid) {
+        Eu4SavegameInfo info = (Eu4SavegameInfo) i;
         if (info.isObserver()) {
-            super.fillNodeContainer(entry, grid);
+            super.fillNodeContainer(i, grid);
             return;
         }
 
@@ -129,28 +137,28 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
             addNode(grid, createRulerLabel(info.getHeir().get(), false));
         }
 
-        if (entry.getInfo().isIronman()) {
+        if (info.isIronman()) {
             var ironman = new StackPane(imageNode(EU4_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
             ironman.setAlignment(Pos.CENTER);
             GuiTooltips.install(ironman, "Ironman savegame");
             addNode(grid, ironman);
         }
 
-        if (entry.getInfo().isRandomNewWorld()) {
+        if (info.isRandomNewWorld()) {
             var rnw = new StackPane(imageNode(EU4_ICON_RANDOM_NEW_WORLD, CLASS_IMAGE_ICON, null));
             rnw.setAlignment(Pos.CENTER);
             GuiTooltips.install(rnw, "Random new world enabled");
             addNode(grid, rnw);
         }
 
-        if (entry.getInfo().isCustomNationInWorld()) {
+        if (info.isCustomNationInWorld()) {
             var cn = new StackPane(imageNode(EU4_ICON_CUSTOM_NATION, CLASS_IMAGE_ICON, null));
             cn.setAlignment(Pos.CENTER);
             GuiTooltips.install(cn, "A custom nation exists in the world");
             addNode(grid, cn);
         }
 
-        if (entry.getInfo().isReleasedVassal()) {
+        if (info.isReleasedVassal()) {
             var rv = new StackPane(imageNode(EU4_ICON_RELEASED_VASSAL, CLASS_IMAGE_ICON, null));
             rv.setAlignment(Pos.CENTER);
             GuiTooltips.install(rv, "Is playing as a released vassal");
@@ -158,40 +166,40 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         }
 
         for (Eu4SavegameInfo.War war : info.getWars()) {
-            createDiplomacyRow(grid, entry, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),
+            createDiplomacyRow(grid, i, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),
                     "Fighting in the " + war.getTitle() + " against ", "", CLASS_WAR);
         }
 
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_ALLIANCE, CLASS_IMAGE_ICON), info.getAllies(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_ALLIANCE, CLASS_IMAGE_ICON), info.getAllies(),
                 "Allies: ", "None", CLASS_ALLIANCE);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_ROYAL_MARRIAGE, CLASS_IMAGE_ICON), info.getMarriages(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_ROYAL_MARRIAGE, CLASS_IMAGE_ICON), info.getMarriages(),
                 "Royal marriages: ", "None", CLASS_MARRIAGE);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_GUARANTEE, CLASS_IMAGE_ICON), info.getGuarantees(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_GUARANTEE, CLASS_IMAGE_ICON), info.getGuarantees(),
                 "Guarantees: ", "None", CLASS_GUARANTEE);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getVassals(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getVassals(),
                 "Vassals: ", "None", CLASS_VASSAL);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getJuniorPartners(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getJuniorPartners(),
                 "Personal union junior partners: ", "none", CLASS_VASSAL);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_TRIBUTARY, CLASS_IMAGE_ICON), info.getTributaryJuniors(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRIBUTARY, CLASS_IMAGE_ICON), info.getTributaryJuniors(),
                 "Tributaries: ", "None", CLASS_VASSAL);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_MARCH, CLASS_IMAGE_ICON), info.getMarches(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_MARCH, CLASS_IMAGE_ICON), info.getMarches(),
                 "Marches: ", "None", CLASS_VASSAL);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_TRUCE, CLASS_IMAGE_ICON),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRUCE, CLASS_IMAGE_ICON),
                 info.getTruces().keySet(), "Truces: ", "None", CLASS_TRUCE);
-        createDiplomacyRow(grid, entry, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON),
                 info.getSeniorPartner().map(Set::of).orElse(Set.of()),
                 "Under personal union with ", "no country", CLASS_VASSAL);
 
-        super.fillNodeContainer(entry, grid);
+        super.fillNodeContainer(i, grid);
     }
 
-    private Image eu4TagNode(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
-        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), entry);
+    private Image eu4TagNode(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), info);
     }
 
-    private Image eu4TagNode(Path path, SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry) {
+    private Image eu4TagNode(Path path, SavegameInfo<Eu4Tag> info) {
         var in = CascadeDirectoryHelper.openFile(
-                path, entry, GameInstallation.EU4);
+                path, info, GameInstallation.EU4);
         return ImageLoader.loadImage(in.orElse(null), null);
     }
 }

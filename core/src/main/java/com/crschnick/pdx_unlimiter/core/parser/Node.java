@@ -141,7 +141,7 @@ public abstract class Node {
             throw new NodeFormatException("Too many entries for key " + key + " for this:\n" + this.toString());
         }
         if (list.size() == 0) {
-            throw new NodeFormatException("Invalid key " + key + " for this:\n" + this.toString());
+            throw new NodeFormatException("Invalid key " + key);
         }
         return list.get(0);
     }

@@ -101,6 +101,9 @@ public class GuiLayout {
     public static void init() {
         Platform.runLater(() -> {
             layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
+
+            // Disable focus on startup
+            layout.requestFocus();
         });
     }
 }

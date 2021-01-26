@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
@@ -8,7 +8,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
-import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.app.util.RakalyWebHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
@@ -162,7 +162,7 @@ public class GuiSavegameEntry {
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
-                RakalyHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
+                RakalyWebHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
             });
             upload.getStyleClass().add(CLASS_UPLOAD);
             GuiTooltips.install(upload, "Upload to Rakaly.com");
@@ -267,7 +267,7 @@ public class GuiSavegameEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(grid);
         if (entry.infoProperty().isNotNull().get()) {
-            SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry, grid);
+            SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry.getInfo(), grid);
         } else {
             stack.getChildren().add(loading);
         }
@@ -280,9 +280,11 @@ public class GuiSavegameEntry {
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
+                var gf = GameIntegration.getForSavegameCache(SavegameCache.getForSavegame(entry));
+                var info = entry.getInfo();
                 Platform.runLater(() -> {
                     loading.setVisible(false);
-                    SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry, grid);
+                    gf.getGuiFactory().fillNodeContainer(info, grid);
                 });
             } else {
                 Platform.runLater(() -> {

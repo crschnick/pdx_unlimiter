@@ -128,4 +128,33 @@ public class GuiErrorReporter {
         return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
                 Optional.ofNullable(textArea.getText()) : Optional.empty();
     }
+
+    public static boolean showRakalyTokenDialog() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        DialogHelper.setIcon(alert);
+
+        alert.getButtonTypes().clear();
+
+        ButtonType ok = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().add(ok);
+
+        ButtonType send = new ButtonType("Send savegame", ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().add(send);
+
+        alert.setTitle("Rakaly reporter");
+        alert.setHeaderText("""
+                During parsing of the ironman savegame, an unknown token has been found.
+
+                To help the developers of Rakaly, the Ironman converter for Paradox games,
+                to improve the quality of converted savegames, you can automatically send them
+                the savegame file to analyze.
+                            """);
+
+        Optional<ButtonType> r = alert.showAndWait();
+        boolean sent = r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
+        if (sent) {
+            DialogHelper.showReportSent();
+        }
+        return sent;
+    }
 }

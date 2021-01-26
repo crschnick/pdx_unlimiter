@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class ErrorHandler {
@@ -16,28 +17,54 @@ public class ErrorHandler {
     private static boolean errorReporterShowing = false;
     private static boolean startupCompleted = false;
 
-    public static void init() {
-        if (!PdxuInstallation.getInstance().isProduction()) {
-            return;
-        }
-
-        LoggerFactory.getLogger(ErrorHandler.class).info("Initializing error handler");
+    private static void setOptions() {
         Sentry.init(sentryOptions -> {
             sentryOptions.setEnvironment("production");
             sentryOptions.setServerName(System.getProperty("os.name"));
             sentryOptions.setRelease(PdxuInstallation.getInstance().getVersion());
             sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262");
         });
+    }
 
-        Sentry.configureScope(scope -> {
-            LogManager.getInstance().getLogFile().ifPresent(l -> {
-                scope.addAttachment(new Attachment(l.toString()));
-            });
-        });
+    public static void init() {
+        if (!PdxuInstallation.getInstance().isProduction()) {
+            return;
+        }
+
+        LoggerFactory.getLogger(ErrorHandler.class).info("Initializing error handler");
+        setOptions();
 
         registerThread(Thread.currentThread());
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
+    }
+
+    private static void rakalyTokenReport(List<String> tokens, Path file) {
+        Sentry.init(sentryOptions -> {
+            sentryOptions.setServerName(System.getProperty("os.name"));
+            sentryOptions.setDsn("https://6b540a8824bc4d3d887061488598700e@o510976.ingest.sentry.io/5607403");
+        });
+
+        Sentry.withScope(scope -> {
+            scope.addAttachment(new Attachment(file.toString()));
+            Sentry.captureMessage("Unknown tokens: " + String.join(", ", tokens));
+        });
+
+        setOptions();
+    }
+
+    public static void reportRakalyTokens(List<String> tokens, Path file) {
+        Runnable run = () -> {
+            var r = GuiErrorReporter.showRakalyTokenDialog();
+            if (r) {
+                rakalyTokenReport(tokens, file);
+            }
+        };
+        if (Platform.isFxApplicationThread()) {
+            run.run();
+        } else {
+            Platform.runLater(run);
+        }
     }
 
     public static void setPlatformInitialized() {
@@ -94,6 +121,9 @@ public class ErrorHandler {
                 errorReporterShowing = true;
                 if (GuiErrorReporter.showException(ex, terminal)) {
                     Sentry.withScope(scope -> {
+                        LogManager.getInstance().getLogFile().ifPresent(l -> {
+                            scope.addAttachment(new Attachment(l.toString()));
+                        });
                         if (attachFile != null) {
                             scope.addAttachment(new Attachment(attachFile.toString()));
                         }
@@ -126,8 +156,14 @@ public class ErrorHandler {
         Runnable run = () -> {
             var r = GuiErrorReporter.showIssueDialog();
             r.ifPresent(msg -> {
-                var id = Sentry.captureMessage("User Issue Report");
-                Sentry.captureUserFeedback(new UserFeedback(id, null, null, msg));
+                Sentry.withScope(scope -> {
+                    LogManager.getInstance().getLogFile().ifPresent(l -> {
+                        scope.addAttachment(new Attachment(l.toString()));
+                    });
+
+                    var id = Sentry.captureMessage("User Issue Report");
+                    Sentry.captureUserFeedback(new UserFeedback(id, null, null, msg));
+                });
             });
         };
         if (Platform.isFxApplicationThread()) {

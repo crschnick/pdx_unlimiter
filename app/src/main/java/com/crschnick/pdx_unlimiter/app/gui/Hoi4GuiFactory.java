@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -58,7 +59,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public Image tagImage(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> entry, Hoi4Tag tag) {
+    public Image tagImage(SavegameInfo<Hoi4Tag> info, Hoi4Tag tag) {
         return null;
     }
 
@@ -72,8 +73,8 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public void fillNodeContainer(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> entry, JFXMasonryPane grid) {
-        super.fillNodeContainer(entry, grid);
+    public void fillNodeContainer(SavegameInfo<Hoi4Tag> info, JFXMasonryPane grid) {
+        super.fillNodeContainer(info, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);

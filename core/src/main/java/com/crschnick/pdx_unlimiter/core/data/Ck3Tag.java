@@ -25,9 +25,14 @@ public class Ck3Tag {
                 .findFirst().get();
     }
 
-    public static Set<Ck3Tag> fromNode(Node living, Node landedTitles, Node coatOfArms) {
+    public static Set<Ck3Tag> fromNode(Node living, Node landedTitles, Node coatOfArms, Node dynasties) {
         var coas = coatOfArms.getNodeForKey("coat_of_arms_manager_database").getNodeArray().stream()
                 .map(CoatOfArms::fromNode)
+                .collect(Collectors.toList());
+
+        var dyns = dynasties.getNodeForKey("dynasty_house").getNodeArray().stream()
+                .map(Dynasty::fromNode)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
         var titles = landedTitles.getNodeForKey("landed_titles").getNodeArray().stream()
@@ -44,7 +49,7 @@ public class Ck3Tag {
                     var tagTitles = domain.getNodeArray().stream()
                             .map(id -> titleIds.get(id.getLong()))
                             .collect(Collectors.toList());
-                    var ruler = Person.fromNode(n);
+                    var ruler = Person.fromNode(n, dyns);
                     return new Ck3Tag(ruler, tagTitles);
                 })
                 .collect(Collectors.toSet());
@@ -64,25 +69,80 @@ public class Ck3Tag {
         return titles.get(0);
     }
 
+    public static class Dynasty {
+        private long id;
+        private String name;
+        private String prefix;
+
+        public Dynasty() {
+        }
+
+        public static Optional<Dynasty> fromNode(Node kv) {
+            var kvn = kv.getKeyValueNode();
+            var n = kvn.getNode();
+
+            Dynasty d = new Dynasty();
+            d.id = Long.parseLong(kvn.getKeyName());
+            if (!n.hasKey("name")) {
+                return Optional.empty();
+            }
+
+            d.name = n.getNodeForKey("name").getString()
+                    .replace("dynn_", "")
+                    .replace("_", " ");
+            d.prefix = n.getNodeForKeyIfExistent("prefix").map(s ->s.getString()
+                    .replace("dynnp_", "")
+                    .replace("_", " ")).orElse(null);
+            return Optional.of(d);
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Optional<String> getPrefix() {
+            return Optional.ofNullable(prefix);
+        }
+    }
+
     public static class Person {
         private long id;
+        private Dynasty dynasty;
         private String firstName;
+        private List<Integer> skills;
 
         public Person() {
         }
 
-        public static Person fromNode(Node kv) {
+        public static Person fromNode(Node kv, List<Dynasty> dynasties) {
             var kvn = kv.getKeyValueNode();
             var n = kvn.getNode();
 
             Person p = new Person();
             p.id = Long.parseLong(kvn.getKeyName());
+            if (n.hasKey("dynasty_house")) {
+                var id = n.getNodeForKey("dynasty_house").getInteger();
+                p.dynasty = dynasties.stream()
+                        .filter(d -> d.id == id)
+                        .findFirst().orElse(null);
+            }
+            p.skills = n.getNodeForKey("skill").getNodeArray().stream()
+                    .map(Node::getInteger)
+                    .collect(Collectors.toList());
             p.firstName = n.getNodeForKey("first_name").getString();
             return p;
         }
 
         public long getId() {
             return id;
+        }
+
+        public Optional<Dynasty> getDynasty() {
+            return Optional.ofNullable(dynasty);
         }
 
         public String getFirstName() {

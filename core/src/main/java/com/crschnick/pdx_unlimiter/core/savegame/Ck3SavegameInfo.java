@@ -34,7 +34,8 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             i.allTags = Ck3Tag.fromNode(
                     n.getNodeForKey("living"),
                     n.getNodeForKey("landed_titles"),
-                    n.getNodeForKey("coat_of_arms"));
+                    n.getNodeForKey("coat_of_arms"),
+                    n.getNodeForKey("dynasties"));
             i.tag = Ck3Tag.getPlayerTag(n, i.allTags);
 
             i.mods = n.getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of())

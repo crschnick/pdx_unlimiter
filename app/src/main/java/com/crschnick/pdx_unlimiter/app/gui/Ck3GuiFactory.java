@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,17 +38,17 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public Image tagImage(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Ck3Tag tag) {
+    public Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
         Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
 
         if (coa.getPatternFile() != null) {
-            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(coa.getColors().get(0), Color.TRANSPARENT)) : 0;
-            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(coa.getColors().get(1), Color.TRANSPARENT)) : 0;
-            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(coa.getColors().get(2), Color.TRANSPARENT)) : 0;
             Function<Integer, Integer> patternFunction = (Integer rgb) -> {
                 if (rgb == 0xFFFF0000) {
@@ -64,7 +65,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             };
             var in = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
-                    entry,
+                    info,
                     GameInstallation.CK3);
             BufferedImage pattern = in.map(stream -> ImageLoader.loadAwtImage(stream, patternFunction)).orElse(null);
             g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE, null);
@@ -72,11 +73,11 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
 
         for (var emblem : coa.getEmblems()) {
-            int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+            int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(emblem.getColors().get(0), Color.TRANSPARENT)) : 0;
-            int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+            int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(emblem.getColors().get(1), Color.TRANSPARENT)) : 0;
-            int eColor3 = emblem.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(entry)
+            int eColor3 = emblem.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(emblem.getColors().get(2), Color.TRANSPARENT)) : 0;
             Function<Integer, Integer> customFilter = (Integer rgb) -> {
                 int alpha = rgb & 0xFF000000;
@@ -97,7 +98,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             var in = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms",
                             (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
-                    entry,
+                    info,
                     GameInstallation.CK3);
             var img = in.map(inputStream -> ImageLoader.loadAwtImage(inputStream, customFilter))
                     .orElse(null);
@@ -140,8 +141,8 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public void fillNodeContainer(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, JFXMasonryPane grid) {
-        super.fillNodeContainer(entry, grid);
+    public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
+        super.fillNodeContainer(info, grid);
         var l = new Label("What info would you like to see in this box? Share your feedback on github!");
         l.setAlignment(Pos.CENTER);
         grid.getChildren().add(l);

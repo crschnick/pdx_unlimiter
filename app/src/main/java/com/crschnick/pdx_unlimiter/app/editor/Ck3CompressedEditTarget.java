@@ -50,12 +50,12 @@ public class Ck3CompressedEditTarget extends EditTarget {
         write(file, nodeMap.get("gamestate"));
     }
 
-    private void write(Path file, Node gamesate) throws IOException {
-        var meta = gamesate.getNodeForKey("meta_data");
+    private void write(Path file, Node gamestate) throws IOException {
+        var meta = gamestate.getNodeForKey("meta_data");
 
         try (var out = Files.newOutputStream(file);
              var zout = new ZipOutputStream(out)) {
-            out.write((header  + "\n").getBytes(StandardCharsets.UTF_8));
+            out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(TextFormatWriter.writeToString(
                     KeyValueNode.create("meta_data", meta), Integer.MAX_VALUE, "\t")
                     .getBytes(StandardCharsets.UTF_8));
@@ -63,7 +63,7 @@ public class Ck3CompressedEditTarget extends EditTarget {
 
             zout.putNextEntry(new ZipEntry("gamestate"));
             zout.write(TextFormatWriter.writeToString(
-                    Node.combine(gamesate, meta),
+                    Node.combine(gamestate, meta),
                     Integer.MAX_VALUE,
                     "\t").getBytes(StandardCharsets.UTF_8));
             zout.closeEntry();

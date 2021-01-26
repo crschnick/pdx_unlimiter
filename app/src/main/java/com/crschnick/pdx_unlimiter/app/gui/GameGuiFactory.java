@@ -65,7 +65,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         alert.setTitle("Incompatible savegame");
 
         StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
-        if (!SavegameActions.isVersionCompatible(entry)) {
+        if (!SavegameActions.isVersionCompatible(entry.getInfo())) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: " + installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: " + entry.getInfo().getVersion().toString());
@@ -107,11 +107,11 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         if (entry.getInfo() == null) {
             prop = new SimpleObjectProperty<>(new Region());
             entry.infoProperty().addListener((c, o, n) -> {
-                prop.set(n != null ? tagNode(entry) : new Region());
+                prop.set(n != null ? tagNode(entry.getInfo()) : new Region());
             });
         } else {
             prop = new SimpleObjectProperty<>(
-                    GameImage.imageNode(tagImage(entry, entry.getInfo().getTag()), CLASS_TAG_ICON));
+                    GameImage.imageNode(tagImage(entry.getInfo(), entry.getInfo().getTag()), CLASS_TAG_ICON));
         }
         return prop;
     }
@@ -125,11 +125,11 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-    public Node tagNode(SavegameEntry<T, I> entry) {
-        return GameImage.imageNode(tagImage(entry, entry.getInfo().getTag()), CLASS_TAG_ICON);
+    public Node tagNode(SavegameInfo<T> info) {
+        return GameImage.imageNode(tagImage(info, info.getTag()), CLASS_TAG_ICON);
     }
 
-    public abstract Image tagImage(SavegameEntry<T, I> entry, T tag);
+    public abstract Image tagImage(SavegameInfo<T> info, T tag);
 
     public abstract Font font() throws IOException;
 
@@ -147,34 +147,34 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-    public void fillNodeContainer(SavegameEntry<T, I> entry, JFXMasonryPane grid) {
+    public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
         Label version;
-        if (SavegameActions.isVersionCompatible(entry)) {
-            version = new Label(entry.getInfo().getVersion().toString());
+        if (SavegameActions.isVersionCompatible(info)) {
+            version = new Label(info.getVersion().toString());
             GuiTooltips.install(version, "Compatible version");
             version.getStyleClass().add(CLASS_COMPATIBLE);
         } else {
-            version = new Label(entry.getInfo().getVersion().toString());
+            version = new Label(info.getVersion().toString());
             GuiTooltips.install(version, "Incompatible savegame version");
             version.getStyleClass().add(CLASS_INCOMPATIBLE);
         }
         version.setAlignment(Pos.CENTER);
         addNode(grid, version);
 
-        if (entry.getInfo().getMods().size() > 0) {
+        if (info.getMods().size() > 0) {
             Label mods = new Label("Mods");
             mods.setGraphic(new FontIcon());
             mods.getStyleClass().add(CLASS_CONTENT);
             GuiTooltips.install(mods,
-                    "Requires the following " + entry.getInfo().getMods().size() + " mods:\n" +
-                            entry.getInfo().getMods().stream()
+                    "Requires the following " + info.getMods().size() + " mods:\n" +
+                            info.getMods().stream()
                                     .map(s -> {
                                         var m = installation.getModForName(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
                                     .collect(Collectors.joining("\n")));
 
-            boolean missing = entry.getInfo().getMods().stream()
+            boolean missing = info.getMods().stream()
                     .map(m -> installation.getModForName(m))
                     .anyMatch(Optional::isEmpty);
             mods.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
@@ -182,19 +182,19 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             addNode(grid, mods);
         }
 
-        if (entry.getInfo().getDlcs().size() > 0) {
+        if (info.getDlcs().size() > 0) {
             Label dlcs = new Label("DLCs");
             dlcs.setGraphic(new FontIcon());
             dlcs.getStyleClass().add(CLASS_CONTENT);
             GuiTooltips.install(dlcs,
-                    "Requires the following " + entry.getInfo().getDlcs().size() + " DLCs:\n" +
-                            entry.getInfo().getDlcs().stream()
+                    "Requires the following " + info.getDlcs().size() + " DLCs:\n" +
+                            info.getDlcs().stream()
                                     .map(s -> {
                                         var m = installation.getDlcForName(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
                                     .collect(Collectors.joining("\n")));
-            boolean missing = entry.getInfo().getDlcs().stream()
+            boolean missing = info.getDlcs().stream()
                     .map(m -> installation.getDlcForName(m))
                     .anyMatch(Optional::isEmpty);
             dlcs.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);

@@ -302,7 +302,7 @@ public abstract class SavegameCache<
                     getDefaultCampaignName(e),
                     campainUuid,
                     e.getDate(),
-                    GameIntegration.getForSavegameCache(this).getGuiFactory().tagImage(e, info.getTag()));
+                    GameIntegration.getForSavegameCache(this).getGuiFactory().tagImage(e.getInfo(), info.getTag()));
             this.collections.add(newCampaign);
         }
 

@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;

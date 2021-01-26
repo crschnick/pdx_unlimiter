@@ -3,16 +3,12 @@ package com.crschnick.pdx_unlimiter.app.util;
 import com.crschnick.pdx_unlimiter.app.game.GameDlc;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameMod;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,45 +18,42 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class CascadeDirectoryHelper {
 
     public static void traverseDirectory(
             Path dir,
-            SavegameEntry<?, ? extends SavegameInfo<?>> entry,
+            SavegameInfo<?> info,
             GameInstallation install,
             Consumer<Path> consumer) {
-        traverseDir(dir, getCascadingDirectories(entry, install), consumer);
+        traverseDir(dir, getCascadingDirectories(info, install), consumer);
     }
 
     public static Optional<Path> openFile(
             Path file,
-            SavegameEntry<?, ? extends SavegameInfo<?>> entry,
+            SavegameInfo<?> info,
             GameInstallation install) {
-        return openFile(file, getCascadingDirectories(entry, install));
+        return openFile(file, getCascadingDirectories(info, install));
     }
 
     private static List<Path> getCascadingDirectories(
-            SavegameEntry<?, ? extends SavegameInfo<?>> entry, GameInstallation install) {
-        boolean loaded = entry != null && entry.getInfo() != null;
+            SavegameInfo<?> info,
+            GameInstallation install) {
         List<Path> dirs = new ArrayList<>();
-        if (loaded) {
-            dirs.addAll(entry.getInfo().getMods().stream()
-                    .map(install::getModForName)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .map(GameMod::getPath)
-                    .collect(Collectors.toList()));
+        dirs.addAll(info.getMods().stream()
+                .map(install::getModForName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(GameMod::getPath)
+                .collect(Collectors.toList()));
 
-            dirs.addAll(entry.getInfo().getDlcs().stream()
-                    .map(install::getDlcForName)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .map(GameDlc::getDataPath)
-                    .collect(Collectors.toList()));
-        }
+        dirs.addAll(info.getDlcs().stream()
+                .map(install::getDlcForName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(GameDlc::getDataPath)
+                .collect(Collectors.toList()));
+
         dirs.add(install.getModBasePath());
         return dirs;
     }

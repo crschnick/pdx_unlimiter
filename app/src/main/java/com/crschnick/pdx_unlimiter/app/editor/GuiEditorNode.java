@@ -9,11 +9,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Optional;
@@ -157,8 +159,10 @@ public class GuiEditorNode {
                 preview.getStyleClass().add("preview");
                 preview.setGraphic(new FontIcon());
                 preview.setOnMouseEntered(e -> {
-                    var tt = TextFormatWriter.writeToString(n.toWritableNode(), 15, "  ");
-                    GuiTooltips.install(preview, tt);
+                    var tt = new Tooltip(
+                            TextFormatWriter.writeToString(n.toWritableNode(), 15, "  "));
+                    tt.setShowDelay(Duration.ZERO);
+                    Tooltip.install(preview, tt);
                 });
                 box.getChildren().add(preview);
             }

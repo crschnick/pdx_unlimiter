@@ -37,10 +37,10 @@ public class SavegameActions {
                 !missingMods && !missingDlc;
     }
 
-    public static boolean isVersionCompatible(SavegameEntry<?, ?> entry) {
+    public static boolean isVersionCompatible(SavegameInfo<?> info) {
         return areCompatible(
                 SavegameManagerState.get().current().getInstallation().getVersion(),
-                entry.getInfo().getVersion());
+                info.getVersion());
     }
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
@@ -77,7 +77,7 @@ public class SavegameActions {
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v);
         var g = gi.orElseThrow(IllegalArgumentException::new);
-        return g.getGuiFactory().tagImage(entry, entry.getInfo().getTag());
+        return g.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
     }
 
     public static void launchCampaignEntry() {

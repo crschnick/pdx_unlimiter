@@ -1,37 +1,30 @@
 package com.crschnick.pdx_unlimiter.app.game;
 
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GameLocalisation {
 
     private static Map<Key, Map<String, String>> LOCALISATIONS = new HashMap<>();
 
-    public static String getTagNameForEntry(SavegameEntry<Eu4Tag, Eu4SavegameInfo> entry, Eu4Tag tag) {
+    public static String getTagNameForEntry(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
         if (tag.isCustom()) {
             return tag.getName();
         }
 
         Key key = new Key(GameInstallation.EU4,
-                entry.getInfo().getMods().stream()
+                info.getMods().stream()
                         .map(m -> GameInstallation.EU4.getModForName(m))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList()),
-                entry.getInfo().getDlcs().stream()
+                info.getDlcs().stream()
                         .map(m -> GameInstallation.EU4.getDlcForName(m))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
@@ -40,7 +33,7 @@ public class GameLocalisation {
         if (!LOCALISATIONS.containsKey(key)) {
             Map<String, String> i18n = new HashMap<>();
 
-            CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), entry, GameInstallation.EU4, file -> {
+            CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), info, GameInstallation.EU4, file -> {
                 if (!LocalisationHelper.isLanguage(file, LocalisationHelper.Language.ENGLISH)) {
                     return;
                 }

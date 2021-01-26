@@ -26,6 +26,7 @@ public class EditorState {
     private EditorFilter filter;
     private ListProperty<EditorNode> content;
     private Consumer<Map<String, Node>> saveFunc;
+
     public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, TextFormatWriter writer, Consumer<Map<String, Node>> saveFunc) {
         this.writer = writer;
         this.parser = parser;

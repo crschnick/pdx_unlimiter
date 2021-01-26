@@ -5,9 +5,10 @@ import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -44,8 +45,7 @@ public class LocalisationHelper {
             ByteOrderMark bom = bin.getBOM();
             String charsetName = bom == null ? "UTF-8" : bom.getCharsetName();
 
-            try(BufferedReader br = new BufferedReader(new InputStreamReader(bin, charsetName) ) )
-            {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(bin, charsetName))) {
                 // Skip lang ID
                 var lang = br.readLine();
 

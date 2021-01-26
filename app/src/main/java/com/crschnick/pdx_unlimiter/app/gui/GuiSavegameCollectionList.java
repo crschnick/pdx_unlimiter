@@ -48,6 +48,14 @@ public class GuiSavegameCollectionList {
             SavegameManagerState.get().current().getSavegameCache().addNewFolder("New Folder");
             e.consume();
         });
+
+        if (SavegameManagerState.get().current() == null) {
+            create.setDisable(true);
+        }
+        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+            create.setDisable(n == null);
+        });
+
         GuiTooltips.install(create, "Create new folder");
         box.getChildren().add(create);
 
