@@ -136,7 +136,7 @@ If you have suggestions, need help, run into any issues or just want to talk to 
 you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 You can also help the project by reporting issues, fixing bugs and making the planned issues a reality.
 
-![Discord Banner](https://discordapp.com/api/guilds/786465137191682088/widget.png?style=banner3)
+![https://discord.gg/bve4vxqfpu](https://discordapp.com/api/guilds/786465137191682088/widget.png?style=banner3)
 
 
 ## Development
