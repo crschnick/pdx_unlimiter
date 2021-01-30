@@ -9,6 +9,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -107,10 +108,19 @@ public class CascadeDirectoryHelper {
         return Optional.empty();
     }
 
+    public static Path pathTransform(FileSystem fs, Path path)
+    {
+        Path ret = fs.getPath(path.isAbsolute() ? fs.getSeparator() : "");
+        for (final Path component: path) {
+            ret = ret.resolve(component.getFileName().toString());
+        }
+        return ret;
+    }
+
     private static Optional<Path> fromZip(Path file, Path zip) {
         try {
             try (var fs = FileSystems.newFileSystem(zip)) {
-                var entry = fs.getRootDirectories().iterator().next().resolve(file);
+                var entry = fs.getRootDirectories().iterator().next().resolve(pathTransform(fs, file));
                 if (Files.exists(entry)) {
                     return Optional.of(entry);
                 }

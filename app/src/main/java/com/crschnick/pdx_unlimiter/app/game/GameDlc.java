@@ -36,8 +36,8 @@ public class GameDlc {
         dlc.expansion = node.getNodeForKeyIfExistent("category")
                 .map(n -> n.getString().equals("expansion"))
                 .orElse(false);
-        dlc.filePath = p.getParent().relativize(filePath);
-        dlc.dataPath = p.getParent().relativize(dataPath);
+        dlc.filePath = filePath;
+        dlc.dataPath = dataPath;
         dlc.name = node.getNodeForKey("name").getString();
         dlc.affectsChecksum = node.getNodeForKey("affects_checksum").getBoolean();
         dlc.affectsCompatability = node.getNodeForKeyIfExistent("affects_compatability")
@@ -60,13 +60,5 @@ public class GameDlc {
 
     public Path getDataPath() {
         return dataPath;
-    }
-
-    public boolean isAffectsChecksum() {
-        return affectsChecksum;
-    }
-
-    public boolean isAffectsCompatability() {
-        return affectsCompatability;
     }
 }

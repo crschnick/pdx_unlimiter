@@ -26,6 +26,12 @@ public class GameImage {
     public static Image CK3_BACKGROUND;
     public static Image CK3_TITLE_MASK;
     public static Image CK3_TITLE_FRAME;
+    public static Image CK3_SKILL_DIPLOMACY;
+    public static Image CK3_SKILL_MARTIAL;
+    public static Image CK3_SKILL_STEWARDSHIP;
+    public static Image CK3_SKILL_INTRIGUE;
+    public static Image CK3_SKILL_LEARNING;
+    public static Image CK3_SKILL_PROWESS;
 
     public static Image STELLARIS_ICON;
     public static Image STELLARIS_ICON_IRONMAN;
@@ -71,7 +77,7 @@ public class GameImage {
         loadCk3Images();
     }
 
-    public static void loadCk3Images() throws IOException {
+    public static void loadCk3Images() {
         if (GameInstallation.CK3 == null) {
             return;
         }
@@ -93,9 +99,16 @@ public class GameImage {
                 GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_86.dds"));
 
+
+        CK3_SKILL_DIPLOMACY = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        VIEWPORTS.put(CK3_SKILL_DIPLOMACY, new Rectangle2D(0, 0, 32, 32));
+
+        CK3_SKILL_MARTIAL = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        VIEWPORTS.put(CK3_SKILL_MARTIAL, new Rectangle2D(32, 0, 32, 32));
+
     }
 
-    public static void loadStellarisImages() throws IOException {
+    public static void loadStellarisImages() {
         if (GameInstallation.STELLARIS == null) {
             return;
         }
@@ -112,7 +125,7 @@ public class GameImage {
 
     }
 
-    public static void loadHoi4Images() throws IOException {
+    public static void loadHoi4Images() {
         if (GameInstallation.HOI4 == null) {
             return;
         }

@@ -151,6 +151,10 @@ public class Ck3Tag {
         public String getFirstName() {
             return firstName;
         }
+
+        public List<Integer> getSkills() {
+            return skills;
+        }
     }
 
     public static class Title {
