@@ -59,7 +59,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public Background createEntryInfoBackground(SavegameEntry<StellarisTag, StellarisSavegameInfo> entry) {
+    public Background createEntryInfoBackground(SavegameInfo<StellarisTag> info) {
         return new Background(new BackgroundFill(
                 Color.GRAY,
                 CornerRadii.EMPTY, Insets.EMPTY));

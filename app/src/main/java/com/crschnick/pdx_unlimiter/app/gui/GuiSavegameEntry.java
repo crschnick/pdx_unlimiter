@@ -41,87 +41,94 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class GuiSavegameEntry {
 
 
-    public static <T, I extends SavegameInfo<T>> Node createCampaignEntryNode(SavegameEntry<T, I> e) {
-        VBox main = new VBox();
-        main.setAlignment(Pos.CENTER);
-        main.setFillWidth(true);
+    public static <T, I extends SavegameInfo<T>> Node createSavegameEntryNode(SavegameEntry<T, I> e) {
+        VBox entryNode = new VBox();
+        {
+            entryNode.setAlignment(Pos.CENTER);
+            entryNode.setFillWidth(true);
+            entryNode.getStyleClass().add(CLASS_ENTRY);
 
-        Label l = new Label(e.getDate().toDisplayString());
-        l.getStyleClass().add(CLASS_DATE);
-
-        JFXTextField name = new JFXTextField();
-        name.getStyleClass().add(CLASS_TEXT_FIELD);
-        name.setAlignment(Pos.CENTER);
-        name.textProperty().bindBidirectional(e.nameProperty());
-
-
-        var tagImage =
-                SavegameManagerState.<T, I>get().current().getGuiFactory().createImage(e);
-        Pane tagPane = new Pane(tagImage.getValue());
-        tagPane.setMaxWidth(80);
-        HBox tagBar = new HBox(tagPane, l);
-        tagBar.getStyleClass().add(CLASS_TAG_BAR);
-        tagImage.addListener((change, o, n) -> {
-            Platform.runLater(() -> {
-                tagPane.getChildren().set(0, n);
+            entryNode.setOnMouseClicked(event -> {
+                if (e.infoProperty().isNotNull().get()) {
+                    SavegameManagerState.<T, I>get().selectEntry(e);
+                }
             });
-        });
 
+            entryNode.setOnDragDetected(me -> {
+                Dragboard db = entryNode.startDragAndDrop(TransferMode.COPY);
+                var sc = SavegameManagerState.<T, I>get().current().getSavegameCache();
+                var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
+                try {
+                    sc.exportSavegame(e, out);
+                } catch (IOException ioException) {
+                    ErrorHandler.handleException(ioException);
+                    me.consume();
+                    return;
+                }
 
-        BorderPane layout = new BorderPane();
-        layout.setLeft(tagBar);
-        layout.setCenter(name);
-
-
-        HBox buttonBar = new HBox();
-        buttonBar.setAlignment(Pos.CENTER);
-        createButtonBar(e, buttonBar);
-        buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
-        layout.setRight(buttonBar);
-
-        tagBar.setAlignment(Pos.CENTER);
-        layout.getStyleClass().add(CLASS_ENTRY_BAR);
-        main.getChildren().add(layout);
-        Node content = createSavegameInfoNode(e);
-
-        ChangeListener<I> lis = (c, o, n) -> {
-            Platform.runLater(() -> {
-                layout.setBackground(n != null ?
-                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e) : null);
+                var cc = new ClipboardContent();
+                cc.putFiles(List.of(out.toFile()));
+                db.setContent(cc);
+                me.consume();
             });
-        };
-        e.infoProperty().addListener(lis);
-        if (e.infoProperty().isNotNull().get()) {
-            layout.setBackground(
-                    SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e));
         }
 
-        main.getChildren().add(content);
-        main.getStyleClass().add(CLASS_ENTRY);
-        main.setOnMouseClicked(event -> {
+
+        BorderPane topBar = new BorderPane();
+        {
+            topBar.getStyleClass().add(CLASS_ENTRY_BAR);
+            ChangeListener<I> lis = (c, o, n) -> {
+                Platform.runLater(() -> {
+                    topBar.setBackground(n != null ?
+                            SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(n) : null);
+                });
+            };
+            e.infoProperty().addListener(lis);
             if (e.infoProperty().isNotNull().get()) {
-                SavegameManagerState.<T, I>get().selectEntry(e);
-            }
-        });
-
-        main.setOnDragDetected(me -> {
-            Dragboard db = main.startDragAndDrop(TransferMode.COPY);
-            var sc = SavegameManagerState.<T, I>get().current().getSavegameCache();
-            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
-            try {
-                sc.exportSavegame(e, out);
-            } catch (IOException ioException) {
-                ErrorHandler.handleException(ioException);
-                me.consume();
-                return;
+                topBar.setBackground(
+                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e.getInfo()));
             }
 
-            var cc = new ClipboardContent();
-            cc.putFiles(List.of(out.toFile()));
-            db.setContent(cc);
-            me.consume();
-        });
-        return main;
+            entryNode.getChildren().add(topBar);
+        }
+
+        {
+            Label l = new Label(e.getDate().toDisplayString());
+            l.getStyleClass().add(CLASS_DATE);
+
+            var tagImage =
+                    SavegameManagerState.<T, I>get().current().getGuiFactory().createImage(e);
+            Pane tagPane = new Pane(tagImage.getValue());
+            tagPane.setMaxWidth(80);
+            HBox tagBar = new HBox(tagPane, l);
+            tagBar.getStyleClass().add(CLASS_TAG_BAR);
+            tagImage.addListener((change, o, n) -> {
+                Platform.runLater(() -> {
+                    tagPane.getChildren().set(0, n);
+                });
+            });
+            tagBar.setAlignment(Pos.CENTER);
+            topBar.setLeft(tagBar);
+        }
+        {
+            JFXTextField name = new JFXTextField();
+            name.getStyleClass().add(CLASS_TEXT_FIELD);
+            name.setAlignment(Pos.CENTER);
+            name.textProperty().bindBidirectional(e.nameProperty());
+            topBar.setCenter(name);
+        }
+        {
+            HBox buttonBar = new HBox();
+            buttonBar.setAlignment(Pos.CENTER);
+            createButtonBar(e, buttonBar);
+            buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
+            topBar.setRight(buttonBar);
+        }
+
+        Node content = createSavegameInfoNode(e);
+        entryNode.getChildren().add(content);
+
+        return entryNode;
     }
 
     private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {

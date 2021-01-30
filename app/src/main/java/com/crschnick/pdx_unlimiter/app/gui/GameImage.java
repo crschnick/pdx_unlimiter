@@ -24,6 +24,8 @@ public class GameImage {
     public static Image CK3_ICON;
     public static Image CK3_ICON_IRONMAN;
     public static Image CK3_BACKGROUND;
+    public static Image CK3_TITLE_MASK;
+    public static Image CK3_TITLE_FRAME;
 
     public static Image STELLARIS_ICON;
     public static Image STELLARIS_ICON_IRONMAN;
@@ -84,6 +86,12 @@ public class GameImage {
 
         CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.CK3.getPath()
                 .resolve("launcher").resolve("assets").resolve("app-background.png"));
+        CK3_TITLE_MASK = ImageLoader.loadImage(
+                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                        .resolve("coat_of_arms").resolve("title_mask.dds"));
+        CK3_TITLE_FRAME = ImageLoader.loadImage(
+                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                        .resolve("coat_of_arms").resolve("title_86.dds"));
 
     }
 

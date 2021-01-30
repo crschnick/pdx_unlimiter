@@ -50,7 +50,7 @@ public class GuiSavegameEntryList {
     public static void createCampaignEntryList(Pane pane) {
         ListView<Node> grid = GuiListView.createViewOfList(
                 SavegameManagerState.get().getShownEntries(),
-                GuiSavegameEntry::createCampaignEntryNode,
+                GuiSavegameEntry::createSavegameEntryNode,
                 SavegameManagerState.get().globalSelectedEntryProperty());
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);

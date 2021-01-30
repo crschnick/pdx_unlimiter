@@ -14,6 +14,12 @@ public abstract class FormatParser {
         return Arrays.equals(first, header);
     }
 
+    public static boolean validateHeader(byte[] header, byte[] content) {
+        byte[] first = new byte[header.length];
+        System.arraycopy(content, 0, first, 0, header.length);
+        return Arrays.equals(first, header);
+    }
+
     public abstract List<Token> tokenize(byte[] data) throws IOException;
 
     public final ArrayNode parse(Path in) throws IOException {

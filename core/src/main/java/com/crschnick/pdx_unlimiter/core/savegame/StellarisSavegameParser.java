@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipFile;
 
-public class StellarisSavegameParser extends SavegameParser<StellarisSavegameInfo> {
+public class StellarisSavegameParser extends SavegameParser {
 
     @Override
     public Status parse(Path input, Melter melter) {

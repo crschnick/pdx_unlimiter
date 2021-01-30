@@ -81,6 +81,18 @@ public class ImageLoader {
         return img;
     }
 
+    static BufferedImage fromFXImage(Image fxImage) {
+        BufferedImage img = new BufferedImage(
+                (int) fxImage.getWidth(), (int) fxImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        for (int x = 0; x < fxImage.getWidth(); x++) {
+            for (int y = 0; y < fxImage.getHeight(); y++) {
+                int rgb = fxImage.getPixelReader().getArgb(x, y);
+                img.setRGB(x, y, rgb);
+            }
+        }
+        return img;
+    }
+
     public static void writePng(Image image, Path out) throws IOException {
         BufferedImage swingImage = new BufferedImage(
                 (int) image.getWidth(),

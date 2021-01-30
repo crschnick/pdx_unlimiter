@@ -52,7 +52,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public Background createEntryInfoBackground(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> entry) {
+    public Background createEntryInfoBackground(SavegameInfo<Hoi4Tag> info) {
         return new Background(new BackgroundFill(
                 ColorHelper.colorFromInt(0, 100),
                 CornerRadii.EMPTY, Insets.EMPTY));

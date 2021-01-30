@@ -7,8 +7,21 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
-public abstract class SavegameParser<I extends SavegameInfo<?>> {
+public abstract class SavegameParser {
+
+    @FunctionalInterface
+    public static interface Melter {
+
+        public static class Result {
+
+            public List<String> unknownTokens;
+            public Path meltedFile;
+        }
+
+        Path melt(Path file) throws IOException;
+    }
 
     public abstract Status parse(Path input, Melter melter);
 
@@ -30,16 +43,12 @@ public abstract class SavegameParser<I extends SavegameInfo<?>> {
         return checksum;
     }
 
-    @FunctionalInterface
-    public static interface Melter {
-        Path melt(Path input) throws IOException;
-    }
-
     public static abstract class Status {
 
-        public void visit(StatusVisitor visitor) {
+        @SuppressWarnings("unchecked")
+        public <I extends SavegameInfo<?>> void visit(StatusVisitor<I> visitor) {
             if (this instanceof Success) {
-                visitor.success((Success) this);
+                visitor.success((Success<I>) this);
             }
             if (this instanceof Error) {
                 visitor.error((Error) this);

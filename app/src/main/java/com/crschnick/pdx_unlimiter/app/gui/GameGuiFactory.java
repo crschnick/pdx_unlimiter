@@ -137,7 +137,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane createIcon();
 
-    public abstract Background createEntryInfoBackground(SavegameEntry<T, I> entry);
+    public abstract Background createEntryInfoBackground(SavegameInfo<T> info);
 
     public ObservableValue<String> createInfoString(SavegameCampaign<T, I> campaign) {
         SimpleStringProperty prop = new SimpleStringProperty(campaign.getDate().toString());

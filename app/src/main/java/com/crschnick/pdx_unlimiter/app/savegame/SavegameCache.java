@@ -52,7 +52,7 @@ public abstract class SavegameCache<
     private String name;
     private GameDateType dateType;
     private Path path;
-    private SavegameParser<I> parser;
+    private SavegameParser parser;
     private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.synchronizedObservableSet(
             FXCollections.observableSet(new HashSet<>()));
 
@@ -60,7 +60,7 @@ public abstract class SavegameCache<
             String name,
             String fileEnding,
             GameDateType dateType,
-            SavegameParser<I> parser,
+            SavegameParser parser,
             Class<I> infoClass) {
         this.name = name;
         this.parser = parser;
@@ -674,7 +674,7 @@ public abstract class SavegameCache<
         return name;
     }
 
-    public SavegameParser<I> getParser() {
+    public SavegameParser getParser() {
         return parser;
     }
 }

@@ -12,12 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipInputStream;
 
-public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
+public class Eu4SavegameParser extends SavegameParser {
 
     private static final GameVersion MIN_VERSION = new GameVersion(1, 28, 0, 0, null);
 
     private static final byte[] EU4_TEXT_HEADER = "EU4txt".getBytes(StandardCharsets.UTF_8);
-    private static final byte[] EU4_BINARY_HEADER = new byte[]{0x45, 0x55, 0x34, 0x62, 0x69, 0x6E};
+    private static final byte[] EU4_BINARY_HEADER = "EU4bin".getBytes(StandardCharsets.UTF_8);
 
     public boolean isCompressed(Path file) throws IOException {
         boolean isZipped = false;
@@ -46,6 +46,7 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
             var fileToParse = input;
             if (isZipped) {
                 if (isBinary(input)) {
+                    var r = melter.melt(input);
                     fileToParse = melter.melt(input);
                     melted = true;
                     isZipped = false;
@@ -77,9 +78,9 @@ public class Eu4SavegameParser extends SavegameParser<Eu4SavegameInfo> {
                     if (!Files.exists(gs)) {
                         return new Invalid("Missing gamestate. This might be a very old savegame, which is not supported");
                     }
-                    var gsIn = Files.newInputStream(gs);
-                    if (FormatParser.validateHeader(EU4_TEXT_HEADER, gsIn)) {
-                        gamestateNode = TextFormatParser.eu4SavegameParser().parse(gsIn.readAllBytes());
+                    var gsContent = Files.readAllBytes(gs);
+                    if (FormatParser.validateHeader(EU4_TEXT_HEADER, gsContent)) {
+                        gamestateNode = TextFormatParser.eu4SavegameParser().parse(gsContent);
                     } else {
                         return new Invalid("Invalid header for gamestate");
                     }

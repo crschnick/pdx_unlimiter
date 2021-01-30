@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
-public class Ck3SavegameParser extends SavegameParser<Ck3SavegameInfo> {
+public class Ck3SavegameParser extends SavegameParser {
 
     private static final int MAX_SEARCH = 100000;
 

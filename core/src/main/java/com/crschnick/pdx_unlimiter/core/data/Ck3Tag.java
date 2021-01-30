@@ -80,6 +80,9 @@ public class Ck3Tag {
         public static Optional<Dynasty> fromNode(Node kv) {
             var kvn = kv.getKeyValueNode();
             var n = kvn.getNode();
+            if (n.isValue() && n.getString().equals("none")) {
+                return Optional.empty();
+            }
 
             Dynasty d = new Dynasty();
             d.id = Long.parseLong(kvn.getKeyName());
