@@ -108,10 +108,14 @@ public class FileWatchManager {
             // Only wait for write access for new files
             if (Files.exists(file) && !Files.isDirectory(file)) {
                 while (true) {
-                    try {
-                        // Wait for file to finish writing
-                        FileLock lock = FileChannel.open(file, StandardOpenOption.READ, StandardOpenOption.WRITE)
-                                .lock(0, Long.MAX_VALUE, false);
+                    // If a temp file was created, it may have already been deleted!
+                    if (!Files.exists(file)) {
+                        break;
+                    }
+
+                    // Wait for file to finish writing
+                    try (FileLock lock = FileChannel.open(file, StandardOpenOption.READ)
+                            .lock(0, Long.MAX_VALUE, true)) {
                         lock.release();
                         break;
                     } catch (Exception e) {
