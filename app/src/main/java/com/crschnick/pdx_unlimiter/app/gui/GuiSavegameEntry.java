@@ -164,7 +164,7 @@ public class GuiSavegameEntry {
             }
         }
 
-        if (SavegameCache.EU4.contains(e)) {
+        if (SavegameCache.EU4 != null && SavegameCache.EU4.contains(e)) {
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
