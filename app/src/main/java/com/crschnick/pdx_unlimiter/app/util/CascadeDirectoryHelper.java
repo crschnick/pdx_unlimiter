@@ -108,8 +108,7 @@ public class CascadeDirectoryHelper {
         return Optional.empty();
     }
 
-    public static Path pathTransform(FileSystem fs, Path path)
-    {
+    private static Path pathTransform(FileSystem fs, Path path) {
         Path ret = fs.getPath(path.isAbsolute() ? fs.getSeparator() : "");
         for (final Path component: path) {
             ret = ret.resolve(component.getFileName().toString());
@@ -128,7 +127,7 @@ public class CascadeDirectoryHelper {
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(CascadeDirectoryHelper.class)
-                    .trace("Exception while loading zip file " + zip.getFileName().toString(), e);
+                    .error("Exception while loading zip file " + zip.getFileName().toString(), e);
         }
         return Optional.empty();
     }

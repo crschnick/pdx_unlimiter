@@ -66,7 +66,7 @@ public abstract class EditTarget {
             @Override
             public void visitCk3(Path file) {
                 try {
-                    if (new Ck3SavegameParser().isCompressed(file)) {
+                    if (Ck3SavegameParser.isCompressed(file)) {
                         toReturn[0] = new Ck3CompressedEditTarget(file);
                     } else {
                         toReturn[0] = new FileEditTarget(file);

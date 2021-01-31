@@ -147,7 +147,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return prop;
     }
 
-    public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
+    protected Label createVersionInfo(SavegameInfo<T> info) {
         Label version;
         if (SavegameActions.isVersionCompatible(info)) {
             version = new Label(info.getVersion().toString());
@@ -158,6 +158,11 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             GuiTooltips.install(version, "Incompatible savegame version");
             version.getStyleClass().add(CLASS_INCOMPATIBLE);
         }
+        return version;
+    }
+
+    public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
+        Label version = createVersionInfo(info);
         version.setAlignment(Pos.CENTER);
         addNode(grid, version);
 

@@ -78,7 +78,7 @@ public class GuiStyle {
 
     public static void addStylesheets(Scene scene) {
         List.of("style.css", "scrollbar.css", "buttons.css",
-                "campaign.css", "status-bar.css", "game-switcher.css", "editor.css").stream()
+                "campaign.css", "status-bar.css", "game-switcher.css", "editor.css", "ck3.css").stream()
                 .map(s -> PdxuApp.class.getResource(s).toExternalForm())
                 .forEach(s -> scene.getStylesheets().add(s));
     }

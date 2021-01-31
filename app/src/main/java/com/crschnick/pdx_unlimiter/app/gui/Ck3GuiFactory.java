@@ -1,10 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
@@ -34,22 +36,39 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         super(GameInstallation.CK3);
     }
 
+    @Override
+    protected Label createVersionInfo(SavegameInfo<Ck3Tag> info) {
+        var l = super.createVersionInfo(info);
+        if (SavegameActions.isVersionCompatible(info)) {
+            l.setText(l.getText() + " " + GameInstallation.CK3.getVersion().getName());
+        }
+        return l;
+    }
+
     private static Region createRulerLabel(Ck3Tag.Person ruler) {
         VBox box = new VBox();
 
         box.alignmentProperty().set(Pos.CENTER);
+        box.getChildren().add(new Label(ruler.getFirstName() + " " + ruler.getDynasty().get().getName()));
+        box.getChildren().add(createRulerStatsNode(ruler));
+        box.getChildren().add(createRulerStatsNode(ruler));
         box.getChildren().add(createRulerStatsNode(ruler));
         box.getStyleClass().add(CLASS_RULER);
-        GuiTooltips.install(box, ruler.getFirstName());
         return box;
     }
 
     private static Region createRulerStatsNode(Ck3Tag.Person ruler) {
-        VBox box = new VBox();
-        box.setAlignment(Pos.CENTER);
-        Label adm = new Label(ruler.getSkills().get(0) + "  ", imageNode(CK3_SKILL_DIPLOMACY, CLASS_POWER_ICON));
-        box.getChildren().add(adm);
-        return box;
+        var imgs = new Image[] {CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
+                CK3_SKILL_INTRIGUE, CK3_SKILL_LEARNING, CK3_SKILL_PROWESS};
+        HBox skills = new HBox();
+        for (int i = 0; i < 6; i++) {
+            VBox box = new VBox();
+            box.setAlignment(Pos.CENTER);
+            box.getChildren().add(imageNode(imgs[i], "skill-icon"));
+            box.getChildren().add(new Label("" + ruler.getSkills().get(i)));
+            skills.getChildren().add(box);
+        }
+        return skills;
     }
 
     @Override
@@ -84,7 +103,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
+        addNode(grid,createRulerLabel(info.getTag().getRuler()) );
         super.fillNodeContainer(info, grid);
-        grid.getChildren().add(createRulerStatsNode(info.getTag().getRuler()));
     }
 }

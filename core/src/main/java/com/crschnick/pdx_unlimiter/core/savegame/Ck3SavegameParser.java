@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.data.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
@@ -15,7 +16,7 @@ public class Ck3SavegameParser extends SavegameParser {
 
     private static final int MAX_SEARCH = 100000;
 
-    private int indexOf(byte[] array, byte[] toFind, int maxSearch) {
+    private static int indexOf(byte[] array, byte[] toFind, int maxSearch) {
         for (int i = 0; i < maxSearch; ++i) {
             boolean found = true;
             for (int j = 0; j < toFind.length; ++j) {
@@ -31,7 +32,7 @@ public class Ck3SavegameParser extends SavegameParser {
         return -1;
     }
 
-    public boolean isBinary(Path input) throws IOException {
+    public static boolean isBinary(Path input) throws IOException {
         var contentString = Files.readString(input);
         var first = contentString.lines().findFirst();
         if (first.isEmpty()) {
@@ -41,7 +42,7 @@ public class Ck3SavegameParser extends SavegameParser {
         return !contentString.startsWith("meta", metaStart);
     }
 
-    public boolean isCompressed(Path file) throws IOException {
+    public static boolean isCompressed(Path file) throws IOException {
         var content = Files.readAllBytes(file);
         int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH);
         boolean compressed = zipContentStart != -1;

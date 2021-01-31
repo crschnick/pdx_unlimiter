@@ -101,10 +101,22 @@ public class GameImage {
 
 
         CK3_SKILL_DIPLOMACY = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
-        VIEWPORTS.put(CK3_SKILL_DIPLOMACY, new Rectangle2D(0, 0, 32, 32));
+        VIEWPORTS.put(CK3_SKILL_DIPLOMACY, new Rectangle2D(0, 0, 60, 60));
 
         CK3_SKILL_MARTIAL = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
-        VIEWPORTS.put(CK3_SKILL_MARTIAL, new Rectangle2D(32, 0, 32, 32));
+        VIEWPORTS.put(CK3_SKILL_MARTIAL, new Rectangle2D(60, 0, 60, 60));
+
+        CK3_SKILL_STEWARDSHIP = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        VIEWPORTS.put(CK3_SKILL_STEWARDSHIP, new Rectangle2D(120, 0, 60, 60));
+
+        CK3_SKILL_INTRIGUE = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        VIEWPORTS.put(CK3_SKILL_INTRIGUE, new Rectangle2D(180, 0, 60, 60));
+
+        CK3_SKILL_LEARNING = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        VIEWPORTS.put(CK3_SKILL_LEARNING, new Rectangle2D(240, 0, 60, 60));
+
+        CK3_SKILL_PROWESS = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        VIEWPORTS.put(CK3_SKILL_PROWESS, new Rectangle2D(300, 0, 60, 60));
 
     }
 
