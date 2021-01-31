@@ -22,6 +22,7 @@ public class PdxuInstallation {
     private boolean developerMode;
     private boolean nativeHookEnabled;
     private boolean image;
+    private boolean disableAllGames;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -86,6 +87,11 @@ public class PdxuInstallation {
                     .map(val -> Path.of(val.toString()))
                     .filter(val -> val.isAbsolute() && Files.exists(val))
                     .ifPresent(path -> INSTANCE.rakalyDir = path);
+
+
+            INSTANCE.disableAllGames = Optional.ofNullable(props.get("disableAllGames"))
+                    .map(val -> Boolean.parseBoolean(val.toString()))
+                    .orElse(false);
         }
 
         INSTANCE.developerMode = Optional.ofNullable(props.get("developerMode"))
@@ -182,5 +188,9 @@ public class PdxuInstallation {
 
     public boolean isImage() {
         return image;
+    }
+
+    public boolean disableAllGames() {
+        return disableAllGames;
     }
 }

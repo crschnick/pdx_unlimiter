@@ -6,7 +6,9 @@ import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.GameImage;
+import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
+import com.crschnick.pdx_unlimiter.app.gui.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
@@ -15,6 +17,7 @@ import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.LoggerFactory;
 
+import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
@@ -26,6 +29,8 @@ public class ComponentManager {
             LogManager.init();
             ErrorHandler.init();
             IntegrityManager.init();
+
+            Settings.init();
 
             LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
@@ -60,18 +65,12 @@ public class ComponentManager {
         TaskExecutor.getInstance().stop(() -> {
             ComponentManager.reset();
             Platform.exit();
-
-            // Explicitly exit, because in case of an OOM error some Thread might always be blocking the exit
-            // Somehow causes weird javafx errors, so its disabled
-            // System.exit(0);
         });
     }
 
     private static void init() {
         LoggerFactory.getLogger(ComponentManager.class).debug("Initializing ...");
         try {
-            Settings.init();
-
             GuiLayout.init();
 
             GameInstallation.init();
@@ -94,6 +93,8 @@ public class ComponentManager {
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }
+
+            SettingsChecker.checkSettings();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }

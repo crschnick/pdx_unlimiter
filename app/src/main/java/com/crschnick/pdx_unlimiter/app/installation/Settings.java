@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.gui.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,9 +39,10 @@ public class Settings {
     private boolean enableAutoUpdate;
 
     public static void init() {
-        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
-        INSTANCE = loadConfig(file);
+        Settings loaded = loadConfig();
+        INSTANCE = loaded.copy();
         INSTANCE.validate();
+        SettingsChecker.onSettingsChange(loaded, INSTANCE);
         try {
             saveConfig();
         } catch (IOException e) {
@@ -56,8 +58,9 @@ public class Settings {
         var oldValue = INSTANCE.getStorageDirectory();
         var oldDir = PdxuInstallation.getInstance().getSavegamesLocation();
 
-        INSTANCE = newS;
+        INSTANCE = newS.copy();
         INSTANCE.validate();
+        SettingsChecker.onSettingsChange(newS, INSTANCE);
 
         var newDir = PdxuInstallation.getInstance().getSavegamesLocation();
         if (!oldDir.equals(newDir)) {
@@ -81,7 +84,8 @@ public class Settings {
         }
     }
 
-    private static Settings loadConfig(Path file) {
+    public static Settings loadConfig() {
+        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
         JsonNode sNode;
         if (Files.exists(file)) {
             JsonNode node = ConfigHelper.readConfig(file);
@@ -91,10 +95,19 @@ public class Settings {
         }
 
         Settings s = new Settings();
-        s.eu4 = GameDirectory.fromNode(sNode.get("eu4"), "Europa Universalis IV");
-        s.hoi4 = GameDirectory.fromNode(sNode.get("hoi4"), "Hearts of Iron IV");
-        s.ck3 = GameDirectory.fromNode(sNode.get("ck3"), "Crusader Kings III");
-        s.stellaris = GameDirectory.fromNode(sNode.get("stellaris"), "Stellaris");
+
+        // Debug functionality
+        if (PdxuInstallation.getInstance().disableAllGames()) {
+            s.eu4 = GameDirectory.ofPath(null);
+            s.hoi4 = GameDirectory.ofPath(null);
+            s.ck3 = GameDirectory.ofPath(null);
+            s.stellaris = GameDirectory.ofPath(null);
+        } else {
+            s.eu4 = GameDirectory.fromNode(sNode.get("eu4"), "Europa Universalis IV");
+            s.hoi4 = GameDirectory.fromNode(sNode.get("hoi4"), "Hearts of Iron IV");
+            s.ck3 = GameDirectory.fromNode(sNode.get("ck3"), "Crusader Kings III");
+            s.stellaris = GameDirectory.fromNode(sNode.get("stellaris"), "Stellaris");
+        }
 
         s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(11);
         s.startSteam = Optional.ofNullable(sNode.get("startSteam")).map(JsonNode::booleanValue).orElse(true);
@@ -274,20 +287,12 @@ public class Settings {
         this.deleteOnImport = deleteOnImport;
     }
 
-    private void showInstallErrorMessage(Exception e, String game) {
-        String msg = e.getMessage() + ".\n\n" + game + " support has been disabled.\n" +
-                "If you believe that your installation is valid, " +
-                "please check in the settings menu whether the installation directory was correctly set.";
-        GuiErrorReporter.showSimpleErrorMessage(
-                "An error occured while loading your " + game + " installation:\n" + msg);
-    }
 
     public void validate() {
         if (eu4.getPath() != null) {
             try {
                 new Eu4Installation(eu4.getPath()).loadData();
             } catch (Exception e) {
-                showInstallErrorMessage(e, "EU4");
                 eu4 = GameDirectory.disabled();
             }
         }
@@ -295,7 +300,6 @@ public class Settings {
             try {
                 new Hoi4Installation(hoi4.getPath()).loadData();
             } catch (Exception e) {
-                showInstallErrorMessage(e, "HOI4");
                 hoi4 = GameDirectory.disabled();
             }
         }
@@ -303,7 +307,6 @@ public class Settings {
             try {
                 new Ck3Installation(ck3.getPath()).loadData();
             } catch (Exception e) {
-                showInstallErrorMessage(e, "CK3");
                 ck3 = GameDirectory.disabled();
             }
         }
@@ -311,26 +314,19 @@ public class Settings {
             try {
                 new StellarisInstallation(stellaris.getPath()).loadData();
             } catch (Exception e) {
-                showInstallErrorMessage(e, "Stellaris");
                 stellaris = GameDirectory.disabled();
             }
         }
 
-        if (eu4.getPath() == null && ck3.getPath() == null && hoi4.getPath() == null && stellaris.getPath() == null) {
-            GuiErrorReporter.showSimpleErrorMessage("""
-                    No supported or compatible Paradox game has been detected.
-                    To fix this, you can set the installation directories of games manually in the settings menu.
-
-                    Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
-                                                """);
-        }
-
         if (ck3toeu4Dir != null) {
             if (!Files.exists(ck3toeu4Dir.resolve("CK3toEU4"))) {
-                GuiErrorReporter.showSimpleErrorMessage("Invalid converter directory");
                 ck3toeu4Dir = null;
             }
         }
+    }
+
+    public boolean hasNoValidInstallation() {
+        return eu4.getPath() == null && ck3.getPath() == null && hoi4.getPath() == null && stellaris.getPath() == null;
     }
 
     public Optional<Path> getCk3toEu4Dir() {

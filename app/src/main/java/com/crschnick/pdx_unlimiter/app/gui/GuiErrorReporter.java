@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,6 +16,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuiErrorReporter {
 
+    public static void showReportSent() {
+        Alert a = DialogHelper.createAlert();
+        a.initModality(Modality.WINDOW_MODAL);
+        a.setAlertType(Alert.AlertType.CONFIRMATION);
+        a.setTitle("Report sent");
+        a.setHeaderText("Your report has been succesfully sent! Thank you");
+        a.show();
+    }
+
     public static boolean showException(Throwable e, boolean terminal) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -22,7 +32,7 @@ public class GuiErrorReporter {
         String stackTrace = sw.toString();
         boolean r = showErrorMessage(e.getMessage(), stackTrace, true, terminal);
         if (r) {
-            DialogHelper.showReportSent();
+            showReportSent();
         }
         return r;
     }
@@ -124,7 +134,7 @@ public class GuiErrorReporter {
         alert.getDialogPane().setContent(dialogPaneContent);
 
         Optional<ButtonType> r = alert.showAndWait();
-        r.ifPresent(b -> DialogHelper.showReportSent());
+        r.ifPresent(b -> showReportSent());
         return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
                 Optional.ofNullable(textArea.getText()) : Optional.empty();
     }
@@ -153,7 +163,7 @@ public class GuiErrorReporter {
         Optional<ButtonType> r = alert.showAndWait();
         boolean sent = r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
         if (sent) {
-            DialogHelper.showReportSent();
+            showReportSent();
         }
         return sent;
     }

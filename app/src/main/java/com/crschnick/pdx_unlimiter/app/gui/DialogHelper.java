@@ -81,15 +81,6 @@ public class DialogHelper {
         }
     }
 
-    public static void showReportSent() {
-        Alert a = createAlert();
-        a.initModality(Modality.WINDOW_MODAL);
-        a.setAlertType(Alert.AlertType.CONFIRMATION);
-        a.setTitle("Report sent");
-        a.setHeaderText("Your report has been succesfully sent! Thank you");
-        a.show();
-    }
-
     public static void showText(String title, String header, String file) {
         String text = null;
         try {
@@ -148,21 +139,6 @@ public class DialogHelper {
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm deletion");
         alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton();
-
-    }
-
-    public static boolean showLowMemoryDialog() {
-        Alert alert = createAlert();
-        alert.setAlertType(Alert.AlertType.WARNING);
-        alert.getButtonTypes().add(ButtonType.CANCEL);
-        alert.setTitle("Low memory warning");
-        alert.setHeaderText(
-                """
-                        It seems like the Pdx-Unlimiter is running low on memory.
-
-                        It is recommended to restart it, to avoid any crashes. If you click on OK, the Pdx-Unlimiter will exit.""");
         Optional<ButtonType> result = alert.showAndWait();
         return result.get().getButtonData().isDefaultButton();
 
