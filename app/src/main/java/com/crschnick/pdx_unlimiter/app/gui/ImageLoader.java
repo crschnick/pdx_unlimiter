@@ -1,7 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,11 @@ public class ImageLoader {
 
     public static Image loadImage(Path p) {
         return loadImage(p, null);
+    }
+
+    public static Image cut(Image img, Rectangle2D r) {
+        PixelReader reader = img.getPixelReader();
+        return new WritableImage(reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());
     }
 
     static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {

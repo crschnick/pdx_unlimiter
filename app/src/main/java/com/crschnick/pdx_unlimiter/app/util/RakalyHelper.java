@@ -27,12 +27,6 @@ public class RakalyHelper {
             throw new IOException(errorMsg);
         }
 
-        if (returnCode == 1) {
-            var tokens = new String(proc.getErrorStream().readAllBytes()).lines()
-                    .collect(Collectors.toList());
-            ErrorHandler.reportRakalyTokens(tokens, file);
-        }
-
         Path temp = FileUtils.getTempDirectory().toPath()
                 .resolve("pdxu").resolve("melted." + FilenameUtils.getExtension(file.toString()));
         FileUtils.forceMkdirParent(temp.toFile());

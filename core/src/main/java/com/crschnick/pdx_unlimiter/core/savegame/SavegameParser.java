@@ -14,12 +14,6 @@ public abstract class SavegameParser {
     @FunctionalInterface
     public static interface Melter {
 
-        public static class Result {
-
-            public List<String> unknownTokens;
-            public Path meltedFile;
-        }
-
         Path melt(Path file) throws IOException;
     }
 

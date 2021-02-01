@@ -45,19 +45,25 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         return l;
     }
 
-    private static Region createRulerLabel(Ck3Tag.Person ruler) {
-        VBox box = new VBox();
-
-        box.alignmentProperty().set(Pos.CENTER);
-        box.getChildren().add(new Label(ruler.getFirstName() + " " + ruler.getDynasty().get().getName()));
-        box.getChildren().add(createRulerStatsNode(ruler));
-        box.getChildren().add(createRulerStatsNode(ruler));
-        box.getChildren().add(createRulerStatsNode(ruler));
-        box.getStyleClass().add(CLASS_RULER);
-        return box;
+    private static Region createRulerLabel(SavegameInfo<Ck3Tag> info, Ck3Tag.Person ruler) {
+        HBox rulerNode = new HBox();
+        {
+            VBox box = new VBox();
+            box.alignmentProperty().set(Pos.CENTER);
+            box.getChildren().add(new Label(ruler.getFirstName() + " " + ruler.getHouse().get().getName()));
+            box.getChildren().add(createRulerStatsNode(info, ruler));
+            box.getStyleClass().add(CLASS_RULER);
+            rulerNode.getChildren().add(box);
+        }
+        {
+            var h = ruler.getHouse().get();
+            var house = GameImage.imageNode(Ck3TagRenderer.tagImage(info, h.getCoatOfArms().get(), Ck3TagRenderer.Type.HOUSE), null);
+            rulerNode.getChildren().add(house);
+        }
+        return rulerNode;
     }
 
-    private static Region createRulerStatsNode(Ck3Tag.Person ruler) {
+    private static Region createRulerStatsNode(SavegameInfo<Ck3Tag> info, Ck3Tag.Person ruler) {
         var imgs = new Image[] {CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
                 CK3_SKILL_INTRIGUE, CK3_SKILL_LEARNING, CK3_SKILL_PROWESS};
         HBox skills = new HBox();
@@ -73,7 +79,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
-        return Ck3TagRenderer.tagImage(info, tag);
+        return Ck3TagRenderer.tagImage(info, tag.getPrimaryTitle().getCoatOfArms(), Ck3TagRenderer.Type.HOUSE);
     }
 
     @Override
@@ -103,7 +109,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
-        addNode(grid,createRulerLabel(info.getTag().getRuler()) );
+        addNode(grid,createRulerLabel(info, info.getTag().getRuler()) );
         super.fillNodeContainer(info, grid);
     }
 }

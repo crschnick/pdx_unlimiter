@@ -24,25 +24,63 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-    public static Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
+    public static enum Type {
+        TITLE,
+        HOUSE,
+        DYNASTY
+    }
+
+    public static Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa, Type type) {
+        BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics coaG = coaImg.getGraphics();
+
+
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
-        Ck3Tag.CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
 
-        pattern(g, coa, info);
+        pattern(coaG, coa, info);
         for (var emblem : coa.getEmblems()) {
-            emblem(g, emblem, info);
+            emblem(coaG, emblem, info);
         }
 
-        applyMask(i, GameImage.CK3_TITLE_MASK);
+        if (type == Type.TITLE) {
+            applyMask(coaImg, GameImage.CK3_TITLE_MASK);
 
-        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
-                -9,
-                -6,
-                i.getWidth() + 17,
-                i.getHeight() + 17,
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+            g.drawImage(coaImg,
+                    20,
+                    20,
+                    i.getWidth() -40,
+                    i.getHeight() -40,
+                    new java.awt.Color(0, 0, 0, 0),
+                    null);
+
+            g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
+                    -9,
+                    -6,
+                    i.getWidth() + 17,
+                    i.getHeight() + 17,
+                    new java.awt.Color(0, 0, 0, 0),
+                    null);
+        }
+        if (type == Type.HOUSE) {
+            applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
+
+            g.drawImage(coaImg,
+                    20,
+                    20,
+                    i.getWidth() -40,
+                    i.getHeight() -40,
+                    new java.awt.Color(0, 0, 0, 0),
+                    null);
+
+            g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_HOUSE_FRAME),
+                    -25,
+                    -15,
+                    i.getWidth() + 33,
+                    i.getHeight() + 30,
+                    new java.awt.Color(0, 0, 0, 0),
+                    null);
+        }
 
         return ImageLoader.toFXImage(i);
     }
@@ -122,11 +160,15 @@ public class Ck3TagRenderer {
                 GameInstallation.CK3);
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
             for (var instance : emblem.getInstances()) {
+                int width = (int) (instance.getScaleX() * IMG_SIZE);
+                int height = (int) (instance.getScaleY() * IMG_SIZE);
+                int startX = (int) ((instance.getX() * IMG_SIZE) - (width / 2.0));
+                int startY = (int) ((instance.getY() * IMG_SIZE) - (height / 2.0));
                 g.drawImage(img,
-                        (int) instance.getX() * IMG_SIZE,
-                        (int) instance.getY() * IMG_SIZE,
-                        (int) instance.getScaleX() * IMG_SIZE,
-                        (int) instance.getScaleY() * IMG_SIZE,
+                        startX,
+                        startY,
+                        width,
+                        height,
                         new java.awt.Color(0, 0, 0, 0),
                         null);
             }

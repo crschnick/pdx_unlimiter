@@ -26,6 +26,8 @@ public class GameImage {
     public static Image CK3_BACKGROUND;
     public static Image CK3_TITLE_MASK;
     public static Image CK3_TITLE_FRAME;
+    public static Image CK3_HOUSE_MASK;
+    public static Image CK3_HOUSE_FRAME;
     public static Image CK3_SKILL_DIPLOMACY;
     public static Image CK3_SKILL_MARTIAL;
     public static Image CK3_SKILL_STEWARDSHIP;
@@ -98,6 +100,15 @@ public class GameImage {
         CK3_TITLE_FRAME = ImageLoader.loadImage(
                 GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_86.dds"));
+
+        CK3_HOUSE_MASK = ImageLoader.loadImage(
+                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                        .resolve("coat_of_arms").resolve("house_mask.dds"));
+        CK3_HOUSE_FRAME = ImageLoader.cut(ImageLoader.loadImage(
+                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                        .resolve("coat_of_arms").resolve("house_115.dds")), new Rectangle2D(150, 0, 150, 150));
+        VIEWPORTS.put(CK3_HOUSE_FRAME, new Rectangle2D(150, 0, 150, 150));
+
 
 
         CK3_SKILL_DIPLOMACY = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
