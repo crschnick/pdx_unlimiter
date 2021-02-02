@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 

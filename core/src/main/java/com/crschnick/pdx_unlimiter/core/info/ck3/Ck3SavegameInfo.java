@@ -1,9 +1,10 @@
-package com.crschnick.pdx_unlimiter.core.savegame;
+package com.crschnick.pdx_unlimiter.core.info.ck3;
 
-import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
 import java.util.List;
 import java.util.Random;

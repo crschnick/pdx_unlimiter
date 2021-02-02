@@ -1,8 +1,9 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
-import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;

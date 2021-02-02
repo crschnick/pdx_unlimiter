@@ -3,7 +3,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +43,10 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
             EU4 = new Eu4Integration();
             ALL.add(EU4);
         }
-//        if (GameInstallation.HOI4 != null) {
-//            HOI4 = new Hoi4Integration();
-//            ALL.add(HOI4);
-//        }
+        if (GameInstallation.HOI4 != null) {
+            HOI4 = new Hoi4Integration();
+            ALL.add(HOI4);
+        }
 
         if (GameInstallation.STELLARIS != null) {
             STELLARIS = new StellarisIntegration();

@@ -1,7 +1,9 @@
-package com.crschnick.pdx_unlimiter.core.savegame;
+package com.crschnick.pdx_unlimiter.core.info.stellaris;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

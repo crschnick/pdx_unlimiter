@@ -1,9 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
-import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.app.installation.IntegrityManager;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameParser;
 
 public class Eu4SavegameCache extends SavegameCache<
@@ -11,7 +12,12 @@ public class Eu4SavegameCache extends SavegameCache<
         Eu4SavegameInfo> {
 
     public Eu4SavegameCache() {
-        super("eu4", "eu4", GameDateType.EU4, new Eu4SavegameParser(), Eu4SavegameInfo.class);
+        super("eu4",
+                "eu4",
+                GameDateType.EU4,
+                new Eu4SavegameParser(),
+                Eu4SavegameInfo.class,
+                IntegrityManager.getInstance().getEu4Checksum());
     }
 
     @Override

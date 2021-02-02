@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.data;
+package com.crschnick.pdx_unlimiter.core.info.hoi4;
 
 import java.util.Objects;
 
@@ -6,6 +6,9 @@ public class Hoi4Tag {
 
     private String tag;
     private String ideology;
+
+    public Hoi4Tag() {
+    }
 
     public Hoi4Tag(String tag, String ideology) {
         this.tag = tag;

@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.data;
+package com.crschnick.pdx_unlimiter.core.info;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonParser;

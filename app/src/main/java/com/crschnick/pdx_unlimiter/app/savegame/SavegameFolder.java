@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 
 import java.time.Instant;
 import java.util.UUID;

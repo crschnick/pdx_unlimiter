@@ -2,14 +2,9 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,16 +14,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.function.Function;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_POWER_ICON;
 
 public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 

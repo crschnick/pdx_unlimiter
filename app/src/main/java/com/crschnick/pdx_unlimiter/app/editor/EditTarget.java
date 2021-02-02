@@ -49,10 +49,9 @@ public abstract class EditTarget {
 
             @Override
             public void visitHoi4(Path file) {
-                toReturn[0] = new CompressedEditTarget(file,
+                toReturn[0] = new FileEditTarget(file,
                         TextFormatParser.hoi4SavegameParser(),
-                        TextFormatWriter.hoi4SavegameWriter(),
-                        Set.of("meta", "gamestate"));
+                        TextFormatWriter.hoi4SavegameWriter());
             }
 
             @Override

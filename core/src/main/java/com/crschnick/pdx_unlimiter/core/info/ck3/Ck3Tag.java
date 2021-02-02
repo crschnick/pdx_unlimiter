@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.data;
+package com.crschnick.pdx_unlimiter.core.info.ck3;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;

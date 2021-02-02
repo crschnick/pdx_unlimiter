@@ -1,9 +1,10 @@
-package com.crschnick.pdx_unlimiter.core.savegame;
+package com.crschnick.pdx_unlimiter.core.info.hoi4;
 
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
-import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
 import java.util.List;
 import java.util.Set;
@@ -17,13 +18,15 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     protected Hoi4Tag tag;
     protected Set<Hoi4Tag> allTags;
 
-    public static Hoi4SavegameInfo fromSavegame(Node n) throws SavegameParseException {
+    public static Hoi4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
         try {
             i.tag = new Hoi4Tag(n.getNodeForKey("player").getString(), n.getNodeForKey("ideology").getString());
             i.date = GameDateType.HOI4.fromString(n.getNodeForKey("date").getString());
             i.campaignUuid = UUID.fromString(n.getNodeForKey("game_unique_id").getString());
             i.campaignHeuristic = i.campaignUuid;
+            i.ironman = melted;
+            i.binary = melted;
 
             i.mods = n.getNodeForKeyIfExistent("mods")
                     .map(Node::getNodeArray).orElse(List.of())

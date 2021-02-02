@@ -1,11 +1,9 @@
-package com.crschnick.pdx_unlimiter.core.savegame;
+package com.crschnick.pdx_unlimiter.core.info.eu4;
 
-import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.core.data.GameDate;
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.*;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeFormatException;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
 import java.util.*;
 import java.util.stream.Collectors;

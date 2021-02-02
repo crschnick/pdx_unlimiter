@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.StellarisGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
 
 public class StellarisIntegration extends GameIntegration<StellarisTag, StellarisSavegameInfo> {

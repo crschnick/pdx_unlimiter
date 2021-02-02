@@ -1,15 +1,21 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.data.StellarisTag;
+import com.crschnick.pdx_unlimiter.app.installation.IntegrityManager;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameParser;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameParser;
 
 public class StellarisSavegameCache extends SavegameCache<
         StellarisTag,
         StellarisSavegameInfo> {
     public StellarisSavegameCache() {
-        super("stellaris", "sav", GameDateType.STELLARIS, new StellarisSavegameParser(), StellarisSavegameInfo.class);
+        super("stellaris",
+                "sav",
+                GameDateType.STELLARIS,
+                new StellarisSavegameParser(),
+                StellarisSavegameInfo.class,
+                IntegrityManager.getInstance().getStellarisChecksum());
     }
 
     @Override

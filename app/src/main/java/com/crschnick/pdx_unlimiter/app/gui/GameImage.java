@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -239,22 +239,11 @@ public class GameImage {
                 GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("app-background.png"));
     }
 
-
-    public static Pane unknownTag() {
-        Label l = new Label("?");
-        l.getStyleClass().add(CLASS_TAG_ICON);
-        l.getStyleClass().add(GuiStyle.CLASS_UNKNOWN_TAG);
-        l.alignmentProperty().set(Pos.CENTER);
-        var sp = new StackPane(l);
-        StackPane.setAlignment(l, Pos.CENTER);
-        return sp;
-    }
-
     public static Path getEu4TagPath(String tag) {
         return Path.of("gfx/flags/" + tag + ".tga");
     }
 
-    private static Path getHoi4TagPath(Hoi4Tag tag) {
+    public static Path getHoi4TagPath(Hoi4Tag tag) {
         return Path.of("gfx/flags/" + tag.getTag() + "_" + tag.getIdeology() + ".tga");
     }
 
@@ -268,7 +257,8 @@ public class GameImage {
         }
 
         ImageView v = new ImageView(i);
-        Pane pane = new Pane(v);
+        StackPane pane = new StackPane(v);
+        pane.setAlignment(Pos.CENTER);
 
         Rectangle2D viewport = VIEWPORTS.get(i);
         if (viewport != null) {

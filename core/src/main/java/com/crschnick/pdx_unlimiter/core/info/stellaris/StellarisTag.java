@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.data;
+package com.crschnick.pdx_unlimiter.core.info.stellaris;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 

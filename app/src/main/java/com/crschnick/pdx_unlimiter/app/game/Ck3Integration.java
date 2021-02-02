@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.game;
 import com.crschnick.pdx_unlimiter.app.gui.Ck3GuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 
 public class Ck3Integration extends GameIntegration<Ck3Tag, Ck3SavegameInfo> {
     @Override

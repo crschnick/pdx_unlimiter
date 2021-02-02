@@ -7,5 +7,9 @@ module com.crschnick.pdx_unlimiter.core {
 
     exports com.crschnick.pdx_unlimiter.core.parser;
     exports com.crschnick.pdx_unlimiter.core.savegame;
-    exports com.crschnick.pdx_unlimiter.core.data;
+    exports com.crschnick.pdx_unlimiter.core.info;
+    exports com.crschnick.pdx_unlimiter.core.info.eu4;
+    exports com.crschnick.pdx_unlimiter.core.info.ck3;
+    exports com.crschnick.pdx_unlimiter.core.info.hoi4;
+    exports com.crschnick.pdx_unlimiter.core.info.stellaris;
 }

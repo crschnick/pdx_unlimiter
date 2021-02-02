@@ -10,11 +10,11 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyWebHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
-import com.crschnick.pdx_unlimiter.core.data.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.data.Eu4Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
 import com.jfoenix.controls.JFXSpinner;
@@ -288,10 +288,9 @@ public class GuiSavegameEntry {
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
                 var gf = GameIntegration.getForSavegameCache(SavegameCache.getForSavegame(entry));
-                var info = entry.getInfo();
                 Platform.runLater(() -> {
                     loading.setVisible(false);
-                    gf.getGuiFactory().fillNodeContainer(info, grid);
+                    gf.getGuiFactory().fillNodeContainer(n, grid);
                 });
             } else {
                 Platform.runLater(() -> {

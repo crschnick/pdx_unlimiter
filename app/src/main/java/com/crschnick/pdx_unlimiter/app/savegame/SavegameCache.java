@@ -10,9 +10,9 @@ import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
-import com.crschnick.pdx_unlimiter.core.data.GameDate;
-import com.crschnick.pdx_unlimiter.core.data.GameDateType;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.GameDate;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,6 +53,7 @@ public abstract class SavegameCache<
     private GameDateType dateType;
     private Path path;
     private SavegameParser parser;
+    private String infoChecksum;
     private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.synchronizedObservableSet(
             FXCollections.observableSet(new HashSet<>()));
 
@@ -61,13 +62,15 @@ public abstract class SavegameCache<
             String fileEnding,
             GameDateType dateType,
             SavegameParser parser,
-            Class<I> infoClass) {
+            Class<I> infoClass,
+            String infoChecksum) {
         this.name = name;
         this.parser = parser;
         this.fileEnding = fileEnding;
         this.dateType = dateType;
         this.path = PdxuInstallation.getInstance().getSavegamesLocation().resolve(name);
         this.infoClass = infoClass;
+        this.infoChecksum = infoChecksum;
     }
 
     public static <T, I extends SavegameInfo<T>> SavegameCache<T, I> getForSavegame(SavegameEntry<T, I> e) {
@@ -537,7 +540,7 @@ public abstract class SavegameCache<
     }
 
     private String getInfoFileName() {
-        return "info_" + IntegrityManager.getInstance().getCoreChecksum() + ".json";
+        return "info_" + infoChecksum + ".json";
     }
 
     public synchronized void meltSavegame(SavegameEntry<T, I> e) {

@@ -1,7 +1,7 @@
-package com.crschnick.pdx_unlimiter.core.savegame;
+package com.crschnick.pdx_unlimiter.core.info;
 
-import com.crschnick.pdx_unlimiter.core.data.GameDate;
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.GameDate;
+import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 
 import java.util.List;
 import java.util.Set;

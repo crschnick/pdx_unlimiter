@@ -1,43 +1,65 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 public class IntegrityManager {
 
     private static final Logger logger = LoggerFactory.getLogger(IntegrityManager.class);
-    private static final String[] DATA_COMPONENTS = new String[]{
-            "Ck3Tag", "Eu4Tag", "GameDate", "GameDateType", "GameVersion", "Hoi4Tag", "StellarisTag"};
-    private static final String[] SAVEGAME_COMPONENTS = new String[]{
-            "Ck3SavegameInfo", "Eu4SavegameInfo", "Hoi4SavegameInfo", "StellarisSavegameInfo", "SavegameInfo"};
     private static IntegrityManager INSTANCE;
-    private String coreChecksum = "none";
+
+    private String eu4Checksum;
+    private String ck3Checksum;
+    private String hoi4Checksum;
+    private String stellarisChecksum;
 
     public static void init() throws Exception {
         INSTANCE = new IntegrityManager();
 
-        MessageDigest d = null;
-        try {
-            d = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("MD5 missing!");
+        Path infoPackage;
+        if (PdxuInstallation.getInstance().isImage()) {
+            infoPackage = FileSystems.getFileSystem(URI.create("jrt:/")).getPath(
+                    "modules",
+                    "com.crschnick.pdx_unlimiter.core",
+                    "com/crschnick/pdx_unlimiter/core/info");
+        } else {
+            var uri = new URI("jar:" + SavegameInfo.class.getProtectionDomain().getCodeSource()
+                    .getLocation().toURI().toString());
+            infoPackage = FileSystems.newFileSystem(uri, Map.of())
+                    .getPath("/com/crschnick/pdx_unlimiter/core/info");
         }
 
-        for (var s : DATA_COMPONENTS) {
-            d.update(GameVersion.class.getResourceAsStream(s + ".class").readAllBytes());
-        }
-        for (var s : SAVEGAME_COMPONENTS) {
-            d.update(SavegameInfo.class.getResourceAsStream(s + ".class").readAllBytes());
-        }
+        INSTANCE.eu4Checksum = calc(infoPackage, "eu4");
+        INSTANCE.ck3Checksum = calc(infoPackage, "ck3");
+        INSTANCE.hoi4Checksum = calc(infoPackage, "hoi4");
+        INSTANCE.stellarisChecksum = calc(infoPackage, "stellaris");
+    }
 
-        INSTANCE.coreChecksum = checksum(d);
-        logger.debug("Core checksum: " + INSTANCE.coreChecksum);
+    private static String calc(Path pack, String game) throws Exception {
+        MessageDigest d = MessageDigest.getInstance("MD5");
+        update(d, pack);
+        update(d, pack.resolve(game));
+        return checksum(d);
+    }
+
+    private static void update(MessageDigest d, Path pack) throws IOException {
+        Files.list(pack).filter(Files::isRegularFile).forEach(p -> {
+            try {
+                d.update(Files.readAllBytes(p));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        });
     }
 
     private static String checksum(MessageDigest d) {
@@ -54,7 +76,19 @@ public class IntegrityManager {
         return INSTANCE;
     }
 
-    public String getCoreChecksum() {
-        return coreChecksum;
+    public String getEu4Checksum() {
+        return eu4Checksum;
+    }
+
+    public String getCk3Checksum() {
+        return ck3Checksum;
+    }
+
+    public String getHoi4Checksum() {
+        return hoi4Checksum;
+    }
+
+    public String getStellarisChecksum() {
+        return stellarisChecksum;
     }
 }

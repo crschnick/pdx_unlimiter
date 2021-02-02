@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
-import com.crschnick.pdx_unlimiter.core.data.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -46,7 +47,6 @@ public class Eu4SavegameParser extends SavegameParser {
             var fileToParse = input;
             if (isZipped) {
                 if (isBinary(input)) {
-                    var r = melter.melt(input);
                     fileToParse = melter.melt(input);
                     melted = true;
                     isZipped = false;
@@ -63,8 +63,8 @@ public class Eu4SavegameParser extends SavegameParser {
                     var content = in.readAllBytes();
                     var node = TextFormatParser.eu4SavegameParser().parse(content);
                     var info = Eu4SavegameInfo.fromSavegame(melted, node);
-                    if (info.version.compareTo(MIN_VERSION) < 0) {
-                        return new Invalid("Savegame version " + info.version + " is not supported");
+                    if (info.getVersion().compareTo(MIN_VERSION) < 0) {
+                        return new Invalid("Savegame version " + info.getVersion() + " is not supported");
                     }
                     return new Success<>(false, checksum, node, info);
                 }
@@ -109,8 +109,8 @@ public class Eu4SavegameParser extends SavegameParser {
 
                     var node = Node.combine(gamestateNode, metaNode, aiNode);
                     var info = Eu4SavegameInfo.fromSavegame(melted, node);
-                    if (info.version.compareTo(MIN_VERSION) < 0) {
-                        return new Invalid("Savegame version " + info.version + " is not supported");
+                    if (info.getVersion().compareTo(MIN_VERSION) < 0) {
+                        return new Invalid("Savegame version " + info.getVersion() + " is not supported");
                     }
                     return new Success<>(true, checksum, node, info);
                 }

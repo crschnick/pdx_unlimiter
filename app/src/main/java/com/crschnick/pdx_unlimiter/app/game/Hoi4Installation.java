@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -62,9 +63,16 @@ public class Hoi4Installation extends GameInstallation {
         JsonNode node = o.readTree(Files.readAllBytes(
                 getPath().resolve("launcher-settings.json")));
         this.userDir = determineUserDirectory(node);
+
         String v = node.required("version").textValue();
-        Matcher m = Pattern.compile("v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)").matcher(v);
+        Matcher m = Pattern.compile("(\\w+)\\s+v(\\d)\\.(\\d+)\\.(\\d+)").matcher(v);
         m.find();
+        this.version = new GameVersion(
+                Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(3)),
+                Integer.parseInt(m.group(4)),
+                0,
+                m.group(1));
 
         String platform = node.required("distPlatform").textValue();
         if (platform.equals("steam") && Settings.getInstance().startSteam()) {

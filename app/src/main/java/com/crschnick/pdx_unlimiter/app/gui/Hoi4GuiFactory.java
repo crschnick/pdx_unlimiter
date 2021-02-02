@@ -2,11 +2,12 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.data.Hoi4Tag;
-import com.crschnick.pdx_unlimiter.core.savegame.Hoi4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
+import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,6 +24,7 @@ import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 
@@ -60,7 +62,13 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Hoi4Tag> info, Hoi4Tag tag) {
-        return null;
+        return hoi4TagNode(GameImage.getHoi4TagPath(tag), info);
+    }
+
+    private Image hoi4TagNode(Path path, SavegameInfo<Hoi4Tag> info) {
+        var in = CascadeDirectoryHelper.openFile(
+                path, info, GameInstallation.HOI4);
+        return ImageLoader.loadImage(in.orElse(null), null);
     }
 
     @Override
@@ -75,8 +83,5 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public void fillNodeContainer(SavegameInfo<Hoi4Tag> info, JFXMasonryPane grid) {
         super.fillNodeContainer(info, grid);
-        var l = new Label("What info would you like to see in this box? Share your feedback on github!");
-        l.setAlignment(Pos.CENTER);
-        grid.getChildren().add(l);
     }
 }
