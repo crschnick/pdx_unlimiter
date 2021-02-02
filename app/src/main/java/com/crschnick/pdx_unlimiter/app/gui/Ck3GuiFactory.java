@@ -47,7 +47,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         }
         {
             var h = ruler.getHouse().get();
-            var house = GameImage.imageNode(Ck3TagRenderer.tagImage(info, h.getCoatOfArms().get(), Ck3TagRenderer.Type.HOUSE), null);
+            var house = GameImage.imageNode(Ck3TagRenderer.tagImage(info, h.getCoatOfArms().get(), Ck3TagRenderer.Type.HOUSE), CLASS_TAG_ICON);
             rulerNode.getChildren().add(house);
         }
         return rulerNode;

@@ -24,23 +24,27 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
         super(lastPlayed, name, campaignId);
         this.date = new SimpleObjectProperty<>(date);
         this.image = new SimpleObjectProperty<>(image);
+    }
 
-        getSavegames().addListener((SetChangeListener<? super SavegameEntry<T, I>>) (change) -> {
-            boolean isNewEntry = change.wasAdded() && change.getElementAdded().infoProperty().isNotNull().get();
-            boolean wasRemoved = change.wasRemoved();
-            if (isNewEntry || wasRemoved) {
-                getSavegames().stream()
-                        .filter(s -> s.infoProperty().isNotNull().get())
-                        .min(Comparator.naturalOrder())
-                        .map(s -> s.getInfo().getDate())
-                        .ifPresent(d -> dateProperty().setValue(d));
+    @Override
+    public void onSavegameLoad(SavegameEntry<T, I> entry) {
+        if (entry == getLatestEntry()) {
+            imageProperty().set(SavegameActions.createImageForEntry(entry));
+        }
+    }
 
-                getSavegames().stream()
-                        .filter(s -> s.infoProperty().isNotNull().get())
-                        .min(Comparator.naturalOrder())
-                        .ifPresent(e -> imageProperty().set(SavegameActions.createImageForEntry(e)));
-            }
-        });
+    @Override
+    public void onSavegamesChange() {
+        getSavegames().stream()
+                .filter(s -> s.infoProperty().isNotNull().get())
+                .min(Comparator.naturalOrder())
+                .map(s -> s.getInfo().getDate())
+                .ifPresent(d -> dateProperty().setValue(d));
+
+        getSavegames().stream()
+                .filter(s -> s.infoProperty().isNotNull().get())
+                .min(Comparator.naturalOrder())
+                .ifPresent(e -> imageProperty().set(SavegameActions.createImageForEntry(e)));
     }
 
     public Image getImage() {

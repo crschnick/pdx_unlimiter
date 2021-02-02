@@ -312,6 +312,7 @@ public abstract class SavegameCache<
         SavegameCollection<T, I> c = this.getSavegameCollection(campainUuid).get();
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
+        c.onSavegamesChange();
 
         SavegameManagerState.<T, I>get().selectEntry(e);
     }
@@ -325,6 +326,7 @@ public abstract class SavegameCache<
                 info.getDate());
         logger.debug("Adding new entry " + e.getName());
         col.getSavegames().add(e);
+        col.onSavegamesChange();
 
         SavegameManagerState.<T, I>get().selectEntry(e);
     }
@@ -371,7 +373,9 @@ public abstract class SavegameCache<
         }
 
         from.getSavegames().remove(entry);
+        from.onSavegamesChange();
         to.getSavegames().add(entry);
+        to.onSavegamesChange();
 
         try {
             FileUtils.deleteDirectory(srcDir);
@@ -408,6 +412,7 @@ public abstract class SavegameCache<
             SavegameManagerState.get().selectEntry(null);
         }
         c.getSavegames().remove(e);
+        c.onSavegamesChange();
         if (c.getSavegames().size() == 0) {
             delete(c);
         }
@@ -450,6 +455,7 @@ public abstract class SavegameCache<
             logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
             try {
                 e.infoProperty().set(JsonHelper.readObject(infoClass, getSavegameInfoFile(e)));
+                getSavegameCollection(e).onSavegameLoad(e);
                 return;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
@@ -463,6 +469,7 @@ public abstract class SavegameCache<
             public void success(SavegameParser.Success<I> s) {
                 logger.debug("Parsing was successful");
                 e.infoProperty().set(s.info);
+                getSavegameCollection(e).onSavegameLoad(e);
 
                 try {
                     // Clear old info files
@@ -570,6 +577,7 @@ public abstract class SavegameCache<
                     try {
                         JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
                         e.infoProperty().set(s.info);
+                        getSavegameCollection(e).onSavegameLoad(e);
                     } catch (IOException ioException) {
                         ErrorHandler.handleException(ioException);
                     }

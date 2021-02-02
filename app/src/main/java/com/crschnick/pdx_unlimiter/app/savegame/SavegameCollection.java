@@ -27,6 +27,10 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
         this.uuid = uuid;
     }
 
+    public void onSavegameLoad(SavegameEntry<T,I> entry) {}
+
+    public void onSavegamesChange() {}
+
     public ObservableSet<SavegameEntry<T, I>> getSavegames() {
         return savegames;
     }
