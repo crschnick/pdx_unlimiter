@@ -1,5 +1,25 @@
 
-.skill-icon {
--fx-min-width: 2em;
--fx-min-height: 2em;
+.ck3 .skill-icon {
+-fx-min-width: 3em;
+-fx-max-width: 3em;
+-fx-min-height: 3em;
+-fx-max-height: 3em;
+}
+
+.ck3 .house-icon {
+-fx-min-width: 6.5em;
+-fx-max-width: 6.5em;
+-fx-min-height: 6.5em;
+-fx-max-height: 6.5em;
+}
+
+.ck3 .ruler-icon {
+-fx-min-width: 2.5em;
+-fx-max-width: 2.5em;
+-fx-min-height: 2.5em;
+-fx-max-height: 2.5em;
+}
+
+.ck3 .ruler-name {
+-fx-font-size: 1.1em;
 }

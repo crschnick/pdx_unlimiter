@@ -36,9 +36,11 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
+    private String styleClass;
     private GameInstallation installation;
 
-    GameGuiFactory(GameInstallation installation) {
+    public GameGuiFactory(String styleClass, GameInstallation installation) {
+        this.styleClass = styleClass;
         this.installation = installation;
     }
 
@@ -162,6 +164,8 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
     public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
+        grid.getStyleClass().add(styleClass);
+
         Label version = createVersionInfo(info);
         version.setAlignment(Pos.CENTER);
         addNode(grid, version);

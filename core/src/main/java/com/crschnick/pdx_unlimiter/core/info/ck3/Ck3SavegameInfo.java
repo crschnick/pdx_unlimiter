@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
+    private String playerName;
+    private String houseName;
     protected Ck3Tag tag;
     protected Set<Ck3Tag> allTags;
 
@@ -44,6 +46,9 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
                     .collect(Collectors.toList());
             i.dlcs = List.of();
 
+            i.playerName = n.getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString();
+            i.houseName = n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString();
+
             Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
             Matcher m = p.matcher(n.getNodeForKey("meta_data").getNodeForKey("version").getString());
             m.matches();
@@ -68,5 +73,13 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     @Override
     public Set<Ck3Tag> getAllTags() {
         return allTags;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public String getHouseName() {
+        return houseName;
     }
 }

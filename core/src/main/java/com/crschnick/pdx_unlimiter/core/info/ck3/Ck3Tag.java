@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.info.ck3;
 
+import com.crschnick.pdx_unlimiter.core.info.GameDate;
+import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 
@@ -10,19 +12,22 @@ public class Ck3Tag {
 
     private Person ruler;
     private List<Title> titles;
+    private List<Title> claims;
 
     public Ck3Tag() {
     }
 
-    public Ck3Tag(Person ruler, List<Title> titles) {
+    public Ck3Tag(Person ruler, List<Title> titles, List<Title> claims) {
         this.ruler = ruler;
         this.titles = titles;
+        this.claims = claims;
     }
 
     public static Ck3Tag getPlayerTag(Node n, Set<Ck3Tag> tags) {
-        return tags.stream().filter(t ->
+        var tag = tags.stream().filter(t ->
                 t.ruler.id == n.getNodeForKey("played_character").getNodeForKey("character").getLong())
                 .findFirst().get();
+        return tag;
     }
 
     public static Set<Ck3Tag> fromNode(Node living, Node landedTitles, Node coatOfArms, Node dynasties) {
@@ -55,8 +60,15 @@ public class Ck3Tag {
                     var tagTitles = domain.getNodeArray().stream()
                             .map(id -> titleIds.get(id.getLong()))
                             .collect(Collectors.toList());
+                    var tagClaims = new ArrayList<Title>();
                     var ruler = Person.fromNode(n, houses);
-                    return new Ck3Tag(ruler, tagTitles);
+                    //var h = n.getKeyValueNode().getNode().getNodeForKey("alive_data").getNodeForKeyIfExistent("heir");
+                    n.getKeyValueNode().getNode().getNodeForKey("alive_data")
+                            .getNodeForKeyIfExistent("claim").ifPresent(claims -> {
+                        tagClaims.addAll(claims.getNodeArray().stream().map(c ->
+                                titleIds.get(c.getNodeForKey("title").getLong())).collect(Collectors.toList()));
+                    });
+                    return new Ck3Tag(ruler, tagTitles, tagClaims);
                 })
                 .collect(Collectors.toSet());
 
@@ -69,6 +81,10 @@ public class Ck3Tag {
 
     public List<Title> getTitles() {
         return titles;
+    }
+
+    public List<Title> getClaims() {
+        return claims;
     }
 
     public Title getPrimaryTitle() {
@@ -218,6 +234,7 @@ public class Ck3Tag {
 
     public static class Person {
         private long id;
+        private GameDate birth;
         private House house;
         private String firstName;
         private List<Integer> skills;
@@ -237,11 +254,16 @@ public class Ck3Tag {
                         .filter(d -> d.id == id)
                         .findFirst().orElse(null);
             }
+            p.birth = GameDateType.CK3.fromString(n.getNodeForKey("birth").getString());
             p.skills = n.getNodeForKey("skill").getNodeArray().stream()
                     .map(Node::getInteger)
                     .collect(Collectors.toList());
             p.firstName = n.getNodeForKey("first_name").getString();
             return p;
+        }
+
+        public GameDate getBirth() {
+            return birth;
         }
 
         public long getId() {

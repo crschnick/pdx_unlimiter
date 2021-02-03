@@ -32,7 +32,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
 
     public Hoi4GuiFactory() {
-        super(GameInstallation.HOI4);
+        super("hoi4", GameInstallation.HOI4);
     }
 
     @Override

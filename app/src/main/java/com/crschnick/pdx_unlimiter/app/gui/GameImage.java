@@ -23,6 +23,10 @@ public class GameImage {
 
     public static Image CK3_ICON;
     public static Image CK3_ICON_IRONMAN;
+    public static Image CK3_ICON_RULER;
+    public static Image CK3_ICON_HEIR;
+    public static Image CK3_ICON_TITLES;
+    public static Image CK3_ICON_CLAIMS;
     public static Image CK3_BACKGROUND;
     public static Image CK3_TITLE_MASK;
     public static Image CK3_TITLE_FRAME;
@@ -70,7 +74,7 @@ public class GameImage {
     public static Image EU4_ICON_MIL;
     public static Image EU4_BACKGROUND;
 
-    private static Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
+    private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
 
     public static void init() throws IOException {
         loadEu4Images();
@@ -129,6 +133,11 @@ public class GameImage {
         CK3_SKILL_PROWESS = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_PROWESS, new Rectangle2D(300, 0, 60, 60));
 
+        CK3_ICON_RULER = ImageLoader.loadImage(i.resolve("flat_icons").resolve("mapmode_kingdom.dds"));
+        CK3_ICON_HEIR = ImageLoader.loadImage(i.resolve("flat_icons").resolve("heir.dds"));
+        CK3_ICON_TITLES = ImageLoader.loadImage(i.resolve("message_feed").resolve("titles.dds"));
+        CK3_ICON_CLAIMS = ImageLoader.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
+
     }
 
     public static void loadStellarisImages() {
@@ -171,7 +180,7 @@ public class GameImage {
 
     }
 
-    public static void loadEu4Images() throws IOException {
+    public static void loadEu4Images() {
         if (GameInstallation.EU4 == null) {
             return;
         }
@@ -289,13 +298,11 @@ public class GameImage {
         }
 
         double imageAspect = i.getWidth() / i.getHeight();
-        ChangeListener<? extends Number> cl = (c, o, n) -> {
-            double w = (double) n;
-            double h = w / imageAspect;
+        ChangeListener<? super Number> cl = (c, o, n) -> {
             double paneAspect = pane.getWidth() / pane.getHeight();
 
-            double relViewportWidth = 0;
-            double relViewportHeight = 0;
+            double relViewportWidth;
+            double relViewportHeight;
 
             // Pane width too big for image
             if (paneAspect > imageAspect) {
@@ -317,8 +324,8 @@ public class GameImage {
                     i.getWidth() * relViewportWidth,
                     i.getHeight() * relViewportHeight));
         };
-        pane.widthProperty().addListener((ChangeListener<? super Number>) cl);
-        pane.heightProperty().addListener((ChangeListener<? super Number>) cl);
+        pane.widthProperty().addListener(cl);
+        pane.heightProperty().addListener(cl);
         return pane;
     }
 }

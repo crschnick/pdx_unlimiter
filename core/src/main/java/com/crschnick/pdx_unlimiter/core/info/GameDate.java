@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.info;
 
+import java.util.stream.IntStream;
+
 public final class GameDate implements Comparable<GameDate> {
 
     private int hour;
@@ -55,5 +57,11 @@ public final class GameDate implements Comparable<GameDate> {
         }
 
         return (int) (type.toHoursSinceBeginning(this) - o.type.toHoursSinceBeginning(o));
+    }
+
+    public static int yearsBetween(GameDate start, GameDate end) {
+        int yearLength = IntStream.range(1, 13).map(start.type::getDaysInMonth).sum();
+        var time = end.toLong() - start.toLong();
+        return (int) (time / 24 / yearLength);
     }
 }

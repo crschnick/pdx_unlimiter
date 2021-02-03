@@ -27,7 +27,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
     public Eu4GuiFactory() {
-        super(GameInstallation.EU4);
+        super("eu4", GameInstallation.EU4);
     }
 
     private static Region createRulerLabel(Eu4SavegameInfo.Ruler ruler, boolean isRuler) {

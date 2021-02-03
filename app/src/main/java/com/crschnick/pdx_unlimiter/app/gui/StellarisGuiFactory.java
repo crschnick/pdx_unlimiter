@@ -32,7 +32,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     private static final int IMG_SIZE = 256;
 
     public StellarisGuiFactory() {
-        super(GameInstallation.STELLARIS);
+        super("stellaris", GameInstallation.STELLARIS);
     }
 
     @Override
