@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -28,10 +29,13 @@ public class GameImage {
     public static Image CK3_ICON_TITLES;
     public static Image CK3_ICON_CLAIMS;
     public static Image CK3_BACKGROUND;
+    public static Image CK3_REALM_MASK;
+    public static Image CK3_REALM_FRAME;
     public static Image CK3_TITLE_MASK;
     public static Image CK3_TITLE_FRAME;
     public static Image CK3_HOUSE_MASK;
     public static Image CK3_HOUSE_FRAME;
+    public static Image CK3_COA_OVERLAY;
     public static Image CK3_SKILL_DIPLOMACY;
     public static Image CK3_SKILL_MARTIAL;
     public static Image CK3_SKILL_STEWARDSHIP;
@@ -138,6 +142,12 @@ public class GameImage {
         CK3_ICON_TITLES = ImageLoader.loadImage(i.resolve("message_feed").resolve("titles.dds"));
         CK3_ICON_CLAIMS = ImageLoader.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
 
+        CK3_REALM_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("_default.dds"));
+        CK3_REALM_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("_default_115.dds"));
+
+        CK3_COA_OVERLAY = ImageLoader.loadImage(
+                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                        .resolve("coat_of_arms").resolve("coa_overlay.dds"));
     }
 
     public static void loadStellarisImages() {

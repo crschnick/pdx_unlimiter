@@ -18,6 +18,22 @@ import java.util.stream.Collectors;
 
 public class ColorHelper {
 
+    public static int getRed(int color) {
+        return (color & 0x00FF0000) >>> 16;
+    }
+
+    public static int getGreen(int color) {
+        return (color & 0x0000FF00) >>> 8;
+    }
+
+    public static int getBlue(int color) {
+        return (color & 0x000000FF);
+    }
+
+    public static int getAlpha(int color) {
+        return (color & 0xFF000000) >>> 24;
+    }
+
     public static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
         return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
     }

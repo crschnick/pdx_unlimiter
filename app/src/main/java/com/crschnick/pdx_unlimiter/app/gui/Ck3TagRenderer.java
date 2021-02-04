@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.function.Function;
 
+import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.*;
+
 public class Ck3TagRenderer {
 
     private static final int IMG_SIZE = 256;
@@ -24,13 +26,7 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-    public static enum Type {
-        TITLE,
-        HOUSE,
-        DYNASTY
-    }
-
-    public static Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa, Type type) {
+    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
 
@@ -43,46 +39,114 @@ public class Ck3TagRenderer {
             emblem(coaG, emblem, info);
         }
 
-        if (type == Type.TITLE) {
-            applyMask(coaImg, GameImage.CK3_TITLE_MASK);
+        g.drawImage(coaImg,
+                0,
+                0,
+                i.getWidth(),
+                i.getHeight(),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
 
-            g.drawImage(coaImg,
-                    20,
-                    20,
-                    i.getWidth() -40,
-                    i.getHeight() -40,
-                    new java.awt.Color(0, 0, 0, 0),
-                    null);
 
-            g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
-                    -9,
-                    -6,
-                    i.getWidth() + 17,
-                    i.getHeight() + 17,
-                    new java.awt.Color(0, 0, 0, 0),
-                    null);
-        }
-        if (type == Type.HOUSE) {
-            applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
+        applyMask(i, GameImage.CK3_REALM_MASK);
+        brighten(i);
 
-            g.drawImage(coaImg,
-                    20,
-                    20,
-                    i.getWidth() -40,
-                    i.getHeight() -40,
-                    new java.awt.Color(0, 0, 0, 0),
-                    null);
 
-            g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_HOUSE_FRAME),
-                    -25,
-                    -15,
-                    i.getWidth() + 33,
-                    i.getHeight() + 30,
-                    new java.awt.Color(0, 0, 0, 0),
-                    null);
-        }
+        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_REALM_FRAME),
+                3,
+                -12,
+                i.getWidth() - 6,
+                i.getHeight() + 24,
+                new java.awt.Color(0, 0, 0, 0),
+                null);
 
         return ImageLoader.toFXImage(i);
+    }
+
+    public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa) {
+        BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics coaG = coaImg.getGraphics();
+
+
+        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = i.getGraphics();
+
+        pattern(coaG, coa, info);
+        for (var emblem : coa.getEmblems()) {
+            emblem(coaG, emblem, info);
+        }
+
+        applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
+
+        g.drawImage(coaImg,
+                20,
+                20,
+                i.getWidth() -40,
+                i.getHeight() -40,
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+
+
+        applyMask(i, GameImage.CK3_COA_OVERLAY);
+        brighten(i);
+
+        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_HOUSE_FRAME),
+                -25,
+                -15,
+                i.getWidth() + 33,
+                i.getHeight() + 30,
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+
+        return ImageLoader.toFXImage(i);
+    }
+
+    public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa) {
+        BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics coaG = coaImg.getGraphics();
+
+
+        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = i.getGraphics();
+
+        pattern(coaG, coa, info);
+        for (var emblem : coa.getEmblems()) {
+            emblem(coaG, emblem, info);
+        }
+
+        applyMask(coaImg, GameImage.CK3_TITLE_MASK);
+
+        g.drawImage(coaImg,
+                20,
+                20,
+                i.getWidth() -40,
+                i.getHeight() -40,
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+
+        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
+                -9,
+                -6,
+                i.getWidth() + 17,
+                i.getHeight() + 17,
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+
+
+        return ImageLoader.toFXImage(i);
+    }
+
+    private static void brighten(BufferedImage awtImage) {
+        for (int x = 0; x < awtImage.getWidth(); x++) {
+            for (int y = 0; y < awtImage.getHeight(); y++) {
+                int argb = awtImage.getRGB(x, y);
+                int color = (getAlpha(argb) << 24) +
+                        (Math.min((int) (1.6 * getRed(argb)), 255) << 16) +
+                        (Math.min((int) (1.6 * getGreen(argb)), 255) << 8)+
+                        (Math.min((int) (1.6 * getBlue(argb)), 255));
+                awtImage.setRGB(x, y, color);
+            }
+        }
     }
 
     private static void applyMask(BufferedImage awtImage, Image mask) {
@@ -90,10 +154,15 @@ public class Ck3TagRenderer {
         double yF = mask.getHeight() / awtImage.getHeight();
         for (int x = 0; x < awtImage.getWidth(); x++) {
             for (int y = 0; y < awtImage.getHeight(); y++) {
-                int rgb = awtImage.getRGB(x, y);
-                int maskAlpha = mask.getPixelReader().getArgb(
-                        (int) Math.floor(xF * x), (int) Math.floor(yF * y)) & 0xFF000000;
-                awtImage.setRGB(x, y, maskAlpha + (rgb & 0x00FFFFFF));
+                int argb = awtImage.getRGB(x, y);
+                int maskArgb = mask.getPixelReader().getArgb(
+                        (int) Math.floor(xF * x), (int) Math.floor(yF * y));
+
+                int color = (((int) ((getAlpha(maskArgb) / 255.0) * getAlpha(argb))) << 24) +
+                            (((int) ((getRed(maskArgb) / 255.0) * getRed(argb))) << 16) +
+                        ( (  (int) ((getGreen(maskArgb) / 255.0) * getGreen(argb))) << 8) +
+                        (((int) ((getBlue(maskArgb) / 255.0) * getBlue(argb))));
+                awtImage.setRGB(x, y, color);
             }
         }
     }

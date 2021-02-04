@@ -52,6 +52,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
             {
                 var topBar = new HBox();
+                topBar.setSpacing(5);
                 topBar.setAlignment(Pos.CENTER);
                 topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
                 var name = new Label(info.getPlayerName() + " of " + info.getTag().getPrimaryTitle().getName());
@@ -71,11 +72,12 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             rulerNode.getChildren().add(box);
         }
         {
-            var h = ruler.getHouse().get();
-            var house = GameImage.imageNode(Ck3TagRenderer.tagImage(info, h.getCoatOfArms().get(),
-                    Ck3TagRenderer.Type.HOUSE), "house-icon");
-            GuiTooltips.install(house, "House " + info.getHouseName());
-            rulerNode.getChildren().add(house);
+            ruler.getHouse().ifPresent(h -> {
+                var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, h.getCoatOfArms().get()),
+                        "house-icon");
+                GuiTooltips.install(house, "House " + info.getHouseName());
+                rulerNode.getChildren().add(house);
+            });
         }
         return rulerNode;
     }
@@ -97,7 +99,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
-        return Ck3TagRenderer.tagImage(info, tag.getPrimaryTitle().getCoatOfArms(), Ck3TagRenderer.Type.HOUSE);
+        return Ck3TagRenderer.realmImage(info, tag.getPrimaryTitle().getCoatOfArms());
     }
 
     @Override
@@ -152,7 +154,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         box.getChildren().add(icon);
         int counter = 0;
         for (Ck3Tag.Title tag : tags) {
-            Node n = GameImage.imageNode(Ck3TagRenderer.tagImage(info, tag.getCoatOfArms(), Ck3TagRenderer.Type.TITLE), CLASS_TAG_ICON);
+            Node n = GameImage.imageNode(Ck3TagRenderer.titleImage(info, tag.getCoatOfArms()), CLASS_TAG_ICON);
             box.getChildren().add(n);
             if (counter > 6) {
                 box.getChildren().add(new Label("..."));
