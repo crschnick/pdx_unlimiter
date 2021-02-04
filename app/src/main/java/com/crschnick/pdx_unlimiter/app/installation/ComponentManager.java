@@ -6,9 +6,7 @@ import com.crschnick.pdx_unlimiter.app.game.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.gui.GameImage;
-import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
-import com.crschnick.pdx_unlimiter.app.gui.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
@@ -17,7 +15,6 @@ import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.LoggerFactory;
 
-import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 

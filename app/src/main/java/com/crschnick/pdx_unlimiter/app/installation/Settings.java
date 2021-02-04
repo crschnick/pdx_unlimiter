@@ -5,7 +5,6 @@ import com.crschnick.pdx_unlimiter.app.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
-import com.crschnick.pdx_unlimiter.app.gui.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;

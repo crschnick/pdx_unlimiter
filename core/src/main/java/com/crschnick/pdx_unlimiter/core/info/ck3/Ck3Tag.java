@@ -129,7 +129,7 @@ public class Ck3Tag {
                 h.name = n.getNodeForKey("name").getString()
                         .replace("dynn_", "")
                         .replace("_", " ");
-                h.prefix = n.getNodeForKeyIfExistent("prefix").map(s ->s.getString()
+                h.prefix = n.getNodeForKeyIfExistent("prefix").map(s -> s.getString()
                         .replace("dynnp_", "")
                         .replace("_", " ")).orElse(null);
             } else {
@@ -198,7 +198,7 @@ public class Ck3Tag {
             d.name = n.getNodeForKey("name").getString()
                     .replace("dynn_", "")
                     .replace("_", " ");
-            d.prefix = n.getNodeForKeyIfExistent("prefix").map(s ->s.getString()
+            d.prefix = n.getNodeForKeyIfExistent("prefix").map(s -> s.getString()
                     .replace("dynnp_", "")
                     .replace("_", " ")).orElse(null);
 

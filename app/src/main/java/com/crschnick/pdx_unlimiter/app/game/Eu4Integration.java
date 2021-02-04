@@ -5,8 +5,8 @@ import com.crschnick.pdx_unlimiter.app.gui.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.Eu4SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 
 public class Eu4Integration extends GameIntegration<Eu4Tag, Eu4SavegameInfo> {
 

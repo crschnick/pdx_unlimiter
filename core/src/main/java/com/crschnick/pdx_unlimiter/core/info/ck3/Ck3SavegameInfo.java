@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 
 public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
-    private String playerName;
-    private String houseName;
     protected Ck3Tag tag;
     protected Set<Ck3Tag> allTags;
+    private String playerName;
+    private String houseName;
 
     public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();

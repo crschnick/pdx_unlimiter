@@ -4,8 +4,8 @@ import com.crschnick.pdx_unlimiter.app.gui.Hoi4GuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.Hoi4SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 
 public class Hoi4Integration extends GameIntegration<Hoi4Tag, Hoi4SavegameInfo> {
     @Override

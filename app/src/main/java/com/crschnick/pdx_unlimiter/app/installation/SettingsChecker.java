@@ -9,9 +9,10 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 
-import java.nio.file.Files;
-
 public class SettingsChecker {
+
+    private static Settings newS;
+    private static Settings newValidatedS;
 
     private static void showInstallErrorMessage(Exception e, String game) {
         String msg = e.getClass().getSimpleName() + ": " + e.getMessage() +
@@ -21,9 +22,6 @@ public class SettingsChecker {
         GuiErrorReporter.showSimpleErrorMessage(
                 "An error occured while loading your " + game + " installation:\n" + msg);
     }
-
-    private static Settings newS;
-    private static Settings newValidatedS;
 
     public static void onSettingsChange(Settings newS, Settings newValidatedS) {
         SettingsChecker.newS = newS;

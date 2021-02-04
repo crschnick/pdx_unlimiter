@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -81,8 +81,8 @@ public class Ck3TagRenderer {
         g.drawImage(coaImg,
                 20,
                 20,
-                i.getWidth() -40,
-                i.getHeight() -40,
+                i.getWidth() - 40,
+                i.getHeight() - 40,
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
@@ -119,8 +119,8 @@ public class Ck3TagRenderer {
         g.drawImage(coaImg,
                 20,
                 20,
-                i.getWidth() -40,
-                i.getHeight() -40,
+                i.getWidth() - 40,
+                i.getHeight() - 40,
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
@@ -142,7 +142,7 @@ public class Ck3TagRenderer {
                 int argb = awtImage.getRGB(x, y);
                 int color = (getAlpha(argb) << 24) +
                         (Math.min((int) (1.6 * getRed(argb)), 255) << 16) +
-                        (Math.min((int) (1.6 * getGreen(argb)), 255) << 8)+
+                        (Math.min((int) (1.6 * getGreen(argb)), 255) << 8) +
                         (Math.min((int) (1.6 * getBlue(argb)), 255));
                 awtImage.setRGB(x, y, color);
             }
@@ -159,8 +159,8 @@ public class Ck3TagRenderer {
                         (int) Math.floor(xF * x), (int) Math.floor(yF * y));
 
                 int color = (((int) ((getAlpha(maskArgb) / 255.0) * getAlpha(argb))) << 24) +
-                            (((int) ((getRed(maskArgb) / 255.0) * getRed(argb))) << 16) +
-                        ( (  (int) ((getGreen(maskArgb) / 255.0) * getGreen(argb))) << 8) +
+                        (((int) ((getRed(maskArgb) / 255.0) * getRed(argb))) << 16) +
+                        (((int) ((getGreen(maskArgb) / 255.0) * getGreen(argb))) << 8) +
                         (((int) ((getBlue(maskArgb) / 255.0) * getBlue(argb))));
                 awtImage.setRGB(x, y, color);
             }
@@ -193,7 +193,7 @@ public class Ck3TagRenderer {
                 int alpha = rgb & 0xFF000000;
                 int color = rgb & 0x00FFFFFF;
                 int colorIndex = pickClosestColor(color, PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
-                int usedColor = new int[] {pColor1, pColor2, pColor3}[colorIndex] & 0x00FFFFFF;
+                int usedColor = new int[]{pColor1, pColor2, pColor3}[colorIndex] & 0x00FFFFFF;
                 return alpha + usedColor;
             };
             var patternFile = CascadeDirectoryHelper.openFile(
@@ -217,7 +217,7 @@ public class Ck3TagRenderer {
             int alpha = rgb & 0xFF000000;
             int color = rgb & 0x00FFFFFF;
             int colorIndex = pickClosestColor(color, EMBLEM_COLOR_1, EMBLEM_COLOR_2, EMBLEM_COLOR_3);
-            int usedColor = new int[] {eColor1, eColor2, eColor3}[colorIndex] & 0x00FFFFFF;
+            int usedColor = new int[]{eColor1, eColor2, eColor3}[colorIndex] & 0x00FFFFFF;
             return alpha + usedColor;
         };
 

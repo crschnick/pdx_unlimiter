@@ -21,6 +21,12 @@ public final class GameDate implements Comparable<GameDate> {
         this.type = type;
     }
 
+    public static int yearsBetween(GameDate start, GameDate end) {
+        int yearLength = IntStream.range(1, 13).map(start.type::getDaysInMonth).sum();
+        var time = end.toLong() - start.toLong();
+        return (int) (time / 24 / yearLength);
+    }
+
     public int getHour() {
         return hour;
     }
@@ -57,11 +63,5 @@ public final class GameDate implements Comparable<GameDate> {
         }
 
         return (int) (type.toHoursSinceBeginning(this) - o.type.toHoursSinceBeginning(o));
-    }
-
-    public static int yearsBetween(GameDate start, GameDate end) {
-        int yearLength = IntStream.range(1, 13).map(start.type::getDaysInMonth).sum();
-        var time = end.toLong() - start.toLong();
-        return (int) (time / 24 / yearLength);
     }
 }

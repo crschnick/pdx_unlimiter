@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.SetChangeListener;
 import javafx.scene.image.Image;
 
 import java.time.Instant;

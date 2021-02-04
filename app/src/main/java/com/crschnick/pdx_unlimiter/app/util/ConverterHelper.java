@@ -7,8 +7,8 @@ import com.crschnick.pdx_unlimiter.app.installation.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import javafx.application.Platform;
 import org.apache.commons.lang3.SystemUtils;
 
