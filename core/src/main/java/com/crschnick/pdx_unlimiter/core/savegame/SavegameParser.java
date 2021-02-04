@@ -11,12 +11,6 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class SavegameParser {
 
-    @FunctionalInterface
-    public static interface Melter {
-
-        Path melt(Path file) throws IOException;
-    }
-
     public abstract Status parse(Path input, Melter melter);
 
     public String checksum(byte[] content) {
@@ -35,6 +29,12 @@ public abstract class SavegameParser {
         }
         String checksum = c.toString();
         return checksum;
+    }
+
+    @FunctionalInterface
+    public static interface Melter {
+
+        Path melt(Path file) throws IOException;
     }
 
     public static abstract class Status {

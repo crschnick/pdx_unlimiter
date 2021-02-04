@@ -7,10 +7,9 @@ mods or connecting your Paradox account. The primary focus lies on savegame mana
 ### What games are supported?
 
 - EU4: Full support
-- HOI4: Currently not, since we use [Rakaly](https://github.com/rakaly)
-  and it does not support hoi4 savegames (yet)
+- CK3: Full support
+- HOI4: Yes, but currently lacking a savegame information display like for EU4
 - Stellaris: Yes, but no mod integration since Stellaris savegames do not store mod information
-- CK3: Yes, but currently lacking a savegame information display like for EU4
 
 Note that only installations using the Paradox Launcher are supported.
 I.e. old game versions do not work.

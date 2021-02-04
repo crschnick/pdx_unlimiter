@@ -5,23 +5,20 @@ import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
-
 public class GameImage {
 
+    private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     public static Image CK3_ICON;
     public static Image CK3_ICON_IRONMAN;
     public static Image CK3_ICON_RULER;
@@ -42,11 +39,9 @@ public class GameImage {
     public static Image CK3_SKILL_INTRIGUE;
     public static Image CK3_SKILL_LEARNING;
     public static Image CK3_SKILL_PROWESS;
-
     public static Image STELLARIS_ICON;
     public static Image STELLARIS_ICON_IRONMAN;
     public static Image STELLARIS_BACKGROUND;
-
     public static Image HOI4_ICON;
     public static Image HOI4_ICON_IRONMAN;
     public static Image HOI4_ICON_VERSION_WARNING;
@@ -56,7 +51,6 @@ public class GameImage {
     public static Image HOI4_ICON_DIFF_ELITE;
     public static Image HOI4_ICON_DIFF_CIVILIAN;
     public static Image HOI4_BACKGROUND;
-
     public static Image EU4_ICON;
     public static Image EU4_ICON_VASSAL;
     public static Image EU4_ICON_ALLIANCE;
@@ -77,8 +71,6 @@ public class GameImage {
     public static Image EU4_ICON_DIP;
     public static Image EU4_ICON_MIL;
     public static Image EU4_BACKGROUND;
-
-    private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
 
     public static void init() throws IOException {
         loadEu4Images();
@@ -116,7 +108,6 @@ public class GameImage {
                 GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("house_115.dds")), new Rectangle2D(150, 0, 150, 150));
         VIEWPORTS.put(CK3_HOUSE_FRAME, new Rectangle2D(150, 0, 150, 150));
-
 
 
         CK3_SKILL_DIPLOMACY = ImageLoader.loadImage(i.resolve("icon_skills.dds"));

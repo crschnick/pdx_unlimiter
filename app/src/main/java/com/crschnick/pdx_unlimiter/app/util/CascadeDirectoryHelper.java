@@ -110,7 +110,7 @@ public class CascadeDirectoryHelper {
 
     private static Path pathTransform(FileSystem fs, Path path) {
         Path ret = fs.getPath(path.isAbsolute() ? fs.getSeparator() : "");
-        for (final Path component: path) {
+        for (final Path component : path) {
             ret = ret.resolve(component.getFileName().toString());
         }
         return ret;

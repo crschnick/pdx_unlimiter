@@ -1,8 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.info;
 
-import com.crschnick.pdx_unlimiter.core.info.GameDate;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;

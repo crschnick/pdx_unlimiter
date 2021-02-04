@@ -1,13 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,7 +19,6 @@ import javafx.scene.text.Font;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Set;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -30,15 +27,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     public Ck3GuiFactory() {
         super("ck3", GameInstallation.CK3);
-    }
-
-    @Override
-    protected Label createVersionInfo(SavegameInfo<Ck3Tag> info) {
-        var l = super.createVersionInfo(info);
-        if (SavegameActions.isVersionCompatible(info)) {
-            l.setText(l.getText() + " " + GameInstallation.CK3.getVersion().getName());
-        }
-        return l;
     }
 
     private static Region createRulerLabel(Ck3SavegameInfo info, Ck3Tag.Person ruler) {
@@ -83,7 +71,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     private static Region createRulerStatsNode(SavegameInfo<Ck3Tag> info, Ck3Tag.Person ruler) {
-        var imgs = new Image[] {CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
+        var imgs = new Image[]{CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
                 CK3_SKILL_INTRIGUE, CK3_SKILL_LEARNING, CK3_SKILL_PROWESS};
         HBox skills = new HBox();
         skills.setAlignment(Pos.CENTER);
@@ -95,6 +83,15 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             skills.getChildren().add(box);
         }
         return skills;
+    }
+
+    @Override
+    protected Label createVersionInfo(SavegameInfo<Ck3Tag> info) {
+        var l = super.createVersionInfo(info);
+        if (SavegameActions.isVersionCompatible(info)) {
+            l.setText(l.getText() + " " + GameInstallation.CK3.getVersion().getName());
+        }
+        return l;
     }
 
     @Override
@@ -171,7 +168,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
-        addNode(grid,createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
+        addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
         createDiplomacyRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
                 info.getTag().getTitles(), "Titles: ", "No titles", "title-row");
         createDiplomacyRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),

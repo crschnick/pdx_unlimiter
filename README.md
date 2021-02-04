@@ -7,8 +7,12 @@ a powerful savegame and game data file editor, some savescumming tools, and inte
 other great community-made tools like 
 [Rakaly](https://rakaly.com), [Skanderbeg](https://skanderbeg.pm) and the
 [CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
-Currently, EU4, CK3 and Stellaris are supported.
+Currently, the following games are supported:
 
+- Europa Universalis IV
+- Crusader Kings III
+- Hearts of Iron IV
+- Stellaris
 
 ## Download
 
@@ -18,9 +22,6 @@ Note that there might be some issues with Windows SmartScreen blocking the insta
 If you are facing these issues, click on "More info" and then "Run anyway".
 
 ### [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
-
-Note that the Linux version is relatively new and has only been tested on a few systems.
-Please report any issues that you are having with it.
 
 
 # Features
@@ -93,8 +94,9 @@ with a text editor, using the Pdx-Unlimiter editor has the following advantages:
 
 Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
 any ironman savegame into a text-based, non-ironman savegame.
-It also provides an easy-to-use interface to convert
-your own ironman savegames into playable non-ironman savegames.
+It also provides an easy-to-use frontend for the Rakaly converter,
+i.e. a graphical user interface to convert your own
+ironman savegames into playable and editable non-ironman savegames.
 
 This is useful if you have ever encountered a situation in which you wanted to
 create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
