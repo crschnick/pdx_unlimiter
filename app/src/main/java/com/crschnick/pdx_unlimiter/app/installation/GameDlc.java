@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.install;
+package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;

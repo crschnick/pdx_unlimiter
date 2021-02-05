@@ -1,10 +1,10 @@
-package com.crschnick.pdx_unlimiter.app.install.game;
+package com.crschnick.pdx_unlimiter.app.installation.game;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.Settings;
-import com.crschnick.pdx_unlimiter.app.install.DistributionType;
-import com.crschnick.pdx_unlimiter.app.install.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.install.GameMod;
+import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.fasterxml.jackson.databind.JsonNode;

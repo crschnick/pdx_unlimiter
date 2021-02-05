@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.install.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.core.SavedState;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;

@@ -1,10 +1,10 @@
-package com.crschnick.pdx_unlimiter.app.install;
+package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
-import com.crschnick.pdx_unlimiter.app.install.game.Ck3Integration;
-import com.crschnick.pdx_unlimiter.app.install.game.Eu4Integration;
-import com.crschnick.pdx_unlimiter.app.install.game.Hoi4Integration;
-import com.crschnick.pdx_unlimiter.app.install.game.StellarisIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Integration;
+import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Integration;
+import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Integration;
+import com.crschnick.pdx_unlimiter.app.installation.game.StellarisIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;

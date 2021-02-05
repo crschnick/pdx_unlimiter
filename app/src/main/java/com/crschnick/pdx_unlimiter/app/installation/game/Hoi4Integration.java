@@ -1,8 +1,8 @@
-package com.crschnick.pdx_unlimiter.app.install.game;
+package com.crschnick.pdx_unlimiter.app.installation.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.game.Hoi4GuiFactory;
-import com.crschnick.pdx_unlimiter.app.install.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.install.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Hoi4SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;

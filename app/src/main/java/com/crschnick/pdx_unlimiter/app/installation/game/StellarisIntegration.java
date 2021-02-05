@@ -1,9 +1,9 @@
-package com.crschnick.pdx_unlimiter.app.install.game;
+package com.crschnick.pdx_unlimiter.app.installation.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.game.StellarisGuiFactory;
-import com.crschnick.pdx_unlimiter.app.install.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.install.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
