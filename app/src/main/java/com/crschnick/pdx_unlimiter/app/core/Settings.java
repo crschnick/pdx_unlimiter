@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.install.game.Ck3Installation;
-import com.crschnick.pdx_unlimiter.app.install.game.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.install.game.Hoi4Installation;
-import com.crschnick.pdx_unlimiter.app.install.game.StellarisInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
+import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
+import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
+import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
