@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;

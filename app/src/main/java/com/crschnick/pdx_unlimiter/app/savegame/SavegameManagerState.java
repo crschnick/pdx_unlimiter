@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.SavedState;
+import com.crschnick.pdx_unlimiter.app.install.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.core.SavedState;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,7 +35,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         globalSelectedCampaign.addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegames().removeListener(cl);
-                SavegameCache.getForSavegame(o).unloadCollectionAsync(o);
+                SavegameStorage.getForSavegame(o).unloadCollectionAsync(o);
             }
 
             if (n != null) {

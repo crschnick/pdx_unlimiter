@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.gui.GuiErrorReporter;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Optional;
 
-import static com.crschnick.pdx_unlimiter.app.gui.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public class RakalyWebHelper {
 
@@ -50,7 +50,7 @@ public class RakalyWebHelper {
         alert.showAndWait();
     }
 
-    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameCache<T, I> cache, SavegameEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameStorage<T, I> cache, SavegameEntry<T, I> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
             showUsageDialog();
             return;
@@ -114,7 +114,7 @@ public class RakalyWebHelper {
 
     }
 
-    public static <T, I extends SavegameInfo<T>> void analyzeEntry(SavegameCache<T, I> cache, SavegameEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void analyzeEntry(SavegameStorage<T, I> cache, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             try {
                 ThreadHelper.browse("https://rakaly.com/eu4/analyze");

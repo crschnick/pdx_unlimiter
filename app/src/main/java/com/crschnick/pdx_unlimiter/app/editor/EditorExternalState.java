@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.FileWatchManager;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
 import org.apache.commons.io.FileUtils;

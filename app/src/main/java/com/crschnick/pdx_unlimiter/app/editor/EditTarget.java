@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;

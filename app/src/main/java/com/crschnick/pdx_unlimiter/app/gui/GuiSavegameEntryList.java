@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;

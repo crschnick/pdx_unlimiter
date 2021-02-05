@@ -88,6 +88,11 @@ public class TextFormatWriter {
             }
         }
 
+        if (n instanceof ColorNode) {
+            ColorNode cn = (ColorNode) n;
+            sb.append(cn.getColorName() + "={" + "");
+        }
+
         return true;
     }
 

@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
-import com.crschnick.pdx_unlimiter.app.gui.GuiImporter;
-import com.crschnick.pdx_unlimiter.app.installation.*;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
+import com.crschnick.pdx_unlimiter.app.core.*;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;

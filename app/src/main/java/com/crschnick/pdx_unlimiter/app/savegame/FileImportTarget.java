@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.install.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public abstract class FileImportTarget {
 
     public static List<FileImportTarget> createTargets(String toImport) {
-        if (SavegameCache.EU4 != null && toImport.startsWith("pdxu")) {
+        if (SavegameStorage.EU4 != null && toImport.startsWith("pdxu")) {
             try {
                 URL url = new URL(toImport.replace("pdxu", "https"));
                 String id = Path.of(url.getPath()).getFileName().toString();
@@ -41,25 +41,25 @@ public abstract class FileImportTarget {
             RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
                 @Override
                 public void visitEu4(Path file) {
-                    if (SavegameCache.EU4 == null) {
+                    if (SavegameStorage.EU4 == null) {
                         return;
                     }
 
-                    targets.add(new StandardImportTarget(SavegameCache.EU4, file));
+                    targets.add(new StandardImportTarget(SavegameStorage.EU4, file));
                 }
 
                 @Override
                 public void visitHoi4(Path file) {
-                    if (SavegameCache.HOI4 == null) {
+                    if (SavegameStorage.HOI4 == null) {
                         return;
                     }
 
-                    targets.add(new StandardImportTarget(SavegameCache.HOI4, file));
+                    targets.add(new StandardImportTarget(SavegameStorage.HOI4, file));
                 }
 
                 @Override
                 public void visitStellaris(Path file) {
-                    if (SavegameCache.STELLARIS == null) {
+                    if (SavegameStorage.STELLARIS == null) {
                         return;
                     }
 
@@ -72,11 +72,11 @@ public abstract class FileImportTarget {
 
                 @Override
                 public void visitCk3(Path file) {
-                    if (SavegameCache.CK3 == null) {
+                    if (SavegameStorage.CK3 == null) {
                         return;
                     }
 
-                    targets.add(new StandardImportTarget(SavegameCache.CK3, file));
+                    targets.add(new StandardImportTarget(SavegameStorage.CK3, file));
                 }
 
                 @Override
@@ -133,7 +133,7 @@ public abstract class FileImportTarget {
                     FileUtils.forceMkdirParent(downloadedFile.toFile());
                     Files.write(downloadedFile, data);
 
-                    onFinish.accept(SavegameCache.EU4.importSavegame(downloadedFile, null, true, null));
+                    onFinish.accept(SavegameStorage.EU4.importSavegame(downloadedFile, null, true, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -174,16 +174,16 @@ public abstract class FileImportTarget {
     public static class StandardImportTarget extends FileImportTarget {
 
         protected Path path;
-        private SavegameCache<?, ?> savegameCache;
+        private SavegameStorage<?, ?> savegameStorage;
 
-        public StandardImportTarget(SavegameCache<?, ?> savegameCache, Path path) {
-            this.savegameCache = savegameCache;
+        public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
+            this.savegameStorage = savegameStorage;
             this.path = path;
         }
 
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
-                onFinish.accept(savegameCache.importSavegame(path, null, true, null));
+                onFinish.accept(savegameStorage.importSavegame(path, null, true, null));
 
                 // Wait for other threads to catch up again-
                 // Without this, ui is very laggy
@@ -229,7 +229,7 @@ public abstract class FileImportTarget {
     public static final class StellarisNormalImportTarget extends StandardImportTarget {
 
         public StellarisNormalImportTarget(Path path) {
-            super(SavegameCache.STELLARIS, path);
+            super(SavegameStorage.STELLARIS, path);
         }
 
         @Override
@@ -241,7 +241,7 @@ public abstract class FileImportTarget {
     public static final class StellarisIronmanImportTarget extends StandardImportTarget {
 
         public StellarisIronmanImportTarget(Path path) {
-            super(SavegameCache.STELLARIS, path);
+            super(SavegameStorage.STELLARIS, path);
         }
 
         @Override

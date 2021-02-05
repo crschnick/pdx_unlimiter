@@ -1,11 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.gui.GuiConverterConfig;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.Settings;
-import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.install.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiConverterConfig;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
@@ -60,7 +60,7 @@ public class ConverterHelper {
             writeLine(writer, "CK3directory", GameInstallation.CK3.getPath().toString());
             writeLine(writer, "EU4directory", GameInstallation.EU4.getPath().toString());
             writeLine(writer, "targetGameModPath", GameInstallation.EU4.getUserPath().resolve("mod").toString());
-            writeLine(writer, "SaveGame", SavegameCache.CK3.getSavegameFile(entry).toString());
+            writeLine(writer, "SaveGame", SavegameStorage.CK3.getSavegameFile(entry).toString());
             for (var e : values.entrySet()) {
                 writeLine(writer, e.getKey(), e.getValue());
             }

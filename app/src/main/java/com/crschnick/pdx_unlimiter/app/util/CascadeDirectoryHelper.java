@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.game.GameDlc;
-import com.crschnick.pdx_unlimiter.app.game.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.game.GameMod;
+import com.crschnick.pdx_unlimiter.app.install.GameDlc;
+import com.crschnick.pdx_unlimiter.app.install.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.install.GameMod;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;

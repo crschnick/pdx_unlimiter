@@ -3,10 +3,10 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.gui.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.install.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -153,10 +153,10 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            var in = SavegameCache.getForSavegame(e).getSavegameFile(e);
+            var in = SavegameStorage.getForSavegame(e).getSavegameFile(e);
             var target = EditTarget.create(in);
             target.ifPresent(t -> {
-                var storageTarget = new StorageEditTarget<>(SavegameCache.getForSavegame(e), e, t);
+                var storageTarget = new StorageEditTarget<>(SavegameStorage.getForSavegame(e), e, t);
                 Editor.createNewEditor(storageTarget);
             });
         }, true, true);
@@ -164,7 +164,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            var sgs = SavegameCache.getForSavegame(e);
+            var sgs = SavegameStorage.getForSavegame(e);
             var in = sgs.getSavegameFile(e);
             sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
         }, true, true);

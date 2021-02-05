@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;

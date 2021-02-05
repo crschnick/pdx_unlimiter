@@ -1,8 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCacheIO;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
@@ -45,7 +46,7 @@ public class GuiMenuBar {
                             " You can only export the storage into an empty directory");
                     return;
                 }
-                SavegameCacheIO.exportSavegameCaches(p);
+                SavegameStorageIO.exportSavegameStorage(p);
             });
         });
         savegames.getItems().add(menuItem2);

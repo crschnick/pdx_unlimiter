@@ -39,11 +39,28 @@ public abstract class FormatParser {
         return (ArrayNode) node.getKey();
     }
 
+    private boolean isColorName(String v) {
+        return v.equals("rgb") || v.equals("hsv") || v.equals("hsv360");
+    }
+
     private Map.Entry<Node, Integer> createNode(List<Token> tokens, int index) {
         if (tokens.get(index).getType() == TokenType.VALUE) {
-            var valToken = ((ValueToken) tokens.get(index));
-            String obj = valToken.value;
-            return new AbstractMap.SimpleEntry<>(new ValueNode(valToken.quoted, obj), index + 1);
+            var vt = ((ValueToken) tokens.get(index));
+            String obj = vt.value;
+
+            boolean isColor = !vt.quoted && isColorName(vt.value);
+            if (isColor) {
+                int r = Integer.parseInt(((ValueToken) tokens.get(index + 2)).value);
+                int g = Integer.parseInt(((ValueToken) tokens.get(index + 3)).value);
+                int b = Integer.parseInt(((ValueToken) tokens.get(index + 4)).value);
+                return new AbstractMap.SimpleEntry<>(new ColorNode(vt.value, new int[] {r, g, b}), index + 6);
+            } else {
+                return new AbstractMap.SimpleEntry<>(new ValueNode(vt.quoted, obj), index + 1);
+            }
+        }
+
+        if (tokens.get(index).getType() == TokenType.EQUALS) {
+            throw new IllegalStateException("Encountered unexpected =");
         }
 
         List<Node> childs = new ArrayList<>();
@@ -57,12 +74,16 @@ public abstract class FormatParser {
                 return new AbstractMap.SimpleEntry<>(new ArrayNode(childs), currentIndex + 1);
             }
 
-            //Special case for missing "="
-            boolean isKeyValueWithoutEquals = tokens.get(currentIndex).getType() == TokenType.VALUE
-                    && ((ValueToken) tokens.get(currentIndex)).value instanceof String
-                    && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP;
-            if (isKeyValueWithoutEquals) {
-                tokens.add(currentIndex + 1, new EqualsToken());
+            if (tokens.get(currentIndex).getType() == TokenType.VALUE) {
+                var vt = ((ValueToken) tokens.get(currentIndex));
+
+                //Special case for missing "="
+                boolean isKeyValueWithoutEquals = !vt.quoted
+                        && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP
+                        && vt.value.matches("\\w+");
+                if (isKeyValueWithoutEquals) {
+                    tokens.add(currentIndex + 1, new EqualsToken());
+                }
             }
 
             boolean isKeyValue = tokens.get(currentIndex + 1).getType() == TokenType.EQUALS;
@@ -89,11 +110,11 @@ public abstract class FormatParser {
         EQUALS
     }
 
-    public abstract class Token {
+    public  static abstract class Token {
         abstract TokenType getType();
     }
 
-    public class ValueToken extends Token {
+    public static class ValueToken extends Token {
 
         boolean quoted;
         String value;
@@ -109,7 +130,7 @@ public abstract class FormatParser {
         }
     }
 
-    public class EqualsToken extends Token {
+    public static class EqualsToken extends Token {
 
         @Override
         TokenType getType() {
@@ -117,7 +138,7 @@ public abstract class FormatParser {
         }
     }
 
-    public class OpenGroupToken extends Token {
+    public static class OpenGroupToken extends Token {
 
         @Override
         TokenType getType() {
@@ -125,7 +146,7 @@ public abstract class FormatParser {
         }
     }
 
-    public class CloseGroupToken extends Token {
+    public static class CloseGroupToken extends Token {
 
         @Override
         TokenType getType() {

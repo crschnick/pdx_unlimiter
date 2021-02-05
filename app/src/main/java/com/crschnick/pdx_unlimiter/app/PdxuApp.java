@@ -2,10 +2,10 @@ package com.crschnick.pdx_unlimiter.app;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
-import com.crschnick.pdx_unlimiter.app.installation.ComponentManager;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.SavedState;
+import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.SavedState;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;

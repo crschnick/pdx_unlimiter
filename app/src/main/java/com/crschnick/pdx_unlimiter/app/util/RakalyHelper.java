@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 

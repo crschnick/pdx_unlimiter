@@ -1,10 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.game.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.installation.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.install.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCache;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
@@ -164,12 +165,12 @@ public class GuiSavegameEntry {
             }
         }
 
-        if (SavegameCache.EU4 != null && SavegameCache.EU4.contains(e)) {
+        if (SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(e)) {
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
-                RakalyWebHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
+                RakalyWebHelper.uploadSavegame(SavegameStorage.EU4, eu4Entry);
             });
             upload.getStyleClass().add(CLASS_UPLOAD);
             GuiTooltips.install(upload, "Upload to Rakaly.com");
@@ -189,14 +190,14 @@ public class GuiSavegameEntry {
             Button uploadSkanderbeg = new JFXButton();
             uploadSkanderbeg.setGraphic(new FontIcon());
             uploadSkanderbeg.setOnMouseClicked((m) -> {
-                SkanderbegHelper.uploadSavegame(SavegameCache.EU4, eu4Entry);
+                SkanderbegHelper.uploadSavegame(SavegameStorage.EU4, eu4Entry);
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
             GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
-        if (SavegameCache.CK3 != null && SavegameCache.CK3.contains(e)) {
+        if (SavegameStorage.CK3 != null && SavegameStorage.CK3.contains(e)) {
             SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
             Button convert = new JFXButton();
             convert.setGraphic(new FontIcon());
@@ -281,13 +282,13 @@ public class GuiSavegameEntry {
 
         stack.sceneProperty().addListener((c, o, n) -> {
             if (n != null) {
-                SavegameCache.getForSavegame(entry).loadEntryAsync(entry);
+                SavegameStorage.getForSavegame(entry).loadEntryAsync(entry);
             }
         });
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
-                var gf = GameIntegration.getForSavegameCache(SavegameCache.getForSavegame(entry));
+                var gf = GameIntegration.getForSavegameCache(SavegameStorage.getForSavegame(entry));
                 Platform.runLater(() -> {
                     loading.setVisible(false);
                     gf.getGuiFactory().fillNodeContainer(n, grid);
