@@ -41,3 +41,8 @@
 -fx-border-width: 0 1em 0 1em;
   -fx-font-family: "monospaced";
 }
+
+.jfx-color-picker .color-label {
+-fx-padding: 0;
+-fx-alignment: center;
+}

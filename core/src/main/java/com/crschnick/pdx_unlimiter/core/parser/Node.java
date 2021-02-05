@@ -72,6 +72,10 @@ public abstract class Node {
         return this instanceof ValueNode;
     }
 
+    public boolean isColor() {
+        return this instanceof ColorNode;
+    }
+
     public boolean isBoolean() {
         if (!isValue()) {
             return false;

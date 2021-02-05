@@ -1,6 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.parser.*;
+import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -19,6 +21,11 @@ public class SimpleNode extends EditorNode {
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
         update(new ArrayNode(List.of(new ValueNode(bn.isStringValue(), text))));
+    }
+
+    public void updateColor(Color c) {
+        ColorNode bn = (ColorNode) backingNode;
+        update(new ArrayNode(List.of(ColorHelper.toColorNode(c))));
     }
 
     @Override

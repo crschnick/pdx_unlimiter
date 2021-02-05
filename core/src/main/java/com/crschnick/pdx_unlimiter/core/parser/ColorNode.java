@@ -1,12 +1,17 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import java.util.List;
+
 public class ColorNode extends Node {
 
+    public static boolean isColorName(String v) {
+        return v.equals("rgb") || v.equals("hsv") || v.equals("hsv360");
+    }
+
     private String colorName;
+    private List<ValueNode> values;
 
-    private int[] values;
-
-    public ColorNode(String colorName, int[] values) {
+    public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
         this.values = values;
     }
@@ -15,7 +20,7 @@ public class ColorNode extends Node {
         return colorName;
     }
 
-    public int[] getValues() {
+    public List<ValueNode> getValues() {
         return values;
     }
 }

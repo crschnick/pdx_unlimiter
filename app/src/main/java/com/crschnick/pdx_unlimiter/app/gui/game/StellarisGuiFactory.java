@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

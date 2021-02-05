@@ -4,9 +4,9 @@ import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameParser;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.savegame.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
 
 public class StellarisSavegameStorage extends SavegameStorage<
         StellarisTag,

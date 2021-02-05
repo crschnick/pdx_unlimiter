@@ -5,18 +5,20 @@ import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.editor.SimpleNode;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.ColorNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXColorPicker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -44,6 +46,14 @@ public class GuiEditorNode {
                 'C',
                 new Insets(0, 2, 1, 0),
                 "Complex type");
+    }
+
+    private static Region createColorTypeNode() {
+        return createTypeNode(
+                new Color(0.9, 0.3, 0.9, 0.3),
+                'C',
+                new Insets(0, 2, 1, 0),
+                "Color");
     }
 
     private static Region createTypeNode(ValueNode.Type type) {
@@ -89,8 +99,9 @@ public class GuiEditorNode {
 
 
     static Optional<Region> createTypeNode(EditorNode n) {
-        boolean isSimple = n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode;
-        if (isSimple) {
+        if (n.isReal() && ((SimpleNode) n).getBackingNode().isColor()) {
+            return Optional.of(createColorTypeNode());
+        } else if (n.isReal() && ((SimpleNode) n).getBackingNode().isValue()) {
             return Optional.ofNullable(createTypeNode(((ValueNode) ((SimpleNode) n).getBackingNode()).determineType()));
         } else {
             return Optional.empty();
@@ -120,6 +131,7 @@ public class GuiEditorNode {
 
     static Region createValueDisplay(EditorNode n, EditorState state) {
         boolean isText = n.isReal() && ((SimpleNode) n).getBackingNode() instanceof ValueNode;
+        boolean isColor = n.isReal() && ((SimpleNode) n).getBackingNode().isColor();
         if (isText) {
             var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
             tf.setAlignment(Pos.CENTER);
@@ -128,6 +140,13 @@ public class GuiEditorNode {
                 state.onTextChanged();
             });
             return tf;
+        } else if (isColor) {
+            var picker = new JFXColorPicker(ColorHelper.fromColorNode((ColorNode) ((SimpleNode) n).getBackingNode()));
+            picker.valueProperty().addListener((c,o,ne) -> {
+                ((SimpleNode) n).updateColor(ne);
+                state.onColorChanged();
+            });
+            return picker;
         } else {
             var box = new HBox();
             box.setAlignment(Pos.CENTER);

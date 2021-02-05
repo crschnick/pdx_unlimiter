@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
+import com.crschnick.pdx_unlimiter.core.parser.ColorNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
@@ -42,12 +43,30 @@ public class ColorHelper {
         return (0xFF << 24) + ((int) (c.getRed() * 0xFF) << 16) + ((int) (c.getGreen() * 0xFF) << 8) + ((int) (c.getBlue() * 0xFF));
     }
 
-    private static javafx.scene.paint.Color colorFromNodes(List<Node> c, boolean hsv) {
-        if (hsv) {
-            return Color.hsb(c.get(0).getDouble(), c.get(1).getDouble(), c.get(2).getDouble());
-        } else {
+    public static ColorNode toColorNode(Color c) {
+        return new ColorNode("rgb", List.of(
+                new ValueNode(false, String.valueOf((int) (c.getRed() * 255))),
+                new ValueNode(false, String.valueOf((int) (c.getGreen() * 255))),
+                new ValueNode(false, String.valueOf((int) (c.getBlue() * 255)))));
+    }
 
-            return Color.color(c.get(0).getDouble(), c.get(1).getDouble(), c.get(2).getDouble());
+    public static Color fromColorNode(ColorNode node) {
+        var c = node.getValues();
+        if (node.getColorName().equals("hsv")) {
+            return Color.hsb(
+                    c.get(0).getDouble(),
+                    c.get(1).getDouble(),
+                    c.get(2).getDouble());
+        } else if (node.getColorName().equals("hsv360")) {
+            return Color.hsb(
+                    c.get(0).getDouble() / 360.0,
+                    c.get(1).getDouble() / 360.0,
+                    c.get(2).getDouble() / 360.0);
+        } else {
+            return Color.color(
+                    c.get(0).getDouble() / 255.0,
+                    c.get(1).getDouble() / 255.0,
+                    c.get(2).getDouble() / 255.0);
         }
     }
 
@@ -56,21 +75,8 @@ public class ColorHelper {
         for (Node n : nodes) {
             var kv = n.getKeyValueNode();
             Node data = kv.getNode();
-            List<Node> color;
-
-            boolean isHsv = false;
-
-            var colorData = data.getNodeForKey("flag");
-            if (colorData instanceof ValueNode) {
-                if (colorData.getString().equals("hsv")) {
-                    isHsv = true;
-                }
-                color = data.getNodeArray().get(3).getNodeArray();
-            } else {
-                color = colorData.getNodeArray();
-            }
-
-            map.put(kv.getKeyName(), colorFromNodes(color, isHsv));
+            ColorNode colorData = (ColorNode) data.getNodeForKey("flag");
+            map.put(kv.getKeyName(), fromColorNode(colorData));
         }
         return map;
     }
@@ -79,22 +85,8 @@ public class ColorHelper {
         Map<String, Color> map = new HashMap<>();
         for (Node n : nodes) {
             var kv = n.getKeyValueNode();
-            Node data = kv.getNode();
-
-            boolean isHsv = false;
-
-            var colorData = data.getNodeForKey("values").getNodeArray();
-            if (data.getNodeForKey("type").getString().equals("hsv")) {
-                isHsv = true;
-            }
-            if (data.getNodeForKey("type").getString().equals("hsv360")) {
-                isHsv = true;
-                colorData = colorData.stream()
-                        .map(v -> new ValueNode(false, String.valueOf(v.getDouble() / 360D)))
-                        .collect(Collectors.toList());
-            }
-
-            map.put(kv.getKeyName(), colorFromNodes(colorData, isHsv));
+            ColorNode data = (ColorNode) kv.getNode();
+            map.put(kv.getKeyName(), fromColorNode(data));
         }
         return map;
     }
@@ -106,7 +98,6 @@ public class ColorHelper {
                 GameInstallation.CK3).get();
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
-            ColorNodeTransformer.transform(node.getNodeForKey("colors"));
             return loadPredefinedCk3Colors(node.getNodeForKey("colors").getNodeArray());
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);

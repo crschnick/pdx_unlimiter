@@ -39,21 +39,17 @@ public abstract class FormatParser {
         return (ArrayNode) node.getKey();
     }
 
-    private boolean isColorName(String v) {
-        return v.equals("rgb") || v.equals("hsv") || v.equals("hsv360");
-    }
-
     private Map.Entry<Node, Integer> createNode(List<Token> tokens, int index) {
         if (tokens.get(index).getType() == TokenType.VALUE) {
             var vt = ((ValueToken) tokens.get(index));
             String obj = vt.value;
 
-            boolean isColor = !vt.quoted && isColorName(vt.value);
+            boolean isColor = !vt.quoted && ColorNode.isColorName(vt.value);
             if (isColor) {
-                int r = Integer.parseInt(((ValueToken) tokens.get(index + 2)).value);
-                int g = Integer.parseInt(((ValueToken) tokens.get(index + 3)).value);
-                int b = Integer.parseInt(((ValueToken) tokens.get(index + 4)).value);
-                return new AbstractMap.SimpleEntry<>(new ColorNode(vt.value, new int[] {r, g, b}), index + 6);
+                return new AbstractMap.SimpleEntry<>(new ColorNode(vt.value, List.of(
+                        new ValueNode(false, ((ValueToken) tokens.get(index + 2)).value),
+                        new ValueNode(false, ((ValueToken) tokens.get(index + 3)).value),
+                        new ValueNode(false, ((ValueToken) tokens.get(index + 4)).value))), index + 6);
             } else {
                 return new AbstractMap.SimpleEntry<>(new ValueNode(vt.quoted, obj), index + 1);
             }
@@ -78,7 +74,9 @@ public abstract class FormatParser {
                 var vt = ((ValueToken) tokens.get(currentIndex));
 
                 //Special case for missing "="
-                boolean isKeyValueWithoutEquals = !vt.quoted
+                boolean isKeyValueWithoutEquals =
+                        !ColorNode.isColorName(vt.value)
+                        && !vt.quoted
                         && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP
                         && vt.value.matches("\\w+");
                 if (isKeyValueWithoutEquals) {

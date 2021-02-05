@@ -91,6 +91,10 @@ public class EditorState {
         dirtyProperty().set(true);
     }
 
+    public void onColorChanged() {
+        dirtyProperty().set(true);
+    }
+
     public void onFileChanged() {
         update(true);
         dirtyProperty().set(true);

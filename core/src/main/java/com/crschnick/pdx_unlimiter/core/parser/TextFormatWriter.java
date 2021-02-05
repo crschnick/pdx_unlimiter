@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 public class TextFormatWriter {
 
@@ -61,7 +62,7 @@ public class TextFormatWriter {
             }
         }
 
-        if (n instanceof ArrayNode) {
+        else if (n instanceof ArrayNode) {
             if (!sb.appendLine("{")) {
                 return false;
             }
@@ -79,7 +80,7 @@ public class TextFormatWriter {
             sb.append("}");
         }
 
-        if (n instanceof ValueNode) {
+        else if (n instanceof ValueNode) {
             ValueNode val = (ValueNode) n;
             if (val.isStringValue()) {
                 sb.append("\"" + val.getValue() + "\"");
@@ -88,9 +89,10 @@ public class TextFormatWriter {
             }
         }
 
-        if (n instanceof ColorNode) {
+        else if (n instanceof ColorNode) {
             ColorNode cn = (ColorNode) n;
-            sb.append(cn.getColorName() + "={" + "");
+            sb.append(cn.getColorName() + "{" + cn.getValues().stream().map(Node::getString)
+                    .collect(Collectors.joining(" ")) + "}");
         }
 
         return true;

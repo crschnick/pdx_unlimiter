@@ -1,12 +1,12 @@
-package com.crschnick.pdx_unlimiter.core.savegame;
+package com.crschnick.pdx_unlimiter.core.info.stellaris;
 
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
 import java.util.*;
 import java.util.regex.Matcher;

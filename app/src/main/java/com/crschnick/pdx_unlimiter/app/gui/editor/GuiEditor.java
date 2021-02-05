@@ -160,8 +160,6 @@ public class GuiEditor {
 
         int nodeCount = Math.min(nodes.size(), 100);
         for (int i = 0; i < nodeCount; i++) {
-            boolean odd = i % 2 != 0;
-
             var n = nodes.get(i);
             var kn = createGridElement(new Label(n.displayKeyName()), i);
             kn.setAlignment(Pos.CENTER_LEFT);
