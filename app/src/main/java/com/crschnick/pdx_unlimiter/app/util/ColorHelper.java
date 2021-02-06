@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ColorHelper {
 

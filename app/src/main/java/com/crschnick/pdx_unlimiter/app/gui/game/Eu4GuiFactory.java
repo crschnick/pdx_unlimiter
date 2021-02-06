@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLocalisation;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -22,8 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 
-import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
 
 public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 

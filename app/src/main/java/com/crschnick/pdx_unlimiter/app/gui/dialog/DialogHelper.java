@@ -1,10 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.LogManager;
 import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.Modality;

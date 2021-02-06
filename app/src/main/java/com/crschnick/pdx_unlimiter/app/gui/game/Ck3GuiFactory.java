@@ -1,14 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,8 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
 
 public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 

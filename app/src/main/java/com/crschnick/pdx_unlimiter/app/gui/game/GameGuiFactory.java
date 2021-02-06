@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -32,8 +32,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 

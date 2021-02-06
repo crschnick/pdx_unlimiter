@@ -4,8 +4,6 @@ import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 

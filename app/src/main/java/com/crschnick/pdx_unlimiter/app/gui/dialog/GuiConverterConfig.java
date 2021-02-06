@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
@@ -20,8 +20,8 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public class GuiConverterConfig {
 

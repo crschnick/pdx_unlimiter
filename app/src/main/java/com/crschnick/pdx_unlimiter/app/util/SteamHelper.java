@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
 

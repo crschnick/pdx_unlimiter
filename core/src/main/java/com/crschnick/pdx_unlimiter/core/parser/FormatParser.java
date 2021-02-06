@@ -76,9 +76,9 @@ public abstract class FormatParser {
                 //Special case for missing "="
                 boolean isKeyValueWithoutEquals =
                         !ColorNode.isColorName(vt.value)
-                        && !vt.quoted
-                        && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP
-                        && vt.value.matches("\\w+");
+                                && !vt.quoted
+                                && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP
+                                && vt.value.matches("\\w+");
                 if (isKeyValueWithoutEquals) {
                     tokens.add(currentIndex + 1, EqualsToken.INSTANCE);
                 }
@@ -108,7 +108,7 @@ public abstract class FormatParser {
         EQUALS
     }
 
-    public  static abstract class Token {
+    public static abstract class Token {
         abstract TokenType getType();
     }
 

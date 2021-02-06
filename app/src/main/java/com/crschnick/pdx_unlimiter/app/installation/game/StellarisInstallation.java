@@ -4,8 +4,8 @@ import com.crschnick.pdx_unlimiter.app.core.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -60,7 +60,7 @@ public class StellarisInstallation extends GameInstallation {
 
     @Override
     public void startDirectly() throws IOException {
-        new ProcessBuilder().command(getExecutable().toString(), "--continuelastsave").start();
+        new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
     }
 
     @Override

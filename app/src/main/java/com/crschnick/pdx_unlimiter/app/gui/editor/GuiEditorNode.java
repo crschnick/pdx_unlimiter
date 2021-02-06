@@ -14,11 +14,12 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -142,7 +143,7 @@ public class GuiEditorNode {
             return tf;
         } else if (isColor) {
             var picker = new JFXColorPicker(ColorHelper.fromColorNode((ColorNode) ((SimpleNode) n).getBackingNode()));
-            picker.valueProperty().addListener((c,o,ne) -> {
+            picker.valueProperty().addListener((c, o, ne) -> {
                 ((SimpleNode) n).updateColor(ne);
                 state.onColorChanged();
             });

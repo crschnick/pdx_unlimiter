@@ -104,6 +104,6 @@ public class Ck3Installation extends GameInstallation {
 
     @Override
     public void startDirectly() throws IOException {
-        new ProcessBuilder().command(getExecutable().toString(), "--continuelastsave").start();
+        new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
     }
 }

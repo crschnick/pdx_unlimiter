@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.core.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.app.core.SavedState;
+import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;

@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 

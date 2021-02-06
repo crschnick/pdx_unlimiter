@@ -60,9 +60,7 @@ public class TextFormatWriter {
             if (!node(indent, n.getKeyValueNode().getNode(), sb)) {
                 return false;
             }
-        }
-
-        else if (n instanceof ArrayNode) {
+        } else if (n instanceof ArrayNode) {
             if (!sb.appendLine("{")) {
                 return false;
             }
@@ -78,18 +76,14 @@ public class TextFormatWriter {
             }
             sb.space(indent);
             sb.append("}");
-        }
-
-        else if (n instanceof ValueNode) {
+        } else if (n instanceof ValueNode) {
             ValueNode val = (ValueNode) n;
             if (val.isStringValue()) {
                 sb.append("\"" + val.getValue() + "\"");
             } else {
                 sb.append(val.getValue());
             }
-        }
-
-        else if (n instanceof ColorNode) {
+        } else if (n instanceof ColorNode) {
             ColorNode cn = (ColorNode) n;
             sb.append(cn.getColorName() + "{" + cn.getValues().stream().map(Node::getString)
                     .collect(Collectors.joining(" ")) + "}");
