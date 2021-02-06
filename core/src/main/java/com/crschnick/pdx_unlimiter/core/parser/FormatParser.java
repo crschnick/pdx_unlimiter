@@ -80,7 +80,7 @@ public abstract class FormatParser {
                         && tokens.get(currentIndex + 1).getType() == TokenType.OPEN_GROUP
                         && vt.value.matches("\\w+");
                 if (isKeyValueWithoutEquals) {
-                    tokens.add(currentIndex + 1, new EqualsToken());
+                    tokens.add(currentIndex + 1, EqualsToken.INSTANCE);
                 }
             }
 
@@ -130,6 +130,8 @@ public abstract class FormatParser {
 
     public static class EqualsToken extends Token {
 
+        public static EqualsToken INSTANCE = new EqualsToken();
+
         @Override
         TokenType getType() {
             return TokenType.EQUALS;
@@ -138,6 +140,8 @@ public abstract class FormatParser {
 
     public static class OpenGroupToken extends Token {
 
+        public static OpenGroupToken INSTANCE = new OpenGroupToken();
+
         @Override
         TokenType getType() {
             return TokenType.OPEN_GROUP;
@@ -145,6 +149,8 @@ public abstract class FormatParser {
     }
 
     public static class CloseGroupToken extends Token {
+
+        public static CloseGroupToken INSTANCE = new CloseGroupToken();
 
         @Override
         TokenType getType() {

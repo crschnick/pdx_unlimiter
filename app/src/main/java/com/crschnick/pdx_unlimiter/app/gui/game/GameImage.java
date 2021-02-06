@@ -26,6 +26,8 @@ public class GameImage {
     public static Image CK3_ICON_HEIR;
     public static Image CK3_ICON_TITLES;
     public static Image CK3_ICON_CLAIMS;
+    public static Image CK3_ICON_WAR;
+    public static Image CK3_ICON_ALLY;
     public static Image CK3_BACKGROUND;
     public static Image CK3_REALM_MASK;
     public static Image CK3_REALM_FRAME;
@@ -144,6 +146,9 @@ public class GameImage {
         CK3_COA_OVERLAY = ImageLoader.loadImage(
                 GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("coa_overlay.dds"));
+
+        CK3_ICON_WAR = ImageLoader.loadImage(i.resolve("map_coa").resolve("icon_at_war_big.dds"));
+        CK3_ICON_ALLY = ImageLoader.loadImage(i.resolve("message_feed").resolve("alliance.dds"));
     }
 
     public static void loadStellarisImages() {

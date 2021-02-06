@@ -51,11 +51,11 @@ public class TextFormatParser extends FormatParser {
             } else if (c == '"') {
                 isInQuotes = !isInQuotes;
             } else if (c == '{') {
-                t = new OpenGroupToken();
+                t = OpenGroupToken.INSTANCE;
             } else if (c == '}') {
-                t = new CloseGroupToken();
+                t = CloseGroupToken.INSTANCE;
             } else if (c == '=') {
-                t = new EqualsToken();
+                t = EqualsToken.INSTANCE;
             }
 
             if (isInComment) {

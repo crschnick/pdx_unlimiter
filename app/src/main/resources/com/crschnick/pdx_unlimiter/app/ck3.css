@@ -1,4 +1,3 @@
-
 .ck3 .skill-icon {
 -fx-min-width: 3em;
 -fx-max-width: 3em;
@@ -22,4 +21,20 @@
 
 .ck3 .ruler-name {
 -fx-font-size: 1.1em;
+}
+
+.ck3 .tag-icon {
+-fx-min-width: 2.8em;
+-fx-max-width: 2.8em;
+-fx-min-height: 2.8em;
+-fx-max-height: 2.8em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.ck3 .image-icon {
+-fx-min-width: 2.5em;
+-fx-max-width: 2.5em;
+-fx-min-height: 2.5em;
+-fx-max-height: 2.5em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }

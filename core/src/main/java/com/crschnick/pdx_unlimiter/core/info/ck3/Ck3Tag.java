@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.core.info.ck3;
 
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 
@@ -9,6 +10,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ck3Tag {
+
+    public static Optional<Ck3Tag> getTag(Set<Ck3Tag> tags, long id) {
+        return tags.stream().filter(t -> t.ruler.id == id).findFirst();
+    }
 
     private Person ruler;
     private List<Title> titles;
@@ -21,6 +26,19 @@ public class Ck3Tag {
         this.ruler = ruler;
         this.titles = titles;
         this.claims = claims;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ck3Tag ck3Tag = (Ck3Tag) o;
+        return ruler.equals(ck3Tag.ruler) && titles.equals(ck3Tag.titles) && claims.equals(ck3Tag.claims);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ruler, titles, claims);
     }
 
     public static Ck3Tag getPlayerTag(Node n, Set<Ck3Tag> tags) {

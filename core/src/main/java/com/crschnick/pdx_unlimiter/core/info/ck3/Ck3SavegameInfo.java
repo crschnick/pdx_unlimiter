@@ -3,13 +3,13 @@ package com.crschnick.pdx_unlimiter.core.info.ck3;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.War;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 import com.crschnick.pdx_unlimiter.core.parser.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,6 +20,8 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     protected Set<Ck3Tag> allTags;
     private String playerName;
     private String houseName;
+    private List<War<Ck3Tag>> wars;
+    private List<Ck3Tag> allies;
 
     public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
@@ -59,10 +61,59 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
                     0,
                     null);
 
+            i.wars = fromActiveWarsNode(i.allTags, i.tag, n);
+
+            i.allies = new ArrayList<>();
+            for (Node rel : n.getNodeForKey("relations").getNodeForKey("active_relations").getNodeArray()) {
+                if (!rel.hasKey("alliances")) {
+                    continue;
+                }
+
+                var first = rel.getNodeForKey("first").getLong();
+                var second = rel.getNodeForKey("second").getLong();
+                if (first == i.tag.getRuler().getId()) {
+                    Ck3Tag.getTag(i.allTags, second).ifPresent(t -> i.allies.add(t));
+                }
+                if (second == i.tag.getRuler().getId()) {
+                    Ck3Tag.getTag(i.allTags, first).ifPresent(t -> i.allies.add(t));
+                }
+            }
+
         } catch (Exception e) {
             throw new SavegameParseException("Could not create savegame info of savegame", e);
         }
         return i;
+    }
+
+    private static List<War<Ck3Tag>> fromActiveWarsNode(Set<Ck3Tag> tags, Ck3Tag tag, Node n) {
+        List<War<Ck3Tag>> wars = new ArrayList<>();
+        for (Node entry : n.getNodeForKey("wars").getNodeForKey("active_wars").getNodeArray()) {
+            var kv = entry.getKeyValueNode();
+            var war = kv.getNode();
+
+            if (war.isValue() && war.getString().equals("none")) {
+                continue;
+            }
+
+            var title = war.getNodeForKey("name").getString();
+
+            List<Ck3Tag> attackers = new ArrayList<>();
+            for (Node atk : war.getNodeForKey("attacker").getNodeForKey("participants").getNodeArray()) {
+                var attacker = atk.getNodeForKey("character").getLong();
+                Ck3Tag.getTag(tags, attacker).ifPresent(attackers::add);
+            }
+
+            List<Ck3Tag> defenders = new ArrayList<>();
+            for (Node atk : war.getNodeForKey("defender").getNodeForKey("participants").getNodeArray()) {
+                var defender = atk.getNodeForKey("character").getLong();
+                Ck3Tag.getTag(tags, defender).ifPresent(defenders::add);
+            }
+
+            if (attackers.contains(tag) || defenders.contains(tag)) {
+                wars.add(new War<Ck3Tag>(title, attackers, defenders));
+            }
+        }
+        return wars;
     }
 
     @Override
@@ -81,5 +132,13 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
     public String getHouseName() {
         return houseName;
+    }
+
+    public List<War<Ck3Tag>> getWars() {
+        return wars;
+    }
+
+    public List<Ck3Tag> getAllies() {
+        return allies;
     }
 }
