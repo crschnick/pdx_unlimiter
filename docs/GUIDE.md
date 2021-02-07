@@ -4,11 +4,9 @@ The savegame manager interface will initially look pretty empty.
 This guide will show you how to 
 
 <p>
-<img align="left" src="empty.png" height="300"/>
-<img align="right" src="screenshot.png" height="300"/>
-  </p>
-
-## Game Installations
+<img align="left" src="empty.png" height="340"/>
+<img align="right" src="screenshot.png" height="340"/>
+</p>
 
 Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
 either saved in your documents directories or your Steam cloudsave directories.
