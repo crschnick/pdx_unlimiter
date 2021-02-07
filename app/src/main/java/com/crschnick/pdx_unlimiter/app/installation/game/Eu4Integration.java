@@ -18,7 +18,7 @@ public class Eu4Integration extends GameIntegration<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public Eu4SavegameStorage getSavegameCache() {
+    public Eu4SavegameStorage getSavegameStorage() {
         return SavegameStorage.EU4;
     }
 

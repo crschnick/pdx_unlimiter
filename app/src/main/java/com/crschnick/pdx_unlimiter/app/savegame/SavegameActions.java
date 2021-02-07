@@ -24,16 +24,17 @@ import java.util.stream.Collectors;
 public class SavegameActions {
 
     public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
-        SavegameManagerState s = SavegameManagerState.get();
+        var ins = GameIntegration.getForSavegameStorage(
+                SavegameStorage.getForSavegame(entry)).getInstallation();
         boolean missingMods = entry.getInfo().getMods().stream()
-                .map(m -> s.current().getInstallation().getModForName(m))
+                .map(ins::getModForName)
                 .anyMatch(Optional::isEmpty);
 
         boolean missingDlc = entry.getInfo().getDlcs().stream()
-                .map(m -> s.current().getInstallation().getDlcForName(m))
+                .map(ins::getDlcForName)
                 .anyMatch(Optional::isEmpty);
 
-        return areCompatible(s.current().getInstallation().getVersion(), entry.getInfo().getVersion()) &&
+        return areCompatible(ins.getVersion(), entry.getInfo().getVersion()) &&
                 !missingMods && !missingDlc;
     }
 
@@ -48,15 +49,15 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void openCampaignEntry(SavegameEntry<T, I> entry) {
-        ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameCache().getPath(entry));
+        ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameStorage().getPath(entry));
     }
 
     public static Optional<Path> exportCampaignEntry() {
         var s = SavegameManagerState.get();
         try {
             var path = s.current().getInstallation().getExportTarget(
-                    s.current().getSavegameCache(), s.globalSelectedEntryProperty().get());
-            s.current().getSavegameCache().exportSavegame(s.globalSelectedEntryProperty().get(), path);
+                    s.current().getSavegameStorage(), s.globalSelectedEntryProperty().get());
+            s.current().getSavegameStorage().exportSavegame(s.globalSelectedEntryProperty().get(), path);
             return Optional.of(path);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -67,13 +68,13 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         var s = SavegameManagerState.<T, I>get();
-        s.current().getSavegameCache().moveEntryAsync(collection, entry);
+        s.current().getSavegameStorage().moveEntryAsync(collection, entry);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         @SuppressWarnings("unchecked")
         Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
-                .filter(i -> i.getSavegameCache().contains(entry))
+                .filter(i -> i.getSavegameStorage().contains(entry))
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v);
         var g = gi.orElseThrow(IllegalArgumentException::new);
@@ -147,7 +148,7 @@ public class SavegameActions {
 
         SavegameManagerState<T, I> s = SavegameManagerState.get();
         TaskExecutor.getInstance().submitTask(() -> {
-            s.<T, I>current().getSavegameCache().meltSavegame(e);
+            s.<T, I>current().getSavegameStorage().meltSavegame(e);
         }, true, true);
     }
 

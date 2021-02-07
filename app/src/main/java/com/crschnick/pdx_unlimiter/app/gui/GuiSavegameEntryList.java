@@ -38,12 +38,12 @@ public class GuiSavegameEntryList {
 
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             if (o != null) {
-                o.getSavegameCache().getCollections().removeListener(campaignListListener);
+                o.getSavegameStorage().getCollections().removeListener(campaignListListener);
             }
 
             if (n != null) {
-                n.getSavegameCache().getCollections().addListener(campaignListListener);
-                update.accept(n.getSavegameCache().getCollections());
+                n.getSavegameStorage().getCollections().addListener(campaignListListener);
+                update.accept(n.getSavegameStorage().getCollections());
             }
         });
     }

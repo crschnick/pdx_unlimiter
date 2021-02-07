@@ -31,9 +31,9 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
         throw new IllegalArgumentException();
     }
 
-    public static <T, I extends SavegameInfo<T>> GameIntegration<T, I> getForSavegameCache(SavegameStorage<T, I> c) {
+    public static <T, I extends SavegameInfo<T>> GameIntegration<T, I> getForSavegameStorage(SavegameStorage<T, I> c) {
         for (var g : ALL) {
-            if (g.getSavegameCache().equals(c)) {
+            if (g.getSavegameStorage().equals(c)) {
                 return (GameIntegration<T, I>) g;
             }
         }
@@ -77,7 +77,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
     public abstract GameGuiFactory<T, I> getGuiFactory();
 
-    public abstract SavegameStorage<T, I> getSavegameCache();
+    public abstract SavegameStorage<T, I> getSavegameStorage();
 
     public abstract SavegameWatcher getSavegameWatcher();
 }

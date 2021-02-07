@@ -118,9 +118,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             return;
         }
 
-        shownCollections.removeIf(col -> !current().getSavegameCache().getCollections().contains(col));
+        shownCollections.removeIf(col -> !current().getSavegameStorage().getCollections().contains(col));
 
-        current().getSavegameCache().getCollections().forEach(col -> {
+        current().getSavegameStorage().getCollections().forEach(col -> {
             if (!shownCollections.contains(col) && filter.shouldShow(col)) {
                 shownCollections.add(col);
                 return;
@@ -168,7 +168,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " + (newInt != null ? newInt.getName() : "null"));
         updateShownCollections();
         if (newInt != null) {
-            newInt.getSavegameCache().getCollections().addListener(
+            newInt.getSavegameStorage().getCollections().addListener(
                     (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
                         updateShownCollections();
                     });
@@ -188,7 +188,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
-                .filter(i -> i.getSavegameCache().getCollections().contains(c))
+                .filter(i -> i.getSavegameStorage().getCollections().contains(c))
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v);
         gi.ifPresentOrElse(v -> {
@@ -219,11 +219,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
-                .filter(i -> i.getSavegameCache().contains(e))
+                .filter(i -> i.getSavegameStorage().contains(e))
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v);
         gi.ifPresentOrElse(v -> {
-            selectCollection(v.getSavegameCache().getSavegameCollection(e));
+            selectCollection(v.getSavegameStorage().getSavegameCollection(e));
 
             globalSelectedEntryPropertyInternal().set(e);
             LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign entry " + e.getName());

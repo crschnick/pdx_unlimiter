@@ -1,10 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import net.nikr.dds.DDSImageReaderSpi;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
@@ -21,7 +23,8 @@ public class ImageLoader {
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
-        registry.registerServiceProvider(new com.realityinteractive.imageio.tga.TGAImageReaderSpi());
+        registry.registerServiceProvider(new DDSImageReaderSpi());
+        registry.registerServiceProvider(new TGAImageReaderSpi());
     }
 
     public static Image loadImage(Path p) {

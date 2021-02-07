@@ -28,7 +28,7 @@ public class GuiSavegameCollection {
     public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
             SavegameCollection<T, I> c) {
         GameIntegration<T, I> gi = GameIntegration.ALL.stream()
-                .filter(i -> i.getSavegameCache().getCollections().contains(c))
+                .filter(i -> i.getSavegameStorage().getCollections().contains(c))
                 .findFirst()
                 .map(v -> (GameIntegration<T, I>) v)
                 .get();
@@ -74,7 +74,7 @@ public class GuiSavegameCollection {
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showCampaignDeleteDialog()) {
-                    SavegameManagerState.<T, I>get().current().getSavegameCache().delete(c);
+                    SavegameManagerState.<T, I>get().current().getSavegameStorage().delete(c);
                 }
             });
             del.setAlignment(Pos.CENTER);

@@ -45,7 +45,7 @@ public class GuiSavegameCollectionList {
         create.getStyleClass().add(GuiStyle.CLASS_NEW);
         create.setGraphic(new FontIcon());
         create.setOnAction(e -> {
-            SavegameManagerState.get().current().getSavegameCache().addNewFolder("New Folder");
+            SavegameManagerState.get().current().getSavegameStorage().addNewFolder("New Folder");
             e.consume();
         });
 

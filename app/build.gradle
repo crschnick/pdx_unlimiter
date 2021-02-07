@@ -123,7 +123,7 @@ addDependenciesModuleInfo {
             artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
             moduleInfoSource = '''
                 module com.realityinteractive.imageio.tga {
-                    requires java.se;
+                    requires java.desktop;
                     exports com.realityinteractive.imageio.tga;
                 }
             '''
@@ -132,9 +132,8 @@ addDependenciesModuleInfo {
             artifact 'net.nikr:dds:1.0.0'
             moduleInfoSource = '''
                 module net.nikr.dds {
-                    requires java.se;
+                    requires java.desktop;
                     exports net.nikr.dds;
-                    provides javax.imageio.spi.ImageReaderSpi with net.nikr.dds.DDSImageReaderSpi;
                 }
             '''
         }
@@ -142,7 +141,6 @@ addDependenciesModuleInfo {
             artifact 'org.apache.commons:commons-lang3:3.11'
             moduleInfoSource = '''
                 module org.apache.commons.lang3 {
-                    requires java.se;
                     exports org.apache.commons.lang3;
                     exports org.apache.commons.lang3.function;
                     exports org.apache.commons.lang3.arch;
@@ -154,7 +152,6 @@ addDependenciesModuleInfo {
             artifact 'commons-io:commons-io:2.8.0'
             moduleInfoSource = '''
                 module org.apache.commons.io {
-                    requires java.se;
                     exports org.apache.commons.io;
                     exports org.apache.commons.io.file;
                     exports org.apache.commons.io.input;

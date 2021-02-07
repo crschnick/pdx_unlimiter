@@ -122,6 +122,10 @@ public class PdxuInstallation {
         return dataDir.resolve("import");
     }
 
+    public Path getLazyImportStorageLocation() {
+        return dataDir.resolve("import");
+    }
+
     private boolean isAlreadyRunning() {
         var procs = ProcessHandle.allProcesses()
                 .map(h -> h.info().command().orElse(""))

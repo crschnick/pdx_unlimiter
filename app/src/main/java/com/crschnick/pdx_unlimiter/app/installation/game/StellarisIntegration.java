@@ -32,7 +32,7 @@ public class StellarisIntegration extends GameIntegration<StellarisTag, Stellari
     }
 
     @Override
-    public SavegameStorage<StellarisTag, StellarisSavegameInfo> getSavegameCache() {
+    public SavegameStorage<StellarisTag, StellarisSavegameInfo> getSavegameStorage() {
         return SavegameStorage.STELLARIS;
     }
 }

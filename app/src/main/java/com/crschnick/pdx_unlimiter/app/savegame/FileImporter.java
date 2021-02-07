@@ -100,6 +100,19 @@ public class FileImporter {
                 }, false, false);
     }
 
+
+    public static void addToLazyImportQueue(Path toImport) {
+        try {
+            Files.createDirectories(PdxuInstallation.getInstance().getLazyImportStorageLocation());
+            var path = PdxuInstallation.getInstance().getLazyImportStorageLocation()
+                    .resolve(UUID.randomUUID().toString());
+            logger.debug("Copying file to " + path + " for lazy import target " + toImport);
+            Files.copy(toImport, path);
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+    }
+
     public static void addToImportQueue(String toImport) {
         try {
             FileUtils.forceMkdir(PdxuInstallation.getInstance().getImportQueueLocation().toFile());
@@ -117,6 +130,5 @@ public class FileImporter {
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
-
     }
 }

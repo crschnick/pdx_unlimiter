@@ -308,7 +308,7 @@ public abstract class SavegameStorage<
                     getDefaultCampaignName(e),
                     campainUuid,
                     e.getDate(),
-                    GameIntegration.getForSavegameCache(this).getGuiFactory().tagImage(e.getInfo(), info.getTag()));
+                    GameIntegration.getForSavegameStorage(this).getGuiFactory().tagImage(e.getInfo(), info.getTag()));
             this.collections.add(newCampaign);
         }
 
@@ -343,7 +343,7 @@ public abstract class SavegameStorage<
                 .anyMatch(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
     }
 
-    public synchronized SavegameCollection<T, I> getSavegameCollection(SavegameEntry<T, I> e) {
+    public synchronized SavegameCollection<T, I> getSavegameCollection(SavegameEntry<?,?> e) {
         var campaign = collections.stream()
                 .filter(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
                 .findAny();
@@ -599,7 +599,7 @@ public abstract class SavegameStorage<
         }, false, true);
     }
 
-    private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
+    private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> col) {
         logger.debug("Parsing file " + file.toString());
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
@@ -622,11 +622,11 @@ public abstract class SavegameStorage<
                 }
 
                 UUID collectionUuid;
-                if (folder == null) {
+                if (col == null) {
                     collectionUuid = s.info.getCampaignHeuristic();
                     logger.debug("Campaign UUID is " + collectionUuid.toString());
                 } else {
-                    collectionUuid = folder.getUuid();
+                    collectionUuid = col.getUuid();
                     logger.debug("Folder UUID is " + collectionUuid.toString());
                 }
                 UUID saveUuid = UUID.randomUUID();
@@ -642,10 +642,10 @@ public abstract class SavegameStorage<
                     return;
                 }
 
-                if (folder == null) {
+                if (col == null) {
                     addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name);
                 } else {
-                    addNewEntryToCollection(folder, saveUuid, s.checksum, s.info, name);
+                    addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name);
                 }
             }
 

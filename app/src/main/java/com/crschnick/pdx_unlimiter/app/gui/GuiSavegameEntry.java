@@ -57,7 +57,7 @@ public class GuiSavegameEntry {
 
             entryNode.setOnDragDetected(me -> {
                 Dragboard db = entryNode.startDragAndDrop(TransferMode.COPY);
-                var sc = SavegameManagerState.<T, I>get().current().getSavegameCache();
+                var sc = SavegameManagerState.<T, I>get().current().getSavegameStorage();
                 var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
                 try {
                     sc.exportSavegame(e, out);
@@ -172,8 +172,8 @@ public class GuiSavegameEntry {
             upload.setOnMouseClicked((m) -> {
                 RakalyWebHelper.uploadSavegame(SavegameStorage.EU4, eu4Entry);
             });
-            upload.getStyleClass().add(CLASS_UPLOAD);
-            GuiTooltips.install(upload, "Upload to Rakaly.com");
+            upload.getStyleClass().add(CLASS_ANALYZE);
+            GuiTooltips.install(upload, "Upload and analyze with Rakaly.com");
             buttonBar.getChildren().add(upload);
 
 
@@ -251,7 +251,7 @@ public class GuiSavegameEntry {
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showSavegameDeleteDialog()) {
-                    SavegameManagerState.<T, I>get().current().getSavegameCache().deleteAsync(e);
+                    SavegameManagerState.<T, I>get().current().getSavegameStorage().deleteAsync(e);
                 }
             });
             del.getStyleClass().add(CLASS_DELETE);
@@ -288,7 +288,7 @@ public class GuiSavegameEntry {
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
-                var gf = GameIntegration.getForSavegameCache(SavegameStorage.getForSavegame(entry));
+                var gf = GameIntegration.getForSavegameStorage(SavegameStorage.getForSavegame(entry));
                 Platform.runLater(() -> {
                     loading.setVisible(false);
                     gf.getGuiFactory().fillNodeContainer(n, grid);

@@ -1,9 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -33,7 +32,7 @@ public class GuiStatusBar {
         SavegameManagerState.get().globalSelectedEntryProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 if (n != null) {
-                    bar.select();
+                    bar.select(n);
                 } else {
                     bar.unselect();
                 }
@@ -56,7 +55,6 @@ public class GuiStatusBar {
     }
 
     private static Region createRunningBar() {
-
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
@@ -105,57 +103,66 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static Region createEntryStatusBar() {
+    private static Region createEntryStatusBar(SavegameEntry<?,?> e) {
         BorderPane barPane = new BorderPane();
-
-        Label text = new Label(
-                SavegameManagerState.get().current().getName(),
-                SavegameManagerState.get().current().getGuiFactory().createIcon());
-        barPane.setLeft(text);
-        BorderPane.setAlignment(text, Pos.CENTER);
-
-        Label name = new Label(
-                SavegameManagerState.get().globalSelectedCampaignProperty().get().getName() +
-                        ", " + SavegameManagerState.get().globalSelectedEntryProperty().get().getName());
-        name.setGraphic(new FontIcon());
-        name.getStyleClass().add(CLASS_TEXT);
-        barPane.setCenter(name);
-
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
-        if (SavegameActions.isEntryCompatible(SavegameManagerState.get().globalSelectedEntryProperty().get())) {
-            name.getStyleClass().add(CLASS_SAVEGAME);
-        } else {
-            barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-            name.getStyleClass().add(CLASS_ALERT);
-            name.setText(name.getText() + " (Incompatible)");
+
+        {
+            Label text = new Label(
+                    GameIntegration.getForSavegameStorage(SavegameStorage.getForSavegame(e)).getName(),
+                    GameIntegration.getForSavegameStorage(
+                            SavegameStorage.getForSavegame(e)).getGuiFactory().createIcon());
+            barPane.setLeft(text);
+            BorderPane.setAlignment(text, Pos.CENTER);
         }
 
-        Button e = new JFXButton("Export");
-        e.setGraphic(new FontIcon());
-        e.getStyleClass().add(CLASS_EXPORT);
-        e.setOnAction(event -> {
-            SavegameActions.exportCampaignEntry();
+        {
+            Label name = new Label(
+                    SavegameStorage.getForSavegame(e).getSavegameCollection(e).getName() + ", " + e.getName());
+            name.setGraphic(new FontIcon());
+            name.getStyleClass().add(CLASS_TEXT);
 
-            event.consume();
-            getStatusBar().hide();
-        });
+            if (SavegameActions.isEntryCompatible(e)) {
+                name.getStyleClass().add(CLASS_SAVEGAME);
+            } else {
+                barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+                name.getStyleClass().add(CLASS_ALERT);
+                name.setText(name.getText() + " (Incompatible)");
+            }
 
-        Button b = new JFXButton("Launch");
-        b.setGraphic(new FontIcon());
-        b.getStyleClass().add(CLASS_LAUNCH);
-        b.setOnAction(event -> {
-            SavegameActions.launchCampaignEntry();
+            barPane.setCenter(name);
+        }
 
-            event.consume();
-            getStatusBar().hide();
-        });
-
-
-        HBox buttons = new HBox(e, b);
+        HBox buttons = new HBox();
         buttons.setSpacing(10);
         buttons.setFillHeight(true);
         buttons.setAlignment(Pos.CENTER);
         barPane.setRight(buttons);
+        {
+            Button export = new JFXButton("Export");
+            export.setGraphic(new FontIcon());
+            export.getStyleClass().add(CLASS_EXPORT);
+            export.setOnAction(event -> {
+                SavegameActions.exportCampaignEntry();
+
+                event.consume();
+                getStatusBar().hide();
+            });
+            buttons.getChildren().add(export);
+        }
+
+        {
+            Button launch = new JFXButton("Launch");
+            launch.setGraphic(new FontIcon());
+            launch.getStyleClass().add(CLASS_LAUNCH);
+            launch.setOnAction(event -> {
+                SavegameActions.launchCampaignEntry();
+
+                event.consume();
+                getStatusBar().hide();
+            });
+            buttons.getChildren().add(launch);
+        }
         return barPane;
     }
 
@@ -192,12 +199,13 @@ public class GuiStatusBar {
         public void stopRunning() {
             hide();
             status = Status.NONE;
-            if (SavegameManagerState.get().globalSelectedEntryProperty().isNotNull().get()) {
-                select();
+            var sel = SavegameManagerState.get().globalSelectedEntryProperty().get();
+            if (sel != null) {
+                select(sel);
             }
         }
 
-        private void select() {
+        private void select(SavegameEntry<?,?> e) {
             Platform.runLater(() -> {
                 if (status == Status.RUNNING) {
                     return;
@@ -205,7 +213,7 @@ public class GuiStatusBar {
 
                 Region bar;
                 status = Status.SELECTED;
-                bar = createEntryStatusBar();
+                bar = createEntryStatusBar(e);
 
                 show(bar);
             });

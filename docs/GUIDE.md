@@ -1,10 +1,12 @@
 ## Pdx-Unlimiter Guide
 
+## Installations
+
 Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
 either saved in your documents directories or your Steam cloudsave directories.
 The Pdx-Unlimiter will try to automatically detect any of those game installation and save game directories.
 If any installation is not detected, you can set them manually in the settings menu.
-Note that only installations of Paradox games with installed Paradox Launcher are supported!
+Note that only up-to-date installations of Paradox games with installed Paradox Launcher are supported!
 
 Furthermore, the Pdx-Unlimiter has an internal savegame
 storage independent of the savegame directories of installed games.
@@ -30,21 +32,107 @@ By clicking on a savegame entry **(6)**, you select it and the status bar **(7)*
 The status bar indicates whether the savegame is compatible and can therefore be launched without any problems.
 
 
-### Importing
+## Savegame storage
 
-There are several ways of importing savegames into the Pdx-Unlimiter storage:
+Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
+either saved in your documents directories or your Steam cloudsave directories.
 
-- By clicking the import button in the menu bar **(5)** which will open a separate import dialog
+The Pdx-Unlimiter has an internal savegame storage that is
+independent of these savegame directories of your installed games.
+To manage a savegame with the Pdx-Unlimiter, you therefore first have to import it.
+There are several different ways of doing that:
+
+- By clicking the import button in the menu bar, which will open a separate import dialog
 - Dragging and dropping the savegame files into the Pdx-Unlimiter. This also works for folders that contain savegames
 - Pressing `CTRL+SHIFT+I` while a supported game is open will import the latest savegame.
   This also works if the game is in fullscreen mode
   If the key combination is pressed, a confirmation sound will play
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
   This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
-  
+
+The savegame storage is separate 
+You can of course change its location in the settings menu.
+For performance reasons and to prevent the storage from bloating, you have to explicitly
+import any savegame that you want to manage.
+This means that changing or deleting a file from your savegame directory
+does not delete it from the Pdx-Unlimiter storage and vice-versa.
+
 In the settings menu you can also enable the option `Delete on import` which specifies
 whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
 
+## Campaigns and folders
+
+When you import savegames, they are automatically grouped by identifying
+other savegames that belong to the same campaign playthrough.
+These campaigns are shown on the left and look like this:
+
+![Campaigns](campaigns.PNG)
+
+In addition to campaigns, you can also create folders by clicking on the **Add Folder** button
+shown in the picture.
+Next to it is a search bar that you can use to quickly find specific campaigns or savegames.
+A folder is meant to store various savegames that might belong to entirely different campaigns.
+An example is the **Melted Savegames** folder that stores any converted Ironman savegame.
+
+The campaigns and folders are ordered by how recently a savegame
+of that campaign was directly launched from the Pdx-Unlimiter.
+If you want to move a savegame to another campaigns or folder, you can do so dragging and dropping it there.
+
+## Savegames
+
+By clicking on a campaign or folder, you can see the contained savegames.
+
+<img align="left" src="savegame.png" alt="savegame" width="200"/>
+
+abc
+
+
+![Savegames](savegame.PNG)
+
+### Status bar
+
+If you click on a savegame entry, a status bar will pop up from the bottom.
+It either looks like this:
+
+![Valid](status-bar.PNG)
+
+By clicking the **Export** button in the status bar,
+you can copy the savegame into the savegame directory of the current game.
+This will however not launch the game automatically.
+
+You can also launch the selected savegame directly by clicking the **Launch** button.
+This direct launch will automatically attempt to enable every required mod and dlc.
+If some content is missing, or the game version is not compatible, a warning will be shown.
+This will bypass the Paradox launcher and main menu, i.e. saving a lot of time.
+
+
+## Savegame Actions
+
+The icon buttons located at the top right of a savegame entry
+indicate what kind of actions you can perform with it.
+These buttons perform the following actions:
+
+<img align="left" src="melt.png" width="200"/>
+Ironman converter, only available for Ironman savegames
+
+<img align="left" src="copy.png" width="200"/>
+Copy functionality. This is useful to create backup copies before editing a savegame.
+
+<img align="left" src="edit.png" width="200"/>
+Opens the savegame editor.
+
+<img align="left" src="analyze.png" width="200"/>
+Uploads the savegame to [Rakaly.com](https://rakaly.com) to analyze it.
+For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
+After this is done, you can click the analyze button **(3)** and the selected savegame will be uploaded to Rakaly.
+
+<img align="left" src="map.png" width="200"/>
+Uploads the savegame to [https://skanderbeg.pm](https://skanderbeg.pm) to generate maps.
+a website for savegame maps and statistics.
+For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
+
+<img align="left" src="delete.png" width="200"/>
+Deletes the savegame.
 
 ### Playing
 
@@ -71,12 +159,13 @@ You can also export the entire storage of the Pdx-Unlimiter into a directory,
 by clicking *Storage* -> *Export storage...* in the menu bar **(5)**.
 This can be useful to backup your savegame collection or transfer it between different computers.
 
-### Uploading
+## Upload to Rakaly.com
 
 The Pdx-Unlimiter supports uploading EU4 savegames to [Rakaly.com](https://rakaly.com).
 For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
-After this is done, you can click the upload button **(3)** and the selected savegame will be uploaded to Rakaly.
-If any error occurs or your savegame is not eligible for any achievement, an error message will be shown.
+After this is done, you can click the analyze button **(3)** and the selected savegame will be uploaded to Rakaly.
+
+## Upload to skanderbeg.pm
 
 There is also support to upload savegames to [https://skanderbeg.pm](https://skanderbeg.pm),
 a website for savegame maps and statistics.
