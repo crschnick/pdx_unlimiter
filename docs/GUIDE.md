@@ -112,27 +112,39 @@ The icon buttons located at the top right of a savegame entry
 indicate what kind of actions you can perform with it.
 These buttons perform the following actions:
 
-<img align="left" src="melt.png"/>
+<p>
+<img align="left" src="melt.png" width=35/>
 Ironman converter, only available for Ironman savegames
+</p>
 
-<img align="left" src="copy.png"/>
+<p>
+<img align="left" src="copy.png" width=35/>
 Copy functionality. This is useful to create backup copies before editing a savegame.
+</p>
 
+</p>
 <img align="left" src="edit.png"/>
 Opens the savegame editor.
+</p>
 
+</p>
 <img align="left" src="analyze.png"/>
 Uploads the savegame to [Rakaly.com](https://rakaly.com) to analyze it.
 For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
 After this is done, you can click the analyze button **(3)** and the selected savegame will be uploaded to Rakaly.
+</p>
 
+</p>
 <img align="left" src="map.png"/>
 Uploads the savegame to [https://skanderbeg.pm](https://skanderbeg.pm) to generate maps.
 a website for savegame maps and statistics.
 For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
+</p>
 
+</p>
 <img align="left" src="delete.png"/>
 Deletes the savegame.
+</p>
 
 ### Playing
 
