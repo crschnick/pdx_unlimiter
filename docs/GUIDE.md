@@ -123,26 +123,25 @@ Copy functionality. This is useful to create backup copies before editing a save
 </p>
 
 </p>
-<img align="left" src="edit.png"/>
+<img align="left" src="edit.png" width=35/>
 Opens the savegame editor.
 </p>
 
 </p>
-<img align="left" src="analyze.png"/>
+<img align="left" src="analyze.png" width=35/>
 Uploads the savegame to [Rakaly.com](https://rakaly.com) to analyze it.
 For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
-After this is done, you can click the analyze button **(3)** and the selected savegame will be uploaded to Rakaly.
 </p>
 
 </p>
-<img align="left" src="map.png"/>
+<img align="left" src="map.png" width=35/>
 Uploads the savegame to [https://skanderbeg.pm](https://skanderbeg.pm) to generate maps.
 a website for savegame maps and statistics.
 For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
 </p>
 
 </p>
-<img align="left" src="delete.png"/>
+<img align="left" src="delete.png" width=35/>
 Deletes the savegame.
 </p>
 
