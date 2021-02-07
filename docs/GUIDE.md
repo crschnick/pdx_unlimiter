@@ -1,6 +1,12 @@
 ## Pdx-Unlimiter Guide
 
-## Installations
+The savegame manager interface will initially look pretty empty.
+This guide will show you how to 
+
+<img align="left" src="empty.png" height="400"/>
+<img align="right" src="screenshot.png" height="400"/>
+
+## Game Installations
 
 Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
 either saved in your documents directories or your Steam cloudsave directories.
@@ -8,17 +14,7 @@ The Pdx-Unlimiter will try to automatically detect any of those game installatio
 If any installation is not detected, you can set them manually in the settings menu.
 Note that only up-to-date installations of Paradox games with installed Paradox Launcher are supported!
 
-Furthermore, the Pdx-Unlimiter has an internal savegame
-storage independent of the savegame directories of installed games.
-You can change its location in the settings menu.
-For performance reasons and to prevent the storage from bloating, you have to explicitly
-import any savegame that you want to manage.
-
-
 ## Savegame storage
-
-Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
-either saved in your documents directories or your Steam cloudsave directories.
 
 The Pdx-Unlimiter has an internal savegame storage that is
 independent of these savegame directories of your installed games.
@@ -33,14 +29,13 @@ There are several different ways of doing that:
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
   This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
 
-The savegame storage is separate 
-You can of course change its location in the settings menu.
 For performance reasons and to prevent the storage from bloating, you have to explicitly
 import any savegame that you want to manage.
-This means that changing or deleting a file from your savegame directory
+This separation means that changing or deleting a file from your savegame directory
 does not delete it from the Pdx-Unlimiter storage and vice-versa.
 
-In the settings menu you can also enable the option `Delete on import` which specifies
+In the settings menu you can change the storage location and
+enable the option `Delete on import` which specifies
 whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
 
 ## Campaigns and folders
@@ -68,7 +63,7 @@ You can also delete an entire campaign by clicking on the **Delete** button.
 By clicking on a campaign or folder, you can see the contained savegames, ordered by their in-game dates.
 A savegame entry looks like this:
 
-<img src="savegame.png" height="100"/>
+<img src="savegame.png" align="right" height="200"/>
 
 All savegame entries contain some information about their current state of the game
 to make it easier for you to identify the right one to use.
