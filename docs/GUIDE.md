@@ -7,9 +7,10 @@ Afterwards, this guide will show you how to make the best use of all the functio
 
 <p>
 <img align="left" src="empty.png" height="350"/>
-  =>
 <img align="right" src="screenshot.png" height="350"/>
 </p>
+
+<p>&nbsp;</p>
 
 ## Table of Contents
 
