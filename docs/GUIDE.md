@@ -66,7 +66,7 @@ When you import savegames, they are automatically grouped by identifying
 other savegames that belong to the same campaign playthrough.
 These campaigns are shown on the left and look like this:
 
-![Campaigns](campaigns.PNG)
+![Campaigns](campaigns.png)
 
 In addition to campaigns, you can also create folders by clicking on the **Add Folder** button
 shown in the picture.
@@ -87,14 +87,14 @@ By clicking on a campaign or folder, you can see the contained savegames.
 abc
 
 
-![Savegames](savegame.PNG)
+![Savegames](savegame.png)
 
-### Status bar
+### Launching savegames
 
 If you click on a savegame entry, a status bar will pop up from the bottom.
-It either looks like this:
+It usually looks like this:
 
-![Valid](status-bar.PNG)
+![Valid](status-bar.png)
 
 By clicking the **Export** button in the status bar,
 you can copy the savegame into the savegame directory of the current game.
@@ -102,11 +102,14 @@ This will however not launch the game automatically.
 
 You can also launch the selected savegame directly by clicking the **Launch** button.
 This direct launch will automatically attempt to enable every required mod and dlc.
-If some content is missing, or the game version is not compatible, a warning will be shown.
 This will bypass the Paradox launcher and main menu, i.e. saving a lot of time.
 
+If some content is missing, or the game version is not compatible, a red status bar will be shown.
+You can still launch the savegame, but you will get a warning about which mod or dlc is missing.
 
-## Savegame Actions
+![Invalid](status-bar-invalid.png)
+
+### Savegame Actions
 
 The icon buttons located at the top right of a savegame entry
 indicate what kind of actions you can perform with it.
@@ -114,7 +117,8 @@ These buttons perform the following actions:
 
 <p>
 <img align="left" src="melt.png" width=35/>
-Ironman converter, only available for Ironman savegames
+Ironman converter, only available for Ironman savegames. This allows you to
+convert ironman savegames into non-ironman savegames, also called 'melting'.
 </p>
 
 <p>
@@ -129,14 +133,13 @@ Opens the savegame editor.
 
 </p>
 <img align="left" src="analyze.png" width=35/>
-Uploads the savegame to [Rakaly.com](https://rakaly.com) to analyze it.
+Uploads the savegame to https://rakaly.com to analyze it.
 For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
 </p>
 
 </p>
 <img align="left" src="map.png" width=35/>
-Uploads the savegame to [https://skanderbeg.pm](https://skanderbeg.pm) to generate maps.
-a website for savegame maps and statistics.
+Uploads the savegame to https://skanderbeg.pm to generate maps.
 For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
 </p>
 
@@ -145,58 +148,32 @@ For this to work, you first have to set your skanderbeg.pm *API key* in the sett
 Deletes the savegame.
 </p>
 
-### Playing
+## Savescumming
 
-You can launch a selected savegame directly by clicking the launch button **(10)** in the bottom status bar.
-This direct launch will automatically attempt to enable every required mod and dlc.
-If some content is missing, or the game version is not compatible, a warning will be shown.
-This will bypass the Paradox launcher and main menu, i.e. saving a lot of time.
+In case of any unfortunate ingame event that you want to revert,
+the Pdx-Unlimiter gives you the ability to savescum, i.e. reverting to a
+previous savegame checkpoint while playing in ironman.
+While playing a supported game, a status bar that looks like will pop up:
 
-Any supported paradox game can also be started from within the Pdx-Unlimiter even
-without selecting a savegame by clicking the `Launch` button in menu bar **(5)**.
-This will start the Paradox Launcher and Steam if needed. If you don't want
-to start Steam as well, you can disable this feature in the settings.
+![Running](status-bar-running.png)
 
-### Exporting
 
-By clicking the export button **(9)** in the status bar,
-you can copy the savegame into the savegame directory of the current game.
-This will however not launch the game automatically.
+These previous savegame checkpoints can be created/imported while being ingame by
+clicking on **Import** button or pressing `CTRL+SHIFT+I`.
+This will import the latest savegame, shown in the center of the status bar.
 
-If you want to export a savegame into any other directory,
-you can simple drag it from within the Pdx-Unlimiter and drop it where you want.
+By pressing either `CTRL+SHIFT+K` or **Kill** in the status bar,
+you can kill the currently running game without it having a chance to overwrite the latest savegame.
+You can simply select your latest imported savegame in the Pdx-Unlimiter and launch it again.
+
+If you just want to revert to the latest saved savegame, you can also use `CTRL+SHIFT+R`
+to combine these functions, i.e. import the latest savegame, kill the game process and launch it again.
+
+## Exporting all savegames
 
 You can also export the entire storage of the Pdx-Unlimiter into a directory,
 by clicking *Storage* -> *Export storage...* in the menu bar **(5)**.
 This can be useful to backup your savegame collection or transfer it between different computers.
-
-## Upload to Rakaly.com
-
-The Pdx-Unlimiter supports uploading EU4 savegames to [Rakaly.com](https://rakaly.com).
-For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
-After this is done, you can click the analyze button **(3)** and the selected savegame will be uploaded to Rakaly.
-
-## Upload to skanderbeg.pm
-
-There is also support to upload savegames to [https://skanderbeg.pm](https://skanderbeg.pm),
-a website for savegame maps and statistics.
-For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
-
-### Reverting
-
-In case of any unfortunate ingame event that you want to revert,
-the Pdx-Unlimiter gives you the ability to savescum, i.e. reverting to the previous save when playing in ironman.
-By pressing either `CTRL+SHIFT+K` or `Kill` in the status bar,
-you can kill the currently running game without it overriding the latest savegame.
-You can simply select your latest imported savegame in the Pdx-Unlimiter and launch it again.
-
-### Converting
-
-You can convert ironman savegames into non-ironman savegames by using the 'melt' functionality.
-The melt button can be found left to the upload button **(3)** for ironman savegames only and looks like an oven.
-From there, you can select the output file name.
-Note that you should include the file ending, e.g. `.eu4` in the file name!
-
 
 ## Automatic updates
 
