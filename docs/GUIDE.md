@@ -62,11 +62,12 @@ whether to delete savegames after succesfully importing it into the Pdx-Unlimite
 
 ## Campaigns and folders
 
+<p>
+<img align="right" src="campaigns.png"/>
+
 When you import savegames, they are automatically grouped by identifying
 other savegames that belong to the same campaign playthrough.
 These campaigns are shown on the left and look like this:
-
-![Campaigns](campaigns.png)
 
 In addition to campaigns, you can also create folders by clicking on the **Add Folder** button
 shown in the picture.
@@ -77,15 +78,12 @@ An example is the **Melted Savegames** folder that stores any converted Ironman 
 The campaigns and folders are ordered by how recently a savegame
 of that campaign was directly launched from the Pdx-Unlimiter.
 If you want to move a savegame to another campaigns or folder, you can do so dragging and dropping it there.
+</p>
+
 
 ## Savegames
 
 By clicking on a campaign or folder, you can see the contained savegames.
-
-<img align="left" src="savegame.png" alt="savegame" width="200"/>
-
-abc
-
 
 ![Savegames](savegame.png)
 
@@ -134,13 +132,13 @@ Opens the savegame editor.
 </p>
 <img align="left" src="analyze.png" width=35/>
 Uploads the savegame to https://rakaly.com to analyze it.
-For this to work, you first have to set your Rakaly.com *User ID* and *API key* in the settings menu.
+For this to work, you first have to set your Rakaly.com <b>User ID</b> and <b>API key</b> in the settings menu.
 </p>
 
 </p>
 <img align="left" src="map.png" width=35/>
 Uploads the savegame to https://skanderbeg.pm to generate maps.
-For this to work, you first have to set your skanderbeg.pm *API key* in the settings menu.
+For this to work, you first have to set your skanderbeg.pm <b>API key</b>> in the settings menu.
 </p>
 
 </p>
