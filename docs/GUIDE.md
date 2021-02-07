@@ -3,8 +3,10 @@
 The savegame manager interface will initially look pretty empty.
 This guide will show you how to 
 
-<img align="left" src="empty.png" height="400"/>
-<img align="right" src="screenshot.png" height="400"/>
+<p>
+<img align="left" src="empty.png" height="300"/>
+<img align="right" src="screenshot.png" height="300"/>
+  </p>
 
 ## Game Installations
 
