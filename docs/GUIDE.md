@@ -14,23 +14,6 @@ You can change its location in the settings menu.
 For performance reasons and to prevent the storage from bloating, you have to explicitly
 import any savegame that you want to manage.
 
-## Savegame management
-
-The savegame manager interface will look something like this for you:
-
-![Interface](guide.png)
-
-On the left side you can see a list of every available campaign.
-The campaign name **(0)** can be edited by clicking on it.
-You can also delete an entire campaign by clicking on the delete button **(1)**.
-
-On the right side, you can see all savegames belonging to the currently opened campaign ordered by date.
-You can rename a savegame by clicking on its name **(2)**,
-upload it to Rakaly.com by clicking on the upload button **(3)**
-and delete it by clicking on the delete button **(4)**.
-By clicking on a savegame entry **(6)**, you select it and the status bar **(7)** will appear.
-The status bar indicates whether the savegame is compatible and can therefore be launched without any problems.
-
 
 ## Savegame storage
 
@@ -62,8 +45,7 @@ whether to delete savegames after succesfully importing it into the Pdx-Unlimite
 
 ## Campaigns and folders
 
-<p>
-<img align="right" src="campaigns.png"/>
+<img align="right" src="campaigns.png" height="250"/>
 
 When you import savegames, they are automatically grouped by identifying
 other savegames that belong to the same campaign playthrough.
@@ -77,15 +59,27 @@ An example is the **Melted Savegames** folder that stores any converted Ironman 
 
 The campaigns and folders are ordered by how recently a savegame
 of that campaign was directly launched from the Pdx-Unlimiter.
-If you want to move a savegame to another campaigns or folder, you can do so dragging and dropping it there.
-</p>
 
+The campaign name can be edited by clicking on it.
+You can also delete an entire campaign by clicking on the **Delete** button.
 
 ## Savegames
 
-By clicking on a campaign or folder, you can see the contained savegames.
+By clicking on a campaign or folder, you can see the contained savegames, ordered by their in-game dates.
+A savegame entry looks like this:
 
-![Savegames](savegame.png)
+<img src="savegame.png" height="100"/>
+
+All savegame entries contain some information about their current state of the game
+to make it easier for you to identify the right one to use.
+They also have a name, visible at the top center.
+This name can be changed, by clicking on it.
+
+A savegame entry behaves like a normal file in the sense that
+you can drag and drop it as you would do with a normal file.
+You can drag a savegame from the GUI outside the Pdx-Unlimiter window and drop it anywhere as a file.
+If you want to move a savegame to another campaigns or folder, you can also do so dragging and dropping it there.
+
 
 ### Launching savegames
 
