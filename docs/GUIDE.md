@@ -6,8 +6,9 @@ i.e. go from the left picture to the right picture.
 Afterwards, this guide will show you how to make the best use of all the functions, the Pdx-Unlimiter provides.
 
 <p>
-<img align="left" src="empty.png" height="360"/>
-<img align="right" src="screenshot.png" height="360"/>
+<img align="left" src="empty.png" height="350"/>
+  =>
+<img align="right" src="screenshot.png" height="350"/>
 </p>
 
 ## Table of Contents
