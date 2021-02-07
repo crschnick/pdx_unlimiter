@@ -1,18 +1,22 @@
 ## Pdx-Unlimiter Guide
 
 The savegame manager interface will initially look pretty empty.
-This guide will show you how to 
+This guide will show you first how to populate the Pdx-Unlimiter with your savegames,
+i.e. go from the left picture to the right picture.
+Afterwards, this guide will show you how to make the best use of all the functions, the Pdx-Unlimiter provides.
 
 <p>
-<img align="left" src="empty.png" height="340"/>
-<img align="right" src="screenshot.png" height="340"/>
+<img align="left" src="empty.png" height="350"/>
+<img align="right" src="screenshot.png" height="350"/>
 </p>
 
+<p>
 Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
 either saved in your documents directories or your Steam cloudsave directories.
 The Pdx-Unlimiter will try to automatically detect any of those game installation and save game directories.
 If any installation is not detected, you can set them manually in the settings menu.
 Note that only up-to-date installations of Paradox games with installed Paradox Launcher are supported!
+</p>
 
 ## Savegame storage
 
