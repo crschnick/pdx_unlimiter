@@ -49,9 +49,6 @@ There are several different ways of doing that:
 
 - By clicking the import button in the menu bar, which will open a separate import dialog
 - Dragging and dropping the savegame files into the Pdx-Unlimiter. This also works for folders that contain savegames
-- Pressing `CTRL+SHIFT+I` while a supported game is open will import the latest savegame.
-  This also works if the game is in fullscreen mode
-  If the key combination is pressed, a confirmation sound will play
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
   This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
 
@@ -141,7 +138,7 @@ Copy functionality. This is useful to create backup copies before editing a save
 
 </p>
 <img align="left" src="edit.png" width=35/>
-Opens the savegame editor.
+Opens the savegame editor, only available for Non-Ironman savegames.
 </p>
 
 </p>
@@ -153,7 +150,7 @@ For this to work, you first have to set your Rakaly.com <b>User ID</b> and <b>AP
 </p>
 <img align="left" src="map.png" width=35/>
 Uploads the savegame to https://skanderbeg.pm to generate maps.
-For this to work, you first have to set your skanderbeg.pm <b>API key</b>> in the settings menu.
+For this to work, you first have to set your skanderbeg.pm <b>API key</b> in the settings menu.
 </p>
 
 </p>
@@ -174,6 +171,7 @@ While playing a supported game, a status bar that looks like will pop up:
 These previous savegame checkpoints can be created/imported while being ingame by
 clicking on **Import** button or pressing `CTRL+SHIFT+I`.
 This will import the latest savegame, shown in the center of the status bar.
+If the key combination is pressed, a confirmation sound will play
 
 By pressing either `CTRL+SHIFT+K` or **Kill** in the status bar,
 you can kill the currently running game without it having a chance to overwrite the latest savegame.
