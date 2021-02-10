@@ -31,7 +31,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Eu4Tag seniorPartner = null;
     private Set<Eu4Tag> tributaryJuniors = new HashSet<>();
     private Eu4Tag tributarySenior = null;
-    //private Map<Eu4Tag, GameDate> truces = new HashMap<>();
     private Set<War> wars = new HashSet<>();
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
@@ -271,6 +270,19 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
                         // Exclude queen consorts
                         if (r.hasKey("consort")) {
+                            continue;
+                        }
+
+                        // Exclude dead rulers
+                        boolean dead = r.hasKey("death_date");
+                        if (dead) {
+                            continue;
+                        }
+
+                        // If we have a new heir, but the heir has already succeeded, set the current heir to null
+                        boolean succeeded = type.equals("heir") && r.hasKey("succeeded");
+                        if (succeeded) {
+                            current = Optional.empty();
                             continue;
                         }
 
