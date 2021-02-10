@@ -47,6 +47,10 @@ public class EditorState {
     }
 
     public void save() {
+        if (!dirty.get()) {
+            return;
+        }
+
         saveFunc.accept(rootNodes.entrySet().stream().collect(
                 Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toWritableNode())));
         dirtyProperty().set(false);

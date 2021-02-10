@@ -23,12 +23,21 @@
 -fx-border-width: 0.15em 0 0 0;
 }
 
+.editor .menu {
+  -fx-font-size: 10pt;
+}
+
+.editor-nav-bar-container {
+  -fx-padding: 0.7em;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0 0 0.1em 0;
+}
+
 .editor-nav-bar {
-  -fx-padding: 0.5em;
   -fx-font-size: 11pt;
   -fx-background-color: #EEEEEEFF;
 -fx-border-color: #CCCCCCFF;
--fx-border-width: 0 0 0.1em 0;
+-fx-border-width: 0.1em;
 }
 
 .editor-grid .jfx-button {

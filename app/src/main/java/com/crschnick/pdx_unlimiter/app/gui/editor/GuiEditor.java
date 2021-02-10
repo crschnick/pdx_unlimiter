@@ -42,7 +42,17 @@ public class GuiEditor {
 
     private static Region create(EditorState state) {
         BorderPane layout = new BorderPane();
-        layout.setTop(createNavigationBar(state));
+        layout.getStyleClass().add("editor");
+        var v = new VBox();
+        v.setFillWidth(true);
+        v.setPadding(new Insets(20, 20, 20, 20));
+        v.getStyleClass().add("editor-nav-bar-container");
+        v.getChildren().add(createNavigationBar(state));
+        var topBars = new VBox(
+                GuiEditorMenuBar.createMenuBar(state),
+                v);
+        topBars.setFillWidth(true);
+        layout.setTop(topBars);
         createNodeList(layout, state);
         layout.setBottom(createFilterBar(state.getFilter()));
         return layout;
@@ -56,21 +66,6 @@ public class GuiEditor {
         Consumer<List<EditorState.NavEntry>> updateBar = l -> {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
-
-                {
-                    Button save = new Button();
-                    save.setDisable(!edState.dirtyProperty().get());
-                    edState.dirtyProperty().addListener((c, o, n) -> {
-                        save.setDisable(!n);
-                    });
-                    save.setGraphic(new FontIcon());
-                    save.getStyleClass().add(GuiStyle.CLASS_SAVE);
-                    save.setOnAction(e -> {
-                        edState.save();
-                    });
-                    bar.getChildren().add(save);
-                }
-
                 {
                     var initBtn = new JFXButton(edState.getFileName());
                     initBtn.setOnAction(e -> {
