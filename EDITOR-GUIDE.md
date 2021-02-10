@@ -1,4 +1,46 @@
 
+## Structure
+
+A savegame consists out of many entries, where each entry has a name,
+also called the key, and an associated value.
+They are formatted as `<key name> = <value>` pairs.
+The associated values can be of one of the following types:
+<p>
+<img align="left" src="docs/boolean.png" width=35/>
+Boolean, either <i>yes</i> or <i>no</i>
+</p>
+<p>
+<img align="left" src="docs/value.png" width=35/>
+Integer, e.g. <i>124</i>
+</p>
+<p>
+<img align="left" src="docs/value.png" width=35/>
+Floating point number, e.g. <i>1.12</i>
+</p>
+<p>
+<img align="left" src="docs/value.png" width=35/>
+Text, e.g. <i>"Text value"</i>
+</p>
+<p>
+<img align="left" src="docs/value.png" width=35/>
+A game specific value, e.g. the relgion id <i>catholic</i> in eu4.
+While it looks like a normal Text value, the difference is
+that you can basically assign anything to a text value while
+you can only assign certain things to a game specific value without breaking the game
+</p>
+<p>
+<img align="left" src="docs/value.png" width=35/>
+Color
+</p>
+<p>
+<img align="left" src="docs/value.png" width=35/>
+A complex type, that has child key-value pairs of its own
+</p>
+
+## aaa
+
+
+
 ## Navigation
 
 The navigation bar located at the top shows you exactly
