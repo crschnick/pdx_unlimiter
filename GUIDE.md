@@ -136,24 +136,24 @@ convert ironman savegames into non-ironman savegames, also called 'melting'.
 Copy functionality. This is useful to create backup copies before editing a savegame.
 </p>
 
-</p>
+<p>
 <img align="left" src="docs/edit.png" width=35/>
 Opens the savegame editor, only available for Non-Ironman savegames.
 </p>
 
-</p>
+<p>
 <img align="left" src="docs/analyze.png" width=35/>
 Uploads the savegame to https://rakaly.com to analyze it.
 For this to work, you first have to set your Rakaly.com <b>User ID</b> and <b>API key</b> in the settings menu.
 </p>
 
-</p>
+<p>
 <img align="left" src="docs/map.png" width=35/>
 Uploads the savegame to https://skanderbeg.pm to generate maps.
 For this to work, you first have to set your skanderbeg.pm <b>API key</b> in the settings menu.
 </p>
 
-</p>
+<p>
 <img align="left" src="docs/delete.png" width=35/>
 Deletes the savegame.
 </p>
