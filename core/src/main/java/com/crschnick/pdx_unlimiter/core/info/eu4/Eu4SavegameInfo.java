@@ -276,6 +276,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                         // Exclude dead rulers
                         boolean dead = r.hasKey("death_date");
                         if (dead) {
+                            current = Optional.empty();
                             continue;
                         }
 
