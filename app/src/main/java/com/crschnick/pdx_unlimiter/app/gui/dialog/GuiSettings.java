@@ -119,7 +119,7 @@ public class GuiSettings {
     private static Node installationLocations(Settings s) {
         GridPane grid = new GridPane();
 
-        var t = new Text("Installations");
+        var t = new Text("Game Installations");
         t.setStyle("-fx-font-weight: bold");
         grid.add(t, 0, 0, 2, 1);
 

@@ -83,7 +83,7 @@ public class GuiErrorReporter {
         }
 
         alert.setAlertType(Alert.AlertType.ERROR);
-        alert.setTitle("Error reporter");
+        alert.setTitle("Pdx-Unlimiter");
         alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
                 """
 

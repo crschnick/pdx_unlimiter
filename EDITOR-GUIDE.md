@@ -35,13 +35,13 @@ The values are the objects located to the right of the equal sign of an entry.
 </p>
 
 </p>
-<img align="left" src="docs/filter.png" width=35/>
+<img align="left" src="docs/filter.png" width=28/>
 Applies the filter string in the text field.
 Alternatively, you can press **Enter** after typing your search string.
 </p>
 
 </p>
-<img align="left" src="docs/clear.png" width=35/>
+<img align="left" src="docs/clear.png" width=28/>
 Clears the active filter.
 </p>
 
