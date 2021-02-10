@@ -85,7 +85,7 @@ public class GuiSavegameEntryList {
 
         Button guide = new Button("Read the guide");
         guide.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md");
+            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md");
         });
         v.getChildren().add(guide);
 

@@ -82,7 +82,7 @@ public class GuiMenuBar {
 
         MenuItem guide = new MenuItem("Guide");
         guide.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md");
+            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md");
         });
         help.getItems().add(guide);
 
