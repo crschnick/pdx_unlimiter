@@ -6,8 +6,8 @@ i.e. go from the left picture to the right picture.
 Afterwards, this guide will show you how to make the best use of all the functions, the Pdx-Unlimiter provides.
 
 <p>
-<img align="left" src="empty.png" height="350"/>
-<img align="right" src="screenshot.png" height="350"/>
+<img align="left" src="docs/empty.png" height="350"/>
+<img align="right" src="docs/screenshot.png" height="350"/>
 </p>
 
 <p>&nbsp;</p>
@@ -63,7 +63,7 @@ whether to delete savegames after succesfully importing it into the Pdx-Unlimite
 
 ## Campaigns and folders
 
-<img align="right" src="campaigns.png" height="250"/>
+<img align="right" src="docs/campaigns.png" height="250"/>
 
 When you import savegames, they are automatically grouped by identifying
 other savegames that belong to the same campaign playthrough.
@@ -86,7 +86,7 @@ You can also delete an entire campaign by clicking on the **Delete** button.
 By clicking on a campaign or folder, you can see the contained savegames, ordered by their in-game dates.
 A savegame entry looks like this:
 
-<img src="savegame.png" align="right" height="200"/>
+<img src="docs/savegame.png" align="right" height="200"/>
 
 All savegame entries contain some information about their current state of the game
 to make it easier for you to identify the right one to use.
@@ -104,7 +104,7 @@ If you want to move a savegame to another campaigns or folder, you can also do s
 If you click on a savegame entry, a status bar will pop up from the bottom.
 It usually looks like this:
 
-![Valid](status-bar.png)
+![Valid](docs/status-bar.png)
 
 By clicking the **Export** button in the status bar,
 you can copy the savegame into the savegame directory of the current game.
@@ -117,7 +117,7 @@ This will bypass the Paradox launcher and main menu, i.e. saving a lot of time.
 If some content is missing, or the game version is not compatible, a red status bar will be shown.
 You can still launch the savegame, but you will get a warning about which mod or dlc is missing.
 
-![Invalid](status-bar-invalid.png)
+![Invalid](docs/status-bar-invalid.png)
 
 ### Savegame Actions
 
@@ -126,35 +126,35 @@ indicate what kind of actions you can perform with it.
 These buttons perform the following actions:
 
 <p>
-<img align="left" src="melt.png" width=35/>
+<img align="left" src="docs/melt.png" width=35/>
 Ironman converter, only available for Ironman savegames. This allows you to
 convert ironman savegames into non-ironman savegames, also called 'melting'.
 </p>
 
 <p>
-<img align="left" src="copy.png" width=35/>
+<img align="left" src="docs/copy.png" width=35/>
 Copy functionality. This is useful to create backup copies before editing a savegame.
 </p>
 
 </p>
-<img align="left" src="edit.png" width=35/>
+<img align="left" src="docs/edit.png" width=35/>
 Opens the savegame editor, only available for Non-Ironman savegames.
 </p>
 
 </p>
-<img align="left" src="analyze.png" width=35/>
+<img align="left" src="docs/analyze.png" width=35/>
 Uploads the savegame to https://rakaly.com to analyze it.
 For this to work, you first have to set your Rakaly.com <b>User ID</b> and <b>API key</b> in the settings menu.
 </p>
 
 </p>
-<img align="left" src="map.png" width=35/>
+<img align="left" src="docs/map.png" width=35/>
 Uploads the savegame to https://skanderbeg.pm to generate maps.
 For this to work, you first have to set your skanderbeg.pm <b>API key</b> in the settings menu.
 </p>
 
 </p>
-<img align="left" src="delete.png" width=35/>
+<img align="left" src="docs/delete.png" width=35/>
 Deletes the savegame.
 </p>
 
@@ -165,7 +165,7 @@ the Pdx-Unlimiter gives you the ability to savescum, i.e. reverting to a
 previous savegame checkpoint while playing in ironman.
 While playing a supported game, a status bar that looks like will pop up:
 
-![Running](status-bar-running.png)
+![Running](docs/status-bar-running.png)
 
 
 These previous savegame checkpoints can be created/imported while being ingame by
