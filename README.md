@@ -33,9 +33,9 @@ The main components of the Pdx-Unlimiter are:
 - [Savescumming tools](#savescumming-tools)
 - [Integrations for other Paradox tools](#third-party-tool-integration)
 
-It you want to know how to use a certain feature, you can just
-read the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/GUIDE.md).
-There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/docs/faq.md)
+It you want to know how to use a certain feature, you can
+read about it in the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md).
+There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/FAQ.md)
 to answer some of your questions.
 
 
@@ -59,6 +59,7 @@ enabled without having to use Paradox launcher configurations.
 It is also checked whether a mod is missing or incompatible with the current version,
 so that nothing can potentially corrupt your savegames.
 
+Usage guide: [Savegame management](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-storage)
 
 ## Savegame editor
 
@@ -103,6 +104,7 @@ create a non-ironman copy of an ironman savegame, but couldn't because the games
 You can for example use the included ironman converter
 to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor).
 
+Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md)
 
 ## Savescumming tools
 
@@ -112,6 +114,7 @@ If you want to revert to a previous savegame checkpoint,
 you can also kill the currently running Paradox game and load the latest save using a keystroke.
 This feature allows you to easily savescum, which is kinda necessary for hard achievements.
 
+Usage guide: [Savescumming](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savescumming)
 
 ## Third party tool integration
 
@@ -131,6 +134,7 @@ The supported tools are:
   This means that you can interact with the converter from within the Pdx-Unlimiter
   and basically convert any managed savegame with just one click as well.
 
+Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md)
 
 ## Community and Support
 

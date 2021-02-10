@@ -30,6 +30,7 @@ Afterwards, this guide will show you how to make the best use of all the functio
 - [Launching savegames](#launching-savegames)
 - [Other things to do with savegames](#savegame-actions)
 - [How to savescum](#savescumming)
+- [Accessing the raw savegame files](#working-with-the-raw-savegame-files)
 
 
 ## Game Installations
@@ -94,9 +95,8 @@ They also have a name, visible at the top center.
 This name can be changed, by clicking on it.
 
 A savegame entry behaves like a normal file in the sense that
-you can drag and drop it as you would do with a normal file.
-You can drag a savegame from the GUI outside the Pdx-Unlimiter window and drop it anywhere as a file.
-If you want to move a savegame to another campaigns or folder, you can also do so dragging and dropping it there.
+if you want to move a savegame to another campaigns or folder,
+you can do so by dragging and dropping into it.
 
 
 ### Launching savegames
@@ -180,10 +180,16 @@ You can simply select your latest imported savegame in the Pdx-Unlimiter and lau
 If you just want to revert to the latest saved savegame, you can also use `CTRL+SHIFT+R`
 to combine these functions, i.e. import the latest savegame, kill the game process and launch it again.
 
-## Exporting all savegames
+## Working with the raw savegame files
 
-You can also export the entire storage of the Pdx-Unlimiter into a directory,
-by clicking *Storage* -> *Export storage...* in the menu bar **(5)**.
+When you import a savegame, its original savegame file is copied into the Pdx-Unlimiter storage.
+If you want to access that savegame file after importing it, you can still do so, since
+a savegame entry in the Pdx-Unlimiter behaves like a normal file in the sense that
+you can drag and drop it as you would do with a normal file.
+So you can drag a savegame from the GUI outside the Pdx-Unlimiter window and drop it anywhere as a file.
+
+You can also export all savegame files of the entire storage into a directory
+by clicking **Storage** -> **Export storage...** in the menu bar at the top.
 This can be useful to backup your savegame collection or transfer it between different computers.
 
 ## Automatic updates
