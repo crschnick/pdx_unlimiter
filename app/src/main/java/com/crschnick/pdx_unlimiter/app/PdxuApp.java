@@ -15,10 +15,14 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
+
+    private static Logger logger = LoggerFactory.getLogger(PdxuApp.class);
 
     private static PdxuApp APP;
     private Image icon;
@@ -40,29 +44,47 @@ public class PdxuApp extends Application {
     public void setupWindowState() {
         Platform.runLater(() -> {
             Scene scene = getScene();
-            Window w = getScene().getWindow();
-
+            Stage w = (Stage) getScene().getWindow();
             var s = SavedState.getInstance();
 
             if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
             if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
             if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
             if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
+            if (s.isMaximized()) w.setMaximized(true);
 
             scene.getWindow().xProperty().addListener((c, o, n) -> {
-                if (windowActive) s.setWindowX(n.intValue());
+                if (windowActive) {
+                    logger.debug("Changing window x to " + n.intValue());
+                    s.setWindowX(n.intValue());
+                }
             });
             scene.getWindow().yProperty().addListener((c, o, n) -> {
-                if (windowActive) s.setWindowY(n.intValue());
+                if (windowActive) {
+                    logger.debug("Changing window y to " + n.intValue());
+                    s.setWindowY(n.intValue());
+                }
             });
             scene.getWindow().widthProperty().addListener((c, o, n) -> {
-                if (windowActive) s.setWindowWidth(n.intValue());
+                if (windowActive) {
+                    logger.debug("Changing window width to " + n.intValue());
+                    s.setWindowWidth(n.intValue());
+                }
             });
             scene.getWindow().heightProperty().addListener((c, o, n) -> {
-                if (windowActive) s.setWindowHeight(n.intValue());
+                if (windowActive) {
+                    logger.debug("Changing window height to " + n.intValue());
+                    s.setWindowHeight(n.intValue());
+                }
+            });
+            w.maximizedProperty().addListener((c, o, n) -> {
+                if (windowActive) {
+                    logger.debug("Changing window maximized to " + n);
+                    s.setMaximized(n);
+                }
             });
 
-            ((Stage) w).show();
+            w.show();
             windowActive = true;
         });
     }
@@ -77,9 +99,9 @@ public class PdxuApp extends Application {
                 @Override
                 public void handle(WindowEvent event) {
                     windowActive = false;
-                    ComponentManager.finalTeardown();
 
-                    // Close windows after teardown, otherwise saved window coordinates will be invalid!
+                    ComponentManager.finalTeardown();
+                    // Close other windows
                     Stage.getWindows().stream()
                             .filter(w -> !w.equals(getScene().getWindow()))
                             .collect(Collectors.toList())

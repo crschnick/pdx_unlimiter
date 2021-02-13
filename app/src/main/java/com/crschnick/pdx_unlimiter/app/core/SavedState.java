@@ -14,6 +14,7 @@ public class SavedState {
 
     public static final int INVALID = Integer.MIN_VALUE;
     private static SavedState INSTANCE;
+    private boolean maximized;
     private int windowX;
     private int windowY;
     private int windowWidth;
@@ -39,6 +40,7 @@ public class SavedState {
         }
 
         SavedState s = new SavedState();
+        s.maximized = Optional.ofNullable(sNode.get("maximized")).map(JsonNode::booleanValue).orElse(false);
         s.windowX = Optional.ofNullable(sNode.get("windowX")).map(JsonNode::intValue).orElse(INVALID);
         s.windowY = Optional.ofNullable(sNode.get("windowY")).map(JsonNode::intValue).orElse(INVALID);
         s.windowWidth = Optional.ofNullable(sNode.get("windowWidth")).map(JsonNode::intValue).orElse(INVALID);
@@ -68,12 +70,21 @@ public class SavedState {
         if (s.activeGame != null) {
             i.put("activeGame", s.activeGame.getId());
         }
+        i.put("maximized", s.maximized);
         i.put("windowX", s.windowX);
         i.put("windowY", s.windowY);
         i.put("windowWidth", s.windowWidth);
         i.put("windowHeight", s.windowHeight);
 
         ConfigHelper.writeConfig(file, n);
+    }
+
+    public boolean isMaximized() {
+        return maximized;
+    }
+
+    public void setMaximized(boolean maximized) {
+        this.maximized = maximized;
     }
 
     public int getWindowX() {
