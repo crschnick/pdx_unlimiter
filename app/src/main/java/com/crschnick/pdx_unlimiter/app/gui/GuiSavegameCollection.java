@@ -27,11 +27,7 @@ public class GuiSavegameCollection {
 
     public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
             SavegameCollection<T, I> c) {
-        GameIntegration<T, I> gi = GameIntegration.ALL.stream()
-                .filter(i -> i.getSavegameStorage().getCollections().contains(c))
-                .findFirst()
-                .map(v -> (GameIntegration<T, I>) v)
-                .get();
+        GameIntegration<T, I> gi = GameIntegration.getForSavegameStorage(SavegameStorage.getForSavegame(c));
 
         HBox btn = new HBox();
         btn.setOnMouseClicked((m) -> SavegameManagerState.<T, I>get().selectCollection(c));

@@ -23,6 +23,7 @@ public class PdxuApp extends Application {
     private static PdxuApp APP;
     private Image icon;
     private StackPane layout;
+    private boolean windowActive;
 
     public static PdxuApp getApp() {
         return APP;
@@ -48,12 +49,21 @@ public class PdxuApp extends Application {
             if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
             if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
 
-            scene.getWindow().xProperty().addListener((c, o, n) -> s.setWindowX(n.intValue()));
-            scene.getWindow().yProperty().addListener((c, o, n) -> s.setWindowY(n.intValue()));
-            scene.getWindow().widthProperty().addListener((c, o, n) -> s.setWindowWidth(n.intValue()));
-            scene.getWindow().heightProperty().addListener((c, o, n) -> s.setWindowHeight(n.intValue()));
+            scene.getWindow().xProperty().addListener((c, o, n) -> {
+                if (windowActive) s.setWindowX(n.intValue());
+            });
+            scene.getWindow().yProperty().addListener((c, o, n) -> {
+                if (windowActive) s.setWindowY(n.intValue());
+            });
+            scene.getWindow().widthProperty().addListener((c, o, n) -> {
+                if (windowActive) s.setWindowWidth(n.intValue());
+            });
+            scene.getWindow().heightProperty().addListener((c, o, n) -> {
+                if (windowActive) s.setWindowHeight(n.intValue());
+            });
 
             ((Stage) w).show();
+            windowActive = true;
         });
     }
 
@@ -66,6 +76,7 @@ public class PdxuApp extends Application {
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
+                    windowActive = false;
                     ComponentManager.finalTeardown();
 
                     // Close windows after teardown, otherwise saved window coordinates will be invalid!
