@@ -81,9 +81,10 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             }
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
-            e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag),
+            e.ruler = Ruler.fromCountryNode(e.date, n.getNodeForKey("countries").getNodeForKey(tag),
                     "monarch_heir", "monarch", "queen").get();
-            e.heir = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "heir").orElse(null);
+            e.heir = Ruler.fromCountryNode(e.date,
+                    n.getNodeForKey("countries").getNodeForKey(tag), "heir").orElse(null);
             for (Node dep : n.getNodeForKey("diplomacy").getNodesForKey("dependency")) {
                 String first = dep.getNodeForKey("first").getString();
                 String second = dep.getNodeForKey("second").getString();
@@ -259,7 +260,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             this.mil = mil;
         }
 
-        public static Optional<Ruler> fromCountryNode(Node n, String... types) {
+        public static Optional<Ruler> fromCountryNode(GameDate date, Node n, String... types) {
             Optional<Ruler> current = Optional.empty();
             for (Node e : n.getNodeForKey("history").getNodeArray()) {
                 var kv = e.getKeyValueNode();
@@ -274,10 +275,13 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                         }
 
                         // Exclude dead rulers
-                        boolean dead = r.hasKey("death_date");
-                        if (dead) {
-                            current = Optional.empty();
-                            continue;
+                        if (r.hasKey("death_date")) {
+                            boolean dead = GameDateType.EU4.fromString(r.getNodeForKey("death_date").getString())
+                                    .compareTo(date) <= 0;
+                            if (dead) {
+                                current = Optional.empty();
+                                continue;
+                            }
                         }
 
                         // If we have a new heir, but the heir has already succeeded, set the current heir to null
