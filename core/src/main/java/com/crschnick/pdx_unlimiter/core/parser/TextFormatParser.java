@@ -68,18 +68,31 @@ public class TextFormatParser extends FormatParser {
 
             boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
             boolean isComment = c == '#';
-            boolean eof = i == bytes.length - 1;
             boolean marksEndOfPreviousToken =
-                    (t != null && prev < i)             // New token finishes old token
+                            (t != null && prev < i)             // New token finishes old token
                             || (isWhitespace && prev < i)          // Whitespace finishes old token
                             || (isComment && prev < i);            // New comment finishes old token
             if (marksEndOfPreviousToken) {
-                var sub = Arrays.copyOfRange(bytes, prev, i);
-                if (sub[0] == '"' && sub[sub.length - 1] == '"') {
-                    tokens.add(new ValueToken(true, new String(Arrays.copyOfRange(sub, 1, sub.length - 1), charset)));
+                int offset;
+                int length;
+                boolean quoted;
+                if (bytes[prev] == '"' && bytes[i - 1] == '"') {
+                    quoted = true;
+                    offset = prev + 1;
+                    length = (i - 2) - (prev + 1) + 1;
                 } else {
-                    tokens.add(new ValueToken(false, new String(sub, StandardCharsets.UTF_8)));
+                    quoted = false;
+                    length = (i - 1) - (prev) + 1;
+                    offset = prev;
                 }
+                var s = new String(bytes, offset, length, charset);
+
+                // Intern any short strings like country tags
+                if (s.length() < 4) {
+                    s = s.intern();
+                }
+
+                tokens.add(new ValueToken(quoted, s));
             }
 
             if (isWhitespace) {
