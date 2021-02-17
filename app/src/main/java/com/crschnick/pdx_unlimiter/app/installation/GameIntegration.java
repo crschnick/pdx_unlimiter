@@ -37,7 +37,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
                 return (GameIntegration<T, I>) g;
             }
         }
-        throw new IllegalArgumentException();
+        return null;
     }
 
 

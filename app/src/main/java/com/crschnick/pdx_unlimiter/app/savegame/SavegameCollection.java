@@ -53,10 +53,6 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
         return uuid;
     }
 
-    public int indexOf(SavegameEntry<T, I> e) {
-        return entryStream().collect(Collectors.toList()).indexOf(e);
-    }
-
     public Stream<SavegameEntry<T, I>> entryStream() {
         var list = new ArrayList<SavegameEntry<T, I>>(getSavegames());
         list.sort(Comparator.comparing(SavegameEntry::getDate));

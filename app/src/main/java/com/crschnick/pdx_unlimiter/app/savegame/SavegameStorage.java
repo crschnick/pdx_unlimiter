@@ -423,27 +423,7 @@ public abstract class SavegameStorage<
         saveData();
     }
 
-    public void loadEntryAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            loadEntry(e);
-        }, false, false);
-    }
-
-    public void unloadCollectionAsync(SavegameCollection<T, I> col) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            boolean loaded = col.getSavegames().stream().anyMatch(e -> e.getInfo() != null);
-            if (!loaded) {
-                return;
-            }
-
-            logger.debug("Unloading collection " + col.getName());
-            for (var e : col.getSavegames()) {
-                e.infoProperty().set(null);
-            }
-        }, false, false);
-    }
-
-    private synchronized void loadEntry(SavegameEntry<T, I> e) {
+    synchronized void loadEntry(SavegameEntry<T, I> e) {
         if (e.infoProperty().isNotNull().get()) {
             return;
         }
@@ -532,8 +512,8 @@ public abstract class SavegameStorage<
         return colName + " (" + sgName + ")." + fileEnding;
     }
 
-    public synchronized void exportSavegame(SavegameEntry<T, I> e, Path destPath) throws IOException {
-        Path srcPath = getPath(e).resolve("savegame." + fileEnding);
+    public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
+        Path srcPath = getSavegameFile(e);
         FileUtils.forceMkdirParent(destPath.toFile());
         FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());

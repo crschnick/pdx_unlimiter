@@ -36,6 +36,7 @@ public class Settings {
     private Path storageDirectory;
     private Path ck3toeu4Dir;
     private boolean enableAutoUpdate;
+    private boolean enableEu4SaveEditor;
 
     public static void init() {
         Settings loaded = loadConfig();
@@ -125,6 +126,14 @@ public class Settings {
             s.enableAutoUpdate = true;
         }
 
+        Path eu4se = PdxuInstallation.getInstance().getSettingsLocation().resolve("eu4saveeditor");
+        try {
+            s.enableEu4SaveEditor = !Files.exists(eu4se) || Boolean.parseBoolean(Files.readString(eu4se));
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            s.enableEu4SaveEditor = false;
+        }
+
         return s;
     }
 
@@ -135,18 +144,10 @@ public class Settings {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ObjectNode i = n.putObject("settings");
         Settings s = Settings.INSTANCE;
-        GameDirectory.toNode(s.eu4).ifPresent(dir -> {
-            i.set("eu4", dir);
-        });
-        GameDirectory.toNode(s.hoi4).ifPresent(dir -> {
-            i.set("hoi4", dir);
-        });
-        GameDirectory.toNode(s.ck3).ifPresent(dir -> {
-            i.set("ck3", dir);
-        });
-        GameDirectory.toNode(s.stellaris).ifPresent(dir -> {
-            i.set("stellaris", dir);
-        });
+        GameDirectory.toNode(s.eu4).ifPresent(dir -> i.set("eu4", dir));
+        GameDirectory.toNode(s.hoi4).ifPresent(dir -> i.set("hoi4", dir));
+        GameDirectory.toNode(s.ck3).ifPresent(dir -> i.set("ck3", dir));
+        GameDirectory.toNode(s.stellaris).ifPresent(dir -> i.set("stellaris", dir));
 
         i.put("deleteOnImport", s.deleteOnImport);
         i.put("fontSize", s.fontSize);
@@ -170,6 +171,9 @@ public class Settings {
         ConfigHelper.writeConfig(file, n);
         Path updateFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
         Files.writeString(updateFile, Boolean.toString(s.enableAutoUpdate));
+
+        Path eu4seFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("eu4saveeditor");
+        Files.writeString(eu4seFile, Boolean.toString(s.enableEu4SaveEditor));
     }
 
     public Settings copy() {
@@ -187,6 +191,7 @@ public class Settings {
         c.skanderbegApiKey = skanderbegApiKey;
         c.storageDirectory = storageDirectory;
         c.ck3toeu4Dir = ck3toeu4Dir;
+        c.enableEu4SaveEditor = enableEu4SaveEditor;
         return c;
     }
 
@@ -388,12 +393,19 @@ public class Settings {
 
             var r = Optional.ofNullable(node).map(n -> Paths.get(n.textValue()))
                     .orElse(InstallLocationHelper.getInstallPath(name).orElse(null));
-            ;
             return ofPath(r);
         }
 
         abstract boolean isDisabled();
 
         abstract Path getPath();
+    }
+
+    public boolean enableEu4SaveEditor() {
+        return enableEu4SaveEditor;
+    }
+
+    public void setEnableEu4SaveEditor(boolean enableEu4SaveEditor) {
+        this.enableEu4SaveEditor = enableEu4SaveEditor;
     }
 }

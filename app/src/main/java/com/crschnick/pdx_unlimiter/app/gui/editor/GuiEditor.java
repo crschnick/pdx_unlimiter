@@ -55,6 +55,10 @@ public class GuiEditor {
         layout.setTop(topBars);
         createNodeList(layout, state);
         layout.setBottom(createFilterBar(state.getFilter()));
+
+        // Disable focus on startup
+        layout.requestFocus();
+
         return layout;
     }
 

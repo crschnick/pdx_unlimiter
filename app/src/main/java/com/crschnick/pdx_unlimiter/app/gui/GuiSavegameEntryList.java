@@ -23,8 +23,9 @@ public class GuiSavegameEntryList {
 
     private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
         Consumer<Set<? extends SavegameCollection<?, ?>>> update = (s) -> {
+            int newSize = s.size();
             Platform.runLater(() -> {
-                if (s.size() > 0) {
+                if (newSize > 0) {
                     pane.getChildren().set(0, listNode);
                 } else {
                     pane.getChildren().set(0, createNoCampaignNode(pane));

@@ -3,6 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
+import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -103,35 +105,32 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static Region createEntryStatusBar(SavegameEntry<?,?> e) {
+    private static <T, I extends SavegameInfo<T>> Region createEntryStatusBar(SavegameEntry<T,I> e) {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
-        {
-            Label text = new Label(
-                    GameIntegration.getForSavegameStorage(SavegameStorage.getForSavegame(e)).getName(),
-                    GameIntegration.getForSavegameStorage(
-                            SavegameStorage.getForSavegame(e)).getGuiFactory().createIcon());
-            barPane.setLeft(text);
-            BorderPane.setAlignment(text, Pos.CENTER);
-        }
-
-        {
-            Label name = new Label(
-                    SavegameStorage.getForSavegame(e).getSavegameCollection(e).getName() + ", " + e.getName());
-            name.setGraphic(new FontIcon());
-            name.getStyleClass().add(CLASS_TEXT);
-
-            if (SavegameActions.isEntryCompatible(e)) {
-                name.getStyleClass().add(CLASS_SAVEGAME);
-            } else {
-                barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-                name.getStyleClass().add(CLASS_ALERT);
-                name.setText(name.getText() + " (Incompatible)");
+        SavegameInfoHelper.withInfo(e, (info, gi) -> {
+            {
+                Label text = new Label(
+                        gi.getName(),
+                        gi.getGuiFactory().createIcon());
+                barPane.setLeft(text);
+                BorderPane.setAlignment(text, Pos.CENTER);
             }
-
-            barPane.setCenter(name);
-        }
+            {
+                Label name = new Label(gi.getSavegameStorage().getEntryName(e));
+                name.setGraphic(new FontIcon());
+                name.getStyleClass().add(CLASS_TEXT);
+                if (SavegameActions.isEntryCompatible(e)) {
+                    name.getStyleClass().add(CLASS_SAVEGAME);
+                } else {
+                    barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+                    name.getStyleClass().add(CLASS_ALERT);
+                    name.setText(name.getText() + " (Incompatible)");
+                }
+                barPane.setCenter(name);
+            }
+        });
 
         HBox buttons = new HBox();
         buttons.setSpacing(10);
@@ -189,8 +188,9 @@ public class GuiStatusBar {
         }
 
         private void setRunning() {
+            // Create node before Platform thread to avoid async issues!
+            Region bar = createRunningBar();
             Platform.runLater(() -> {
-                Region bar = createRunningBar();
                 getStatusBar().show(bar);
                 status = Status.RUNNING;
             });
@@ -205,16 +205,15 @@ public class GuiStatusBar {
             }
         }
 
-        private void select(SavegameEntry<?,?> e) {
+        private <T, I extends SavegameInfo<T>> void select(SavegameEntry<T,I> e) {
+            // Create node before Platform thread to avoid async issues!
+            Region bar = createEntryStatusBar(e);
             Platform.runLater(() -> {
                 if (status == Status.RUNNING) {
                     return;
                 }
 
-                Region bar;
                 status = Status.SELECTED;
-                bar = createEntryStatusBar(e);
-
                 show(bar);
             });
         }

@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
+import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -98,8 +99,9 @@ public class GuiSavegameCollection {
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
             c.getSavegames().addListener((SetChangeListener<SavegameEntry<?, ?>>) change -> {
+                int newLength = change.getSet().size();
                 Platform.runLater(() -> {
-                    count.setText("[" + change.getSet().size() + "]");
+                    count.setText("[" + newLength + "]");
                 });
             });
             bottom.getChildren().add(count);

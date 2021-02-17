@@ -7,11 +7,13 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,19 +25,34 @@ import java.util.stream.Collectors;
 
 public class SavegameActions {
 
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T,I> entry) {
+        return Optional.ofNullable(SavegameInfoHelper.createWithIntegration(entry, gi -> {
+            var sc = gi.getSavegameStorage();
+            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(entry));
+            try {
+                sc.copySavegameTo(entry, out);
+            } catch (IOException ioException) {
+                ErrorHandler.handleException(ioException);
+                return null;
+            }
+            return out;
+        }));
+    }
+
     public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
-        var ins = GameIntegration.getForSavegameStorage(
-                SavegameStorage.getForSavegame(entry)).getInstallation();
-        boolean missingMods = entry.getInfo().getMods().stream()
-                .map(ins::getModForName)
-                .anyMatch(Optional::isEmpty);
+        return SavegameInfoHelper.withInfo(entry, (info, gi) -> {
+            var ins= gi.getInstallation();
+            boolean missingMods = info.getMods().stream()
+                    .map(ins::getModForName)
+                    .anyMatch(Optional::isEmpty);
 
-        boolean missingDlc = entry.getInfo().getDlcs().stream()
-                .map(ins::getDlcForName)
-                .anyMatch(Optional::isEmpty);
+            boolean missingDlc = info.getDlcs().stream()
+                    .map(ins::getDlcForName)
+                    .anyMatch(Optional::isEmpty);
 
-        return areCompatible(ins.getVersion(), entry.getInfo().getVersion()) &&
-                !missingMods && !missingDlc;
+            return areCompatible(ins.getVersion(), info.getVersion()) &&
+                    !missingMods && !missingDlc;
+        }).orElse(false);
     }
 
     public static boolean isVersionCompatible(SavegameInfo<?> info) {
@@ -57,7 +74,7 @@ public class SavegameActions {
         try {
             var path = s.current().getInstallation().getExportTarget(
                     s.current().getSavegameStorage(), s.globalSelectedEntryProperty().get());
-            s.current().getSavegameStorage().exportSavegame(s.globalSelectedEntryProperty().get(), path);
+            s.current().getSavegameStorage().copySavegameTo(s.globalSelectedEntryProperty().get(), path);
             return Optional.of(path);
         } catch (IOException e) {
             ErrorHandler.handleException(e);

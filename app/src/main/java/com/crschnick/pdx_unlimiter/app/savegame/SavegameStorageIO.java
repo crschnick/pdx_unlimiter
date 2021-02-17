@@ -35,7 +35,7 @@ public class SavegameStorageIO {
                     fileOut = fileOut.resolveSibling("(" + counter + ") " + cache.getFileName(e));
                     counter++;
                 }
-                cache.exportSavegame(e, fileOut);
+                cache.copySavegameTo(e, fileOut);
             }
         }
     }

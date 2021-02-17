@@ -152,6 +152,32 @@ public class GuiSettings {
         return grid;
     }
 
+    private static Node eu4SaveEditor(Settings s) {
+        GridPane grid = new GridPane();
+
+        var t = new Text("Eu4SaveEditor");
+        t.setStyle("-fx-font-weight: bold");
+        TextFlow name = new TextFlow(t);
+        grid.add(name, 0, 0, 2, 1);
+
+        grid.add(GuiTooltips.helpNode("""
+Specifies whether to enable the Eu4SaveEditor.
+
+If you enable this, the Eu4SaveEditor will be downloaded and installed next time you start the Pdx-Unlimiter."""),
+                0, 1);
+        grid.add(new Label("Enable Eu4SaveEditor:"), 1, 1);
+        JFXCheckBox cb = new JFXCheckBox();
+        cb.setSelected(s.enableEu4SaveEditor());
+        cb.selectedProperty().addListener((c, o, n) -> {
+            s.setEnableEu4SaveEditor(n);
+        });
+        grid.add(cb, 2, 1);
+        GridPane.setHgrow(cb, Priority.ALWAYS);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        return grid;
+    }
+
     private static Node misc(Settings s) {
         GridPane grid = new GridPane();
 
@@ -348,6 +374,8 @@ public class GuiSettings {
                 installationLocations(s),
                 new Separator(),
                 misc(s),
+                new Separator(),
+                eu4SaveEditor(s),
                 new Separator(),
                 rakaly(s),
                 new Separator(),

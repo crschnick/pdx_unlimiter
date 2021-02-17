@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -15,19 +16,18 @@ import java.util.function.Function;
 public class GuiListView {
 
     public static <T> ListView<Node> createViewOfList(
-            ObservableList<T> list,
+            ListProperty<T> list,
             Function<T, Node> nodeFactory,
             ReadOnlyProperty<T> selectedProperty) {
         JFXListView<Node> listView = new JFXListView<Node>();
-        list.addListener((ListChangeListener<? super T>) lc -> {
+        list.addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 var map = new HashMap<T, Node>();
-                listView.getItems().forEach(n -> map.put((T) n.getProperties().get("list-item"), n));
+                listView.getItems().forEach(node -> map.put((T) node.getProperties().get("list-item"), node));
 
                 listView.getItems().clear();
 
-                // Make copy in case the list changes during this loop
-                new ArrayList<>(list).forEach(li -> {
+                n.forEach(li -> {
                     var item = map.getOrDefault(li, createForItem(li, nodeFactory));
                     listView.getItems().add(item);
                 });

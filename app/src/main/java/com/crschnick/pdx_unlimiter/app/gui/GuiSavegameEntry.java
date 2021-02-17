@@ -10,6 +10,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyWebHelper;
+import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
@@ -22,7 +23,6 @@ import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -41,66 +41,20 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiSavegameEntry {
 
-
-    public static <T, I extends SavegameInfo<T>> Node createSavegameEntryNode(SavegameEntry<T, I> e) {
-        VBox entryNode = new VBox();
-        {
-            entryNode.setAlignment(Pos.CENTER);
-            entryNode.setFillWidth(true);
-            entryNode.getStyleClass().add(CLASS_ENTRY);
-
-            entryNode.setOnMouseClicked(event -> {
-                if (e.infoProperty().isNotNull().get()) {
-                    SavegameManagerState.<T, I>get().selectEntry(e);
-                }
-            });
-
-            entryNode.setOnDragDetected(me -> {
-                Dragboard db = entryNode.startDragAndDrop(TransferMode.COPY);
-                var sc = SavegameManagerState.<T, I>get().current().getSavegameStorage();
-                var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(e));
-                try {
-                    sc.exportSavegame(e, out);
-                } catch (IOException ioException) {
-                    ErrorHandler.handleException(ioException);
-                    me.consume();
-                    return;
-                }
-
-                var cc = new ClipboardContent();
-                cc.putFiles(List.of(out.toFile()));
-                db.setContent(cc);
-                me.consume();
-            });
-        }
-
-
+    private static <T, I extends SavegameInfo<T>> Region setupTopBar(SavegameEntry<T, I> e) {
         BorderPane topBar = new BorderPane();
-        {
-            topBar.getStyleClass().add(CLASS_ENTRY_BAR);
-            ChangeListener<I> lis = (c, o, n) -> {
-                Platform.runLater(() -> {
-                    topBar.setBackground(n != null ?
-                            SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(n) : null);
-                });
-            };
-            e.infoProperty().addListener(lis);
-            if (e.infoProperty().isNotNull().get()) {
-                topBar.setBackground(
-                        SavegameManagerState.<T, I>get().current().getGuiFactory().createEntryInfoBackground(e.getInfo()));
-            }
-
-            entryNode.getChildren().add(topBar);
-        }
+        topBar.getStyleClass().add(CLASS_ENTRY_BAR);
+        SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+            topBar.setBackground(gi.getGuiFactory().createEntryInfoBackground(info));
+        });
 
         {
             Label l = new Label(e.getDate().toDisplayString());
             l.getStyleClass().add(CLASS_DATE);
 
-            var tagImage =
-                    SavegameManagerState.<T, I>get().current().getGuiFactory().createImage(e);
+            var tagImage = SavegameInfoHelper.createWithIntegration(e,
+                    gi -> gi.getGuiFactory().createImage(e));
             Pane tagPane = new Pane(tagImage.getValue());
-            tagPane.setMaxWidth(80);
             HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
             tagImage.addListener((change, o, n) -> {
@@ -125,7 +79,31 @@ public class GuiSavegameEntry {
             buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
             topBar.setRight(buttonBar);
         }
+        return topBar;
+    }
 
+    private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(Region r, SavegameEntry<T, I> e) {
+        r.setOnDragDetected(me -> {
+            var out = SavegameActions.exportToTemp(e);
+            out.ifPresent(p -> {
+                Dragboard db = r.startDragAndDrop(TransferMode.COPY);
+                var cc = new ClipboardContent();
+                cc.putFiles(List.of(p.toFile()));
+                db.setContent(cc);
+            });
+            me.consume();
+        });
+    }
+
+    public static <T, I extends SavegameInfo<T>> Node createSavegameEntryNode(SavegameEntry<T, I> e) {
+        VBox entryNode = new VBox();
+        entryNode.setAlignment(Pos.CENTER);
+        entryNode.setFillWidth(true);
+        entryNode.getStyleClass().add(CLASS_ENTRY);
+        entryNode.setOnMouseClicked(event -> SavegameManagerState.<T, I>get().selectEntry(e));
+
+        setupDragAndDrop(entryNode, e);
+        entryNode.getChildren().add(setupTopBar(e));
         Node content = createSavegameInfoNode(e);
         entryNode.getChildren().add(content);
 
@@ -152,17 +130,11 @@ public class GuiSavegameEntry {
             });
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            if (e.getInfo() != null && e.getInfo().isBinary()) {
-                buttonBar.getChildren().add(melt);
-            } else {
-                e.infoProperty().addListener((c, o, n) -> {
-                    if (n != null && n.isBinary()) {
-                        Platform.runLater(() -> buttonBar.getChildren().add(0, melt));
-                    } else {
-                        Platform.runLater(() -> buttonBar.getChildren().remove(melt));
-                    }
-                });
-            }
+            SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+                if (info.isBinary()) {
+                    buttonBar.getChildren().add(0, melt);
+                }
+            });
         }
 
         if (SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(e)) {
@@ -175,16 +147,6 @@ public class GuiSavegameEntry {
             upload.getStyleClass().add(CLASS_ANALYZE);
             GuiTooltips.install(upload, "Upload and analyze with Rakaly.com");
             buttonBar.getChildren().add(upload);
-
-
-//            Button analyze = new JFXButton();
-//            analyze.setGraphic(new FontIcon());
-//            analyze.setOnMouseClicked((m) -> {
-//                RakalyHelper.analyzeEntry(SavegameCache.EU4, eu4Entry);
-//            });
-//            analyze.getStyleClass().add(CLASS_ANALYZE);
-//            GuiTooltips.install(analyze, "Analyze with Rakaly.com");
-//            buttonBar.getChildren().add(analyze);
 
 
             Button uploadSkanderbeg = new JFXButton();
@@ -228,22 +190,11 @@ public class GuiSavegameEntry {
             });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
-
-            if (e.getInfo() != null && !e.getInfo().isBinary()) {
-                buttonBar.getChildren().add(0, edit);
-            } else {
-                e.infoProperty().addListener((c, o, n) -> {
-                    if (n != null && !n.isBinary()) {
-                        Platform.runLater(() -> {
-                            buttonBar.getChildren().add(0, edit);
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            buttonBar.getChildren().remove(edit);
-                        });
-                    }
-                });
-            }
+            SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+                if (!info.isBinary()) {
+                    buttonBar.getChildren().add(0, edit);
+                }
+            });
         }
 
         {
@@ -262,41 +213,44 @@ public class GuiSavegameEntry {
 
     private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(SavegameEntry<T, I> entry) {
         StackPane stack = new StackPane();
-        JFXMasonryPane grid = new JFXMasonryPane();
-        grid.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);
-        grid.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
-        grid.setHSpacing(10);
-        grid.setVSpacing(10);
-        grid.minHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> 3 * grid.getCellHeight() + 2 * grid.getVSpacing() + grid.getPadding().getBottom() + grid.getPadding().getTop(), grid.paddingProperty()));
-        grid.setLimitRow(3);
+        JFXMasonryPane container = new JFXMasonryPane();
+        container.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);
+        container.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
+        container.setHSpacing(10);
+        container.setVSpacing(10);
+        container.minHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> 3 * container.getCellHeight() + 2 * container.getVSpacing() + container.getPadding().getBottom() + container.getPadding().getTop(), container.paddingProperty()));
+        container.setLimitRow(3);
 
         JFXSpinner loading = new JFXSpinner();
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
-        stack.getChildren().add(grid);
+        stack.getChildren().add(container);
         if (entry.infoProperty().isNotNull().get()) {
-            SavegameManagerState.<T, I>get().current().getGuiFactory().fillNodeContainer(entry.getInfo(), grid);
+            SavegameInfoHelper.withInfo(entry, (info, gi) -> {
+                gi.getGuiFactory().fillNodeContainer(info, container);
+            });
         } else {
             stack.getChildren().add(loading);
         }
 
         stack.sceneProperty().addListener((c, o, n) -> {
             if (n != null) {
-                SavegameStorage.getForSavegame(entry).loadEntryAsync(entry);
+                SavegameManagerState.<T,I>get().loadEntryAsync(entry);
             }
         });
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
-                var gf = GameIntegration.getForSavegameStorage(SavegameStorage.getForSavegame(entry));
-                Platform.runLater(() -> {
-                    loading.setVisible(false);
-                    gf.getGuiFactory().fillNodeContainer(n, grid);
+                SavegameInfoHelper.doWithIntegration(entry, gi -> {
+                    Platform.runLater(() -> {
+                        loading.setVisible(false);
+                        gi.getGuiFactory().fillNodeContainer(n, container);
+                    });
                 });
             } else {
                 Platform.runLater(() -> {
                     loading.setVisible(true);
-                    grid.getChildren().clear();
+                    container.getChildren().clear();
                 });
             }
         });
