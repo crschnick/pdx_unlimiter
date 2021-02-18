@@ -4,8 +4,8 @@
 A savegame consists out of many entries, where each entry has a name,
 also called the key, and an associated value.
 They are formatted as `<key name> = <value>` pairs and look like this:
-![Entry](docs/data-entry.png)
 
+![Entry](docs/data-entry.png)
 
 The associated values can be of one of the following primitive types:
 <p>
@@ -36,15 +36,23 @@ you can only assign certain things to a game specific value without breaking the
 Color
 </p>
 
+### Lists
+
 A value can also be a list of any type of the ones listed above and would look like this:
+
 ![List-Entry](docs/list-entry.png)
+
 You can open the list contents by clicking on it.
 
 <p>
 <img align="left" src="docs/complex.png" width=28/>
-A complex type is assigned if a list contains key-value pairs on its own, its type is described as complex
+Complex type, assigned if a list contains key-value pairs on its own, its type is described as complex
 </p>
 
+<p>
+<img align="left" src="docs/preview.png" width=28/>
+A button that you can hover over to get a preview of the list contents in text form.
+</p>
 
 ## aaa
 
