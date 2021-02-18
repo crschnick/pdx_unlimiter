@@ -88,7 +88,8 @@ public class TextFormatParser extends FormatParser {
                 var s = new String(bytes, offset, length, charset);
 
                 // Intern any short strings like country tags
-                if (s.length() < 4) {
+                // Also intern any unquoted value like key names and game specific values
+                if (!quoted || s.length() < 4) {
                     s = s.intern();
                 }
 

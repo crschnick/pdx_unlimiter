@@ -3,9 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.*;
 import net.nikr.dds.DDSImageReaderSpi;
 import org.slf4j.LoggerFactory;
 
@@ -55,22 +53,26 @@ public class ImageLoader {
         }
 
         WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                int rgb = image.getRGB(x, y);
-                img.getPixelWriter().setArgb(x, y, pixelSelector != null ? pixelSelector.apply(rgb) : rgb);
+        var iArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+        if (pixelSelector != null) {
+            for (int i = 0; i < iArray.length; i++) {
+                iArray[i] = pixelSelector.apply(iArray[i]);
             }
         }
+        PixelWriter pw = img.getPixelWriter();
+        pw.setPixels(0, 0, image.getWidth(), image.getHeight(), PixelFormat.getIntArgbInstance(), iArray, 0, image.getWidth());
         return img;
     }
 
     static BufferedImage loadAwtImage(Path input, Function<Integer, Integer> pixelSelector) {
         try {
             BufferedImage image = ImageIO.read(input.toFile());
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    int rgb = image.getRGB(x, y);
-                    image.setRGB(x, y, pixelSelector != null ? pixelSelector.apply(rgb) : rgb);
+            if (pixelSelector != null) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    for (int y = 0; y < image.getHeight(); y++) {
+                        int rgb = image.getRGB(x, y);
+                        image.setRGB(x, y, pixelSelector.apply(rgb));
+                    }
                 }
             }
             return image;
@@ -80,14 +82,11 @@ public class ImageLoader {
         }
     }
 
-    static Image toFXImage(BufferedImage awtImage) {
-        WritableImage img = new WritableImage(awtImage.getWidth(), awtImage.getHeight());
-        for (int x = 0; x < awtImage.getWidth(); x++) {
-            for (int y = 0; y < awtImage.getHeight(); y++) {
-                int rgb = awtImage.getRGB(x, y);
-                img.getPixelWriter().setArgb(x, y, rgb);
-            }
-        }
+    static Image toFXImage(BufferedImage image) {
+        WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
+        var iArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+        PixelWriter pw = img.getPixelWriter();
+        pw.setPixels(0, 0, image.getWidth(), image.getHeight(), PixelFormat.getIntArgbInstance(), iArray, 0, image.getWidth());
         return img;
     }
 
