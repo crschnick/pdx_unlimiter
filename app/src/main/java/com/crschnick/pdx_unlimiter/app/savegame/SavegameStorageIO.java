@@ -23,7 +23,7 @@ public class SavegameStorageIO {
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
-        }, true, true);
+        }, true);
     }
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> cache, Path out) throws IOException {

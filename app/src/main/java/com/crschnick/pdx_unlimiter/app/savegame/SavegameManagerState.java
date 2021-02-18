@@ -8,13 +8,10 @@ import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -104,7 +101,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                     gi.getSavegameStorage().loadEntry(e);
                 }
             });
-        }, false, false);
+        }, false);
     }
 
     public void unloadCollectionAsync(SavegameCollection<T, I> col) {
@@ -118,7 +115,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             for (var e : col.getSavegames()) {
                 e.infoProperty().set(null);
             }
-        }, false, false);
+        }, false);
     }
 
     private void updateShownEntries() {

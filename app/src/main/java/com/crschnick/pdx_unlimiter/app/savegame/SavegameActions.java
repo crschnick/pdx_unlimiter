@@ -166,7 +166,7 @@ public class SavegameActions {
         SavegameManagerState<T, I> s = SavegameManagerState.get();
         TaskExecutor.getInstance().submitTask(() -> {
             s.<T, I>current().getSavegameStorage().meltSavegame(e);
-        }, true, true);
+        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
@@ -177,7 +177,7 @@ public class SavegameActions {
                 var storageTarget = new StorageEditTarget<>(SavegameStorage.getForSavegame(e), e, t);
                 Editor.createNewEditor(storageTarget);
             });
-        }, true, true);
+        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
@@ -185,6 +185,6 @@ public class SavegameActions {
             var sgs = SavegameStorage.getForSavegame(e);
             var in = sgs.getSavegameFile(e);
             sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
-        }, true, true);
+        }, true);
     }
 }

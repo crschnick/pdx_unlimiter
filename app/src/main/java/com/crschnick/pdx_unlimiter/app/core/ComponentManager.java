@@ -45,7 +45,7 @@ public class ComponentManager {
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
 
         TaskExecutor.getInstance().start();
-        TaskExecutor.getInstance().submitTask(ComponentManager::init, true, false);
+        TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
     }
 
     public static void reloadSettings(Settings newS) {
@@ -55,7 +55,7 @@ public class ComponentManager {
             reset();
             Settings.updateSettings(newS);
             init();
-        }, true, false);
+        }, true);
     }
 
     public static void finalTeardown() {
@@ -84,6 +84,7 @@ public class ComponentManager {
 
             GameIntegration.init();
             SavegameManagerState.init();
+            CacheManager.init();
 
             FileWatchManager.init();
             EditorExternalState.init();
@@ -105,6 +106,7 @@ public class ComponentManager {
 
             FileWatchManager.reset();
             SavegameManagerState.reset();
+            CacheManager.reset();
             GameIntegration.reset();
 
             LoggerFactory.getLogger(ComponentManager.class).debug("Waiting for platform thread");

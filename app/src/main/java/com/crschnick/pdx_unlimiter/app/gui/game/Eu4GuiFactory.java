@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLocalisation;
@@ -20,6 +21,8 @@ import javafx.scene.text.Font;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -193,8 +196,17 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         super.fillNodeContainer(i, grid);
     }
 
+    public static class Eu4TagImageCache extends CacheManager.Cache {
+        Map<String,Image> tagImages = new HashMap<>();
+
+        public Eu4TagImageCache() {
+            super(CacheManager.Scope.SAVEGAME_COLLECTION);
+        }
+    }
+
     private Image eu4TagNode(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
-        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), info);
+        return CacheManager.getInstance().get(Eu4TagImageCache.class).tagImages.computeIfAbsent(
+                tag.getTag(), s -> eu4TagNode(GameImage.getEu4TagPath(s), info));
     }
 
     private Image eu4TagNode(Path path, SavegameInfo<Eu4Tag> info) {

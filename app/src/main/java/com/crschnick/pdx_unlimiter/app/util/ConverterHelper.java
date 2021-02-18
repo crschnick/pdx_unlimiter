@@ -111,6 +111,6 @@ public class ConverterHelper {
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
-        }, true, false);
+        }, true);
     }
 }

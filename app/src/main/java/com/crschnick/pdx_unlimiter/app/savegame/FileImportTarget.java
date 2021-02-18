@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import org.apache.commons.io.FileUtils;
@@ -137,7 +136,7 @@ public abstract class FileImportTarget {
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
-            }, true, true);
+            }, true);
         }
 
         @Override
@@ -157,7 +156,7 @@ public abstract class FileImportTarget {
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
-            }, false, false);
+            }, false);
         }
 
         @Override
@@ -184,11 +183,7 @@ public abstract class FileImportTarget {
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
                 onFinish.accept(savegameStorage.importSavegame(path, null, true, null));
-
-                // Wait for other threads to catch up again-
-                // Without this, ui is very laggy
-                ThreadHelper.sleep(2000);
-            }, true, true);
+            }, true);
         }
 
         public Instant getLastModified() {
@@ -213,7 +208,7 @@ public abstract class FileImportTarget {
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
-            }, false, false);
+            }, false);
         }
 
         @Override

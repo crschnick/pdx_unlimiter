@@ -355,7 +355,7 @@ public abstract class SavegameStorage<
             SavegameCollection<T, I> to, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             moveEntry(to, entry);
-        }, true, true);
+        }, true);
     }
 
     private synchronized void moveEntry(
@@ -395,7 +395,7 @@ public abstract class SavegameStorage<
     public void deleteAsync(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             delete(e);
-        }, false, false);
+        }, false);
     }
 
     private synchronized void delete(SavegameEntry<T, I> e) {
@@ -576,7 +576,7 @@ public abstract class SavegameStorage<
                     ErrorHandler.handleException(new SavegameParseException(iv.message));
                 }
             });
-        }, false, true);
+        }, false);
     }
 
     private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> col) {

@@ -3,13 +3,14 @@ package com.crschnick.pdx_unlimiter.core.parser;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class TextFormatParser extends FormatParser {
 
     private Charset charset;
+    private int index;
+    private int slIndex;
+    private TextFormatTokenizer tokenizer;
 
     private TextFormatParser(Charset charset) {
         this.charset = charset;
@@ -35,81 +36,87 @@ public class TextFormatParser extends FormatParser {
         return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
-    private List<Token> tokenizeInternal(byte[] bytes) {
-        // Approx amount of needed tokens
-        List<Token> tokens = new ArrayList<>(bytes.length / 5);
-        int prev = 0;
-        boolean isInQuotes = false;
-        boolean isInComment = false;
+    public final ArrayNode parse(byte[] input) {
+        this.tokenizer = new TextFormatTokenizer(charset, input);
+        this.tokenizer.tokenize();
 
-        for (int i = 0; i <= bytes.length; i++) {
-            // Add extra new line at the end to simulate end of token
-            char c = i == bytes.length ? '\n' : (char) bytes[i];
-            Token t = null;
-            if (isInQuotes && c != '"') {
-                continue;
-            } else if (c == '"') {
-                isInQuotes = !isInQuotes;
-            } else if (c == '{') {
-                t = OpenGroupToken.INSTANCE;
-            } else if (c == '}') {
-                t = CloseGroupToken.INSTANCE;
-            } else if (c == '=') {
-                t = EqualsToken.INSTANCE;
-            }
-
-            if (isInComment) {
-                if (c == '\n') {
-                    isInComment = false;
-                }
-                prev = i + 1;
-                continue;
-            }
-
-            boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
-            boolean isComment = c == '#';
-            boolean marksEndOfPreviousToken =
-                            (t != null && prev < i)             // New token finishes old token
-                            || (isWhitespace && prev < i)          // Whitespace finishes old token
-                            || (isComment && prev < i);            // New comment finishes old token
-            if (marksEndOfPreviousToken) {
-                int offset;
-                int length;
-                boolean quoted;
-                if (bytes[prev] == '"' && bytes[i - 1] == '"') {
-                    quoted = true;
-                    offset = prev + 1;
-                    length = (i - 2) - (prev + 1) + 1;
-                } else {
-                    quoted = false;
-                    length = (i - 1) - (prev) + 1;
-                    offset = prev;
-                }
-                var s = new String(bytes, offset, length, charset);
-
-                // Intern any short strings like country tags
-                // Also intern any unquoted value like key names and game specific values
-                if (!quoted || s.length() < 4) {
-                    s = s.intern();
-                }
-
-                tokens.add(new ValueToken(quoted, s));
-            }
-
-            if (isWhitespace) {
-                prev = i + 1;
-            } else if (t != null) {
-                tokens.add(t);
-                prev = i + 1;
-            } else if (isComment) {
-                isInComment = true;
-            }
-        }
-        return tokens;
+        Map.Entry<Node, Integer> node = parseNode();
+        return (ArrayNode) node.getKey();
     }
 
-    @Override
-    public List<FormatParser.Token> tokenize(byte[] data) throws IOException {
-        return tokenizeInternal(data);
+    private Map.Entry<Node, Integer> parseNode() {
+        var tt = tokenizer.getTokenTypes();
+        var sl = tokenizer.getStringLiterals();
+        if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
+            String val = sl.get(slIndex++);
+            boolean isColor = ColorNode.isColorName(val);
+            if (isColor) {
+                return new AbstractMap.SimpleEntry<>(new ColorNode(val, List.of(
+                        new ValueNode(false, sl.get(slIndex++)),
+                        new ValueNode(false, sl.get(slIndex++)),
+                        new ValueNode(false, sl.get(slIndex++)))), index + 6);
+            } else {
+                return new AbstractMap.SimpleEntry<>(new ValueNode(false, val), index + 1);
+            }
+        } else if (tt[index] == TextFormatTokenizer.STRING_QUOTED) {
+            String val = sl.get(slIndex++);
+            return new AbstractMap.SimpleEntry<>(new ValueNode(true, val), index + 1);
+        }
+
+//        if (tt[index] == TextFormatTokenizer.EQUALS) {
+//            throw new IllegalStateException("Encountered unexpected =");
+//        }
+//
+//        if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
+//            throw new IllegalStateException("Encountered unexpected }");
+//        }
+
+        return parseGroup();
+    }
+
+    private Map.Entry<Node, Integer> parseGroup() {
+        var tt = tokenizer.getTokenTypes();
+        List<Node> children = new ArrayList<>();
+
+//        if (tt[index] != TextFormatTokenizer.OPEN_GROUP) {
+//            throw new IllegalStateException("Expected {");
+//        }
+
+        int currentIndex = index + 1;
+        while (true) {
+            if (currentIndex == tt.length) {
+                throw new IllegalStateException("Reached EOF but found no closing group token");
+            }
+
+            if (tt[currentIndex] == TextFormatTokenizer.CLOSE_GROUP) {
+                return new AbstractMap.SimpleEntry<>(new ArrayNode(children), currentIndex + 1);
+            }
+
+            boolean isKeyValue = tt[currentIndex + 1] == TextFormatTokenizer.EQUALS;
+            if (isKeyValue) {
+                index = currentIndex + 2;
+                String realKey = tokenizer.getStringLiterals().get(slIndex++);
+                Map.Entry<Node, Integer> result = parseNode();
+                children.add(KeyValueNode.create(realKey, result.getKey()));
+                currentIndex = result.getValue();
+                continue;
+            }
+
+            boolean isKeyValueWithoutEquals = tt[currentIndex] == TextFormatTokenizer.STRING_UNQUOTED &&
+                    tt[currentIndex + 1] == TextFormatTokenizer.OPEN_GROUP;
+            if (isKeyValueWithoutEquals) {
+                index = currentIndex + 1;
+                String realKey = tokenizer.getStringLiterals().get(slIndex++);
+                Map.Entry<Node, Integer> result = parseNode();
+                children.add(KeyValueNode.create(realKey, result.getKey()));
+                currentIndex = result.getValue();
+                continue;
+            }
+
+            index = currentIndex;
+            Map.Entry<Node, Integer> result = parseNode();
+            currentIndex = result.getValue();
+            children.add(result.getKey());
+        }
     }
 }

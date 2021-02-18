@@ -38,7 +38,7 @@ public class SkanderbegHelper {
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
             }
-        }, true, true);
+        }, true);
     }
 
     private static String uploadContent(byte[] content, String fileName) throws Exception {

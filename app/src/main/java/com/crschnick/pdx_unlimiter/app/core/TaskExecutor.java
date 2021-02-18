@@ -5,7 +5,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,23 +20,6 @@ public class TaskExecutor {
 
     public static TaskExecutor getInstance() {
         return INSTANCE;
-    }
-
-    private static void forceGC() {
-        var used = Runtime.getRuntime().totalMemory();
-        LoggerFactory.getLogger(TaskExecutor.class).debug("Used memory: " + used / 1024 + "kB");
-        LoggerFactory.getLogger(TaskExecutor.class).debug("Running gc ...");
-
-        Object obj = new Object();
-        WeakReference<?> ref = new WeakReference<>(obj);
-        obj = null;
-        while (ref.get() != null) {
-            System.gc();
-            ThreadHelper.sleep(20);
-        }
-
-        var usedAfter = Runtime.getRuntime().totalMemory();
-        LoggerFactory.getLogger(TaskExecutor.class).debug("Used memory after gc: " + usedAfter / 1024 + "kB");
     }
 
     public void start() {
@@ -88,15 +70,15 @@ public class TaskExecutor {
         }
     }
 
-    public void submitTask(Runnable r, boolean isBlocking, boolean doGc) {
+    public void submitTask(Runnable r, boolean isBlocking) {
         submitTask(() -> {
             r.run();
             return null;
         }, v -> {
-        }, isBlocking, doGc);
+        }, isBlocking);
     }
 
-    public <T> void submitTask(Callable<T> r, Consumer<T> onFinish, boolean isBlocking, boolean doGc) {
+    public <T> void submitTask(Callable<T> r, Consumer<T> onFinish, boolean isBlocking) {
         if (executorService.isShutdown()) {
             return;
         }
@@ -116,9 +98,6 @@ public class TaskExecutor {
                 ErrorHandler.handleException(e);
             }
 
-            if (doGc) {
-                forceGC();
-            }
 
             if (isBlocking) {
                 busy.setValue(false);

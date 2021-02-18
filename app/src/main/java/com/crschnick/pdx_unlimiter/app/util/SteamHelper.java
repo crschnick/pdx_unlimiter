@@ -28,7 +28,7 @@ public class SteamHelper {
                     } catch (Exception e) {
                         ErrorHandler.handleException(e);
                     }
-                }, true, false);
+                }, true);
             }
         } else {
             ThreadHelper.browse(uri);
