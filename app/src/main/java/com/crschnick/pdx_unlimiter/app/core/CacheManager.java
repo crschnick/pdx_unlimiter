@@ -1,6 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameFolder;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
+import javafx.collections.SetChangeListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -8,9 +13,11 @@ import java.util.Map;
 
 public class CacheManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(CacheManager.class);
+
     public static enum Scope {
         SAVEGAME,
-        SAVEGAME_COLLECTION,
+        SAVEGAME_CAMPAIGN,
         GAME
     }
 
@@ -27,17 +34,6 @@ public class CacheManager {
 
     public static void init() {
         INSTANCE = new CacheManager();
-        SavegameManagerState.get().currentGameProperty().addListener((c,o,n) -> {
-            INSTANCE.caches.clear();
-        });
-
-        SavegameManagerState.get().globalSelectedCampaignProperty().addListener((c,o,n) -> {
-            INSTANCE.caches.entrySet().removeIf(e -> !e.getValue().scope.equals(Scope.GAME));
-        });
-
-        SavegameManagerState.get().globalSelectedEntryProperty().addListener((c,o,n) -> {
-            INSTANCE.caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME));
-        });
     }
 
     public static void reset() {
@@ -50,6 +46,25 @@ public class CacheManager {
     }
 
     private Map<Class<? extends Cache>,Cache> caches = new HashMap<>();
+
+    public void onGameChange() {
+        logger.debug("Clearing game caches");
+        caches.clear();
+    }
+
+    public void onSavegameCollectionChange() {
+        logger.debug("Clearing savegame collection caches");
+        caches.entrySet().removeIf(e -> !e.getValue().scope.equals(Scope.GAME));
+    }
+
+    public void onSavegameLoad() {
+        if (SavegameManagerState.get().globalSelectedCampaignProperty().get() instanceof SavegameFolder) {
+            logger.debug("Clearing savegame collection caches");
+            caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN));
+        }
+        logger.debug("Clearing savegame caches");
+        caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME));
+    }
 
     @SuppressWarnings("unchecked")
     public <T extends Cache> T get(Class<T> clazz) {

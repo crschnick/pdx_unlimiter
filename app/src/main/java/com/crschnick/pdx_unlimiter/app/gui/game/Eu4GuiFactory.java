@@ -200,7 +200,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         Map<String,Image> tagImages = new HashMap<>();
 
         public Eu4TagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_COLLECTION);
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
         }
     }
 

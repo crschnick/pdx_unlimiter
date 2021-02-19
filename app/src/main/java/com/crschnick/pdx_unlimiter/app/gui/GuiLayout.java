@@ -69,7 +69,7 @@ public class GuiLayout {
         TaskExecutor.getInstance().busyProperty().addListener((c, o, n) -> {
             if (!n) {
                 ThreadHelper.create("loading delay", true, () -> {
-                    ThreadHelper.sleep(200);
+                    ThreadHelper.sleep(50);
                     if (!TaskExecutor.getInstance().isBusy()) {
                         Platform.runLater(() -> loadingBg.setVisible(false));
                     }

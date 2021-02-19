@@ -48,6 +48,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         });
     }
 
+    @SuppressWarnings("unchecked")
     public static <T, I extends SavegameInfo<T>> SavegameManagerState<T, I> get() {
         return (SavegameManagerState<T, I>) INSTANCE;
     }
@@ -81,11 +82,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public ReadOnlyObjectProperty<SavegameEntry<T, I>> globalSelectedEntryProperty() {
-        return (SimpleObjectProperty<SavegameEntry<T, I>>) globalSelectedEntry;
+        return globalSelectedEntry;
     }
 
     private SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntryPropertyInternal() {
-        return (SimpleObjectProperty<SavegameEntry<T, I>>) globalSelectedEntry;
+        return globalSelectedEntry;
     }
 
     public Filter getFilter() {

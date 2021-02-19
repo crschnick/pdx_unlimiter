@@ -83,8 +83,9 @@ public class ComponentManager {
             FileImporter.init();
 
             GameIntegration.init();
-            SavegameManagerState.init();
+
             CacheManager.init();
+            SavegameManagerState.init();
 
             FileWatchManager.init();
             EditorExternalState.init();

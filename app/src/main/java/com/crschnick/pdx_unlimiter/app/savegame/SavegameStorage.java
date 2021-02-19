@@ -57,8 +57,7 @@ public abstract class SavegameStorage<
     private Path path;
     private SavegameParser parser;
     private String infoChecksum;
-    private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.synchronizedObservableSet(
-            FXCollections.observableSet(new HashSet<>()));
+    private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
             String name,
@@ -128,7 +127,7 @@ public abstract class SavegameStorage<
         ALL = Set.of();
     }
 
-    private void loadData() {
+    private synchronized void loadData() {
         try {
             Files.createDirectories(getPath());
         } catch (IOException e) {
@@ -194,7 +193,7 @@ public abstract class SavegameStorage<
         }
     }
 
-    private void saveData() {
+    private synchronized void saveData() {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
 
         ArrayNode c = n.putArray("campaigns");
@@ -428,12 +427,6 @@ public abstract class SavegameStorage<
             return;
         }
 
-        logger.debug("Starting to load entry " + getEntryName(e));
-        if (e.infoProperty().isNotNull().get()) {
-            logger.debug("Entry is already loaded");
-            return;
-        }
-
         if (Files.exists(getSavegameInfoFile(e))) {
             logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
             try {
@@ -519,7 +512,7 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    protected synchronized SavegameParser.Status importSavegame(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
+    protected SavegameParser.Status importSavegame(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
         var status = importSavegameData(file, name, checkDuplicate, folder);
         saveData();
         return status;
@@ -612,20 +605,22 @@ public abstract class SavegameStorage<
                 UUID saveUuid = UUID.randomUUID();
                 logger.debug("Generated savegame UUID " + saveUuid.toString());
 
-                Path entryPath = getPath().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
-                try {
-                    FileUtils.forceMkdir(entryPath.toFile());
-                    FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
-                    JsonHelper.writeObject(s.info, entryPath.resolve(getInfoFileName()));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                    return;
-                }
+                synchronized (this) {
+                    Path entryPath = getPath().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
+                    try {
+                        FileUtils.forceMkdir(entryPath.toFile());
+                        FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
+                        JsonHelper.writeObject(s.info, entryPath.resolve(getInfoFileName()));
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e);
+                        return;
+                    }
 
-                if (col == null) {
-                    addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name);
-                } else {
-                    addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name);
+                    if (col == null) {
+                        addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name);
+                    } else {
+                        addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name);
+                    }
                 }
             }
 

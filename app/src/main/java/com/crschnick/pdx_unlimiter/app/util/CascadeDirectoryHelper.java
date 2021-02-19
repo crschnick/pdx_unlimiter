@@ -48,12 +48,12 @@ public class CascadeDirectoryHelper {
                 .map(GameMod::getPath)
                 .collect(Collectors.toList()));
 
-        dirs.addAll(info.getDlcs().stream()
-                .map(install::getDlcForName)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(GameDlc::getDataPath)
-                .collect(Collectors.toList()));
+//        dirs.addAll(info.getDlcs().stream()
+//                .map(install::getDlcForName)
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .map(GameDlc::getDataPath)
+//                .collect(Collectors.toList()));
 
         dirs.add(install.getModBasePath());
         return dirs;
