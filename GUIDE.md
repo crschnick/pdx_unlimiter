@@ -137,8 +137,17 @@ Copy functionality. This is useful to create backup copies before editing a save
 </p>
 
 <p>
+<img align="left" src="docs/eu4se.png" width=35/>
+Opens the <a href="https://github.com/Osallek/Eu4SaveEditor">Eu4SavegameEditor</a>,
+a very user friendly editor with a map based interface.
+It is only available for Non-Ironman EU4 savegames of the latest game version.
+To have access to it, you first need to enable it in the settings menu.
+</p>
+
+<p>
 <img align="left" src="docs/edit.png" width=35/>
-Opens the savegame editor, only available for Non-Ironman savegames.
+Opens the Pdx-Unlimiter savegame editor, only available for Non-Ironman savegames.
+You can use this text based editor, if the Eu4SaveEditor is not available or you need advanced editing features.
 </p>
 
 <p>
