@@ -14,6 +14,10 @@
  -fx-icon-code: "mdi-folder-multiple-outline";
 }
 
+.eu4se-button .ikonli-font-icon {
+   -fx-icon-code: "mdi-auto-fix";
+  }
+
 .ikonli-font-icon {
     -fx-icon-color: -fx-text-inner-color;
 }

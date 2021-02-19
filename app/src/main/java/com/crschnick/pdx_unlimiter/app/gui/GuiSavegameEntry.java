@@ -8,10 +8,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.util.ConverterHelper;
-import com.crschnick.pdx_unlimiter.app.util.RakalyWebHelper;
-import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
-import com.crschnick.pdx_unlimiter.app.util.SkanderbegHelper;
+import com.crschnick.pdx_unlimiter.app.util.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
@@ -158,6 +155,19 @@ public class GuiSavegameEntry {
             GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
+
+        SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+            if (Eu4SeHelper.supports(e, info)) {
+                Button eu4Se = new JFXButton();
+                eu4Se.setGraphic(new FontIcon());
+                eu4Se.setOnMouseClicked((m) -> {
+                    Eu4SeHelper.open(e);
+                });
+                eu4Se.getStyleClass().add("eu4se-button");
+                GuiTooltips.install(eu4Se, "Open with Eu4SaveEditor");
+                buttonBar.getChildren().add(0, eu4Se);
+            }
+        });
 
         if (SavegameStorage.CK3 != null && SavegameStorage.CK3.contains(e)) {
             SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;

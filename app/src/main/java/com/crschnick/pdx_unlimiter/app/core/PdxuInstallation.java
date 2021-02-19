@@ -23,6 +23,7 @@ public class PdxuInstallation {
     private boolean nativeHookEnabled;
     private boolean image;
     private boolean disableAllGames;
+    private Path eu4SeDir;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -49,6 +50,11 @@ public class PdxuInstallation {
             appInstallPath = INSTANCE.dataDir;
         }
         INSTANCE.rakalyDir = appInstallPath.resolve("rakaly");
+
+        INSTANCE.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
+        if (!Files.exists(INSTANCE.eu4SeDir)) {
+            INSTANCE.eu4SeDir = null;
+        }
 
         Properties props = new Properties();
         if (INSTANCE.production) {
@@ -176,6 +182,14 @@ public class PdxuInstallation {
 
     public Path getSavegamesLocation() {
         return Settings.getInstance().getStorageDirectory().orElse(getDefaultSavegamesLocation());
+    }
+
+    public boolean isEu4SaveEditorInstalled() {
+        return getEu4SaveEditorLocation() != null;
+    }
+
+    public Path getEu4SaveEditorLocation() {
+        return eu4SeDir;
     }
 
     public String getVersion() {
