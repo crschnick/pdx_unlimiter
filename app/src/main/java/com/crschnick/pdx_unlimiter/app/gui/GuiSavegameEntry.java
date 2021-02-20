@@ -1,9 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
@@ -28,10 +26,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
-import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
 import java.util.List;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -157,7 +153,7 @@ public class GuiSavegameEntry {
         }
 
         SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
-            if (Eu4SeHelper.supports(e, info)) {
+            if (Eu4SeHelper.shouldShowButton(e, info)) {
                 Button eu4Se = new JFXButton();
                 eu4Se.setGraphic(new FontIcon());
                 eu4Se.setOnMouseClicked((m) -> {

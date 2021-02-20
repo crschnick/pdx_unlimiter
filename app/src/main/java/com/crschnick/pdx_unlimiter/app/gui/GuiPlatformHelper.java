@@ -61,7 +61,13 @@ public class GuiPlatformHelper {
 
         LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Pausing platform thread");
         Platform.runLater(() -> {
-            semaphore.acquireUninterruptibly();
+            try {
+                if (!semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
+                    ErrorHandler.handleException(
+                            new TimeoutException("Platform continue timed out. Possible deadlock"));
+                }
+            } catch (InterruptedException ignored) {
+            }
         });
         while (semaphore.getQueueLength() == 0) {
             ThreadHelper.sleep(1);

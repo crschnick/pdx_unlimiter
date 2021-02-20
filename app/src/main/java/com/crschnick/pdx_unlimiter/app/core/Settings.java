@@ -128,7 +128,7 @@ public class Settings {
 
         Path eu4se = PdxuInstallation.getInstance().getSettingsLocation().resolve("eu4saveeditor");
         try {
-            s.enableEu4SaveEditor = !Files.exists(eu4se) || Boolean.parseBoolean(Files.readString(eu4se));
+            s.enableEu4SaveEditor = Files.exists(eu4se) && Boolean.parseBoolean(Files.readString(eu4se));
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             s.enableEu4SaveEditor = false;

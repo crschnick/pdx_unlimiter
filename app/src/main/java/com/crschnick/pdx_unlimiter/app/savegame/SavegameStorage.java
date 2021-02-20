@@ -541,7 +541,19 @@ public abstract class SavegameStorage<
         });
     }
 
-    public synchronized void reloadSavegameAsync(SavegameEntry<T, I> e) {
+    public synchronized void invalidateSavegameInfo(SavegameEntry<T, I> e) {
+        if (Files.exists(getSavegameInfoFile(e))) {
+            logger.debug("Invalidating " + getSavegameInfoFile(e));
+            try {
+                Files.delete(getSavegameInfoFile(e));
+                return;
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+        }
+    }
+
+    public void reloadSavegameAsync(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             logger.debug("Reloading savegame");
             e.infoProperty().set(null);
@@ -550,12 +562,14 @@ public abstract class SavegameStorage<
                 @Override
                 public void success(SavegameParser.Success<I> s) {
                     logger.debug("Reloading was successful");
-                    try {
-                        JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
-                        e.infoProperty().set(s.info);
-                        getSavegameCollection(e).onSavegameLoad(e);
-                    } catch (IOException ioException) {
-                        ErrorHandler.handleException(ioException);
+                    synchronized (SavegameStorage.this) {
+                        try {
+                            JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
+                            e.infoProperty().set(s.info);
+                            getSavegameCollection(e).onSavegameLoad(e);
+                        } catch (IOException ioException) {
+                            ErrorHandler.handleException(ioException);
+                        }
                     }
                 }
 
