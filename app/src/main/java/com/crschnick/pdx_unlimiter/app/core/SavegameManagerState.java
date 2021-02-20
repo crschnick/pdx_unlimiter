@@ -1,9 +1,9 @@
-package com.crschnick.pdx_unlimiter.app.savegame;
+package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.core.SavedState;
-import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
@@ -259,7 +259,8 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public void selectEntry(SavegameEntry<T, I> e) {
-        if (e.getInfo() == null) {
+        // Don't do anything if entry is not loaded yet
+        if (e != null && e.getInfo() == null) {
             return;
         }
 
@@ -268,7 +269,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-
             if (e == null) {
                 if (current.isNotNull().get()) {
                     globalSelectedEntryPropertyInternal().set(null);

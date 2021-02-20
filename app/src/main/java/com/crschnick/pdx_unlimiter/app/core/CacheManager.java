@@ -1,36 +1,17 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameFolder;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
-import javafx.collections.SetChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CacheManager {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheManager.class);
-
-    public static enum Scope {
-        SAVEGAME,
-        SAVEGAME_CAMPAIGN,
-        GAME
-    }
-
-    public static class Cache {
-
-        private Scope scope;
-
-        public Cache(Scope scope) {
-            this.scope = scope;
-        }
-    }
-
     private static CacheManager INSTANCE;
+    private Map<Class<? extends Cache>, Cache> caches = new HashMap<>();
 
     public static void init() {
         INSTANCE = new CacheManager();
@@ -44,8 +25,6 @@ public class CacheManager {
     public static CacheManager getInstance() {
         return INSTANCE;
     }
-
-    private Map<Class<? extends Cache>,Cache> caches = new HashMap<>();
 
     public void onGameChange() {
         logger.debug("Clearing game caches");
@@ -73,6 +52,21 @@ public class CacheManager {
         } catch (Exception e) {
             ErrorHandler.handleException(e);
             return null;
+        }
+    }
+
+    public static enum Scope {
+        SAVEGAME,
+        SAVEGAME_CAMPAIGN,
+        GAME
+    }
+
+    public static class Cache {
+
+        private Scope scope;
+
+        public Cache(Scope scope) {
+            this.scope = scope;
         }
     }
 }

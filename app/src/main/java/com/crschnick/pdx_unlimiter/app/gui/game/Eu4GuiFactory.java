@@ -196,14 +196,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         super.fillNodeContainer(i, grid);
     }
 
-    public static class Eu4TagImageCache extends CacheManager.Cache {
-        Map<String,Image> tagImages = new HashMap<>();
-
-        public Eu4TagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
-        }
-    }
-
     private Image eu4TagNode(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
         return CacheManager.getInstance().get(Eu4TagImageCache.class).tagImages.computeIfAbsent(
                 tag.getTag(), s -> eu4TagNode(GameImage.getEu4TagPath(s), info));
@@ -213,5 +205,13 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         var in = CascadeDirectoryHelper.openFile(
                 path, info, GameInstallation.EU4);
         return ImageLoader.loadImage(in.orElse(null), null);
+    }
+
+    public static class Eu4TagImageCache extends CacheManager.Cache {
+        Map<String, Image> tagImages = new HashMap<>();
+
+        public Eu4TagImageCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
+        }
     }
 }

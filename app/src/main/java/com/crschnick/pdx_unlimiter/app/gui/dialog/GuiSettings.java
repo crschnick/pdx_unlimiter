@@ -161,9 +161,9 @@ public class GuiSettings {
         grid.add(name, 0, 0, 2, 1);
 
         grid.add(GuiTooltips.helpNode("""
-Specifies whether to enable the Eu4SaveEditor.
+                        Specifies whether to enable the Eu4SaveEditor.
 
-If you enable this, the Eu4SaveEditor will be downloaded and installed next time you start the Pdx-Unlimiter."""),
+                        If you enable this, the Eu4SaveEditor will be downloaded and installed next time you start the Pdx-Unlimiter."""),
                 0, 1);
         grid.add(new Label("Enable Eu4SaveEditor:"), 1, 1);
         JFXCheckBox cb = new JFXCheckBox();

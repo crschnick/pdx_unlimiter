@@ -8,7 +8,6 @@ import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import javafx.application.Platform;

@@ -67,7 +67,7 @@ public class TextFormatTokenizer {
         boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
         boolean isComment = c == '#';
         boolean marksEndOfPreviousToken =
-                           (t != 0 && prev < i)                // New token finishes old token
+                (t != 0 && prev < i)                // New token finishes old token
                         || (isWhitespace && prev < i)          // Whitespace finishes old token
                         || (isComment && prev < i);            // New comment finishes old token
         if (marksEndOfPreviousToken) {

@@ -66,7 +66,7 @@ public class SettingsChecker {
             if (newValidatedS.hasNoValidInstallation()) {
                 GuiErrorReporter.showSimpleErrorMessage("""
                         Welcome to the Pdx-Unlimiter!
-                        
+                                                
                         The automatic game detection did not detect any supported Paradox game.
                         To get started, you can set the installation directories of games manually in the settings menu.
 

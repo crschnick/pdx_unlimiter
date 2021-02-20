@@ -13,6 +13,7 @@ public class Ck3Tag {
     private Person ruler;
     private List<Title> titles;
     private List<Title> claims;
+
     public Ck3Tag() {
     }
 

@@ -8,20 +8,6 @@ import javafx.util.Duration;
 
 public class GuiTooltips {
 
-    public static class FocusTooltip extends Tooltip {
-
-        public FocusTooltip(String string) {
-            super(string);
-        }
-
-        @Override
-        protected void show() {
-            Window owner = getOwnerWindow();
-            if (owner.isFocused())
-                super.show();
-        }
-    }
-
     public static Tooltip createTooltip(String text) {
         var tt = new FocusTooltip(text);
         tt.styleProperty().setValue("-fx-font-size: 1em; -fx-background-color: #333333FF;");
@@ -43,5 +29,19 @@ public class GuiTooltips {
         tt.setShowDelay(Duration.millis(350));
         tt.setShowDuration(Duration.INDEFINITE);
         Tooltip.install(node, tt);
+    }
+
+    public static class FocusTooltip extends Tooltip {
+
+        public FocusTooltip(String string) {
+            super(string);
+        }
+
+        @Override
+        protected void show() {
+            Window owner = getOwnerWindow();
+            if (owner.isFocused())
+                super.show();
+        }
     }
 }

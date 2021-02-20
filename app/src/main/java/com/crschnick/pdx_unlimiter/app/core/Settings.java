@@ -349,6 +349,14 @@ public class Settings {
         return deleteOnImport;
     }
 
+    public boolean enableEu4SaveEditor() {
+        return enableEu4SaveEditor;
+    }
+
+    public void setEnableEu4SaveEditor(boolean enableEu4SaveEditor) {
+        this.enableEu4SaveEditor = enableEu4SaveEditor;
+    }
+
     private static abstract class GameDirectory {
 
         private static Optional<TextNode> toNode(GameDirectory d) {
@@ -399,13 +407,5 @@ public class Settings {
         abstract boolean isDisabled();
 
         abstract Path getPath();
-    }
-
-    public boolean enableEu4SaveEditor() {
-        return enableEu4SaveEditor;
-    }
-
-    public void setEnableEu4SaveEditor(boolean enableEu4SaveEditor) {
-        this.enableEu4SaveEditor = enableEu4SaveEditor;
     }
 }

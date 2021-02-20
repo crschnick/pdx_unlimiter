@@ -1,8 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
@@ -14,6 +12,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GuiPlatformHelper {
+
+    private static volatile AtomicInteger otherPauses = new AtomicInteger(0);
+    private static Semaphore semaphore = new Semaphore(0);
 
     private static void waitForPlatform() {
         if (Platform.isFxApplicationThread()) {
@@ -37,9 +38,6 @@ public class GuiPlatformHelper {
         }
         LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Synced with platform thread");
     }
-
-    private static volatile AtomicInteger otherPauses = new AtomicInteger(0);
-    private static Semaphore semaphore = new Semaphore(0);
 
     public static void doWhilePlatformIsPaused(Runnable r) {
         waitForAndPausePlatform();

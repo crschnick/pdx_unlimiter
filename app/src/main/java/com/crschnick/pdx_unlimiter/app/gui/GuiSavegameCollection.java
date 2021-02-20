@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
-import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;

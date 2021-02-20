@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;

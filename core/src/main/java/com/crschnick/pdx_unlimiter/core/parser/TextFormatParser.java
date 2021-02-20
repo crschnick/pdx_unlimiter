@@ -1,9 +1,11 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class TextFormatParser extends FormatParser {
 

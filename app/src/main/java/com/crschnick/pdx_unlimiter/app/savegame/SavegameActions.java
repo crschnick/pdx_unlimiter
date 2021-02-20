@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class SavegameActions {
 
-    public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T,I> entry) {
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry) {
         return Optional.ofNullable(SavegameInfoHelper.createWithIntegration(entry, gi -> {
             var sc = gi.getSavegameStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(entry));
@@ -41,7 +42,7 @@ public class SavegameActions {
 
     public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
         return SavegameInfoHelper.withInfo(entry, (info, gi) -> {
-            var ins= gi.getInstallation();
+            var ins = gi.getInstallation();
             boolean missingMods = info.getMods().stream()
                     .map(ins::getModForName)
                     .anyMatch(Optional::isEmpty);

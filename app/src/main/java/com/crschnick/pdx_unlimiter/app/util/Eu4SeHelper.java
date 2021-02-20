@@ -2,24 +2,17 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
-import com.jfoenix.controls.JFXButton;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
-
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_ANALYZE;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_MAP;
 import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public class Eu4SeHelper {
@@ -47,7 +40,7 @@ public class Eu4SeHelper {
         alert.showAndWait();
     }
 
-    public static boolean shouldShowButton(SavegameEntry<?,?> entry, SavegameInfo<?> info) {
+    public static boolean shouldShowButton(SavegameEntry<?, ?> entry, SavegameInfo<?> info) {
         if (info.isBinary()) {
             return false;
         }
@@ -55,7 +48,7 @@ public class Eu4SeHelper {
         return SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(entry);
     }
 
-    public static void open(SavegameEntry<?,?> entry) {
+    public static void open(SavegameEntry<?, ?> entry) {
         if (!PdxuInstallation.getInstance().isEu4SaveEditorInstalled()) {
             showUsageDialog();
             return;

@@ -1,10 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -241,7 +241,7 @@ public class GuiSavegameEntry {
 
         stack.sceneProperty().addListener((c, o, n) -> {
             if (n != null) {
-                SavegameManagerState.<T,I>get().loadEntryAsync(entry);
+                SavegameManagerState.<T, I>get().loadEntryAsync(entry);
             }
         });
 

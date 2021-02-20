@@ -4,12 +4,9 @@ import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyProperty;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
 

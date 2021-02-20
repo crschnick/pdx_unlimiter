@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -342,7 +343,7 @@ public abstract class SavegameStorage<
                 .anyMatch(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
     }
 
-    public synchronized SavegameCollection<T, I> getSavegameCollection(SavegameEntry<?,?> e) {
+    public synchronized SavegameCollection<T, I> getSavegameCollection(SavegameEntry<?, ?> e) {
         var campaign = collections.stream()
                 .filter(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
                 .findAny();
@@ -422,7 +423,7 @@ public abstract class SavegameStorage<
         saveData();
     }
 
-    synchronized void loadEntry(SavegameEntry<T, I> e) {
+    public synchronized void loadEntry(SavegameEntry<T, I> e) {
         if (e.infoProperty().isNotNull().get()) {
             return;
         }

@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.savegame.*;
+import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
@@ -105,7 +107,7 @@ public class GuiStatusBar {
         return barPane;
     }
 
-    private static <T, I extends SavegameInfo<T>> Region createEntryStatusBar(SavegameEntry<T,I> e) {
+    private static <T, I extends SavegameInfo<T>> Region createEntryStatusBar(SavegameEntry<T, I> e) {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
@@ -205,7 +207,7 @@ public class GuiStatusBar {
             }
         }
 
-        private <T, I extends SavegameInfo<T>> void select(SavegameEntry<T,I> e) {
+        private <T, I extends SavegameInfo<T>> void select(SavegameEntry<T, I> e) {
             // Create node before Platform thread to avoid async issues!
             Region bar = createEntryStatusBar(e);
             Platform.runLater(() -> {

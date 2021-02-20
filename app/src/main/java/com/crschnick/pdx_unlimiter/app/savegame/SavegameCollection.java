@@ -10,7 +10,6 @@ import javafx.collections.ObservableSet;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {

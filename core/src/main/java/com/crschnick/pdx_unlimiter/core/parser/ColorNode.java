@@ -6,6 +6,7 @@ public class ColorNode extends Node {
 
     private String colorName;
     private List<ValueNode> values;
+
     public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
         this.values = values;
