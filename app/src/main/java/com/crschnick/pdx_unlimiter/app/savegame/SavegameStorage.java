@@ -49,16 +49,16 @@ public abstract class SavegameStorage<
     public static Ck3SavegameStorage CK3;
     public static Set<SavegameStorage<?, ?>> ALL;
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Class<I> infoClass;
-    private String fileEnding;
-    private String name;
-    private GameDateType dateType;
-    private Path path;
-    private SavegameParser parser;
-    private String infoChecksum;
-    private volatile ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
+    private final Class<I> infoClass;
+    private final String fileEnding;
+    private final String name;
+    private final GameDateType dateType;
+    private final Path path;
+    private final SavegameParser parser;
+    private final String infoChecksum;
+    private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
             String name,
@@ -74,24 +74,6 @@ public abstract class SavegameStorage<
         this.path = PdxuInstallation.getInstance().getSavegamesLocation().resolve(name);
         this.infoClass = infoClass;
         this.infoChecksum = infoChecksum;
-    }
-
-    public static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> getForSavegame(SavegameEntry<T, I> e) {
-        @SuppressWarnings("unchecked")
-        Optional<SavegameStorage<T, I>> sg = ALL.stream()
-                .filter(i -> i.contains(e))
-                .findFirst()
-                .map(v -> (SavegameStorage<T, I>) v);
-        return sg.orElseThrow(IllegalArgumentException::new);
-    }
-
-    public static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> getForSavegame(SavegameCollection<T, I> col) {
-        @SuppressWarnings("unchecked")
-        Optional<SavegameStorage<T, I>> sg = ALL.stream()
-                .filter(i -> i.getCollections().contains(col))
-                .findFirst()
-                .map(v -> (SavegameStorage<T, I>) v);
-        return sg.orElseThrow(IllegalArgumentException::new);
     }
 
     public static void init() {
@@ -136,7 +118,7 @@ public abstract class SavegameStorage<
             return;
         }
 
-        JsonNode node = null;
+        JsonNode node;
         if (Files.exists(getDataFile())) {
             node = ConfigHelper.readConfig(getDataFile());
         } else {
@@ -155,7 +137,7 @@ public abstract class SavegameStorage<
 
                 Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
                 Image image = ImageLoader.loadImage(getPath().resolve(id.toString()).resolve("campaign.png"));
-                collections.add(new SavegameCampaign<T, I>(lastDate, name, id, date, image));
+                collections.add(new SavegameCampaign<>(lastDate, name, id, date, image));
             }
         }
 
@@ -186,7 +168,7 @@ public abstract class SavegameStorage<
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
                     GameDate date = dateType.fromString(entryNode.required("date").textValue());
                     String checksum = entryNode.required("checksum").textValue();
-                    collection.add(new SavegameEntry<T, I>(name, eId, null, checksum, date));
+                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Could not load campaign config of " + collection.getName(), null);
@@ -255,26 +237,7 @@ public abstract class SavegameStorage<
         ConfigHelper.writeConfig(getDataFile(), n);
     }
 
-    public synchronized void delete(SavegameCollection<T, I> c) {
-        if (!this.collections.contains(c)) {
-            return;
-        }
-
-        Path campaignPath = path.resolve(c.getUuid().toString());
-        try {
-            FileUtils.deleteDirectory(campaignPath.toFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (SavegameManagerState.get().globalSelectedCampaignProperty().get() == c) {
-            SavegameManagerState.get().selectCollection(null);
-        }
-
-        this.collections.remove(c);
-    }
-
-    private synchronized Optional<SavegameFolder<T, I>> getOrCreateFolder(String name) {
+    synchronized Optional<SavegameFolder<T, I>> getOrCreateFolder(String name) {
         return this.collections.stream()
                 .filter(f -> f instanceof SavegameFolder && f.getName().equals(name))
                 .map(f -> (SavegameFolder<T, I>) f)
@@ -316,8 +279,6 @@ public abstract class SavegameStorage<
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
         c.onSavegamesChange();
-
-        SavegameManagerState.<T, I>get().selectEntry(e);
     }
 
     public synchronized void addNewEntryToCollection(SavegameCollection<T, I> col, UUID entryUuid, String checksum, I info, String name) {
@@ -330,8 +291,6 @@ public abstract class SavegameStorage<
         logger.debug("Adding new entry " + e.getName());
         col.getSavegames().add(e);
         col.onSavegamesChange();
-
-        SavegameManagerState.<T, I>get().selectEntry(e);
     }
 
     protected abstract String getDefaultEntryName(I info);
@@ -351,14 +310,7 @@ public abstract class SavegameStorage<
                 "Could not find savegame collection for entry " + e.getName()));
     }
 
-    public void moveEntryAsync(
-            SavegameCollection<T, I> to, SavegameEntry<T, I> entry) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            moveEntry(to, entry);
-        }, true);
-    }
-
-    private synchronized void moveEntry(
+    synchronized void moveEntry(
             SavegameCollection<T, I> to, SavegameEntry<T, I> entry) {
         var from = getSavegameCollection(entry);
         if (from == to) {
@@ -392,13 +344,23 @@ public abstract class SavegameStorage<
         saveData();
     }
 
-    public void deleteAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            delete(e);
-        }, false);
+    synchronized void delete(SavegameCollection<T, I> c) {
+        if (!this.collections.contains(c)) {
+            return;
+        }
+
+        Path campaignPath = path.resolve(c.getUuid().toString());
+        try {
+            FileUtils.deleteDirectory(campaignPath.toFile());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
+
+        this.collections.remove(c);
     }
 
-    private synchronized void delete(SavegameEntry<T, I> e) {
+
+    synchronized void delete(SavegameEntry<T, I> e) {
         SavegameCollection<T, I> c = getSavegameCollection(e);
         if (!this.collections.contains(c) || !c.getSavegames().contains(e)) {
             return;
@@ -527,21 +489,6 @@ public abstract class SavegameStorage<
         return "info_" + infoChecksum + ".json";
     }
 
-    public synchronized void meltSavegame(SavegameEntry<T, I> e) {
-        logger.debug("Melting savegame");
-        Path meltedFile;
-        try {
-            meltedFile = RakalyHelper.meltSavegame(getSavegameFile(e));
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
-            return;
-        }
-        var folder = getOrCreateFolder("Melted savegames");
-        folder.ifPresent(f -> {
-            importSavegame(meltedFile, null, true, f);
-        });
-    }
-
     public synchronized void invalidateSavegameInfo(SavegameEntry<T, I> e) {
         if (Files.exists(getSavegameInfoFile(e))) {
             logger.debug("Invalidating " + getSavegameInfoFile(e));
@@ -554,37 +501,35 @@ public abstract class SavegameStorage<
         }
     }
 
-    public void reloadSavegameAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            logger.debug("Reloading savegame");
-            e.infoProperty().set(null);
-            var status = parser.parse(getSavegameFile(e), RakalyHelper::meltSavegame);
-            status.visit(new SavegameParser.StatusVisitor<I>() {
-                @Override
-                public void success(SavegameParser.Success<I> s) {
-                    logger.debug("Reloading was successful");
-                    synchronized (SavegameStorage.this) {
-                        try {
-                            JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
-                            e.infoProperty().set(s.info);
-                            getSavegameCollection(e).onSavegameLoad(e);
-                        } catch (IOException ioException) {
-                            ErrorHandler.handleException(ioException);
-                        }
+    void reloadSavegameAsync(SavegameEntry<T, I> e) {
+        logger.debug("Reloading savegame");
+        e.infoProperty().set(null);
+        var status = parser.parse(getSavegameFile(e), RakalyHelper::meltSavegame);
+        status.visit(new SavegameParser.StatusVisitor<I>() {
+            @Override
+            public void success(SavegameParser.Success<I> s) {
+                logger.debug("Reloading was successful");
+                synchronized (SavegameStorage.this) {
+                    try {
+                        JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
+                        e.infoProperty().set(s.info);
+                        getSavegameCollection(e).onSavegameLoad(e);
+                    } catch (IOException ioException) {
+                        ErrorHandler.handleException(ioException);
                     }
                 }
+            }
 
-                @Override
-                public void error(SavegameParser.Error e) {
-                    ErrorHandler.handleException(e.error);
-                }
+            @Override
+            public void error(SavegameParser.Error e) {
+                ErrorHandler.handleException(e.error);
+            }
 
-                @Override
-                public void invalid(SavegameParser.Invalid iv) {
-                    ErrorHandler.handleException(new SavegameParseException(iv.message));
-                }
-            });
-        }, false);
+            @Override
+            public void invalid(SavegameParser.Invalid iv) {
+                ErrorHandler.handleException(new SavegameParseException(iv.message));
+            }
+        });
     }
 
     private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> col) {
@@ -668,10 +613,6 @@ public abstract class SavegameStorage<
 
     public ObservableSet<SavegameCollection<T, I>> getCollections() {
         return collections;
-    }
-
-    public String getFileEnding() {
-        return fileEnding;
     }
 
     public String getName() {

@@ -6,11 +6,13 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
+import com.crschnick.pdx_unlimiter.app.util.Eu4SeHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 
 public class SettingsChecker {
 
+    private static Settings oldS;
     private static Settings newS;
     private static Settings newValidatedS;
 
@@ -23,7 +25,8 @@ public class SettingsChecker {
                 "An error occured while loading your " + game + " installation:\n" + msg);
     }
 
-    public static void onSettingsChange(Settings newS, Settings newValidatedS) {
+    public static void onSettingsChange(Settings oldS, Settings newS, Settings newValidatedS) {
+        SettingsChecker.oldS = oldS;
         SettingsChecker.newS = newS;
         SettingsChecker.newValidatedS = newValidatedS;
     }
@@ -73,6 +76,10 @@ public class SettingsChecker {
                         Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
                                                                         """);
                 Platform.runLater(GuiSettings::showSettings);
+            }
+
+            if (!oldS.enableEu4SaveEditor() && newS.enableEu4SaveEditor()) {
+                Eu4SeHelper.showEnabledDialog();
             }
         }).start();
     }

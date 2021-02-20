@@ -8,10 +8,13 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
@@ -27,7 +30,7 @@ import java.util.stream.Collectors;
 public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry) {
-        return Optional.ofNullable(SavegameInfoHelper.createWithIntegration(entry, gi -> {
+        return Optional.ofNullable(SavegameHelper.mapSavegame(entry, gi -> {
             var sc = gi.getSavegameStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(entry));
             try {
@@ -41,7 +44,7 @@ public class SavegameActions {
     }
 
     public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
-        return SavegameInfoHelper.withInfo(entry, (info, gi) -> {
+        return SavegameHelper.mapSavegame(entry, (info, gi) -> {
             var ins = gi.getInstallation();
             boolean missingMods = info.getMods().stream()
                     .map(ins::getModForName)
@@ -86,7 +89,11 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         var s = SavegameManagerState.<T, I>get();
-        s.current().getSavegameStorage().moveEntryAsync(collection, entry);
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameHelper.withSavegame(entry, gi -> {
+                gi.getSavegameStorage().moveEntry(collection, entry);
+            });
+        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
@@ -166,26 +173,72 @@ public class SavegameActions {
 
         SavegameManagerState<T, I> s = SavegameManagerState.get();
         TaskExecutor.getInstance().submitTask(() -> {
-            s.<T, I>current().getSavegameStorage().meltSavegame(e);
+
+            SavegameHelper.withSavegame(e, gi -> {
+                        Path meltedFile;
+                        try {
+                            meltedFile = RakalyHelper.meltSavegame(gi.getSavegameStorage().getSavegameFile(e));
+                        } catch (Exception ex) {
+                            ErrorHandler.handleException(ex);
+                            return;
+                        }
+                        var folder = gi.getSavegameStorage()
+                                .getOrCreateFolder("Melted savegames");
+                        folder.ifPresent(f -> {
+                            gi.getSavegameStorage().importSavegame(meltedFile, null, true, f);
+                        });
+                    });
+        }, true);
+    }
+
+    public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameHelper.withSavegame(e, gi -> {
+                gi.getSavegameStorage().delete(e);
+            });
+        }, true);
+    }
+
+    public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameHelper.withCollection(c, gi -> {
+                gi.getSavegameStorage().delete(c);
+                if (SavegameManagerState.get().globalSelectedCampaignProperty().get() == c) {
+                    SavegameManagerState.get().selectCollection(null);
+                }
+            });
         }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            var in = SavegameStorage.getForSavegame(e).getSavegameFile(e);
-            var target = EditTarget.create(in);
-            target.ifPresent(t -> {
-                var storageTarget = new StorageEditTarget<>(SavegameStorage.getForSavegame(e), e, t);
-                Editor.createNewEditor(storageTarget);
+            SavegameHelper.withSavegame(e, gi -> {
+                var in = gi.getSavegameStorage().getSavegameFile(e);
+                var target = EditTarget.create(in);
+                target.ifPresent(t -> {
+                    var storageTarget = new StorageEditTarget<>(gi.getSavegameStorage(), e, t);
+                    Editor.createNewEditor(storageTarget);
+                });
             });
         }, true);
     }
 
+    public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameHelper.withSavegame(e, gi -> {
+                var sgs = gi.getSavegameStorage();
+                sgs.reloadSavegameAsync(e);
+            });
+        }, false);
+    }
+
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            var sgs = SavegameStorage.getForSavegame(e);
-            var in = sgs.getSavegameFile(e);
-            sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
+            SavegameHelper.withSavegame(e, gi -> {
+                var sgs = gi.getSavegameStorage();
+                var in = sgs.getSavegameFile(e);
+                sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
+            });
         }, true);
     }
 }

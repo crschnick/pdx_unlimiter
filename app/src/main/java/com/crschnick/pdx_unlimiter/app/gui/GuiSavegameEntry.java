@@ -37,7 +37,7 @@ public class GuiSavegameEntry {
     private static <T, I extends SavegameInfo<T>> Region setupTopBar(SavegameEntry<T, I> e) {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
-        SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+        SavegameHelper.withSavegameAsync(e, (info, gi) -> {
             topBar.setBackground(gi.getGuiFactory().createEntryInfoBackground(info));
         });
 
@@ -45,7 +45,7 @@ public class GuiSavegameEntry {
             Label l = new Label(e.getDate().toDisplayString());
             l.getStyleClass().add(CLASS_DATE);
 
-            var tagImage = SavegameInfoHelper.createWithIntegration(e,
+            var tagImage = SavegameHelper.mapSavegame(e,
                     gi -> gi.getGuiFactory().createImage(e));
             Pane tagPane = new Pane(tagImage.getValue());
             HBox tagBar = new HBox(tagPane, l);
@@ -123,7 +123,7 @@ public class GuiSavegameEntry {
             });
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+            SavegameHelper.withSavegameAsync(e, (info, gi) -> {
                 if (info.isBinary()) {
                     buttonBar.getChildren().add(0, melt);
                 }
@@ -152,7 +152,7 @@ public class GuiSavegameEntry {
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
-        SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+        SavegameHelper.withSavegameAsync(e, (info, gi) -> {
             if (Eu4SeHelper.shouldShowButton(e, info)) {
                 Button eu4Se = new JFXButton();
                 eu4Se.setGraphic(new FontIcon());
@@ -196,7 +196,7 @@ public class GuiSavegameEntry {
             });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
-            SavegameInfoHelper.withInfoAsync(e, (info, gi) -> {
+            SavegameHelper.withSavegameAsync(e, (info, gi) -> {
                 if (!info.isBinary()) {
                     buttonBar.getChildren().add(0, edit);
                 }
@@ -208,7 +208,7 @@ public class GuiSavegameEntry {
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
                 if (DialogHelper.showSavegameDeleteDialog()) {
-                    SavegameManagerState.<T, I>get().current().getSavegameStorage().deleteAsync(e);
+                    SavegameActions.delete(e);
                 }
             });
             del.getStyleClass().add(CLASS_DELETE);
@@ -232,7 +232,7 @@ public class GuiSavegameEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(container);
         if (entry.infoProperty().isNotNull().get()) {
-            SavegameInfoHelper.withInfo(entry, (info, gi) -> {
+            SavegameHelper.withSavegame(entry, (info, gi) -> {
                 gi.getGuiFactory().fillNodeContainer(info, container);
             });
         } else {
@@ -247,7 +247,7 @@ public class GuiSavegameEntry {
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
-                SavegameInfoHelper.doWithIntegration(entry, gi -> {
+                SavegameHelper.withSavegame(entry, gi -> {
                     Platform.runLater(() -> {
                         loading.setVisible(false);
                         gi.getGuiFactory().fillNodeContainer(n, container);

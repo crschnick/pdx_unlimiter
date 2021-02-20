@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
+import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -111,7 +111,7 @@ public class GuiStatusBar {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
-        SavegameInfoHelper.withInfo(e, (info, gi) -> {
+        SavegameHelper.withSavegame(e, (info, gi) -> {
             {
                 Label text = new Label(
                         gi.getName(),

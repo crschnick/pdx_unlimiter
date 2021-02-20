@@ -42,7 +42,7 @@ public class Settings {
         Settings loaded = loadConfig();
         INSTANCE = loaded.copy();
         INSTANCE.validate();
-        SettingsChecker.onSettingsChange(loaded, INSTANCE);
+        SettingsChecker.onSettingsChange(loaded, loaded, INSTANCE);
         try {
             saveConfig();
         } catch (IOException e) {
@@ -58,9 +58,10 @@ public class Settings {
         var oldValue = INSTANCE.getStorageDirectory();
         var oldDir = PdxuInstallation.getInstance().getSavegamesLocation();
 
+        var oldSettings = INSTANCE.copy();
         INSTANCE = newS.copy();
         INSTANCE.validate();
-        SettingsChecker.onSettingsChange(newS, INSTANCE);
+        SettingsChecker.onSettingsChange(oldSettings, newS, INSTANCE);
 
         var newDir = PdxuInstallation.getInstance().getSavegamesLocation();
         if (!oldDir.equals(newDir)) {

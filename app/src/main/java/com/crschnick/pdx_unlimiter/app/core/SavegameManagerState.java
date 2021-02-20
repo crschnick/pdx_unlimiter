@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.SavegameInfoHelper;
+import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -32,9 +32,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             FXCollections.observableArrayList());
 
     private SavegameManagerState() {
-        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> {
-            updateShownEntries();
-        };
+        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
 
         globalSelectedCampaign.addListener((c, o, n) -> {
             if (o != null) {
@@ -94,15 +92,13 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameInfoHelper.doWithIntegration(e, gi -> {
-                if (globalSelectedCampaignPropertyInternal().get() != null &&
-                        globalSelectedCampaignPropertyInternal().get().equals(
-                                gi.getSavegameStorage().getSavegameCollection(e))) {
-                    gi.getSavegameStorage().loadEntry(e);
-                }
-            });
-        }, false);
+        TaskExecutor.getInstance().submitTask(() -> SavegameHelper.withSavegame(e, gi -> {
+            if (globalSelectedCampaignPropertyInternal().get() != null &&
+                    globalSelectedCampaignPropertyInternal().get().equals(
+                            gi.getSavegameStorage().getSavegameCollection(e))) {
+                gi.getSavegameStorage().loadEntry(e);
+            }
+        }), false);
     }
 
     public void unloadCollectionAsync(SavegameCollection<T, I> col) {
@@ -185,10 +181,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return shownCollections;
     }
 
+    @SuppressWarnings("unchecked")
     public GameIntegration<T, I> current() {
         return (GameIntegration<T, I>) current.get();
     }
 
+    @SuppressWarnings("unchecked")
     public <G extends GameIntegration<T, I>> SimpleObjectProperty<G> currentGameProperty() {
         return (SimpleObjectProperty<G>) current;
     }
@@ -291,7 +289,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public class Filter {
-        private StringProperty filter = new SimpleStringProperty("");
+        private final StringProperty filter = new SimpleStringProperty("");
 
         private Filter() {
             filter.addListener((c, o, n) -> {
@@ -318,11 +316,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         public boolean shouldShow(SavegameEntry<?, ?> entry) {
-            if (entry.getName().toLowerCase().contains(filter.get().toLowerCase())) {
-                return true;
-            }
-
-            return false;
+            return entry.getName().toLowerCase().contains(filter.get().toLowerCase());
         }
     }
 }

@@ -15,7 +15,6 @@ module com.crschnick.pdx_unlimiter.app {
     requires org.kordamp.ikonli.javafx;
     requires com.jfoenix;
     requires com.google.gson;
-
     requires org.slf4j;
     requires org.slf4j.simple;
     requires io.sentry;
@@ -23,7 +22,5 @@ module com.crschnick.pdx_unlimiter.app {
     uses javax.imageio.spi.ImageReaderSpi;
     uses net.nikr.dds.DDSImageReaderSpi;
 
-    exports com.crschnick.pdx_unlimiter.app;
-    exports com.crschnick.pdx_unlimiter.app.savegame;
-    exports com.crschnick.pdx_unlimiter.app.installation;
+    exports com.crschnick.pdx_unlimiter.app to javafx.graphics;
 }
