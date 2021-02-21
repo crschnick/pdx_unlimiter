@@ -103,7 +103,7 @@ public class TextFormatTokenizer {
             // Intern any short strings like country tags
             // Also intern any unquoted value like key names and game specific values
             if (!quoted || s.length() < 4) {
-                //s = s.intern();
+                s = s.intern();
             }
 
             stringLiterals.add(s);
