@@ -2,8 +2,6 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
@@ -373,9 +371,6 @@ public abstract class SavegameStorage<
             ErrorHandler.handleException(ex);
         }
 
-        if (SavegameManagerState.get().globalSelectedEntryProperty().get() == e) {
-            SavegameManagerState.get().selectEntry(null);
-        }
         c.getSavegames().remove(e);
         c.onSavegamesChange();
         if (c.getSavegames().size() == 0) {
@@ -547,7 +542,6 @@ public abstract class SavegameStorage<
                     if (exists.isPresent()) {
                         logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                         loadEntry(exists.get());
-                        SavegameManagerState.<T, I>get().selectEntry(exists.get());
                         return;
                     } else {
                         logger.debug("No entry with checksum found");

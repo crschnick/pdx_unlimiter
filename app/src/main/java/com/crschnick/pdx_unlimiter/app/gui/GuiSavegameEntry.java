@@ -135,7 +135,7 @@ public class GuiSavegameEntry {
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
-                RakalyWebHelper.uploadSavegame(SavegameStorage.EU4, eu4Entry);
+                RakalyWebHelper.uploadSavegame(eu4Entry);
             });
             upload.getStyleClass().add(CLASS_ANALYZE);
             GuiTooltips.install(upload, "Upload and analyze with Rakaly.com");
