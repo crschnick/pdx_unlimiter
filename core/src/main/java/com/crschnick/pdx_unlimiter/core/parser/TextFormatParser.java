@@ -9,9 +9,11 @@ import java.util.Map;
 
 public class TextFormatParser extends FormatParser {
 
+    private boolean debug;
     private Charset charset;
     private int index;
     private int slIndex;
+    private int arrayIndex;
     private TextFormatTokenizer tokenizer;
 
     private TextFormatParser(Charset charset) {
@@ -65,24 +67,25 @@ public class TextFormatParser extends FormatParser {
             return new AbstractMap.SimpleEntry<>(new ValueNode(true, val), index + 1);
         }
 
-//        if (tt[index] == TextFormatTokenizer.EQUALS) {
-//            throw new IllegalStateException("Encountered unexpected =");
-//        }
-//
-//        if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-//            throw new IllegalStateException("Encountered unexpected }");
-//        }
+        if (debug && tt[index] == TextFormatTokenizer.EQUALS) {
+            throw new IllegalStateException("Encountered unexpected =");
+        }
+
+        if (debug && tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
+            throw new IllegalStateException("Encountered unexpected }");
+        }
 
         return parseGroup();
     }
 
     private Map.Entry<Node, Integer> parseGroup() {
         var tt = tokenizer.getTokenTypes();
-        List<Node> children = new ArrayList<>();
+        if (debug && tt[index] != TextFormatTokenizer.OPEN_GROUP) {
+            throw new IllegalStateException("Expected {");
+        }
 
-//        if (tt[index] != TextFormatTokenizer.OPEN_GROUP) {
-//            throw new IllegalStateException("Expected {");
-//        }
+        var size = tokenizer.getArraySizes()[arrayIndex++];
+        List<Node> children = new ArrayList<>(size);
 
         int currentIndex = index + 1;
         while (true) {
@@ -91,6 +94,10 @@ public class TextFormatParser extends FormatParser {
             }
 
             if (tt[currentIndex] == TextFormatTokenizer.CLOSE_GROUP) {
+                if (debug && size < children.size()) {
+                    throw new IllegalStateException("Invalid array size");
+                }
+
                 return new AbstractMap.SimpleEntry<>(new ArrayNode(children), currentIndex + 1);
             }
 

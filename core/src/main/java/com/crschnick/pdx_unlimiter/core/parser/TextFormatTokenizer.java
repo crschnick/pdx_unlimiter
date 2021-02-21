@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.core.parser;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class TextFormatTokenizer {
 
@@ -21,6 +22,9 @@ public class TextFormatTokenizer {
     private byte[] tokenTypes;
     private List<String> stringLiterals;
     private int tokenCounter;
+    private Stack<Integer> arraySizeStack;
+    private int[] arraySizes;
+    private int arraySizesCounter;
 
     public TextFormatTokenizer(Charset charset, byte[] bytes) {
         this.charset = charset;
@@ -29,10 +33,16 @@ public class TextFormatTokenizer {
         this.tokenCounter = 0;
         this.tokenTypes = new byte[bytes.length / 2];
         this.stringLiterals = new ArrayList<>(bytes.length / 10);
+        this.arraySizeStack = new Stack<>();
+        this.arraySizes = new int[bytes.length / 10];
+        this.arraySizesCounter = 0;
     }
 
     public void tokenize() {
         tokenTypes[0] = OPEN_GROUP;
+        arraySizes[0] = 0;
+        arraySizeStack.add(0);
+        arraySizesCounter++;
         tokenCounter = 1;
         for (i = 0; i <= bytes.length; i++) {
             tokenizeIteration();
@@ -87,10 +97,13 @@ public class TextFormatTokenizer {
             }
             var s = new String(bytes, offset, length, charset);
 
+            // Increase array size whenever a scalar is found
+            arraySizes[arraySizeStack.peek()]++;
+
             // Intern any short strings like country tags
             // Also intern any unquoted value like key names and game specific values
             if (!quoted || s.length() < 4) {
-                s = s.intern();
+                //s = s.intern();
             }
 
             stringLiterals.add(s);
@@ -99,6 +112,15 @@ public class TextFormatTokenizer {
         if (isWhitespace) {
             prev = i + 1;
         } else if (t != 0) {
+            if (t == CLOSE_GROUP) {
+                arraySizeStack.pop();
+            } else if (t == EQUALS) {
+                arraySizes[arraySizeStack.peek()]--;
+            } else if (t == OPEN_GROUP) {
+                arraySizes[arraySizeStack.peek()]++;
+                arraySizeStack.add(arraySizesCounter++);
+            }
+
             tokenTypes[tokenCounter++] = t;
             prev = i + 1;
         } else if (isComment) {
@@ -112,5 +134,9 @@ public class TextFormatTokenizer {
 
     public List<String> getStringLiterals() {
         return stringLiterals;
+    }
+
+    public int[] getArraySizes() {
+        return arraySizes;
     }
 }
