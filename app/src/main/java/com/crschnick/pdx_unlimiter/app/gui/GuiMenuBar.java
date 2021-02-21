@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
+import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -106,6 +107,12 @@ public class GuiMenuBar {
             throw new RuntimeException("This is a test exception!");
         });
         dev.getItems().add(error);
+
+        MenuItem gc = new MenuItem("Force GC");
+        gc.setOnAction((a) -> {
+            MemoryHelper.forceGC();
+        });
+        dev.getItems().add(gc);
 
 
         MenuBar menuBar = new MenuBar();

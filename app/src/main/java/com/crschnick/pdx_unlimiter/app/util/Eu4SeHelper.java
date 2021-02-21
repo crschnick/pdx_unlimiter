@@ -60,7 +60,15 @@ public class Eu4SeHelper {
             return false;
         }
 
-        return SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(entry);
+        if (SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(entry)) {
+            Eu4SavegameInfo eu4i = (Eu4SavegameInfo) info;
+            if (eu4i.isRandomNewWorld()) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static void open(SavegameEntry<?, ?> entry) {
