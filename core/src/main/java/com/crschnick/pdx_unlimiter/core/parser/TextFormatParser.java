@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class TextFormatParser extends FormatParser {
 
-    private final boolean debug = true;
+    private final boolean debug = false;
     private final Charset charset;
     private int index;
     private int slIndex;
