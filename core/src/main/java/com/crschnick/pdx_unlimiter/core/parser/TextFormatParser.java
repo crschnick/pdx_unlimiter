@@ -9,8 +9,8 @@ import java.util.Map;
 
 public class TextFormatParser extends FormatParser {
 
-    private boolean debug;
-    private Charset charset;
+    private final boolean debug = true;
+    private final Charset charset;
     private int index;
     private int slIndex;
     private int arrayIndex;
@@ -55,6 +55,9 @@ public class TextFormatParser extends FormatParser {
             String val = sl.get(slIndex++);
             boolean isColor = ColorNode.isColorName(val);
             if (isColor) {
+                // A color is also an array, so we have to move the array index!
+                arrayIndex++;
+
                 return new AbstractMap.SimpleEntry<>(new ColorNode(val, List.of(
                         new ValueNode(false, sl.get(slIndex++)),
                         new ValueNode(false, sl.get(slIndex++)),
@@ -95,7 +98,7 @@ public class TextFormatParser extends FormatParser {
 
             if (tt[currentIndex] == TextFormatTokenizer.CLOSE_GROUP) {
                 if (debug && size < children.size()) {
-                    throw new IllegalStateException("Invalid array size");
+                    throw new IllegalStateException("Invalid array size. Expected: <= " + size + ", got: " + children.size());
                 }
 
                 return new AbstractMap.SimpleEntry<>(new ArrayNode(children), currentIndex + 1);
