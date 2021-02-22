@@ -15,6 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public class Eu4SeHelper {
@@ -78,6 +81,14 @@ public class Eu4SeHelper {
         }
 
         ThreadHelper.create("eu4se", true, () -> {
+            // Create mod dir in case no mods are installed
+            try {
+                Files.createDirectory(GameInstallation.EU4.getUserPath().resolve("mod"));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+                return;
+            }
+
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;
             String saveFile = "save_file=" + SavegameStorage.EU4.getSavegameFile(eu4Entry).toString();
             String modsFolder = "mods_folder=" + GameInstallation.EU4.getUserPath().resolve("mod").toString();
