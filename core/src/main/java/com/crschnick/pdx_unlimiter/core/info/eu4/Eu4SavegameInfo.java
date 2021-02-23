@@ -4,11 +4,12 @@ import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.NodeFormatException;
+import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.NodeFormatException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
@@ -52,12 +53,12 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
             e.allTags = new HashSet<>();
-            for (Node countryNode : n.getNodeForKey("countries").getNodeArray()) {
-                e.allTags.add(Eu4Tag.fromNode(countryNode));
-                if (countryNode.getKeyValueNode().getNode().hasKey("custom_nation_points")) {
+            n.getNodeForKey("countries").forEach((k,v) -> {
+                e.allTags.add(Eu4Tag.fromNode(k, v));
+                if (v.hasKey("custom_nation_points")) {
                     e.customNationInWorld = true;
                 }
-            }
+            });
             e.observer = !n.getNodeForKey("not_observer").getBoolean();
             e.randomNewWorld = n.getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
             e.ironman = melted;
@@ -261,13 +262,12 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         }
 
         public static Optional<Ruler> fromCountryNode(GameDate date, Node n, String... types) {
-            Optional<Ruler> current = Optional.empty();
-            for (Node e : n.getNodeForKey("history").getNodeArray()) {
-                var kv = e.getKeyValueNode();
+            AtomicReference<Optional<Ruler>> current = new AtomicReference<>(Optional.empty());
+            n.getNodeForKey("history").forEach((k,v) -> {
                 for (String type : types) {
-                    if (GameDateType.EU4.isDate(kv.getKeyName()) && kv.getNode().hasKey(type)) {
+                    if (GameDateType.EU4.isDate(k) && v.hasKey(type)) {
                         // Sometimes there are multiple monarchs in one event Node ... wtf?
-                        Node r = kv.getNode().getNodesForKey(type).get(0);
+                        Node r = v.getNodesForKey(type).get(0);
 
                         // Exclude queen consorts
                         if (r.hasKey("consort")) {
@@ -279,7 +279,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                             boolean dead = GameDateType.EU4.fromString(r.getNodeForKey("death_date").getString())
                                     .compareTo(date) <= 0;
                             if (dead) {
-                                current = Optional.empty();
+                                current.set(Optional.empty());
                                 continue;
                             }
                         }
@@ -287,7 +287,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                         // If we have a new heir, but the heir has already succeeded, set the current heir to null
                         boolean succeeded = type.equals("heir") && r.hasKey("succeeded");
                         if (succeeded) {
-                            current = Optional.empty();
+                            current.set(Optional.empty());
                             continue;
                         }
 
@@ -297,16 +297,16 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                             fullName = name + " " + r.getNodeForKey("dynasty").getString();
                         }
 
-                        current = Optional.of(new Ruler(
+                        current.set(Optional.of(new Ruler(
                                 name,
                                 fullName,
                                 r.getNodeForKey("ADM").getInteger(),
                                 r.getNodeForKey("DIP").getInteger(),
-                                r.getNodeForKey("MIL").getInteger()));
+                                r.getNodeForKey("MIL").getInteger())));
                     }
                 }
-            }
-            return current;
+            });
+            return current.get();
         }
 
         public String getName() {

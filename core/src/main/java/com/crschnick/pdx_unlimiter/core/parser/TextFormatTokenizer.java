@@ -13,26 +13,29 @@ public class TextFormatTokenizer {
     public static final byte CLOSE_GROUP = 4;
     public static final byte EQUALS = 5;
 
-    private Charset charset;
     private byte[] bytes;
     private boolean isInQuotes;
     private boolean isInComment;
     private int prev;
     private int i;
     private byte[] tokenTypes;
-    private List<String> stringLiterals;
+
+    private int scalarCounter;
+    private int[] scalarsStart;
+    private int[] scalarsLength;
+
     private int tokenCounter;
     private Stack<Integer> arraySizeStack;
     private int[] arraySizes;
     private int arraySizesCounter;
 
-    public TextFormatTokenizer(Charset charset, byte[] bytes) {
-        this.charset = charset;
+    public TextFormatTokenizer(byte[] bytes) {
         this.bytes = bytes;
         this.prev = 0;
         this.tokenCounter = 0;
         this.tokenTypes = new byte[bytes.length / 2];
-        this.stringLiterals = new ArrayList<>(bytes.length / 10);
+        this.scalarsStart = new int[bytes.length / 10];
+        this.scalarsLength = new int[bytes.length / 10];
         this.arraySizeStack = new Stack<>();
         this.arraySizes = new int[bytes.length / 10];
         this.arraySizesCounter = 0;
@@ -81,32 +84,16 @@ public class TextFormatTokenizer {
                         || (isWhitespace && prev < i)          // Whitespace finishes old token
                         || (isComment && prev < i);            // New comment finishes old token
         if (marksEndOfPreviousToken) {
-            int offset;
-            int length;
-            boolean quoted;
+            int offset = prev;
+            int length = (i - 1) - prev + 1;
             if (bytes[prev] == '"' && bytes[i - 1] == '"') {
-                quoted = true;
-                offset = prev + 1;
-                length = (i - 2) - (prev + 1) + 1;
                 tokenTypes[tokenCounter++] = STRING_QUOTED;
             } else {
-                quoted = false;
-                length = (i - 1) - (prev) + 1;
-                offset = prev;
                 tokenTypes[tokenCounter++] = STRING_UNQUOTED;
             }
-            var s = new String(bytes, offset, length, charset);
-
-            // Increase array size whenever a scalar is found
-            arraySizes[arraySizeStack.peek()]++;
-
-            // Intern any short strings like country tags
-            // Also intern any unquoted value like key names and game specific values
-            if (!quoted || s.length() < 4) {
-                s = s.intern();
-            }
-
-            stringLiterals.add(s);
+            scalarsStart[scalarCounter] = offset;
+            scalarsLength[scalarCounter] = length;
+            scalarCounter++;
         }
 
         if (isWhitespace) {
@@ -132,11 +119,15 @@ public class TextFormatTokenizer {
         return tokenTypes;
     }
 
-    public List<String> getStringLiterals() {
-        return stringLiterals;
-    }
-
     public int[] getArraySizes() {
         return arraySizes;
+    }
+
+    public int[] getScalarsStart() {
+        return scalarsStart;
+    }
+
+    public int[] getScalarsLength() {
+        return scalarsLength;
     }
 }

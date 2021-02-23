@@ -1,11 +1,10 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.node.*;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TextFormatParser extends FormatParser {
 
@@ -15,6 +14,7 @@ public class TextFormatParser extends FormatParser {
     private int slIndex;
     private int arrayIndex;
     private TextFormatTokenizer tokenizer;
+    private NodeContext context;
 
     private TextFormatParser(Charset charset) {
         this.charset = charset;
@@ -40,34 +40,60 @@ public class TextFormatParser extends FormatParser {
         return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
-    public final ArrayNode parse(byte[] input) {
-        this.tokenizer = new TextFormatTokenizer(charset, input);
+    public final Node parse(byte[] input) {
+        this.context = new NodeContext(input, charset);
+        this.tokenizer = new TextFormatTokenizer(input);
         this.tokenizer.tokenize();
-
-        Map.Entry<Node, Integer> node = parseNode();
-        return (ArrayNode) node.getKey();
+        return parseNode();
     }
 
-    private Map.Entry<Node, Integer> parseNode() {
+    private Node parseNode() {
         var tt = tokenizer.getTokenTypes();
-        var sl = tokenizer.getStringLiterals();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
-            String val = sl.get(slIndex++);
-            boolean isColor = ColorNode.isColorName(val);
+            var begin = tokenizer.getScalarsStart()[slIndex];
+            var length = tokenizer.getScalarsLength()[slIndex];
+
+            boolean isColor = ColorNode.isColorName(context, begin, length);
             if (isColor) {
+                var cn = new ColorNode(context.evaluate(begin, length), List.of(
+                        new ValueNode(
+                                context,
+                                false,
+                                tokenizer.getScalarsStart()[slIndex + 1],
+                                tokenizer.getScalarsLength()[slIndex + 1]),
+                        new ValueNode(
+                                context,
+                                false,
+                                tokenizer.getScalarsStart()[slIndex + 2],
+                                tokenizer.getScalarsLength()[slIndex + 2]),
+                        new ValueNode(
+                                context,
+                                false,
+                                tokenizer.getScalarsStart()[slIndex + 3],
+                                tokenizer.getScalarsLength()[slIndex + 3])));
+
                 // A color is also an array, so we have to move the array index!
                 arrayIndex++;
 
-                return new AbstractMap.SimpleEntry<>(new ColorNode(val, List.of(
-                        new ValueNode(false, sl.get(slIndex++)),
-                        new ValueNode(false, sl.get(slIndex++)),
-                        new ValueNode(false, sl.get(slIndex++)))), index + 6);
+                slIndex+=3;
+
+                return cn;
             } else {
-                return new AbstractMap.SimpleEntry<>(new ValueNode(false, val), index + 1);
+                var node = new ValueNode(
+                        context,
+                        false,
+                        tokenizer.getScalarsStart()[slIndex],
+                        tokenizer.getScalarsLength()[slIndex]);
+                index++;
+                return node;
             }
         } else if (tt[index] == TextFormatTokenizer.STRING_QUOTED) {
-            String val = sl.get(slIndex++);
-            return new AbstractMap.SimpleEntry<>(new ValueNode(true, val), index + 1);
+            var node = new ValueNode(context, true,
+                    tokenizer.getScalarsStart()[slIndex],
+                    tokenizer.getScalarsLength()[slIndex]);
+            slIndex++;
+            index++;
+            return node;
         }
 
         if (debug && tt[index] == TextFormatTokenizer.EQUALS) {
@@ -78,57 +104,55 @@ public class TextFormatParser extends FormatParser {
             throw new IllegalStateException("Encountered unexpected }");
         }
 
-        return parseGroup();
+        return parseArray();
     }
 
-    private Map.Entry<Node, Integer> parseGroup() {
+    private Node parseArray() {
         var tt = tokenizer.getTokenTypes();
+
         if (debug && tt[index] != TextFormatTokenizer.OPEN_GROUP) {
             throw new IllegalStateException("Expected {");
         }
+        index++;
 
         var size = tokenizer.getArraySizes()[arrayIndex++];
-        List<Node> children = new ArrayList<>(size);
-
-        int currentIndex = index + 1;
+        var builder = new ArrayNode.Builder(context, size);
         while (true) {
-            if (currentIndex == tt.length) {
+            if (index == tt.length) {
                 throw new IllegalStateException("Reached EOF but found no closing group token");
             }
 
-            if (tt[currentIndex] == TextFormatTokenizer.CLOSE_GROUP) {
-                if (debug && size < children.size()) {
-                    throw new IllegalStateException("Invalid array size. Expected: <= " + size + ", got: " + children.size());
+            if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
+                if (debug && size < builder.getUsedSize()) {
+                    throw new IllegalStateException(
+                            "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize());
                 }
 
-                return new AbstractMap.SimpleEntry<>(new ArrayNode(children), currentIndex + 1);
+                return builder.build();
             }
 
-            boolean isKeyValue = tt[currentIndex + 1] == TextFormatTokenizer.EQUALS;
+            boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
-                index = currentIndex + 2;
-                String realKey = tokenizer.getStringLiterals().get(slIndex++);
-                Map.Entry<Node, Integer> result = parseNode();
-                children.add(KeyValueNode.create(realKey, result.getKey()));
-                currentIndex = result.getValue();
+                index += 2;
+                Node result = parseNode();
+                builder.put(tokenizer.getScalarsStart()[slIndex], tokenizer.getScalarsLength()[slIndex], result);
+                slIndex++;
                 continue;
             }
 
-            boolean isKeyValueWithoutEquals = tt[currentIndex] == TextFormatTokenizer.STRING_UNQUOTED &&
-                    tt[currentIndex + 1] == TextFormatTokenizer.OPEN_GROUP;
+            boolean isKeyValueWithoutEquals = tt[index] == TextFormatTokenizer.STRING_UNQUOTED &&
+                    tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
             if (isKeyValueWithoutEquals) {
-                index = currentIndex + 1;
-                String realKey = tokenizer.getStringLiterals().get(slIndex++);
-                Map.Entry<Node, Integer> result = parseNode();
-                children.add(KeyValueNode.create(realKey, result.getKey()));
-                currentIndex = result.getValue();
+                index++;
+                Node result = parseNode();
+                builder.put(tokenizer.getScalarsStart()[slIndex], tokenizer.getScalarsLength()[slIndex], result);
+                slIndex++;
                 continue;
             }
 
-            index = currentIndex;
-            Map.Entry<Node, Integer> result = parseNode();
-            currentIndex = result.getValue();
-            children.add(result.getKey());
+            // Parse unnamed array element
+            Node result = parseNode();
+            builder.put(result);
         }
     }
 }

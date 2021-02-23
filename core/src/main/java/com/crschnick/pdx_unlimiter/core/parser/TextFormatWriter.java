@@ -1,11 +1,13 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Collectors;
 
 public class TextFormatWriter {
 
@@ -55,39 +57,34 @@ public class TextFormatWriter {
     }
 
     private static boolean node(int indent, Node n, LimitedStringBuilder sb) {
-        if (n instanceof KeyValueNode) {
-            sb.append(n.getKeyValueNode().getKeyName() + "=");
-            if (!node(indent, n.getKeyValueNode().getNode(), sb)) {
-                return false;
-            }
-        } else if (n instanceof ArrayNode) {
-            if (!sb.appendLine("{")) {
-                return false;
-            }
-            for (var c : n.getNodeArray()) {
-                sb.space(indent + 1);
-                if (!node(indent + 1, c, sb)) {
-                    return false;
-                }
-                if (!sb.appendLine("")) {
-                    return false;
-                }
-
-            }
-            sb.space(indent);
-            sb.append("}");
-        } else if (n instanceof ValueNode) {
-            ValueNode val = (ValueNode) n;
-            if (val.isStringValue()) {
-                sb.append("\"" + val.getValue() + "\"");
-            } else {
-                sb.append(val.getValue());
-            }
-        } else if (n instanceof ColorNode) {
-            ColorNode cn = (ColorNode) n;
-            sb.append(cn.getColorName() + "{" + cn.getValues().stream().map(Node::getString)
-                    .collect(Collectors.joining(" ")) + "}");
-        }
+//        if (n instanceof ArrayNode) {
+//            if (!sb.appendLine("{")) {
+//                return false;
+//            }
+//            n.forEach((k,v) -> {
+//                sb.space(indent + 1);
+//                sb.append(k + "=");
+//                if (!node(indent + 1, v, sb)) {
+//                    return false;
+//                }
+//                if (!sb.appendLine("")) {
+//                    return false;
+//                }
+//            }, true);
+//            sb.space(indent);
+//            sb.append("}");
+//        } else if (n instanceof ValueNode) {
+//            ValueNode val = (ValueNode) n;
+//            if (val.isStringValue()) {
+//                sb.append("\"" + val.getValue() + "\"");
+//            } else {
+//                sb.append(val.getValue());
+//            }
+//        } else if (n instanceof ColorNode) {
+//            ColorNode cn = (ColorNode) n;
+//            sb.append(cn.getColorName() + "{" + cn.getValues().stream().map(Node::getString)
+//                    .collect(Collectors.joining(" ")) + "}");
+//        }
 
         return true;
     }

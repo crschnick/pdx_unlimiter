@@ -1,3 +1,23 @@
+
+### Why should I use this?
+
+If you are an experienced player of various Paradox games, you probably have encountered the following situations:
+
+- Playing multiple campaigns interleaved and losing the overview having to 
+- Making many different checkpoint saves that you can revert
+  back to in case anything goes wrong and ruins your campaign
+  
+- Wanting to edit a savegame to toy around or experiment because console commands are only limited in their power
+- Using one or more third party tools like an Ironman converter or [savegame converters]() 
+- Organizing and cleaning your existing savegame collection ...
+- Waiting to load for the main menu to load
+
+If you only play one campaign at a time and therefore do not switch between mod configurations,
+do not make savegame backups to either savescum or protect against data loss,
+do not use any commonly used third party tools for Paradox games,
+and never edit your savegames to either experiment or do some multiplayer configuration changes,
+then you will not gain anything from using the Pdx-Unlimiter.
+
 ### Is this a replacement for the Paradox Launcher?
 
 No, since it does not provide a user interface for enabling/disabling/installing

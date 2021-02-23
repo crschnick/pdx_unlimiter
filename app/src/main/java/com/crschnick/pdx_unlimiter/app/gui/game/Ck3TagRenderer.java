@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import javafx.scene.image.Image;
 
@@ -26,7 +27,7 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa) {
+    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
 
@@ -63,7 +64,7 @@ public class Ck3TagRenderer {
         return ImageLoader.toFXImage(i);
     }
 
-    public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa) {
+    public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
 
@@ -101,7 +102,7 @@ public class Ck3TagRenderer {
         return ImageLoader.toFXImage(i);
     }
 
-    public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3Tag.CoatOfArms coa) {
+    public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
 
@@ -181,7 +182,7 @@ public class Ck3TagRenderer {
         return cMin;
     }
 
-    private static void pattern(Graphics g, Ck3Tag.CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
+    private static void pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
         if (coa.getPatternFile() != null) {
             int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                     .getOrDefault(coa.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
@@ -206,7 +207,7 @@ public class Ck3TagRenderer {
         }
     }
 
-    private static void emblem(Graphics g, Ck3Tag.CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
+    private static void emblem(Graphics g, Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
         int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
                 .getOrDefault(emblem.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
         int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)

@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.node.Node;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -20,9 +22,9 @@ public abstract class FormatParser {
         return Arrays.equals(first, header);
     }
 
-    public final ArrayNode parse(Path in) throws IOException {
+    public final Node parse(Path in) throws IOException {
         return parse(Files.readAllBytes(in));
     }
 
-    public abstract ArrayNode parse(byte[] input);
+    public abstract Node parse(byte[] input);
 }

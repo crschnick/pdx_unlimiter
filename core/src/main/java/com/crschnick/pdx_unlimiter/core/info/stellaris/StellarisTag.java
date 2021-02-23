@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info.stellaris;
 
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 
 public class StellarisTag {
 
