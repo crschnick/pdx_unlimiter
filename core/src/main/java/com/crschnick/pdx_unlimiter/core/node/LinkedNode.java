@@ -1,7 +1,9 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.util.JoinedList;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -22,6 +24,14 @@ public final class LinkedNode extends Node {
     @Override
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
         super.forEach(c, includeNullKeys);
+    }
+
+    @Override
+    public void write(NodeWriter writer) throws IOException {
+        for (var n : joined) {
+            n.write(writer);
+            writer.newLine();
+        }
     }
 
     @Override

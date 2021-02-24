@@ -64,12 +64,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             rulerNode.getChildren().add(box);
         }
         {
-            ruler.getHouse().ifPresent(h -> {
-                var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, h.getCoatOfArms().get()),
-                        "house-icon");
-                GuiTooltips.install(house, "House " + info.getHouseName());
-                rulerNode.getChildren().add(house);
-            });
+            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, ruler.getHouse().getCoatOfArms()),
+                    "house-icon");
+            GuiTooltips.install(house, "House " + info.getHouseName());
+            rulerNode.getChildren().add(house);
         }
         return rulerNode;
     }

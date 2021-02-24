@@ -41,4 +41,8 @@ public class Ck3Person {
     public List<Integer> getSkills() {
         return skills;
     }
+
+    public Ck3House getHouse() {
+        return house;
+    }
 }

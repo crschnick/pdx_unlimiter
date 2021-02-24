@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -15,6 +16,11 @@ public class FileEditTarget extends EditTarget {
 
     public FileEditTarget(Path file, TextFormatParser parser, TextFormatWriter writer) {
         super(file, parser, writer);
+    }
+
+    @Override
+    public void save() throws IOException {
+
     }
 
     @Override

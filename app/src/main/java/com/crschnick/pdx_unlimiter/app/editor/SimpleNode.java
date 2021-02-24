@@ -1,19 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.node.ValueNode;
-import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.*;
 import com.crschnick.pdx_unlimiter.core.parser.*;
 import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public class SimpleNode extends EditorNode {
+public final class SimpleNode extends EditorNode {
 
-    private int keyIndex;
+    private final int keyIndex;
     private Node backingNode;
 
     public SimpleNode(EditorNode directParent, String keyName, int parentIndex, int keyIndex, Node backingNode) {
@@ -24,12 +21,25 @@ public class SimpleNode extends EditorNode {
 
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
-        update(new ArrayNode(List.of(new ValueNode(bn.isStringValue(), text))));
+        update(ArrayNode.array(List.of(new ValueNode(text, bn.isQuoted()))));
     }
 
     public void updateColor(Color c) {
-        ColorNode bn = (ColorNode) backingNode;
-        update(new ArrayNode(List.of(ColorHelper.toColorNode(c))));
+        update(ArrayNode.array(List.of(ColorHelper.toColorNode(c))));
+    }
+
+    public void insertArray(ArrayNode toInsert, int beginIndex, int endIndex) {
+        ArrayNode ar = (ArrayNode) getRealParent().getBackingNode();
+
+        var begin = ar.splice(0, beginIndex);
+        var end = ar.splice(endIndex,ar.getNodeArray().size() - endIndex);
+        var linked = new LinkedNode(List.of(begin, toInsert, end));
+
+        // Update parent node to reflect change
+        if (getDirectParent() != null) {
+            getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), linked);
+        }
+        this.backingNode = linked;
     }
 
     @Override
@@ -54,7 +64,7 @@ public class SimpleNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return filter.test(TextFormatWriter.writeToString(backingNode, Integer.MAX_VALUE, ""));
+        return false;
     }
 
     @Override
@@ -79,7 +89,7 @@ public class SimpleNode extends EditorNode {
 
     @Override
     public List<EditorNode> open() {
-        return EditorNode.create(this, backingNode.getNodeArray());
+        return EditorNode.create(this, (ArrayNode) backingNode);
     }
 
     public Node toWritableNode() {
@@ -87,16 +97,11 @@ public class SimpleNode extends EditorNode {
     }
 
     public void update(ArrayNode newNode) {
-        Node nodeToUse = backingNode instanceof ArrayNode ? newNode : newNode.getNodes().get(0);
+        Node nodeToUse = backingNode instanceof ArrayNode ? newNode : newNode.getNodeArray().get(0);
 
         // Update parent node to reflect change
         if (getDirectParent() != null) {
-            getKeyName().ifPresentOrElse(s -> {
-                getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(),
-                        KeyValueNode.create(s, nodeToUse));
-            }, () -> {
-                getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), nodeToUse);
-            });
+            getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), nodeToUse);
         }
         this.backingNode = nodeToUse;
     }

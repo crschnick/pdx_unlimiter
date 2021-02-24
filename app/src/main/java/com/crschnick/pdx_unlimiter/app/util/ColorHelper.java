@@ -44,9 +44,9 @@ public class ColorHelper {
 
     public static ColorNode toColorNode(Color c) {
         return new ColorNode("rgb", List.of(
-                new ValueNode(false, String.valueOf((int) (c.getRed() * 255))),
-                new ValueNode(false, String.valueOf((int) (c.getGreen() * 255))),
-                new ValueNode(false, String.valueOf((int) (c.getBlue() * 255)))));
+                new ValueNode(String.valueOf((int) (c.getRed() * 255)), false),
+                new ValueNode(String.valueOf((int) (c.getGreen() * 255)), false),
+                new ValueNode(String.valueOf((int) (c.getBlue() * 255)), false)));
     }
 
     public static Color fromColorNode(ColorNode node) {
@@ -69,24 +69,21 @@ public class ColorHelper {
         }
     }
 
-    private static Map<String, Color> loadPredefinedColors(List<Node> nodes) {
+    private static Map<String, Color> loadPredefinedColors(Node node) {
         Map<String, Color> map = new HashMap<>();
-        for (Node n : nodes) {
-            var kv = n.getKeyValueNode();
-            Node data = kv.getNode();
-            ColorNode colorData = (ColorNode) data.getNodeForKey("flag");
-            map.put(kv.getKeyName(), fromColorNode(colorData));
-        }
+        node.getNodeForKey("colors").forEach((k,v) -> {
+            ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
+            map.put(k, fromColorNode(colorData));
+        });
         return map;
     }
 
-    private static Map<String, Color> loadPredefinedCk3Colors(List<Node> nodes) {
+    private static Map<String, Color> loadPredefinedCk3Colors(Node node) {
         Map<String, Color> map = new HashMap<>();
-        for (Node n : nodes) {
-            var kv = n.getKeyValueNode();
-            ColorNode data = (ColorNode) kv.getNode();
-            map.put(kv.getKeyName(), fromColorNode(data));
-        }
+        node.getNodeForKey("colors").forEach((k,v) -> {
+            ColorNode colorData = (ColorNode) v;
+            map.put(k, fromColorNode(colorData));
+        });
         return map;
     }
 
@@ -97,7 +94,7 @@ public class ColorHelper {
                 GameInstallation.CK3).get();
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedCk3Colors(node.getNodeForKey("colors").getNodeArray());
+            return loadPredefinedCk3Colors(node);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();
@@ -110,7 +107,7 @@ public class ColorHelper {
 
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedColors(node.getNodeForKey("colors").getNodeArray());
+            return loadPredefinedColors(node);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();

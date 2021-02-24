@@ -36,7 +36,7 @@ public class EditorExternalState {
                                 return;
                             }
 
-                            ArrayNode newNode = e.state.getParser().parse(changed);
+                            ArrayNode newNode = (ArrayNode) e.state.getParser().parse(changed);
                             e.editorNode.update(newNode);
                             e.state.onFileChanged();
                         } catch (Exception ex) {

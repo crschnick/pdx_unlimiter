@@ -1,5 +1,8 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,6 +40,17 @@ public final class ColorNode extends Node {
 
     public List<ValueNode> getValues() {
         return values;
+    }
+
+    @Override
+    public void write(NodeWriter writer) throws IOException {
+        writer.write(colorName);
+        writer.write("= {");
+        for (var v : values) {
+            v.write(writer);
+            writer.write(" ");
+        }
+        writer.write("}");
     }
 
     @Override

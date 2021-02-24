@@ -1,5 +1,8 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -44,16 +47,43 @@ public class ArrayNode extends Node {
         }
     }
 
+    public static ArrayNode array(List<Node> values) {
+        return new ArrayNode(null, null, null, values);
+    }
+
+    public static ArrayNode singleKeyNode(String key, Node value) {
+        var ctx = new NodeContext(key);
+        return new ArrayNode(ctx, new int[]{0}, new int[] {ctx.getData().length}, List.of(value));
+    }
+
     private final NodeContext context;
     private final int[] keysBegin;
     private final int[] keysLength;
     private final List<Node> values;
 
-    public ArrayNode(NodeContext context, int[] keysBegin, int[] keysLength, List<Node> values) {
+    private ArrayNode(NodeContext context, int[] keysBegin, int[] keysLength, List<Node> values) {
         this.context = context;
         this.keysBegin = keysBegin;
         this.keysLength = keysLength;
         this.values = values;
+    }
+
+    public int getSubsequentEqualKeyCount(int startIndex) {
+        var b = context.getSubData(keysBegin[startIndex], keysLength[startIndex]);
+        for (int i = startIndex + 1; i < values.size(); i++) {
+            if (!isKeyAt(i, b)) {
+                return i - startIndex;
+            }
+        }
+        return values.size() - startIndex + 1;
+    }
+
+    public ArrayNode splice(int begin, int length) {
+        int[] kb = new int[length];
+        int[] kl = new int[length];
+        System.arraycopy(keysBegin, begin, kb, 0, length);
+        System.arraycopy(keysLength, begin, kl, 0, length);
+        return new ArrayNode(context, kb, kl, values.subList(begin, begin + length));
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
@@ -64,6 +94,26 @@ public class ArrayNode extends Node {
 
             c.accept(context.evaluate(keysBegin[i], keysLength[i]), values.get(i));
         }
+    }
+
+    @Override
+    public void write(NodeWriter writer) throws IOException {
+        writer.write("{");
+        writer.newLine();
+        writer.incrementIndent();
+
+        for (int i = 0; i < values.size(); i++) {
+            if (hasKeyAtIndex(i)) {
+                writer.write(context, keysBegin[i], keysLength[i]);
+                writer.write("=");
+            }
+
+            values.get(i).write(writer);
+            writer.newLine();
+        }
+
+        writer.decrementIndent();
+        writer.write("}");
     }
 
     @Override

@@ -171,7 +171,7 @@ public class EditorState {
         return parser;
     }
 
-    public class NavEntry {
+    public static class NavEntry {
         private EditorNode editorNode;
         private DoubleProperty scroll;
 

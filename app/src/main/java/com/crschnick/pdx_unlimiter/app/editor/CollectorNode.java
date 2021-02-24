@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
 import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
@@ -35,8 +36,7 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return nodes.stream().anyMatch(n -> filter.test(
-                TextFormatWriter.writeToString(n, Integer.MAX_VALUE, "")));
+        return false;
     }
 
     @Override
@@ -65,18 +65,12 @@ public class CollectorNode extends EditorNode {
     }
 
     public Node toWritableNode() {
-        return new ArrayNode(nodes);
+        return ArrayNode.array(nodes);
     }
 
     @Override
     public void update(ArrayNode newNode) {
-        var ar = getRealParent().getBackingNode().getNodeArray();
-
-        for (int i = 0; i < nodes.size(); i++) {
-            ar.remove(firstNodeIndex);
-        }
-        ar.addAll(firstNodeIndex, newNode.getNodeArray().stream()
-                .map(node -> KeyValueNode.create(keyName, node)).collect(Collectors.toList()));
+        getRealParent().insertArray(newNode, firstNodeIndex, firstNodeIndex + nodes.size());
     }
 
     public List<Node> getNodes() {

@@ -8,7 +8,6 @@ import java.util.List;
 
 public class TextFormatParser extends FormatParser {
 
-    private final boolean debug = false;
     private final Charset charset;
     private int index;
     private int slIndex;
@@ -96,13 +95,8 @@ public class TextFormatParser extends FormatParser {
             return node;
         }
 
-        if (debug && tt[index] == TextFormatTokenizer.EQUALS) {
-            throw new IllegalStateException("Encountered unexpected =");
-        }
-
-        if (debug && tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-            throw new IllegalStateException("Encountered unexpected }");
-        }
+        assert tt[index] != TextFormatTokenizer.EQUALS;
+        assert tt[index] != TextFormatTokenizer.CLOSE_GROUP;
 
         return parseArray();
     }
@@ -110,9 +104,7 @@ public class TextFormatParser extends FormatParser {
     private Node parseArray() {
         var tt = tokenizer.getTokenTypes();
 
-        if (debug && tt[index] != TextFormatTokenizer.OPEN_GROUP) {
-            throw new IllegalStateException("Expected {");
-        }
+        assert tt[index] == TextFormatTokenizer.OPEN_GROUP;
         index++;
 
         var size = tokenizer.getArraySizes()[arrayIndex++];
@@ -123,11 +115,7 @@ public class TextFormatParser extends FormatParser {
             }
 
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                if (debug && size < builder.getUsedSize()) {
-                    throw new IllegalStateException(
-                            "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize());
-                }
-
+                assert size >= builder.getUsedSize();
                 return builder.build();
             }
 

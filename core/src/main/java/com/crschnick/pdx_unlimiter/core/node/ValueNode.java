@@ -1,5 +1,8 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public final class ValueNode extends Node {
@@ -9,6 +12,13 @@ public final class ValueNode extends Node {
     private final int length;
     private Object value;
 
+    public ValueNode(String value, boolean quoted) {
+        this.value = value;
+        this.status = (quoted ? NodeConstants.QUOTED : 0) + NodeConstants.EVALUATED + NodeConstants.TYPE_STRING;
+        begin = -1;
+        length = -1;
+    }
+
     public ValueNode(NodeContext context, boolean quoted, int begin, int length) {
         this.value = context;
         this.begin = begin;
@@ -16,7 +26,7 @@ public final class ValueNode extends Node {
         this.status = (quoted ? NodeConstants.QUOTED : 0);
     }
 
-    private boolean isQuoted() {
+    public boolean isQuoted() {
         return (status & NodeConstants.QUOTED) != 0;
     }
 
@@ -26,6 +36,21 @@ public final class ValueNode extends Node {
 
     private NodeContext getContext() {
         return (NodeContext) value;
+    }
+
+    @Override
+    public void write(NodeWriter writer) throws IOException {
+        if (isEvalulated()) {
+            if (isQuoted()) {
+                writer.write("\"");
+            }
+            writer.write(value.toString());
+            if (isQuoted()) {
+                writer.write("\"");
+            }
+        } else {
+            writer.write(getContext(), begin, length);
+        }
     }
 
     @Override

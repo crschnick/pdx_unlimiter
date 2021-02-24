@@ -1,5 +1,8 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -38,6 +41,8 @@ public abstract class Node {
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
         throw new UnsupportedOperationException();
     }
+
+    public abstract void write(NodeWriter writer) throws IOException;
 
     public List<Node> getNodeArray() {
         throw new UnsupportedOperationException();
