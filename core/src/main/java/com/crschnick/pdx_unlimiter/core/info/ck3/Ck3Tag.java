@@ -35,7 +35,7 @@ public class Ck3Tag {
         var person = Ck3Person.fromNode(personNode, house);
         var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
                 .getNodeForKey("coat_of_arms_manager_database"));
-        var titles = Ck3Title.createTitleMap(n.getNodeForKey("landed_titles"), coaMap);
+        var titles = Ck3Title.createTitleMap(n, coaMap);
 
         var domain = personNode.getNodeForKey("landed_data").getNodeForKey("domain");
         var tagTitles = domain.getNodeArray().stream()

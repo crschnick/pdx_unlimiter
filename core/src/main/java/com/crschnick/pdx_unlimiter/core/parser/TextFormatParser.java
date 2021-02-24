@@ -4,6 +4,9 @@ import com.crschnick.pdx_unlimiter.core.node.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class TextFormatParser extends FormatParser {
@@ -39,11 +42,38 @@ public class TextFormatParser extends FormatParser {
         return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
+    private void reset() {
+        this.index = 0;
+        this.slIndex = 0;
+        this.arrayIndex = 0;
+        this.tokenizer = null;
+        this.context = null;
+    }
+
     public final Node parse(byte[] input) {
         this.context = new NodeContext(input, charset);
+
+        var used = Runtime.getRuntime().totalMemory();
+        System.out.println("Used memory: " + used / 1024 + "kB");
+
+        var now = Instant.now();
         this.tokenizer = new TextFormatTokenizer(input);
         this.tokenizer.tokenize();
+        System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+
+
+        used = Runtime.getRuntime().totalMemory();
+        System.out.println("Used memory: " + used / 1024 + "kB");
+
+        now = Instant.now();
         var r = parseNode();
+        System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+
+        used = Runtime.getRuntime().totalMemory();
+        System.out.println("Used memory: " + used / 1024 + "kB");
+
+        reset();
+
         return r;
     }
 
@@ -79,6 +109,7 @@ public class TextFormatParser extends FormatParser {
                 arrayIndex++;
 
                 slIndex+=3;
+                index+=5;
 
                 return cn;
             } else {
@@ -124,7 +155,8 @@ public class TextFormatParser extends FormatParser {
 
             boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
-                assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED: "Expected unquoted key";
+                assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED ||
+                        tt[index] == TextFormatTokenizer.STRING_QUOTED: "Expected unquoted key";
 
                 int start = tokenizer.getScalarsStart()[slIndex];
                 int length = tokenizer.getScalarsLength()[slIndex];

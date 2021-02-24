@@ -10,6 +10,7 @@ public class ArrayNode extends Node {
 
     public static class Builder {
 
+        private boolean hasKeys;
         private int index;
 
         private final NodeContext context;
@@ -25,7 +26,11 @@ public class ArrayNode extends Node {
         }
 
         public Node build() {
-            return new ArrayNode(context, keysBegin, keysLength, values);
+            if (!hasKeys) {
+                return ArrayNode.array(values);
+            } else {
+                return new ArrayNode(context, keysBegin, keysLength, values);
+            }
         }
 
         public void put(Node value) {
@@ -36,6 +41,7 @@ public class ArrayNode extends Node {
         }
 
         public void put(int begin, int length, Node value) {
+            hasKeys = true;
             keysBegin[index] = begin;
             keysLength[index] = length;
             values.add(value);
@@ -115,12 +121,19 @@ public class ArrayNode extends Node {
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
+        String key = null;
         for (int i = 0; i < values.size(); i++) {
-            if (!hasKeyAtIndex(i) && !includeNullKeys) {
-                continue;
+            if (!hasKeyAtIndex(i)) {
+                if (!includeNullKeys) {
+                    continue;
+                } else {
+                    key = null;
+                }
+            } else {
+                key = context.evaluate(keysBegin[i], keysLength[i]);
             }
 
-            c.accept(context.evaluate(keysBegin[i], keysLength[i]), values.get(i));
+            c.accept(key, values.get(i));
         }
     }
 
@@ -160,6 +173,10 @@ public class ArrayNode extends Node {
     }
 
     private boolean hasKeyAtIndex(int index) {
+        if (keysBegin == null) {
+            return false;
+        }
+
         return keysBegin[index] != -1;
     }
 
@@ -182,6 +199,11 @@ public class ArrayNode extends Node {
     }
 
     private Node getNodeForKeyInternal(String key) {
+        // Check if this node has no keys
+        if (context == null) {
+            return null;
+        }
+
         var b = key.getBytes(context.getCharset());
         for (int i = 0; i < values.size(); i++) {
             if (isKeyAt(i, b)) {

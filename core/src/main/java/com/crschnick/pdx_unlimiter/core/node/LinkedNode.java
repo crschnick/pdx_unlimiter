@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.util.JoinedList;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -51,17 +52,34 @@ public final class LinkedNode extends Node {
 
     @Override
     public Node getNodeForKey(String key) {
-        return super.getNodeForKey(key);
+        for (var ar : arrayNodes) {
+            var r = ar.getNodeForKeyIfExistent(key);
+            if (r.isPresent()) {
+                return r.get();
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     @Override
     public Optional<Node> getNodeForKeyIfExistent(String key) {
-        return super.getNodeForKeyIfExistent(key);
+        for (var ar : arrayNodes) {
+            var r = ar.getNodeForKeyIfExistent(key);
+            if (r.isPresent()) {
+                return r;
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
     public List<Node> getNodesForKey(String key) {
-        return super.getNodesForKey(key);
+        List<Node> found = new ArrayList<>();
+        for (var ar : arrayNodes) {
+            var r = ar.getNodeForKeyIfExistent(key);
+            r.ifPresent(found::add);
+        }
+        return found;
     }
 
     @Override

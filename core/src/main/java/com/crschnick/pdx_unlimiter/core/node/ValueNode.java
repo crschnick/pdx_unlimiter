@@ -69,20 +69,20 @@ public final class ValueNode extends Node {
             if ((status & NodeConstants.QUOTED) != 0) {
                 t = ValueType.TEXT;
             } else {
-                var s = new String((byte[]) value, NodeConstants.getCharset(status));
+                var s = evaluateToString();
                 if (s.equals("yes") || s.equals("no")) {
                     t = ValueType.BOOLEAN;
                 }
 
                 else if (DOUBLE.matcher(s).matches()) {
-                    t = ValueType.UNQUOTED_STRING;
+                    t = ValueType.FLOATING_POINT;
                 }
 
                 else if (LONG.matcher(s).matches()) {
                     t = ValueType.INTEGER;
                 }
 
-                throw new IllegalStateException();
+                t = ValueType.UNQUOTED_STRING;
             }
         }
         return new Descriptor(t, KeyType.NONE);

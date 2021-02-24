@@ -37,10 +37,10 @@ public class TextFormatTokenizer {
         this.prev = 0;
         this.tokenCounter = 0;
         this.tokenTypes = new byte[bytes.length / 2];
-        this.scalarsStart = new int[bytes.length / 7];
-        this.scalarsLength = new int[bytes.length / 7];
+        this.scalarsStart = new int[bytes.length / 5];
+        this.scalarsLength = new int[bytes.length / 5];
         this.arraySizeStack = new Stack<>();
-        this.arraySizes = new int[bytes.length / 7];
+        this.arraySizes = new int[bytes.length / 5];
         this.arraySizesCounter = 0;
     }
 
