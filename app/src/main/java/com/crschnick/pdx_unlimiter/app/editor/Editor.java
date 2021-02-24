@@ -21,7 +21,7 @@ public class Editor {
             ErrorHandler.handleException(e);
             return;
         }
-        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), target.getWriter(), n -> {
+        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {
             try {
                 target.write(n);
             } catch (Exception e) {

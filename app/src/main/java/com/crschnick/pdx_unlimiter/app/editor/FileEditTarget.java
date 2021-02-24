@@ -1,26 +1,21 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 
-import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
 public class FileEditTarget extends EditTarget {
 
     public FileEditTarget(Path file) {
-        super(file, TextFormatParser.textFileParser(), TextFormatWriter.textFileWriter());
+        super(file, TextFormatParser.textFileParser());
     }
 
-    public FileEditTarget(Path file, TextFormatParser parser, TextFormatWriter writer) {
-        super(file, parser, writer);
-    }
-
-    @Override
-    public void save() throws IOException {
-
+    public FileEditTarget(Path file, TextFormatParser parser) {
+        super(file, parser);
     }
 
     @Override
@@ -30,6 +25,8 @@ public class FileEditTarget extends EditTarget {
 
     @Override
     public void write(Map<String, Node> nodeMap) throws Exception {
-        writer.write(nodeMap.get("root"), Integer.MAX_VALUE, "\t", file);
+        try (var out = Files.newOutputStream(file)) {
+            NodeWriter.write(out, getParser().getCharset(), nodeMap.get("root"), "\t");
+        }
     }
 }

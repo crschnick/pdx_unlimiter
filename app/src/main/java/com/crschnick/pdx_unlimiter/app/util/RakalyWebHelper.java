@@ -4,29 +4,14 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.Settings;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.Base64;
-import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
@@ -55,7 +40,7 @@ public class RakalyWebHelper {
         alert.showAndWait();
     }
 
-    public static void uploadSavegame(SavegameEntry<?,?> entry) {
+    public static void uploadSavegame(SavegameEntry<?, ?> entry) {
         if (Settings.getInstance().getRakalyApiKey().isEmpty() || Settings.getInstance().getRakalyUserId().isEmpty()) {
             showUsageDialog();
             return;

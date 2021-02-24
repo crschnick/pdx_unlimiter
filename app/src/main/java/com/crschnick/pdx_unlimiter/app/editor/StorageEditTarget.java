@@ -14,7 +14,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     private EditTarget target;
 
     public StorageEditTarget(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry, EditTarget target) {
-        super(storage.getSavegameFile(entry), target.getParser(), target.getWriter());
+        super(storage.getSavegameFile(entry), target.getParser());
         this.entry = entry;
         this.target = target;
     }

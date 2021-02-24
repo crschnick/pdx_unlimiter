@@ -22,6 +22,11 @@ public final class LinkedNode extends Node {
     }
 
     @Override
+    public Descriptor describe() {
+        return arrayNodes.get(0).describe();
+    }
+
+    @Override
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
         super.forEach(c, includeNullKeys);
     }

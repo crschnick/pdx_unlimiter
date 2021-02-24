@@ -6,19 +6,24 @@ import com.crschnick.pdx_unlimiter.core.node.NodeContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public interface NodeWriter {
 
-    public static String writeToString(Node node, int maxLines, String indent) throws IOException {
+    static String writeToString(Node node, int maxLines, String indent) {
         var out = new ByteArrayOutputStream();
         var writer = new NodeWriterImpl(out, StandardCharsets.UTF_8, maxLines, indent);
-        node.write(writer);
+        try {
+            node.write(writer);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return out.toString(StandardCharsets.UTF_8);
     }
 
-    public static void write(OutputStream out, Charset charset, Node node, String indent) throws IOException {
+    static void write(OutputStream out, Charset charset, Node node, String indent) throws IOException {
         var writer = new NodeWriterImpl(out, charset, Integer.MAX_VALUE, indent);
         node.write(writer);
     }

@@ -8,13 +8,11 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
@@ -175,19 +173,19 @@ public class SavegameActions {
         TaskExecutor.getInstance().submitTask(() -> {
 
             SavegameHelper.withSavegame(e, gi -> {
-                        Path meltedFile;
-                        try {
-                            meltedFile = RakalyHelper.meltSavegame(gi.getSavegameStorage().getSavegameFile(e));
-                        } catch (Exception ex) {
-                            ErrorHandler.handleException(ex);
-                            return;
-                        }
-                        var folder = gi.getSavegameStorage()
-                                .getOrCreateFolder("Melted savegames");
-                        folder.ifPresent(f -> {
-                            gi.getSavegameStorage().importSavegame(meltedFile, null, true, f);
-                        });
-                    });
+                Path meltedFile;
+                try {
+                    meltedFile = RakalyHelper.meltSavegame(gi.getSavegameStorage().getSavegameFile(e));
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                    return;
+                }
+                var folder = gi.getSavegameStorage()
+                        .getOrCreateFolder("Melted savegames");
+                folder.ifPresent(f -> {
+                    gi.getSavegameStorage().importSavegame(meltedFile, null, true, f);
+                });
+            });
         }, true);
     }
 

@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -89,7 +90,9 @@ public class EditorExternalState {
 
         try {
             openEntries.add(new Entry(file, node, state));
-            state.getWriter().write(node.toWritableNode(), Integer.MAX_VALUE, "  ", file);
+            try (var out = Files.newOutputStream(file)) {
+                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
+            }
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);

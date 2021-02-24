@@ -8,8 +8,9 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.ValueNode;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import javafx.geometry.Insets;
@@ -49,30 +50,22 @@ public class GuiEditorNode {
                 "Complex type");
     }
 
-    private static Region createColorTypeNode() {
-        return createTypeNode(
-                new Color(0.9, 0.3, 0.9, 0.3),
-                'C',
-                new Insets(0, 2, 1, 0),
-                "Color");
-    }
-
-    private static Region createTypeNode(ValueNode.Type type) {
-        if (type == ValueNode.Type.BOOLEAN) {
+    private static Region createTypeNode(Node.ValueType type) {
+        if (type == Node.ValueType.BOOLEAN) {
             return createTypeNode(
                     new Color(0.2, 0.2, 1, 0.5),
                     'B',
                     new Insets(0, 0, 1, 1),
                     "Boolean");
         }
-        if (type == ValueNode.Type.TEXT) {
+        if (type == Node.ValueType.TEXT) {
             return createTypeNode(
                     new Color(0.2, 1, 0.2, 0.5),
                     'T',
                     new Insets(1, 0, 0, 1),
                     "Text");
         }
-        if (type == ValueNode.Type.INTEGER) {
+        if (type == Node.ValueType.INTEGER) {
             return createTypeNode(
                     new Color(1, 0.2, 0.2, 0.5),
                     'I',
@@ -80,7 +73,7 @@ public class GuiEditorNode {
                     "Integer");
         }
 
-        if (type == ValueNode.Type.FLOATING_POINT) {
+        if (type == Node.ValueType.FLOATING_POINT) {
             return createTypeNode(
                     new Color(0.4, 1, 1, 0.5),
                     'F',
@@ -88,43 +81,29 @@ public class GuiEditorNode {
                     "Floating point number");
         }
 
-        if (type == ValueNode.Type.GAME_VALUE) {
+        if (type == Node.ValueType.UNQUOTED_STRING) {
             return createTypeNode(
                     new Color(1, 0.8, 0.3, 0.5),
                     'V',
                     new Insets(1, 0.3, 0, 1),
                     "Game specific value");
         }
-        return null;
+        if (type == Node.ValueType.COLOR) {
+            return createTypeNode(
+                    new Color(0.9, 0.3, 0.9, 0.3),
+                    'C',
+                    new Insets(0, 2, 1, 0),
+                    "Color");
+        }
+
+        throw new IllegalStateException();
     }
 
 
     static Optional<Region> createTypeNode(EditorNode n) {
         if (n.isReal() && ((SimpleNode) n).getBackingNode().isColor()) {
-            return Optional.of(createColorTypeNode());
-        } else if (n.isReal() && ((SimpleNode) n).getBackingNode().isValue()) {
-            return Optional.ofNullable(createTypeNode(((ValueNode) ((SimpleNode) n).getBackingNode()).determineType()));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private static Optional<ValueNode.Type> determineListType(ArrayNode an) {
-        if (an.getNodes().size() == 0) {
-            return Optional.empty();
-        }
-
-        if (an.getNodes().size() == 1) {
-            return an.getNodes().get(0) instanceof ValueNode ?
-                    Optional.ofNullable(((ValueNode) an.getNodes().get(0)).determineType()) : Optional.empty();
-        }
-
-        Optional<ValueNode.Type> t0 = an.getNodes().get(0) instanceof ValueNode ?
-                Optional.ofNullable(((ValueNode) an.getNodes().get(0)).determineType()) : Optional.empty();
-        Optional<ValueNode.Type> t1 = an.getNodes().get(1) instanceof ValueNode ?
-                Optional.ofNullable(((ValueNode) an.getNodes().get(1)).determineType()) : Optional.empty();
-        if (t0.equals(t1)) {
-            return t0;
+            var d = ((SimpleNode) n).getBackingNode();
+            return Optional.of(createTypeNode(d.describe().getValueType()));
         } else {
             return Optional.empty();
         }
@@ -154,10 +133,10 @@ public class GuiEditorNode {
             box.setSpacing(5);
 
             {
-                Optional<ValueNode.Type> type = n.isReal() ? determineListType(
-                        (ArrayNode) ((SimpleNode) n).getBackingNode()) : Optional.empty();
-                type.ifPresentOrElse(t -> {
-                    box.getChildren().add(createTypeNode(t));
+                var descriptor = Optional.ofNullable(
+                        n.isReal() ? ((SimpleNode) n).getBackingNode().describe() : null);
+                descriptor.ifPresentOrElse(t -> {
+                    box.getChildren().add(createTypeNode(t.getValueType()));
                 }, () -> {
                     box.getChildren().add(createComplexTypeNode());
                 });
@@ -183,8 +162,7 @@ public class GuiEditorNode {
                 preview.getStyleClass().add("preview");
                 preview.setGraphic(new FontIcon());
                 preview.setOnMouseEntered(e -> {
-                    var tt = new Tooltip(
-                            TextFormatWriter.writeToString(n.toWritableNode(), 15, "  "));
+                    var tt = new Tooltip(NodeWriter.writeToString(n.toWritableNode(), 15, "  "));
                     tt.setShowDelay(Duration.ZERO);
                     Tooltip.install(preview, tt);
                 });

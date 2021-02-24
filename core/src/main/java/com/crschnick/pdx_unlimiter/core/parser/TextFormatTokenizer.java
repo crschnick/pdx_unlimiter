@@ -13,18 +13,21 @@ public class TextFormatTokenizer {
     public static final byte CLOSE_GROUP = 4;
     public static final byte EQUALS = 5;
 
+    private static final byte DOUBLE_QUOTE_CHAR = 34;
+
     private byte[] bytes;
     private boolean isInQuotes;
     private boolean isInComment;
     private int prev;
     private int i;
+
     private byte[] tokenTypes;
+    private int tokenCounter;
 
     private int scalarCounter;
     private int[] scalarsStart;
     private int[] scalarsLength;
 
-    private int tokenCounter;
     private Stack<Integer> arraySizeStack;
     private int[] arraySizes;
     private int arraySizesCounter;
@@ -34,10 +37,10 @@ public class TextFormatTokenizer {
         this.prev = 0;
         this.tokenCounter = 0;
         this.tokenTypes = new byte[bytes.length / 2];
-        this.scalarsStart = new int[bytes.length / 10];
-        this.scalarsLength = new int[bytes.length / 10];
+        this.scalarsStart = new int[bytes.length / 7];
+        this.scalarsLength = new int[bytes.length / 7];
         this.arraySizeStack = new Stack<>();
-        this.arraySizes = new int[bytes.length / 10];
+        this.arraySizes = new int[bytes.length / 7];
         this.arraySizesCounter = 0;
     }
 
@@ -86,7 +89,7 @@ public class TextFormatTokenizer {
         if (marksEndOfPreviousToken) {
             int offset = prev;
             int length = (i - 1) - prev + 1;
-            if (bytes[prev] == '"' && bytes[i - 1] == '"') {
+            if (bytes[prev] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
                 tokenTypes[tokenCounter++] = STRING_QUOTED;
             } else {
                 tokenTypes[tokenCounter++] = STRING_UNQUOTED;
@@ -94,6 +97,7 @@ public class TextFormatTokenizer {
             scalarsStart[scalarCounter] = offset;
             scalarsLength[scalarCounter] = length;
             scalarCounter++;
+            arraySizes[arraySizeStack.peek()]++;
         }
 
         if (isWhitespace) {

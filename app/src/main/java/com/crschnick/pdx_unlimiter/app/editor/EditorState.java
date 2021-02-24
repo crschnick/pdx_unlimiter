@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,7 +17,6 @@ public class EditorState {
 
     private String fileName;
     private TextFormatParser parser;
-    private TextFormatWriter writer;
     private BooleanProperty dirty;
     private Map<String, EditorNode> rootNodes;
     private EditorExternalState externalState;
@@ -27,8 +25,7 @@ public class EditorState {
     private ListProperty<EditorNode> content;
     private Consumer<Map<String, Node>> saveFunc;
 
-    public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, TextFormatWriter writer, Consumer<Map<String, Node>> saveFunc) {
-        this.writer = writer;
+    public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
@@ -161,10 +158,6 @@ public class EditorState {
 
     public BooleanProperty dirtyProperty() {
         return dirty;
-    }
-
-    public TextFormatWriter getWriter() {
-        return writer;
     }
 
     public TextFormatParser getParser() {

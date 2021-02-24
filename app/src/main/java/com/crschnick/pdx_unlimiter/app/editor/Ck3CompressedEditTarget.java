@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriterImpl;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
@@ -25,7 +24,7 @@ public class Ck3CompressedEditTarget extends EditTarget {
     private String header;
 
     public Ck3CompressedEditTarget(Path file) {
-        super(file, TextFormatParser.ck3SavegameParser(), NodeWriter.ck3SavegameWriter());
+        super(file, TextFormatParser.ck3SavegameParser());
     }
 
     @Override

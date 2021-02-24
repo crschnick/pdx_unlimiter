@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.node.*;
-import com.crschnick.pdx_unlimiter.core.parser.*;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public final class SimpleNode extends EditorNode {
         ArrayNode ar = (ArrayNode) getRealParent().getBackingNode();
 
         var begin = ar.splice(0, beginIndex);
-        var end = ar.splice(endIndex,ar.getNodeArray().size() - endIndex);
+        var end = ar.splice(endIndex, ar.getNodeArray().size() - endIndex);
         var linked = new LinkedNode(List.of(begin, toInsert, end));
 
         // Update parent node to reflect change

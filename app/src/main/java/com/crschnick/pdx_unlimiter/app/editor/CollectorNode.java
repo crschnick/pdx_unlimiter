@@ -1,14 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class CollectorNode extends EditorNode {
 
@@ -61,7 +57,7 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public List<EditorNode> open() {
-        return EditorNode.create(this, nodes);
+        return EditorNode.create(this, ArrayNode.array(nodes));
     }
 
     public Node toWritableNode() {

@@ -86,6 +86,34 @@ public class ArrayNode extends Node {
         return new ArrayNode(context, kb, kl, values.subList(begin, begin + length));
     }
 
+    @Override
+    public List<Node> getNodeArray() {
+        return values;
+    }
+
+    @Override
+    public Descriptor describe() {
+        if (values.size() == 0) {
+            return new Descriptor(ValueType.NONE, KeyType.NONE);
+        }
+
+        var type = values.get(0).describe();
+        int keyCount = 0;
+        for (int i = 0; i < values.size(); i++) {
+            if (hasKeyAtIndex(i)) {
+                keyCount++;
+            }
+        }
+
+        if (keyCount == 0) {
+            return new Descriptor(type.getValueType(), KeyType.NONE);
+        }
+        if (keyCount == values.size()) {
+            return new Descriptor(type.getValueType(), KeyType.ALL);
+        }
+        return new Descriptor(type.getValueType(), KeyType.MIXED);
+    }
+
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
         for (int i = 0; i < values.size(); i++) {
             if (!hasKeyAtIndex(i) && !includeNullKeys) {
@@ -145,7 +173,7 @@ public class ArrayNode extends Node {
         }
 
         int start = keysBegin[index];
-        for (int i = 0; i < keysLength[i]; i++) {
+        for (int i = 0; i < keysLength[index]; i++) {
             if (context.getData()[start + i] != b[i]) {
                 return false;
             }
@@ -171,7 +199,7 @@ public class ArrayNode extends Node {
 
     @Override
     public boolean hasKey(String key) {
-        return getNodeForKey(key) != null;
+        return getNodeForKeyInternal(key) != null;
     }
 
     @Override

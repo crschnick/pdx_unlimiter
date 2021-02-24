@@ -29,9 +29,10 @@ public final class ColorNode extends Node {
             return false;
         }
 
-        return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, length) ||
-                Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, length) ||
-                Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, length);
+        var end = begin + length;
+        return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, end) ||
+                Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, end) ||
+                Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end);
     }
 
     public String getColorName() {
@@ -40,6 +41,11 @@ public final class ColorNode extends Node {
 
     public List<ValueNode> getValues() {
         return values;
+    }
+
+    @Override
+    public Descriptor describe() {
+        return new Descriptor(ValueType.COLOR, KeyType.NONE);
     }
 
     @Override

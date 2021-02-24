@@ -39,6 +39,56 @@ public final class ValueNode extends Node {
     }
 
     @Override
+    public String toString() {
+        if (isEvalulated()) {
+            return value.toString();
+        } else {
+            return getContext().evaluate(begin, length);
+        }
+    }
+
+    @Override
+    public Descriptor describe() {
+        ValueType t = null;
+        if (isEvalulated()) {
+            if ((status & NodeConstants.TYPE_BOOLEAN) != 0) {
+                t = ValueType.BOOLEAN;
+            }
+            else if (value instanceof Integer || value instanceof Long) {
+                t = ValueType.INTEGER;
+            }
+            else if (value instanceof Double) {
+                t = ValueType.FLOATING_POINT;
+            }
+            else if (value instanceof String) {
+                t = (status & NodeConstants.QUOTED) != 0 ? ValueType.TEXT : ValueType.UNQUOTED_STRING;
+            }
+
+            throw new IllegalStateException();
+        } else {
+            if ((status & NodeConstants.QUOTED) != 0) {
+                t = ValueType.TEXT;
+            } else {
+                var s = new String((byte[]) value, NodeConstants.getCharset(status));
+                if (s.equals("yes") || s.equals("no")) {
+                    t = ValueType.BOOLEAN;
+                }
+
+                else if (DOUBLE.matcher(s).matches()) {
+                    t = ValueType.UNQUOTED_STRING;
+                }
+
+                else if (LONG.matcher(s).matches()) {
+                    t = ValueType.INTEGER;
+                }
+
+                throw new IllegalStateException();
+            }
+        }
+        return new Descriptor(t, KeyType.NONE);
+    }
+
+    @Override
     public void write(NodeWriter writer) throws IOException {
         if (isEvalulated()) {
             if (isQuoted()) {
@@ -76,7 +126,7 @@ public final class ValueNode extends Node {
 
     private String evaluateToString() {
         boolean quoted = isQuoted();
-        return getContext().evaluate(begin + (quoted ? 1 : 0), begin + length - (quoted ? 1 : 0));
+        return getContext().evaluate(begin + (quoted ? 1 : 0), length - (quoted ? 2 : 0));
     }
 
     @Override
@@ -150,52 +200,6 @@ public final class ValueNode extends Node {
         return false;
     }
 
-    public enum Type {
-        TEXT,
-        BOOLEAN,
-        INTEGER,
-        FLOATING_POINT,
-        UNQUOTED_STRING
-    }
-
     private static final Pattern LONG = Pattern.compile("-?[0-9]+");
     private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
-
-    public Type determineType() {
-        if (isEvalulated()) {
-            if ((status & NodeConstants.TYPE_BOOLEAN) != 0) {
-                return Type.BOOLEAN;
-            }
-            if (value instanceof Integer || value instanceof Long) {
-                return Type.INTEGER;
-            }
-            if (value instanceof Double) {
-                return Type.FLOATING_POINT;
-            }
-            if (value instanceof String) {
-                return (status & NodeConstants.QUOTED) != 0 ? Type.TEXT : Type.UNQUOTED_STRING;
-            }
-
-            throw new IllegalStateException();
-        }
-
-        if ((status & NodeConstants.QUOTED) != 0) {
-            return Type.TEXT;
-        }
-
-        var s = new String((byte[]) value, NodeConstants.getCharset(status));
-        if (s.equals("yes") || s.equals("no")) {
-            return Type.BOOLEAN;
-        }
-
-        if (DOUBLE.matcher(s).matches()) {
-            return Type.UNQUOTED_STRING;
-        }
-
-        if (LONG.matcher(s).matches()) {
-            return Type.INTEGER;
-        }
-
-        throw new IllegalStateException();
-    }
 }

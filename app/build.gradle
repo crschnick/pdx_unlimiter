@@ -35,7 +35,8 @@ List<String> runArgs = [
         "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.hoi4=com.fasterxml.jackson.databind",
         "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.stellaris=com.fasterxml.jackson.databind",
         "-Xmx4g",
-        "-XX:+ExitOnOutOfMemoryError"]
+        "-XX:+ExitOnOutOfMemoryError",
+        "-ea"]
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'

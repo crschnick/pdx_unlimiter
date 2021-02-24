@@ -43,7 +43,8 @@ public class TextFormatParser extends FormatParser {
         this.context = new NodeContext(input, charset);
         this.tokenizer = new TextFormatTokenizer(input);
         this.tokenizer.tokenize();
-        return parseNode();
+        var r = parseNode();
+        return r;
     }
 
     private Node parseNode() {
@@ -52,9 +53,17 @@ public class TextFormatParser extends FormatParser {
             var begin = tokenizer.getScalarsStart()[slIndex];
             var length = tokenizer.getScalarsLength()[slIndex];
 
+            index++;
+            slIndex++;
+
             boolean isColor = ColorNode.isColorName(context, begin, length);
             if (isColor) {
                 var cn = new ColorNode(context.evaluate(begin, length), List.of(
+                        new ValueNode(
+                                context,
+                                false,
+                                tokenizer.getScalarsStart()[slIndex],
+                                tokenizer.getScalarsLength()[slIndex]),
                         new ValueNode(
                                 context,
                                 false,
@@ -64,12 +73,7 @@ public class TextFormatParser extends FormatParser {
                                 context,
                                 false,
                                 tokenizer.getScalarsStart()[slIndex + 2],
-                                tokenizer.getScalarsLength()[slIndex + 2]),
-                        new ValueNode(
-                                context,
-                                false,
-                                tokenizer.getScalarsStart()[slIndex + 3],
-                                tokenizer.getScalarsLength()[slIndex + 3])));
+                                tokenizer.getScalarsLength()[slIndex + 2])));
 
                 // A color is also an array, so we have to move the array index!
                 arrayIndex++;
@@ -81,9 +85,8 @@ public class TextFormatParser extends FormatParser {
                 var node = new ValueNode(
                         context,
                         false,
-                        tokenizer.getScalarsStart()[slIndex],
-                        tokenizer.getScalarsLength()[slIndex]);
-                index++;
+                        begin,
+                        length);
                 return node;
             }
         } else if (tt[index] == TextFormatTokenizer.STRING_QUOTED) {
@@ -95,8 +98,8 @@ public class TextFormatParser extends FormatParser {
             return node;
         }
 
-        assert tt[index] != TextFormatTokenizer.EQUALS;
-        assert tt[index] != TextFormatTokenizer.CLOSE_GROUP;
+        assert tt[index] != TextFormatTokenizer.EQUALS: "Encountered unexpected =";
+        assert tt[index] != TextFormatTokenizer.CLOSE_GROUP: "Encountered unexpected }";
 
         return parseArray();
     }
@@ -104,27 +107,36 @@ public class TextFormatParser extends FormatParser {
     private Node parseArray() {
         var tt = tokenizer.getTokenTypes();
 
-        assert tt[index] == TextFormatTokenizer.OPEN_GROUP;
+        assert tt[index] == TextFormatTokenizer.OPEN_GROUP: "Expected {";
         index++;
 
         var size = tokenizer.getArraySizes()[arrayIndex++];
         var builder = new ArrayNode.Builder(context, size);
         while (true) {
-            if (index == tt.length) {
-                throw new IllegalStateException("Reached EOF but found no closing group token");
-            }
+            assert index < tt.length: "Reached EOF but found no closing group token";
 
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                assert size >= builder.getUsedSize();
+                assert size >= builder.getUsedSize():
+                        "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
+                index++;
                 return builder.build();
             }
 
             boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
-                index += 2;
-                Node result = parseNode();
-                builder.put(tokenizer.getScalarsStart()[slIndex], tokenizer.getScalarsLength()[slIndex], result);
+                assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED: "Expected unquoted key";
+
+                int start = tokenizer.getScalarsStart()[slIndex];
+                int length = tokenizer.getScalarsLength()[slIndex];
                 slIndex++;
+                index += 2;
+
+                Node result = parseNode();
+
+                //System.out.println("key: " + context.evaluate(start, length));
+                //System.out.println("val: " + result.toString());
+
+                builder.put(start, length, result);
                 continue;
             }
 
@@ -142,5 +154,9 @@ public class TextFormatParser extends FormatParser {
             Node result = parseNode();
             builder.put(result);
         }
+    }
+
+    public Charset getCharset() {
+        return charset;
     }
 }

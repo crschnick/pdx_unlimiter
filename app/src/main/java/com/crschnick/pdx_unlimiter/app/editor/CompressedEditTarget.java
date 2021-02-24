@@ -1,10 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +15,8 @@ public class CompressedEditTarget extends EditTarget {
 
     private Set<String> entries;
 
-    public CompressedEditTarget(Path file, TextFormatParser parser, TextFormatWriter writer, Set<String> entries) {
-        super(file, parser, writer);
+    public CompressedEditTarget(Path file, TextFormatParser parser, Set<String> entries) {
+        super(file, parser);
         this.entries = entries;
     }
 
@@ -36,7 +37,9 @@ public class CompressedEditTarget extends EditTarget {
         try (var fs = FileSystems.newFileSystem(file)) {
             for (var s : entries) {
                 var path = fs.getPath(s);
-                writer.write(nodeMap.get(s), Integer.MAX_VALUE, "\t", path);
+                try (var out = Files.newOutputStream(path)) {
+                    NodeWriter.write(out, getParser().getCharset(), nodeMap.get(s), "\t");
+                }
             }
         }
     }

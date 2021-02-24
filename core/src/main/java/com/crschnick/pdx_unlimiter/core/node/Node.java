@@ -9,30 +9,41 @@ import java.util.function.BiConsumer;
 
 public abstract class Node {
 
-    public static enum ArrayType {
+    public static enum KeyType {
         NONE,
-        ARRAY,
-        OBJECT,
+        ALL,
         MIXED
     }
 
+    public enum ValueType {
+        NONE,
+        TEXT,
+        BOOLEAN,
+        INTEGER,
+        FLOATING_POINT,
+        UNQUOTED_STRING,
+        COLOR
+    }
+
     public static class Descriptor {
-        private ValueNode.Type basicType;
-        private ArrayType arrayType;
+        private final ValueType valueType;
+        private final KeyType keyType;
 
-        public Descriptor(ValueNode.Type basicType, ArrayType arrayType) {
-            this.basicType = basicType;
-            this.arrayType = arrayType;
+        public Descriptor(ValueType valueType, KeyType keyType) {
+            this.valueType = valueType;
+            this.keyType = keyType;
         }
 
-        public ValueNode.Type getBasicType() {
-            return basicType;
+        public ValueType getValueType() {
+            return valueType;
         }
 
-        public ArrayType getArrayType() {
-            return arrayType;
+        public KeyType getArrayType() {
+            return keyType;
         }
     }
+
+    public abstract Descriptor describe();
 
     public final void forEach(BiConsumer<String, Node> c) {
         forEach(c, false);
