@@ -77,9 +77,10 @@ public class TextFormatParser extends FormatParser {
             boolean isColor = ColorNode.isColorName(context, slIndex);
 
             if (isColor) {
+                var type = context.evaluate(slIndex);
                 index++;
                 slIndex++;
-                var cn = new ColorNode(context.evaluate(slIndex), List.of(
+                var cn = new ColorNode(type, List.of(
                         new ValueNode(
                                 context,
                                 slIndex),

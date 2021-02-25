@@ -96,7 +96,8 @@ public class LogManager {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
 
-        System.setProperty("prism.verbose", "true");
+        // Debug output for platform
+        // System.setProperty("prism.verbose", "true");
 
         if (!debugInstallations) {
             System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
