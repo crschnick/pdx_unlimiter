@@ -51,29 +51,20 @@ public class TextFormatParser extends FormatParser {
     }
 
     public final Node parse(byte[] input) {
-        var used = Runtime.getRuntime().totalMemory();
-        System.out.println("Used memory: " + used / 1024 + "kB");
-
         this.tokenizer = new TextFormatTokenizer(input);
 
         var now = Instant.now();
         this.tokenizer.tokenize();
-        System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+        // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
         this.context = new NodeContext(input, charset,
                 tokenizer.getScalarsStart(),
                 tokenizer.getScalarsLength(),
                 tokenizer.getScalarCount());
 
-        used = Runtime.getRuntime().totalMemory();
-        System.out.println("Used memory: " + used / 1024 + "kB");
-
         now = Instant.now();
         var r = parseArray();
-        System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
-
-        used = Runtime.getRuntime().totalMemory();
-        System.out.println("Used memory: " + used / 1024 + "kB");
+        // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
         reset();
 

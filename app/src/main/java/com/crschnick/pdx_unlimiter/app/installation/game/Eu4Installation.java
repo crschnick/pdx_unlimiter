@@ -44,14 +44,17 @@ public class Eu4Installation extends GameInstallation {
     }
 
     private Path determineUserDirectory(JsonNode node) {
-        try {
-            String userdir = Files.readString(getPath().resolve("userdir.txt"));
-            if (!userdir.isEmpty()) {
-                logger.debug("Found custom userdir " + userdir);
-                return Path.of(userdir);
+        var userdirFile = getPath().resolve("userdir.txt");
+        if (Files.exists(userdirFile)) {
+            try {
+                String userdir = Files.readString(userdirFile);
+                if (!userdir.isEmpty()) {
+                    logger.debug("Found custom userdir " + userdir);
+                    return Path.of(userdir);
+                }
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
             }
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
         }
 
         String value = Optional.ofNullable(node.get("gameDataPath"))

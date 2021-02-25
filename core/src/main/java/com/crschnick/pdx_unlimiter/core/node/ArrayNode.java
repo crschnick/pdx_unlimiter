@@ -110,14 +110,17 @@ public final class ArrayNode extends Node {
         return new ArrayNode(context, ks, vs, values.subList(begin, begin + length));
     }
 
-    @Override
-    public List<Node> getNodeArray() {
+    private void evaluateAllValueNodes() {
         for (int i = 0; i < values.size(); i++) {
             if (values.get(i) == null) {
                 values.set(i, new ValueNode(context, valueScalars[i]));
             }
         }
+    }
 
+    @Override
+    public List<Node> getNodeArray() {
+        evaluateAllValueNodes();
         return values;
     }
 
@@ -145,6 +148,7 @@ public final class ArrayNode extends Node {
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
+        evaluateAllValueNodes();
         String key = null;
         for (int i = 0; i < values.size(); i++) {
             if (!hasKeyAtIndex(i)) {
