@@ -32,9 +32,16 @@ public class Eu4SavegameParser extends SavegameParser {
     }
 
     public boolean isBinary(Path input) throws IOException {
-        try (var fs = FileSystems.newFileSystem(input);
-             var in = Files.newInputStream(fs.getPath("gamestate"))) {
-            return FormatParser.validateHeader(EU4_BINARY_HEADER, in);
+        try (var fs = FileSystems.newFileSystem(input)) {
+            var gs = fs.getPath("gamestate");
+
+            // If it is very old and does not contain a gamestate, just return false to avoid melting
+            if (!Files.exists(gs)) {
+                return false;
+            }
+            try (var in = Files.newInputStream(gs)) {
+                return FormatParser.validateHeader(EU4_BINARY_HEADER, in);
+            }
         }
     }
 
