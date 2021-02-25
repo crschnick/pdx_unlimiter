@@ -61,12 +61,14 @@ public class ColorHelper {
                     c.get(0).getDouble() / 360.0,
                     c.get(1).getDouble() / 360.0,
                     c.get(2).getDouble() / 360.0);
-        } else {
+        } else if (node.getColorName().equals("rgb")) {
             return Color.color(
                     c.get(0).getDouble() / 255.0,
                     c.get(1).getDouble() / 255.0,
                     c.get(2).getDouble() / 255.0);
         }
+
+        throw new IllegalArgumentException();
     }
 
     private static Map<String, Color> loadPredefinedColors(Node node) {
