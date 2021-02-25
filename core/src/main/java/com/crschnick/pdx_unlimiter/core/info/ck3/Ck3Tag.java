@@ -27,7 +27,7 @@ public class Ck3Tag {
     }
 
     public static Ck3Tag getPlayerTag(Node n, Set<Ck3Tag> allTags) {
-        long id = n.getNodeForKey("currenty_played_characters").getNodeArray().get(0).getLong();
+        long id = n.getNodeForKey("currently_played_characters").getNodeArray().get(0).getLong();
         var personNode = n.getNodeForKey("living").getNodeForKey(String.valueOf(id));
         var house = new Ck3House(
                 n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString(),

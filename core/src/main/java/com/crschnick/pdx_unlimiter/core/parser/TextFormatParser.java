@@ -54,8 +54,9 @@ public class TextFormatParser extends FormatParser {
         var used = Runtime.getRuntime().totalMemory();
         System.out.println("Used memory: " + used / 1024 + "kB");
 
-        var now = Instant.now();
         this.tokenizer = new TextFormatTokenizer(input);
+
+        var now = Instant.now();
         this.tokenizer.tokenize();
         System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 

@@ -71,7 +71,7 @@ public final class ValueNode extends Node {
         boolean quoted = isQuoted();
         var s = context.evaluate(scalarIndex);
         if (quoted) {
-            return s.substring(1, s.length() - 2);
+            return s.substring(1, s.length() - 1);
         } else {
             return s;
         }

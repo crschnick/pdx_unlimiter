@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class ArrayNode extends Node {
+public final class ArrayNode extends Node {
 
     public static class Builder {
 
@@ -26,11 +26,7 @@ public class ArrayNode extends Node {
         }
 
         public Node build() {
-            if (keyScalars == null) {
-                return ArrayNode.array(values);
-            } else {
-                return new ArrayNode(context, keyScalars, valueScalars, values);
-            }
+            return new ArrayNode(context, keyScalars, valueScalars, values);
         }
 
         public void putScalarValue(int scalarIndex) {
@@ -76,7 +72,7 @@ public class ArrayNode extends Node {
 
     public static ArrayNode singleKeyNode(String key, Node value) {
         var ctx = new NodeContext(key);
-        return new ArrayNode(ctx, new int[]{0}, new int[] {ctx.getData().length}, List.of(value));
+        return new ArrayNode(ctx, new int[]{0}, new int[] {-1}, List.of(value));
     }
 
     private final NodeContext context;
@@ -89,6 +85,11 @@ public class ArrayNode extends Node {
         this.keyScalars = keyScalars;
         this.valueScalars = valueScalars;
         this.values = values;
+    }
+
+    @Override
+    public String toString() {
+        return "{ (" + values.size() + ") }";
     }
 
     public int getSubsequentEqualKeyCount(int startIndex) {
@@ -111,6 +112,12 @@ public class ArrayNode extends Node {
 
     @Override
     public List<Node> getNodeArray() {
+        for (int i = 0; i < values.size(); i++) {
+            if (values.get(i) == null) {
+                values.set(i, new ValueNode(context, valueScalars[i]));
+            }
+        }
+
         return values;
     }
 
@@ -147,7 +154,7 @@ public class ArrayNode extends Node {
                     key = null;
                 }
             } else {
-                key = context.evaluate(i);
+                key = context.evaluate(keyScalars[i]);
             }
 
             c.accept(key, values.get(i));
@@ -225,6 +232,11 @@ public class ArrayNode extends Node {
         var b = key.getBytes(context.getCharset());
         for (int i = 0; i < values.size(); i++) {
             if (isKeyAt(i, b)) {
+                // Initialize value node if we haven't done that already
+                if (values.get(i) == null) {
+                    values.set(i, new ValueNode(context, valueScalars[i]));
+                }
+
                 return values.get(i);
             }
         }

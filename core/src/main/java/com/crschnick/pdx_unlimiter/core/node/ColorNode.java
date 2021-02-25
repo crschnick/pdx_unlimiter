@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ColorNode extends Node {
 
@@ -14,6 +15,13 @@ public final class ColorNode extends Node {
     public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
         this.values = values;
+    }
+
+    @Override
+    public String toString() {
+        return colorName + "{ " + values.stream()
+                .map(ValueNode::toString)
+                .collect(Collectors.joining(" ")) + " }";
     }
 
     private static final byte[] RGB = "rgb".getBytes();
