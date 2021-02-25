@@ -10,41 +10,58 @@ public class ArrayNode extends Node {
 
     public static class Builder {
 
-        private boolean hasKeys;
         private int index;
 
+        private final int maxSize;
         private final NodeContext context;
-        private final int[] keysBegin;
-        private final int[] keysLength;
+        private int[] keyScalars;
+        private final int[] valueScalars;
         private final List<Node> values;
 
         public Builder(NodeContext context, int maxSize) {
+            this.maxSize = maxSize;
             this.context = context;
-            this.keysBegin = new int[maxSize];
-            this.keysLength = new int[maxSize];
+            this.valueScalars = new int[maxSize];
             this.values = new ArrayList<>(maxSize);
         }
 
         public Node build() {
-            if (!hasKeys) {
+            if (keyScalars == null) {
                 return ArrayNode.array(values);
             } else {
-                return new ArrayNode(context, keysBegin, keysLength, values);
+                return new ArrayNode(context, keyScalars, valueScalars, values);
             }
         }
 
-        public void put(Node value) {
-            keysBegin[index] = -1;
-            keysLength[index] = -1;
-            values.add(value);
+        public void putScalarValue(int scalarIndex) {
+            valueScalars[index] = scalarIndex;
+            values.add(null);
             index++;
         }
 
-        public void put(int begin, int length, Node value) {
-            hasKeys = true;
-            keysBegin[index] = begin;
-            keysLength[index] = length;
-            values.add(value);
+        public void putKeyAndScalarValue(int keyIndex, int scalarIndex) {
+            if (keyScalars == null) {
+                this.keyScalars = new int[maxSize];
+            }
+            keyScalars[index] = keyIndex;
+            valueScalars[index] = scalarIndex;
+            values.add(null);
+            index++;
+        }
+
+        public void putNodeValue(Node node) {
+            valueScalars[index] = -1;
+            values.add(node);
+            index++;
+        }
+
+        public void putKeyAndNodeValue(int keyIndex, Node node) {
+            if (keyScalars == null) {
+                this.keyScalars = new int[maxSize];
+            }
+            keyScalars[index] = keyIndex;
+            valueScalars[index] = -1;
+            values.add(node);
             index++;
         }
 
@@ -63,19 +80,19 @@ public class ArrayNode extends Node {
     }
 
     private final NodeContext context;
-    private final int[] keysBegin;
-    private final int[] keysLength;
+    private final int[] keyScalars;
+    private final int[] valueScalars;
     private final List<Node> values;
 
-    private ArrayNode(NodeContext context, int[] keysBegin, int[] keysLength, List<Node> values) {
+    private ArrayNode(NodeContext context, int[] keyScalars, int[] valueScalars, List<Node> values) {
         this.context = context;
-        this.keysBegin = keysBegin;
-        this.keysLength = keysLength;
+        this.keyScalars = keyScalars;
+        this.valueScalars = valueScalars;
         this.values = values;
     }
 
     public int getSubsequentEqualKeyCount(int startIndex) {
-        var b = context.getSubData(keysBegin[startIndex], keysLength[startIndex]);
+        var b = context.getSubData(keyScalars[startIndex]);
         for (int i = startIndex + 1; i < values.size(); i++) {
             if (!isKeyAt(i, b)) {
                 return i - startIndex;
@@ -85,11 +102,11 @@ public class ArrayNode extends Node {
     }
 
     public ArrayNode splice(int begin, int length) {
-        int[] kb = new int[length];
-        int[] kl = new int[length];
-        System.arraycopy(keysBegin, begin, kb, 0, length);
-        System.arraycopy(keysLength, begin, kl, 0, length);
-        return new ArrayNode(context, kb, kl, values.subList(begin, begin + length));
+        int[] ks = new int[length];
+        int[] vs = new int[length];
+        System.arraycopy(keyScalars, begin, ks, 0, length);
+        System.arraycopy(valueScalars, begin, vs, 0, length);
+        return new ArrayNode(context, ks, vs, values.subList(begin, begin + length));
     }
 
     @Override
@@ -130,7 +147,7 @@ public class ArrayNode extends Node {
                     key = null;
                 }
             } else {
-                key = context.evaluate(keysBegin[i], keysLength[i]);
+                key = context.evaluate(i);
             }
 
             c.accept(key, values.get(i));
@@ -145,7 +162,7 @@ public class ArrayNode extends Node {
 
         for (int i = 0; i < values.size(); i++) {
             if (hasKeyAtIndex(i)) {
-                writer.write(context, keysBegin[i], keysLength[i]);
+                writer.write(context, keyScalars[i]);
                 writer.write("=");
             }
 
@@ -173,11 +190,11 @@ public class ArrayNode extends Node {
     }
 
     private boolean hasKeyAtIndex(int index) {
-        if (keysBegin == null) {
+        if (keyScalars == null) {
             return false;
         }
 
-        return keysBegin[index] != -1;
+        return keyScalars[index] != -1;
     }
 
     private boolean isKeyAt(int index, byte[] b) {
@@ -185,12 +202,13 @@ public class ArrayNode extends Node {
             return false;
         }
 
-        if (keysLength[index] != b.length) {
+        int keyScalarIndex = keyScalars[index];
+        if (context.getLiteralsLength()[keyScalarIndex] != b.length) {
             return false;
         }
 
-        int start = keysBegin[index];
-        for (int i = 0; i < keysLength[index]; i++) {
+        int start = context.getLiteralsBegin()[keyScalarIndex];
+        for (int i = 0; i < context.getLiteralsLength()[keyScalarIndex]; i++) {
             if (context.getData()[start + i] != b[i]) {
                 return false;
             }
@@ -200,7 +218,7 @@ public class ArrayNode extends Node {
 
     private Node getNodeForKeyInternal(String key) {
         // Check if this node has no keys
-        if (context == null) {
+        if (keyScalars == null) {
             return null;
         }
 

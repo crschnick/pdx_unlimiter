@@ -44,9 +44,9 @@ public class ColorHelper {
 
     public static ColorNode toColorNode(Color c) {
         return new ColorNode("rgb", List.of(
-                new ValueNode(String.valueOf((int) (c.getRed() * 255)), false),
-                new ValueNode(String.valueOf((int) (c.getGreen() * 255)), false),
-                new ValueNode(String.valueOf((int) (c.getBlue() * 255)), false)));
+                new ValueNode(String.valueOf((int) (c.getRed() * 255))),
+                new ValueNode(String.valueOf((int) (c.getGreen() * 255))),
+                new ValueNode(String.valueOf((int) (c.getBlue() * 255)))));
     }
 
     public static Color fromColorNode(ColorNode node) {

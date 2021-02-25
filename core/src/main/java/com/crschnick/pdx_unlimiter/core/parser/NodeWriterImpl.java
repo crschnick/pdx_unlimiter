@@ -63,15 +63,15 @@ public final class NodeWriterImpl implements NodeWriter {
     }
 
     @Override
-    public void write(NodeContext ctx, int begin, int length) throws IOException {
+    public void write(NodeContext ctx, int index) throws IOException {
         if (hitMaxLines) {
             return;
         }
 
         if (ctx.getCharset().equals(charset)) {
-            out.write(ctx.getData(), begin, length);
+            out.write(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index]);
         } else {
-            var s = ctx.evaluate(begin, length);
+            var s = ctx.evaluate(index);
             out.write(s.getBytes(charset));
         }
     }

@@ -35,13 +35,12 @@ List<String> runArgs = [
         "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.hoi4=com.fasterxml.jackson.databind",
         "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.stellaris=com.fasterxml.jackson.databind",
         "-Xmx4g",
-        "-XX:+ExitOnOutOfMemoryError",
-        "-ea"]
+        "-XX:+ExitOnOutOfMemoryError"]
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'
     mainClass = 'com.crschnick.pdx_unlimiter.app.Main'
-    applicationDefaultJvmArgs = runArgs
+    applicationDefaultJvmArgs = runArgs + ["-ea"]
 }
 
 javafx {

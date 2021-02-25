@@ -56,7 +56,7 @@ public interface NodeWriter {
 
     void indent() throws IOException;
 
-    void write(NodeContext ctx, int begin, int length) throws IOException;
+    void write(NodeContext ctx, int index) throws IOException;
 
     void write(String s) throws IOException;
 

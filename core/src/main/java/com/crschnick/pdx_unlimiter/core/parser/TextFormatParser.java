@@ -51,8 +51,6 @@ public class TextFormatParser extends FormatParser {
     }
 
     public final Node parse(byte[] input) {
-        this.context = new NodeContext(input, charset);
-
         var used = Runtime.getRuntime().totalMemory();
         System.out.println("Used memory: " + used / 1024 + "kB");
 
@@ -61,12 +59,16 @@ public class TextFormatParser extends FormatParser {
         this.tokenizer.tokenize();
         System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
+        this.context = new NodeContext(input, charset,
+                tokenizer.getScalarsStart(),
+                tokenizer.getScalarsLength(),
+                tokenizer.getScalarCount());
 
         used = Runtime.getRuntime().totalMemory();
         System.out.println("Used memory: " + used / 1024 + "kB");
 
         now = Instant.now();
-        var r = parseNode();
+        var r = parseArray();
         System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
         used = Runtime.getRuntime().totalMemory();
@@ -77,33 +79,24 @@ public class TextFormatParser extends FormatParser {
         return r;
     }
 
-    private Node parseNode() {
+    private Node parseNodeIfNotSimpleValue() {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
-            var begin = tokenizer.getScalarsStart()[slIndex];
-            var length = tokenizer.getScalarsLength()[slIndex];
+            boolean isColor = ColorNode.isColorName(context, slIndex);
 
-            index++;
-            slIndex++;
-
-            boolean isColor = ColorNode.isColorName(context, begin, length);
             if (isColor) {
-                var cn = new ColorNode(context.evaluate(begin, length), List.of(
+                index++;
+                slIndex++;
+                var cn = new ColorNode(context.evaluate(slIndex), List.of(
                         new ValueNode(
                                 context,
-                                false,
-                                tokenizer.getScalarsStart()[slIndex],
-                                tokenizer.getScalarsLength()[slIndex]),
+                                slIndex),
                         new ValueNode(
                                 context,
-                                false,
-                                tokenizer.getScalarsStart()[slIndex + 1],
-                                tokenizer.getScalarsLength()[slIndex + 1]),
+                                slIndex + 1),
                         new ValueNode(
                                 context,
-                                false,
-                                tokenizer.getScalarsStart()[slIndex + 2],
-                                tokenizer.getScalarsLength()[slIndex + 2])));
+                                slIndex + 2)));
 
                 // A color is also an array, so we have to move the array index!
                 arrayIndex++;
@@ -112,27 +105,17 @@ public class TextFormatParser extends FormatParser {
                 index+=5;
 
                 return cn;
-            } else {
-                var node = new ValueNode(
-                        context,
-                        false,
-                        begin,
-                        length);
-                return node;
             }
-        } else if (tt[index] == TextFormatTokenizer.STRING_QUOTED) {
-            var node = new ValueNode(context, true,
-                    tokenizer.getScalarsStart()[slIndex],
-                    tokenizer.getScalarsLength()[slIndex]);
-            slIndex++;
-            index++;
-            return node;
+        } else {
+            assert tt[index] != TextFormatTokenizer.EQUALS: "Encountered unexpected =";
+            assert tt[index] != TextFormatTokenizer.CLOSE_GROUP: "Encountered unexpected }";
+
+            if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
+                return parseArray();
+            }
         }
 
-        assert tt[index] != TextFormatTokenizer.EQUALS: "Encountered unexpected =";
-        assert tt[index] != TextFormatTokenizer.CLOSE_GROUP: "Encountered unexpected }";
-
-        return parseArray();
+        return null;
     }
 
     private Node parseArray() {
@@ -156,35 +139,49 @@ public class TextFormatParser extends FormatParser {
             boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
                 assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED ||
-                        tt[index] == TextFormatTokenizer.STRING_QUOTED: "Expected unquoted key";
+                        tt[index] == TextFormatTokenizer.STRING_QUOTED: "Expected key";
 
-                int start = tokenizer.getScalarsStart()[slIndex];
-                int length = tokenizer.getScalarsLength()[slIndex];
+                int keyIndex = slIndex;
                 slIndex++;
                 index += 2;
 
-                Node result = parseNode();
+                Node result = parseNodeIfNotSimpleValue();
+                if (result == null) {
+                    builder.putKeyAndScalarValue(keyIndex, slIndex);
+                    index++;
+                    slIndex++;
+                } else {
+                    builder.putKeyAndNodeValue(keyIndex, result);
+                }
 
                 //System.out.println("key: " + context.evaluate(start, length));
                 //System.out.println("val: " + result.toString());
 
-                builder.put(start, length, result);
                 continue;
             }
 
             boolean isKeyValueWithoutEquals = tt[index] == TextFormatTokenizer.STRING_UNQUOTED &&
                     tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
             if (isKeyValueWithoutEquals) {
-                index++;
-                Node result = parseNode();
-                builder.put(tokenizer.getScalarsStart()[slIndex], tokenizer.getScalarsLength()[slIndex], result);
+                int keyIndex = slIndex;
                 slIndex++;
+                index++;
+                Node result = parseNodeIfNotSimpleValue();
+                assert result != null: "KeyValue without equal sign must be an array node";
+                builder.putKeyAndNodeValue(keyIndex, result);
+
                 continue;
             }
 
             // Parse unnamed array element
-            Node result = parseNode();
-            builder.put(result);
+            Node result = parseNodeIfNotSimpleValue();
+            if (result == null) {
+                builder.putScalarValue(slIndex);
+                index++;
+                slIndex++;
+            } else {
+                builder.putNodeValue(result);
+            }
         }
     }
 

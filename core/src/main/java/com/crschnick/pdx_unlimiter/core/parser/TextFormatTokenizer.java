@@ -26,7 +26,7 @@ public class TextFormatTokenizer {
 
     private int scalarCounter;
     private int[] scalarsStart;
-    private int[] scalarsLength;
+    private short[] scalarsLength;
 
     private Stack<Integer> arraySizeStack;
     private int[] arraySizes;
@@ -38,7 +38,7 @@ public class TextFormatTokenizer {
         this.tokenCounter = 0;
         this.tokenTypes = new byte[bytes.length / 2];
         this.scalarsStart = new int[bytes.length / 5];
-        this.scalarsLength = new int[bytes.length / 5];
+        this.scalarsLength = new short[bytes.length / 5];
         this.arraySizeStack = new Stack<>();
         this.arraySizes = new int[bytes.length / 5];
         this.arraySizesCounter = 0;
@@ -88,7 +88,7 @@ public class TextFormatTokenizer {
                         || (isComment && prev < i);            // New comment finishes old token
         if (marksEndOfPreviousToken) {
             int offset = prev;
-            int length = (i - 1) - prev + 1;
+            short length = (short) ((i - 1) - prev + 1);
             if (bytes[prev] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
                 tokenTypes[tokenCounter++] = STRING_QUOTED;
             } else {
@@ -131,7 +131,11 @@ public class TextFormatTokenizer {
         return scalarsStart;
     }
 
-    public int[] getScalarsLength() {
+    public short[] getScalarsLength() {
         return scalarsLength;
+    }
+
+    public int getScalarCount() {
+        return scalarCounter;
     }
 }

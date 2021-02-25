@@ -23,7 +23,8 @@ public final class SimpleNode extends EditorNode {
 
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
-        update(ArrayNode.array(List.of(new ValueNode(text, bn.isQuoted()))));
+        var val = bn.isQuoted() ? "\"" + text + "\"" : text;
+        update(ArrayNode.array(List.of(new ValueNode(val))));
     }
 
     public void updateColor(Color c) {

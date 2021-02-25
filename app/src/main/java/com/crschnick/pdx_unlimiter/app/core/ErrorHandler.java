@@ -53,20 +53,6 @@ public class ErrorHandler {
         setOptions();
     }
 
-    public static void reportRakalyTokens(List<String> tokens, Path file) {
-        Runnable run = () -> {
-            var r = GuiErrorReporter.showRakalyTokenDialog();
-            if (r) {
-                rakalyTokenReport(tokens, file);
-            }
-        };
-        if (Platform.isFxApplicationThread()) {
-            run.run();
-        } else {
-            Platform.runLater(run);
-        }
-    }
-
     public static void setPlatformInitialized() {
         startupCompleted = true;
     }

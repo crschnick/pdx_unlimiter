@@ -20,7 +20,9 @@ public final class ColorNode extends Node {
     private static final byte[] HSV = "hsv".getBytes();
     private static final byte[] HSV360 = "hsv360".getBytes();
 
-    public static boolean isColorName(NodeContext ctx, int begin, int length) {
+    public static boolean isColorName(NodeContext ctx, int index) {
+        var begin = ctx.getLiteralsBegin()[index];
+        var length = ctx.getLiteralsLength()[index];
         if (length != 3 && length != 6) {
             return false;
         }
