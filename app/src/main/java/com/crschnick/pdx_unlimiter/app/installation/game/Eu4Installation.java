@@ -92,7 +92,9 @@ public class Eu4Installation extends GameInstallation {
         String platform = node.required("distPlatform").textValue();
         logger.debug("Distribution platform: " + platform);
         if (platform.equals("steam") && Settings.getInstance().startSteam()) {
-            this.distType = new DistributionType.Steam(Integer.parseInt(Files.readString(getPath().resolve("steam_appid.txt"))));
+            // Trim the id because sometimes it contains trailing new lines!
+            var id = Files.readString(getPath().resolve("steam_appid.txt")).trim();
+            this.distType = new DistributionType.Steam(Integer.parseInt(id));
         } else {
             this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
         }
