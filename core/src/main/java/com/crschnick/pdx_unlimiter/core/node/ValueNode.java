@@ -50,9 +50,9 @@ public final class ValueNode extends Node {
 
             else if (LONG.matcher(s).matches()) {
                 t = ValueType.INTEGER;
+            } else {
+                t = ValueType.UNQUOTED_STRING;
             }
-
-            t = ValueType.UNQUOTED_STRING;
         }
         return new Descriptor(t, KeyType.NONE);
     }

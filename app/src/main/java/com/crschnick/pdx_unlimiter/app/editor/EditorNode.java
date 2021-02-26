@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public abstract class EditorNode {
@@ -25,22 +26,32 @@ public abstract class EditorNode {
         var result = new ArrayList<EditorNode>();
         AtomicInteger parentIndex = new AtomicInteger();
         AtomicInteger index = new AtomicInteger();
+        AtomicReference<String> previousKey = new AtomicReference<>();
+        AtomicInteger previousKeyStart = new AtomicInteger();
         ar.forEach((k, v) -> {
             if (k != null) {
-                int end = index.get() + ar.getSubsequentEqualKeyCount(index.get());
+                if (k.equals(previousKey.get())) {
+                    return;
+                }
 
-                if (end > index.get()) {
+                int start = previousKeyStart.get();
+                int end = index.get();
+                previousKey.set(k);
+                previousKeyStart.set(end + 1);
+
+                if (end - start > 1) {
                     result.add(new CollectorNode(
                             parent,
                             k,
                             parentIndex.get(),
-                            index.get(),
-                            new ArrayList<>(ar.getNodeArray().subList(index.get(), end + 1))));
-
-                    index.set(end + 1);
+                            start,
+                            new ArrayList<>(ar.getNodeArray().subList(start, end))));
+                    index.getAndIncrement();
                     parentIndex.getAndIncrement();
                     return;
                 }
+            } else {
+                previousKey.set(null);
             }
 
             result.add(new SimpleNode(

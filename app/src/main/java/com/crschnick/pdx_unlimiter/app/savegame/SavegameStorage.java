@@ -186,7 +186,7 @@ public abstract class SavegameStorage<
                     .map(entry -> JsonNodeFactory.instance.objectNode()
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
-                            .put("checksum", entry.getChecksum())
+                            .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
@@ -218,7 +218,7 @@ public abstract class SavegameStorage<
                     .map(entry -> JsonNodeFactory.instance.objectNode()
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
-                            .put("checksum", entry.getChecksum())
+                            .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
@@ -537,7 +537,7 @@ public abstract class SavegameStorage<
                 logger.debug("Checksum is " + s.checksum);
                 if (checkDuplicate) {
                     var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
-                            .filter(ch -> ch.getChecksum().equals(s.checksum))
+                            .filter(ch -> ch.getContentChecksum().equals(s.checksum))
                             .findAny();
                     if (exists.isPresent()) {
                         logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");

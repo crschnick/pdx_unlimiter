@@ -16,7 +16,6 @@ public abstract class Node {
     }
 
     public enum ValueType {
-        NONE,
         TEXT,
         BOOLEAN,
         INTEGER,
@@ -38,7 +37,7 @@ public abstract class Node {
             return valueType;
         }
 
-        public KeyType getArrayType() {
+        public KeyType getKeyType() {
             return keyType;
         }
     }

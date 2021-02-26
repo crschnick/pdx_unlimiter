@@ -96,10 +96,10 @@ public final class ArrayNode extends Node {
         var b = context.getSubData(keyScalars[startIndex]);
         for (int i = startIndex + 1; i < values.size(); i++) {
             if (!isKeyAt(i, b)) {
-                return i - startIndex;
+                return i - startIndex - 1;
             }
         }
-        return values.size() - startIndex + 1;
+        return values.size() - startIndex - 1;
     }
 
     public ArrayNode splice(int begin, int length) {
@@ -126,11 +126,26 @@ public final class ArrayNode extends Node {
 
     @Override
     public Descriptor describe() {
+        evaluateAllValueNodes();
+
         if (values.size() == 0) {
-            return new Descriptor(ValueType.NONE, KeyType.NONE);
+            // Empty array type
+            return new Descriptor(null, KeyType.NONE);
         }
 
-        var type = values.get(0).describe();
+        boolean hasArrays = values.stream().anyMatch(Node::isArray);
+        ValueType type = null;
+        if (!hasArrays) {
+            type = values.get(0).describe().getValueType();
+            for (int i = 1; i < values.size(); i++) {
+                var iT = values.get(i).describe().getValueType();
+                if (!iT.equals(type)) {
+                    type = null;
+                    break;
+                }
+            }
+        }
+
         int keyCount = 0;
         for (int i = 0; i < values.size(); i++) {
             if (hasKeyAtIndex(i)) {
@@ -139,12 +154,12 @@ public final class ArrayNode extends Node {
         }
 
         if (keyCount == 0) {
-            return new Descriptor(type.getValueType(), KeyType.NONE);
+            return new Descriptor(type, KeyType.NONE);
         }
         if (keyCount == values.size()) {
-            return new Descriptor(type.getValueType(), KeyType.ALL);
+            return new Descriptor(type, KeyType.ALL);
         }
-        return new Descriptor(type.getValueType(), KeyType.MIXED);
+        return new Descriptor(type, KeyType.MIXED);
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
@@ -167,6 +182,9 @@ public final class ArrayNode extends Node {
 
     @Override
     public void write(NodeWriter writer) throws IOException {
+        //TODO: Can be done better
+        evaluateAllValueNodes();
+
         writer.write("{");
         writer.newLine();
         writer.incrementIndent();
