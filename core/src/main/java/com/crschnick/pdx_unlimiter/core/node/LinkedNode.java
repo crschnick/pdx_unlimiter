@@ -10,16 +10,21 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public final class LinkedNode extends Node {
+public final class LinkedNode extends ArrayNode {
 
-    private final List<Node> arrayNodes;
+    private final List<ArrayNode> arrayNodes;
     private final JoinedList<Node> joined;
 
-    public LinkedNode(List<Node> arrayNodes) {
+    public LinkedNode(List<ArrayNode> arrayNodes) {
         this.arrayNodes = arrayNodes;
         this.joined = new JoinedList<>(arrayNodes.stream()
                 .map(Node::getNodeArray)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public String toString() {
+        return "{ (" + joined.size() + ") }";
     }
 
     @Override
@@ -33,9 +38,14 @@ public final class LinkedNode extends Node {
     }
 
     @Override
-    public void write(NodeWriter writer) throws IOException {
-        for (var n : joined) {
-            n.write(writer);
+    public ArrayNode splice(int begin, int length) {
+        return null;
+    }
+
+    @Override
+    protected void writeInternal(NodeWriter writer) throws IOException {
+        for (var n : arrayNodes) {
+            n.writeInternal(writer);
             writer.newLine();
         }
     }
@@ -80,20 +90,5 @@ public final class LinkedNode extends Node {
             r.ifPresent(found::add);
         }
         return found;
-    }
-
-    @Override
-    public boolean isValue() {
-        return false;
-    }
-
-    @Override
-    public boolean isArray() {
-        return true;
-    }
-
-    @Override
-    public boolean isColor() {
-        return false;
     }
 }

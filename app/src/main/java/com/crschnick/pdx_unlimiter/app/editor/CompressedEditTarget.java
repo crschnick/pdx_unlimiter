@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -38,7 +39,7 @@ public class CompressedEditTarget extends EditTarget {
             for (var s : entries) {
                 var path = fs.getPath(s);
                 try (var out = Files.newOutputStream(path)) {
-                    NodeWriter.write(out, getParser().getCharset(), nodeMap.get(s), "\t");
+                    NodeWriter.write(out, getParser().getCharset(), (ArrayNode) nodeMap.get(s), "\t");
                 }
             }
         }

@@ -48,7 +48,7 @@ public class TextFormatParser extends FormatParser {
         this.context = null;
     }
 
-    public final Node parse(byte[] input) {
+    public final ArrayNode parse(byte[] input) {
         this.tokenizer = new TextFormatTokenizer(input);
 
         var now = Instant.now();
@@ -61,7 +61,7 @@ public class TextFormatParser extends FormatParser {
                 tokenizer.getScalarCount());
 
         now = Instant.now();
-        var r = parseArray();
+        ArrayNode r = parseArray();
         // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
         reset();
@@ -109,7 +109,7 @@ public class TextFormatParser extends FormatParser {
         return null;
     }
 
-    private Node parseArray() {
+    private ArrayNode parseArray() {
         var tt = tokenizer.getTokenTypes();
 
         assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";

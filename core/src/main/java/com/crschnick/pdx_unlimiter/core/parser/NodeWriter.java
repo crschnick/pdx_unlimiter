@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;
 
@@ -12,43 +13,21 @@ import java.nio.charset.StandardCharsets;
 
 public interface NodeWriter {
 
-    static String writeToString(Node node, int maxLines, String indent) {
+    static String writeToString(ArrayNode node, int maxLines, String indent) {
         var out = new ByteArrayOutputStream();
         var writer = new NodeWriterImpl(out, StandardCharsets.UTF_8, maxLines, indent);
         try {
-            node.write(writer);
+            node.writeTopLevel(writer);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
         return out.toString(StandardCharsets.UTF_8);
     }
 
-    static void write(OutputStream out, Charset charset, Node node, String indent) throws IOException {
+    static void write(OutputStream out, Charset charset, ArrayNode node, String indent) throws IOException {
         var writer = new NodeWriterImpl(out, charset, Integer.MAX_VALUE, indent);
-        node.write(writer);
+        node.writeTopLevel(writer);
     }
-
-
-    static NodeWriter textFileWriter(OutputStream out) {
-        return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
-    }
-
-    static NodeWriter ck3SavegameWriter(OutputStream out) {
-        return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
-    }
-
-    static NodeWriter eu4SavegameWriter(OutputStream out) {
-        return new NodeWriterImpl(out, StandardCharsets.ISO_8859_1, Integer.MAX_VALUE, "\t");
-    }
-
-    static NodeWriter stellarisSavegameWriter(OutputStream out) {
-        return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
-    }
-
-    static NodeWriter hoi4SavegameWriter(OutputStream out) {
-        return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
-    }
-
 
     void incrementIndent();
 

@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
@@ -79,9 +80,9 @@ public class Eu4SavegameParser extends SavegameParser {
                 }
             } else {
                 try (var fs = FileSystems.newFileSystem(fileToParse)) {
-                    Node gamestateNode = null;
-                    Node metaNode = null;
-                    Node aiNode = null;
+                    ArrayNode gamestateNode = null;
+                    ArrayNode metaNode = null;
+                    ArrayNode aiNode = null;
 
                     var gs = fs.getPath("gamestate");
                     if (!Files.exists(gs)) {

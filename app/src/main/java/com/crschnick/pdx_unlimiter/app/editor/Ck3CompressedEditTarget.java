@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriterImpl;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
@@ -49,21 +50,21 @@ public class Ck3CompressedEditTarget extends EditTarget {
 
     @Override
     public void write(Map<String, Node> nodeMap) throws Exception {
-        write(file, nodeMap.get("gamestate"));
+        write(file, (ArrayNode) nodeMap.get("gamestate"));
     }
 
-    private void write(Path file, Node gamestate) throws IOException {
-        var meta = gamestate.getNodeForKey("meta_data");
+    private void write(Path file, ArrayNode gamestate) throws IOException {
+        ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
         var metaHeader = ArrayNode.singleKeyNode("meta_data", meta);
 
         try (var out = Files.newOutputStream(file);
              var zout = new ZipOutputStream(out)) {
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
-            NodeWriterImpl.write(out, StandardCharsets.UTF_8, metaHeader, "\t");
+            NodeWriter.write(out, StandardCharsets.UTF_8, metaHeader, "\t");
             out.write("\n".getBytes(StandardCharsets.UTF_8));
 
             zout.putNextEntry(new ZipEntry("gamestate"));
-            NodeWriterImpl.write(out, StandardCharsets.UTF_8, new LinkedNode(List.of(meta, gamestate)), "\t");
+            NodeWriter.write(out, StandardCharsets.UTF_8, new LinkedNode(List.of(meta, gamestate)), "\t");
             zout.closeEntry();
         }
     }

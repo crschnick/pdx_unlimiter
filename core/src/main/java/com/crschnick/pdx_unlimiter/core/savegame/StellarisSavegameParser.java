@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -18,8 +19,8 @@ public class StellarisSavegameParser extends SavegameParser {
             String checksum = checksum(Files.readAllBytes(input));
 
             var zipFile = new ZipFile(input.toFile());
-            Node gamestateNode = null;
-            Node metaNode = null;
+            ArrayNode gamestateNode = null;
+            ArrayNode metaNode = null;
 
             var gs = zipFile.getEntry("gamestate");
             if (gs == null) {

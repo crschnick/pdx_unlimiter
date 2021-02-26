@@ -60,7 +60,7 @@ public class CollectorNode extends EditorNode {
         return EditorNode.create(this, ArrayNode.array(nodes));
     }
 
-    public Node toWritableNode() {
+    public ArrayNode toWritableNode() {
         return ArrayNode.array(nodes);
     }
 

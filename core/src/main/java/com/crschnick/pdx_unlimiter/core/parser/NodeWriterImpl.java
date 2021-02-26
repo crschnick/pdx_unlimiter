@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;
 
@@ -19,23 +20,12 @@ public final class NodeWriterImpl implements NodeWriter {
     private int currentLines;
     private boolean hitMaxLines;
     private int indent;
+
     public NodeWriterImpl(OutputStream out, Charset charset, int maxLines, String indentValue) {
         this.out = out;
         this.charset = charset;
         this.maxLines = maxLines;
         this.indentValue = indentValue.getBytes();
-    }
-
-    public static String writeToString(Node node, int maxLines, String indent) throws IOException {
-        var out = new ByteArrayOutputStream();
-        var writer = new NodeWriterImpl(out, StandardCharsets.UTF_8, maxLines, indent);
-        node.write(writer);
-        return out.toString(StandardCharsets.UTF_8);
-    }
-
-    public static void write(OutputStream out, Charset charset, Node node, String indent) throws IOException {
-        var writer = new NodeWriterImpl(out, charset, Integer.MAX_VALUE, indent);
-        node.write(writer);
     }
 
     @Override

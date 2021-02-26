@@ -91,8 +91,9 @@ public final class SimpleNode extends EditorNode {
         return EditorNode.create(this, (ArrayNode) backingNode);
     }
 
-    public Node toWritableNode() {
-        return backingNode;
+    public ArrayNode toWritableNode() {
+        return backingNode.isArray() ? (ArrayNode) backingNode :
+                ArrayNode.singleKeyNode(null, backingNode);
     }
 
     public void update(ArrayNode newNode) {

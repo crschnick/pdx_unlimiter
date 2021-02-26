@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -26,7 +27,7 @@ public class FileEditTarget extends EditTarget {
     @Override
     public void write(Map<String, Node> nodeMap) throws Exception {
         try (var out = Files.newOutputStream(file)) {
-            NodeWriter.write(out, getParser().getCharset(), nodeMap.get("root"), "\t");
+            NodeWriter.write(out, getParser().getCharset(), (ArrayNode) nodeMap.get("root"), "\t");
         }
     }
 }
