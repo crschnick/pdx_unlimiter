@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Editor {
 
-    private static Map<EditorState, Stage> editors = new HashMap<>();
+    private static final Map<EditorState, Stage> editors = new HashMap<>();
 
     public static void createNewEditor(EditTarget target) {
         Map<String, Node> nodes;

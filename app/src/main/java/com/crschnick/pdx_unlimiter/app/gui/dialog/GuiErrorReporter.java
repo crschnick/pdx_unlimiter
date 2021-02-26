@@ -85,13 +85,13 @@ public class GuiErrorReporter {
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Pdx-Unlimiter");
         alert.setHeaderText((msg != null ? "An error occured: " + msg : "An error occured") + (reportable ?
-"""
+                """
 
 
-You can notify the developers of this error automatically by clicking the 'Report automatically' button. (This will send some diagnostics data.)
-Alternatively, you can also report it on GitHub to provide some information about the issue and get notified about the status of your reported issue.
+                        You can notify the developers of this error automatically by clicking the 'Report automatically' button. (This will send some diagnostics data.)
+                        Alternatively, you can also report it on GitHub to provide some information about the issue and get notified about the status of your reported issue.
 
-""" + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
+                        """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
 
         VBox dialogPaneContent = new VBox();
 

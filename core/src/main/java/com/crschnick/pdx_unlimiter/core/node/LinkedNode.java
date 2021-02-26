@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 public final class LinkedNode extends Node {
 
-    private List<Node> arrayNodes;
-    private JoinedList<Node> joined;
+    private final List<Node> arrayNodes;
+    private final JoinedList<Node> joined;
 
     public LinkedNode(List<Node> arrayNodes) {
         this.arrayNodes = arrayNodes;

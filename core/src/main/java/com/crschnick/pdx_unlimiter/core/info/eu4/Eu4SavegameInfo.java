@@ -22,16 +22,16 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private boolean observer;
     private Ruler ruler;
     private Ruler heir;
-    private Set<Eu4Tag> vassals = new HashSet<>();
-    private Set<Eu4Tag> allies = new HashSet<>();
-    private Set<Eu4Tag> marches = new HashSet<>();
-    private Set<Eu4Tag> marriages = new HashSet<>();
-    private Set<Eu4Tag> guarantees = new HashSet<>();
-    private Eu4Tag overlord = null;
-    private Set<Eu4Tag> juniorPartners = new HashSet<>();
-    private Eu4Tag seniorPartner = null;
-    private Set<Eu4Tag> tributaryJuniors = new HashSet<>();
-    private Eu4Tag tributarySenior = null;
+    private final Set<Eu4Tag> vassals = new HashSet<>();
+    private final Set<Eu4Tag> allies = new HashSet<>();
+    private final Set<Eu4Tag> marches = new HashSet<>();
+    private final Set<Eu4Tag> marriages = new HashSet<>();
+    private final Set<Eu4Tag> guarantees = new HashSet<>();
+    private final Eu4Tag overlord = null;
+    private final Set<Eu4Tag> juniorPartners = new HashSet<>();
+    private final Eu4Tag seniorPartner = null;
+    private final Set<Eu4Tag> tributaryJuniors = new HashSet<>();
+    private final Eu4Tag tributarySenior = null;
     private Set<War> wars = new HashSet<>();
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
@@ -53,7 +53,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
             e.allTags = new HashSet<>();
-            n.getNodeForKey("countries").forEach((k,v) -> {
+            n.getNodeForKey("countries").forEach((k, v) -> {
                 e.allTags.add(Eu4Tag.fromNode(k, v));
                 if (v.hasKey("custom_nation_points")) {
                     e.customNationInWorld = true;
@@ -263,7 +263,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
         public static Optional<Ruler> fromCountryNode(GameDate date, Node n, String... types) {
             AtomicReference<Optional<Ruler>> current = new AtomicReference<>(Optional.empty());
-            n.getNodeForKey("history").forEach((k,v) -> {
+            n.getNodeForKey("history").forEach((k, v) -> {
                 for (String type : types) {
                     if (GameDateType.EU4.isDate(k) && v.hasKey(type)) {
                         // Sometimes there are multiple monarchs in one event Node ... wtf?

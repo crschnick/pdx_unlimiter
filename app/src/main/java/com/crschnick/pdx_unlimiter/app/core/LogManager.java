@@ -20,8 +20,8 @@ public class LogManager {
 
     private static LogManager INSTANCE;
 
-    private Path logFile;
-    private boolean debugInstallations;
+    private final Path logFile;
+    private final boolean debugInstallations;
 
     private LogManager(Path logFile, boolean debugInstallations) {
         this.logFile = logFile;
@@ -57,7 +57,7 @@ public class LogManager {
             l.info("Writing to log file " + logFile.toString());
 
             System.setOut(new PrintStream(new OutputStream() {
-                private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
+                private final ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
 
                 @Override
                 public void write(int b) {
@@ -71,7 +71,7 @@ public class LogManager {
                 }
             }));
             System.setErr(new PrintStream(new OutputStream() {
-                private ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
+                private final ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
 
                 @Override
                 public void write(int b) {

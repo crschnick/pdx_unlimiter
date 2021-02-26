@@ -37,8 +37,8 @@ import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAler
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
-    private String styleClass;
-    private GameInstallation installation;
+    private final String styleClass;
+    private final GameInstallation installation;
 
     public GameGuiFactory(String styleClass, GameInstallation installation) {
         this.styleClass = styleClass;

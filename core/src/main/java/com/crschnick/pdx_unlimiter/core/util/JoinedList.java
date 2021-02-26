@@ -44,7 +44,7 @@ public final class JoinedList<E> extends AbstractList<E> {
     private int getListIndex(int index) {
         for (var l : lists) {
             if (index > l.size()) {
-                index-= l.size();
+                index -= l.size();
             }
         }
         return index;

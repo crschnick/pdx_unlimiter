@@ -3,67 +3,22 @@ package com.crschnick.pdx_unlimiter.core.node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public final class ArrayNode extends Node {
 
-    public static class Builder {
-
-        private int index;
-
-        private final int maxSize;
-        private final NodeContext context;
-        private int[] keyScalars;
-        private final int[] valueScalars;
-        private final List<Node> values;
-
-        public Builder(NodeContext context, int maxSize) {
-            this.maxSize = maxSize;
-            this.context = context;
-            this.valueScalars = new int[maxSize];
-            this.values = new ArrayList<>(maxSize);
-        }
-
-        public Node build() {
-            return new ArrayNode(context, keyScalars, valueScalars, values);
-        }
-
-        public void putScalarValue(int scalarIndex) {
-            valueScalars[index] = scalarIndex;
-            values.add(null);
-            index++;
-        }
-
-        public void putKeyAndScalarValue(int keyIndex, int scalarIndex) {
-            if (keyScalars == null) {
-                this.keyScalars = new int[maxSize];
-            }
-            keyScalars[index] = keyIndex;
-            valueScalars[index] = scalarIndex;
-            values.add(null);
-            index++;
-        }
-
-        public void putNodeValue(Node node) {
-            valueScalars[index] = -1;
-            values.add(node);
-            index++;
-        }
-
-        public void putKeyAndNodeValue(int keyIndex, Node node) {
-            if (keyScalars == null) {
-                this.keyScalars = new int[maxSize];
-            }
-            keyScalars[index] = keyIndex;
-            valueScalars[index] = -1;
-            values.add(node);
-            index++;
-        }
-
-        public int getUsedSize() {
-            return index;
-        }
+    private final NodeContext context;
+    private final int[] keyScalars;
+    private final int[] valueScalars;
+    private final List<Node> values;
+    private ArrayNode(NodeContext context, int[] keyScalars, int[] valueScalars, List<Node> values) {
+        this.context = context;
+        this.keyScalars = keyScalars;
+        this.valueScalars = valueScalars;
+        this.values = values;
     }
 
     public static ArrayNode array(List<Node> values) {
@@ -72,19 +27,7 @@ public final class ArrayNode extends Node {
 
     public static ArrayNode singleKeyNode(String key, Node value) {
         var ctx = new NodeContext(key);
-        return new ArrayNode(ctx, new int[]{0}, new int[] {-1}, List.of(value));
-    }
-
-    private final NodeContext context;
-    private final int[] keyScalars;
-    private final int[] valueScalars;
-    private final List<Node> values;
-
-    private ArrayNode(NodeContext context, int[] keyScalars, int[] valueScalars, List<Node> values) {
-        this.context = context;
-        this.keyScalars = keyScalars;
-        this.valueScalars = valueScalars;
-        this.values = values;
+        return new ArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
     }
 
     @Override
@@ -296,5 +239,62 @@ public final class ArrayNode extends Node {
             }
         }
         return found;
+    }
+
+    public static class Builder {
+
+        private final int maxSize;
+        private final NodeContext context;
+        private final int[] valueScalars;
+        private final List<Node> values;
+        private int index;
+        private int[] keyScalars;
+
+        public Builder(NodeContext context, int maxSize) {
+            this.maxSize = maxSize;
+            this.context = context;
+            this.valueScalars = new int[maxSize];
+            this.values = new ArrayList<>(maxSize);
+        }
+
+        public Node build() {
+            return new ArrayNode(context, keyScalars, valueScalars, values);
+        }
+
+        public void putScalarValue(int scalarIndex) {
+            valueScalars[index] = scalarIndex;
+            values.add(null);
+            index++;
+        }
+
+        public void putKeyAndScalarValue(int keyIndex, int scalarIndex) {
+            if (keyScalars == null) {
+                this.keyScalars = new int[maxSize];
+            }
+            keyScalars[index] = keyIndex;
+            valueScalars[index] = scalarIndex;
+            values.add(null);
+            index++;
+        }
+
+        public void putNodeValue(Node node) {
+            valueScalars[index] = -1;
+            values.add(node);
+            index++;
+        }
+
+        public void putKeyAndNodeValue(int keyIndex, Node node) {
+            if (keyScalars == null) {
+                this.keyScalars = new int[maxSize];
+            }
+            keyScalars[index] = keyIndex;
+            valueScalars[index] = -1;
+            values.add(node);
+            index++;
+        }
+
+        public int getUsedSize() {
+            return index;
+        }
     }
 }

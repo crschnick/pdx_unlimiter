@@ -4,28 +4,20 @@ import com.crschnick.pdx_unlimiter.app.editor.CollectorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.editor.SimpleNode;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.Optional;
 
 public class GuiEditorNode {
 
@@ -58,7 +50,7 @@ public class GuiEditorNode {
                         ((CollectorNode) n).getNodes().size();
                 int stringSize = String.valueOf(length).length();
                 var lengthString = stringSize == 1 ? " " + length + " " :
-                        (stringSize <= 3 ? " ".repeat(3 - stringSize) + String.valueOf(length) :
+                        (stringSize <= 3 ? " ".repeat(3 - stringSize) + length :
                                 String.valueOf(length));
                 var btn = new JFXButton("List[" + lengthString + "]");
                 btn.setAlignment(Pos.CENTER);

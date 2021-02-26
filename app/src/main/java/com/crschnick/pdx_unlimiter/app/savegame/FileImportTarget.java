@@ -109,7 +109,7 @@ public abstract class FileImportTarget {
 
     public static final class DownloadImportTarget extends FileImportTarget {
 
-        private URL url;
+        private final URL url;
         private Path downloadedFile;
 
         public DownloadImportTarget(URL url) {
@@ -173,7 +173,7 @@ public abstract class FileImportTarget {
     public static class StandardImportTarget extends FileImportTarget {
 
         protected Path path;
-        private SavegameStorage<?, ?> savegameStorage;
+        private final SavegameStorage<?, ?> savegameStorage;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
             this.savegameStorage = savegameStorage;

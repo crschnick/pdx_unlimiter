@@ -12,6 +12,19 @@ import java.nio.charset.StandardCharsets;
 public final class NodeWriterImpl implements NodeWriter {
 
     private static final byte[] NEW_LINE = "\n".getBytes();
+    private final OutputStream out;
+    private final Charset charset;
+    private final int maxLines;
+    private final byte[] indentValue;
+    private int currentLines;
+    private boolean hitMaxLines;
+    private int indent;
+    public NodeWriterImpl(OutputStream out, Charset charset, int maxLines, String indentValue) {
+        this.out = out;
+        this.charset = charset;
+        this.maxLines = maxLines;
+        this.indentValue = indentValue.getBytes();
+    }
 
     public static String writeToString(Node node, int maxLines, String indent) throws IOException {
         var out = new ByteArrayOutputStream();
@@ -23,22 +36,6 @@ public final class NodeWriterImpl implements NodeWriter {
     public static void write(OutputStream out, Charset charset, Node node, String indent) throws IOException {
         var writer = new NodeWriterImpl(out, charset, Integer.MAX_VALUE, indent);
         node.write(writer);
-    }
-
-    private final OutputStream out;
-    private final Charset charset;
-    private final int maxLines;
-    private final byte[] indentValue;
-
-    private int currentLines;
-    private boolean hitMaxLines;
-    private int indent;
-
-    public NodeWriterImpl(OutputStream out, Charset charset, int maxLines, String indentValue) {
-        this.out = out;
-        this.charset = charset;
-        this.maxLines = maxLines;
-        this.indentValue = indentValue.getBytes();
     }
 
     @Override

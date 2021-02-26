@@ -34,7 +34,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.campaignUuid = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new HashSet<>();
-            n.getNodeForKey("country").forEach((k,v) -> {
+            n.getNodeForKey("country").forEach((k, v) -> {
                 // Invalid country node
                 if (v.isValue()) {
                     return;

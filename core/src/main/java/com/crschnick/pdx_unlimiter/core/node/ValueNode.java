@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 public final class ValueNode extends Node {
 
     private static final byte DOUBLE_QUOTE_CHAR = 34;
-
+    private static final Pattern LONG = Pattern.compile("-?[0-9]+");
+    private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
     private final NodeContext context;
     private final int scalarIndex;
 
@@ -42,13 +43,9 @@ public final class ValueNode extends Node {
             var s = evaluateContent();
             if (s.equals("yes") || s.equals("no")) {
                 t = ValueType.BOOLEAN;
-            }
-
-            else if (DOUBLE.matcher(s).matches()) {
+            } else if (DOUBLE.matcher(s).matches()) {
                 t = ValueType.FLOATING_POINT;
-            }
-
-            else if (LONG.matcher(s).matches()) {
+            } else if (LONG.matcher(s).matches()) {
                 t = ValueType.INTEGER;
             } else {
                 t = ValueType.UNQUOTED_STRING;
@@ -111,7 +108,4 @@ public final class ValueNode extends Node {
     public boolean isColor() {
         return false;
     }
-
-    private static final Pattern LONG = Pattern.compile("-?[0-9]+");
-    private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
 }

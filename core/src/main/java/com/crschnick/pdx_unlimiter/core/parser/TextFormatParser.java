@@ -4,9 +4,7 @@ import com.crschnick.pdx_unlimiter.core.node.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class TextFormatParser extends FormatParser {
@@ -94,14 +92,14 @@ public class TextFormatParser extends FormatParser {
                 // A color is also an array, so we have to move the array index!
                 arrayIndex++;
 
-                slIndex+=3;
-                index+=5;
+                slIndex += 3;
+                index += 5;
 
                 return cn;
             }
         } else {
-            assert tt[index] != TextFormatTokenizer.EQUALS: "Encountered unexpected =";
-            assert tt[index] != TextFormatTokenizer.CLOSE_GROUP: "Encountered unexpected }";
+            assert tt[index] != TextFormatTokenizer.EQUALS : "Encountered unexpected =";
+            assert tt[index] != TextFormatTokenizer.CLOSE_GROUP : "Encountered unexpected }";
 
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
                 return parseArray();
@@ -114,16 +112,16 @@ public class TextFormatParser extends FormatParser {
     private Node parseArray() {
         var tt = tokenizer.getTokenTypes();
 
-        assert tt[index] == TextFormatTokenizer.OPEN_GROUP: "Expected {";
+        assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
         index++;
 
         var size = tokenizer.getArraySizes()[arrayIndex++];
         var builder = new ArrayNode.Builder(context, size);
         while (true) {
-            assert index < tt.length: "Reached EOF but found no closing group token";
+            assert index < tt.length : "Reached EOF but found no closing group token";
 
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                assert size >= builder.getUsedSize():
+                assert size >= builder.getUsedSize() :
                         "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
                 index++;
                 return builder.build();
@@ -132,7 +130,7 @@ public class TextFormatParser extends FormatParser {
             boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
                 assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED ||
-                        tt[index] == TextFormatTokenizer.STRING_QUOTED: "Expected key";
+                        tt[index] == TextFormatTokenizer.STRING_QUOTED : "Expected key";
 
                 int keyIndex = slIndex;
                 slIndex++;
@@ -160,7 +158,7 @@ public class TextFormatParser extends FormatParser {
                 slIndex++;
                 index++;
                 Node result = parseNodeIfNotSimpleValue();
-                assert result != null: "KeyValue without equal sign must be an array node";
+                assert result != null : "KeyValue without equal sign must be an array node";
                 builder.putKeyAndNodeValue(keyIndex, result);
 
                 continue;

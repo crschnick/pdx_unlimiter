@@ -17,7 +17,7 @@ public class EditorExternalState {
 
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
-    private Set<Entry> openEntries = new HashSet<>();
+    private final Set<Entry> openEntries = new HashSet<>();
 
     public static void init() {
         try {
@@ -100,9 +100,9 @@ public class EditorExternalState {
     }
 
     public static class Entry {
-        private Path file;
-        private EditorNode editorNode;
-        private EditorState state;
+        private final Path file;
+        private final EditorNode editorNode;
+        private final EditorState state;
         private boolean registered;
 
         public Entry(Path file, EditorNode editorNode, EditorState state) {

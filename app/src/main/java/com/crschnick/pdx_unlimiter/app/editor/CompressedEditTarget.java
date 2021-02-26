@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class CompressedEditTarget extends EditTarget {
 
-    private Set<String> entries;
+    private final Set<String> entries;
 
     public CompressedEditTarget(Path file, TextFormatParser parser, Set<String> entries) {
         super(file, parser);

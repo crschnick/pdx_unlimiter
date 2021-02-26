@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference;
 
 public class MemoryHelper {
 
-    private static Logger logger = LoggerFactory.getLogger(MemoryHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(MemoryHelper.class);
 
     public static void forceGC() {
         var used = Runtime.getRuntime().totalMemory();

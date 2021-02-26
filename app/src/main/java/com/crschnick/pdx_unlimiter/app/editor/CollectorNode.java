@@ -8,8 +8,8 @@ import java.util.function.Predicate;
 
 public class CollectorNode extends EditorNode {
 
-    private int firstNodeIndex;
-    private List<Node> nodes;
+    private final int firstNodeIndex;
+    private final List<Node> nodes;
 
     public CollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
         super(directParent, keyName, parentIndex);

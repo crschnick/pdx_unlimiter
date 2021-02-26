@@ -15,15 +15,15 @@ import java.util.stream.Collectors;
 
 public class EditorState {
 
-    private String fileName;
-    private TextFormatParser parser;
-    private BooleanProperty dirty;
-    private Map<String, EditorNode> rootNodes;
-    private EditorExternalState externalState;
-    private ListProperty<NavEntry> navPath;
-    private EditorFilter filter;
-    private ListProperty<EditorNode> content;
-    private Consumer<Map<String, Node>> saveFunc;
+    private final String fileName;
+    private final TextFormatParser parser;
+    private final BooleanProperty dirty;
+    private final Map<String, EditorNode> rootNodes;
+    private final EditorExternalState externalState;
+    private final ListProperty<NavEntry> navPath;
+    private final EditorFilter filter;
+    private final ListProperty<EditorNode> content;
+    private final Consumer<Map<String, Node>> saveFunc;
 
     public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
         this.parser = parser;
@@ -165,8 +165,8 @@ public class EditorState {
     }
 
     public static class NavEntry {
-        private EditorNode editorNode;
-        private DoubleProperty scroll;
+        private final EditorNode editorNode;
+        private final DoubleProperty scroll;
 
         private NavEntry(EditorNode editorNode, double scroll) {
             this.editorNode = editorNode;

@@ -6,7 +6,6 @@ import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Ck3Title {
 
@@ -24,7 +23,7 @@ public class Ck3Title {
     public static Map<Long, Ck3Title> createTitleMap(Node node, Map<Long, Ck3CoatOfArms> coaMap) {
         var tts = node.getNodeForKey("landed_titles").getNodeForKey("landed_titles");
         var map = new HashMap<Long, Ck3Title>();
-        tts.forEach((k,v) -> {
+        tts.forEach((k, v) -> {
             fromNode(v, coaMap).ifPresent(t -> {
                 map.put(Long.parseLong(k), t);
             });

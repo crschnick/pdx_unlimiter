@@ -32,7 +32,7 @@ public abstract class SavegameParser {
     }
 
     @FunctionalInterface
-    public static interface Melter {
+    public interface Melter {
 
         Path melt(Path file) throws IOException;
     }

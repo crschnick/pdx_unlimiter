@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
 
-    private SavegameEntry<T, I> entry;
-    private EditTarget target;
+    private final SavegameEntry<T, I> entry;
+    private final EditTarget target;
 
     public StorageEditTarget(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry, EditTarget target) {
         super(storage.getSavegameFile(entry), target.getParser());

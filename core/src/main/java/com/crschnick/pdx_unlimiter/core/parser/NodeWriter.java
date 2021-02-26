@@ -37,15 +37,15 @@ public interface NodeWriter {
         return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
     }
 
-    public static NodeWriter eu4SavegameWriter(OutputStream out) {
+    static NodeWriter eu4SavegameWriter(OutputStream out) {
         return new NodeWriterImpl(out, StandardCharsets.ISO_8859_1, Integer.MAX_VALUE, "\t");
     }
 
-    public static NodeWriter stellarisSavegameWriter(OutputStream out) {
+    static NodeWriter stellarisSavegameWriter(OutputStream out) {
         return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
     }
 
-    public static NodeWriter hoi4SavegameWriter(OutputStream out) {
+    static NodeWriter hoi4SavegameWriter(OutputStream out) {
         return new NodeWriterImpl(out, StandardCharsets.UTF_8, Integer.MAX_VALUE, "\t");
     }
 

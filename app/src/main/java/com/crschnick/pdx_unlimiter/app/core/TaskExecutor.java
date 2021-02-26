@@ -15,7 +15,7 @@ public class TaskExecutor {
 
     private static final TaskExecutor INSTANCE = new TaskExecutor();
     private boolean active = false;
-    private BooleanProperty busy = new SimpleBooleanProperty(false);
+    private final BooleanProperty busy = new SimpleBooleanProperty(false);
     private ExecutorService executorService;
 
     public static TaskExecutor getInstance() {

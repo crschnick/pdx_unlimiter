@@ -9,39 +9,6 @@ import java.util.function.BiConsumer;
 
 public abstract class Node {
 
-    public static enum KeyType {
-        NONE,
-        ALL,
-        MIXED
-    }
-
-    public enum ValueType {
-        TEXT,
-        BOOLEAN,
-        INTEGER,
-        FLOATING_POINT,
-        UNQUOTED_STRING,
-        COLOR
-    }
-
-    public static class Descriptor {
-        private final ValueType valueType;
-        private final KeyType keyType;
-
-        public Descriptor(ValueType valueType, KeyType keyType) {
-            this.valueType = valueType;
-            this.keyType = keyType;
-        }
-
-        public ValueType getValueType() {
-            return valueType;
-        }
-
-        public KeyType getKeyType() {
-            return keyType;
-        }
-    }
-
     public abstract Descriptor describe();
 
     public final void forEach(BiConsumer<String, Node> c) {
@@ -98,5 +65,38 @@ public abstract class Node {
 
     public List<Node> getNodesForKey(String key) {
         throw new UnsupportedOperationException();
+    }
+
+    public enum KeyType {
+        NONE,
+        ALL,
+        MIXED
+    }
+
+    public enum ValueType {
+        TEXT,
+        BOOLEAN,
+        INTEGER,
+        FLOATING_POINT,
+        UNQUOTED_STRING,
+        COLOR
+    }
+
+    public static class Descriptor {
+        private final ValueType valueType;
+        private final KeyType keyType;
+
+        public Descriptor(ValueType valueType, KeyType keyType) {
+            this.valueType = valueType;
+            this.keyType = keyType;
+        }
+
+        public ValueType getValueType() {
+            return valueType;
+        }
+
+        public KeyType getKeyType() {
+            return keyType;
+        }
     }
 }

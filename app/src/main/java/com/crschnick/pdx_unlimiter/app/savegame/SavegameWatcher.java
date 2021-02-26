@@ -17,8 +17,8 @@ public class SavegameWatcher {
     public static SavegameWatcher HOI4;
     public static SavegameWatcher STELLARIS;
     public static SavegameWatcher CK3;
-    private GameInstallation install;
-    private ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
+    private final GameInstallation install;
+    private final ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
 
     private SavegameWatcher(GameInstallation install) {
         this.install = install;

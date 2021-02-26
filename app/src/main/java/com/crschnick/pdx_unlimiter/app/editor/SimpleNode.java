@@ -58,11 +58,7 @@ public final class SimpleNode extends EditorNode {
             return true;
         }
 
-        if (filter.test(String.valueOf(keyIndex))) {
-            return true;
-        }
-
-        return false;
+        return filter.test(String.valueOf(keyIndex));
     }
 
     @Override

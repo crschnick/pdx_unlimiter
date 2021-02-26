@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class GameKeyListener implements NativeKeyListener {
 
-    private GameApp handle;
+    private final GameApp handle;
 
     public GameKeyListener(GameApp handle) {
         this.handle = handle;

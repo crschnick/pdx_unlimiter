@@ -1,8 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
 public class NodeConstants {
 
     public static final int EVALUATED = 4;

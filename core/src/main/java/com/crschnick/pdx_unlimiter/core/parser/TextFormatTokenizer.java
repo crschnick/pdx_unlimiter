@@ -1,8 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 public class TextFormatTokenizer {
@@ -15,21 +12,21 @@ public class TextFormatTokenizer {
 
     private static final byte DOUBLE_QUOTE_CHAR = 34;
 
-    private byte[] bytes;
+    private final byte[] bytes;
     private boolean isInQuotes;
     private boolean isInComment;
     private int prev;
     private int i;
 
-    private byte[] tokenTypes;
+    private final byte[] tokenTypes;
     private int tokenCounter;
 
     private int scalarCounter;
-    private int[] scalarsStart;
-    private short[] scalarsLength;
+    private final int[] scalarsStart;
+    private final short[] scalarsLength;
 
-    private Stack<Integer> arraySizeStack;
-    private int[] arraySizes;
+    private final Stack<Integer> arraySizeStack;
+    private final int[] arraySizes;
     private int arraySizesCounter;
 
     public TextFormatTokenizer(byte[] bytes) {

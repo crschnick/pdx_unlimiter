@@ -61,7 +61,7 @@ public class Ck3Tag {
 
         var living = n.getNodeForKey("living");
         Set<Ck3Tag> allTags = new HashSet<>();
-        living.forEach((k,v) -> {
+        living.forEach((k, v) -> {
             if (!v.hasKey("landed_data")) {
                 return;
             }

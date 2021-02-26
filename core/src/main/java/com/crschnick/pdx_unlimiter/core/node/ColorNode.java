@@ -9,24 +9,15 @@ import java.util.stream.Collectors;
 
 public final class ColorNode extends Node {
 
+    private static final byte[] RGB = "rgb".getBytes();
+    private static final byte[] HSV = "hsv".getBytes();
+    private static final byte[] HSV360 = "hsv360".getBytes();
     private final String colorName;
     private final List<ValueNode> values;
-
     public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
         this.values = values;
     }
-
-    @Override
-    public String toString() {
-        return colorName + "{ " + values.stream()
-                .map(ValueNode::toString)
-                .collect(Collectors.joining(" ")) + " }";
-    }
-
-    private static final byte[] RGB = "rgb".getBytes();
-    private static final byte[] HSV = "hsv".getBytes();
-    private static final byte[] HSV360 = "hsv360".getBytes();
 
     public static boolean isColorName(NodeContext ctx, int index) {
         var begin = ctx.getLiteralsBegin()[index];
@@ -43,6 +34,13 @@ public final class ColorNode extends Node {
         return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end);
+    }
+
+    @Override
+    public String toString() {
+        return colorName + "{ " + values.stream()
+                .map(ValueNode::toString)
+                .collect(Collectors.joining(" ")) + " }";
     }
 
     public String getColorName() {

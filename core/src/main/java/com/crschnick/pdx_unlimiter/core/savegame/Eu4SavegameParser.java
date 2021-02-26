@@ -2,9 +2,9 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.IOException;

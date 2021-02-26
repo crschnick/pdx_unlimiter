@@ -11,12 +11,12 @@ import java.util.UUID;
 
 public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Comparable<SavegameEntry<T, I>> {
 
-    private StringProperty name;
-    private UUID uuid;
-    private ObjectProperty<I> info;
-    private String contentChecksum;
-    private boolean persistent;
-    private GameDate date;
+    private final StringProperty name;
+    private final UUID uuid;
+    private final ObjectProperty<I> info;
+    private final String contentChecksum;
+    private final boolean persistent;
+    private final GameDate date;
     private String sourceFileChecksum;
 
     public SavegameEntry(String name, UUID uuid, I info,

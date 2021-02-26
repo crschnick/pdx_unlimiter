@@ -169,7 +169,7 @@ public class GuiStatusBar {
 
     public static class StatusBar {
         private Status status;
-        private Pane pane;
+        private final Pane pane;
 
         public StatusBar(Pane pane) {
             this.status = Status.NONE;

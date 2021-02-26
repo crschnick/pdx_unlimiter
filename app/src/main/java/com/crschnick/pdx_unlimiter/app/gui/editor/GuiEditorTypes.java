@@ -12,8 +12,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-import java.util.Optional;
-
 public class GuiEditorTypes {
 
     private static Region createTypeNode(Color c, char ch, Insets insets, String tooltip) {

@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 
 public class GameAppManager {
 
-    private static GameAppManager INSTANCE = new GameAppManager();
+    private static final GameAppManager INSTANCE = new GameAppManager();
 
-    private SimpleObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
+    private final SimpleObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
 
     private GameAppManager() {
     }
@@ -45,11 +45,7 @@ public class GameAppManager {
     }
 
     private static boolean isInstanceOfGame(String cmd, GameInstallation install) {
-        if (cmd.contains(install.getExecutable().toString())) {
-            return true;
-        }
-
-        return false;
+        return cmd.contains(install.getExecutable().toString());
     }
 
     public static GameAppManager getInstance() {
