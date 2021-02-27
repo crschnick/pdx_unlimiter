@@ -86,7 +86,7 @@ public class Ck3SavegameParser extends SavegameParser {
 
             Node node = TextFormatParser.ck3SavegameParser().parse(savegameText);
             return new Success<>(binary, checksum, node, Ck3SavegameInfo.fromSavegame(melted, node));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return new Error(e);
         }
     }

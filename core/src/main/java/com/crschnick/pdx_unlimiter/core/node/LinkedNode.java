@@ -34,7 +34,14 @@ public final class LinkedNode extends ArrayNode {
 
     @Override
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
-        super.forEach(c, includeNullKeys);
+        for (var ar : arrayNodes) {
+            ar.forEach(c, includeNullKeys);
+        }
+    }
+
+    @Override
+    public boolean isKeyAt(String key, int index) {
+        return false;
     }
 
     @Override
@@ -48,6 +55,18 @@ public final class LinkedNode extends ArrayNode {
             n.writeInternal(writer);
             writer.newLine();
         }
+    }
+
+    @Override
+    protected void writeFlatInternal(NodeWriter writer) throws IOException {
+        for (var n : arrayNodes) {
+            n.writeFlatInternal(writer);
+        }
+    }
+
+    @Override
+    protected boolean isFlat() {
+        return arrayNodes.stream().allMatch(ArrayNode::isFlat);
     }
 
     @Override

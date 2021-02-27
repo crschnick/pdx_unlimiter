@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriterImpl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -20,9 +21,15 @@ public abstract class ArrayNode extends Node {
         return new SimpleArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
     }
 
+    public abstract boolean isKeyAt(String key, int index);
+
     public abstract ArrayNode splice(int begin, int length);
 
     protected abstract void writeInternal(NodeWriter writer) throws IOException;
+
+    protected abstract void writeFlatInternal(NodeWriter writer) throws IOException;
+
+    protected abstract boolean isFlat();
 
     public void writeTopLevel(NodeWriter writer) throws IOException {
         writeInternal(writer);
@@ -30,6 +37,15 @@ public abstract class ArrayNode extends Node {
 
     @Override
     public void write(NodeWriter writer) throws IOException {
+        boolean flat = isFlat();
+        if (flat) {
+            writer.write("{");
+            writeFlatInternal(writer);
+            writer.space();
+            writer.write("}");
+            return;
+        }
+
         writer.write("{");
         writer.newLine();
         writer.incrementIndent();
@@ -37,6 +53,7 @@ public abstract class ArrayNode extends Node {
         writeInternal(writer);
 
         writer.decrementIndent();
+        writer.indent();
         writer.write("}");
     }
 
@@ -71,6 +88,13 @@ public abstract class ArrayNode extends Node {
             this.values = new ArrayList<>(maxSize);
         }
 
+        private void initKeys() {
+            if (keyScalars == null) {
+                this.keyScalars = new int[maxSize];
+                Arrays.fill(this.keyScalars, -1);
+            }
+        }
+
         public ArrayNode build() {
             return new SimpleArrayNode(context, keyScalars, valueScalars, values);
         }
@@ -82,9 +106,7 @@ public abstract class ArrayNode extends Node {
         }
 
         public void putKeyAndScalarValue(int keyIndex, int scalarIndex) {
-            if (keyScalars == null) {
-                this.keyScalars = new int[maxSize];
-            }
+            initKeys();
             keyScalars[index] = keyIndex;
             valueScalars[index] = scalarIndex;
             values.add(null);
@@ -98,9 +120,7 @@ public abstract class ArrayNode extends Node {
         }
 
         public void putKeyAndNodeValue(int keyIndex, Node node) {
-            if (keyScalars == null) {
-                this.keyScalars = new int[maxSize];
-            }
+            initKeys();
             keyScalars[index] = keyIndex;
             valueScalars[index] = -1;
             values.add(node);

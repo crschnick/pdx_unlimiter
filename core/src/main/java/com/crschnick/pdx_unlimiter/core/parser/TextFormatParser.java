@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 
-public class TextFormatParser extends FormatParser {
+public final class TextFormatParser extends FormatParser {
 
     private final Charset charset;
     private int index;
@@ -48,25 +48,30 @@ public class TextFormatParser extends FormatParser {
         this.context = null;
     }
 
-    public final ArrayNode parse(byte[] input) {
-        this.tokenizer = new TextFormatTokenizer(input);
+    public final ArrayNode parse(byte[] input) throws Exception {
+        try {
+            this.tokenizer = new TextFormatTokenizer(input);
 
-        var now = Instant.now();
-        this.tokenizer.tokenize();
-        // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+            var now = Instant.now();
+            this.tokenizer.tokenize();
+            // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
-        this.context = new NodeContext(input, charset,
-                tokenizer.getScalarsStart(),
-                tokenizer.getScalarsLength(),
-                tokenizer.getScalarCount());
+            this.context = new NodeContext(input, charset,
+                    tokenizer.getScalarsStart(),
+                    tokenizer.getScalarsLength(),
+                    tokenizer.getScalarCount());
 
-        now = Instant.now();
-        ArrayNode r = parseArray();
-        // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+            now = Instant.now();
+            ArrayNode r = parseArray();
+            // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
-        reset();
+            reset();
 
-        return r;
+            return r;
+        } catch (Throwable t) {
+            // Catch also errors!
+            throw new RuntimeException(t);
+        }
     }
 
     private Node parseNodeIfNotSimpleValue() {

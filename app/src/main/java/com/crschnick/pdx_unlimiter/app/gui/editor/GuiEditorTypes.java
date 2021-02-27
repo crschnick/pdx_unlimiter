@@ -36,9 +36,9 @@ public class GuiEditorTypes {
 
     private static Region createCollectorTypeNode() {
         return createTypeNode(
-                new Color(0.7, 0.7, 0.8, 1),
+                new Color(0.8, 0.3, 0.9, 0.8),
                 'S',
-                new Insets(0, 2, 1, 0),
+                new Insets(0, 0, 1, 1),
                 "Synthetic collection");
     }
 

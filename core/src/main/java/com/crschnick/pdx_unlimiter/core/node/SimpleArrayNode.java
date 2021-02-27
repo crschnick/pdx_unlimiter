@@ -27,6 +27,11 @@ public final class SimpleArrayNode extends ArrayNode {
         return "{ (" + values.size() + ") }";
     }
 
+    @Override
+    public boolean isKeyAt(String key, int index) {
+        return isKeyAt(index, key.getBytes(context.getCharset()));
+    }
+
     public ArrayNode splice(int begin, int length) {
         int[] ks = new int[length];
         int[] vs = new int[length];
@@ -89,6 +94,7 @@ public final class SimpleArrayNode extends ArrayNode {
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
         evaluateAllValueNodes();
+
         String key;
         for (int i = 0; i < values.size(); i++) {
             if (!hasKeyAtIndex(i)) {
@@ -106,8 +112,6 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     protected void writeInternal(NodeWriter writer) throws IOException {
-        evaluateAllValueNodes();
-
         for (int i = 0; i < values.size(); i++) {
             writer.indent();
             if (hasKeyAtIndex(i)) {
@@ -115,9 +119,34 @@ public final class SimpleArrayNode extends ArrayNode {
                 writer.write("=");
             }
 
-            values.get(i).write(writer);
+            if (values.get(i) == null) {
+                writer.write(context, valueScalars[i]);
+            } else {
+                values.get(i).write(writer);
+            }
             writer.newLine();
         }
+    }
+
+    @Override
+    protected void writeFlatInternal(NodeWriter writer) throws IOException {
+        for (int i = 0; i < values.size(); i++) {
+            writer.space();
+            writer.write(context, valueScalars[i]);
+        }
+    }
+
+    @Override
+    protected boolean isFlat() {
+        if (keyScalars == null) {
+            for (var v : values) {
+                if (v != null && !v.isValue()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private boolean hasKeyAtIndex(int index) {

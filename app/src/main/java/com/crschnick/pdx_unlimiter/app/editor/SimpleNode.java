@@ -32,7 +32,7 @@ public final class SimpleNode extends EditorNode {
     }
 
     public void insertArray(ArrayNode toInsert, int beginIndex, int endIndex) {
-        ArrayNode ar = (ArrayNode) getRealParent().getBackingNode();
+        ArrayNode ar = (ArrayNode) backingNode;
 
         var begin = ar.splice(0, beginIndex);
         var end = ar.splice(endIndex, ar.getNodeArray().size() - endIndex);
@@ -97,7 +97,7 @@ public final class SimpleNode extends EditorNode {
     }
 
     public void update(ArrayNode newNode) {
-        Node nodeToUse = backingNode instanceof ArrayNode ? newNode : newNode.getNodeArray().get(0);
+        Node nodeToUse = backingNode.isArray() ? newNode : newNode.getNodeArray().get(0);
 
         // Update parent node to reflect change
         if (getDirectParent() != null) {

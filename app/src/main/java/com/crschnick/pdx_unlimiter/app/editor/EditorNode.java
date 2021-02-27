@@ -26,32 +26,38 @@ public abstract class EditorNode {
         var result = new ArrayList<EditorNode>();
         AtomicInteger parentIndex = new AtomicInteger();
         AtomicInteger index = new AtomicInteger();
-        AtomicReference<String> previousKey = new AtomicReference<>();
         AtomicInteger previousKeyStart = new AtomicInteger();
         ar.forEach((k, v) -> {
             if (k != null) {
-                if (k.equals(previousKey.get())) {
+                boolean endsHere = index.get() + 1 == ar.getNodeArray().size() ||
+                        !ar.isKeyAt(k, index.get() + 1);
+                if (!endsHere) {
+                    index.getAndIncrement();
                     return;
                 }
 
                 int start = previousKeyStart.get();
                 int end = index.get();
-                previousKey.set(k);
-                previousKeyStart.set(end + 1);
+                boolean shouldCollect = end > start;
 
-                if (end - start > 1) {
+                if (shouldCollect) {
                     result.add(new CollectorNode(
                             parent,
                             k,
                             parentIndex.get(),
                             start,
-                            new ArrayList<>(ar.getNodeArray().subList(start, end))));
+                            new ArrayList<>(ar.getNodeArray().subList(start, end + 1))));
                     index.getAndIncrement();
                     parentIndex.getAndIncrement();
+                }
+
+                previousKeyStart.set(end + 1);
+
+                if (shouldCollect) {
                     return;
                 }
             } else {
-                previousKey.set(null);
+                previousKeyStart.incrementAndGet();
             }
 
             result.add(new SimpleNode(

@@ -33,11 +33,22 @@ public class TextFormatTokenizer {
         this.bytes = bytes;
         this.prev = 0;
         this.tokenCounter = 0;
-        this.tokenTypes = new byte[bytes.length / 2];
-        this.scalarsStart = new int[bytes.length / 5];
-        this.scalarsLength = new short[bytes.length / 5];
+
+        if (bytes.length < 300) {
+            // Special case for small files
+            this.tokenTypes = new byte[bytes.length];
+            this.scalarsStart = new int[bytes.length];
+            this.scalarsLength = new short[bytes.length];
+            this.arraySizes = new int[bytes.length];
+        } else {
+            // Pessimistic assumptions, should always hold!
+            this.tokenTypes = new byte[bytes.length / 2];
+            this.scalarsStart = new int[bytes.length / 5];
+            this.scalarsLength = new short[bytes.length / 5];
+            this.arraySizes = new int[bytes.length / 5];
+        }
+
         this.arraySizeStack = new Stack<>();
-        this.arraySizes = new int[bytes.length / 5];
         this.arraySizesCounter = 0;
     }
 

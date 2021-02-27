@@ -17,7 +17,7 @@ public class GameDlc {
     private boolean affectsChecksum;
     private boolean affectsCompatability;
 
-    public static Optional<GameDlc> fromDirectory(Path p) throws IOException {
+    public static Optional<GameDlc> fromDirectory(Path p) throws Exception {
         if (!Files.isDirectory(p)) {
             return Optional.empty();
         }

@@ -125,7 +125,7 @@ public class Eu4SavegameParser extends SavegameParser {
                     return new Success<>(true, checksum, node, info);
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return new Error(e);
         }
     }
