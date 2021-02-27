@@ -18,7 +18,7 @@ public class Editor {
         try {
             nodes = target.parse();
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            ErrorHandler.handleException(e, null, target.file);
             return;
         }
         EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {

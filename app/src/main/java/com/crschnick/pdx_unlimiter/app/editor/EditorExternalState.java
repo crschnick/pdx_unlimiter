@@ -41,7 +41,7 @@ public class EditorExternalState {
                             e.editorNode.update(newNode);
                             e.state.onFileChanged();
                         } catch (Exception ex) {
-                            ErrorHandler.handleException(ex);
+                            ErrorHandler.handleException(ex, null, changed);
                         }
                     });
                 }
