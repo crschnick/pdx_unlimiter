@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.util.JoinedList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -13,13 +14,13 @@ import java.util.stream.Collectors;
 public final class LinkedNode extends ArrayNode {
 
     private final List<ArrayNode> arrayNodes;
-    private final JoinedList<Node> joined;
+    private final List<Node> joined;
 
     public LinkedNode(List<ArrayNode> arrayNodes) {
         this.arrayNodes = arrayNodes;
-        this.joined = new JoinedList<>(arrayNodes.stream()
+        this.joined = Collections.unmodifiableList(new JoinedList<>(arrayNodes.stream()
                 .map(Node::getNodeArray)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList())));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -51,7 +52,7 @@ public final class SimpleArrayNode extends ArrayNode {
     @Override
     public List<Node> getNodeArray() {
         evaluateAllValueNodes();
-        return values;
+        return Collections.unmodifiableList(values);
     }
 
     @Override

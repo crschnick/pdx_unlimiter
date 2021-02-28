@@ -74,6 +74,10 @@ public final class NodeWriterImpl implements NodeWriter {
 
     @Override
     public void space() throws IOException {
+        if (hitMaxLines) {
+            return;
+        }
+
         out.write(" ".getBytes(charset));
     }
 
