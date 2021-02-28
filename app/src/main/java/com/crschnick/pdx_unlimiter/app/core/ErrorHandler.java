@@ -39,20 +39,6 @@ public class ErrorHandler {
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
     }
 
-    private static void rakalyTokenReport(List<String> tokens, Path file) {
-        Sentry.init(sentryOptions -> {
-            sentryOptions.setServerName(System.getProperty("os.name"));
-            sentryOptions.setDsn("https://6b540a8824bc4d3d887061488598700e@o510976.ingest.sentry.io/5607403");
-        });
-
-        Sentry.withScope(scope -> {
-            scope.addAttachment(new Attachment(file.toString()));
-            Sentry.captureMessage("Unknown tokens: " + String.join(", ", tokens));
-        });
-
-        setOptions();
-    }
-
     public static void setPlatformInitialized() {
         startupCompleted = true;
     }
@@ -105,7 +91,8 @@ public class ErrorHandler {
             if (PdxuInstallation.getInstance() == null ||
                     PdxuInstallation.getInstance().isProduction() && !errorReporterShowing) {
                 errorReporterShowing = true;
-                if (GuiErrorReporter.showException(ex, terminal)) {
+                boolean shouldSendDiagnostics = GuiErrorReporter.showException(ex, terminal);
+                if (shouldSendDiagnostics) {
                     Sentry.withScope(scope -> {
                         LogManager.getInstance().getLogFile().ifPresent(l -> {
                             scope.addAttachment(new Attachment(l.toString()));
@@ -115,6 +102,8 @@ public class ErrorHandler {
                         }
                         Sentry.captureException(ex);
                     });
+                } else {
+                    Sentry.captureException(ex);
                 }
                 errorReporterShowing = false;
             }
