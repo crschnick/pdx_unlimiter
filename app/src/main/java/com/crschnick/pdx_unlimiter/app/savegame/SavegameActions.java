@@ -77,17 +77,18 @@ public class SavegameActions {
         ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameStorage().getPath(entry));
     }
 
-    public static Optional<Path> exportCampaignEntry() {
-        var s = SavegameManagerState.get();
-        try {
-            var path = s.current().getInstallation().getExportTarget(
-                    s.current().getSavegameStorage(), s.globalSelectedEntryProperty().get());
-            s.current().getSavegameStorage().copySavegameTo(s.globalSelectedEntryProperty().get(), path);
-            return Optional.of(path);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return Optional.empty();
-        }
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportCampaignEntry(SavegameEntry<T,I> e) {
+        return SavegameHelper.mapSavegame(e, ctx -> {
+            try {
+                var path = ctx.getIntegration().getInstallation().getExportTarget(
+                        ctx.getIntegration().getSavegameStorage(), e);
+                ctx.getIntegration().getSavegameStorage().copySavegameTo(e, path);
+                return Optional.of(path);
+            } catch (IOException ex) {
+                ErrorHandler.handleException(ex);
+                return Optional.empty();
+            }
+        });
     }
 
     public static <T, I extends SavegameInfo<T>> void moveEntry(
@@ -120,7 +121,7 @@ public class SavegameActions {
                 }
             }
 
-            Optional<Path> p = exportCampaignEntry();
+            Optional<Path> p = exportCampaignEntry(e);
             if (p.isPresent()) {
                 try {
                     gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), p.get());
@@ -167,7 +168,10 @@ public class SavegameActions {
                 @Override
                 public void success(SavegameParser.Success<SavegameInfo<?>> s) {
                     gi.getSavegameStorage().getSavegameForChecksum(s.checksum)
-                            .ifPresent(SavegameActions::launchCampaignEntry);
+                            .ifPresent(e -> {
+                                SavegameManagerState.get().selectEntry(e);
+                                launchCampaignEntry(e);
+                    });
                 }
             });
         });
