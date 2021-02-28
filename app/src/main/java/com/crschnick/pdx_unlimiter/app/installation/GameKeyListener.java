@@ -32,9 +32,7 @@ public class GameKeyListener implements NativeKeyListener {
                     LoggerFactory.getLogger(GameKeyListener.class).debug("Reloading latest save");
                     Toolkit.getDefaultToolkit().beep();
                     handle.kill();
-                    SavegameActions.importLatestSavegameDirectly(s -> {
-                        SavegameActions.launchCampaignEntry();
-                    });
+                    SavegameActions.importLatestAndLaunch();
                 }, true);
             }
         }

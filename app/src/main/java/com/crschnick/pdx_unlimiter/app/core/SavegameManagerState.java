@@ -92,7 +92,8 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> SavegameHelper.withSavegame(e, gi -> {
+        TaskExecutor.getInstance().submitTask(() -> SavegameHelper.withSavegame(e, ctx -> {
+            var gi = ctx.getIntegration();
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
                             gi.getSavegameStorage().getSavegameCollection(e))) {

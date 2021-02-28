@@ -536,9 +536,7 @@ public abstract class SavegameStorage<
                 logger.debug("Parsing was successful");
                 logger.debug("Checksum is " + s.checksum);
                 if (checkDuplicate) {
-                    var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
-                            .filter(ch -> ch.getContentChecksum().equals(s.checksum))
-                            .findAny();
+                    var exists = getSavegameForChecksum(s.checksum);
                     if (exists.isPresent()) {
                         logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                         loadEntry(exists.get());
@@ -589,6 +587,12 @@ public abstract class SavegameStorage<
             }
         });
         return status;
+    }
+
+    public synchronized Optional<SavegameEntry<T,I>> getSavegameForChecksum(String cs) {
+        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+                .filter(ch -> ch.getContentChecksum().equals(cs))
+                .findAny();
     }
 
     public String getEntryName(SavegameEntry<T, I> e) {

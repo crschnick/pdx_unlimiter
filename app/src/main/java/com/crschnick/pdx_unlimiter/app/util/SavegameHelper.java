@@ -16,6 +16,30 @@ import java.util.function.Function;
 
 public class SavegameHelper {
 
+    public static class SavegameContext<T, I extends SavegameInfo<T>> {
+
+        private SavegameInfo<T> info;
+        private SavegameEntry<T,I> entry;
+        private SavegameCollection<T,I> collection;
+        private GameIntegration<T,I> integration;
+
+        public SavegameInfo<T> getInfo() {
+            return info;
+        }
+
+        public SavegameEntry<T, I> getEntry() {
+            return entry;
+        }
+
+        public SavegameCollection<T, I> getCollection() {
+            return collection;
+        }
+
+        public GameIntegration<T,I> getIntegration() {
+            return integration;
+        }
+    }
+
     private static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> getForSavegame(SavegameEntry<T, I> e) {
         @SuppressWarnings("unchecked")
         Optional<SavegameStorage<T, I>> sg = SavegameStorage.ALL.stream()
@@ -50,39 +74,21 @@ public class SavegameHelper {
         con.accept(gi);
     }
 
-    public static <T, I extends SavegameInfo<T>> void withSavegame(
-            SavegameEntry<T, I> e,
-            BiConsumer<SavegameInfo<T>, GameIntegration<T, I>> con) {
-        mapSavegame(e, (info, gi) -> {
-            con.accept(info, gi);
-            return null;
-        });
-    }
-
-    public static <T, I extends SavegameInfo<T>, R> Optional<R> mapSavegame(
-            SavegameEntry<T, I> e,
-            BiFunction<SavegameInfo<T>, GameIntegration<T, I>, R> con) {
-        if (e.getInfo() != null) {
-            return Optional.ofNullable(mapSavegame(e, gi -> con.apply(e.getInfo(), gi)));
-        }
-        return Optional.empty();
-    }
-
     public static <T, I extends SavegameInfo<T>> void withSavegameAsync(
             SavegameEntry<T, I> e,
-            BiConsumer<SavegameInfo<T>, GameIntegration<T, I>> con) {
+            Consumer<SavegameContext<T,I>> con) {
         if (e.getInfo() != null) {
-            withSavegame(e, gi -> con.accept(e.getInfo(), gi));
+            withSavegame(e, con::accept);
         } else {
-            // Remove listener if info is unloaded
             e.infoProperty().addListener(new javafx.beans.value.ChangeListener<I>() {
                 @Override
                 public void changed(ObservableValue<? extends I> observable, I oldValue, I newValue) {
                     if (newValue != null) {
                         Platform.runLater(() -> {
-                            withSavegame(e, gi -> con.accept(newValue, gi));
+                            withSavegame(e, con::accept);
                         });
                     } else {
+                        // Remove listener if info is unloaded
                         e.infoProperty().removeListener(this);
                     }
                 }
@@ -91,7 +97,15 @@ public class SavegameHelper {
     }
 
     public static <T, I extends SavegameInfo<T>> void withSavegame(
-            SavegameEntry<T, I> e, Consumer<GameIntegration<T, I>> con) {
+            SavegameEntry<T, I> e, Consumer<SavegameContext<T, I>> con) {
+        mapSavegame(e, (ctx) -> {
+            con.accept(ctx);
+            return null;
+        });
+    }
+
+    public static <T, I extends SavegameInfo<T>, R> R mapSavegame(
+            SavegameEntry<T, I> e, Function<SavegameContext<T, I>, R> con) {
         var st = getForSavegame(e);
         if (st == null) {
             throw new IllegalStateException();
@@ -104,24 +118,15 @@ public class SavegameHelper {
 
         var col = gi.getSavegameStorage().getSavegameCollection(e);
         if (col == null) {
-            return;
-        }
-
-        con.accept(gi);
-    }
-
-    public static <T, I extends SavegameInfo<T>, R> R mapSavegame(
-            SavegameEntry<T, I> e, Function<GameIntegration<T, I>, R> con) {
-        var st = getForSavegame(e);
-        if (st == null) {
             throw new IllegalStateException();
         }
 
-        var gi = GameIntegration.getForSavegameStorage(st);
-        if (gi == null) {
-            throw new IllegalStateException();
-        }
+        var ctx = new SavegameContext<T,I>();
+        ctx.info = e.getInfo();
+        ctx.entry = e;
+        ctx.collection = col;
+        ctx.integration = gi;
 
-        return con.apply(gi);
+        return con.apply(ctx);
     }
 }

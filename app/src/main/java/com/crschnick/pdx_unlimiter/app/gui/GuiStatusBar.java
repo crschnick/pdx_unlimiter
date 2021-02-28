@@ -111,16 +111,16 @@ public class GuiStatusBar {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
-        SavegameHelper.withSavegame(e, (info, gi) -> {
+        SavegameHelper.withSavegame(e, ctx -> {
             {
                 Label text = new Label(
-                        gi.getName(),
-                        gi.getGuiFactory().createIcon());
+                        ctx.getIntegration().getName(),
+                        ctx.getIntegration().getGuiFactory().createIcon());
                 barPane.setLeft(text);
                 BorderPane.setAlignment(text, Pos.CENTER);
             }
             {
-                Label name = new Label(gi.getSavegameStorage().getEntryName(e));
+                Label name = new Label(ctx.getIntegration().getSavegameStorage().getEntryName(e));
                 name.setGraphic(new FontIcon());
                 name.getStyleClass().add(CLASS_TEXT);
                 if (SavegameActions.isEntryCompatible(e)) {
@@ -157,7 +157,7 @@ public class GuiStatusBar {
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add(CLASS_LAUNCH);
             launch.setOnAction(event -> {
-                SavegameActions.launchCampaignEntry();
+                SavegameActions.launchCampaignEntry(e);
 
                 event.consume();
                 getStatusBar().hide();
