@@ -98,7 +98,7 @@ public class SavegameActions {
             SavegameHelper.withSavegame(entry, ctx -> {
                 ctx.getIntegration().getSavegameStorage().moveEntry(collection, entry);
             });
-        }, true);
+        }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
@@ -206,7 +206,7 @@ public class SavegameActions {
             SavegameHelper.withSavegame(e, ctx -> {
                 ctx.getIntegration().getSavegameStorage().delete(e);
             });
-        }, true);
+        }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
@@ -217,7 +217,7 @@ public class SavegameActions {
                     SavegameManagerState.get().selectCollection(null);
                 }
             });
-        }, true);
+        }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
@@ -249,6 +249,6 @@ public class SavegameActions {
                 var in = sgs.getSavegameFile(e);
                 sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
             });
-        }, true);
+        }, false);
     }
 }

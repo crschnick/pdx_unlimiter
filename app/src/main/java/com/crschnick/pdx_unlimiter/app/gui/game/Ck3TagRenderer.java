@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
@@ -11,6 +12,8 @@ import javafx.scene.image.Image;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.*;
@@ -26,6 +29,15 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_1 = 0x000080;
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
+
+    public static class ColorCache extends CacheManager.Cache {
+
+        private Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
+
+        public ColorCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
+        }
+    }
 
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -183,12 +195,17 @@ public class Ck3TagRenderer {
     }
 
     private static void pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
+        var cache = CacheManager.getInstance().get(ColorCache.class);
+        if (cache.colors.size() == 0) {
+            cache.colors.putAll(ColorHelper.loadCk3(info));
+        }
+
         if (coa.getPatternFile() != null) {
-            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
+            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(cache.colors
                     .getOrDefault(coa.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
-            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
+            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(cache.colors
                     .getOrDefault(coa.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT)) : 0;
-            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
+            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(cache.colors
                     .getOrDefault(coa.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT)) : 0;
             Function<Integer, Integer> patternFunction = (Integer rgb) -> {
                 int alpha = rgb & 0xFF000000;
@@ -208,11 +225,16 @@ public class Ck3TagRenderer {
     }
 
     private static void emblem(Graphics g, Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
-        int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
+        var cache = CacheManager.getInstance().get(ColorCache.class);
+        if (cache.colors.size() == 0) {
+            cache.colors.putAll(ColorHelper.loadCk3(info));
+        }
+
+        int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(cache.colors
                 .getOrDefault(emblem.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
-        int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
+        int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(cache.colors
                 .getOrDefault(emblem.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT)) : 0;
-        int eColor3 = emblem.getColors().size() > 2 ? ColorHelper.intFromColor(ColorHelper.loadCk3(info)
+        int eColor3 = emblem.getColors().size() > 2 ? ColorHelper.intFromColor(cache.colors
                 .getOrDefault(emblem.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT)) : 0;
         Function<Integer, Integer> customFilter = (Integer rgb) -> {
             int alpha = rgb & 0xFF000000;

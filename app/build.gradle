@@ -72,7 +72,7 @@ dependencies {
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
-    implementation files("$buildDir/generated-modules/sentry-4.0.0-alpha.2.jar")
+    implementation files("$buildDir/generated-modules/sentry-4.2.0.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.0.2.jar")
     implementation project(':core')
 }
@@ -94,7 +94,7 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact 'io.sentry:sentry:4.0.0-alpha.2'
+            artifact 'io.sentry:sentry:4.2.0'
             moduleInfoSource = '''
                 module io.sentry {
                     exports io.sentry;

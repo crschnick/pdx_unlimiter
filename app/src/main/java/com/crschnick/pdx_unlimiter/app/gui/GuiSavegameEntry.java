@@ -201,6 +201,8 @@ public class GuiSavegameEntry {
                     buttonBar.getChildren().add(0, edit);
                 }
             });
+            // Temp!
+            edit.setDisable(true);
         }
 
         {

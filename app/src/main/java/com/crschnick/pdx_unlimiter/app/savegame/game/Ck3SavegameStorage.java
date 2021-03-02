@@ -21,7 +21,7 @@ public class Ck3SavegameStorage extends SavegameStorage<Ck3Tag, Ck3SavegameInfo>
     }
 
     @Override
-    protected String getDefaultCampaignName(SavegameEntry<Ck3Tag, Ck3SavegameInfo> latest) {
-        return latest.getInfo().getTag().getPrimaryTitle().getName();
+    protected String getDefaultCampaignName(Ck3SavegameInfo info) {
+        return info.getTag().getPrimaryTitle().getName();
     }
 }

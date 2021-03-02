@@ -259,17 +259,19 @@ public abstract class SavegameStorage<
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
-                info,
+                // Set info to null, since we don't want to store it
+                // directly after importing. It can be loaded later
+                null,
                 checksum,
                 info.getDate());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
-            logger.debug("Adding new campaign " + getDefaultCampaignName(e));
+            logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
-                    getDefaultCampaignName(e),
+                    getDefaultCampaignName(info),
                     campainUuid,
                     e.getDate(),
-                    GameIntegration.getForSavegameStorage(this).getGuiFactory().tagImage(e.getInfo(), info.getTag()));
+                    GameIntegration.getForSavegameStorage(this).getGuiFactory().tagImage(info, info.getTag()));
             this.collections.add(newCampaign);
         }
 
@@ -283,7 +285,7 @@ public abstract class SavegameStorage<
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
-                info,
+                null,
                 checksum,
                 info.getDate());
         logger.debug("Adding new entry " + e.getName());
@@ -293,7 +295,7 @@ public abstract class SavegameStorage<
 
     protected abstract String getDefaultEntryName(I info);
 
-    protected abstract String getDefaultCampaignName(SavegameEntry<T, I> latest);
+    protected abstract String getDefaultCampaignName(I info);
 
     public synchronized boolean contains(SavegameEntry<?, ?> e) {
         return collections.stream()
