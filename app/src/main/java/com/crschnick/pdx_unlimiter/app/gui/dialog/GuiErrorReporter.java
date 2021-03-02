@@ -84,14 +84,14 @@ public class GuiErrorReporter {
 
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Pdx-Unlimiter");
-        alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ?
+        alert.setHeaderText((msg != null ? "An error occured: " + msg : "An error occured") + (reportable ?
                 """
 
 
-                        If you have a suspicion of the cause and want to help us fix the error, you can report it on github.
-                        Alternatively you can notify the developers of this error automatically by clicking the 'Report automatically' button.
-                        This will send some diagnostics data.
-                        """ + (!terminal ? "\n Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
+                        You can notify the developers of this error automatically by clicking the 'Report automatically' button. (This will send some diagnostics data.)
+                        Alternatively, you can also report it on GitHub to provide some information about the issue and get notified about the status of your reported issue.
+
+                        """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
 
         VBox dialogPaneContent = new VBox();
 
@@ -137,34 +137,5 @@ public class GuiErrorReporter {
         r.ifPresent(b -> showReportSent());
         return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
                 Optional.ofNullable(textArea.getText()) : Optional.empty();
-    }
-
-    public static boolean showRakalyTokenDialog() {
-        Alert alert = new Alert(Alert.AlertType.NONE);
-        DialogHelper.setIcon(alert);
-
-        alert.getButtonTypes().clear();
-
-        ButtonType ok = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().add(ok);
-
-        ButtonType send = new ButtonType("Send savegame", ButtonBar.ButtonData.OK_DONE);
-        alert.getButtonTypes().add(send);
-
-        alert.setTitle("Rakaly reporter");
-        alert.setHeaderText("""
-                During parsing of the ironman savegame, an unknown token has been found.
-
-                To help the developers of Rakaly, the Ironman converter for Paradox games,
-                to improve the quality of converted savegames, you can automatically send them
-                the savegame file to analyze.
-                            """);
-
-        Optional<ButtonType> r = alert.showAndWait();
-        boolean sent = r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
-        if (sent) {
-            showReportSent();
-        }
-        return sent;
     }
 }

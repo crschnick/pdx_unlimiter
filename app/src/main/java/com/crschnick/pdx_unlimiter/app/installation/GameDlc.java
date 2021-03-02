@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class GameDlc {
     private boolean affectsChecksum;
     private boolean affectsCompatability;
 
-    public static Optional<GameDlc> fromDirectory(Path p) throws IOException {
+    public static Optional<GameDlc> fromDirectory(Path p) throws Exception {
         if (!Files.isDirectory(p)) {
             return Optional.empty();
         }

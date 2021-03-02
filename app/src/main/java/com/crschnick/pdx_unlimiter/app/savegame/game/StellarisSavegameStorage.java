@@ -26,7 +26,7 @@ public class StellarisSavegameStorage extends SavegameStorage<
     }
 
     @Override
-    protected String getDefaultCampaignName(SavegameEntry<StellarisTag, StellarisSavegameInfo> latest) {
-        return latest.getInfo().getTag().getName();
+    protected String getDefaultCampaignName(StellarisSavegameInfo info) {
+        return info.getTag().getName();
     }
 }

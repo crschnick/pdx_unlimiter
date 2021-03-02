@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.jfoenix.controls.JFXRadioButton;
 import javafx.event.ActionEvent;
@@ -150,7 +150,7 @@ public class GuiConverterConfig {
                             .resolve("Configuration").resolve("fronter-options.txt")));
             translations = LocalisationHelper.loadTranslations(Settings.getInstance().getCk3toEu4Dir().get()
                     .resolve("Configuration").resolve("options.yml"), LocalisationHelper.Language.ENGLISH);
-        } catch (IOException e) {
+        } catch (Exception e) {
             ErrorHandler.handleException(e);
             return false;
         }

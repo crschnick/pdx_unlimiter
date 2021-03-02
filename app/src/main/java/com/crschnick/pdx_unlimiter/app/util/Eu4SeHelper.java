@@ -65,10 +65,7 @@ public class Eu4SeHelper {
 
         if (SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(entry)) {
             Eu4SavegameInfo eu4i = (Eu4SavegameInfo) info;
-            if (eu4i.isRandomNewWorld()) {
-                return false;
-            }
-            return true;
+            return !eu4i.isRandomNewWorld();
         } else {
             return false;
         }
@@ -82,11 +79,14 @@ public class Eu4SeHelper {
 
         ThreadHelper.create("eu4se", true, () -> {
             // Create mod dir in case no mods are installed
-            try {
-                Files.createDirectory(GameInstallation.EU4.getUserPath().resolve("mod"));
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-                return;
+            var modDir = GameInstallation.EU4.getUserPath().resolve("mod");
+            if (!Files.exists(modDir)) {
+                try {
+                    Files.createDirectory(modDir);
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                    return;
+                }
             }
 
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;

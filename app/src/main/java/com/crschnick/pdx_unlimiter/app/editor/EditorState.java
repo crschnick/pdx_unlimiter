@@ -1,8 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,19 +15,17 @@ import java.util.stream.Collectors;
 
 public class EditorState {
 
-    private String fileName;
-    private TextFormatParser parser;
-    private TextFormatWriter writer;
-    private BooleanProperty dirty;
-    private Map<String, EditorNode> rootNodes;
-    private EditorExternalState externalState;
-    private ListProperty<NavEntry> navPath;
-    private EditorFilter filter;
-    private ListProperty<EditorNode> content;
-    private Consumer<Map<String, Node>> saveFunc;
+    private final String fileName;
+    private final TextFormatParser parser;
+    private final BooleanProperty dirty;
+    private final Map<String, EditorNode> rootNodes;
+    private final EditorExternalState externalState;
+    private final ListProperty<NavEntry> navPath;
+    private final EditorFilter filter;
+    private final ListProperty<EditorNode> content;
+    private final Consumer<Map<String, Node>> saveFunc;
 
-    public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, TextFormatWriter writer, Consumer<Map<String, Node>> saveFunc) {
-        this.writer = writer;
+    public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
@@ -163,17 +160,13 @@ public class EditorState {
         return dirty;
     }
 
-    public TextFormatWriter getWriter() {
-        return writer;
-    }
-
     public TextFormatParser getParser() {
         return parser;
     }
 
-    public class NavEntry {
-        private EditorNode editorNode;
-        private DoubleProperty scroll;
+    public static class NavEntry {
+        private final EditorNode editorNode;
+        private final DoubleProperty scroll;
 
         private NavEntry(EditorNode editorNode, double scroll) {
             this.editorNode = editorNode;

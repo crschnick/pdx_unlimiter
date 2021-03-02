@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -32,7 +32,7 @@ public abstract class SavegameParser {
     }
 
     @FunctionalInterface
-    public static interface Melter {
+    public interface Melter {
 
         Path melt(Path file) throws IOException;
     }

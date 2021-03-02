@@ -3,7 +3,8 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class EditorExternalState {
 
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
-    private Set<Entry> openEntries = new HashSet<>();
+    private final Set<Entry> openEntries = new HashSet<>();
 
     public static void init() {
         try {
@@ -40,13 +41,13 @@ public class EditorExternalState {
                             e.editorNode.update(newNode);
                             e.state.onFileChanged();
                         } catch (Exception ex) {
-                            ErrorHandler.handleException(ex);
+                            ErrorHandler.handleException(ex, null, changed);
                         }
                     });
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorHandler.handleException(e);
         }
     }
 
@@ -89,7 +90,9 @@ public class EditorExternalState {
 
         try {
             openEntries.add(new Entry(file, node, state));
-            state.getWriter().write(node.toWritableNode(), Integer.MAX_VALUE, "  ", file);
+            try (var out = Files.newOutputStream(file)) {
+                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
+            }
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
@@ -97,9 +100,9 @@ public class EditorExternalState {
     }
 
     public static class Entry {
-        private Path file;
-        private EditorNode editorNode;
-        private EditorState state;
+        private final Path file;
+        private final EditorNode editorNode;
+        private final EditorState state;
         private boolean registered;
 
         public Entry(Path file, EditorNode editorNode, EditorState state) {

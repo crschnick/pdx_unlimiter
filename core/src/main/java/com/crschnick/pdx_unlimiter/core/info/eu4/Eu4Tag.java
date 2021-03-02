@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info.eu4;
 
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.List;
 import java.util.Set;
@@ -23,15 +22,14 @@ public class Eu4Tag {
         this.name = name;
     }
 
-    public static Eu4Tag fromNode(Node n) {
-        KeyValueNode kv = n.getKeyValueNode();
-        List<Node> mc = kv.getNode().getNodeForKey("colors").getNodeForKey("map_color").getNodeArray();
+    public static Eu4Tag fromNode(String tag, Node n) {
+        List<Node> mc = n.getNodeForKey("colors").getNodeForKey("map_color").getNodeArray();
         int mColor = (mc.get(0).getInteger() << 24) + (mc.get(1).getInteger() << 16) + (mc.get(2).getInteger() << 8);
-        List<Node> cc = kv.getNode().getNodeForKey("colors").getNodeForKey("country_color").getNodeArray();
+        List<Node> cc = n.getNodeForKey("colors").getNodeForKey("country_color").getNodeArray();
         int cColor = (cc.get(0).getInteger() << 24) + (cc.get(1).getInteger() << 16) + (cc.get(2).getInteger() << 8);
-        String name = kv.getNode().hasKey("name") ?
-                kv.getNode().getNodeForKey("name").getString() : null;
-        return new Eu4Tag(kv.getKeyName(), mColor, cColor, name);
+        String name = n.hasKey("name") ?
+                n.getNodeForKey("name").getString() : null;
+        return new Eu4Tag(tag, mColor, cColor, name);
     }
 
     public static Eu4Tag getTag(Set<Eu4Tag> tags, String name) {

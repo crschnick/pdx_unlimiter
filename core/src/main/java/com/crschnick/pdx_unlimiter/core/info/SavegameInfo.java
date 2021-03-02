@@ -29,10 +29,6 @@ public abstract class SavegameInfo<T> {
         return ironman;
     }
 
-    public UUID getCampaignUuid() {
-        return campaignUuid;
-    }
-
     public GameDate getDate() {
         return date;
     }

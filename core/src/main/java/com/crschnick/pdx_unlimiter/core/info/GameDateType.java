@@ -171,11 +171,7 @@ public abstract class GameDateType {
     public boolean isDate(String s) {
         if (hasHours() && Pattern.matches("-?\\d+\\.\\d+\\.\\d+\\.\\d+", s)) {
             return true;
-        } else if (!hasHours() && Pattern.matches("-?\\d+\\.\\d+\\.\\d+", s)) {
-            return true;
-        }
-
-        return false;
+        } else return !hasHours() && Pattern.matches("-?\\d+\\.\\d+\\.\\d+", s);
     }
 
     public GameDate fromString(String s) {
@@ -204,7 +200,7 @@ public abstract class GameDateType {
 
         @Override
         public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
+                throws IOException {
             JsonNode node = jp.getCodec().readTree(jp);
             if (node.textValue().equals("eu4")) {
                 return EU4;

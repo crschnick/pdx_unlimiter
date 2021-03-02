@@ -1,18 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatWriter;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class CollectorNode extends EditorNode {
 
-    private int firstNodeIndex;
-    private List<Node> nodes;
+    private final int firstNodeIndex;
+    private final List<Node> nodes;
 
     public CollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
         super(directParent, keyName, parentIndex);
@@ -35,8 +32,7 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public boolean filterValue(Predicate<String> filter) {
-        return nodes.stream().anyMatch(n -> filter.test(
-                TextFormatWriter.writeToString(n, Integer.MAX_VALUE, "")));
+        return false;
     }
 
     @Override
@@ -61,22 +57,16 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public List<EditorNode> open() {
-        return EditorNode.create(this, nodes);
+        return EditorNode.create(this, ArrayNode.array(nodes));
     }
 
-    public Node toWritableNode() {
-        return new ArrayNode(nodes);
+    public ArrayNode toWritableNode() {
+        return ArrayNode.array(nodes);
     }
 
     @Override
     public void update(ArrayNode newNode) {
-        var ar = getRealParent().getBackingNode().getNodeArray();
-
-        for (int i = 0; i < nodes.size(); i++) {
-            ar.remove(firstNodeIndex);
-        }
-        ar.addAll(firstNodeIndex, newNode.getNodeArray().stream()
-                .map(node -> KeyValueNode.create(keyName, node)).collect(Collectors.toList()));
+        getRealParent().insertArray(newNode, firstNodeIndex, firstNodeIndex + nodes.size());
     }
 
     public List<Node> getNodes() {

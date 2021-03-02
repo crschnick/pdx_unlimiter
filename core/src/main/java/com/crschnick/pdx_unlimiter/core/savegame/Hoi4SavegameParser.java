@@ -44,7 +44,7 @@ public class Hoi4SavegameParser extends SavegameParser {
                 var info = Hoi4SavegameInfo.fromSavegame(melted, node);
                 return new Success<>(melted, checksum, node, info);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return new Error(e);
         }
     }

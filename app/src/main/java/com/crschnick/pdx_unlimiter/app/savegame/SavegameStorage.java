@@ -186,7 +186,7 @@ public abstract class SavegameStorage<
                     .map(entry -> JsonNodeFactory.instance.objectNode()
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
-                            .put("checksum", entry.getChecksum())
+                            .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
@@ -218,7 +218,7 @@ public abstract class SavegameStorage<
                     .map(entry -> JsonNodeFactory.instance.objectNode()
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
-                            .put("checksum", entry.getChecksum())
+                            .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
@@ -259,17 +259,19 @@ public abstract class SavegameStorage<
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
-                info,
+                // Set info to null, since we don't want to store it
+                // directly after importing. It can be loaded later
+                null,
                 checksum,
                 info.getDate());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
-            logger.debug("Adding new campaign " + getDefaultCampaignName(e));
+            logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
-                    getDefaultCampaignName(e),
+                    getDefaultCampaignName(info),
                     campainUuid,
                     e.getDate(),
-                    GameIntegration.getForSavegameStorage(this).getGuiFactory().tagImage(e.getInfo(), info.getTag()));
+                    GameIntegration.getForSavegameStorage(this).getGuiFactory().tagImage(info, info.getTag()));
             this.collections.add(newCampaign);
         }
 
@@ -283,7 +285,7 @@ public abstract class SavegameStorage<
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
-                info,
+                null,
                 checksum,
                 info.getDate());
         logger.debug("Adding new entry " + e.getName());
@@ -293,7 +295,7 @@ public abstract class SavegameStorage<
 
     protected abstract String getDefaultEntryName(I info);
 
-    protected abstract String getDefaultCampaignName(SavegameEntry<T, I> latest);
+    protected abstract String getDefaultCampaignName(I info);
 
     public synchronized boolean contains(SavegameEntry<?, ?> e) {
         return collections.stream()
@@ -536,9 +538,7 @@ public abstract class SavegameStorage<
                 logger.debug("Parsing was successful");
                 logger.debug("Checksum is " + s.checksum);
                 if (checkDuplicate) {
-                    var exists = getCollections().stream().flatMap(SavegameCollection::entryStream)
-                            .filter(ch -> ch.getChecksum().equals(s.checksum))
-                            .findAny();
+                    var exists = getSavegameForChecksum(s.checksum);
                     if (exists.isPresent()) {
                         logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                         loadEntry(exists.get());
@@ -589,6 +589,12 @@ public abstract class SavegameStorage<
             }
         });
         return status;
+    }
+
+    public synchronized Optional<SavegameEntry<T,I>> getSavegameForChecksum(String cs) {
+        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+                .filter(ch -> ch.getContentChecksum().equals(cs))
+                .findAny();
     }
 
     public String getEntryName(SavegameEntry<T, I> e) {

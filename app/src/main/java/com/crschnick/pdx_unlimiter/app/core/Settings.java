@@ -29,7 +29,7 @@ public class Settings {
     private int fontSize;
     private boolean deleteOnImport;
     private boolean startSteam;
-    private boolean confirmDeletion = true;
+    private boolean confirmDeletion;
     private String rakalyUserId;
     private String rakalyApiKey;
     private String skanderbegApiKey;
@@ -112,6 +112,7 @@ public class Settings {
 
         s.fontSize = Optional.ofNullable(sNode.get("fontSize")).map(JsonNode::intValue).orElse(11);
         s.startSteam = Optional.ofNullable(sNode.get("startSteam")).map(JsonNode::booleanValue).orElse(true);
+        s.confirmDeletion = Optional.ofNullable(sNode.get("confirmDeletion")).map(JsonNode::booleanValue).orElse(true);
         s.deleteOnImport = Optional.ofNullable(sNode.get("deleteOnImport")).map(JsonNode::booleanValue).orElse(false);
         s.rakalyUserId = Optional.ofNullable(sNode.get("rakalyUserId")).map(JsonNode::textValue).orElse(null);
         s.rakalyApiKey = Optional.ofNullable(sNode.get("rakalyApiKey")).map(JsonNode::textValue).orElse(null);
@@ -150,6 +151,7 @@ public class Settings {
         GameDirectory.toNode(s.ck3).ifPresent(dir -> i.set("ck3", dir));
         GameDirectory.toNode(s.stellaris).ifPresent(dir -> i.set("stellaris", dir));
 
+        i.put("confirmDeletion", s.confirmDeletion);
         i.put("deleteOnImport", s.deleteOnImport);
         i.put("fontSize", s.fontSize);
         i.put("startSteam", s.startSteam);
@@ -186,6 +188,7 @@ public class Settings {
         c.fontSize = fontSize;
         c.startSteam = startSteam;
         c.enableAutoUpdate = enableAutoUpdate;
+        c.confirmDeletion = confirmDeletion;
         c.deleteOnImport = deleteOnImport;
         c.rakalyUserId = rakalyUserId;
         c.rakalyApiKey = rakalyApiKey;

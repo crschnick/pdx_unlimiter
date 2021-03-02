@@ -1,20 +1,20 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.node.*;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
-public class TextFormatParser extends FormatParser {
+public final class TextFormatParser extends FormatParser {
 
-    private final boolean debug = false;
     private final Charset charset;
     private int index;
     private int slIndex;
     private int arrayIndex;
     private TextFormatTokenizer tokenizer;
+    private NodeContext context;
 
     private TextFormatParser(Charset charset) {
         this.charset = charset;
@@ -40,95 +40,148 @@ public class TextFormatParser extends FormatParser {
         return new TextFormatParser(StandardCharsets.UTF_8);
     }
 
-    public final ArrayNode parse(byte[] input) {
-        this.tokenizer = new TextFormatTokenizer(charset, input);
-        this.tokenizer.tokenize();
-
-        Map.Entry<Node, Integer> node = parseNode();
-        return (ArrayNode) node.getKey();
+    private void reset() {
+        this.index = 0;
+        this.slIndex = 0;
+        this.arrayIndex = 0;
+        this.tokenizer = null;
+        this.context = null;
     }
 
-    private Map.Entry<Node, Integer> parseNode() {
+    public final ArrayNode parse(byte[] input) throws Exception {
+        try {
+            this.tokenizer = new TextFormatTokenizer(input);
+
+            var now = Instant.now();
+            this.tokenizer.tokenize();
+            // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+
+            this.context = new NodeContext(input, charset,
+                    tokenizer.getScalarsStart(),
+                    tokenizer.getScalarsLength(),
+                    tokenizer.getScalarCount());
+
+            now = Instant.now();
+            ArrayNode r = parseArray();
+            // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+
+            reset();
+
+            return r;
+        } catch (Throwable t) {
+            // Catch also errors!
+            throw new RuntimeException(t);
+        }
+    }
+
+    private Node parseNodeIfNotSimpleValue() {
         var tt = tokenizer.getTokenTypes();
-        var sl = tokenizer.getStringLiterals();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
-            String val = sl.get(slIndex++);
-            boolean isColor = ColorNode.isColorName(val);
+            boolean isColor = ColorNode.isColorName(context, slIndex);
+
             if (isColor) {
+                var type = context.evaluate(slIndex);
+                index++;
+                slIndex++;
+                var cn = new ColorNode(type, List.of(
+                        new ValueNode(
+                                context,
+                                slIndex),
+                        new ValueNode(
+                                context,
+                                slIndex + 1),
+                        new ValueNode(
+                                context,
+                                slIndex + 2)));
+
                 // A color is also an array, so we have to move the array index!
                 arrayIndex++;
 
-                return new AbstractMap.SimpleEntry<>(new ColorNode(val, List.of(
-                        new ValueNode(false, sl.get(slIndex++)),
-                        new ValueNode(false, sl.get(slIndex++)),
-                        new ValueNode(false, sl.get(slIndex++)))), index + 6);
-            } else {
-                return new AbstractMap.SimpleEntry<>(new ValueNode(false, val), index + 1);
+                slIndex += 3;
+                index += 5;
+
+                return cn;
             }
-        } else if (tt[index] == TextFormatTokenizer.STRING_QUOTED) {
-            String val = sl.get(slIndex++);
-            return new AbstractMap.SimpleEntry<>(new ValueNode(true, val), index + 1);
+        } else {
+            assert tt[index] != TextFormatTokenizer.EQUALS : "Encountered unexpected =";
+            assert tt[index] != TextFormatTokenizer.CLOSE_GROUP : "Encountered unexpected }";
+
+            if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
+                return parseArray();
+            }
         }
 
-        if (debug && tt[index] == TextFormatTokenizer.EQUALS) {
-            throw new IllegalStateException("Encountered unexpected =");
-        }
-
-        if (debug && tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-            throw new IllegalStateException("Encountered unexpected }");
-        }
-
-        return parseGroup();
+        return null;
     }
 
-    private Map.Entry<Node, Integer> parseGroup() {
+    private ArrayNode parseArray() {
         var tt = tokenizer.getTokenTypes();
-        if (debug && tt[index] != TextFormatTokenizer.OPEN_GROUP) {
-            throw new IllegalStateException("Expected {");
-        }
+
+        assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
+        index++;
 
         var size = tokenizer.getArraySizes()[arrayIndex++];
-        List<Node> children = new ArrayList<>(size);
-
-        int currentIndex = index + 1;
+        var builder = new ArrayNode.Builder(context, size);
         while (true) {
-            if (currentIndex == tt.length) {
-                throw new IllegalStateException("Reached EOF but found no closing group token");
+            assert index < tt.length : "Reached EOF but found no closing group token";
+
+            if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
+                assert size >= builder.getUsedSize() :
+                        "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
+                index++;
+                return builder.build();
             }
 
-            if (tt[currentIndex] == TextFormatTokenizer.CLOSE_GROUP) {
-                if (debug && size < children.size()) {
-                    throw new IllegalStateException("Invalid array size. Expected: <= " + size + ", got: " + children.size());
+            boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
+            if (isKeyValue) {
+                assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED ||
+                        tt[index] == TextFormatTokenizer.STRING_QUOTED : "Expected key";
+
+                int keyIndex = slIndex;
+                slIndex++;
+                index += 2;
+
+                Node result = parseNodeIfNotSimpleValue();
+                if (result == null) {
+                    builder.putKeyAndScalarValue(keyIndex, slIndex);
+                    index++;
+                    slIndex++;
+                } else {
+                    builder.putKeyAndNodeValue(keyIndex, result);
                 }
 
-                return new AbstractMap.SimpleEntry<>(new ArrayNode(children), currentIndex + 1);
-            }
+                //System.out.println("key: " + context.evaluate(start, length));
+                //System.out.println("val: " + result.toString());
 
-            boolean isKeyValue = tt[currentIndex + 1] == TextFormatTokenizer.EQUALS;
-            if (isKeyValue) {
-                index = currentIndex + 2;
-                String realKey = tokenizer.getStringLiterals().get(slIndex++);
-                Map.Entry<Node, Integer> result = parseNode();
-                children.add(KeyValueNode.create(realKey, result.getKey()));
-                currentIndex = result.getValue();
                 continue;
             }
 
-            boolean isKeyValueWithoutEquals = tt[currentIndex] == TextFormatTokenizer.STRING_UNQUOTED &&
-                    tt[currentIndex + 1] == TextFormatTokenizer.OPEN_GROUP;
+            boolean isKeyValueWithoutEquals = tt[index] == TextFormatTokenizer.STRING_UNQUOTED &&
+                    tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
             if (isKeyValueWithoutEquals) {
-                index = currentIndex + 1;
-                String realKey = tokenizer.getStringLiterals().get(slIndex++);
-                Map.Entry<Node, Integer> result = parseNode();
-                children.add(KeyValueNode.create(realKey, result.getKey()));
-                currentIndex = result.getValue();
+                int keyIndex = slIndex;
+                slIndex++;
+                index++;
+                Node result = parseNodeIfNotSimpleValue();
+                assert result != null : "KeyValue without equal sign must be an array node";
+                builder.putKeyAndNodeValue(keyIndex, result);
+
                 continue;
             }
 
-            index = currentIndex;
-            Map.Entry<Node, Integer> result = parseNode();
-            currentIndex = result.getValue();
-            children.add(result.getKey());
+            // Parse unnamed array element
+            Node result = parseNodeIfNotSimpleValue();
+            if (result == null) {
+                builder.putScalarValue(slIndex);
+                index++;
+                slIndex++;
+            } else {
+                builder.putNodeValue(result);
+            }
         }
+    }
+
+    public Charset getCharset() {
+        return charset;
     }
 }

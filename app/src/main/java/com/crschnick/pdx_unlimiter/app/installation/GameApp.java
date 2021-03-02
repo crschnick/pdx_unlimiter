@@ -7,8 +7,8 @@ import org.jnativehook.keyboard.NativeKeyListener;
 public class GameApp {
 
     private NativeKeyListener listener;
-    private GameInstallation installation;
-    private ProcessHandle process;
+    private final GameInstallation installation;
+    private final ProcessHandle process;
 
     public GameApp(ProcessHandle process, GameInstallation installation) {
         this.process = process;

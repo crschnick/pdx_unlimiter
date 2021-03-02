@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.parser;
+package com.crschnick.pdx_unlimiter.core.node;
 
 public class NodeFormatException extends RuntimeException {
 

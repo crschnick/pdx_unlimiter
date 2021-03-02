@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class GameKeyListener implements NativeKeyListener {
 
-    private GameApp handle;
+    private final GameApp handle;
 
     public GameKeyListener(GameApp handle) {
         this.handle = handle;
@@ -32,9 +32,7 @@ public class GameKeyListener implements NativeKeyListener {
                     LoggerFactory.getLogger(GameKeyListener.class).debug("Reloading latest save");
                     Toolkit.getDefaultToolkit().beep();
                     handle.kill();
-                    SavegameActions.importLatestSavegameDirectly(s -> {
-                        SavegameActions.launchCampaignEntry();
-                    });
+                    SavegameActions.importLatestAndLaunch();
                 }, true);
             }
         }

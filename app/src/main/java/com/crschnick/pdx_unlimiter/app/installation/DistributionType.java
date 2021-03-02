@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public abstract class DistributionType {
 
-    private String name;
+    private final String name;
 
     public DistributionType(String name) {
         this.name = name;
@@ -23,7 +23,7 @@ public abstract class DistributionType {
 
     public static class Steam extends DistributionType {
 
-        private int appId;
+        private final int appId;
 
         public Steam(int appId) {
             super("Steam");
@@ -45,7 +45,7 @@ public abstract class DistributionType {
 
     public static class PdxLauncher extends DistributionType {
 
-        private Path launcherPath;
+        private final Path launcherPath;
 
         public PdxLauncher(Path launcherPath) {
             super("Paradox Launcher");

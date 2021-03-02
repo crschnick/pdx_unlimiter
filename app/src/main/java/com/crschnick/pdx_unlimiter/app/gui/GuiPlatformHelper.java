@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GuiPlatformHelper {
 
-    private static volatile AtomicInteger otherPauses = new AtomicInteger(0);
-    private static Semaphore semaphore = new Semaphore(0);
+    private static final AtomicInteger otherPauses = new AtomicInteger(0);
+    private static final Semaphore semaphore = new Semaphore(0);
 
     private static void waitForPlatform() {
         if (Platform.isFxApplicationThread()) {

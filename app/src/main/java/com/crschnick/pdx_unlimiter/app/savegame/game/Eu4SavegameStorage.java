@@ -28,7 +28,7 @@ public class Eu4SavegameStorage extends SavegameStorage<
     }
 
     @Override
-    protected String getDefaultCampaignName(SavegameEntry<Eu4Tag, Eu4SavegameInfo> latest) {
-        return GameLocalisation.getTagNameForEntry(latest.getInfo(), latest.getInfo().getTag());
+    protected String getDefaultCampaignName(Eu4SavegameInfo info) {
+        return GameLocalisation.getTagNameForEntry(info, info.getTag());
     }
 }

@@ -7,6 +7,7 @@ module com.crschnick.pdx_unlimiter.core {
 
     exports com.crschnick.pdx_unlimiter.core.parser;
     exports com.crschnick.pdx_unlimiter.core.savegame;
+    exports com.crschnick.pdx_unlimiter.core.node;
     exports com.crschnick.pdx_unlimiter.core.info;
     exports com.crschnick.pdx_unlimiter.core.info.eu4;
     exports com.crschnick.pdx_unlimiter.core.info.ck3;

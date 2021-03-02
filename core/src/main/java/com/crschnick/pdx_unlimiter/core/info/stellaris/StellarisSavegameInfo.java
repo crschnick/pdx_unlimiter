@@ -3,9 +3,7 @@ package com.crschnick.pdx_unlimiter.core.info.stellaris;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 
 import java.util.*;
@@ -36,19 +34,17 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.campaignUuid = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new HashSet<>();
-            for (Node country : n.getNodeForKey("country").getNodeArray()) {
-                KeyValueNode kv = country.getKeyValueNode();
-
+            n.getNodeForKey("country").forEach((k, v) -> {
                 // Invalid country node
-                if (kv.getNode() instanceof ValueNode && ((ValueNode) kv.getNode()).getValue() instanceof String) {
-                    continue;
+                if (v.isValue()) {
+                    return;
                 }
 
-                Node flag = kv.getNode().getNodeForKey("flag");
+                Node flag = v.getNodeForKey("flag");
                 Node icon = flag.getNodeForKey("icon");
                 Node bg = flag.getNodeForKey("background");
                 var tag = new StellarisTag(
-                        kv.getNode().getNodeForKey("name").getString(),
+                        v.getNodeForKey("name").getString(),
                         icon.getNodeForKey("category").getString(),
                         icon.getNodeForKey("file").getString(),
                         bg.getNodeForKey("category").getString(),
@@ -61,7 +57,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                 }
 
                 i.allTags.add(tag);
-            }
+            });
 
             i.mods = List.of();
 

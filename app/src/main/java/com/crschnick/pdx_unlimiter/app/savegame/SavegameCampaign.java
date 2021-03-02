@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
-    private volatile ObjectProperty<GameDate> date;
-    private ObjectProperty<Image> image;
+    private final ObjectProperty<GameDate> date;
+    private final ObjectProperty<Image> image;
 
     public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, Image image) {
         super(lastPlayed, name, campaignId);

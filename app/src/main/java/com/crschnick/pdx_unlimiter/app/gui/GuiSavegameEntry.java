@@ -37,8 +37,8 @@ public class GuiSavegameEntry {
     private static <T, I extends SavegameInfo<T>> Region setupTopBar(SavegameEntry<T, I> e) {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
-        SavegameHelper.withSavegameAsync(e, (info, gi) -> {
-            topBar.setBackground(gi.getGuiFactory().createEntryInfoBackground(info));
+        SavegameHelper.withSavegameAsync(e, ctx -> {
+            topBar.setBackground(ctx.getIntegration().getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
         });
 
         {
@@ -46,7 +46,7 @@ public class GuiSavegameEntry {
             l.getStyleClass().add(CLASS_DATE);
 
             var tagImage = SavegameHelper.mapSavegame(e,
-                    gi -> gi.getGuiFactory().createImage(e));
+                    ctx -> ctx.getIntegration().getGuiFactory().createImage(e));
             Pane tagPane = new Pane(tagImage.getValue());
             HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
@@ -123,8 +123,8 @@ public class GuiSavegameEntry {
             });
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            SavegameHelper.withSavegameAsync(e, (info, gi) -> {
-                if (info.isBinary()) {
+            SavegameHelper.withSavegameAsync(e, ctx -> {
+                if (ctx.getInfo().isBinary()) {
                     buttonBar.getChildren().add(0, melt);
                 }
             });
@@ -152,8 +152,8 @@ public class GuiSavegameEntry {
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
-        SavegameHelper.withSavegameAsync(e, (info, gi) -> {
-            if (Eu4SeHelper.shouldShowButton(e, info)) {
+        SavegameHelper.withSavegameAsync(e, ctx -> {
+            if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
                 Button eu4Se = new JFXButton();
                 eu4Se.setGraphic(new FontIcon());
                 eu4Se.setOnMouseClicked((m) -> {
@@ -196,11 +196,13 @@ public class GuiSavegameEntry {
             });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
-            SavegameHelper.withSavegameAsync(e, (info, gi) -> {
-                if (!info.isBinary()) {
+            SavegameHelper.withSavegameAsync(e, ctx -> {
+                if (!ctx.getInfo().isBinary()) {
                     buttonBar.getChildren().add(0, edit);
                 }
             });
+            // Temp!
+            edit.setDisable(true);
         }
 
         {
@@ -232,8 +234,8 @@ public class GuiSavegameEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(container);
         if (entry.infoProperty().isNotNull().get()) {
-            SavegameHelper.withSavegame(entry, (info, gi) -> {
-                gi.getGuiFactory().fillNodeContainer(info, container);
+            SavegameHelper.withSavegame(entry, ctx -> {
+                ctx.getIntegration().getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
             });
         } else {
             stack.getChildren().add(loading);
@@ -247,10 +249,10 @@ public class GuiSavegameEntry {
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
-                SavegameHelper.withSavegame(entry, gi -> {
+                SavegameHelper.withSavegame(entry, ctx -> {
                     Platform.runLater(() -> {
                         loading.setVisible(false);
-                        gi.getGuiFactory().fillNodeContainer(n, container);
+                        ctx.getIntegration().getGuiFactory().fillNodeContainer(n, container);
                     });
                 });
             } else {

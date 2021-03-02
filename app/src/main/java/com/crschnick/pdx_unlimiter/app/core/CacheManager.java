@@ -11,7 +11,7 @@ public class CacheManager {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheManager.class);
     private static CacheManager INSTANCE;
-    private Map<Class<? extends Cache>, Cache> caches = new HashMap<>();
+    private final Map<Class<? extends Cache>, Cache> caches = new HashMap<>();
 
     public static void init() {
         INSTANCE = new CacheManager();
@@ -55,7 +55,7 @@ public class CacheManager {
         }
     }
 
-    public static enum Scope {
+    public enum Scope {
         SAVEGAME,
         SAVEGAME_CAMPAIGN,
         GAME
@@ -63,7 +63,7 @@ public class CacheManager {
 
     public static class Cache {
 
-        private Scope scope;
+        private final Scope scope;
 
         public Cache(Scope scope) {
             this.scope = scope;

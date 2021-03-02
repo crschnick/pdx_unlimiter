@@ -25,7 +25,7 @@ public class Hoi4SavegameStorage extends SavegameStorage<Hoi4Tag, Hoi4SavegameIn
     }
 
     @Override
-    protected String getDefaultCampaignName(SavegameEntry<Hoi4Tag, Hoi4SavegameInfo> latest) {
+    protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
         return "Unknown";
     }
 }

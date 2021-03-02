@@ -5,10 +5,10 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.parser.ColorNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.ColorNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
-import com.crschnick.pdx_unlimiter.core.parser.ValueNode;
 import javafx.scene.paint.Color;
 
 import java.nio.file.Path;
@@ -44,9 +44,9 @@ public class ColorHelper {
 
     public static ColorNode toColorNode(Color c) {
         return new ColorNode("rgb", List.of(
-                new ValueNode(false, String.valueOf((int) (c.getRed() * 255))),
-                new ValueNode(false, String.valueOf((int) (c.getGreen() * 255))),
-                new ValueNode(false, String.valueOf((int) (c.getBlue() * 255)))));
+                new ValueNode(String.valueOf((int) (c.getRed() * 255))),
+                new ValueNode(String.valueOf((int) (c.getGreen() * 255))),
+                new ValueNode(String.valueOf((int) (c.getBlue() * 255)))));
     }
 
     public static Color fromColorNode(ColorNode node) {
@@ -61,32 +61,31 @@ public class ColorHelper {
                     c.get(0).getDouble() / 360.0,
                     c.get(1).getDouble() / 360.0,
                     c.get(2).getDouble() / 360.0);
-        } else {
+        } else if (node.getColorName().equals("rgb")) {
             return Color.color(
                     c.get(0).getDouble() / 255.0,
                     c.get(1).getDouble() / 255.0,
                     c.get(2).getDouble() / 255.0);
         }
+
+        throw new IllegalArgumentException();
     }
 
-    private static Map<String, Color> loadPredefinedColors(List<Node> nodes) {
+    private static Map<String, Color> loadPredefinedColors(Node node) {
         Map<String, Color> map = new HashMap<>();
-        for (Node n : nodes) {
-            var kv = n.getKeyValueNode();
-            Node data = kv.getNode();
-            ColorNode colorData = (ColorNode) data.getNodeForKey("flag");
-            map.put(kv.getKeyName(), fromColorNode(colorData));
-        }
+        node.getNodeForKey("colors").forEach((k, v) -> {
+            ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
+            map.put(k, fromColorNode(colorData));
+        });
         return map;
     }
 
-    private static Map<String, Color> loadPredefinedCk3Colors(List<Node> nodes) {
+    private static Map<String, Color> loadPredefinedCk3Colors(Node node) {
         Map<String, Color> map = new HashMap<>();
-        for (Node n : nodes) {
-            var kv = n.getKeyValueNode();
-            ColorNode data = (ColorNode) kv.getNode();
-            map.put(kv.getKeyName(), fromColorNode(data));
-        }
+        node.getNodeForKey("colors").forEach((k, v) -> {
+            ColorNode colorData = (ColorNode) v;
+            map.put(k, fromColorNode(colorData));
+        });
         return map;
     }
 
@@ -97,7 +96,7 @@ public class ColorHelper {
                 GameInstallation.CK3).get();
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedCk3Colors(node.getNodeForKey("colors").getNodeArray());
+            return loadPredefinedCk3Colors(node);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();
@@ -110,7 +109,7 @@ public class ColorHelper {
 
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedColors(node.getNodeForKey("colors").getNodeArray());
+            return loadPredefinedColors(node);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();

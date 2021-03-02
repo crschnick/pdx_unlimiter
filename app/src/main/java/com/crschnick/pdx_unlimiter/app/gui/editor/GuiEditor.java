@@ -165,7 +165,7 @@ public class GuiEditor {
 
             grid.add(kn, 0, i);
             grid.add(createGridElement(new Label("="), i), 1, i);
-            grid.add(createGridElement(GuiEditorNode.createTypeNode(n).orElse(null), i), 2, i);
+            grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 2, i);
             grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
 
             if (n.getDirectParent() != null) {
@@ -294,7 +294,6 @@ public class GuiEditor {
             });
             filterDisplay.setAlignment(Pos.CENTER);
             box.getChildren().add(filterDisplay);
-            //filterDisplay.prefHeightProperty().bind(box.prefHeightProperty());
         }
 
         return box;

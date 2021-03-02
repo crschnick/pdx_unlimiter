@@ -6,8 +6,10 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Person;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,7 +33,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         super("ck3", GameInstallation.CK3);
     }
 
-    private static Region createRulerLabel(Ck3SavegameInfo info, Ck3Tag.Person ruler) {
+    private static Region createRulerLabel(Ck3SavegameInfo info, Ck3Person ruler) {
         HBox rulerNode = new HBox();
         rulerNode.setSpacing(15);
         rulerNode.setAlignment(Pos.CENTER);
@@ -62,17 +64,15 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             rulerNode.getChildren().add(box);
         }
         {
-            ruler.getHouse().ifPresent(h -> {
-                var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, h.getCoatOfArms().get()),
-                        "house-icon");
-                GuiTooltips.install(house, "House " + info.getHouseName());
-                rulerNode.getChildren().add(house);
-            });
+            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, ruler.getHouse().getCoatOfArms()),
+                    "house-icon");
+            GuiTooltips.install(house, "House " + info.getHouseName());
+            rulerNode.getChildren().add(house);
         }
         return rulerNode;
     }
 
-    private static Region createRulerStatsNode(SavegameInfo<Ck3Tag> info, Ck3Tag.Person ruler) {
+    private static Region createRulerStatsNode(SavegameInfo<Ck3Tag> info, Ck3Person ruler) {
         var imgs = new Image[]{CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
                 CK3_SKILL_INTRIGUE, CK3_SKILL_LEARNING, CK3_SKILL_PROWESS};
         HBox skills = new HBox();
@@ -126,9 +126,9 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
-    private String getTitlesTooltip(List<Ck3Tag.Title> titles) {
+    private String getTitlesTooltip(List<Ck3Title> titles) {
         StringBuilder b = new StringBuilder();
-        for (Ck3Tag.Title t : titles) {
+        for (Ck3Title t : titles) {
             b.append(t.getName());
             b.append(", ");
         }
@@ -150,7 +150,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             JFXMasonryPane pane,
             SavegameInfo<Ck3Tag> info,
             Node icon,
-            List<Ck3Tag.Title> tags,
+            List<Ck3Title> tags,
             String tooltipStart,
             String none,
             String style) {
@@ -162,7 +162,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         box.setAlignment(Pos.CENTER);
         box.getChildren().add(icon);
         int counter = 0;
-        for (Ck3Tag.Title tag : tags) {
+        for (Ck3Title tag : tags) {
             Node n = GameImage.imageNode(Ck3TagRenderer.titleImage(info, tag.getCoatOfArms()), CLASS_TAG_ICON);
             box.getChildren().add(n);
             if (counter > 6) {

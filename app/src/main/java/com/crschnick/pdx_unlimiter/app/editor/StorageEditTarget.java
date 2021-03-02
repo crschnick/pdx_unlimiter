@@ -4,17 +4,17 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
 
-    private SavegameEntry<T, I> entry;
-    private EditTarget target;
+    private final SavegameEntry<T, I> entry;
+    private final EditTarget target;
 
     public StorageEditTarget(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry, EditTarget target) {
-        super(storage.getSavegameFile(entry), target.getParser(), target.getWriter());
+        super(storage.getSavegameFile(entry), target.getParser());
         this.entry = entry;
         this.target = target;
     }

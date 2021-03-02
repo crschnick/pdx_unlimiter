@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class EditorFilter {
 
-    private StringProperty filterString;
-    private BooleanProperty caseSensitive;
+    private final StringProperty filterString;
+    private final BooleanProperty caseSensitive;
     private BooleanProperty filterKeys;
     private BooleanProperty filterValues;
 
@@ -50,11 +50,7 @@ public class EditorFilter {
 
             if (filterKeys.get() && n.filterKey(this::contains)) {
                 return true;
-            } else if (filterValues.get() && n.filterValue(this::contains)) {
-                return true;
-            } else {
-                return false;
-            }
+            } else return filterValues.get() && n.filterValue(this::contains);
         }).collect(Collectors.toList());
     }
 

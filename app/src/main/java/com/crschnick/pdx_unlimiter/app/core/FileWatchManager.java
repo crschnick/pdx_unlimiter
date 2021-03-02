@@ -16,8 +16,8 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 public class FileWatchManager {
 
-    private static FileWatchManager INSTANCE = new FileWatchManager();
-    private Set<WatchedDirectory> watchedDirectories = new CopyOnWriteArraySet<>();
+    private static final FileWatchManager INSTANCE = new FileWatchManager();
+    private final Set<WatchedDirectory> watchedDirectories = new CopyOnWriteArraySet<>();
 
     public static FileWatchManager getInstance() {
         return INSTANCE;
@@ -49,7 +49,7 @@ public class FileWatchManager {
     private static class WatchedDirectory {
         private Path directory;
         private BiConsumer<Path, WatchEvent.Kind<Path>> listener;
-        private Map<Path, WatchService> watchers = new ConcurrentHashMap<>();
+        private final Map<Path, WatchService> watchers = new ConcurrentHashMap<>();
 
         public static WatchedDirectory create(Path dir, BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
             var w = new WatchedDirectory();

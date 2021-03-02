@@ -66,11 +66,11 @@ public class LocalisationHelper {
         return map;
     }
 
-    public static enum Language {
+    public enum Language {
         ENGLISH("l_english"),
         GERMAN("l_german");
 
-        private String id;
+        private final String id;
 
         Language(String id) {
             this.id = id;

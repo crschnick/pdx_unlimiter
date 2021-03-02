@@ -8,13 +8,11 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
@@ -30,8 +28,8 @@ import java.util.stream.Collectors;
 public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry) {
-        return Optional.ofNullable(SavegameHelper.mapSavegame(entry, gi -> {
-            var sc = gi.getSavegameStorage();
+        return Optional.ofNullable(SavegameHelper.mapSavegame(entry, ctx -> {
+            var sc = ctx.getIntegration().getSavegameStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(entry));
             try {
                 sc.copySavegameTo(entry, out);
@@ -44,7 +42,13 @@ public class SavegameActions {
     }
 
     public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
-        return SavegameHelper.mapSavegame(entry, (info, gi) -> {
+        return SavegameHelper.mapSavegame(entry, ctx -> {
+            var gi = ctx.getIntegration();
+            var info = ctx.getInfo();
+            if (info == null) {
+                return false;
+            }
+
             var ins = gi.getInstallation();
             boolean missingMods = info.getMods().stream()
                     .map(ins::getModForName)
@@ -56,7 +60,7 @@ public class SavegameActions {
 
             return areCompatible(ins.getVersion(), info.getVersion()) &&
                     !missingMods && !missingDlc;
-        }).orElse(false);
+        });
     }
 
     public static boolean isVersionCompatible(SavegameInfo<?> info) {
@@ -73,27 +77,28 @@ public class SavegameActions {
         ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameStorage().getPath(entry));
     }
 
-    public static Optional<Path> exportCampaignEntry() {
-        var s = SavegameManagerState.get();
-        try {
-            var path = s.current().getInstallation().getExportTarget(
-                    s.current().getSavegameStorage(), s.globalSelectedEntryProperty().get());
-            s.current().getSavegameStorage().copySavegameTo(s.globalSelectedEntryProperty().get(), path);
-            return Optional.of(path);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return Optional.empty();
-        }
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportCampaignEntry(SavegameEntry<T,I> e) {
+        return SavegameHelper.mapSavegame(e, ctx -> {
+            try {
+                var path = ctx.getIntegration().getInstallation().getExportTarget(
+                        ctx.getIntegration().getSavegameStorage(), e);
+                ctx.getIntegration().getSavegameStorage().copySavegameTo(e, path);
+                return Optional.of(path);
+            } catch (IOException ex) {
+                ErrorHandler.handleException(ex);
+                return Optional.empty();
+            }
+        });
     }
 
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         var s = SavegameManagerState.<T, I>get();
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(entry, gi -> {
-                gi.getSavegameStorage().moveEntry(collection, entry);
+            SavegameHelper.withSavegame(entry, ctx -> {
+                ctx.getIntegration().getSavegameStorage().moveEntry(collection, entry);
             });
-        }, true);
+        }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
@@ -106,46 +111,40 @@ public class SavegameActions {
         return g.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
     }
 
-    public static void launchCampaignEntry() {
-        var s = SavegameManagerState.get();
-        if (s.globalSelectedEntryProperty().get() == null) {
-            return;
-        }
-
-        var e = s.globalSelectedEntryProperty().get();
-
-        if (!isEntryCompatible(e)) {
-            boolean startAnyway = s.current().getGuiFactory().displayIncompatibleWarning(e);
-            if (!startAnyway) {
-                return;
+    public static <T, I extends SavegameInfo<T>> void launchCampaignEntry(SavegameEntry<T,I> e) {
+        SavegameHelper.withSavegame(e, ctx -> {
+            var gi = ctx.getIntegration();
+            if (!isEntryCompatible(e)) {
+                boolean startAnyway = gi.getGuiFactory().displayIncompatibleWarning(e);
+                if (!startAnyway) {
+                    return;
+                }
             }
-        }
 
-        Optional<Path> p = exportCampaignEntry();
-        if (p.isPresent()) {
-            try {
-                s.current().getInstallation().writeLaunchConfig(
-                        s.globalSelectedEntryProperty().get().getName(),
-                        s.globalSelectedCampaignProperty().get().getLastPlayed(), p.get());
+            Optional<Path> p = exportCampaignEntry(e);
+            if (p.isPresent()) {
+                try {
+                    gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), p.get());
 
-                var mods = e.getInfo().getMods().stream()
-                        .map(m -> s.current().getInstallation().getModForName(m))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-                var dlcs = e.getInfo().getDlcs().stream()
-                        .map(d -> s.current().getInstallation().getDlcForName(d))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-                s.current().getInstallation().writeDlcLoadFile(mods, dlcs);
+                    var mods = e.getInfo().getMods().stream()
+                            .map(m -> gi.getInstallation().getModForName(m))
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList());
+                    var dlcs = e.getInfo().getDlcs().stream()
+                            .map(d -> gi.getInstallation().getDlcForName(d))
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList());
+                    gi.getInstallation().writeDlcLoadFile(mods, dlcs);
 
-                s.globalSelectedCampaignProperty().get().lastPlayedProperty().setValue(Instant.now());
-                s.current().getInstallation().startDirectly();
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                    ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
+                    ctx.getIntegration().getInstallation().startDirectly();
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
             }
-        }
+        });
     }
 
     public static void importLatestSavegame() {
@@ -157,13 +156,25 @@ public class SavegameActions {
         FileImporter.importTargets(Set.of(savegames.get(0)));
     }
 
-    public static void importLatestSavegameDirectly(Consumer<SavegameParser.Status> r) {
+    public static void importLatestAndLaunch() {
+        var gi = SavegameManagerState.get().current();
         var savegames = SavegameManagerState.get().current().getSavegameWatcher().getSavegames();
         if (savegames.size() == 0) {
             return;
         }
 
-        savegames.get(0).importTarget(r);
+        savegames.get(0).importTarget(s -> {
+            s.visit(new SavegameParser.StatusVisitor<>() {
+                @Override
+                public void success(SavegameParser.Success<SavegameInfo<?>> s) {
+                    gi.getSavegameStorage().getSavegameForChecksum(s.checksum)
+                            .ifPresent(e -> {
+                                SavegameManagerState.get().selectEntry(e);
+                                launchCampaignEntry(e);
+                    });
+                }
+            });
+        });
     }
 
     public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
@@ -171,32 +182,31 @@ public class SavegameActions {
             return;
         }
 
-        SavegameManagerState<T, I> s = SavegameManagerState.get();
         TaskExecutor.getInstance().submitTask(() -> {
-
-            SavegameHelper.withSavegame(e, gi -> {
-                        Path meltedFile;
-                        try {
-                            meltedFile = RakalyHelper.meltSavegame(gi.getSavegameStorage().getSavegameFile(e));
-                        } catch (Exception ex) {
-                            ErrorHandler.handleException(ex);
-                            return;
-                        }
-                        var folder = gi.getSavegameStorage()
-                                .getOrCreateFolder("Melted savegames");
-                        folder.ifPresent(f -> {
-                            gi.getSavegameStorage().importSavegame(meltedFile, null, true, f);
-                        });
-                    });
+            SavegameHelper.withSavegame(e, ctx -> {
+                var gi = ctx.getIntegration();
+                Path meltedFile;
+                try {
+                    meltedFile = RakalyHelper.meltSavegame(gi.getSavegameStorage().getSavegameFile(e));
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                    return;
+                }
+                var folder = gi.getSavegameStorage()
+                        .getOrCreateFolder("Melted savegames");
+                folder.ifPresent(f -> {
+                    gi.getSavegameStorage().importSavegame(meltedFile, null, true, f);
+                });
+            });
         }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, gi -> {
-                gi.getSavegameStorage().delete(e);
+            SavegameHelper.withSavegame(e, ctx -> {
+                ctx.getIntegration().getSavegameStorage().delete(e);
             });
-        }, true);
+        }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
@@ -207,16 +217,16 @@ public class SavegameActions {
                     SavegameManagerState.get().selectCollection(null);
                 }
             });
-        }, true);
+        }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, gi -> {
-                var in = gi.getSavegameStorage().getSavegameFile(e);
+            SavegameHelper.withSavegame(e, ctx -> {
+                var in = ctx.getIntegration().getSavegameStorage().getSavegameFile(e);
                 var target = EditTarget.create(in);
                 target.ifPresent(t -> {
-                    var storageTarget = new StorageEditTarget<>(gi.getSavegameStorage(), e, t);
+                    var storageTarget = new StorageEditTarget<>(ctx.getIntegration().getSavegameStorage(), e, t);
                     Editor.createNewEditor(storageTarget);
                 });
             });
@@ -225,8 +235,8 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, gi -> {
-                var sgs = gi.getSavegameStorage();
+            SavegameHelper.withSavegame(e, ctx -> {
+                var sgs = ctx.getIntegration().getSavegameStorage();
                 sgs.reloadSavegameAsync(e);
             });
         }, false);
@@ -234,11 +244,11 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, gi -> {
-                var sgs = gi.getSavegameStorage();
+            SavegameHelper.withSavegame(e, ctx -> {
+                var sgs = ctx.getIntegration().getSavegameStorage();
                 var in = sgs.getSavegameFile(e);
                 sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
             });
-        }, true);
+        }, false);
     }
 }

@@ -1,20 +1,20 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.parser.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.KeyValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public abstract class EditorNode {
 
-    protected String keyName;
-    private int parentIndex;
-    private EditorNode directParent;
+    protected final String keyName;
+    private final int parentIndex;
+    private final EditorNode directParent;
 
     public EditorNode(EditorNode directParent, String keyName, int parentIndex) {
         this.directParent = directParent;
@@ -22,45 +22,54 @@ public abstract class EditorNode {
         this.parentIndex = parentIndex;
     }
 
-    public static List<EditorNode> create(EditorNode parent, List<Node> nodes) {
+    public static List<EditorNode> create(EditorNode parent, ArrayNode ar) {
         var result = new ArrayList<EditorNode>();
-        int parentIndex = 0;
-        for (int i = 0; i < nodes.size(); ) {
-            var n = nodes.get(i);
-            if (n instanceof KeyValueNode) {
-                var k = n.getKeyValueNode().getKeyName();
-                int end = i;
-                while (end + 1 < nodes.size() &&
-                        nodes.get(end + 1) instanceof KeyValueNode &&
-                        nodes.get(end + 1).getKeyValueNode().getKeyName().equals(k)) {
-                    end++;
+        AtomicInteger parentIndex = new AtomicInteger();
+        AtomicInteger index = new AtomicInteger();
+        AtomicInteger previousKeyStart = new AtomicInteger();
+        ar.forEach((k, v) -> {
+            if (k != null) {
+                boolean endsHere = index.get() + 1 == ar.getNodeArray().size() ||
+                        !ar.isKeyAt(k, index.get() + 1);
+                if (!endsHere) {
+                    index.getAndIncrement();
+                    return;
                 }
 
-                if (end > i) {
+                int start = previousKeyStart.get();
+                int end = index.get();
+                boolean shouldCollect = end > start;
+
+                if (shouldCollect) {
                     result.add(new CollectorNode(
                             parent,
                             k,
-                            parentIndex,
-                            i,
-                            nodes.subList(i, end + 1).stream()
-                                    .map(node -> node.getKeyValueNode().getNode())
-                                    .collect(Collectors.toList())));
-                    i = end + 1;
-                    parentIndex++;
-                    continue;
+                            parentIndex.get(),
+                            start,
+                            new ArrayList<>(ar.getNodeArray().subList(start, end + 1))));
+                    index.getAndIncrement();
+                    parentIndex.getAndIncrement();
                 }
+
+                previousKeyStart.set(end + 1);
+
+                if (shouldCollect) {
+                    return;
+                }
+            } else {
+                previousKeyStart.incrementAndGet();
             }
 
             result.add(new SimpleNode(
                     parent,
-                    n instanceof KeyValueNode ? n.getKeyValueNode().getKeyName() : null,
-                    parentIndex,
-                    i,
-                    n instanceof KeyValueNode ? n.getKeyValueNode().getNode() : n));
-            parentIndex++;
-            i++;
-        }
+                    k,
+                    parentIndex.get(),
+                    index.get(),
+                    v));
 
+            parentIndex.getAndIncrement();
+            index.getAndIncrement();
+        }, true);
         return result;
     }
 
@@ -80,7 +89,7 @@ public abstract class EditorNode {
 
     public abstract List<EditorNode> open();
 
-    public abstract Node toWritableNode();
+    public abstract ArrayNode toWritableNode();
 
     public abstract void update(ArrayNode newNode);
 

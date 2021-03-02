@@ -14,10 +14,10 @@ import java.util.stream.Stream;
 
 public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
 
-    private volatile ObjectProperty<Instant> lastPlayed;
-    private volatile StringProperty name;
-    private UUID uuid;
-    private volatile ObservableSet<SavegameEntry<T, I>> savegames = FXCollections.observableSet(new HashSet<>());
+    private final ObjectProperty<Instant> lastPlayed;
+    private final StringProperty name;
+    private final UUID uuid;
+    private final ObservableSet<SavegameEntry<T, I>> savegames = FXCollections.observableSet(new HashSet<>());
 
     public SavegameCollection(Instant lastPlayed, String name, UUID uuid) {
         this.lastPlayed = new SimpleObjectProperty<>(lastPlayed);

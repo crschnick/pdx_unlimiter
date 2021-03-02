@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.gui.editor.GuiEditor;
-import com.crschnick.pdx_unlimiter.core.parser.Node;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
@@ -11,17 +11,17 @@ import java.util.Map;
 
 public class Editor {
 
-    private static Map<EditorState, Stage> editors = new HashMap<>();
+    private static final Map<EditorState, Stage> editors = new HashMap<>();
 
     public static void createNewEditor(EditTarget target) {
         Map<String, Node> nodes;
         try {
             nodes = target.parse();
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            ErrorHandler.handleException(e, null, target.file);
             return;
         }
-        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), target.getWriter(), n -> {
+        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {
             try {
                 target.write(n);
             } catch (Exception e) {

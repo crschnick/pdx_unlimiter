@@ -1,8 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 public class TextFormatTokenizer {
@@ -13,28 +10,45 @@ public class TextFormatTokenizer {
     public static final byte CLOSE_GROUP = 4;
     public static final byte EQUALS = 5;
 
-    private Charset charset;
-    private byte[] bytes;
+    private static final byte DOUBLE_QUOTE_CHAR = 34;
+
+    private final byte[] bytes;
     private boolean isInQuotes;
     private boolean isInComment;
     private int prev;
     private int i;
-    private byte[] tokenTypes;
-    private List<String> stringLiterals;
+
+    private final byte[] tokenTypes;
     private int tokenCounter;
-    private Stack<Integer> arraySizeStack;
-    private int[] arraySizes;
+
+    private int scalarCounter;
+    private final int[] scalarsStart;
+    private final short[] scalarsLength;
+
+    private final Stack<Integer> arraySizeStack;
+    private final int[] arraySizes;
     private int arraySizesCounter;
 
-    public TextFormatTokenizer(Charset charset, byte[] bytes) {
-        this.charset = charset;
+    public TextFormatTokenizer(byte[] bytes) {
         this.bytes = bytes;
         this.prev = 0;
         this.tokenCounter = 0;
-        this.tokenTypes = new byte[bytes.length / 2];
-        this.stringLiterals = new ArrayList<>(bytes.length / 10);
+
+        if (bytes.length < 300) {
+            // Special case for small files
+            this.tokenTypes = new byte[bytes.length];
+            this.scalarsStart = new int[bytes.length];
+            this.scalarsLength = new short[bytes.length];
+            this.arraySizes = new int[bytes.length];
+        } else {
+            // Pessimistic assumptions, should always hold!
+            this.tokenTypes = new byte[bytes.length / 2];
+            this.scalarsStart = new int[bytes.length / 5];
+            this.scalarsLength = new short[bytes.length / 5];
+            this.arraySizes = new int[bytes.length / 5];
+        }
+
         this.arraySizeStack = new Stack<>();
-        this.arraySizes = new int[bytes.length / 10];
         this.arraySizesCounter = 0;
     }
 
@@ -81,32 +95,17 @@ public class TextFormatTokenizer {
                         || (isWhitespace && prev < i)          // Whitespace finishes old token
                         || (isComment && prev < i);            // New comment finishes old token
         if (marksEndOfPreviousToken) {
-            int offset;
-            int length;
-            boolean quoted;
-            if (bytes[prev] == '"' && bytes[i - 1] == '"') {
-                quoted = true;
-                offset = prev + 1;
-                length = (i - 2) - (prev + 1) + 1;
+            int offset = prev;
+            short length = (short) ((i - 1) - prev + 1);
+            if (bytes[prev] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
                 tokenTypes[tokenCounter++] = STRING_QUOTED;
             } else {
-                quoted = false;
-                length = (i - 1) - (prev) + 1;
-                offset = prev;
                 tokenTypes[tokenCounter++] = STRING_UNQUOTED;
             }
-            var s = new String(bytes, offset, length, charset);
-
-            // Increase array size whenever a scalar is found
+            scalarsStart[scalarCounter] = offset;
+            scalarsLength[scalarCounter] = length;
+            scalarCounter++;
             arraySizes[arraySizeStack.peek()]++;
-
-            // Intern any short strings like country tags
-            // Also intern any unquoted value like key names and game specific values
-            if (!quoted || s.length() < 4) {
-                s = s.intern();
-            }
-
-            stringLiterals.add(s);
         }
 
         if (isWhitespace) {
@@ -132,11 +131,19 @@ public class TextFormatTokenizer {
         return tokenTypes;
     }
 
-    public List<String> getStringLiterals() {
-        return stringLiterals;
-    }
-
     public int[] getArraySizes() {
         return arraySizes;
+    }
+
+    public int[] getScalarsStart() {
+        return scalarsStart;
+    }
+
+    public short[] getScalarsLength() {
+        return scalarsLength;
+    }
+
+    public int getScalarCount() {
+        return scalarCounter;
     }
 }
