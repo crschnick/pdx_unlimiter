@@ -1,5 +1,6 @@
-package com.crschnick.pdx_unlimiter.app.core;
+package com.crschnick.pdx_unlimiter.app.core.settings;
 
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 public class SavedState {
@@ -48,14 +50,16 @@ public class SavedState {
 
         var active = Optional.ofNullable(sNode.get("activeGame"));
         active.map(JsonNode::textValue).ifPresent(n -> {
-            GameInstallation.ALL.forEach(i -> {
-                if (i.getId().equals(n)) {
+            GameInstallation.ALL.values().forEach(i -> {
+                if (i != null && i.getId().equals(n)) {
                     s.activeGame = i;
                 }
             });
         });
         if (s.activeGame == null) {
-            s.activeGame = GameInstallation.ALL.stream().findFirst().orElse(null);
+            s.activeGame = GameInstallation.ALL.values().stream()
+                    .filter(Objects::nonNull)
+                    .findFirst().orElse(null);
         }
 
         return s;

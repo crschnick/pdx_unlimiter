@@ -184,7 +184,7 @@ public class GuiSavegameEntry {
             GuiTooltips.install(open, "Open stored savegame location");
             buttonBar.getChildren().add(open);
             open.setOnMouseClicked((m) -> {
-                SavegameActions.openCampaignEntry(e);
+                SavegameActions.openSavegame(e);
             });
         }
 

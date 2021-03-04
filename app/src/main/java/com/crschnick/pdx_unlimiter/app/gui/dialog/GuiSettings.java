@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXCheckBox;
@@ -390,5 +390,4 @@ public class GuiSettings {
             ComponentManager.reloadSettings(s);
         }
     }
-
 }

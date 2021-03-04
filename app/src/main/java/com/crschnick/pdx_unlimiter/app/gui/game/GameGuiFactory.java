@@ -58,53 +58,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         p.setAlignment(Pos.CENTER);
     }
 
-    public boolean displayIncompatibleWarning(SavegameEntry<T, I> entry) {
-        var launch = new ButtonType("Launch anyway");
-        Alert alert = createAlert();
-        alert.setAlertType(Alert.AlertType.WARNING);
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().add(ButtonType.CLOSE);
-        alert.getButtonTypes().add(launch);
-        alert.setTitle("Incompatible savegame");
-
-        StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
-        if (!SavegameActions.isVersionCompatible(entry.getInfo())) {
-            builder.append("Incompatible versions:\n")
-                    .append("- Game version: " + installation.getVersion().toString()).append("\n")
-                    .append("- Savegame version: " + entry.getInfo().getVersion().toString());
-        }
-
-        boolean missingMods = entry.getInfo().getMods().stream()
-                .map(m -> installation.getModForName(m))
-                .anyMatch(Optional::isEmpty);
-        if (missingMods) {
-            builder.append("\nThe following Mods are missing:\n").append(entry.getInfo().getMods().stream()
-                    .map(s -> {
-                        var m = installation.getModForName(s);
-                        return (m.isPresent() ? null : "- " + s);
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n")));
-        }
-
-        boolean missingDlc = entry.getInfo().getDlcs().stream()
-                .map(m -> installation.getDlcForName(m))
-                .anyMatch(Optional::isEmpty);
-        if (missingDlc) {
-            builder.append("\nThe following DLCs are missing:\n").append(entry.getInfo().getDlcs().stream()
-                    .map(s -> {
-                        var m = installation.getDlcForName(s);
-                        return (m.isPresent() ? null : "- " + s);
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n")));
-        }
-
-        alert.setHeaderText(builder.toString());
-        return alert.showAndWait().orElse(ButtonType.CLOSE).equals(launch);
-    }
-
-
     public ObservableValue<Node> createImage(SavegameEntry<T, I> entry) {
         SimpleObjectProperty<Node> prop;
         if (entry.getInfo() == null) {

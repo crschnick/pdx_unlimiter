@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SavegameActions {
@@ -73,11 +72,11 @@ public class SavegameActions {
         return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
     }
 
-    public static <T, I extends SavegameInfo<T>> void openCampaignEntry(SavegameEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> void openSavegame(SavegameEntry<T, I> entry) {
         ThreadHelper.open(SavegameManagerState.<T, I>get().current().getSavegameStorage().getPath(entry));
     }
 
-    public static <T, I extends SavegameInfo<T>> Optional<Path> exportCampaignEntry(SavegameEntry<T,I> e) {
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportSavegame(SavegameEntry<T,I> e) {
         return SavegameHelper.mapSavegame(e, ctx -> {
             try {
                 var path = ctx.getIntegration().getInstallation().getExportTarget(
@@ -121,7 +120,7 @@ public class SavegameActions {
                 }
             }
 
-            Optional<Path> p = exportCampaignEntry(e);
+            Optional<Path> p = exportSavegame(e);
             if (p.isPresent()) {
                 try {
                     gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), p.get());

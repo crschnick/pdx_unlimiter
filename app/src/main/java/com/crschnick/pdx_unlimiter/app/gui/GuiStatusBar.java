@@ -144,7 +144,7 @@ public class GuiStatusBar {
             export.setGraphic(new FontIcon());
             export.getStyleClass().add(CLASS_EXPORT);
             export.setOnAction(event -> {
-                SavegameActions.exportCampaignEntry(e);
+                SavegameActions.exportSavegame(e);
 
                 event.consume();
                 getStatusBar().hide();

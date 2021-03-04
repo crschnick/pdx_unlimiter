@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class GameInstallation {
 
@@ -34,7 +33,7 @@ public abstract class GameInstallation {
     public static Ck3Installation CK3 = null;
     public static StellarisInstallation STELLARIS = null;
 
-    public static Set<GameInstallation> ALL;
+    public static Map<Game,GameInstallation> ALL;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected DistributionType distType;
     protected Path userDir;
@@ -61,10 +60,12 @@ public abstract class GameInstallation {
         s.getHoi4().ifPresent(p -> GameInstallation.HOI4 = new Hoi4Installation(p));
         s.getCk3().ifPresent(p -> GameInstallation.CK3 = new Ck3Installation(p));
         s.getStellaris().ifPresent(p -> GameInstallation.STELLARIS = new StellarisInstallation(p));
-        ALL = Stream.of(EU4, HOI4, STELLARIS, CK3)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        for (GameInstallation i : ALL) {
+        ALL = Map.of(Game.EU4, EU4, Game.CK3, CK3, Game.HOI4, HOI4, Game.STELLARIS, STELLARIS);
+        for (GameInstallation i : ALL.values()) {
+            if (i == null) {
+                continue;
+            }
+
             i.loadData();
             try {
                 i.initOptional();
@@ -75,7 +76,7 @@ public abstract class GameInstallation {
     }
 
     public static void reset() {
-        ALL = Set.of();
+        ALL = Map.of();
         EU4 = null;
         HOI4 = null;
         STELLARIS = null;
@@ -184,7 +185,7 @@ public abstract class GameInstallation {
 
     public abstract void loadData() throws Exception;
 
-    protected Path getLauncherDataPath() {
+    public Path getLauncherDataPath() {
         return getPath();
     }
 
@@ -211,4 +212,14 @@ public abstract class GameInstallation {
     public GameVersion getVersion() {
         return version;
     }
+
+    public List<GameMod> getMods() {
+        return mods;
+    }
+
+    public List<GameDlc> getDlcs() {
+        return dlcs;
+    }
+
+
 }

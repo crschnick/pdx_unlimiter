@@ -3,8 +3,9 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.LogManager;
-import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
@@ -13,8 +14,27 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 public class DialogHelper {
+
+    public static Optional<ButtonType> waitForResult(Alert alert) {
+        final Optional<ButtonType>[] result = new Optional[]{Optional.empty()};
+        if (!Platform.isFxApplicationThread()) {
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.runLater(() -> {
+                result[0] = alert.showAndWait();
+                latch.countDown();
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException ignored) {
+            }
+        } else {
+            result[0] = alert.showAndWait();
+        }
+        return result[0];
+    }
 
     public static void showLogDialog() {
         var refresh = new ButtonType("Refresh");

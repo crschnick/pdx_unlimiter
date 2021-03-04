@@ -1,9 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
+import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
@@ -69,6 +71,14 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         if (INSTANCE.current() != null) {
             INSTANCE.selectIntegration(null);
         }
+    }
+
+    public LocalisationHelper.Language getActiveLanguage() {
+        if (current() == null) {
+            return LocalisationHelper.Language.ENGLISH;
+        }
+
+        return current.get().getInstallation();
     }
 
     public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignProperty() {

@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.core;
+package com.crschnick.pdx_unlimiter.app.core.settings;
 
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSettings;

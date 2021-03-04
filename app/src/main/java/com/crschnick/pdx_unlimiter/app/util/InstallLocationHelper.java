@@ -12,6 +12,16 @@ import java.util.Optional;
 
 public class InstallLocationHelper {
 
+    public static Optional<Path> getIronyDefaultInstallPath() {
+        var dir = Path.of(System.getenv("LOCALAPPDATA"))
+                .resolve("Programs").resolve("Irony");
+        if (Files.exists(dir)) {
+            return Optional.of(dir);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public static Path getUserDocumentsPath() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return Path.of(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
@@ -20,7 +30,7 @@ public class InstallLocationHelper {
         }
     }
 
-    public static Optional<Path> getInstallPath(String app) {
+    public static Optional<Path> getSteamGameInstallPath(String app) {
         Optional<Path> steamDir = SteamHelper.getSteamPath();
         var installDir = steamDir.map(d -> d.resolve("steamapps")
                 .resolve("common").resolve(app))

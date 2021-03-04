@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation.game;
 
-import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
@@ -93,7 +93,7 @@ public class Ck3Installation extends GameInstallation {
     }
 
     @Override
-    protected Path getLauncherDataPath() {
+    public Path getLauncherDataPath() {
         return getPath().resolve("launcher");
     }
 
