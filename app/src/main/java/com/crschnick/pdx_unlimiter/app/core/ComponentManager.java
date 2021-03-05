@@ -50,12 +50,12 @@ public class ComponentManager {
         TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
     }
 
-    public static void reloadSettings(Settings newS) {
+    public static void reloadSettings(Runnable settingsUpdater) {
         TaskExecutor.getInstance().stopAndWait();
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(() -> {
             reset();
-            Settings.updateSettings(newS);
+            settingsUpdater.run();
             init();
         }, true);
     }

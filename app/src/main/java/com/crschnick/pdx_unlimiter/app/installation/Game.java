@@ -2,8 +2,30 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 public enum Game {
 
-    EU4,
-    HOI4,
-    CK3,
-    STELLARIS
+    EU4("eu4", "EU4", "Europa Universalis IV"),
+    HOI4("hoi4", "HOI4", "Hearts of Iron IV"),
+    CK3("ck3", "CK3", "Crusader Kings III"),
+    STELLARIS("stellaris", "Stellaris", "Stellaris");
+
+    private String id;
+    private String abbreviation;
+    private String fullName;
+
+    Game(String id, String abbreviation, String fullName) {
+        this.id = id;
+        this.abbreviation = abbreviation;
+        this.fullName = fullName;
+    }
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
 }

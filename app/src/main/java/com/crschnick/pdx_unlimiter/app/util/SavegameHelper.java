@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
+import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -8,6 +10,7 @@ import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -18,10 +21,15 @@ public class SavegameHelper {
 
     public static class SavegameContext<T, I extends SavegameInfo<T>> {
 
+        private Game game;
         private SavegameInfo<T> info;
         private SavegameEntry<T,I> entry;
         private SavegameCollection<T,I> collection;
         private GameIntegration<T,I> integration;
+
+        public Game getGame() {
+            return game;
+        }
 
         public SavegameInfo<T> getInfo() {
             return info;
@@ -116,12 +124,17 @@ public class SavegameHelper {
             throw new IllegalStateException();
         }
 
+        var game = GameIntegration.ALL.entrySet().stream()
+                .filter(en -> en.getValue().equals(gi)).map(Map.Entry::getKey)
+                .findFirst().orElseThrow(IllegalStateException::new);
+
         var col = gi.getSavegameStorage().getSavegameCollection(e);
         if (col == null) {
             throw new IllegalStateException();
         }
 
         var ctx = new SavegameContext<T,I>();
+        ctx.game = game;
         ctx.info = e.getInfo();
         ctx.entry = e;
         ctx.collection = col;

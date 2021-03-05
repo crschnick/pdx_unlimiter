@@ -30,13 +30,12 @@ public class Eu4Installation extends GameInstallation {
     @Override
     public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
         var sgPath = FilenameUtils.separatorsToUnix(getUserPath().relativize(path).toString());
-        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
         ObjectNode n = JsonNodeFactory.instance.objectNode()
                 .put("title", name)
                 .put("desc", "")
                 .put("date", lastPlayed.toString())
                 .put("filename", sgPath);
-        JsonHelper.write(n, out);
+        JsonHelper.write(n, getUserPath().resolve("continue_game.json"));
     }
 
     public void loadData() throws Exception {
@@ -94,7 +93,7 @@ public class Eu4Installation extends GameInstallation {
         logger.debug("EU4 version: " + v);
         String platform = node.required("distPlatform").textValue();
         logger.debug("Distribution platform: " + platform);
-        if (platform.equals("steam") && Settings.getInstance().startSteam()) {
+        if (platform.equals("steam")) {
             // Trim the id because sometimes it contains trailing new lines!
             var id = Files.readString(getPath().resolve("steam_appid.txt")).trim();
             this.distType = new DistributionType.Steam(Integer.parseInt(id));
@@ -104,8 +103,12 @@ public class Eu4Installation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() throws IOException {
-        new ProcessBuilder().command(getExecutable().toString(), "-continuelastsave").start();
+    public void startDirectly() {
+        try {
+            new ProcessBuilder().command(getExecutable().toString(), "-continuelastsave").start();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     @Override

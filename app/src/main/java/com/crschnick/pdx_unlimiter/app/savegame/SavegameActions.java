@@ -101,13 +101,9 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
-        @SuppressWarnings("unchecked")
-        Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
-                .filter(i -> i.getSavegameStorage().contains(entry))
-                .findFirst()
-                .map(v -> (GameIntegration<T, I>) v);
-        var g = gi.orElseThrow(IllegalArgumentException::new);
-        return g.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
+        return SavegameHelper.mapSavegame(entry, ctx -> {
+            return ctx.getIntegration().getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
+        });
     }
 
     public static <T, I extends SavegameInfo<T>> void launchCampaignEntry(SavegameEntry<T,I> e) {

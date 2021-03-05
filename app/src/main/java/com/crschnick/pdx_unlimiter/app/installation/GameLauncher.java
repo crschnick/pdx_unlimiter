@@ -1,14 +1,16 @@
-package com.crschnick.pdx_unlimiter.app.installation.launcher;
+package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiIncompatibleWarning;
-import com.crschnick.pdx_unlimiter.app.installation.GameDlc;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.GameMod;
+import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.util.IronyHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
+import com.crschnick.pdx_unlimiter.app.util.SteamHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,41 +24,71 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class LauncherHelper {
+public class GameLauncher {
 
+    private static void startLauncher() {
+        var install = SavegameManagerState.get().current().getInstallation();
+        if (Settings.getInstance().launchIrony.getValue()) {
+            IronyHelper.launchEntry(ctx.getGame(), false);
+        } else {
+            install.getDistType().startLauncher();
+        }
+    }
 
-    public static <T, I extends SavegameInfo<T>> void launchCampaignEntry(SavegameEntry<T,I> e) {
+    private static void startDirectly(SavegameEntry<?,?> e) {
+        SavegameHelper.withSavegame(e, ctx -> {
+            var install = ctx.getIntegration().getInstallation();
+            if (Settings.getInstance().launchIrony.getValue()) {
+                IronyHelper.launchEntry(ctx.getGame(), true);
+            } else {
+                boolean doLaunch = install.getDistType().checkDirectLaunch();
+                if (doLaunch) {
+                    ctx.getIntegration().getInstallation().startDirectly();
+                }
+            }
+        });
+    }
+
+    public static <T, I extends SavegameInfo<T>> void launchSavegame(SavegameEntry<T,I> e) {
         SavegameHelper.withSavegame(e, ctx -> {
             var gi = ctx.getIntegration();
             if (!SavegameActions.isEntryCompatible(e)) {
-                boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning()
+                boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
+                        ctx.getIntegration().getInstallation(), e);
                 if (!startAnyway) {
                     return;
                 }
             }
 
-            Optional<Path> p = SavegameActions.exportSavegame(e);
-            if (p.isPresent()) {
-                try {
-                    gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), p.get());
+            try {
+                var path = ctx.getIntegration().getInstallation().getExportTarget(
+                        ctx.getIntegration().getSavegameStorage(), e);
+                ctx.getIntegration().getSavegameStorage().copySavegameTo(e, path);
+                gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
+                ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
+
+                var dlcs = e.getInfo().getDlcs().stream()
+                        .map(d -> gi.getInstallation().getDlcForName(d))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
+                if (ctx.getGame().equals(Game.STELLARIS)) {
+                    writeStellarisDlcLoadFile(GameInstallation.STELLARIS, dlcs);
+                } else {
                     var mods = e.getInfo().getMods().stream()
                             .map(m -> gi.getInstallation().getModForName(m))
                             .filter(Optional::isPresent)
                             .map(Optional::get)
                             .collect(Collectors.toList());
-                    var dlcs = e.getInfo().getDlcs().stream()
-                            .map(d -> gi.getInstallation().getDlcForName(d))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
-                    gi.getInstallation().writeDlcLoadFile(mods, dlcs);
-
-                    ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
-                    ctx.getIntegration().getInstallation().startDirectly();
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
+                    writeDlcLoadFile(ctx.getIntegration().getInstallation(), mods, dlcs);
                 }
+
+
+                startDirectly(e);
+            } catch (Exception ex) {
+
+                ErrorHandler.handleException(ex);
             }
         });
     }

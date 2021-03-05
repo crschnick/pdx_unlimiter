@@ -1,6 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.SteamHelper;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -17,9 +19,15 @@ public abstract class DistributionType {
         this.name = name;
     }
 
-    public abstract void launch();
+    public abstract boolean checkDirectLaunch();
+
+    public abstract void startLauncher();
 
     public abstract List<Path> getSavegamePaths();
+
+    public String getName() {
+        return name;
+    }
 
     public static class Steam extends DistributionType {
 
@@ -31,7 +39,18 @@ public abstract class DistributionType {
         }
 
         @Override
-        public void launch() {
+        public boolean checkDirectLaunch() {
+            if (!SteamHelper.isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
+                GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
+                        "Please start Steam first before launching the game");
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public void startLauncher() {
             SteamHelper.openSteamURI("steam://run/" + appId + "//");
         }
 
@@ -40,6 +59,10 @@ public abstract class DistributionType {
             return SteamHelper.getRemoteDataPaths(appId).stream()
                     .map(d -> d.resolve("save games"))
                     .collect(Collectors.toList());
+        }
+
+        public int getAppId() {
+            return appId;
         }
     }
 
@@ -53,7 +76,12 @@ public abstract class DistributionType {
         }
 
         @Override
-        public void launch() {
+        public boolean checkDirectLaunch() {
+            return true;
+        }
+
+        @Override
+        public void startLauncher() {
             Path bootstrapper = null;
             if (SystemUtils.IS_OS_WINDOWS) {
                 bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))

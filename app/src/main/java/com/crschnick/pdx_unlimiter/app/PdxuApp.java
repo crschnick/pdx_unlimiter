@@ -8,10 +8,13 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
@@ -21,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
 
-    private static Logger logger = LoggerFactory.getLogger(PdxuApp.class);
+    private static final Logger logger = LoggerFactory.getLogger(PdxuApp.class);
 
     private static PdxuApp APP;
     private Image icon;
@@ -46,11 +49,28 @@ public class PdxuApp extends Application {
             Stage w = (Stage) getScene().getWindow();
             var s = SavedState.getInstance();
 
-            if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
-            if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
-            if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
-            if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
-            if (s.isMaximized()) w.setMaximized(true);
+            boolean inBounds = false;
+            for (Screen screen : Screen.getScreens()) {
+                Rectangle2D visualBounds = screen.getVisualBounds();
+                // Check whether the bounds intersect where the intersection is larger than 20 pixels!
+                if (visualBounds.intersects(new Rectangle2D(
+                        s.getWindowX() + 20,
+                        s.getWindowY() + 20,
+                        s.getWindowWidth() - 40,
+                        s.getWindowHeight() - 40))) {
+                    inBounds = true;
+                    break;
+                }
+            }
+            if (inBounds) {
+                if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
+                if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
+                if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
+                if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
+                if (s.isMaximized()) w.setMaximized(true);
+            } else {
+                logger.warn("Saved window was out of bounds");
+            }
 
             scene.getWindow().xProperty().addListener((c, o, n) -> {
                 if (windowActive) {
@@ -94,18 +114,15 @@ public class PdxuApp extends Application {
             APP = this;
             icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
             primaryStage.getIcons().add(icon);
-            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent event) {
-                    windowActive = false;
+            primaryStage.setOnCloseRequest(event -> {
+                windowActive = false;
 
-                    ComponentManager.finalTeardown();
-                    // Close other windows
-                    Stage.getWindows().stream()
-                            .filter(w -> !w.equals(getScene().getWindow()))
-                            .collect(Collectors.toList())
-                            .forEach(w -> w.fireEvent(event));
-                }
+                ComponentManager.finalTeardown();
+                // Close other windows
+                Stage.getWindows().stream()
+                        .filter(w -> !w.equals(getScene().getWindow()))
+                        .collect(Collectors.toList())
+                        .forEach(w -> w.fireEvent(event));
             });
 
             layout = GuiLayout.createLayout();

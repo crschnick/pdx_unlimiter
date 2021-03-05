@@ -10,20 +10,17 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
-    public static Eu4Integration EU4;
-    public static Hoi4Integration HOI4;
-    public static StellarisIntegration STELLARIS;
-    public static Ck3Integration CK3;
-
-    public static List<GameIntegration<?, ? extends SavegameInfo<?>>> ALL;
+    public static Map<Game,GameIntegration<?, ? extends SavegameInfo<?>>> ALL;
 
     public static <T, I extends SavegameInfo<T>> GameIntegration<T, I> getForInstallation(GameInstallation i) {
-        for (var g : ALL) {
+        for (var g : ALL.values()) {
             if (g.getInstallation().equals(i)) {
                 return (GameIntegration<T, I>) g;
             }
@@ -32,7 +29,7 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
     }
 
     public static <T, I extends SavegameInfo<T>> GameIntegration<T, I> getForSavegameStorage(SavegameStorage<T, I> c) {
-        for (var g : ALL) {
+        for (var g : ALL.values()) {
             if (g.getSavegameStorage().equals(c)) {
                 return (GameIntegration<T, I>) g;
             }
@@ -42,33 +39,23 @@ public abstract class GameIntegration<T, I extends SavegameInfo<T>> {
 
 
     public static void init() {
-        ALL = new ArrayList<>();
-        if (GameInstallation.EU4 != null) {
-            EU4 = new Eu4Integration();
-            ALL.add(EU4);
+        ALL = new HashMap<>();
+        if (GameInstallation.ALL.get(Game.EU4) != null) {
+            ALL.put(Game.EU4, new Eu4Integration());
         }
-        if (GameInstallation.HOI4 != null) {
-            HOI4 = new Hoi4Integration();
-            ALL.add(HOI4);
+        if (GameInstallation.ALL.get(Game.CK3) != null) {
+            ALL.put(Game.CK3, new Ck3Integration());
         }
-
-        if (GameInstallation.STELLARIS != null) {
-            STELLARIS = new StellarisIntegration();
-            ALL.add(STELLARIS);
+        if (GameInstallation.ALL.get(Game.HOI4) != null) {
+            ALL.put(Game.HOI4, new Hoi4Integration());
         }
-
-        if (GameInstallation.CK3 != null) {
-            CK3 = new Ck3Integration();
-            ALL.add(CK3);
+        if (GameInstallation.ALL.get(Game.STELLARIS) != null) {
+            ALL.put(Game.STELLARIS, new StellarisIntegration());
         }
     }
 
     public static void reset() {
         ALL.clear();
-        EU4 = null;
-        CK3 = null;
-        STELLARIS = null;
-        HOI4 = null;
     }
 
     public abstract String getName();

@@ -9,12 +9,8 @@ import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class GameInstallation {
 
@@ -39,13 +34,11 @@ public abstract class GameInstallation {
     protected Path userDir;
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
-    private String id;
     private Path path;
     private Path executable;
     private List<GameDlc> dlcs = new ArrayList<>();
 
     public GameInstallation(String id, Path path, Path executable) {
-        this.id = id;
         this.path = path;
         if (SystemUtils.IS_OS_WINDOWS) {
             this.executable = getPath().resolve(executable).resolveSibling(executable.getFileName().toString() + ".exe");
@@ -56,10 +49,10 @@ public abstract class GameInstallation {
 
     public static void init() throws Exception {
         Settings s = Settings.getInstance();
-        s.getEu4().ifPresent(p -> GameInstallation.EU4 = new Eu4Installation(p));
-        s.getHoi4().ifPresent(p -> GameInstallation.HOI4 = new Hoi4Installation(p));
-        s.getCk3().ifPresent(p -> GameInstallation.CK3 = new Ck3Installation(p));
-        s.getStellaris().ifPresent(p -> GameInstallation.STELLARIS = new StellarisInstallation(p));
+        Optional.ofNullable(s.eu4.getValue()).ifPresent(p -> GameInstallation.EU4 = new Eu4Installation(p));
+        Optional.ofNullable(s.ck3.getValue()).ifPresent(p -> GameInstallation.CK3 = new Ck3Installation(p));
+        Optional.ofNullable(s.hoi4.getValue()).ifPresent(p -> GameInstallation.HOI4 = new Hoi4Installation(p));
+        Optional.ofNullable(s.stellaris.getValue()).ifPresent(p -> GameInstallation.STELLARIS = new StellarisInstallation(p));
         ALL = Map.of(Game.EU4, EU4, Game.CK3, CK3, Game.HOI4, HOI4, Game.STELLARIS, STELLARIS);
         for (GameInstallation i : ALL.values()) {
             if (i == null) {
@@ -83,10 +76,6 @@ public abstract class GameInstallation {
         CK3 = null;
     }
 
-    public String getId() {
-        return id;
-    }
-
     public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
         savegameDirs.add(getSavegamesPath());
@@ -102,28 +91,13 @@ public abstract class GameInstallation {
     }
 
     public void startLauncher() {
-        getDistType().launch();
+        getDistType().startLauncher();
     }
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(
             SavegameStorage<T, I> cache, SavegameEntry<T, I> e) {
         Path file = getSavegamesPath().resolve(cache.getFileName(e));
         return file;
-    }
-
-    public void writeDlcLoadFile(List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
-        var out = Files.newOutputStream(getUserPath().resolve("dlc_load.json"));
-        ObjectNode n = JsonNodeFactory.instance.objectNode();
-        n.putArray("enabled_mods").addAll(mods.stream()
-                .map(d -> FilenameUtils.separatorsToUnix(getUserPath().relativize(d.getModFile()).toString()))
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
-        n.putArray("disabled_dlcs").addAll(this.dlcs.stream()
-                .filter(d -> d.isExpansion() && !dlcs.contains(d))
-                .map(d -> FilenameUtils.separatorsToUnix(getPath().relativize(d.getInfoFilePath()).toString()))
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
-        JsonHelper.write(n, out);
     }
 
     private void loadDlcs() throws IOException {
@@ -181,7 +155,7 @@ public abstract class GameInstallation {
 
     public abstract Optional<GameMod> getModForName(String name);
 
-    public abstract void startDirectly() throws IOException;
+    public abstract void startDirectly();
 
     public abstract void loadData() throws Exception;
 

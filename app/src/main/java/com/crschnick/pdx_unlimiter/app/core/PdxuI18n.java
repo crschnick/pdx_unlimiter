@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class PdxuI18n {
 
@@ -12,8 +13,8 @@ public class PdxuI18n {
 
     private Map<String, String> map = new HashMap<>();
 
-    public static String get(String s) {
-        return get(LocalisationHelper.Language.ENGLISH).getValue(s);
+    public static String get(String s, String... vars) {
+        return get(LocalisationHelper.Language.ENGLISH).getValue(s, vars);
     }
 
     public static PdxuI18n get(LocalisationHelper.Language language) {
@@ -29,7 +30,13 @@ public class PdxuI18n {
         return i18n;
     }
 
-    public String getValue(String s) {
-        return map.get(s);
+    private static final String VAR_PATTERN = "\\$\\w+\\$";
+
+    public String getValue(String s, String... vars) {
+        var val = map.get(s);
+        for (var v : vars) {
+            val = val.replaceAll(VAR_PATTERN, v);
+        }
+        return val;
     }
 }

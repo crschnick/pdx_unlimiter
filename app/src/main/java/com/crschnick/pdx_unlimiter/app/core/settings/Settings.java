@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.core.settings;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
@@ -24,10 +25,29 @@ public final class Settings {
 
     private static Settings INSTANCE;
 
-    private InstallDirectory eu4;
-    private InstallDirectory hoi4;
-    private InstallDirectory ck3;
-    private InstallDirectory stellaris;
+    public final SettingsEntry.GameDirectory eu4 = new SettingsEntry.GameDirectory(
+            "EU4",
+            "eu4",
+            Game.EU4,
+            Eu4Installation.class);
+
+    public final SettingsEntry.GameDirectory hoi4 = new SettingsEntry.GameDirectory(
+            "HOI4",
+            "hoi4",
+            Game.HOI4,
+            Hoi4Installation.class);
+
+    public final SettingsEntry.GameDirectory ck3 = new SettingsEntry.GameDirectory(
+            "CK3",
+            "ck3",
+            Game.CK3,
+            Ck3Installation.class);
+
+    public final SettingsEntry.GameDirectory stellaris = new SettingsEntry.GameDirectory(
+            "STELLARIS",
+            "stellaris",
+            Game.STELLARIS,
+            StellarisInstallation.class);
 
     public final SettingsEntry.IntegerEntry fontSize = new SettingsEntry.IntegerEntry(
             "FONT_SIZE",
@@ -136,50 +156,11 @@ public final class Settings {
 
 
     public static void init() {
-        Settings loaded = loadConfig();
-        INSTANCE = loaded;
-        INSTANCE.validate();
-        SettingsChecker.onSettingsChange(loaded, loaded, INSTANCE);
-        try {
-            saveConfig();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+        INSTANCE = loadConfig();
     }
 
     public static Settings getInstance() {
         return INSTANCE;
-    }
-
-    public static void updateSettings(Settings newS) {
-        var oldValue = INSTANCE.getStorageDirectory();
-        var oldDir = PdxuInstallation.getInstance().getSavegamesLocation();
-
-        var oldSettings = INSTANCE.copy();
-        INSTANCE = newS.copy();
-        INSTANCE.validate();
-        SettingsChecker.onSettingsChange(oldSettings, newS, INSTANCE);
-
-        var newDir = PdxuInstallation.getInstance().getSavegamesLocation();
-        if (!oldDir.equals(newDir)) {
-            if (FileUtils.listFiles(newDir.toFile(), null, false).size() > 0) {
-                GuiErrorReporter.showSimpleErrorMessage("New storage directory " + newDir + " must be empty!");
-                INSTANCE.setStorageDirectory(oldValue.orElse(null));
-            } else {
-                try {
-                    Files.delete(newDir);
-                    FileUtils.moveDirectory(oldDir.toFile(), newDir.toFile());
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
-            }
-        }
-
-        try {
-            saveConfig();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
     }
 
     public static Settings loadConfig() {
@@ -226,9 +207,5 @@ public final class Settings {
                 ErrorHandler.handleException(e);
             }
         }
-    }
-
-    public boolean hasNoValidInstallation() {
-        return eu4.getPath() == null && ck3.getPath() == null && hoi4.getPath() == null && stellaris.getPath() == null;
     }
 }

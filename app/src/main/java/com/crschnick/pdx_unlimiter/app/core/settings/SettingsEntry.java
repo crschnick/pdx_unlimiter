@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +22,7 @@ import java.nio.file.Path;
 
 public abstract class SettingsEntry<T> {
 
-    static class BooleanEntry extends SettingsEntry<Boolean> {
+    public static class BooleanEntry extends SettingsEntry<Boolean> {
 
         public BooleanEntry(String id, String serializationName, boolean value) {
             super(id, serializationName, Type.BOOLEAN, value);
@@ -38,7 +39,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    static class IntegerEntry extends SettingsEntry<Integer> {
+    public static class IntegerEntry extends SettingsEntry<Integer> {
 
         private final int min;
         private final int max;
@@ -50,7 +51,7 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        protected void set(Integer newValue) {
+        public void set(Integer newValue) {
             //TODO check range
             super.set(newValue);
         }
@@ -74,7 +75,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    static class StringEntry extends SettingsEntry<String> {
+    public static class StringEntry extends SettingsEntry<String> {
 
         public StringEntry(String id, String serializationName, String value) {
             super(id, serializationName, Type.STRING, value);
@@ -91,10 +92,14 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    static abstract class DirectoryEntry extends SettingsEntry<Path> {
+    public static abstract class DirectoryEntry extends SettingsEntry<Path> {
 
         public DirectoryEntry(String id, String serializationName, Path value) {
             super(id, serializationName, Type.PATH, value);
+        }
+
+        public DirectoryEntry(String name, String description, String serializationName, Path value) {
+            super(name, description, serializationName, Type.PATH, value);
         }
 
         @Override
@@ -108,42 +113,45 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    static class GameDirectory extends DirectoryEntry {
+    public static class GameDirectory extends DirectoryEntry {
 
+        private Game game;
         private boolean disabled;
         private final Class<? extends GameInstallation> installClass;
 
-        GameDirectory(String id, String serializationName, String name, Class<? extends GameInstallation> installClass) {
-            super(id, serializationName, null);
+        GameDirectory(String id, String serializationName, Game game, Class<? extends GameInstallation> installClass) {
+            super(PdxuI18n.get("GAME_DIR", PdxuI18n.get(id)),
+                    PdxuI18n.get("GAME_DIR_DESC", PdxuI18n.get(id)),
+                    serializationName,
+                    null);
+            this.game = game;
             this.disabled = false;
             this.installClass = installClass;
-            InstallLocationHelper.getSteamGameInstallPath(name).ifPresent(p -> set(p));
+            InstallLocationHelper.getSteamGameInstallPath(game.getFullName()).ifPresent(p -> set(p));
         }
 
-        private void showInstallErrorMessage(Exception e, String name) {
+        private void showInstallErrorMessage(Exception e) {
             String msg = e.getClass().getSimpleName() + ": " + e.getMessage() +
-                    ".\n\n" + name + " support has been disabled.\n" +
+                    ".\n\n" + game.getFullName() + " support has been disabled.\n" +
                     "If you believe that your installation is valid, " +
                     "please check in the settings menu whether the installation directory was correctly set.";
             GuiErrorReporter.showSimpleErrorMessage(
-                    "An error occured while loading your " + name + " installation:\n" + msg);
+                    "An error occured while loading your " + game.getFullName() + " installation:\n" + msg);
         }
 
         @Override
-        protected void set(Path newPath) {
+        public void set(Path newPath) {
             if (disabled) {
                 disabled = false;
             }
 
-            String name = null;
             try {
                 var i = (GameInstallation) installClass.getDeclaredConstructors()[0].newInstance(newPath);
-                name = i.getId();
                 i.loadData();
                 super.set(newPath);
             } catch (Exception e) {
                 this.disabled = true;
-                showInstallErrorMessage(e, name);
+                showInstallErrorMessage(e);
             }
         }
 
@@ -169,14 +177,14 @@ public abstract class SettingsEntry<T> {
     }
 
 
-    static class StorageDirectory extends DirectoryEntry {
+    public static class StorageDirectory extends DirectoryEntry {
 
         public StorageDirectory(String id, String serializationName) {
             super(id, serializationName, PdxuInstallation.getInstance().getDefaultSavegamesLocation());
         }
 
         @Override
-        protected void set(Path newPath) {
+        public void set(Path newPath) {
             if (FileUtils.listFiles(newPath.toFile(), null, false).size() > 0) {
                 GuiErrorReporter.showSimpleErrorMessage("New storage directory " + newPath + " must be empty!");
             } else {
@@ -191,7 +199,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    static class ThirdPartyDirectory extends DirectoryEntry {
+    public static class ThirdPartyDirectory extends DirectoryEntry {
 
         private final Path checkFile;
 
@@ -202,7 +210,7 @@ public abstract class SettingsEntry<T> {
 
 
         @Override
-        protected void set(Path newPath) {
+        public void set(Path newPath) {
             var file = newPath.resolve(checkFile);
             boolean found = Files.exists(file);
             if (!found) {
@@ -241,11 +249,19 @@ public abstract class SettingsEntry<T> {
         this.value = new SimpleObjectProperty<>(value);
     }
 
+    public SettingsEntry(String name, String description, String serializationName, Type type, T value) {
+        this.name = name;
+        this.description = description;
+        this.serializationName = serializationName;
+        this.type = type;
+        this.value = new SimpleObjectProperty<>(value);
+    }
+
     public abstract void set(JsonNode node);
 
     public abstract JsonNode toNode();
 
-    protected void set(T newValue) {
+    public void set(T newValue) {
         value.set(newValue);
     }
 
