@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiConverterConfig;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
@@ -26,7 +27,7 @@ public class ConverterHelper {
 
     public static Map<String, String> loadConfig() {
         Map<String, String> map = new HashMap<>();
-        var config = Settings.getInstance().getCk3toEu4Dir().get()
+        var config = Settings.getInstance().ck3toeu4Dir.getValue()
                 .resolve("CK3toEU4").resolve("configuration.txt");
         if (!Files.exists(config)) {
             return map;
@@ -52,7 +53,7 @@ public class ConverterHelper {
     }
 
     public static void writeConfig(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) {
-        var config = Settings.getInstance().getCk3toEu4Dir().get()
+        var config = Settings.getInstance().ck3toeu4Dir.getValue()
                 .resolve("CK3toEU4").resolve("configuration.txt");
         try {
             var writer = Files.newBufferedWriter(config);
@@ -60,7 +61,7 @@ public class ConverterHelper {
             writeLine(writer, "CK3directory", GameInstallation.CK3.getPath().toString());
             writeLine(writer, "EU4directory", GameInstallation.EU4.getPath().toString());
             writeLine(writer, "targetGameModPath", GameInstallation.EU4.getUserPath().resolve("mod").toString());
-            writeLine(writer, "SaveGame", SavegameStorage.CK3.getSavegameFile(entry).toString());
+            writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getSavegameFile(entry).toString());
             for (var e : values.entrySet()) {
                 writeLine(writer, e.getKey(), e.getValue());
             }
@@ -71,7 +72,7 @@ public class ConverterHelper {
     }
 
     public static void convertCk3ToEu4(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
-        if (Settings.getInstance().getCk3toEu4Dir().isEmpty()) {
+        if (Settings.getInstance().ck3toeu4Dir.getValue() == null) {
             GuiConverterConfig.showUsageDialog();
             return;
         }
@@ -88,10 +89,10 @@ public class ConverterHelper {
 
         TaskExecutor.getInstance().submitTask(() -> {
             try {
-                var handle = new ProcessBuilder(Settings.getInstance().getCk3toEu4Dir().get()
+                var handle = new ProcessBuilder(Settings.getInstance().ck3toeu4Dir.getValue()
                         .resolve("CK3toEU4")
                         .resolve("CK3ToEU4Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "")).toString())
-                        .directory(Settings.getInstance().getCk3toEu4Dir().get().resolve("CK3toEU4").toFile())
+                        .directory(Settings.getInstance().ck3toeu4Dir.getValue().resolve("CK3toEU4").toFile())
                         .redirectErrorStream(true)
                         .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                         .start();

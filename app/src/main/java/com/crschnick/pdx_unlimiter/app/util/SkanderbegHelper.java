@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.util;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -19,8 +20,8 @@ import java.nio.file.Files;
 
 public class SkanderbegHelper {
 
-    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameStorage<T, I> cache, SavegameEntry<T, I> entry) {
-        if (Settings.getInstance().getSkanderbegApiKey().isEmpty()) {
+    public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameEntry<T, I> entry) {
+        if (Settings.getInstance().skanderbegApiKey.getValue() != null) {
             GuiErrorReporter.showSimpleErrorMessage("Missing skanderbeg.pm API key. " +
                     "To use this functionality, set it in the settings menu.");
             return;
@@ -28,12 +29,13 @@ public class SkanderbegHelper {
 
         TaskExecutor.getInstance().submitTask(() -> {
             try {
-                byte[] body = Files.readAllBytes(cache.getSavegameFile(entry));
+                byte[] body = Files.readAllBytes(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
                 if (entry.getInfo().isIronman()) {
-                    body = Files.readAllBytes(RakalyHelper.meltSavegame(cache.getSavegameFile(entry)));
+                    body = Files.readAllBytes(RakalyHelper.meltSavegame(
+                            SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry)));
                 }
 
-                String saveId = uploadContent(body, cache.getFileName(entry));
+                String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4).getFileName(entry));
                 ThreadHelper.browse("https://skanderbeg.pm/browse.php?id=" + saveId);
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
@@ -56,7 +58,7 @@ public class SkanderbegHelper {
         System.arraycopy(suffix.getBytes(StandardCharsets.UTF_8), 0, body, content.length + prefix.length(), suffix.length());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://skanderbeg.pm/api.php?key=" +
-                        Settings.getInstance().getSkanderbegApiKey().get() + "&scope=uploadSaveFile"))
+                        Settings.getInstance().skanderbegApiKey.getValue() + "&scope=uploadSaveFile"))
                 .header("Content-Type", "multipart/form-data; boundary=2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f")
                 .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                 .build();

@@ -70,6 +70,7 @@ dependencies {
     implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
     implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
+    implementation files("$buildDir/generated-modules/commons-collections4-4.4.jar")
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
     implementation files("$buildDir/generated-modules/sentry-4.2.0.jar")
@@ -145,6 +146,15 @@ addDependenciesModuleInfo {
                     exports org.apache.commons.lang3.function;
                     exports org.apache.commons.lang3.arch;
                     exports org.apache.commons.lang3.reflect;
+                }
+            '''
+        }
+        module {
+            artifact 'org.apache.commons:commons-collections4:4.4'
+            moduleInfoSource = '''
+                module org.apache.commons.collections4 {
+                    exports org.apache.commons.collections4;
+                    exports org.apache.commons.collections4.bidimap;
                 }
             '''
         }

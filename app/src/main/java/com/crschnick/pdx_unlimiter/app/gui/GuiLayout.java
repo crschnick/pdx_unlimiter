@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -85,10 +86,11 @@ public class GuiLayout {
 
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> Platform.runLater(() -> {
             if (n != null) {
-                stack.getChildren().set(0, n.getGuiFactory().background());
+                stack.getChildren().set(0, GameGuiFactory.ALL.get(n).background());
                 try {
                     menu.setOpacity(0.95);
-                    stack.styleProperty().set("-fx-font-family: " + n.getGuiFactory().font().getName() + ";");
+                    stack.styleProperty().set("-fx-font-family: " +
+                            GameGuiFactory.ALL.get(n).font().getName() + ";");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -100,7 +102,7 @@ public class GuiLayout {
 
     public static void init() {
         Platform.runLater(() -> {
-            layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
+            layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
 
             // Disable focus on startup
             layout.requestFocus();

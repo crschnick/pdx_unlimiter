@@ -9,6 +9,7 @@ import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
+import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.apache.commons.lang3.SystemUtils;
@@ -34,11 +35,12 @@ public abstract class GameInstallation {
     protected Path userDir;
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
+    protected LocalisationHelper.Language language;
     private Path path;
     private Path executable;
     private List<GameDlc> dlcs = new ArrayList<>();
 
-    public GameInstallation(String id, Path path, Path executable) {
+    public GameInstallation(Path path, Path executable) {
         this.path = path;
         if (SystemUtils.IS_OS_WINDOWS) {
             this.executable = getPath().resolve(executable).resolveSibling(executable.getFileName().toString() + ".exe");
@@ -195,5 +197,7 @@ public abstract class GameInstallation {
         return dlcs;
     }
 
-
+    public LocalisationHelper.Language getLanguage() {
+        return language;
+    }
 }

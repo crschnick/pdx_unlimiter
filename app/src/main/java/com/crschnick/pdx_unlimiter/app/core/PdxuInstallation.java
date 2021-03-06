@@ -186,10 +186,6 @@ public class PdxuInstallation {
         return getDataDir().resolve("savegames");
     }
 
-    public Path getSavegamesLocation() {
-        return Settings.getInstance().storageDirectory.orElse(getDefaultSavegamesLocation());
-    }
-
     public boolean isEu4SaveEditorInstalled() {
         return getEu4SaveEditorLocation() != null;
     }

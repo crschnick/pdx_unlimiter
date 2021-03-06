@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -63,7 +64,7 @@ public class Eu4SeHelper {
             return false;
         }
 
-        if (SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(entry)) {
+        if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(entry)) {
             Eu4SavegameInfo eu4i = (Eu4SavegameInfo) info;
             return !eu4i.isRandomNewWorld();
         } else {
@@ -90,13 +91,13 @@ public class Eu4SeHelper {
             }
 
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;
-            String saveFile = "save_file=" + SavegameStorage.EU4.getSavegameFile(eu4Entry).toString();
+            String saveFile = "save_file=" + SavegameStorage.ALL.get(Game.EU4).getSavegameFile(eu4Entry).toString();
             String modsFolder = "mods_folder=" + GameInstallation.EU4.getUserPath().resolve("mod").toString();
             String gameFolder = "game_folder=" + GameInstallation.EU4.getPath().toString();
             String overwrite = "override=true";
 
             try {
-                SavegameStorage.EU4.invalidateSavegameInfo(eu4Entry);
+                SavegameStorage.<Eu4Tag, Eu4SavegameInfo>get(Game.EU4).invalidateSavegameInfo(eu4Entry);
                 var proc = new ProcessBuilder(
                         PdxuInstallation.getInstance().getEu4SaveEditorLocation()
                                 .resolve("bin").resolve("Eu4SaveEditor.bat").toString(),

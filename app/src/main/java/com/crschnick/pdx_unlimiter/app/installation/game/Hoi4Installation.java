@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation.game;
 
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
 public class Hoi4Installation extends GameInstallation {
 
     public Hoi4Installation(Path path) {
-        super("hoi4", path, Path.of("hoi4"));
+        super(path, Path.of("hoi4"));
     }
 
     public void loadData() throws Exception {
@@ -38,7 +39,6 @@ public class Hoi4Installation extends GameInstallation {
 
     @Override
     public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
-        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
         SimpleDateFormat d = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
         ObjectNode n = JsonNodeFactory.instance.objectNode()
                 .put("title", name)
@@ -46,7 +46,7 @@ public class Hoi4Installation extends GameInstallation {
                 .put("date", d.format(new Date(lastPlayed.toEpochMilli())) + "\n")
                 .put("filename", getSavegamesPath().relativize(path).toString())
                 .put("is_remote", false);
-        JsonHelper.write(n, out);
+        JsonHelper.write(n, getUserPath().resolve("continue_game.json"));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Hoi4Installation extends GameInstallation {
                 m.group(1));
 
         String platform = node.required("distPlatform").textValue();
-        if (platform.equals("steam") && Settings.getInstance().startSteam()) {
+        if (platform.equals("steam")) {
             this.distType = new DistributionType.Steam(Integer.parseInt(Files.readString(getPath().resolve("steam_appid.txt"))));
         } else {
             this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
@@ -86,7 +86,11 @@ public class Hoi4Installation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() throws IOException {
-        new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+    public void startDirectly() {
+        try {
+            new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 }

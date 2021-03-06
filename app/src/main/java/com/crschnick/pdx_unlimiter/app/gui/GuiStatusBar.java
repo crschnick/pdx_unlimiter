@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
+import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -157,7 +158,7 @@ public class GuiStatusBar {
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add(CLASS_LAUNCH);
             launch.setOnAction(event -> {
-                SavegameActions.launchCampaignEntry(e);
+                GameLauncher.launchSavegame(e);
 
                 event.consume();
                 getStatusBar().hide();

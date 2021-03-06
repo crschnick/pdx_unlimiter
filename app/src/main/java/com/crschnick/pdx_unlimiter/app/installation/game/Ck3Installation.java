@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation.game;
 
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -25,7 +26,7 @@ import java.util.regex.Pattern;
 public class Ck3Installation extends GameInstallation {
 
     public Ck3Installation(Path path) {
-        super("ck3", path, Path.of("binaries", "ck3"));
+        super(path, Path.of("binaries", "ck3"));
     }
 
     public void loadData() throws Exception {
@@ -39,7 +40,6 @@ public class Ck3Installation extends GameInstallation {
 
     @Override
     public void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException {
-        var out = Files.newOutputStream(getUserPath().resolve("continue_game.json"));
         SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         var date = d.format(new Date(lastPlayed.toEpochMilli()));
         var sgPath = FilenameUtils.getBaseName(
@@ -48,7 +48,7 @@ public class Ck3Installation extends GameInstallation {
                 .put("title", sgPath)
                 .put("desc", "")
                 .put("date", date);
-        JsonHelper.write(n, out);
+        JsonHelper.write(n, getUserPath().resolve("continue_game.json"));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class Ck3Installation extends GameInstallation {
                 m.group(4));
 
         String platform = node.required("distPlatform").textValue();
-        if (platform.equals("steam") && Settings.getInstance().startSteam()) {
+        if (platform.equals("steam")) {
             this.distType = new DistributionType.Steam(
                     Integer.parseInt(Files.readString(getPath().resolve("binaries").resolve("steam_appid.txt"))));
         } else {
@@ -103,7 +103,11 @@ public class Ck3Installation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() throws IOException {
-        new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+    public void startDirectly() {
+        try {
+            new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 }

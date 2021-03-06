@@ -18,6 +18,7 @@ module com.crschnick.pdx_unlimiter.app {
     requires org.slf4j;
     requires org.slf4j.simple;
     requires io.sentry;
+    requires org.apache.commons.collections4;
 
     uses javax.imageio.spi.ImageReaderSpi;
     uses net.nikr.dds.DDSImageReaderSpi;

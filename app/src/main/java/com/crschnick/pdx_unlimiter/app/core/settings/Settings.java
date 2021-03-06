@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.core.settings;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
@@ -13,13 +14,16 @@ import com.crschnick.pdx_unlimiter.app.util.Eu4SeHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public final class Settings {
 
@@ -154,9 +158,47 @@ public final class Settings {
             Path.of("IronyModManager.exe")
     );
 
+    public final SettingsEntry.BooleanEntry enabledTimedImports = new SettingsEntry.BooleanEntry(
+            "TIMED_IMPORTS",
+            "enabledTimedImports",
+            false
+    );
+
+    public final SettingsEntry.IntegerEntry timedImportsInterval = new SettingsEntry.IntegerEntry(
+            "TIMED_IMPORTS_INTERVAL",
+            "timedImportsInterval",
+            15,
+            1,
+            60
+    );
+
+    private static final Set<SettingsCheck> CHECKS = Set.of(
+            s -> {
+                boolean hasNoValidInstallation =
+                        s.eu4.getValue() == null && s.ck3.getValue() == null &&
+                        s.hoi4.getValue() == null && s.stellaris.getValue() == null;
+                if (hasNoValidInstallation) {
+                    GuiErrorReporter.showSimpleErrorMessage("""
+Welcome to the Pdx-Unlimiter!
+                        
+The automatic game detection did not detect any supported Paradox game.
+To get started, you can set the installation directories of games manually in the settings menu.
+
+Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
+                    """);
+                    Platform.runLater(GuiSettings::showSettings);
+                }
+            }
+    );
+
 
     public static void init() {
         INSTANCE = loadConfig();
+        check();
+    }
+
+    public static void check() {
+        CHECKS.forEach(c -> c.check(INSTANCE));
     }
 
     public static Settings getInstance() {

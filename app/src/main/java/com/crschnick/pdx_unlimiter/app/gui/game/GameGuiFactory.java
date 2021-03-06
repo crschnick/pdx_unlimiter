@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
@@ -25,9 +26,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +41,15 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
+
+    public static final BidiMap<Game,GameGuiFactory<?,?>> ALL = new DualHashBidiMap<>();
+
+    static {
+        ALL.put(Game.EU4, new Eu4GuiFactory());
+        ALL.put(Game.HOI4, new Hoi4GuiFactory());
+        ALL.put(Game.CK3, new Ck3GuiFactory());
+        ALL.put(Game.STELLARIS, new StellarisGuiFactory());
+    }
 
     private final String styleClass;
     private final GameInstallation installation;

@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
@@ -130,7 +131,7 @@ public class GuiSavegameEntry {
             });
         }
 
-        if (SavegameStorage.EU4 != null && SavegameStorage.EU4.contains(e)) {
+        if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(e)) {
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
@@ -145,7 +146,7 @@ public class GuiSavegameEntry {
             Button uploadSkanderbeg = new JFXButton();
             uploadSkanderbeg.setGraphic(new FontIcon());
             uploadSkanderbeg.setOnMouseClicked((m) -> {
-                SkanderbegHelper.uploadSavegame(SavegameStorage.EU4, eu4Entry);
+                SkanderbegHelper.uploadSavegame(eu4Entry);
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
             GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
@@ -165,7 +166,7 @@ public class GuiSavegameEntry {
             }
         });
 
-        if (SavegameStorage.CK3 != null && SavegameStorage.CK3.contains(e)) {
+        if (SavegameStorage.ALL.get(Game.CK3) != null && SavegameStorage.ALL.get(Game.CK3).contains(e)) {
             SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
             Button convert = new JFXButton();
             convert.setGraphic(new FontIcon());

@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.core;
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
-import com.crschnick.pdx_unlimiter.app.core.settings.SettingsChecker;
 import com.crschnick.pdx_unlimiter.app.editor.EditorExternalState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
@@ -28,8 +27,6 @@ public class ComponentManager {
             LogManager.init();
             ErrorHandler.init();
             IntegrityManager.init();
-
-            Settings.init();
 
             LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
@@ -56,6 +53,7 @@ public class ComponentManager {
         TaskExecutor.getInstance().submitTask(() -> {
             reset();
             settingsUpdater.run();
+            Settings.check();
             init();
         }, true);
     }
@@ -70,6 +68,8 @@ public class ComponentManager {
     private static void init() {
         LoggerFactory.getLogger(ComponentManager.class).debug("Initializing ...");
         try {
+            Settings.init();
+
             GuiLayout.init();
 
             GameInstallation.init();
@@ -94,8 +94,6 @@ public class ComponentManager {
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }
-
-            SettingsChecker.checkSettings();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }

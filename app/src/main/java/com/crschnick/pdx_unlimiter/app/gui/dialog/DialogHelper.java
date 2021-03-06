@@ -80,7 +80,7 @@ public class DialogHelper {
         // In case settings are not loaded yet
         if (Settings.getInstance() != null) {
             alert.getDialogPane().styleProperty().setValue(
-                    "-fx-font-size: " + (Settings.getInstance().getFontSize() - 2) + "pt;");
+                    "-fx-font-size: " + (Settings.getInstance().fontSize.getValue() - 2) + "pt;");
         }
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
@@ -91,7 +91,8 @@ public class DialogHelper {
         Alert alert = new Alert(Alert.AlertType.NONE);
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
-        alert.getDialogPane().styleProperty().setValue("-fx-font-size: " + (Settings.getInstance().getFontSize()) + "pt;");
+        alert.getDialogPane().styleProperty().setValue("-fx-font-size: " +
+                (Settings.getInstance().fontSize.getValue()) + "pt;");
         GuiStyle.makeEmptyAlert(alert.getDialogPane().getScene());
         return alert;
     }

@@ -4,6 +4,9 @@ import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,16 +20,20 @@ public class GuiGameSwitcher {
         alert.setTitle("Select game");
 
         HBox games = new HBox();
-        for (var integ : GameIntegration.ALL) {
-            var icon = integ.getGuiFactory().createIcon();
+        for (var game : Game.values()) {
+            if (GameInstallation.ALL.get(game) == null) {
+                continue;
+            }
+
+            var icon = GameGuiFactory.ALL.get(game).createIcon();
             ColorAdjust desaturate = new ColorAdjust();
             desaturate.setSaturation(-1);
             icon.getStyleClass().add(GuiStyle.CLASS_GAME_ICON);
 
-            GuiTooltips.install(icon, integ.getName());
+            GuiTooltips.install(icon, game.getFullName());
             icon.setOnMouseClicked(e -> {
-                SavegameManagerState.get().selectIntegration(integ);
-                SavedState.getInstance().setActiveGame(integ.getInstallation());
+                SavegameManagerState.get().selectGame(game);
+                SavedState.getInstance().setActiveGame(game);
                 alert.setResult(ButtonType.CLOSE);
             });
 

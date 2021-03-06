@@ -37,7 +37,7 @@ public class GameLauncher {
 
     private static void startDirectly(SavegameEntry<?,?> e) {
         SavegameHelper.withSavegame(e, ctx -> {
-            var install = ctx.getIntegration().getInstallation();
+            var install = ctx.getInstallation();
             if (Settings.getInstance().launchIrony.getValue()) {
                 IronyHelper.launchEntry(ctx.getGame(), true);
             } else {

@@ -2,7 +2,9 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Ck3SavegameStorage;
@@ -24,6 +26,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.image.Image;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +45,13 @@ public abstract class SavegameStorage<
         T,
         I extends SavegameInfo<T>> {
 
-    public static Eu4SavegameStorage EU4;
-    public static Hoi4SavegameStorage HOI4;
-    public static StellarisSavegameStorage STELLARIS;
-    public static Ck3SavegameStorage CK3;
-    public static Set<SavegameStorage<?, ?>> ALL;
+
+    public static final BidiMap<Game,SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
+
+    @SuppressWarnings("unchecked")
+    public static <T,I extends SavegameInfo<T>> SavegameStorage<T,I> get(Game g) {
+        return (SavegameStorage<T, I>) ALL.get(g);
+    }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -69,43 +75,26 @@ public abstract class SavegameStorage<
         this.parser = parser;
         this.fileEnding = fileEnding;
         this.dateType = dateType;
-        this.path = PdxuInstallation.getInstance().getSavegamesLocation().resolve(name);
+        this.path = Settings.getInstance().storageDirectory.getValue().resolve(name);
         this.infoClass = infoClass;
         this.infoChecksum = infoChecksum;
     }
 
     public static void init() {
-        if (GameInstallation.EU4 != null) {
-            EU4 = new Eu4SavegameStorage();
-        }
-        if (GameInstallation.HOI4 != null) {
-            HOI4 = new Hoi4SavegameStorage();
-        }
-        if (GameInstallation.STELLARIS != null) {
-            STELLARIS = new StellarisSavegameStorage();
-        }
-        if (GameInstallation.CK3 != null) {
-            CK3 = new Ck3SavegameStorage();
-        }
-        ALL = Stream.of(EU4, HOI4, STELLARIS, CK3)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        for (SavegameStorage<?, ?> cache : ALL) {
-            cache.loadData();
+        ALL.put(Game.EU4, new Eu4SavegameStorage());
+        ALL.put(Game.HOI4, new Hoi4SavegameStorage());
+        ALL.put(Game.CK3, new Ck3SavegameStorage());
+        ALL.put(Game.STELLARIS, new StellarisSavegameStorage());
+        for (SavegameStorage<?, ?> s : ALL.values()) {
+            s.loadData();
         }
     }
 
     public static void reset() {
-        for (SavegameStorage<?, ?> cache : ALL) {
-            cache.saveData();
+        for (SavegameStorage<?, ?> s : ALL.values()) {
+            s.saveData();
         }
-
-        EU4 = null;
-        HOI4 = null;
-        STELLARIS = null;
-        CK3 = null;
-        ALL = Set.of();
+        ALL.clear();
     }
 
     private synchronized void loadData() {
@@ -437,7 +426,7 @@ public abstract class SavegameStorage<
         });
     }
 
-    public synchronized Path getSavegameFile(SavegameEntry<T, I> e) {
+    public synchronized Path getSavegameFile(SavegameEntry<?,?> e) {
         return getPath(e).resolve("savegame." + fileEnding);
     }
 
@@ -445,7 +434,7 @@ public abstract class SavegameStorage<
         return getPath(e).resolve(getInfoFileName());
     }
 
-    public synchronized Path getPath(SavegameEntry<T, I> e) {
+    public synchronized Path getPath(SavegameEntry<?,?> e) {
         Path campaignPath = path.resolve(getSavegameCollection(e).getUuid().toString());
         return campaignPath.resolve(e.getUuid().toString());
     }
@@ -459,7 +448,7 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized String getFileName(SavegameEntry<T, I> e) {
+    public synchronized String getFileName(SavegameEntry<?,?> e) {
         var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         return colName + " (" + sgName + ")." + fileEnding;

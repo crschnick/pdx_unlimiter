@@ -58,7 +58,7 @@ public class FileImporter {
             for (FileImportTarget t : targets) {
                 logger.debug("Starting to import target " + t.getName() + " from " + input);
                 t.importTarget(s -> {
-                    if (Settings.getInstance().deleteOnImport()) {
+                    if (Settings.getInstance().deleteOnImport.getValue()) {
                         logger.debug("Deleting import target " + t.getName());
                         t.delete();
                     }
@@ -79,7 +79,7 @@ public class FileImporter {
                 statusMap.put(t, s);
             }
 
-            if (Settings.getInstance().deleteOnImport()) {
+            if (Settings.getInstance().deleteOnImport.getValue()) {
                 logger.debug("Deleting import target " + t.getName());
                 t.delete();
             }

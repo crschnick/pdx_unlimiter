@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -92,7 +93,6 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
-        var s = SavegameManagerState.<T, I>get();
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameHelper.withSavegame(entry, ctx -> {
                 ctx.getIntegration().getSavegameStorage().moveEntry(collection, entry);
@@ -103,42 +103,6 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         return SavegameHelper.mapSavegame(entry, ctx -> {
             return ctx.getIntegration().getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
-        });
-    }
-
-    public static <T, I extends SavegameInfo<T>> void launchCampaignEntry(SavegameEntry<T,I> e) {
-        SavegameHelper.withSavegame(e, ctx -> {
-            var gi = ctx.getIntegration();
-            if (!isEntryCompatible(e)) {
-                boolean startAnyway = gi.getGuiFactory().displayIncompatibleWarning(e);
-                if (!startAnyway) {
-                    return;
-                }
-            }
-
-            Optional<Path> p = exportSavegame(e);
-            if (p.isPresent()) {
-                try {
-                    gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), p.get());
-
-                    var mods = e.getInfo().getMods().stream()
-                            .map(m -> gi.getInstallation().getModForName(m))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
-                    var dlcs = e.getInfo().getDlcs().stream()
-                            .map(d -> gi.getInstallation().getDlcForName(d))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
-                    gi.getInstallation().writeDlcLoadFile(mods, dlcs);
-
-                    ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
-                    ctx.getIntegration().getInstallation().startDirectly();
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                }
-            }
         });
     }
 
@@ -165,7 +129,7 @@ public class SavegameActions {
                     gi.getSavegameStorage().getSavegameForChecksum(s.checksum)
                             .ifPresent(e -> {
                                 SavegameManagerState.get().selectEntry(e);
-                                launchCampaignEntry(e);
+                                GameLauncher.launchSavegame(e);
                     });
                 }
             });

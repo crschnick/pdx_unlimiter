@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.core.settings;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +22,7 @@ public class SavedState {
     private int windowY;
     private int windowWidth;
     private int windowHeight;
-    private GameInstallation activeGame;
+    private Game activeGame;
 
     public static void init() {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("state.json");
@@ -50,15 +51,16 @@ public class SavedState {
 
         var active = Optional.ofNullable(sNode.get("activeGame"));
         active.map(JsonNode::textValue).ifPresent(n -> {
-            GameInstallation.ALL.values().forEach(i -> {
-                if (i != null && i.getId().equals(n)) {
-                    s.activeGame = i;
+            GameInstallation.ALL.forEach((key, value) -> {
+                if (value != null && key.getId().equals(n)) {
+                    s.activeGame = key;
                 }
             });
         });
         if (s.activeGame == null) {
-            s.activeGame = GameInstallation.ALL.values().stream()
-                    .filter(Objects::nonNull)
+            s.activeGame = GameInstallation.ALL.entrySet().stream()
+                    .filter(e -> e.getValue() != null)
+                    .map(e -> e.getKey())
                     .findFirst().orElse(null);
         }
 
@@ -123,11 +125,11 @@ public class SavedState {
         this.windowHeight = windowHeight;
     }
 
-    public GameInstallation getActiveGame() {
+    public Game getActiveGame() {
         return activeGame;
     }
 
-    public void setActiveGame(GameInstallation activeGame) {
+    public void setActiveGame(Game activeGame) {
         this.activeGame = activeGame;
     }
 }

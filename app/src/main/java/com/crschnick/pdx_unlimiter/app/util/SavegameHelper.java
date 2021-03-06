@@ -25,7 +25,6 @@ public class SavegameHelper {
         private SavegameInfo<T> info;
         private SavegameEntry<T,I> entry;
         private SavegameCollection<T,I> collection;
-        private GameIntegration<T,I> integration;
 
         public Game getGame() {
             return game;
@@ -42,27 +41,21 @@ public class SavegameHelper {
         public SavegameCollection<T, I> getCollection() {
             return collection;
         }
-
-        public GameIntegration<T,I> getIntegration() {
-            return integration;
-        }
     }
 
-    private static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> getForSavegame(SavegameEntry<T, I> e) {
-        @SuppressWarnings("unchecked")
-        Optional<SavegameStorage<T, I>> sg = SavegameStorage.ALL.stream()
-                .filter(i -> i.contains(e))
+    public static <T, I extends SavegameInfo<T>> Game getForSavegame(SavegameEntry<T, I> e) {
+        Optional<Game> sg = SavegameStorage.ALL.entrySet().stream()
+                .filter(kv -> kv.getValue().contains(e))
                 .findFirst()
-                .map(v -> (SavegameStorage<T, I>) v);
+                .map(v -> v.getKey());
         return sg.orElseThrow(IllegalArgumentException::new);
     }
 
-    private static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> getForCollection(SavegameCollection<T, I> col) {
-        @SuppressWarnings("unchecked")
-        Optional<SavegameStorage<T, I>> sg = SavegameStorage.ALL.stream()
-                .filter(i -> i.getCollections().contains(col))
+    public static <T, I extends SavegameInfo<T>> Game getForCollection(SavegameCollection<T, I> col) {
+        Optional<Game> sg = SavegameStorage.ALL.entrySet().stream()
+                .filter(kv -> kv.getValue().getCollections().contains(col))
                 .findFirst()
-                .map(v -> (SavegameStorage<T, I>) v);
+                .map(v -> v.getKey());
         return sg.orElseThrow(IllegalArgumentException::new);
     }
 
@@ -74,8 +67,8 @@ public class SavegameHelper {
             throw new IllegalStateException();
         }
 
-        var gi = GameIntegration.getForSavegameStorage(st);
-        if (gi == null) {
+        var g = GameIntegration.getForSavegameStorage(st);
+        if (g == null) {
             throw new IllegalStateException();
         }
 
@@ -138,7 +131,6 @@ public class SavegameHelper {
         ctx.info = e.getInfo();
         ctx.entry = e;
         ctx.collection = col;
-        ctx.integration = gi;
 
         return con.apply(ctx);
     }

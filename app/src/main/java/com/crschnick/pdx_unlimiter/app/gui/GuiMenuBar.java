@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
@@ -23,6 +24,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 public class GuiMenuBar {
 
@@ -54,7 +56,7 @@ public class GuiMenuBar {
 
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
-            ThreadHelper.open(PdxuInstallation.getInstance().getSavegamesLocation());
+            ThreadHelper.open(Settings.getInstance().storageDirectory.getValue());
         });
         savegames.getItems().add(sd);
 
