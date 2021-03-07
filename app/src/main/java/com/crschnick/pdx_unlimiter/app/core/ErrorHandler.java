@@ -9,7 +9,6 @@ import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class ErrorHandler {

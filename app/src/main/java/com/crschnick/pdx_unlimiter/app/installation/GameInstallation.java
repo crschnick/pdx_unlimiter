@@ -22,20 +22,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class GameInstallation {
 
-    public static final BidiMap<Game,GameInstallation> ALL = new DualHashBidiMap<>();
+    public static final BidiMap<Game, GameInstallation> ALL = new DualHashBidiMap<>();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected DistributionType distType;
     protected Path userDir;
     protected List<GameMod> mods = new ArrayList<>();
     protected GameVersion version;
     protected LocalisationHelper.Language language;
-    private Path path;
+    private final Path path;
     private Path executable;
-    private List<GameDlc> dlcs = new ArrayList<>();
+    private final List<GameDlc> dlcs = new ArrayList<>();
 
     public GameInstallation(Path path, Path executable) {
         this.path = path;

@@ -14,6 +14,7 @@ public final class ColorNode extends Node {
     private static final byte[] HSV360 = "hsv360".getBytes();
     private final String colorName;
     private final List<ValueNode> values;
+
     public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
         this.values = values;

@@ -14,14 +14,6 @@ import java.util.stream.Collectors;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
-    protected Eu4Tag tag;
-    protected Set<Eu4Tag> allTags;
-    private boolean randomNewWorld;
-    private boolean customNationInWorld;
-    private boolean releasedVassal;
-    private boolean observer;
-    private Ruler ruler;
-    private Ruler heir;
     private final Set<Eu4Tag> vassals = new HashSet<>();
     private final Set<Eu4Tag> allies = new HashSet<>();
     private final Set<Eu4Tag> marches = new HashSet<>();
@@ -32,6 +24,14 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private final Eu4Tag seniorPartner = null;
     private final Set<Eu4Tag> tributaryJuniors = new HashSet<>();
     private final Eu4Tag tributarySenior = null;
+    protected Eu4Tag tag;
+    protected Set<Eu4Tag> allTags;
+    private boolean randomNewWorld;
+    private boolean customNationInWorld;
+    private boolean releasedVassal;
+    private boolean observer;
+    private Ruler ruler;
+    private Ruler heir;
     private Set<War> wars = new HashSet<>();
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {

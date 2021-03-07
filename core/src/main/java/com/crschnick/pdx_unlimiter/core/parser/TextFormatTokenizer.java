@@ -13,20 +13,17 @@ public class TextFormatTokenizer {
     private static final byte DOUBLE_QUOTE_CHAR = 34;
 
     private final byte[] bytes;
+    private final byte[] tokenTypes;
+    private final int[] scalarsStart;
+    private final short[] scalarsLength;
+    private final Stack<Integer> arraySizeStack;
+    private final int[] arraySizes;
     private boolean isInQuotes;
     private boolean isInComment;
     private int prev;
     private int i;
-
-    private final byte[] tokenTypes;
     private int tokenCounter;
-
     private int scalarCounter;
-    private final int[] scalarsStart;
-    private final short[] scalarsLength;
-
-    private final Stack<Integer> arraySizeStack;
-    private final int[] arraySizes;
     private int arraySizesCounter;
 
     public TextFormatTokenizer(byte[] bytes) {

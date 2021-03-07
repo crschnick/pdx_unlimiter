@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
@@ -17,7 +16,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAler
 
 public class GuiIncompatibleWarning {
 
-    public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?,?> entry) {
+    public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {
         var launch = new ButtonType("Launch anyway");
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.WARNING);

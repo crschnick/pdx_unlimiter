@@ -1,13 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public abstract class EditorNode {

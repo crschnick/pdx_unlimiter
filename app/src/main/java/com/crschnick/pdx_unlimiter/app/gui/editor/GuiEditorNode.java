@@ -6,7 +6,6 @@ import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.editor.SimpleNode;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;

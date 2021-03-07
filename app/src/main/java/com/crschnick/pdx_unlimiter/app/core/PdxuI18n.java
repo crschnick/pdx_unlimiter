@@ -2,19 +2,17 @@ package com.crschnick.pdx_unlimiter.app.core;
 
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-public class PdxuI18n {
+public final class PdxuI18n {
 
     private static final Map<LocalisationHelper.Language, PdxuI18n> ALL = new HashMap<>();
 
     private Map<String, String> map = new HashMap<>();
 
     public static String get(String s, String... vars) {
-        return get(LocalisationHelper.Language.ENGLISH).getValue(s, vars);
+        return LocalisationHelper.getValue(get(LocalisationHelper.Language.ENGLISH).getMap().get(s), vars);
     }
 
     public static PdxuI18n get(LocalisationHelper.Language language) {
@@ -30,13 +28,7 @@ public class PdxuI18n {
         return i18n;
     }
 
-    private static final String VAR_PATTERN = "\\$\\w+\\$";
-
-    public String getValue(String s, String... vars) {
-        var val = map.get(s);
-        for (var v : vars) {
-            val = val.replaceAll(VAR_PATTERN, v);
-        }
-        return val;
+    public Map<String, String> getMap() {
+        return map;
     }
 }

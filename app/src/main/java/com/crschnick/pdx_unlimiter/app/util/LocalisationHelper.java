@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 
 public class LocalisationHelper {
 
+    private static final String VAR_PATTERN = "\\$\\w+\\$";
+
     public static Map<String, String> loadTranslations(Path file, Language lang) {
         Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.id +
                 "." + FilenameUtils.getExtension(file.toString()));
@@ -64,6 +66,13 @@ public class LocalisationHelper {
         }
 
         return map;
+    }
+
+    public static String getValue(String s, String... vars) {
+        for (var v : vars) {
+            s = s.replaceAll(VAR_PATTERN, v);
+        }
+        return s;
     }
 
     public enum Language {

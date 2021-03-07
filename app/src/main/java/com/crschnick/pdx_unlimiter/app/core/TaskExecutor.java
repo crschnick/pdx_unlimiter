@@ -14,8 +14,8 @@ import java.util.function.Consumer;
 public class TaskExecutor {
 
     private static final TaskExecutor INSTANCE = new TaskExecutor();
-    private boolean active = false;
     private final BooleanProperty busy = new SimpleBooleanProperty(false);
+    private boolean active = false;
     private ExecutorService executorService;
 
     public static TaskExecutor getInstance() {

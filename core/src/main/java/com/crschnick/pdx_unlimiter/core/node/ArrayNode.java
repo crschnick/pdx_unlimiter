@@ -1,14 +1,11 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriterImpl;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.BiConsumer;
 
 public abstract class ArrayNode extends Node {
 

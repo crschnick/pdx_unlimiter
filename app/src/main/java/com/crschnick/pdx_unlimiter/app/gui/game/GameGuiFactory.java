@@ -6,7 +6,6 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
@@ -18,8 +17,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -32,18 +29,14 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
-    public static final BidiMap<Game,GameGuiFactory<?,?>> ALL = new DualHashBidiMap<>();
+    public static final BidiMap<Game, GameGuiFactory<?, ?>> ALL = new DualHashBidiMap<>();
 
     static {
         ALL.put(Game.EU4, new Eu4GuiFactory());
@@ -53,7 +46,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T,I extends SavegameInfo<T>> GameGuiFactory<T,I> get(Game g) {
+    public static <T, I extends SavegameInfo<T>> GameGuiFactory<T, I> get(Game g) {
         return (GameGuiFactory<T, I>) ALL.get(g);
     }
 

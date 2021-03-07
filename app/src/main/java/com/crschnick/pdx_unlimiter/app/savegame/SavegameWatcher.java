@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 public class SavegameWatcher {
 
-    public static final BidiMap<Game,SavegameWatcher> ALL = new DualHashBidiMap<>();
+    public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
 
     private final GameInstallation install;
     private final ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();

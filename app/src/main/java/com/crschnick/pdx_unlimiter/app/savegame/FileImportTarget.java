@@ -174,8 +174,8 @@ public abstract class FileImportTarget {
 
     public static class StandardImportTarget extends FileImportTarget {
 
-        protected Path path;
         private final SavegameStorage<?, ?> savegameStorage;
+        protected Path path;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
             this.savegameStorage = savegameStorage;

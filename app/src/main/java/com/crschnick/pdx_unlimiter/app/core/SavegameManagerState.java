@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
-import java.util.Optional;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
@@ -172,7 +171,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
             newCollections.removeIf(col -> !SavegameStorage.get(current()).getCollections().contains(col));
 
-            SavegameStorage.<T,I>get(current()).getCollections().forEach(col -> {
+            SavegameStorage.<T, I>get(current()).getCollections().forEach(col -> {
                 if (!newCollections.contains(col) && filter.shouldShow(col)) {
                     newCollections.add(col);
                     return;
@@ -278,7 +277,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 }
             } else {
                 var game = SavegameHelper.getForSavegame(e);
-                selectCollection(SavegameStorage.<T,I>get(game).getSavegameCollection(e));
+                selectCollection(SavegameStorage.<T, I>get(game).getSavegameCollection(e));
 
                 globalSelectedEntryPropertyInternal().set(e);
                 logger.debug("Selected campaign entry " + e.getName());

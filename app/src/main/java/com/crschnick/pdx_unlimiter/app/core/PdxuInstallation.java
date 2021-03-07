@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;

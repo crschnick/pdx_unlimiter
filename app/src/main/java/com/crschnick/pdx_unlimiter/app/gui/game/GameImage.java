@@ -91,7 +91,7 @@ public class GameImage {
         if (!GameInstallation.ALL.containsKey(Game.CK3)) {
             return;
         }
-        
+
         var installPath = GameInstallation.ALL.get(Game.CK3).getPath();
         Path p = installPath.resolve("game");
         Path i = p.resolve("gfx").resolve("interface").resolve("icons");

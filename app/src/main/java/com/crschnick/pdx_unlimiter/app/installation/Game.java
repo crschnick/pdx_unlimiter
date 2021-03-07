@@ -7,9 +7,9 @@ public enum Game {
     CK3("ck3", "CK3", "Crusader Kings III"),
     STELLARIS("stellaris", "Stellaris", "Stellaris");
 
-    private String id;
-    private String abbreviation;
-    private String fullName;
+    private final String id;
+    private final String abbreviation;
+    private final String fullName;
 
     Game(String id, String abbreviation, String fullName) {
         this.id = id;

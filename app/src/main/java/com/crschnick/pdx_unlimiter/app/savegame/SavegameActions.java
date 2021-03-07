@@ -76,7 +76,7 @@ public class SavegameActions {
         });
     }
 
-    public static <T, I extends SavegameInfo<T>> Optional<Path> exportSavegame(SavegameEntry<T,I> e) {
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportSavegame(SavegameEntry<T, I> e) {
         return SavegameHelper.mapSavegame(e, ctx -> {
             try {
                 var path = ctx.getInstallation().getExportTarget(e);
@@ -130,7 +130,7 @@ public class SavegameActions {
                             .ifPresent(e -> {
                                 SavegameManagerState.get().selectEntry(e);
                                 GameLauncher.launchSavegame(e);
-                    });
+                            });
                 }
             });
         });

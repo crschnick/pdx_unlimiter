@@ -20,39 +20,46 @@ import org.apache.commons.io.FileUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 public final class Settings {
 
     private static Settings INSTANCE;
+    private static final Set<SettingsCheck> CHECKS = Set.of(
+            s -> {
+                boolean hasNoValidInstallation =
+                        s.eu4.getValue() == null && s.ck3.getValue() == null &&
+                                s.hoi4.getValue() == null && s.stellaris.getValue() == null;
+                if (hasNoValidInstallation) {
+                    GuiErrorReporter.showSimpleErrorMessage("""
+                            Welcome to the Pdx-Unlimiter!
+                                                    
+                            The automatic game detection did not detect any supported Paradox game.
+                            To get started, you can set the installation directories of games manually in the settings menu.
 
+                            Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
+                                                """);
+                    Platform.runLater(GuiSettings::showSettings);
+                }
+            }
+    );
     public final SettingsEntry.GameDirectory eu4 = new SettingsEntry.GameDirectory(
-            "EU4",
             "eu4",
             Game.EU4,
             Eu4Installation.class);
-
     public final SettingsEntry.GameDirectory hoi4 = new SettingsEntry.GameDirectory(
-            "HOI4",
             "hoi4",
             Game.HOI4,
             Hoi4Installation.class);
-
     public final SettingsEntry.GameDirectory ck3 = new SettingsEntry.GameDirectory(
-            "CK3",
             "ck3",
             Game.CK3,
             Ck3Installation.class);
-
     public final SettingsEntry.GameDirectory stellaris = new SettingsEntry.GameDirectory(
-            "STELLARIS",
             "stellaris",
             Game.STELLARIS,
             StellarisInstallation.class);
-
     public final SettingsEntry.IntegerEntry fontSize = new SettingsEntry.IntegerEntry(
             "FONT_SIZE",
             "fontSize",
@@ -60,31 +67,26 @@ public final class Settings {
             10,
             20
     );
-
     public final SettingsEntry.BooleanEntry deleteOnImport = new SettingsEntry.BooleanEntry(
             "DELETE_ON_IMPORT",
             "deleteOnImport",
             false
     );
-
     public final SettingsEntry.BooleanEntry startSteam = new SettingsEntry.BooleanEntry(
             "START_STEAM",
             "startSteam",
             true
     );
-
     public final SettingsEntry.BooleanEntry confirmDeletion = new SettingsEntry.BooleanEntry(
             "CONFIRM_DELETION",
             "confirmDeletion",
             true
     );
-
     public final SettingsEntry.BooleanEntry launchIrony = new SettingsEntry.BooleanEntry(
             "LAUNCH_IRONY",
             "launchIrony",
             false
     );
-
     public final SettingsEntry.BooleanEntry enableEu4SaveEditor = new SettingsEntry.BooleanEntry(
             "ENABLE_EU4SE",
             "enableEu4SaveEditor",
@@ -105,7 +107,6 @@ public final class Settings {
             }
         }
     };
-
     public final SettingsEntry.BooleanEntry enableAutoUpdate = new SettingsEntry.BooleanEntry(
             "ENABLE_AUTOUPDATE",
             "enableAutoUpdate",
@@ -122,48 +123,40 @@ public final class Settings {
             }
         }
     };
-
     public final SettingsEntry.StringEntry rakalyUserId = new SettingsEntry.StringEntry(
             "RAKALY_USER_ID",
             "rakalyUserId",
             null
     );
-
     public final SettingsEntry.StringEntry rakalyApiKey = new SettingsEntry.StringEntry(
             "RAKALY_API_KEY",
             "rakalyApiKey",
             null
     );
-
     public final SettingsEntry.StringEntry skanderbegApiKey = new SettingsEntry.StringEntry(
             "SKANDERBEG_API_KEY",
             "skanderbegApiKey",
             null
     );
-
     public final SettingsEntry.StorageDirectory storageDirectory = new SettingsEntry.StorageDirectory(
             "STORAGE_DIR",
             "storageDirectory"
     );
-
     public final SettingsEntry.ThirdPartyDirectory ck3toeu4Dir = new SettingsEntry.ThirdPartyDirectory(
             "CK3_TO_EU4_DIR",
             "ck3toeu4Dir",
             Path.of("Ck3ToEu4", "CK3ToEU4Converter.exe")
     );
-
     public final SettingsEntry.ThirdPartyDirectory ironyDir = new SettingsEntry.ThirdPartyDirectory(
             "IRONY_DIR",
             "ironyDir",
             Path.of("IronyModManager.exe")
     );
-
     public final SettingsEntry.BooleanEntry enabledTimedImports = new SettingsEntry.BooleanEntry(
             "TIMED_IMPORTS",
             "enabledTimedImports",
             false
     );
-
     public final SettingsEntry.IntegerEntry timedImportsInterval = new SettingsEntry.IntegerEntry(
             "TIMED_IMPORTS_INTERVAL",
             "timedImportsInterval",
@@ -171,26 +164,6 @@ public final class Settings {
             1,
             60
     );
-
-    private static final Set<SettingsCheck> CHECKS = Set.of(
-            s -> {
-                boolean hasNoValidInstallation =
-                        s.eu4.getValue() == null && s.ck3.getValue() == null &&
-                        s.hoi4.getValue() == null && s.stellaris.getValue() == null;
-                if (hasNoValidInstallation) {
-                    GuiErrorReporter.showSimpleErrorMessage("""
-Welcome to the Pdx-Unlimiter!
-                        
-The automatic game detection did not detect any supported Paradox game.
-To get started, you can set the installation directories of games manually in the settings menu.
-
-Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
-                    """);
-                    Platform.runLater(GuiSettings::showSettings);
-                }
-            }
-    );
-
 
     public static void init() {
         INSTANCE = loadConfig();

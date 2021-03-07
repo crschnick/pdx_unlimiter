@@ -26,7 +26,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.Semaphore;
 
 public class GuiMenuBar {
 

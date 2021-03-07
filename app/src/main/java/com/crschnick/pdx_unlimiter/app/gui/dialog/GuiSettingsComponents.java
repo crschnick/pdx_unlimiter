@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
-import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.core.settings.SettingsEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
@@ -90,8 +89,8 @@ public class GuiSettingsComponents {
 
         int row = 1;
         for (var entry : entries) {
-            grid.add(GuiTooltips.helpNode(entry.getDescription()), 0, 1);
-            grid.add(new Label(entry.getName() + ":"), 1, 1);
+            grid.add(GuiTooltips.helpNode(entry.getDescription()), 0, row);
+            grid.add(new Label(entry.getName() + ":"), 1, row);
 
             Region val = null;
             if (entry.getType().equals(SettingsEntry.Type.PATH)) {

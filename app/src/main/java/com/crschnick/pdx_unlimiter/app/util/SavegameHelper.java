@@ -10,53 +10,11 @@ import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SavegameHelper {
-
-    public static class SavegameContext<T, I extends SavegameInfo<T>> {
-
-        private Game game;
-        private GameInstallation installation;
-        private GameGuiFactory<T,I> guiFactory;
-        private SavegameStorage<T,I> storage;
-        private SavegameInfo<T> info;
-        private SavegameEntry<T,I> entry;
-        private SavegameCollection<T,I> collection;
-
-        public Game getGame() {
-            return game;
-        }
-
-        public SavegameInfo<T> getInfo() {
-            return info;
-        }
-
-        public SavegameEntry<T, I> getEntry() {
-            return entry;
-        }
-
-        public SavegameCollection<T, I> getCollection() {
-            return collection;
-        }
-
-        public GameInstallation getInstallation() {
-            return installation;
-        }
-
-        public SavegameStorage<T, I> getStorage() {
-            return storage;
-        }
-
-        public GameGuiFactory<T, I> getGuiFactory() {
-            return guiFactory;
-        }
-    }
 
     public static <T, I extends SavegameInfo<T>> Game getForSavegame(SavegameEntry<T, I> e) {
         Optional<Game> sg = SavegameStorage.ALL.entrySet().stream()
@@ -82,7 +40,7 @@ public class SavegameHelper {
             throw new IllegalStateException();
         }
 
-        var ctx = new SavegameContext<T,I>();
+        var ctx = new SavegameContext<T, I>();
         ctx.storage = SavegameStorage.get(g);
         ctx.installation = GameInstallation.ALL.get(g);
         ctx.game = g;
@@ -95,7 +53,7 @@ public class SavegameHelper {
 
     public static <T, I extends SavegameInfo<T>> void withSavegameAsync(
             SavegameEntry<T, I> e,
-            Consumer<SavegameContext<T,I>> con) {
+            Consumer<SavegameContext<T, I>> con) {
         if (e.getInfo() != null) {
             withSavegame(e, con);
         } else {
@@ -130,7 +88,7 @@ public class SavegameHelper {
             throw new IllegalStateException();
         }
 
-        var ctx = new SavegameContext<T,I>();
+        var ctx = new SavegameContext<T, I>();
         ctx.storage = SavegameStorage.get(g);
         ctx.installation = GameInstallation.ALL.get(g);
         ctx.guiFactory = GameGuiFactory.get(g);
@@ -138,12 +96,51 @@ public class SavegameHelper {
         ctx.info = e.getInfo();
         ctx.entry = e;
 
-        var col = SavegameStorage.<T,I>get(g).getSavegameCollection(e);
+        var col = SavegameStorage.<T, I>get(g).getSavegameCollection(e);
         if (col == null) {
             throw new IllegalStateException();
         }
         ctx.collection = col;
 
         return con.apply(ctx);
+    }
+
+    public static class SavegameContext<T, I extends SavegameInfo<T>> {
+
+        private Game game;
+        private GameInstallation installation;
+        private GameGuiFactory<T, I> guiFactory;
+        private SavegameStorage<T, I> storage;
+        private SavegameInfo<T> info;
+        private SavegameEntry<T, I> entry;
+        private SavegameCollection<T, I> collection;
+
+        public Game getGame() {
+            return game;
+        }
+
+        public SavegameInfo<T> getInfo() {
+            return info;
+        }
+
+        public SavegameEntry<T, I> getEntry() {
+            return entry;
+        }
+
+        public SavegameCollection<T, I> getCollection() {
+            return collection;
+        }
+
+        public GameInstallation getInstallation() {
+            return installation;
+        }
+
+        public SavegameStorage<T, I> getStorage() {
+            return storage;
+        }
+
+        public GameGuiFactory<T, I> getGuiFactory() {
+            return guiFactory;
+        }
     }
 }

@@ -31,15 +31,6 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-    public static class ColorCache extends CacheManager.Cache {
-
-        private Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
-
-        public ColorCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
-        }
-    }
-
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
@@ -266,5 +257,14 @@ public class Ck3TagRenderer {
                         null);
             }
         });
+    }
+
+    public static class ColorCache extends CacheManager.Cache {
+
+        private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
+
+        public ColorCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
+        }
     }
 }

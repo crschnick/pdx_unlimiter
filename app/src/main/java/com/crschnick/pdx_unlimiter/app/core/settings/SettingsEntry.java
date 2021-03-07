@@ -9,7 +9,6 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.beans.property.ObjectProperty;
@@ -19,8 +18,67 @@ import org.apache.commons.io.FileUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 public abstract class SettingsEntry<T> {
+
+    protected final Supplier<String> name;
+    protected final Supplier<String> description;
+    protected final String serializationName;
+    protected final Type type;
+    protected ObjectProperty<T> value;
+
+
+    public SettingsEntry(String id, String serializationName, Type type, T value) {
+        this.name = () -> PdxuI18n.get(id);
+        this.serializationName = serializationName;
+        this.description = () -> PdxuI18n.get(id + "_DESC");
+        this.type = type;
+        this.value = new SimpleObjectProperty<>(value);
+    }
+
+    public SettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type, T value) {
+        this.name = name;
+        this.description = description;
+        this.serializationName = serializationName;
+        this.type = type;
+        this.value = new SimpleObjectProperty<>(value);
+    }
+
+    public abstract void set(JsonNode node);
+
+    public abstract JsonNode toNode();
+
+    public void set(T newValue) {
+        value.set(newValue);
+    }
+
+    public String getName() {
+        return name.get();
+    }
+
+    public String getDescription() {
+        return description.get();
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public T getValue() {
+        return value.get();
+    }
+
+    public String getSerializationName() {
+        return serializationName;
+    }
+
+    public enum Type {
+        BOOLEAN,
+        INTEGER,
+        STRING,
+        PATH
+    }
 
     public static class BooleanEntry extends SettingsEntry<Boolean> {
 
@@ -98,7 +156,7 @@ public abstract class SettingsEntry<T> {
             super(id, serializationName, Type.PATH, value);
         }
 
-        public DirectoryEntry(String name, String description, String serializationName, Path value) {
+        public DirectoryEntry(Supplier<String> name, Supplier<String> description, String serializationName, Path value) {
             super(name, description, serializationName, Type.PATH, value);
         }
 
@@ -115,13 +173,13 @@ public abstract class SettingsEntry<T> {
 
     public static class GameDirectory extends DirectoryEntry {
 
-        private Game game;
-        private boolean disabled;
+        private final Game game;
         private final Class<? extends GameInstallation> installClass;
+        private boolean disabled;
 
-        GameDirectory(String id, String serializationName, Game game, Class<? extends GameInstallation> installClass) {
-            super(PdxuI18n.get("GAME_DIR"),
-                    PdxuI18n.get("GAME_DIR_DESC"),
+        GameDirectory(String serializationName, Game game, Class<? extends GameInstallation> installClass) {
+            super(() -> PdxuI18n.get("GAME_DIR", game.getAbbreviation()),
+                    () -> PdxuI18n.get("GAME_DIR_DESC", game.getAbbreviation()),
                     serializationName,
                     null);
             this.game = game;
@@ -176,7 +234,6 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-
     public static class StorageDirectory extends DirectoryEntry {
 
         public StorageDirectory(String id, String serializationName) {
@@ -221,67 +278,10 @@ public abstract class SettingsEntry<T> {
         }
 
         private void showErrorMessage() {
-            String msg = PdxuI18n.get(name) + " support has been disabled.\n" +
+            String msg = PdxuI18n.get(name.get()) + " support has been disabled.\n" +
                     "If you believe that the installation is valid, " +
                     "please check whether the installation directory was correctly set.";
             GuiErrorReporter.showSimpleErrorMessage(msg);
         }
-    }
-
-    public static enum Type {
-        BOOLEAN,
-        INTEGER,
-        STRING,
-        PATH
-    }
-
-    protected final String name;
-    protected final String description;
-    protected final String serializationName;
-    protected final Type type;
-    protected ObjectProperty<T> value;
-
-    public SettingsEntry(String id, String serializationName, Type type, T value) {
-        this.name = PdxuI18n.get(id);
-        this.serializationName = serializationName;
-        this.description = PdxuI18n.get(id + "_DESC");
-        this.type = type;
-        this.value = new SimpleObjectProperty<>(value);
-    }
-
-    public SettingsEntry(String name, String description, String serializationName, Type type, T value) {
-        this.name = name;
-        this.description = description;
-        this.serializationName = serializationName;
-        this.type = type;
-        this.value = new SimpleObjectProperty<>(value);
-    }
-
-    public abstract void set(JsonNode node);
-
-    public abstract JsonNode toNode();
-
-    public void set(T newValue) {
-        value.set(newValue);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public T getValue() {
-        return value.get();
-    }
-
-    public String getSerializationName() {
-        return serializationName;
     }
 }

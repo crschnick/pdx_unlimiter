@@ -4,9 +4,6 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
 public class GameAppManager {
 
     private static final GameAppManager INSTANCE = new GameAppManager();

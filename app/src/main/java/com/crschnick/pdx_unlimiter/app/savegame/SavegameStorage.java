@@ -34,7 +34,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 public abstract class SavegameStorage<
@@ -42,15 +44,8 @@ public abstract class SavegameStorage<
         I extends SavegameInfo<T>> {
 
 
-    public static final BidiMap<Game,SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
-
-    @SuppressWarnings("unchecked")
-    public static <T,I extends SavegameInfo<T>> SavegameStorage<T,I> get(Game g) {
-        return (SavegameStorage<T, I>) ALL.get(g);
-    }
-
+    public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final Class<I> infoClass;
     private final String fileEnding;
     private final String name;
@@ -59,7 +54,6 @@ public abstract class SavegameStorage<
     private final SavegameParser parser;
     private final String infoChecksum;
     private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
-
     public SavegameStorage(
             String name,
             String fileEnding,
@@ -74,6 +68,11 @@ public abstract class SavegameStorage<
         this.path = Settings.getInstance().storageDirectory.getValue().resolve(name);
         this.infoClass = infoClass;
         this.infoChecksum = infoChecksum;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> get(Game g) {
+        return (SavegameStorage<T, I>) ALL.get(g);
     }
 
     public static void init() {
@@ -251,7 +250,7 @@ public abstract class SavegameStorage<
                 info.getDate());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
-            var img = GameGuiFactory.<T,I>get(ALL.inverseBidiMap().get(this))
+            var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
                     .tagImage(info, info.getTag());
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
@@ -424,7 +423,7 @@ public abstract class SavegameStorage<
         });
     }
 
-    public synchronized Path getSavegameFile(SavegameEntry<?,?> e) {
+    public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
         return getSavegameDataDirectory(e).resolve("savegame." + fileEnding);
     }
 
@@ -432,7 +431,7 @@ public abstract class SavegameStorage<
         return getSavegameDataDirectory(e).resolve(getInfoFileName());
     }
 
-    public synchronized Path getSavegameDataDirectory(SavegameEntry<?,?> e) {
+    public synchronized Path getSavegameDataDirectory(SavegameEntry<?, ?> e) {
         Path campaignPath = path.resolve(getSavegameCollection(e).getUuid().toString());
         return campaignPath.resolve(e.getUuid().toString());
     }
@@ -446,7 +445,7 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized String getFileName(SavegameEntry<?,?> e) {
+    public synchronized String getFileName(SavegameEntry<?, ?> e) {
         var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         return colName + " (" + sgName + ")." + fileEnding;
@@ -578,7 +577,7 @@ public abstract class SavegameStorage<
         return status;
     }
 
-    public synchronized Optional<SavegameEntry<T,I>> getSavegameForChecksum(String cs) {
+    public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
                 .filter(ch -> ch.getContentChecksum().equals(cs))
                 .findAny();

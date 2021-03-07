@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
@@ -56,7 +56,7 @@ public class RakalyWebHelper {
                         "--user", Settings.getInstance().rakalyUserId.getValue(),
                         "--api-key", Settings.getInstance().rakalyApiKey.getValue(),
                         SavegameStorage.ALL.get(Game.EU4)
-                                .getSavegameFile((SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry).toString())
+                                .getSavegameFile(entry).toString())
                         .redirectError(ProcessBuilder.Redirect.DISCARD)
                         .start();
                 var out = new String(proc.getInputStream().readAllBytes());

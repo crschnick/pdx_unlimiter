@@ -4,20 +4,17 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiIncompatibleWarning;
-import com.crschnick.pdx_unlimiter.app.installation.*;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.util.IronyHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
-import com.crschnick.pdx_unlimiter.app.util.SteamHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +32,7 @@ public class GameLauncher {
         }
     }
 
-    private static void startDirectly(SavegameEntry<?,?> e) {
+    private static void startDirectly(SavegameEntry<?, ?> e) {
         SavegameHelper.withSavegame(e, ctx -> {
             var install = ctx.getInstallation();
             if (Settings.getInstance().launchIrony.getValue()) {
@@ -49,7 +46,7 @@ public class GameLauncher {
         });
     }
 
-    public static <T, I extends SavegameInfo<T>> void launchSavegame(SavegameEntry<T,I> e) {
+    public static <T, I extends SavegameInfo<T>> void launchSavegame(SavegameEntry<T, I> e) {
         SavegameHelper.withSavegame(e, ctx -> {
             if (!SavegameActions.isEntryCompatible(e)) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
