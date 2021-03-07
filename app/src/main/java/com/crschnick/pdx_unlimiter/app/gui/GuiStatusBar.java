@@ -1,11 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
@@ -64,8 +66,8 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(SavegameManagerState.get().current().getName() + " (Running)",
-                SavegameManagerState.get().current().getGuiFactory().createIcon());
+        Label text = new Label(SavegameManagerState.get().current().getFullName() + " (Running)",
+                GameGuiFactory.get(SavegameManagerState.get().current()).createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
@@ -77,9 +79,10 @@ public class GuiStatusBar {
         javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> latest.setText("Latest: " + (n.size() > 0 ? n.get(0).getName() : "None")));
         };
-        SavegameManagerState.get().current().getSavegameWatcher().savegamesProperty().addListener(l);
-        l.changed(null, null,
-                SavegameManagerState.get().current().getSavegameWatcher().savegamesProperty().get());
+
+        var watcher = SavegameWatcher.ALL.get(SavegameManagerState.get().current());
+        watcher.savegamesProperty().addListener(l);
+        l.changed(null, null, watcher.savegamesProperty().get());
         barPane.setCenter(latest);
 
         Button importLatest = new JFXButton("Import");
@@ -115,13 +118,13 @@ public class GuiStatusBar {
         SavegameHelper.withSavegame(e, ctx -> {
             {
                 Label text = new Label(
-                        ctx.getIntegration().getName(),
-                        ctx.getIntegration().getGuiFactory().createIcon());
+                        ctx.getGame().getFullName(),
+                        ctx.getGuiFactory().createIcon());
                 barPane.setLeft(text);
                 BorderPane.setAlignment(text, Pos.CENTER);
             }
             {
-                Label name = new Label(ctx.getIntegration().getSavegameStorage().getEntryName(e));
+                Label name = new Label(ctx.getStorage().getEntryName(e));
                 name.setGraphic(new FontIcon());
                 name.getStyleClass().add(CLASS_TEXT);
                 if (SavegameActions.isEntryCompatible(e)) {

@@ -1,12 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Ck3SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Eu4SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Hoi4SavegameStorage;
@@ -37,8 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class SavegameStorage<
@@ -99,7 +95,7 @@ public abstract class SavegameStorage<
 
     private synchronized void loadData() {
         try {
-            Files.createDirectories(getPath());
+            Files.createDirectories(getSavegameDataDirectory());
         } catch (IOException e) {
             ErrorHandler.handleTerminalException(e);
             return;
@@ -118,12 +114,12 @@ public abstract class SavegameStorage<
                 String name = c.get(i).required("name").textValue();
                 GameDate date = dateType.fromString(c.get(i).required("date").textValue());
                 UUID id = UUID.fromString(c.get(i).required("uuid").textValue());
-                if (!Files.isDirectory(getPath().resolve(id.toString()))) {
+                if (!Files.isDirectory(getSavegameDataDirectory().resolve(id.toString()))) {
                     continue;
                 }
 
                 Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
-                Image image = ImageLoader.loadImage(getPath().resolve(id.toString()).resolve("campaign.png"));
+                Image image = ImageLoader.loadImage(getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
                 collections.add(new SavegameCampaign<>(lastDate, name, id, date, image));
             }
         }
@@ -134,7 +130,7 @@ public abstract class SavegameStorage<
             for (int i = 0; i < f.size(); i++) {
                 String name = f.get(i).required("name").textValue();
                 UUID id = UUID.fromString(f.get(i).required("uuid").textValue());
-                if (!Files.isDirectory(getPath().resolve(id.toString()))) {
+                if (!Files.isDirectory(getSavegameDataDirectory().resolve(id.toString()))) {
                     continue;
                 }
 
@@ -147,7 +143,7 @@ public abstract class SavegameStorage<
         for (SavegameCollection<T, I> collection : collections) {
             try {
                 String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
-                var colFile = getPath().resolve(
+                var colFile = getSavegameDataDirectory().resolve(
                         collection.getUuid().toString()).resolve(typeName + ".json");
                 JsonNode campaignNode = JsonHelper.read(colFile);
                 StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
@@ -179,11 +175,11 @@ public abstract class SavegameStorage<
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
-            ConfigHelper.writeConfig(getPath()
+            ConfigHelper.writeConfig(getSavegameDataDirectory()
                     .resolve(campaign.getUuid().toString()).resolve("campaign.json"), campaignFileNode);
 
             try {
-                ImageLoader.writePng(campaign.getImage(), getPath()
+                ImageLoader.writePng(campaign.getImage(), getSavegameDataDirectory()
                         .resolve(campaign.getUuid().toString()).resolve("campaign.png"));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
@@ -211,7 +207,7 @@ public abstract class SavegameStorage<
                             .put("uuid", entry.getUuid().toString()))
                     .forEach(entries::add);
 
-            ConfigHelper.writeConfig(getPath()
+            ConfigHelper.writeConfig(getSavegameDataDirectory()
                     .resolve(folder.getUuid().toString()).resolve("folder.json"), folderFileNode);
 
             ObjectNode folderNode = JsonNodeFactory.instance.objectNode()
@@ -235,7 +231,7 @@ public abstract class SavegameStorage<
     public synchronized Optional<SavegameFolder<T, I>> addNewFolder(String name) {
         var col = new SavegameFolder<T, I>(Instant.now(), name, UUID.randomUUID());
         try {
-            Files.createDirectory(getPath().resolve(col.getUuid().toString()));
+            Files.createDirectory(getSavegameDataDirectory().resolve(col.getUuid().toString()));
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             return Optional.empty();
@@ -255,12 +251,14 @@ public abstract class SavegameStorage<
                 info.getDate());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
+            var img = GameGuiFactory.<T,I>get(ALL.inverseBidiMap().get(this))
+                    .tagImage(info, info.getTag());
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
                     getDefaultCampaignName(info),
                     campainUuid,
                     e.getDate(),
-                    GameIntegration.getForSavegameStorage(this).getGuiFactory().tagImage(info, info.getTag()));
+                    img);
             this.collections.add(newCampaign);
         }
 
@@ -306,11 +304,11 @@ public abstract class SavegameStorage<
             return;
         }
 
-        var srcDir = getPath(entry).toFile();
+        var srcDir = getSavegameDataDirectory(entry).toFile();
         try {
             FileUtils.copyDirectory(
                     srcDir,
-                    getPath().resolve(to.getUuid().toString()).resolve(entry.getUuid().toString()).toFile());
+                    getSavegameDataDirectory().resolve(to.getUuid().toString()).resolve(entry.getUuid().toString()).toFile());
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             return;
@@ -398,7 +396,7 @@ public abstract class SavegameStorage<
 
                 try {
                     // Clear old info files
-                    Files.list(getPath(e)).filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
+                    Files.list(getSavegameDataDirectory(e)).filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
                         try {
                             logger.debug("Deleting old info file " + p.toString());
                             Files.delete(p);
@@ -427,14 +425,14 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Path getSavegameFile(SavegameEntry<?,?> e) {
-        return getPath(e).resolve("savegame." + fileEnding);
+        return getSavegameDataDirectory(e).resolve("savegame." + fileEnding);
     }
 
     public synchronized Path getSavegameInfoFile(SavegameEntry<T, I> e) {
-        return getPath(e).resolve(getInfoFileName());
+        return getSavegameDataDirectory(e).resolve(getInfoFileName());
     }
 
-    public synchronized Path getPath(SavegameEntry<?,?> e) {
+    public synchronized Path getSavegameDataDirectory(SavegameEntry<?,?> e) {
         Path campaignPath = path.resolve(getSavegameCollection(e).getUuid().toString());
         return campaignPath.resolve(e.getUuid().toString());
     }
@@ -549,7 +547,7 @@ public abstract class SavegameStorage<
                 logger.debug("Generated savegame UUID " + saveUuid.toString());
 
                 synchronized (this) {
-                    Path entryPath = getPath().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
+                    Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
                     try {
                         FileUtils.forceMkdir(entryPath.toFile());
                         FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
@@ -592,12 +590,12 @@ public abstract class SavegameStorage<
         return cn + " (" + en + ")";
     }
 
-    public Path getPath() {
+    public Path getSavegameDataDirectory() {
         return path;
     }
 
     public Path getDataFile() {
-        return getPath().resolve("campaigns.json");
+        return getSavegameDataDirectory().resolve("campaigns.json");
     }
 
     public ObservableSet<SavegameCollection<T, I>> getCollections() {

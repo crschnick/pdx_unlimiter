@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
@@ -31,10 +32,6 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
 
     private static final int IMG_SIZE = 256;
 
-    public StellarisGuiFactory() {
-        super("stellaris", GameInstallation.STELLARIS);
-    }
-
     @Override
     public Image tagImage(SavegameInfo<StellarisTag> info, StellarisTag tag) {
         return stellarisTagNode(Path.of(tag.getBackgroundFile()), tag, info);
@@ -43,7 +40,8 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public Font font() throws IOException {
         return Font.loadFont(
-                Files.newInputStream(GameInstallation.STELLARIS.getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+                Files.newInputStream(GameInstallation.ALL.get(Game.STELLARIS)
+                        .getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
 
     }
 
@@ -87,14 +85,14 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
         };
 
         var in = CascadeDirectoryHelper.openFile(
-                Path.of("flags", "backgrounds").resolve(path), info, GameInstallation.STELLARIS);
+                Path.of("flags", "backgrounds").resolve(path), info, GameInstallation.ALL.get(Game.STELLARIS));
         in.map(stream -> ImageLoader.loadAwtImage(stream, customFilter))
                 .ifPresent(pattern -> g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE, null));
 
         Image icon = null;
         var iconIn = CascadeDirectoryHelper.openFile(
                 Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile()),
-                info, GameInstallation.STELLARIS);
+                info, GameInstallation.ALL.get(Game.STELLARIS));
         iconIn.map(stream -> ImageLoader.loadAwtImage(stream, null))
                 .ifPresent(pattern -> g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE,
                         new java.awt.Color(0, 0, 0, 0), null));

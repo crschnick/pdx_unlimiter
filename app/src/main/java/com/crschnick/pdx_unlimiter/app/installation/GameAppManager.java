@@ -19,9 +19,7 @@ public class GameAppManager {
     public static void init() {
         TaskExecutor.getInstance().submitLoop(() -> {
             if ((INSTANCE.activeGame.get() == null)) {
-                var process = Stream.of(GameInstallation.EU4, GameInstallation.HOI4,
-                        GameInstallation.CK3, GameInstallation.STELLARIS)
-                        .filter(Objects::nonNull)
+                var process = GameInstallation.ALL.values().stream()
                         .map(g -> new GameApp(ProcessHandle.allProcesses()
                                 .filter(p -> p.info().command()
                                         .map(cs -> isInstanceOfGame(cs, g)).orElse(false))
@@ -32,8 +30,8 @@ public class GameAppManager {
                 if (process.isPresent()) {
                     INSTANCE.activeGame.set(process.get());
                     INSTANCE.activeGame.get().onStart();
-                    SavegameManagerState.get().selectIntegration(
-                            GameIntegration.getForInstallation(process.get().getInstallation()));
+                    SavegameManagerState.get().selectGame(
+                            GameInstallation.ALL.inverseBidiMap().get(process.get().getInstallation()));
                 }
             } else {
                 if (!INSTANCE.activeGame.get().isAlive()) {

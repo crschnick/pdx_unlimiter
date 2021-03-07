@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
@@ -58,10 +57,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     public static void init() {
         SavedState s = SavedState.getInstance();
-        for (var g : Game.values()) {
-            if (s.getActiveGame().equals(g)) {
-                INSTANCE.selectGame(g);
-                return;
+        if (s.getActiveGame() != null) {
+            for (var g : Game.values()) {
+                if (s.getActiveGame().equals(g)) {
+                    INSTANCE.selectGame(g);
+                    return;
+                }
             }
         }
 
@@ -106,11 +107,10 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> SavegameHelper.withSavegame(e, ctx -> {
-            var gi = ctx.getIntegration();
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
-                            gi.getSavegameStorage().getSavegameCollection(e))) {
-                gi.getSavegameStorage().loadEntry(e);
+                            ctx.getStorage().getSavegameCollection(e))) {
+                ctx.getStorage().loadEntry(e);
             }
         }), false);
     }
@@ -222,7 +222,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             unselectCampaignAndEntry();
 
             current.set(newGame);
-            LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " +
+            logger.debug("Selected game " +
                     (newGame != null ? newGame.getFullName() : "null"));
             updateShownCollections();
             if (newGame != null) {
@@ -239,7 +239,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     public void selectCollection(SavegameCollection<T, I> c) {
         if (c == null) {
             unselectCampaignAndEntry();
-            LoggerFactory.getLogger(GameIntegration.class).debug("Unselected campaign");
+            logger.debug("Unselected campaign");
             return;
         }
 
@@ -257,7 +257,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
             globalSelectedCampaignPropertyInternal().set(c);
             updateShownEntries();
-            LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign " + c.getName());
+            logger.debug("Selected campaign " + c.getName());
         });
     }
 
@@ -281,7 +281,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 selectCollection(SavegameStorage.<T,I>get(game).getSavegameCollection(e));
 
                 globalSelectedEntryPropertyInternal().set(e);
-                LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign entry " + e.getName());
+                logger.debug("Selected campaign entry " + e.getName());
             }
         });
     }

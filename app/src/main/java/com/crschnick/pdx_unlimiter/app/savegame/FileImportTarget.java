@@ -119,7 +119,7 @@ public abstract class FileImportTarget {
 
         @Override
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
-            if (GameInstallation.EU4 == null) {
+            if (GameInstallation.ALL.containsKey(Game.EU4)) {
                 return;
             }
 

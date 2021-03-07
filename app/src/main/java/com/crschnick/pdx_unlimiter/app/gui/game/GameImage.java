@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
@@ -87,32 +88,33 @@ public class GameImage {
     }
 
     public static void loadCk3Images() {
-        if (GameInstallation.CK3 == null) {
+        if (!GameInstallation.ALL.containsKey(Game.CK3)) {
             return;
         }
-
-        Path p = GameInstallation.CK3.getPath().resolve("game");
+        
+        var installPath = GameInstallation.ALL.get(Game.CK3).getPath();
+        Path p = installPath.resolve("game");
         Path i = p.resolve("gfx").resolve("interface").resolve("icons");
 
         CK3_ICON = ImageLoader.loadImage(
-                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
+                installPath.resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
 
         CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
 
-        CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.CK3.getPath()
+        CK3_BACKGROUND = ImageLoader.loadImage(installPath
                 .resolve("launcher").resolve("assets").resolve("app-background.png"));
         CK3_TITLE_MASK = ImageLoader.loadImage(
-                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_mask.dds"));
         CK3_TITLE_FRAME = ImageLoader.loadImage(
-                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_86.dds"));
 
         CK3_HOUSE_MASK = ImageLoader.loadImage(
-                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("house_mask.dds"));
         CK3_HOUSE_FRAME = ImageLoader.cut(ImageLoader.loadImage(
-                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("house_115.dds")), new Rectangle2D(150, 0, 150, 150));
         VIEWPORTS.put(CK3_HOUSE_FRAME, new Rectangle2D(150, 0, 150, 150));
 
@@ -144,7 +146,7 @@ public class GameImage {
         CK3_REALM_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("_default_115.dds"));
 
         CK3_COA_OVERLAY = ImageLoader.loadImage(
-                GameInstallation.CK3.getPath().resolve("game").resolve("gfx").resolve("interface")
+                installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("coa_overlay.dds"));
 
         CK3_ICON_WAR = ImageLoader.loadImage(i.resolve("map_coa").resolve("icon_at_war_big.dds"));
@@ -152,32 +154,31 @@ public class GameImage {
     }
 
     public static void loadStellarisImages() {
-        if (GameInstallation.STELLARIS == null) {
+        if (!GameInstallation.ALL.containsKey(Game.STELLARIS)) {
             return;
         }
 
-        Path p = GameInstallation.STELLARIS.getPath();
-        Path i = p.resolve("gfx").resolve("interface").resolve("icons");
+        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getPath();
+        Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
 
         STELLARIS_ICON = ImageLoader.loadImage(
-                GameInstallation.STELLARIS.getPath().resolve("gfx").resolve("exe_icon.bmp"));
+                installPath.resolve("gfx").resolve("exe_icon.bmp"));
 
         STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
         STELLARIS_BACKGROUND = ImageLoader.loadImage(
-                GameInstallation.STELLARIS.getPath().resolve("launcher-assets").resolve("app-background.png"));
+                installPath.resolve("launcher-assets").resolve("app-background.png"));
 
     }
 
     public static void loadHoi4Images() {
-        if (GameInstallation.HOI4 == null) {
+        if (!GameInstallation.ALL.containsKey(Game.HOI4)) {
             return;
         }
 
-        Path p = GameInstallation.HOI4.getPath();
-        Path i = p.resolve("gfx").resolve("interface");
+        var installPath = GameInstallation.ALL.get(Game.HOI4).getPath();
+        Path i = installPath.resolve("gfx").resolve("interface");
 
-        HOI4_ICON = ImageLoader.loadImage(
-                GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("game-icon.png"));
+        HOI4_ICON = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("game-icon.png"));
 
         HOI4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("warning_icon.dds"));
         HOI4_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
@@ -187,21 +188,19 @@ public class GameImage {
         HOI4_ICON_DIFF_ELITE = ImageLoader.loadImage(i.resolve("difficulty_button_elite.dds"));
         HOI4_ICON_DIFF_CIVILIAN = ImageLoader.loadImage(i.resolve("difficulty_button_civilian.dds"));
         HOI4_FLAG_OVERLAY = ImageLoader.loadImage(i.resolve("flag_overlay.dds"));
-        HOI4_BACKGROUND = ImageLoader.loadImage(
-                GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("app-background.png"));
+        HOI4_BACKGROUND = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("app-background.png"));
 
     }
 
     public static void loadEu4Images() {
-        if (GameInstallation.EU4 == null) {
+        if (!GameInstallation.ALL.containsKey(Game.EU4)) {
             return;
         }
 
-        Path p = GameInstallation.EU4.getPath();
-        Path i = p.resolve("gfx").resolve("interface");
+        var installPath = GameInstallation.ALL.get(Game.EU4).getPath();
+        Path i = installPath.resolve("gfx").resolve("interface");
 
-        EU4_ICON = ImageLoader.loadImage(
-                GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("icon.png"));
+        EU4_ICON = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("icon.png"));
 
         EU4_ICON_VASSAL = ImageLoader.loadImage(i.resolve("icon_vassal.dds"));
         EU4_ICON_ALLIANCE = ImageLoader.loadImage(i.resolve("icon_alliance.dds"));
@@ -256,8 +255,7 @@ public class GameImage {
                 i.resolve("release_nation_icon.dds"));
         VIEWPORTS.put(EU4_ICON_RELEASED_VASSAL, new Rectangle2D(37, 0, 36, 30));
 
-        EU4_BACKGROUND = ImageLoader.loadImage(
-                GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("app-background.png"));
+        EU4_BACKGROUND = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("app-background.png"));
     }
 
     public static Path getEu4TagPath(String tag) {

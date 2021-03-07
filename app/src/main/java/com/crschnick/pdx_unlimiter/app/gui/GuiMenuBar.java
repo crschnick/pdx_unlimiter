@@ -5,7 +5,9 @@ import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
+import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
@@ -141,7 +143,8 @@ public class GuiMenuBar {
 
         JFXButton importB = new JFXButton("Import");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(SavegameManagerState.get().current().getSavegameWatcher());
+            GuiImporter.createImporterDialog(SavegameWatcher.ALL.get(
+                    SavegameManagerState.get().current()));
             e.consume();
         });
         importB.setGraphic(new FontIcon());
@@ -153,7 +156,7 @@ public class GuiMenuBar {
 
         JFXButton launch = new JFXButton("Launch");
         launch.setOnAction(e -> {
-            SavegameManagerState.get().current().getInstallation().startLauncher();
+            GameLauncher.startLauncher();
             e.consume();
         });
         launch.setGraphic(new FontIcon());
@@ -175,7 +178,7 @@ public class GuiMenuBar {
         Label game = new Label();
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             var current = SavegameManagerState.get().current();
-            var name = current != null ? SavegameManagerState.get().current().getName() : "None";
+            var name = current != null ? SavegameManagerState.get().current().getFullName() : "None";
             Platform.runLater(() -> game.setText(name));
         });
         spacer.getChildren().add(game);

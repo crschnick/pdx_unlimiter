@@ -3,6 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.collections.SetChangeListener;
@@ -37,14 +39,17 @@ public class GuiSavegameEntryList {
             update.accept(change.getSet());
         };
 
+        //TODO: change
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             if (o != null) {
-                o.getSavegameStorage().getCollections().removeListener(campaignListListener);
+                var storage = SavegameStorage.get(o);
+                storage.getCollections().removeListener(campaignListListener);
             }
 
             if (n != null) {
-                n.getSavegameStorage().getCollections().addListener(campaignListListener);
-                update.accept(n.getSavegameStorage().getCollections());
+                var storage = SavegameStorage.get(n);
+                storage.getCollections().addListener(campaignListListener);
+                update.accept(storage.getCollections());
             }
         });
     }
@@ -65,12 +70,13 @@ public class GuiSavegameEntryList {
     private static Node createNoCampaignNode(Pane pane) {
         VBox v = new VBox();
         Label text = new Label("It seems like there are no imported savegames for " +
-                SavegameManagerState.get().current().getName() + " yet.\n");
+                SavegameManagerState.get().current().getFullName() + " yet.\n");
         v.getChildren().add(text);
 
         Button importB = new Button("Import savegames");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(SavegameManagerState.get().current().getSavegameWatcher());
+            GuiImporter.createImporterDialog(SavegameWatcher.ALL.get(
+                    SavegameManagerState.get().current()));
             e.consume();
         });
         importB.setGraphic(new FontIcon());

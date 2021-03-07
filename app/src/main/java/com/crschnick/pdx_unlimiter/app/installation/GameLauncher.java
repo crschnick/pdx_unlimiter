@@ -26,12 +26,12 @@ import java.util.stream.StreamSupport;
 
 public class GameLauncher {
 
-    private static void startLauncher() {
-        var install = SavegameManagerState.get().current().getInstallation();
+    public static void startLauncher() {
+        var game = SavegameManagerState.get().current();
         if (Settings.getInstance().launchIrony.getValue()) {
-            IronyHelper.launchEntry(ctx.getGame(), false);
+            IronyHelper.launchEntry(game, false);
         } else {
-            install.getDistType().startLauncher();
+            GameInstallation.ALL.get(game).getDistType().startLauncher();
         }
     }
 
@@ -43,7 +43,7 @@ public class GameLauncher {
             } else {
                 boolean doLaunch = install.getDistType().checkDirectLaunch();
                 if (doLaunch) {
-                    ctx.getIntegration().getInstallation().startDirectly();
+                    ctx.getInstallation().startDirectly();
                 }
             }
         });
@@ -51,37 +51,35 @@ public class GameLauncher {
 
     public static <T, I extends SavegameInfo<T>> void launchSavegame(SavegameEntry<T,I> e) {
         SavegameHelper.withSavegame(e, ctx -> {
-            var gi = ctx.getIntegration();
             if (!SavegameActions.isEntryCompatible(e)) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
-                        ctx.getIntegration().getInstallation(), e);
+                        ctx.getInstallation(), e);
                 if (!startAnyway) {
                     return;
                 }
             }
 
             try {
-                var path = ctx.getIntegration().getInstallation().getExportTarget(
-                        ctx.getIntegration().getSavegameStorage(), e);
-                ctx.getIntegration().getSavegameStorage().copySavegameTo(e, path);
-                gi.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
+                var path = ctx.getInstallation().getExportTarget(e);
+                ctx.getStorage().copySavegameTo(e, path);
+                ctx.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
                 ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
 
                 var dlcs = e.getInfo().getDlcs().stream()
-                        .map(d -> gi.getInstallation().getDlcForName(d))
+                        .map(d -> ctx.getInstallation().getDlcForName(d))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList());
                 if (ctx.getGame().equals(Game.STELLARIS)) {
-                    writeStellarisDlcLoadFile(GameInstallation.STELLARIS, dlcs);
+                    writeStellarisDlcLoadFile(GameInstallation.ALL.get(Game.STELLARIS), dlcs);
                 } else {
                     var mods = e.getInfo().getMods().stream()
-                            .map(m -> gi.getInstallation().getModForName(m))
+                            .map(m -> ctx.getInstallation().getModForName(m))
                             .filter(Optional::isPresent)
                             .map(Optional::get)
                             .collect(Collectors.toList());
-                    writeDlcLoadFile(ctx.getIntegration().getInstallation(), mods, dlcs);
+                    writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
                 }
 
 

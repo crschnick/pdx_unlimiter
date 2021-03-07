@@ -7,7 +7,6 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.ColorAdjust;

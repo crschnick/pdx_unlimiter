@@ -39,7 +39,7 @@ public class GuiSavegameEntry {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
         SavegameHelper.withSavegameAsync(e, ctx -> {
-            topBar.setBackground(ctx.getIntegration().getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
+            topBar.setBackground(ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
         });
 
         {
@@ -47,7 +47,7 @@ public class GuiSavegameEntry {
             l.getStyleClass().add(CLASS_DATE);
 
             var tagImage = SavegameHelper.mapSavegame(e,
-                    ctx -> ctx.getIntegration().getGuiFactory().createImage(e));
+                    ctx -> ctx.getGuiFactory().createImage(e));
             Pane tagPane = new Pane(tagImage.getValue());
             HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
@@ -236,7 +236,7 @@ public class GuiSavegameEntry {
         stack.getChildren().add(container);
         if (entry.infoProperty().isNotNull().get()) {
             SavegameHelper.withSavegame(entry, ctx -> {
-                ctx.getIntegration().getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+                ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
             });
         } else {
             stack.getChildren().add(loading);
@@ -253,7 +253,7 @@ public class GuiSavegameEntry {
                 SavegameHelper.withSavegame(entry, ctx -> {
                     Platform.runLater(() -> {
                         loading.setVisible(false);
-                        ctx.getIntegration().getGuiFactory().fillNodeContainer(n, container);
+                        ctx.getGuiFactory().fillNodeContainer(n, container);
                     });
                 });
             } else {

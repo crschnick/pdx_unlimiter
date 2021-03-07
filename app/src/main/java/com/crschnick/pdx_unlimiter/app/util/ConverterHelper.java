@@ -57,10 +57,10 @@ public class ConverterHelper {
                 .resolve("CK3toEU4").resolve("configuration.txt");
         try {
             var writer = Files.newBufferedWriter(config);
-            writeLine(writer, "CK3DocDirectory", GameInstallation.CK3.getUserPath().toString());
-            writeLine(writer, "CK3directory", GameInstallation.CK3.getPath().toString());
-            writeLine(writer, "EU4directory", GameInstallation.EU4.getPath().toString());
-            writeLine(writer, "targetGameModPath", GameInstallation.EU4.getUserPath().resolve("mod").toString());
+            writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserPath().toString());
+            writeLine(writer, "CK3directory", GameInstallation.ALL.get(Game.CK3).getPath().toString());
+            writeLine(writer, "EU4directory", GameInstallation.ALL.get(Game.EU4).getPath().toString());
+            writeLine(writer, "targetGameModPath", GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod").toString());
             writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getSavegameFile(entry).toString());
             for (var e : values.entrySet()) {
                 writeLine(writer, e.getKey(), e.getValue());

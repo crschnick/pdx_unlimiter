@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
@@ -51,12 +52,9 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         ALL.put(Game.STELLARIS, new StellarisGuiFactory());
     }
 
-    private final String styleClass;
-    private final GameInstallation installation;
-
-    public GameGuiFactory(String styleClass, GameInstallation installation) {
-        this.styleClass = styleClass;
-        this.installation = installation;
+    @SuppressWarnings("unchecked")
+    public static <T,I extends SavegameInfo<T>> GameGuiFactory<T,I> get(Game g) {
+        return (GameGuiFactory<T, I>) ALL.get(g);
     }
 
     protected static void addNode(JFXMasonryPane pane, Region content) {
@@ -132,6 +130,8 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
     public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
+        var installation = GameInstallation.ALL.get(ALL.inverseBidiMap().get(this));
+        var styleClass = ALL.inverseBidiMap().get(this).getId();
         grid.getStyleClass().add(styleClass);
 
         Label version = createVersionInfo(info);

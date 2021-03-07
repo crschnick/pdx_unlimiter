@@ -120,8 +120,8 @@ public abstract class SettingsEntry<T> {
         private final Class<? extends GameInstallation> installClass;
 
         GameDirectory(String id, String serializationName, Game game, Class<? extends GameInstallation> installClass) {
-            super(PdxuI18n.get("GAME_DIR", PdxuI18n.get(id)),
-                    PdxuI18n.get("GAME_DIR_DESC", PdxuI18n.get(id)),
+            super(PdxuI18n.get("GAME_DIR"),
+                    PdxuI18n.get("GAME_DIR_DESC"),
                     serializationName,
                     null);
             this.game = game;

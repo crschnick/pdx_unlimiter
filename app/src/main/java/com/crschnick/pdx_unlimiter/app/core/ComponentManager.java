@@ -8,7 +8,6 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
@@ -84,8 +83,6 @@ public class ComponentManager {
             GameAppManager.init();
             FileImporter.init();
 
-            GameIntegration.init();
-
             CacheManager.init();
             SavegameManagerState.init();
 
@@ -108,7 +105,6 @@ public class ComponentManager {
             FileWatchManager.reset();
             SavegameManagerState.reset();
             CacheManager.reset();
-            GameIntegration.reset();
 
             LoggerFactory.getLogger(ComponentManager.class).debug("Waiting for platform thread");
             // Sync with platform thread after GameIntegration reset

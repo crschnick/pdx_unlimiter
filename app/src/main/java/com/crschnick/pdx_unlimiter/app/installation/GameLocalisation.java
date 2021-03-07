@@ -18,14 +18,14 @@ public class GameLocalisation {
             return tag.getName();
         }
 
-        Key key = new Key(GameInstallation.EU4,
+        Key key = new Key(GameInstallation.ALL.get(Game.EU4),
                 info.getMods().stream()
-                        .map(m -> GameInstallation.EU4.getModForName(m))
+                        .map(m -> GameInstallation.ALL.get(Game.EU4).getModForName(m))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList()),
                 info.getDlcs().stream()
-                        .map(m -> GameInstallation.EU4.getDlcForName(m))
+                        .map(m -> GameInstallation.ALL.get(Game.EU4).getDlcForName(m))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList()));
@@ -33,7 +33,7 @@ public class GameLocalisation {
         if (!LOCALISATIONS.containsKey(key)) {
             Map<String, String> i18n = new HashMap<>();
 
-            CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), info, GameInstallation.EU4, file -> {
+            CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), info, GameInstallation.ALL.get(Game.EU4), file -> {
                 if (!LocalisationHelper.isLanguage(file, LocalisationHelper.Language.ENGLISH)) {
                     return;
                 }

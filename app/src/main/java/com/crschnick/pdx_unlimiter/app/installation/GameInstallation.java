@@ -12,6 +12,8 @@ import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +26,7 @@ import java.util.*;
 
 public abstract class GameInstallation {
 
-    public static Eu4Installation EU4 = null;
-    public static Hoi4Installation HOI4 = null;
-    public static Ck3Installation CK3 = null;
-    public static StellarisInstallation STELLARIS = null;
-
-    public static Map<Game,GameInstallation> ALL;
+    public static final BidiMap<Game,GameInstallation> ALL = new DualHashBidiMap<>();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected DistributionType distType;
     protected Path userDir;
@@ -51,16 +48,15 @@ public abstract class GameInstallation {
 
     public static void init() throws Exception {
         Settings s = Settings.getInstance();
-        Optional.ofNullable(s.eu4.getValue()).ifPresent(p -> GameInstallation.EU4 = new Eu4Installation(p));
-        Optional.ofNullable(s.ck3.getValue()).ifPresent(p -> GameInstallation.CK3 = new Ck3Installation(p));
-        Optional.ofNullable(s.hoi4.getValue()).ifPresent(p -> GameInstallation.HOI4 = new Hoi4Installation(p));
-        Optional.ofNullable(s.stellaris.getValue()).ifPresent(p -> GameInstallation.STELLARIS = new StellarisInstallation(p));
-        ALL = Map.of(Game.EU4, EU4, Game.CK3, CK3, Game.HOI4, HOI4, Game.STELLARIS, STELLARIS);
+        Optional.ofNullable(s.eu4.getValue()).ifPresent(
+                p -> ALL.put(Game.EU4, new Eu4Installation(p)));
+        Optional.ofNullable(s.ck3.getValue()).ifPresent(
+                p -> ALL.put(Game.CK3, new Ck3Installation(p)));
+        Optional.ofNullable(s.hoi4.getValue()).ifPresent(
+                p -> ALL.put(Game.HOI4, new Hoi4Installation(p)));
+        Optional.ofNullable(s.stellaris.getValue()).ifPresent(
+                p -> ALL.put(Game.STELLARIS, new StellarisInstallation(p)));
         for (GameInstallation i : ALL.values()) {
-            if (i == null) {
-                continue;
-            }
-
             i.loadData();
             try {
                 i.initOptional();
@@ -71,11 +67,7 @@ public abstract class GameInstallation {
     }
 
     public static void reset() {
-        ALL = Map.of();
-        EU4 = null;
-        HOI4 = null;
-        STELLARIS = null;
-        CK3 = null;
+        ALL.clear();
     }
 
     public List<Path> getAllSavegameDirectories() {
@@ -92,14 +84,9 @@ public abstract class GameInstallation {
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
-    public void startLauncher() {
-        getDistType().startLauncher();
-    }
-
-    public <T, I extends SavegameInfo<T>> Path getExportTarget(
-            SavegameStorage<T, I> cache, SavegameEntry<T, I> e) {
-        Path file = getSavegamesPath().resolve(cache.getFileName(e));
-        return file;
+    public <T, I extends SavegameInfo<T>> Path getExportTarget(SavegameEntry<T, I> e) {
+        return getSavegamesPath().resolve(SavegameStorage.get(
+                ALL.inverseBidiMap().get(this)).getFileName(e));
     }
 
     private void loadDlcs() throws IOException {

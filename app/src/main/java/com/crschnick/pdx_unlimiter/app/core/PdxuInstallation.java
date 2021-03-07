@@ -25,6 +25,7 @@ public class PdxuInstallation {
     private boolean image;
     private boolean disableAllGames;
     private Path eu4SeDir;
+    private Path languageDir;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -33,6 +34,12 @@ public class PdxuInstallation {
         INSTANCE.image = Files.exists(appPath.resolve("version"));
         INSTANCE.production = INSTANCE.image;
         INSTANCE.version = "unknown";
+
+        if (INSTANCE.image) {
+            INSTANCE.languageDir = Path.of("lang");
+        } else {
+            INSTANCE.languageDir = appPath.resolve("lang");
+        }
 
         // Legacy support
         var legacyDataDir = Path.of(System.getProperty("user.home"),
@@ -80,6 +87,8 @@ public class PdxuInstallation {
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
+
+            INSTANCE.languageDir = Path.of("lang");
 
             var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
@@ -159,8 +168,7 @@ public class PdxuInstallation {
     }
 
     public Path getLanguageLocation() {
-        Path appPath = Path.of(System.getProperty("java.home"));
-        return appPath.resolve("lang");
+        return languageDir;
     }
 
     public Path getLogsLocation() {

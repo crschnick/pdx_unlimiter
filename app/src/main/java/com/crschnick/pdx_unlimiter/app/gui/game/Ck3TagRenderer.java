@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
@@ -217,7 +218,7 @@ public class Ck3TagRenderer {
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
                     info,
-                    GameInstallation.CK3);
+                    GameInstallation.ALL.get(Game.CK3));
             patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
                 g.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE, null);
             });
@@ -249,7 +250,7 @@ public class Ck3TagRenderer {
                 Path.of("gfx", "coat_of_arms",
                         (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
                 info,
-                GameInstallation.CK3);
+                GameInstallation.ALL.get(Game.CK3));
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
             for (var instance : emblem.getInstances()) {
                 int width = (int) (instance.getScaleX() * IMG_SIZE);
