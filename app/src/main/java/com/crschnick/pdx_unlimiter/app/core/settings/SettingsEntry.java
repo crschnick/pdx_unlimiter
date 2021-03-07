@@ -10,6 +10,7 @@ import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,20 +30,20 @@ public abstract class SettingsEntry<T> {
     protected ObjectProperty<T> value;
 
 
-    public SettingsEntry(String id, String serializationName, Type type, T value) {
+    public SettingsEntry(String id, String serializationName, Type type) {
         this.name = () -> PdxuI18n.get(id);
         this.serializationName = serializationName;
         this.description = () -> PdxuI18n.get(id + "_DESC");
         this.type = type;
-        this.value = new SimpleObjectProperty<>(value);
+        this.value = new SimpleObjectProperty<>();
     }
 
-    public SettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type, T value) {
+    public SettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type) {
         this.name = name;
         this.description = description;
         this.serializationName = serializationName;
         this.type = type;
-        this.value = new SimpleObjectProperty<>(value);
+        this.value = new SimpleObjectProperty<>();
     }
 
     public abstract void set(JsonNode node);
@@ -52,6 +53,8 @@ public abstract class SettingsEntry<T> {
     public void set(T newValue) {
         value.set(newValue);
     }
+
+    public abstract void setDefault();
 
     public String getName() {
         return name.get();
@@ -80,10 +83,26 @@ public abstract class SettingsEntry<T> {
         PATH
     }
 
-    public static class BooleanEntry extends SettingsEntry<Boolean> {
 
-        public BooleanEntry(String id, String serializationName, boolean value) {
-            super(id, serializationName, Type.BOOLEAN, value);
+    public static abstract class SimpleEntry<T> extends SettingsEntry<T> {
+
+        private final T defaultValue;
+
+        public SimpleEntry(String id, String serializationName, Type type, T defaultValue) {
+            super(id, serializationName, type);
+            this.defaultValue = defaultValue;
+        }
+
+        @Override
+        public final void setDefault() {
+            this.value.set(defaultValue);
+        }
+    }
+
+    public static class BooleanEntry extends SimpleEntry<Boolean> {
+
+        public BooleanEntry(String id, String serializationName, boolean defaultValue) {
+            super(id, serializationName, Type.BOOLEAN, defaultValue);
         }
 
         @Override
@@ -97,13 +116,13 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class IntegerEntry extends SettingsEntry<Integer> {
+    public static class IntegerEntry extends SimpleEntry<Integer> {
 
         private final int min;
         private final int max;
 
-        public IntegerEntry(String id, String serializationName, int value, int min, int max) {
-            super(id, serializationName, Type.INTEGER, value);
+        public IntegerEntry(String id, String serializationName, int defaultValue, int min, int max) {
+            super(id, serializationName, Type.INTEGER, defaultValue);
             this.min = min;
             this.max = max;
         }
@@ -133,10 +152,10 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class StringEntry extends SettingsEntry<String> {
+    public static class StringEntry extends SimpleEntry<String> {
 
-        public StringEntry(String id, String serializationName, String value) {
-            super(id, serializationName, Type.STRING, value);
+        public StringEntry(String id, String serializationName, String defaultValue) {
+            super(id, serializationName, Type.STRING, defaultValue);
         }
 
         @Override
@@ -152,22 +171,47 @@ public abstract class SettingsEntry<T> {
 
     public static abstract class DirectoryEntry extends SettingsEntry<Path> {
 
-        public DirectoryEntry(String id, String serializationName, Path value) {
-            super(id, serializationName, Type.PATH, value);
+        protected boolean disabled;
+
+        public DirectoryEntry(String id, String serializationName) {
+            super(id, serializationName, Type.PATH);
+            this.disabled = false;
         }
 
-        public DirectoryEntry(Supplier<String> name, Supplier<String> description, String serializationName, Path value) {
-            super(name, description, serializationName, Type.PATH, value);
+        public DirectoryEntry(Supplier<String> name, Supplier<String> description, String serializationName) {
+            super(name, description, serializationName, Type.PATH);
+            this.disabled = false;
+        }
+
+        @Override
+        public void set(Path newPath) {
+            if (disabled && newPath != null) {
+                disabled = false;
+            }
+
+            this.value.set(newPath);
         }
 
         @Override
         public void set(JsonNode node) {
-            this.set(Path.of(node.textValue()));
+            if (node.isNull()) {
+                this.disabled = true;
+                this.value.set(null);
+            } else {
+                this.disabled = false;
+                this.value.set(Path.of(node.textValue()));
+            }
         }
 
         @Override
         public JsonNode toNode() {
-            return new TextNode(this.value.get().toString());
+            if (disabled) {
+                return NullNode.getInstance();
+            } else if (value.isNull().get()) {
+                return null;
+            } else {
+                return new TextNode(value.get().toString());
+            }
         }
     }
 
@@ -175,17 +219,13 @@ public abstract class SettingsEntry<T> {
 
         private final Game game;
         private final Class<? extends GameInstallation> installClass;
-        private boolean disabled;
 
         GameDirectory(String serializationName, Game game, Class<? extends GameInstallation> installClass) {
             super(() -> PdxuI18n.get("GAME_DIR", game.getAbbreviation()),
                     () -> PdxuI18n.get("GAME_DIR_DESC", game.getAbbreviation()),
-                    serializationName,
-                    null);
+                    serializationName);
             this.game = game;
-            this.disabled = false;
             this.installClass = installClass;
-            InstallLocationHelper.getSteamGameInstallPath(game.getFullName()).ifPresent(p -> set(p));
         }
 
         private void showInstallErrorMessage(Exception e) {
@@ -199,9 +239,7 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Path newPath) {
-            if (disabled) {
-                disabled = false;
-            }
+            super.set(newPath);
 
             try {
                 var i = (GameInstallation) installClass.getDeclaredConstructors()[0].newInstance(newPath);
@@ -214,34 +252,25 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public void set(JsonNode node) {
-            if (!node.textValue().equals("disabled")) {
-                this.disabled = true;
-                this.value.set(null);
-            } else {
-                this.disabled = false;
-                this.value.set(Path.of(node.textValue()));
-            }
-        }
-
-        @Override
-        public JsonNode toNode() {
-            if (disabled) {
-                return new TextNode("disabled");
-            } else {
-                return new TextNode(value.get().toString());
-            }
+        public void setDefault() {
+            InstallLocationHelper.getSteamGameInstallPath(game.getFullName()).ifPresent(p -> {
+                this.set(p);
+            });
         }
     }
 
     public static class StorageDirectory extends DirectoryEntry {
 
         public StorageDirectory(String id, String serializationName) {
-            super(id, serializationName, PdxuInstallation.getInstance().getDefaultSavegamesLocation());
+            super(id, serializationName);
         }
 
         @Override
         public void set(Path newPath) {
+            if (newPath.equals(value.get())) {
+                return;
+            }
+
             if (FileUtils.listFiles(newPath.toFile(), null, false).size() > 0) {
                 GuiErrorReporter.showSimpleErrorMessage("New storage directory " + newPath + " must be empty!");
             } else {
@@ -254,17 +283,23 @@ public abstract class SettingsEntry<T> {
                 this.value.set(newPath);
             }
         }
+
+        @Override
+        public void setDefault() {
+            this.value.set(PdxuInstallation.getInstance().getDefaultSavegamesLocation());
+        }
     }
 
     public static class ThirdPartyDirectory extends DirectoryEntry {
 
         private final Path checkFile;
+        private final Supplier<Path> defaultValue;
 
-        public ThirdPartyDirectory(String id, String serializationName, Path checkFile) {
-            super(id, serializationName, null);
+        public ThirdPartyDirectory(String id, String serializationName, Path checkFile, Supplier<Path> defaultValue) {
+            super(id, serializationName);
             this.checkFile = checkFile;
+            this.defaultValue = defaultValue;
         }
-
 
         @Override
         public void set(Path newPath) {
@@ -277,8 +312,13 @@ public abstract class SettingsEntry<T> {
             }
         }
 
+        @Override
+        public void setDefault() {
+            this.value.set(defaultValue.get());
+        }
+
         private void showErrorMessage() {
-            String msg = PdxuI18n.get(name.get()) + " support has been disabled.\n" +
+            String msg = name.get() + " support has been disabled.\n" +
                     "If you believe that the installation is valid, " +
                     "please check whether the installation directory was correctly set.";
             GuiErrorReporter.showSimpleErrorMessage(msg);

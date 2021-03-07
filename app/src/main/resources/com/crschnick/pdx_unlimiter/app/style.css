@@ -6,6 +6,10 @@
  -fx-padding: 1em 0 0 0.7em;
 }
 
+.settings {
+ -fx-padding: 1.25em;
+}
+
 .entry-list {
 -fx-background-color: #FFFFFFAA;
 -fx-background-insets: 0;

@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.LogManager;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -91,8 +92,8 @@ public class DialogHelper {
         Alert alert = new Alert(Alert.AlertType.NONE);
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
-        alert.getDialogPane().styleProperty().setValue("-fx-font-size: " +
-                (Settings.getInstance().fontSize.getValue()) + "pt;");
+        alert.getDialogPane().styleProperty().setValue(
+                "-fx-font-size: " + (Settings.getInstance().fontSize.getValue() - 2) + "pt;");
         GuiStyle.makeEmptyAlert(alert.getDialogPane().getScene());
         return alert;
     }
@@ -106,7 +107,7 @@ public class DialogHelper {
     public static void showText(String title, String header, String file) {
         String text = null;
         try {
-            text = new String(DialogHelper.class.getResourceAsStream(file).readAllBytes());
+            text = new String(GuiLayout.class.getResourceAsStream(file).readAllBytes());
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             return;

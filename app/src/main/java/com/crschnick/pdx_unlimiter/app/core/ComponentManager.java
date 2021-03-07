@@ -13,6 +13,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
@@ -20,14 +21,17 @@ import java.util.concurrent.CountDownLatch;
 
 public class ComponentManager {
 
+    private static Logger logger;
+
     public static void initialSetup(String[] args) {
         try {
             PdxuInstallation.init();
             LogManager.init();
+            logger = LoggerFactory.getLogger(ComponentManager.class);
             ErrorHandler.init();
             IntegrityManager.init();
 
-            LoggerFactory.getLogger(PdxuApp.class).info("Running pdxu with arguments: " + Arrays.toString(args));
+            logger.info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
@@ -53,6 +57,7 @@ public class ComponentManager {
             reset();
             settingsUpdater.run();
             Settings.check();
+            Settings.save();
             init();
         }, true);
     }
@@ -65,16 +70,14 @@ public class ComponentManager {
     }
 
     private static void init() {
-        LoggerFactory.getLogger(ComponentManager.class).debug("Initializing ...");
+        logger.debug("Initializing ...");
         try {
-            Settings.init();
-
-            GuiLayout.init();
-
-            GameInstallation.init();
-
             SavedState.init();
             PdxuApp.getApp().setupWindowState();
+
+            Settings.init();
+            GuiLayout.init();
+            GameInstallation.init();
 
             GameImage.init();
             SavegameStorage.init();
@@ -94,11 +97,11 @@ public class ComponentManager {
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
-        LoggerFactory.getLogger(ComponentManager.class).debug("Finished initialization");
+        logger.debug("Finished initialization");
     }
 
     private static void reset() {
-        LoggerFactory.getLogger(ComponentManager.class).debug("Resetting program state ...");
+        logger.debug("Resetting program state ...");
         try {
             SavedState.getInstance().saveConfig();
 
@@ -106,12 +109,12 @@ public class ComponentManager {
             SavegameManagerState.reset();
             CacheManager.reset();
 
-            LoggerFactory.getLogger(ComponentManager.class).debug("Waiting for platform thread");
+            logger.debug("Waiting for platform thread");
             // Sync with platform thread after GameIntegration reset
             CountDownLatch latch = new CountDownLatch(1);
             Platform.runLater(latch::countDown);
             latch.await();
-            LoggerFactory.getLogger(ComponentManager.class).debug("Synced with platform thread");
+            logger.debug("Synced with platform thread");
 
             SavegameWatcher.reset();
             SavegameStorage.reset();
@@ -122,6 +125,6 @@ public class ComponentManager {
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }
-        LoggerFactory.getLogger(ComponentManager.class).debug("Reset completed");
+        logger.debug("Reset completed");
     }
 }

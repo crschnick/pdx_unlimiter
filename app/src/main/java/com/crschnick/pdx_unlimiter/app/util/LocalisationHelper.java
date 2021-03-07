@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +70,9 @@ public class LocalisationHelper {
     }
 
     public static String getValue(String s, String... vars) {
+        Objects.requireNonNull(s);
+
+        s = s.replace("\\n", "\n");
         for (var v : vars) {
             s = s.replaceAll(VAR_PATTERN, v);
         }

@@ -11,6 +11,7 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.Eu4SeHelper;
+import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -94,6 +95,10 @@ public final class Settings {
     ) {
         @Override
         public void set(Boolean newValue) {
+            if (newValue.equals(value.get())) {
+                return;
+            }
+
             if (newValue) {
                 Eu4SeHelper.showEnabledDialog();
             }
@@ -145,12 +150,14 @@ public final class Settings {
     public final SettingsEntry.ThirdPartyDirectory ck3toeu4Dir = new SettingsEntry.ThirdPartyDirectory(
             "CK3_TO_EU4_DIR",
             "ck3toeu4Dir",
-            Path.of("Ck3ToEu4", "CK3ToEU4Converter.exe")
+            Path.of("Ck3ToEu4", "CK3ToEU4Converter.exe"),
+            () -> null
     );
     public final SettingsEntry.ThirdPartyDirectory ironyDir = new SettingsEntry.ThirdPartyDirectory(
             "IRONY_DIR",
             "ironyDir",
-            Path.of("IronyModManager.exe")
+            Path.of("IronyModManager.exe"),
+            () -> InstallLocationHelper.getIronyDefaultInstallPath().orElse(null)
     );
     public final SettingsEntry.BooleanEntry enabledTimedImports = new SettingsEntry.BooleanEntry(
             "TIMED_IMPORTS",
@@ -166,7 +173,7 @@ public final class Settings {
     );
 
     public static void init() {
-        INSTANCE = loadConfig();
+        INSTANCE = load();
         check();
     }
 
@@ -178,7 +185,7 @@ public final class Settings {
         return INSTANCE;
     }
 
-    public static Settings loadConfig() {
+    private static Settings load() {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
         JsonNode sNode;
         if (Files.exists(file)) {
@@ -195,6 +202,8 @@ public final class Settings {
                 var node = sNode.get(e.getSerializationName());
                 if (node != null) {
                     e.set(node);
+                } else {
+                    e.setDefault();
                 }
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
@@ -203,9 +212,14 @@ public final class Settings {
         return s;
     }
 
-    public static void saveConfig() throws IOException {
+    public static void save() {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
-        FileUtils.forceMkdirParent(file.toFile());
+        try {
+            FileUtils.forceMkdirParent(file.toFile());
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return;
+        }
 
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ObjectNode i = n.putObject("settings");

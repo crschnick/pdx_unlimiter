@@ -12,7 +12,12 @@ public final class PdxuI18n {
     private Map<String, String> map = new HashMap<>();
 
     public static String get(String s, String... vars) {
-        return LocalisationHelper.getValue(get(LocalisationHelper.Language.ENGLISH).getMap().get(s), vars);
+        var localisedString = get(LocalisationHelper.Language.ENGLISH).getMap().get(s);
+        if (localisedString == null) {
+            throw new IllegalArgumentException("No localisation found for key " + s);
+        }
+
+        return LocalisationHelper.getValue(localisedString, vars);
     }
 
     public static PdxuI18n get(LocalisationHelper.Language language) {

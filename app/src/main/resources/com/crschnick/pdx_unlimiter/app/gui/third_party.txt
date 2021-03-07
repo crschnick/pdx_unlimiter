@@ -4,11 +4,11 @@ JavaFX 15 (https://openjfx.io/) (GPL v2)
 
 Rakaly (https://github.com/rakaly/cli) (MIT License)
 
-Elevate (https://github.com/jpassing/elevate) (MIT License)
-
 Apache Commons IO (https://commons.apache.org/proper/commons-io/) (Apache License v2.0)
 
 Apache Commons Lang3 (https://commons.apache.org/proper/commons-lang/) (Apache License v2.0)
+
+Apache Commons Collections4 (https://commons.apache.org/proper/commons-collections/) (Apache License v2.0)
 
 JNativeHook (https://github.com/kwhat/jnativehook) (GPL v3)
 

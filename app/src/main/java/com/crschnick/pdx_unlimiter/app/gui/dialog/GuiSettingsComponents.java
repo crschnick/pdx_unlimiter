@@ -6,10 +6,12 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -28,19 +30,26 @@ public class GuiSettingsComponents {
 
     private static Region pathEntryNode(SettingsEntry.DirectoryEntry de, Set<Runnable> applyFuncs) {
         TextField textArea = new TextField();
-        textArea.setEditable(false);
-        Button b = new Button();
-        b.setGraphic(new FontIcon());
-        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
-
-        b.setOnMouseClicked((m) -> {
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
-            File file = fileChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
+        EventHandler<MouseEvent> eh = (m) -> {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            if (!textArea.getText().isEmpty()) {
+                Path p = Path.of(textArea.getText());
+                dirChooser.setInitialDirectory(p.toFile());
+            }
+            dirChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
+            File file = dirChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
                 textArea.setText(file.toString());
             }
-        });
+            m.consume();
+        };
+        textArea.setEditable(false);
+        textArea.setOnMouseClicked(eh);
+
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
+        b.setOnMouseClicked(eh);
 
         textArea.setText(Optional.ofNullable(de.getValue()).map(Path::toString)
                 .orElse(""));
