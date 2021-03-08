@@ -101,7 +101,7 @@ public class GuiSettingsComponents {
             grid.add(GuiTooltips.helpNode(entry.getDescription()), 0, row);
             grid.add(new Label(entry.getName() + ":"), 1, row);
 
-            Region val = null;
+            Region val;
             if (entry.getType().equals(SettingsEntry.Type.PATH)) {
                 val = pathEntryNode((SettingsEntry.DirectoryEntry) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.BOOLEAN)) {

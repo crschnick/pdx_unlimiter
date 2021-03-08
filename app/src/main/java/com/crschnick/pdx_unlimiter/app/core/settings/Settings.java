@@ -12,6 +12,7 @@ import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.Eu4SeHelper;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -236,5 +237,6 @@ public final class Settings {
                 ErrorHandler.handleException(e);
             }
         }
+        ConfigHelper.writeConfig(file, n);
     }
 }

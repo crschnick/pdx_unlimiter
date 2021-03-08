@@ -5,7 +5,9 @@ import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -27,13 +29,25 @@ public class Hoi4Installation extends GameInstallation {
         super(path, Path.of("hoi4"));
     }
 
-    public void loadData() throws Exception {
-        loadSettings();
+    @Override
+    protected GameVersion determineVersion(JsonNode node) {
+        String v = node.required("version").textValue();
+        Matcher m = Pattern.compile("(\\w+)\\s+v(\\d)\\.(\\d+)\\.(\\d+)").matcher(v);
+        m.find();
+        return new GameVersion(
+                Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(3)),
+                Integer.parseInt(m.group(4)),
+                0,
+                m.group(1));
     }
 
     @Override
-    public void initOptional() throws Exception {
-        super.initOptional();
+    protected LocalisationHelper.Language determineLanguage() throws Exception {
+        var sf = getUserPath().resolve("settings.txt");
+        var node = TextFormatParser.textFileParser().parse(sf);
+        var langId = node.getNodeForKey("language").getString();
+        return LocalisationHelper.Language.byId(langId);
     }
 
     @Override
@@ -50,38 +64,7 @@ public class Hoi4Installation extends GameInstallation {
 
     @Override
     public Optional<GameMod> getModForName(String name) {
-        return mods.stream().filter(d -> d.getName().equals(name)).findAny();
-    }
-
-    private Path determineUserDirectory(JsonNode node) {
-        String value = Optional.ofNullable(node.get("gameDataPath"))
-                .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in HOI4 launcher config file"))
-                .textValue();
-        return replaceVariablesInPath(value);
-    }
-
-    public void loadSettings() throws IOException {
-        ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(
-                getPath().resolve("launcher-settings.json")));
-        this.userDir = determineUserDirectory(node);
-
-        String v = node.required("version").textValue();
-        Matcher m = Pattern.compile("(\\w+)\\s+v(\\d)\\.(\\d+)\\.(\\d+)").matcher(v);
-        m.find();
-        this.version = new GameVersion(
-                Integer.parseInt(m.group(2)),
-                Integer.parseInt(m.group(3)),
-                Integer.parseInt(m.group(4)),
-                0,
-                m.group(1));
-
-        String platform = node.required("distPlatform").textValue();
-        if (platform.equals("steam")) {
-            this.distType = new DistributionType.Steam(Integer.parseInt(Files.readString(getPath().resolve("steam_appid.txt"))));
-        } else {
-            this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
-        }
+        return getMods().stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
     @Override

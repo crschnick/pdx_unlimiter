@@ -106,6 +106,9 @@ public class GuiErrorReporter {
 
         alert.getDialogPane().setContent(dialogPaneContent);
 
+        //TODO: better metric?
+        alert.getDialogPane().setMaxWidth(400);
+
         Optional<ButtonType> r = alert.showAndWait();
         return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.OK_DONE);
     }

@@ -5,7 +5,9 @@ import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -28,13 +30,26 @@ public class Ck3Installation extends GameInstallation {
         super(path, Path.of("binaries", "ck3"));
     }
 
-    public void loadData() throws Exception {
-        loadSettings();
+    @Override
+    protected GameVersion determineVersion(JsonNode node) {
+        String v = node.required("version").textValue();
+        Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)\\s+\\((\\w+)\\)").matcher(v);
+        m.find();
+        return new GameVersion(
+                Integer.parseInt(m.group(1)),
+                Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(3)),
+                0,
+                m.group(4));
     }
 
     @Override
-    public void initOptional() throws Exception {
-        super.initOptional();
+    protected LocalisationHelper.Language determineLanguage() throws Exception {
+        var sf = getUserPath().resolve("pdx_settings.txt");
+        var node = TextFormatParser.textFileParser().parse(sf);
+        var langId = node.getNodeForKey("\"System\"")
+                .getNodeForKey("\"language\"").getNodeForKey("value").getString();
+        return LocalisationHelper.Language.byId(langId);
     }
 
     @Override
@@ -52,38 +67,12 @@ public class Ck3Installation extends GameInstallation {
 
     @Override
     public Optional<GameMod> getModForName(String name) {
-        return mods.stream().filter(d -> getUserPath().relativize(d.getModFile()).equals(Path.of(name))).findAny();
+        return getMods().stream().filter(d -> getUserPath().relativize(d.getModFile()).equals(Path.of(name))).findAny();
     }
 
-    private Path determineUserDirectory(JsonNode node) {
-        String value = Optional.ofNullable(node.get("gameDataPath"))
-                .orElseThrow(() -> new IllegalArgumentException("Couldn't find game data path in CK3 launcher config file"))
-                .textValue();
-        return replaceVariablesInPath(value);
-    }
-
-    public void loadSettings() throws IOException {
-        ObjectMapper o = new ObjectMapper();
-        JsonNode node = o.readTree(Files.readAllBytes(
-                getLauncherDataPath().resolve("launcher-settings.json")));
-        this.userDir = determineUserDirectory(node);
-        String v = node.required("version").textValue();
-        Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)\\s+\\((\\w+)\\)").matcher(v);
-        m.find();
-        this.version = new GameVersion(
-                Integer.parseInt(m.group(1)),
-                Integer.parseInt(m.group(2)),
-                Integer.parseInt(m.group(3)),
-                0,
-                m.group(4));
-
-        String platform = node.required("distPlatform").textValue();
-        if (platform.equals("steam")) {
-            this.distType = new DistributionType.Steam(
-                    Integer.parseInt(Files.readString(getPath().resolve("binaries").resolve("steam_appid.txt"))));
-        } else {
-            this.distType = new DistributionType.PdxLauncher(getLauncherDataPath());
-        }
+    @Override
+    public Path getSteamAppIdFile() {
+        return getPath().resolve("binaries").resolve("steam_appid.txt");
     }
 
     @Override

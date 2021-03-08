@@ -6,6 +6,8 @@ l_english:
  IRONY: "Irony mod manager"
  SELECT_DIR: "Select $DIR$ directory"
  GAME_DIRS: "Game Installations"
+ GAME_DIR_ERROR: "An error occured while loading your $GAME$ installation"
+ GAME_DIR_ERROR_MSG: "$GAME$ support has been disabled. If you believe that your installation is valid, please check in the settings menu whether the installation directory was correctly set."
  GAME_DIR: "$GAME$ installation"
  GAME_DIR_DESC: "The $GAME$ installation directory.\n\nNote that this should be the installation directory that contains the game executable and assets.\nNOT the user directory that contains your savegames and mods."
  STORAGE_DIR: "Storage directory"
@@ -43,3 +45,4 @@ l_english:
  TIMED_IMPORTS_DESC: "Enables automatically importing the latest savegame after a certain time has passed while playing."
  TIMED_IMPORTS_INTERVAL: "Minutes between imports"
  TIMED_IMPORTS_INTERVAL_DESC: "The interval between automatic imports in minutes."
+ THIRD_PARTY_ERROR: "$APP$ support has been disabled.\nIf you believe that the installation is valid,\nplease check whether the installation directory was correctly set."

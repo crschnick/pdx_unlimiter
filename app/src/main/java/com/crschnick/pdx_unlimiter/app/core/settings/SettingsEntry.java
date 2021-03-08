@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.InvalidInstallationException;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -17,6 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -228,13 +230,10 @@ public abstract class SettingsEntry<T> {
             this.installClass = installClass;
         }
 
-        private void showInstallErrorMessage(Exception e) {
-            String msg = e.getClass().getSimpleName() + ": " + e.getMessage() +
-                    ".\n\n" + game.getFullName() + " support has been disabled.\n" +
-                    "If you believe that your installation is valid, " +
-                    "please check in the settings menu whether the installation directory was correctly set.";
-            GuiErrorReporter.showSimpleErrorMessage(
-                    "An error occured while loading your " + game.getFullName() + " installation:\n" + msg);
+        private void showInstallErrorMessage(String msg) {
+            String fullMsg = PdxuI18n.get("GAME_DIR_ERROR", game.getFullName()) + ":\n" +
+                    msg + "\n\n" + PdxuI18n.get("GAME_DIR_ERROR_MSG");
+            GuiErrorReporter.showSimpleErrorMessage(fullMsg);
         }
 
         @Override
@@ -245,9 +244,12 @@ public abstract class SettingsEntry<T> {
                 var i = (GameInstallation) installClass.getDeclaredConstructors()[0].newInstance(newPath);
                 i.loadData();
                 super.set(newPath);
+            } catch (InvalidInstallationException e) {
+                this.disabled = true;
+                showInstallErrorMessage(PdxuI18n.get(e.getMessageId()));
             } catch (Exception e) {
                 this.disabled = true;
-                showInstallErrorMessage(e);
+                showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
 
@@ -314,14 +316,22 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void setDefault() {
-            this.value.set(defaultValue.get());
+            var df = defaultValue.get();
+            if (df == null) {
+                this.value.set(null);
+                this.disabled = false;
+                return;
+            }
+
+            var file = df.resolve(checkFile);
+            boolean found = Files.exists(file);
+            if (found) {
+                this.value.set(df);
+            }
         }
 
         private void showErrorMessage() {
-            String msg = name.get() + " support has been disabled.\n" +
-                    "If you believe that the installation is valid, " +
-                    "please check whether the installation directory was correctly set.";
-            GuiErrorReporter.showSimpleErrorMessage(msg);
+            GuiErrorReporter.showSimpleErrorMessage(PdxuI18n.get("THIRD_PARTY_ERROR"));
         }
     }
 }

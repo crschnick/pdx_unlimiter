@@ -9,9 +9,11 @@ import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.SystemUtils;
@@ -30,11 +32,11 @@ public abstract class GameInstallation {
 
     public static final BidiMap<Game, GameInstallation> ALL = new DualHashBidiMap<>();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    protected DistributionType distType;
-    protected Path userDir;
-    protected List<GameMod> mods = new ArrayList<>();
-    protected GameVersion version;
-    protected LocalisationHelper.Language language;
+    private DistributionType distType;
+    private Path userDir;
+    private final List<GameMod> mods = new ArrayList<>();
+    private GameVersion version;
+    private LocalisationHelper.Language language;
     private final Path path;
     private Path executable;
     private final List<GameDlc> dlcs = new ArrayList<>();
@@ -148,7 +150,68 @@ public abstract class GameInstallation {
 
     public abstract void startDirectly();
 
-    public abstract void loadData() throws Exception;
+    public void loadData() throws IOException, InvalidInstallationException {
+        Game g = ALL.inverseBidiMap().get(this);
+        if (!Files.isRegularFile(getExecutable())) {
+            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation());
+        }
+
+        var ls = getLauncherDataPath().resolve("launcher-settings.json");
+        if (!Files.exists(ls)) {
+            throw new InvalidInstallationException("LAUNCHER_SETTINGS_NOT_FOUND", g.getAbbreviation());
+        }
+
+        JsonNode node = JsonHelper.read(ls);
+        try {
+            this.userDir = determineUserDir(node);
+            logger.debug(g.getAbbreviation() + " user dir: " + this.userDir);
+            if (!Files.exists(this.userDir)) {
+                throw new InvalidInstallationException(
+                        "GAME_DATA_PATH_DOES_NOT_EXIST", g.getAbbreviation(), this.userDir.toString());
+            }
+
+            this.version = determineVersion(node);
+            logger.debug(g.getAbbreviation() + " version: " + this.version);
+            this.distType = determineDistType(node);
+            logger.debug(g.getAbbreviation() + " distribution type: " + this.distType.getName());
+            this.language = determineLanguage();
+            logger.debug(g.getAbbreviation() + " language: " +
+                    (this.language != null ? this.language.name() : "unknown"));
+        } catch (InvalidInstallationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InvalidInstallationException(e);
+        }
+    }
+
+    protected Path determineUserDir(JsonNode node) throws InvalidInstallationException{
+        Game g = ALL.inverseBidiMap().get(this);
+        String value = Optional.ofNullable(node.get("gameDataPath"))
+                .orElseThrow(() -> new InvalidInstallationException("GAME_DATA_PATH_NOT_FOUND", g.getAbbreviation()))
+                .textValue();
+        return replaceVariablesInPath(value);
+    }
+
+    protected abstract GameVersion determineVersion(JsonNode node);
+
+    private DistributionType determineDistType(JsonNode node) throws IOException {
+        String platform = node.required("distPlatform").textValue();
+        DistributionType d;
+        if (platform.equals("steam")) {
+            // Trim the id because sometimes it contains trailing new lines!
+            var id = Files.readString(getSteamAppIdFile()).trim();
+            d = new DistributionType.Steam(Integer.parseInt(id));
+        } else {
+            d = new DistributionType.PdxLauncher(getLauncherDataPath());
+        }
+        return d;
+    }
+
+    protected abstract LocalisationHelper.Language determineLanguage() throws Exception;
+
+    public Path getSteamAppIdFile() {
+        return getPath().resolve("steam_appid.txt");
+    }
 
     public Path getLauncherDataPath() {
         return getPath();
