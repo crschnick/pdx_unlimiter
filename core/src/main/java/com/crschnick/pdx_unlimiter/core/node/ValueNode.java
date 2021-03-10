@@ -36,7 +36,7 @@ public final class ValueNode extends Node {
 
     @Override
     public Descriptor describe() {
-        ValueType t = null;
+        ValueType t;
         if (isQuoted()) {
             t = ValueType.TEXT;
         } else {
@@ -107,5 +107,10 @@ public final class ValueNode extends Node {
     @Override
     public boolean isColor() {
         return false;
+    }
+
+    @Override
+    public boolean matches(NodeMatcher matcher) {
+        return matcher.matchesScalar(context, scalarIndex);
     }
 }

@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
+import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
@@ -65,21 +66,17 @@ public class GuiIncompatibleWarning {
     }
 
     public static Optional<Boolean> showStellarisModWarning(List<GameMod> enabledMods) {
-        var launchButton = new ButtonType("Launch");
-        var changeModsButton = new ButtonType("Change mods");
+        var launchButton = new ButtonType(PdxuI18n.get("LAUNCH"));
+        var changeModsButton = new ButtonType(PdxuI18n.get("CHANGE_MODS"));
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.WARNING);
         alert.getButtonTypes().clear();
         alert.getButtonTypes().add(ButtonType.CLOSE);
         alert.getButtonTypes().add(launchButton);
         alert.getButtonTypes().add(changeModsButton);
-        alert.setTitle("Stellaris mod information");
+        alert.setTitle(PdxuI18n.get("STELLARIS_INFO_TITLE"));
 
-        String builder = """
-                Stellaris savegames do not store which mods they require.
-                Therefore, you have to verify manually, that you are using the correct ones.
-                                
-                """ + "\nThe following Mods are enabled:\n" + enabledMods.stream()
+        String builder = PdxuI18n.get("STELLARIS_INFO") + enabledMods.stream()
                 .map(m -> "- " + m.getName())
                 .collect(Collectors.joining("\n"));
         alert.setHeaderText(builder);

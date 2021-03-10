@@ -22,7 +22,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SavegameManagerState.class);
 
-    private static final SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<Object, SavegameInfo<Object>>();
+    private static final SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<>();
     private final SimpleObjectProperty<Game> current = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaign =
             new SimpleObjectProperty<>();
@@ -47,6 +47,10 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 n.getSavegames().addListener(cl);
             }
         });
+
+        currentGameProperty().addListener((c,o,n) -> {
+            SavedState.getInstance().setActiveGame(n);
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -57,14 +61,16 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     public static void init() {
         SavedState s = SavedState.getInstance();
         if (s.getActiveGame() != null) {
-            for (var g : Game.values()) {
-                if (s.getActiveGame().equals(g)) {
-                    INSTANCE.selectGame(g);
-                    return;
-                }
+            // Check if stored active game is no longer valid
+            if (!GameInstallation.ALL.containsKey(s.getActiveGame())) {
+                SavedState.getInstance().setActiveGame(null);
+            } else {
+                INSTANCE.selectGame(s.getActiveGame());
+                return;
             }
         }
 
+        // If no active game is set, select the first one available (if existent)
         GameInstallation.ALL.entrySet().stream().findFirst().ifPresent(e -> {
             INSTANCE.selectGame(e.getKey());
         });

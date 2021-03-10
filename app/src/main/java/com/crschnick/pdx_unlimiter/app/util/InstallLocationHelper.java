@@ -14,7 +14,7 @@ public class InstallLocationHelper {
 
     public static Optional<Path> getIronyDefaultInstallPath() {
         var dir = Path.of(System.getenv("LOCALAPPDATA"))
-                .resolve("Programs").resolve("Irony");
+                .resolve("Programs").resolve("Irony Mod Manager");
         if (Files.exists(dir)) {
             return Optional.of(dir);
         } else {

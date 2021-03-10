@@ -24,20 +24,66 @@ import java.util.stream.StreamSupport;
 public class GameLauncher {
 
     public static void startLauncher() {
+        try {
         var game = SavegameManagerState.get().current();
         if (Settings.getInstance().launchIrony.getValue()) {
             IronyHelper.launchEntry(game, false);
         } else {
             GameInstallation.ALL.get(game).getDistType().startLauncher();
         }
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex);
+        }
+    }
+
+    public static void startLauncherWithContinueGame(SavegameEntry<?, ?> e) {
+        try {
+            setupContinueGame(e);
+            var game = SavegameManagerState.get().current();
+            if (Settings.getInstance().launchIrony.getValue()) {
+                IronyHelper.launchEntry(game, true);
+            } else {
+                GameInstallation.ALL.get(game).getDistType().startLauncher();
+            }
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex);
+        }
+    }
+
+    private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T,I> e) throws IOException {
+        var ctx = SavegameHelper.getContext(e);
+        var path = ctx.getInstallation().getExportTarget(e);
+        ctx.getStorage().copySavegameTo(e, path);
+        ctx.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
+        ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
+
+        var dlcs = e.getInfo().getDlcs().stream()
+                .map(d -> ctx.getInstallation().getDlcForName(d))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        var mods = e.getInfo().getMods().stream()
+                .map(m -> ctx.getInstallation().getModForName(m))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        if (ctx.getGame().equals(Game.STELLARIS)) {
+            writeStellarisDlcLoadFile(GameInstallation.ALL.get(Game.STELLARIS), dlcs);
+        } else {
+            writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
+        }
     }
 
     private static void startDirectly(SavegameEntry<?, ?> e) {
         SavegameHelper.withSavegame(e, ctx -> {
-            var install = ctx.getInstallation();
+            if (ctx.getGame().equals(Game.STELLARIS)) {
+                var r = GuiIncompatibleWarning.showStellarisModWarning(
+                        GameInstallation.ALL.get(Game.STELLARIS).getMods());
+            }
             if (Settings.getInstance().launchIrony.getValue()) {
-                IronyHelper.launchEntry(ctx.getGame(), true);
+                //IronyHelper.launchEntry(ctx.getGame(), true);
             } else {
+                var install = ctx.getInstallation();
                 boolean doLaunch = install.getDistType().checkDirectLaunch();
                 if (doLaunch) {
                     ctx.getInstallation().startDirectly();
@@ -56,50 +102,14 @@ public class GameLauncher {
                 }
             }
 
-            try {
-                var path = ctx.getInstallation().getExportTarget(e);
-                ctx.getStorage().copySavegameTo(e, path);
-                ctx.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
-                ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
-
-
-                var dlcs = e.getInfo().getDlcs().stream()
-                        .map(d -> ctx.getInstallation().getDlcForName(d))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-                if (ctx.getGame().equals(Game.STELLARIS)) {
-                    writeStellarisDlcLoadFile(GameInstallation.ALL.get(Game.STELLARIS), dlcs);
-                } else {
-                    var mods = e.getInfo().getMods().stream()
-                            .map(m -> ctx.getInstallation().getModForName(m))
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
-                    writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
-                }
-
-
-                startDirectly(e);
-            } catch (Exception ex) {
-
-                ErrorHandler.handleException(ex);
-            }
+            //setupContinueGame(e);
+            startDirectly(e);
         });
-    }
-
-    static List<GameMod> getEnabledMods(GameInstallation installation) throws IOException {
-        var file = installation.getUserPath().resolve("dlc_load.json");
-        var node = JsonHelper.read(file);
-        return StreamSupport.stream(node.get("enabled_mods").spliterator(), false)
-                .map(m -> installation.getModForName(m.textValue()))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList());
     }
 
     static void writeStellarisDlcLoadFile(
             GameInstallation installation, List<GameDlc> dlcs) throws IOException {
-        var existingMods = getEnabledMods(installation);
+        var existingMods = installation.getMods();
         writeDlcLoadFile(installation, existingMods, dlcs);
     }
 

@@ -7,6 +7,16 @@ public enum Game {
     CK3("ck3", "CK3", "Crusader Kings III"),
     STELLARIS("stellaris", "Stellaris", "Stellaris");
 
+
+    public static Game byId(String id) {
+        for (Game g : values()) {
+            if (g.getId().equals(id)) {
+                return g;
+            }
+        }
+        return null;
+    }
+
     private final String id;
     private final String abbreviation;
     private final String fullName;

@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
@@ -48,6 +49,13 @@ public abstract class GameInstallation {
         } else if (SystemUtils.IS_OS_LINUX) {
             this.executable = getPath().resolve(executable);
         }
+    }
+
+    public static void initTemporary(Game game, GameInstallation install) throws
+            IOException, InvalidInstallationException {
+        ALL.put(game, install);
+        install.loadData();
+        ALL.removeValue(game);
     }
 
     public static void init() throws Exception {
@@ -152,6 +160,7 @@ public abstract class GameInstallation {
 
     public void loadData() throws IOException, InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
+        LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getAbbreviation() + " installation ...");
         if (!Files.isRegularFile(getExecutable())) {
             throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation());
         }
@@ -177,6 +186,7 @@ public abstract class GameInstallation {
             this.language = determineLanguage();
             logger.debug(g.getAbbreviation() + " language: " +
                     (this.language != null ? this.language.name() : "unknown"));
+            LoggerFactory.getLogger(getClass()).debug("Finished initialization");
         } catch (InvalidInstallationException e) {
             throw e;
         } catch (Exception e) {

@@ -16,14 +16,19 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class SettingsEntry<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(SettingsEntry.class);
 
     protected final Supplier<String> name;
     protected final Supplier<String> description;
@@ -38,6 +43,7 @@ public abstract class SettingsEntry<T> {
         this.description = () -> PdxuI18n.get(id + "_DESC");
         this.type = type;
         this.value = new SimpleObjectProperty<>();
+        setupLogger();
     }
 
     public SettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type) {
@@ -46,6 +52,13 @@ public abstract class SettingsEntry<T> {
         this.serializationName = serializationName;
         this.type = type;
         this.value = new SimpleObjectProperty<>();
+        setupLogger();
+    }
+
+    private void setupLogger() {
+        this.value.addListener((c,o,n) -> {
+            logger.info("Changing settings entry " + serializationName + " from " + o + " to " + n);
+        });
     }
 
     public abstract void set(JsonNode node);
@@ -238,11 +251,18 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Path newPath) {
-            super.set(newPath);
+            if (newPath == null) {
+                this.value.set(null);
+                return;
+            }
+
+            if (newPath.equals(value.get())) {
+                return;
+            }
 
             try {
                 var i = (GameInstallation) installClass.getDeclaredConstructors()[0].newInstance(newPath);
-                i.loadData();
+                GameInstallation.initTemporary(game, i);
                 super.set(newPath);
             } catch (InvalidInstallationException e) {
                 this.disabled = true;
@@ -269,6 +289,8 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Path newPath) {
+            Objects.requireNonNull(newPath);
+
             if (newPath.equals(value.get())) {
                 return;
             }
@@ -279,10 +301,10 @@ public abstract class SettingsEntry<T> {
                 try {
                     Files.delete(newPath);
                     FileUtils.moveDirectory(value.get().toFile(), newPath.toFile());
+                    this.value.set(newPath);
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);
                 }
-                this.value.set(newPath);
             }
         }
 
@@ -305,12 +327,24 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Path newPath) {
+            if (newPath == null) {
+                this.value.set(null);
+                return;
+            }
+
+
+            if (newPath.equals(value.get())) {
+                return;
+            }
+
             var file = newPath.resolve(checkFile);
             boolean found = Files.exists(file);
             if (!found) {
                 showErrorMessage();
+                this.disabled = true;
+                this.value.set(null);
             } else {
-                this.value.set(newPath);
+                super.set(newPath);
             }
         }
 

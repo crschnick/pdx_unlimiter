@@ -54,7 +54,7 @@ public class GuiSettingsComponents {
         textArea.setText(Optional.ofNullable(de.getValue()).map(Path::toString)
                 .orElse(""));
         applyFuncs.add(() -> {
-            de.set(Path.of(textArea.getText()));
+            de.set(textArea.getText().equals("") ? null : Path.of(textArea.getText()));
         });
 
         HBox hbox = new HBox(textArea, b);

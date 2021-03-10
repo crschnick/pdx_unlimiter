@@ -8,12 +8,8 @@ import java.io.IOException;
 
 public class IronyHelper {
 
-    public static void launchEntry(Game game, boolean continueGame) {
+    public static void launchEntry(Game game, boolean continueGame) throws IOException {
         var exe = Settings.getInstance().ironyDir.getValue().resolve("IronyModManager.exe");
-        try {
-            new ProcessBuilder(exe.toString(), "-g", game.getAbbreviation(), continueGame ? "-r" : "").start();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+        new ProcessBuilder(exe.toString(), "-g", game.getAbbreviation(), continueGame ? "-r" : "").start();
     }
 }

@@ -21,7 +21,7 @@ public abstract class DistributionType {
 
     public abstract boolean checkDirectLaunch();
 
-    public abstract void startLauncher();
+    public abstract void startLauncher() throws IOException;
 
     public abstract List<Path> getSavegamePaths();
 
@@ -81,7 +81,7 @@ public abstract class DistributionType {
         }
 
         @Override
-        public void startLauncher() {
+        public void startLauncher() throws IOException {
             Path bootstrapper = null;
             if (SystemUtils.IS_OS_WINDOWS) {
                 bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
@@ -94,16 +94,12 @@ public abstract class DistributionType {
                         .resolve("bootstrapper-v2");
             }
 
-            try {
                 new ProcessBuilder()
                         .directory(launcherPath.toFile())
                         .command(bootstrapper.toString(),
                                 "--pdxlGameDir", launcherPath.toString(),
                                 "--gameDir", launcherPath.toString())
                         .start();
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
         }
 
         @Override

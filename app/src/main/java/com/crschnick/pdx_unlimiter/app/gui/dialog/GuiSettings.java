@@ -47,7 +47,8 @@ public class GuiSettings {
         alert.getDialogPane().setContent(sp);
         sp.setPrefWidth(550);
         sp.setPrefHeight(600);
-        vbox.getStyleClass().add("settings");
+        vbox.getStyleClass().add("settings-content");
+        sp.getStyleClass().add("settings-container");
 
         Optional<ButtonType> r = alert.showAndWait();
         if (r.isPresent() && r.get().equals(ButtonType.APPLY)) {

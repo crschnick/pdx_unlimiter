@@ -28,11 +28,6 @@ public final class NodeContext {
         this.literalsCount = literalsCount;
     }
 
-    public byte[] getSubData(int literalIndex) {
-        return Arrays.copyOfRange(data, literalsBegin[literalIndex],
-                literalsBegin[literalIndex] + literalsLength[literalIndex]);
-    }
-
     public String evaluate(int literalIndex) {
         return new String(data, literalsBegin[literalIndex], literalsLength[literalIndex], charset);
     }
@@ -51,9 +46,5 @@ public final class NodeContext {
 
     public short[] getLiteralsLength() {
         return literalsLength;
-    }
-
-    public int getLiteralsCount() {
-        return literalsCount;
     }
 }

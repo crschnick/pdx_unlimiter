@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -26,7 +27,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
-        Alert alert = DialogHelper.createAlert();
+        Alert alert = DialogHelper.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
@@ -112,10 +113,9 @@ public class GuiImporter {
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import");
         alert.getDialogPane().setContent(create(watcher.getSavegames(), selected));
-        alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
         watcher.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                // Clear the selected savegames!!
+                // Clear the selected savegames!
                 selected.clear();
                 alert.getDialogPane().setContent(create(n, selected));
             });

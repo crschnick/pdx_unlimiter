@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//TODO: Adapt to context instead of string
 public final class ColorNode extends Node {
 
     private static final byte[] RGB = "rgb".getBytes();
@@ -81,5 +82,10 @@ public final class ColorNode extends Node {
     @Override
     public boolean isColor() {
         return true;
+    }
+
+    @Override
+    public boolean matches(NodeMatcher matcher) {
+        return matcher.matchesScalar(new NodeContext(colorName), 0);
     }
 }

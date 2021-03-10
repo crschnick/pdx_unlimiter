@@ -41,7 +41,15 @@ public class ComponentManager {
         }
     }
 
-    public static void additionalSetup() {
+    public static void initialPlatformSetup() {
+        try {
+            SavedState.init();
+            PdxuApp.getApp().setupWindowState();
+            Settings.init();
+        } catch (Exception e) {
+            ErrorHandler.handleTerminalException(e);
+        }
+
         ErrorHandler.setPlatformInitialized();
         Platform.setImplicitExit(false);
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
@@ -72,10 +80,6 @@ public class ComponentManager {
     private static void init() {
         logger.debug("Initializing ...");
         try {
-            SavedState.init();
-            PdxuApp.getApp().setupWindowState();
-
-            Settings.init();
             GuiLayout.init();
             GameInstallation.init();
 

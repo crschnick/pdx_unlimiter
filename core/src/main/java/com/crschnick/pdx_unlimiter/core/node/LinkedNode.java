@@ -76,6 +76,16 @@ public final class LinkedNode extends ArrayNode {
     }
 
     @Override
+    public boolean matches(NodeMatcher matcher) {
+        for (var n : arrayNodes) {
+            if (n.matches(matcher)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean hasKey(String key) {
         return super.hasKey(key);
     }

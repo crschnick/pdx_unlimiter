@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public abstract class Node {
 
@@ -50,6 +51,8 @@ public abstract class Node {
     public abstract boolean isArray();
 
     public abstract boolean isColor();
+
+    public abstract boolean matches(NodeMatcher matcher);
 
     public boolean hasKey(String key) {
         throw new UnsupportedOperationException();

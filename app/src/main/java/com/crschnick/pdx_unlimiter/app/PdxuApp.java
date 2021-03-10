@@ -8,15 +8,12 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +128,7 @@ public class PdxuApp extends Application {
             Scene scene = new Scene(layout, 1000, 720);
             primaryStage.setScene(scene);
             GuiStyle.addStylesheets(primaryStage.getScene());
-            ComponentManager.additionalSetup();
+            ComponentManager.initialPlatformSetup();
         } catch (Exception ex) {
             ErrorHandler.handleTerminalException(ex);
         }

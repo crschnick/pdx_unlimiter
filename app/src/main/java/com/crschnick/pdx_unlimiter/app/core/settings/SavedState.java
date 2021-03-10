@@ -50,18 +50,8 @@ public class SavedState {
 
         var active = Optional.ofNullable(sNode.get("activeGame"));
         active.map(JsonNode::textValue).ifPresent(n -> {
-            GameInstallation.ALL.forEach((key, value) -> {
-                if (value != null && key.getId().equals(n)) {
-                    s.activeGame = key;
-                }
-            });
+            s.activeGame = Game.byId(n);
         });
-        if (s.activeGame == null) {
-            s.activeGame = GameInstallation.ALL.entrySet().stream()
-                    .filter(e -> e.getValue() != null)
-                    .map(e -> e.getKey())
-                    .findFirst().orElse(null);
-        }
 
         return s;
     }

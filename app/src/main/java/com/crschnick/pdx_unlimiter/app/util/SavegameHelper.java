@@ -81,8 +81,8 @@ public class SavegameHelper {
         });
     }
 
-    public static <T, I extends SavegameInfo<T>, R> R mapSavegame(
-            SavegameEntry<T, I> e, Function<SavegameContext<T, I>, R> con) {
+    public static <T, I extends SavegameInfo<T>> SavegameContext<T, I> getContext(
+            SavegameEntry<T, I> e) {
         var g = getForSavegame(e);
         if (g == null) {
             throw new IllegalStateException();
@@ -101,7 +101,12 @@ public class SavegameHelper {
             throw new IllegalStateException();
         }
         ctx.collection = col;
+        return ctx;
+    }
 
+    public static <T, I extends SavegameInfo<T>, R> R mapSavegame(
+            SavegameEntry<T, I> e, Function<SavegameContext<T, I>, R> con) {
+        var ctx = getContext(e);
         return con.apply(ctx);
     }
 

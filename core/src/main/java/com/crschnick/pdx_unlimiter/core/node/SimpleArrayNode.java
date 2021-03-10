@@ -56,6 +56,28 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     @Override
+    public boolean matches(NodeMatcher matcher) {
+        for (int i = 0; i < values.size(); i++) {
+            if (hasKeyAtIndex(i)) {
+                if (matcher.matchesScalar(context, keyScalars[i])) {
+                    return true;
+                }
+            }
+
+            if (values.get(i) == null) {
+                if (matcher.matchesScalar(context, valueScalars[i])) {
+                    return true;
+                }
+            } else {
+                if (values.get(i).matches(matcher)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public Descriptor describe() {
         evaluateAllValueNodes();
 
