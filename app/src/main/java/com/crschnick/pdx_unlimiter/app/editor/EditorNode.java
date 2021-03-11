@@ -40,7 +40,7 @@ public abstract class EditorNode {
                 boolean shouldCollect = end > start;
 
                 if (shouldCollect) {
-                    result.add(new CollectorNode(
+                    result.add(new EditorCollectorNode(
                             parent,
                             k,
                             parentIndex.get(),
@@ -59,7 +59,7 @@ public abstract class EditorNode {
                 previousKeyStart.incrementAndGet();
             }
 
-            result.add(new SimpleNode(
+            result.add(new EditorSimpleNode(
                     parent,
                     k,
                     parentIndex.get(),
@@ -84,7 +84,7 @@ public abstract class EditorNode {
 
     public abstract boolean isReal();
 
-    public abstract SimpleNode getRealParent();
+    public abstract EditorSimpleNode getRealParent();
 
     public abstract List<EditorNode> expand();
 

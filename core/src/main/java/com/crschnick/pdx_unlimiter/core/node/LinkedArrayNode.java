@@ -97,7 +97,6 @@ public final class LinkedArrayNode extends ArrayNode {
     protected void writeInternal(NodeWriter writer) throws IOException {
         for (var n : arrayNodes) {
             n.writeInternal(writer);
-            writer.newLine();
         }
     }
 

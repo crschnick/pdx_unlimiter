@@ -22,7 +22,9 @@ public class EditorExternalState {
     public static void init() {
         try {
             FileUtils.forceMkdir(TEMP.toFile());
+            // Remove old editor files in dir
             FileUtils.cleanDirectory(TEMP.toFile());
+
             FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
                 if (!Files.exists(changed)) {
                     removeForFile(changed);
@@ -81,18 +83,18 @@ public class EditorExternalState {
 
     public void startEdit(EditorState state, EditorNode node) {
         var ex = getForNode(node);
-        if (ex.isPresent()) {
-            ThreadHelper.open(ex.get().file);
-            return;
-        }
-
-        Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
+        Path file = ex.map(e -> e.file).orElse(
+                TEMP.resolve(UUID.randomUUID().toString() + ".pdxt"));
 
         try {
-            openEntries.add(new Entry(file, node, state));
             try (var out = Files.newOutputStream(file)) {
                 NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
             }
+            ex.ifPresentOrElse(e -> {
+                e.registered = false;
+            }, () -> {
+                openEntries.add(new Entry(file, node, state));
+            });
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);

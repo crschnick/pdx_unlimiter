@@ -39,7 +39,7 @@ public class EditorState {
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
-            rootNodes.put(e.getKey(), new SimpleNode(null, e.getKey(), counter, counter, e.getValue()));
+            rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
     }
 

@@ -7,12 +7,12 @@ import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
 import java.util.List;
 import java.util.function.Predicate;
 
-public final class CollectorNode extends EditorNode {
+public final class EditorCollectorNode extends EditorNode {
 
     private final int firstNodeIndex;
     private List<Node> nodes;
 
-    public CollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
+    public EditorCollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
         super(directParent, keyName, parentIndex);
         this.firstNodeIndex = firstNodeIndex;
         this.nodes = nodes;
@@ -52,8 +52,8 @@ public final class CollectorNode extends EditorNode {
     }
 
     @Override
-    public SimpleNode getRealParent() {
-        return (SimpleNode) getDirectParent();
+    public EditorSimpleNode getRealParent() {
+        return (EditorSimpleNode) getDirectParent();
     }
 
     @Override

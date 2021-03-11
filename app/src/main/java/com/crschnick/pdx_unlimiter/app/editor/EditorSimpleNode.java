@@ -7,12 +7,12 @@ import javafx.scene.paint.Color;
 import java.util.List;
 import java.util.function.Predicate;
 
-public final class SimpleNode extends EditorNode {
+public final class EditorSimpleNode extends EditorNode {
 
     private final int keyIndex;
     private Node backingNode;
 
-    public SimpleNode(EditorNode directParent, String keyName, int parentIndex, int keyIndex, Node backingNode) {
+    public EditorSimpleNode(EditorNode directParent, String keyName, int parentIndex, int keyIndex, Node backingNode) {
         super(directParent, keyName, parentIndex);
         this.keyIndex = keyIndex;
         this.backingNode = backingNode;
@@ -77,8 +77,8 @@ public final class SimpleNode extends EditorNode {
     }
 
     @Override
-    public SimpleNode getRealParent() {
-        return getDirectParent().isReal() ? (SimpleNode) getDirectParent() : getDirectParent().getRealParent();
+    public EditorSimpleNode getRealParent() {
+        return getDirectParent().isReal() ? (EditorSimpleNode) getDirectParent() : getDirectParent().getRealParent();
     }
 
     @Override
