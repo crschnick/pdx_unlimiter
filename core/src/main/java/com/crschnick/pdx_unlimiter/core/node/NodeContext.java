@@ -12,6 +12,14 @@ public final class NodeContext {
     private final short[] literalsLength;
     private final int literalsCount;
 
+    public NodeContext() {
+        this.data = null;
+        this.charset = StandardCharsets.UTF_8;
+        this.literalsBegin = null;
+        this.literalsLength = null;
+        this.literalsCount = 0;
+    }
+
     public NodeContext(String data) {
         this.data = data.getBytes();
         this.charset = StandardCharsets.UTF_8;

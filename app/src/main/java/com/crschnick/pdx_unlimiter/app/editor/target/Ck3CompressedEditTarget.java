@@ -1,8 +1,8 @@
-package com.crschnick.pdx_unlimiter.app.editor;
+package com.crschnick.pdx_unlimiter.app.editor.target;
 
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
+import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -63,7 +63,7 @@ public class Ck3CompressedEditTarget extends EditTarget {
             out.write("\n".getBytes(StandardCharsets.UTF_8));
 
             zout.putNextEntry(new ZipEntry("gamestate"));
-            NodeWriter.write(out, StandardCharsets.UTF_8, new LinkedNode(List.of(meta, gamestate)), "\t");
+            NodeWriter.write(out, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(meta, gamestate)), "\t");
             zout.closeEntry();
         }
     }

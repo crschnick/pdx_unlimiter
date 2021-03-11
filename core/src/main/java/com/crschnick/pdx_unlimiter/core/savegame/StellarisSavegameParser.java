@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
+import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.nio.file.Files;
@@ -37,7 +37,7 @@ public class StellarisSavegameParser extends SavegameParser {
 
             zipFile.close();
 
-            var node = new LinkedNode(List.of(metaNode, gamestateNode));
+            var node = new LinkedArrayNode(List.of(metaNode, gamestateNode));
             return new Success<>(true, checksum, node, StellarisSavegameInfo.fromSavegame(node));
         } catch (Throwable e) {
             return new Error(e);

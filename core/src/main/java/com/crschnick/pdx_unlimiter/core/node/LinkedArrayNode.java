@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
-import com.crschnick.pdx_unlimiter.core.util.JoinedList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,23 +8,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
-public final class LinkedNode extends ArrayNode {
+public final class LinkedArrayNode extends ArrayNode {
 
     private final List<ArrayNode> arrayNodes;
-    private final List<Node> joined;
+    private List<Node> joined;
 
-    public LinkedNode(List<ArrayNode> arrayNodes) {
+    public LinkedArrayNode(List<ArrayNode> arrayNodes) {
         this.arrayNodes = arrayNodes;
-        this.joined = Collections.unmodifiableList(new JoinedList<>(arrayNodes.stream()
-                .map(Node::getNodeArray)
-                .collect(Collectors.toList())));
     }
 
     @Override
     public String toString() {
-        return "{ (" + joined.size() + ") }";
+        return "LinkedArrayNode(" + joined.size() + ") }";
     }
 
     @Override
@@ -41,13 +36,61 @@ public final class LinkedNode extends ArrayNode {
     }
 
     @Override
+    public int size() {
+        return arrayNodes.stream().mapToInt(ArrayNode::size).sum();
+    }
+
+    @Override
     public boolean isKeyAt(String key, int index) {
-        return false;
+        int list = getArrayNodeForIndex(index);
+        return arrayNodes.get(list).isKeyAt(key, getLocalIndex(list, index));
     }
 
     @Override
     public ArrayNode splice(int begin, int length) {
-        return null;
+        int ls = getArrayNodeForIndex(begin);
+        // Use inclusive end index
+        int le = getArrayNodeForIndex(begin + length - 1);
+
+        // If only one sublist needs to be spliced, it can be done easily
+        if (ls == le) {
+            var b = getLocalIndex(ls, begin);
+            var e = getLocalIndex(le, begin + length);
+            return arrayNodes.get(ls).splice(b, e - b);
+        }
+
+        List<ArrayNode> spliced = new ArrayList<>();
+
+        var localStartFirst = getLocalIndex(ls, begin);
+        spliced.add(arrayNodes.get(ls).splice(localStartFirst, arrayNodes.get(ls).size() - localStartFirst));
+
+        for (int i = ls + 1; i < le - 1; i++) {
+            spliced.add(arrayNodes.get(i));
+        }
+
+        var localEndLast = getLocalIndex(le, begin + length);
+        spliced.add(arrayNodes.get(le).splice(0, localEndLast));
+        return new LinkedArrayNode(spliced);
+    }
+
+    private int getLocalIndex(int listIndex, int absIndex) {
+        int current = 0;
+        for (int i = 0; i < listIndex; i++) {
+            current += arrayNodes.get(i).size();
+        }
+        return absIndex - current;
+    }
+
+    private int getArrayNodeForIndex(int index) {
+        int current = 0;
+        for (var a : arrayNodes) {
+            if (index < current + a.size()) {
+                return arrayNodes.indexOf(a);
+            } else {
+                current += a.size();
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -72,6 +115,13 @@ public final class LinkedNode extends ArrayNode {
 
     @Override
     public List<Node> getNodeArray() {
+        if (joined == null) {
+            this.joined = new ArrayList<>();
+            for (var n : arrayNodes) {
+                joined.addAll(n.getNodeArray());
+            }
+            this.joined = Collections.unmodifiableList(joined);
+        }
         return joined;
     }
 

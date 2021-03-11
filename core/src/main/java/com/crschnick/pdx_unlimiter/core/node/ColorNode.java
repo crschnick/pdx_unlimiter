@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,12 +14,17 @@ public final class ColorNode extends Node {
     private static final byte[] RGB = "rgb".getBytes();
     private static final byte[] HSV = "hsv".getBytes();
     private static final byte[] HSV360 = "hsv360".getBytes();
-    private final String colorName;
-    private final List<ValueNode> values;
+    private String colorName;
+    private List<ValueNode> values;
 
     public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
-        this.values = values;
+        this.values = Collections.unmodifiableList(values);
+    }
+
+    public void set(ColorNode other) {
+        this.colorName = other.getColorName();
+        this.values = Collections.unmodifiableList(other.getValues());
     }
 
     public static boolean isColorName(NodeContext ctx, int index) {

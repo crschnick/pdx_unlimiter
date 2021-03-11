@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.editor;
+package com.crschnick.pdx_unlimiter.app.editor.target;
 
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;

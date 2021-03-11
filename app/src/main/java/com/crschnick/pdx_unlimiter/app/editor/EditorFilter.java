@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,6 +40,7 @@ public class EditorFilter {
     }
 
     public List<EditorNode> filter(List<EditorNode> input) {
+        var matcher = new NodeMatcher(filterString.get());
         return input.stream().filter(n -> {
             if (!filterKeys.get() && !filterValues.get()) {
                 return true;
@@ -50,7 +52,9 @@ public class EditorFilter {
 
             if (filterKeys.get() && n.filterKey(this::contains)) {
                 return true;
-            } else return filterValues.get() && n.filterValue(this::contains);
+            } else {
+                return filterValues.get() && n.filterValue(matcher);
+            }
         }).collect(Collectors.toList());
     }
 

@@ -3,7 +3,7 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
+import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
@@ -116,7 +116,7 @@ public class Eu4SavegameParser extends SavegameParser {
                         return new Invalid("Invalid header for ai");
                     }
 
-                    var node = new LinkedNode(List.of(metaNode, gamestateNode, aiNode));
+                    var node = new LinkedArrayNode(List.of(metaNode, gamestateNode, aiNode));
                     var info = Eu4SavegameInfo.fromSavegame(melted, node);
                     if (info.getVersion().compareTo(MIN_VERSION) < 0) {
                         return new Invalid("Savegame version " + info.getVersion() + " is not supported");

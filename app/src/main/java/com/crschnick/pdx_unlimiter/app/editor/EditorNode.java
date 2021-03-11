@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,17 +76,17 @@ public abstract class EditorNode {
 
     public abstract boolean filterKey(Predicate<String> filter);
 
-    public abstract boolean filterValue(Predicate<String> filter);
+    public abstract boolean filterValue(NodeMatcher matcher);
 
-    public abstract String displayKeyName();
+    public abstract String getDisplayKeyName();
 
-    public abstract String navigationName();
+    public abstract String getNavigationName();
 
     public abstract boolean isReal();
 
     public abstract SimpleNode getRealParent();
 
-    public abstract List<EditorNode> open();
+    public abstract List<EditorNode> expand();
 
     public abstract ArrayNode toWritableNode();
 

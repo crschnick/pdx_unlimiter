@@ -3,10 +3,7 @@ package com.crschnick.pdx_unlimiter.core.node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public final class SimpleArrayNode extends ArrayNode {
@@ -17,15 +14,20 @@ public final class SimpleArrayNode extends ArrayNode {
     private final List<Node> values;
 
     SimpleArrayNode(NodeContext context, int[] keyScalars, int[] valueScalars, List<Node> values) {
-        this.context = context;
+        this.context = Objects.requireNonNull(context);
         this.keyScalars = keyScalars;
         this.valueScalars = valueScalars;
-        this.values = values;
+        this.values = Objects.requireNonNull(values);
     }
 
     @Override
     public String toString() {
-        return "{ (" + values.size() + ") }";
+        return "SimpleArrayNode(" + values.size() + ")";
+    }
+
+    @Override
+    public int size() {
+        return values.size();
     }
 
     @Override

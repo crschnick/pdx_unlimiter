@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.editor;
+package com.crschnick.pdx_unlimiter.app.editor.target;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.node.Node;
@@ -86,5 +86,9 @@ public abstract class EditTarget {
 
     public TextFormatParser getParser() {
         return parser;
+    }
+
+    public Path getFile() {
+        return file;
     }
 }

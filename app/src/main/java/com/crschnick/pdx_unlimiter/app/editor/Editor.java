@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.editor.GuiEditor;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import javafx.application.Platform;
@@ -18,7 +19,7 @@ public class Editor {
         try {
             nodes = target.parse();
         } catch (Exception e) {
-            ErrorHandler.handleException(e, null, target.file);
+            ErrorHandler.handleException(e, null, target.getFile());
             return;
         }
         EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {

@@ -1,10 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.node.ValueNode;
+import com.crschnick.pdx_unlimiter.core.node.*;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -24,31 +21,29 @@ public final class SimpleNode extends EditorNode {
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
         var val = bn.isQuoted() ? "\"" + text + "\"" : text;
-        update(ArrayNode.array(List.of(new ValueNode(val))));
+        bn.set(new ValueNode(val));
     }
 
     public void updateColor(Color c) {
-        update(ArrayNode.array(List.of(ColorHelper.toColorNode(c))));
+        ColorNode cn = (ColorNode) backingNode;
+        var newColorNode = ColorHelper.toColorNode(c);
+        cn.set(newColorNode);
     }
 
-    public void insertArray(ArrayNode toInsert, int beginIndex, int endIndex) {
+    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
         ArrayNode ar = (ArrayNode) backingNode;
-
-        var begin = ar.splice(0, beginIndex);
-        var end = ar.splice(endIndex, ar.getNodeArray().size() - endIndex);
-        var linked = new LinkedNode(List.of(begin, toInsert, end));
+        this.backingNode = ar.replacePart(toInsert, beginIndex, length);
 
         // Update parent node to reflect change
         if (getDirectParent() != null) {
-            getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), linked);
+            getRealParent().replacePart((ArrayNode) this.backingNode, getKeyIndex(), 1);
         }
-        this.backingNode = linked;
     }
 
     @Override
     public void delete() {
         if (getDirectParent() != null) {
-            getRealParent().getBackingNode().getNodeArray().remove(getKeyIndex());
+            getRealParent().replacePart(ArrayNode.emptyArray(), getKeyIndex(), 1);
         }
     }
 
@@ -62,18 +57,18 @@ public final class SimpleNode extends EditorNode {
     }
 
     @Override
-    public boolean filterValue(Predicate<String> filter) {
-        return false;
+    public boolean filterValue(NodeMatcher matcher) {
+        return this.backingNode.matches(matcher);
     }
 
     @Override
-    public String displayKeyName() {
+    public String getDisplayKeyName() {
         return getKeyName().orElse("[" + keyIndex + "]");
     }
 
     @Override
-    public String navigationName() {
-        return getKeyName().orElseGet(() -> getDirectParent().navigationName() + "[" + keyIndex + "]");
+    public String getNavigationName() {
+        return getKeyName().orElseGet(() -> getDirectParent().getNavigationName() + "[" + keyIndex + "]");
     }
 
     @Override
@@ -87,23 +82,35 @@ public final class SimpleNode extends EditorNode {
     }
 
     @Override
-    public List<EditorNode> open() {
+    public List<EditorNode> expand() {
         return EditorNode.create(this, (ArrayNode) backingNode);
     }
 
     public ArrayNode toWritableNode() {
         return backingNode.isArray() ? (ArrayNode) backingNode :
-                ArrayNode.singleKeyNode(null, backingNode);
+                ArrayNode.array(List.of(backingNode));
     }
 
     public void update(ArrayNode newNode) {
-        Node nodeToUse = backingNode.isArray() ? newNode : newNode.getNodeArray().get(0);
+        if (backingNode.isArray()) {
+            this.backingNode = newNode;
 
-        // Update parent node to reflect change
-        if (getDirectParent() != null) {
-            getRealParent().getBackingNode().getNodeArray().set(getKeyIndex(), nodeToUse);
+            // Update parent node to reflect change
+            if (getDirectParent() != null) {
+                var replacement = getKeyName().map(k -> ArrayNode.singleKeyNode(k, this.backingNode))
+                        .orElse(ArrayNode.array(this.backingNode.getNodeArray()));
+                getRealParent().replacePart(replacement, getKeyIndex(), 1);
+            }
+        } else {
+            var nodeToUse = newNode.getNodeArray().get(0);
+            if (nodeToUse.isColor()) {
+                ((ColorNode) backingNode).set((ColorNode) nodeToUse);
+            } else if (nodeToUse.isValue()) {
+                ((ValueNode) backingNode).set((ValueNode) nodeToUse);
+            } else {
+                throw new IllegalArgumentException();
+            }
         }
-        this.backingNode = nodeToUse;
     }
 
     public int getKeyIndex() {

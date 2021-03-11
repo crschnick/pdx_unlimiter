@@ -2,14 +2,15 @@ package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public class CollectorNode extends EditorNode {
+public final class CollectorNode extends EditorNode {
 
     private final int firstNodeIndex;
-    private final List<Node> nodes;
+    private List<Node> nodes;
 
     public CollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
         super(directParent, keyName, parentIndex);
@@ -19,10 +20,10 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public void delete() {
-        var ar = getRealParent().getBackingNode().getNodeArray();
-        for (int i = 0; i < nodes.size(); i++) {
-            ar.remove(firstNodeIndex);
-        }
+        getRealParent().replacePart(
+                ArrayNode.emptyArray(),
+                firstNodeIndex,
+                nodes.size());
     }
 
     @Override
@@ -31,17 +32,17 @@ public class CollectorNode extends EditorNode {
     }
 
     @Override
-    public boolean filterValue(Predicate<String> filter) {
-        return false;
+    public boolean filterValue(NodeMatcher matcher) {
+        return nodes.stream().anyMatch(n -> n.matches(matcher));
     }
 
     @Override
-    public String displayKeyName() {
+    public String getDisplayKeyName() {
         return keyName + "(s)";
     }
 
     @Override
-    public String navigationName() {
+    public String getNavigationName() {
         return keyName;
     }
 
@@ -56,7 +57,7 @@ public class CollectorNode extends EditorNode {
     }
 
     @Override
-    public List<EditorNode> open() {
+    public List<EditorNode> expand() {
         return EditorNode.create(this, ArrayNode.array(nodes));
     }
 
@@ -66,7 +67,11 @@ public class CollectorNode extends EditorNode {
 
     @Override
     public void update(ArrayNode newNode) {
-        getRealParent().insertArray(newNode, firstNodeIndex, firstNodeIndex + nodes.size());
+        getRealParent().replacePart(
+                ArrayNode.sameKeyArray(keyName, newNode.getNodeArray()),
+                firstNodeIndex,
+                nodes.size());
+        this.nodes = newNode.getNodeArray();
     }
 
     public List<Node> getNodes() {

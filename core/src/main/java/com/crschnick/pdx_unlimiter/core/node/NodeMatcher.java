@@ -22,7 +22,7 @@ public final class NodeMatcher {
     }
 
     private static boolean contains(byte[] array, int start, short length, byte[] toFind) {
-        for (int i = start; i < length - toFind.length; ++i) {
+        for (int i = start; i < start + length - toFind.length; ++i) {
             boolean found = true;
             for (int j = 0; j < toFind.length; ++j) {
                 if (array[i + j] != toFind[j]) {
