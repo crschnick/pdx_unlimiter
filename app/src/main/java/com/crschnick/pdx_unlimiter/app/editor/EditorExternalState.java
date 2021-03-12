@@ -87,14 +87,14 @@ public class EditorExternalState {
                 TEMP.resolve(UUID.randomUUID().toString() + ".pdxt"));
 
         try {
-            try (var out = Files.newOutputStream(file)) {
-                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
-            }
             ex.ifPresentOrElse(e -> {
                 e.registered = false;
             }, () -> {
                 openEntries.add(new Entry(file, node, state));
             });
+            try (var out = Files.newOutputStream(file)) {
+                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
+            }
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);

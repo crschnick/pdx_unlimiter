@@ -161,6 +161,9 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameHelper.withSavegame(e, ctx -> {
+                if (SavegameManagerState.get().globalSelectedEntryProperty().get() == e) {
+                    SavegameManagerState.get().selectEntry(null);
+                }
                 ctx.getStorage().delete(e);
             });
         }, false);
@@ -169,10 +172,10 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameHelper.withCollection(c, ctx -> {
-                ctx.getStorage().delete(c);
                 if (SavegameManagerState.get().globalSelectedCampaignProperty().get() == c) {
                     SavegameManagerState.get().selectCollection(null);
                 }
+                ctx.getStorage().delete(c);
             });
         }, false);
     }
