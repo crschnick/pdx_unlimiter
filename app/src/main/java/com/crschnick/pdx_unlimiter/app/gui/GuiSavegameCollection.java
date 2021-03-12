@@ -1,12 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -39,7 +35,7 @@ public class GuiSavegameCollection {
         {
             if (c instanceof SavegameCampaign) {
                 SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
-                SavegameHelper.withCollection(c, gi -> {
+                SavegameContext.withCollection(c, gi -> {
                     ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
                     prop.addListener((change, o, n) -> {
                         Platform.runLater(() -> {
@@ -73,7 +69,7 @@ public class GuiSavegameCollection {
             del.setGraphic(new FontIcon());
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
-                if (DialogHelper.showCampaignDeleteDialog()) {
+                if (GuiDialogHelper.showCampaignDeleteDialog()) {
                     SavegameActions.delete(c);
                 }
             });
@@ -89,7 +85,7 @@ public class GuiSavegameCollection {
             if (c instanceof SavegameCampaign) {
                 SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
                 Label date = new Label();
-                SavegameHelper.withCollection(c, gi -> {
+                SavegameContext.withCollection(c, gi -> {
                     date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
                 });
                 date.getStyleClass().add(CLASS_DATE);

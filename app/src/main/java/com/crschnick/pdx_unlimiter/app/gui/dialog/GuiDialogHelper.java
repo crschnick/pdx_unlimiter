@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
-public class DialogHelper {
+public class GuiDialogHelper {
 
     public static Optional<ButtonType> waitForResult(Alert alert) {
         final Optional<ButtonType>[] result = new Optional[]{Optional.empty()};
@@ -35,45 +35,6 @@ public class DialogHelper {
             result[0] = alert.showAndWait();
         }
         return result[0];
-    }
-
-    public static void showLogDialog() {
-        var refresh = new ButtonType("Refresh");
-        Alert alert = createAlert();
-        alert.getButtonTypes().add(ButtonType.CLOSE);
-        alert.getButtonTypes().add(refresh);
-        alert.initModality(Modality.WINDOW_MODAL);
-        alert.setTitle("Show log");
-
-
-        TextArea textArea = new TextArea(LogManager.getInstance().getLogFile().isPresent() ?
-                "" : "Log file output is currently disabled!");
-        textArea.editableProperty().setValue(false);
-
-        Button val = (Button) alert.getDialogPane().lookupButton(refresh);
-        val.addEventFilter(
-                ActionEvent.ACTION,
-                e -> {
-                    if (LogManager.getInstance().getLogFile().isPresent()) {
-                        try {
-                            textArea.setText(Files.readString(LogManager.getInstance().getLogFile().get()));
-                        } catch (IOException ex) {
-                            ErrorHandler.handleException(ex);
-                        }
-                    }
-                    e.consume();
-                }
-        );
-        val.fireEvent(new ActionEvent());
-
-        ScrollPane p = new ScrollPane(textArea);
-        p.setFitToWidth(true);
-        p.setFitToHeight(true);
-        p.setMinWidth(700);
-        p.setMinHeight(500);
-        alert.getDialogPane().setContent(p);
-
-        alert.showAndWait();
     }
 
     public static Alert createAlert() {
@@ -105,7 +66,7 @@ public class DialogHelper {
     }
 
     public static void showText(String title, String header, String file) {
-        String text = null;
+        String text;
         try {
             text = new String(GuiLayout.class.getResourceAsStream(file).readAllBytes());
         } catch (IOException e) {

@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.util;
+package com.crschnick.pdx_unlimiter.app.util.integration;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
@@ -19,7 +20,7 @@ import javafx.scene.control.ButtonType;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createAlert;
 
 public class Eu4SeHelper {
 

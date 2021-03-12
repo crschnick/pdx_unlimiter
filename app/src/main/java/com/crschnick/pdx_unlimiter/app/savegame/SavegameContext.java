@@ -1,11 +1,8 @@
-package com.crschnick.pdx_unlimiter.app.util;
+package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -14,7 +11,15 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class SavegameHelper {
+public class SavegameContext<T, I extends SavegameInfo<T>> {
+
+    private Game game;
+    private GameInstallation installation;
+    private GameGuiFactory<T, I> guiFactory;
+    private SavegameStorage<T, I> storage;
+    private SavegameInfo<T> info;
+    private SavegameEntry<T, I> entry;
+    private SavegameCollection<T, I> collection;
 
     public static <T, I extends SavegameInfo<T>> Game getForSavegame(SavegameEntry<T, I> e) {
         Optional<Game> sg = SavegameStorage.ALL.entrySet().stream()
@@ -110,42 +115,31 @@ public class SavegameHelper {
         return con.apply(ctx);
     }
 
-    public static class SavegameContext<T, I extends SavegameInfo<T>> {
+    public Game getGame() {
+        return game;
+    }
 
-        private Game game;
-        private GameInstallation installation;
-        private GameGuiFactory<T, I> guiFactory;
-        private SavegameStorage<T, I> storage;
-        private SavegameInfo<T> info;
-        private SavegameEntry<T, I> entry;
-        private SavegameCollection<T, I> collection;
+    public SavegameInfo<T> getInfo() {
+        return info;
+    }
 
-        public Game getGame() {
-            return game;
-        }
+    public SavegameEntry<T, I> getEntry() {
+        return entry;
+    }
 
-        public SavegameInfo<T> getInfo() {
-            return info;
-        }
+    public SavegameCollection<T, I> getCollection() {
+        return collection;
+    }
 
-        public SavegameEntry<T, I> getEntry() {
-            return entry;
-        }
+    public GameInstallation getInstallation() {
+        return installation;
+    }
 
-        public SavegameCollection<T, I> getCollection() {
-            return collection;
-        }
+    public SavegameStorage<T, I> getStorage() {
+        return storage;
+    }
 
-        public GameInstallation getInstallation() {
-            return installation;
-        }
-
-        public SavegameStorage<T, I> getStorage() {
-            return storage;
-        }
-
-        public GameGuiFactory<T, I> getGuiFactory() {
-            return guiFactory;
-        }
+    public GameGuiFactory<T, I> getGuiFactory() {
+        return guiFactory;
     }
 }

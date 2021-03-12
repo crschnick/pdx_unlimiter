@@ -8,6 +8,15 @@ public enum Game {
     STELLARIS("stellaris", "Stellaris", "Stellaris");
 
 
+    private final String id;
+    private final String abbreviation;
+    private final String fullName;
+    Game(String id, String abbreviation, String fullName) {
+        this.id = id;
+        this.abbreviation = abbreviation;
+        this.fullName = fullName;
+    }
+
     public static Game byId(String id) {
         for (Game g : values()) {
             if (g.getId().equals(id)) {
@@ -15,16 +24,6 @@ public enum Game {
             }
         }
         return null;
-    }
-
-    private final String id;
-    private final String abbreviation;
-    private final String fullName;
-
-    Game(String id, String abbreviation, String fullName) {
-        this.id = id;
-        this.abbreviation = abbreviation;
-        this.fullName = fullName;
     }
 
     public String getAbbreviation() {

@@ -7,7 +7,6 @@ import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -27,7 +26,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
@@ -94,7 +93,7 @@ public class GuiImporter {
     }
 
     private static void showNoSavegamesDialog() {
-        Alert alert = DialogHelper.createAlert();
+        Alert alert = GuiDialogHelper.createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.setTitle("No savegames found");
         alert.setHeaderText("It seems like there are no savegames to import!");
@@ -109,7 +108,7 @@ public class GuiImporter {
 
         Set<FileImportTarget> selected = new HashSet<>();
 
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import");
         alert.getDialogPane().setContent(create(watcher.getSavegames(), selected));
@@ -136,7 +135,7 @@ public class GuiImporter {
         deleteB.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-                    if (DialogHelper.showSavegameDeleteDialog()) {
+                    if (GuiDialogHelper.showSavegameDeleteDialog()) {
                         selected.forEach(FileImportTarget::delete);
                     }
                     e.consume();

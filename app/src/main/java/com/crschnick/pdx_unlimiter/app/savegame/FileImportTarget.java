@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import org.apache.commons.io.FileUtils;
@@ -13,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -125,7 +127,18 @@ public abstract class FileImportTarget {
 
             TaskExecutor.getInstance().submitTask(() -> {
                 try {
-                    byte[] data = HttpHelper.executeGet(url);
+                    HttpClient client = HttpClient.newBuilder()
+                            .version(HttpClient.Version.HTTP_2)
+                            .followRedirects(HttpClient.Redirect.NORMAL)
+                            .build();
+
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(url.toURI())
+                            .GET()
+                            .build();
+
+                    HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+                    byte[] data = response.body();
 
                     String tempDir = System.getProperty("java.io.tmpdir");
                     this.downloadedFile = Paths.get(tempDir).resolve("pdxu")

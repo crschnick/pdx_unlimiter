@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createAlert;
 
 public class GuiConverterConfig {
 

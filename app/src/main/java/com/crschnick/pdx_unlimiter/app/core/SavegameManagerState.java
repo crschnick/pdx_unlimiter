@@ -5,10 +5,10 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -48,7 +48,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             }
         });
 
-        currentGameProperty().addListener((c,o,n) -> {
+        currentGameProperty().addListener((c, o, n) -> {
             SavedState.getInstance().setActiveGame(n);
         });
     }
@@ -111,7 +111,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> SavegameHelper.withSavegame(e, ctx -> {
+        TaskExecutor.getInstance().submitTask(() -> SavegameContext.withSavegame(e, ctx -> {
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
                             ctx.getStorage().getSavegameCollection(e))) {
@@ -253,7 +253,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            var game = SavegameHelper.getForCollection(c);
+            var game = SavegameContext.getForCollection(c);
 
             // If we didn't change the game and an entry is already selected, unselect it
             if (!selectGame(game) && globalSelectedEntryProperty().isNotNull().get()) {
@@ -282,7 +282,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                     globalSelectedEntryPropertyInternal().set(null);
                 }
             } else {
-                var game = SavegameHelper.getForSavegame(e);
+                var game = SavegameContext.getForSavegame(e);
                 selectCollection(SavegameStorage.<T, I>get(game).getSavegameCollection(e));
 
                 globalSelectedEntryPropertyInternal().set(e);

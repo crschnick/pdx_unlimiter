@@ -1,8 +1,10 @@
-package com.crschnick.pdx_unlimiter.app.util;
+package com.crschnick.pdx_unlimiter.app.util.integration;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import com.crschnick.pdx_unlimiter.app.util.WindowsRegistry;
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -14,6 +16,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SteamHelper {
+
+    public static Optional<Path> getSteamGameInstallPath(String app) {
+        Optional<Path> steamDir = SteamHelper.getSteamPath();
+        var installDir = steamDir.map(d -> d.resolve("steamapps")
+                .resolve("common").resolve(app))
+                .filter(Files::exists);
+        if (installDir.isPresent()) {
+            try {
+                return Optional.of(installDir.get().toRealPath());
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+        return Optional.empty();
+    }
 
     public static void openSteamURI(String uri) {
         if (SystemUtils.IS_OS_LINUX) {

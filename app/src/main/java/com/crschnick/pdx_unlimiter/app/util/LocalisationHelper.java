@@ -83,6 +83,12 @@ public class LocalisationHelper {
         ENGLISH("l_english"),
         GERMAN("l_german");
 
+        private final String id;
+
+        Language(String id) {
+            this.id = id;
+        }
+
         public static Language byId(String langId) {
             for (var v : values()) {
                 if (v.id.equals(langId)) {
@@ -90,12 +96,6 @@ public class LocalisationHelper {
                 }
             }
             return null;
-        }
-
-        private final String id;
-
-        Language(String id) {
-            this.id = id;
         }
     }
 }

@@ -71,11 +71,11 @@ public class GuiMenuBar {
 
         MenuItem lc = new MenuItem("License");
         lc.setOnAction((a) -> {
-            DialogHelper.showText("License", "License", "license.txt");
+            GuiDialogHelper.showText("License", "License", "license.txt");
         });
         MenuItem tc = new MenuItem("Third party software");
         tc.setOnAction((a) -> {
-            DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
+            GuiDialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
         });
         about.getItems().add(src);
         about.getItems().add(lc);
@@ -98,7 +98,7 @@ public class GuiMenuBar {
 
         MenuItem log = new MenuItem("Show log");
         log.setOnAction((a) -> {
-            DialogHelper.showLogDialog();
+            GuiLog.showLogDialog();
         });
         help.getItems().add(log);
 
@@ -190,7 +190,6 @@ public class GuiMenuBar {
         s.getStyleClass().add("menu-bar");
         s.getChildren().add(createRightBar());
 
-        HBox menubars = new HBox(leftBar, spacer, s);
-        return menubars;
+        return new HBox(leftBar, spacer, s);
     }
 }

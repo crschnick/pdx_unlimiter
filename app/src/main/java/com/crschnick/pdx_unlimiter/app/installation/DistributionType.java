@@ -1,9 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
-import com.crschnick.pdx_unlimiter.app.util.SteamHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.SteamHelper;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -94,12 +93,12 @@ public abstract class DistributionType {
                         .resolve("bootstrapper-v2");
             }
 
-                new ProcessBuilder()
-                        .directory(launcherPath.toFile())
-                        .command(bootstrapper.toString(),
-                                "--pdxlGameDir", launcherPath.toString(),
-                                "--gameDir", launcherPath.toString())
-                        .start();
+            new ProcessBuilder()
+                    .directory(launcherPath.toFile())
+                    .command(bootstrapper.toString(),
+                            "--pdxlGameDir", launcherPath.toString(),
+                            "--gameDir", launcherPath.toString())
+                    .start();
         }
 
         @Override

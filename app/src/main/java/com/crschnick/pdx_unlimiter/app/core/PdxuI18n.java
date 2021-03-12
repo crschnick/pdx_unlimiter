@@ -17,16 +17,6 @@ public final class PdxuI18n {
         return get(LocalisationHelper.Language.ENGLISH).getLocalised(s, vars);
     }
 
-    public String getLocalised(String s, String... vars) {
-        var localisedString = getMap().get(s);
-        if (localisedString == null) {
-            LoggerFactory.getLogger(PdxuI18n.class).error("No localisation found for key " + s);
-            return s;
-        }
-
-        return LocalisationHelper.getValue(localisedString, vars);
-    }
-
     public static PdxuI18n get(LocalisationHelper.Language language) {
         if (ALL.containsKey(language)) {
             return ALL.get(language);
@@ -40,6 +30,16 @@ public final class PdxuI18n {
 
         ALL.put(language, i18n);
         return i18n;
+    }
+
+    public String getLocalised(String s, String... vars) {
+        var localisedString = getMap().get(s);
+        if (localisedString == null) {
+            LoggerFactory.getLogger(PdxuI18n.class).error("No localisation found for key " + s);
+            return s;
+        }
+
+        return LocalisationHelper.getValue(localisedString, vars);
     }
 
     public Map<String, String> getMap() {

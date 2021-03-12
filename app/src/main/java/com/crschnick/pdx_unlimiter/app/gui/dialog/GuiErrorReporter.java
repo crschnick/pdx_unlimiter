@@ -17,11 +17,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GuiErrorReporter {
 
     public static void showReportSent() {
-        Alert a = DialogHelper.createAlert();
+        Alert a = GuiDialogHelper.createAlert();
         a.initModality(Modality.WINDOW_MODAL);
         a.setAlertType(Alert.AlertType.CONFIRMATION);
         a.setTitle("Report sent");
-        a.setHeaderText("Your report has been succesfully sent! Thank you");
+        a.setHeaderText("Your report has been successfully sent! Thank you");
         a.show();
     }
 
@@ -63,7 +63,7 @@ public class GuiErrorReporter {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         // Create Alert without icon since it may not have loaded yet
         if (PdxuApp.getApp() != null && PdxuApp.getApp().getIcon() != null) {
-            DialogHelper.setIcon(alert);
+            GuiDialogHelper.setIcon(alert);
         }
         alert.getButtonTypes().clear();
 
@@ -115,7 +115,7 @@ public class GuiErrorReporter {
 
     public static Optional<String> showIssueDialog() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        DialogHelper.setIcon(alert);
+        GuiDialogHelper.setIcon(alert);
 
         alert.getButtonTypes().clear();
         ButtonType report = new ButtonType("Send", ButtonBar.ButtonData.APPLY);

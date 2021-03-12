@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.util;
+package com.crschnick.pdx_unlimiter.app.util.integration;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
@@ -7,14 +7,13 @@ import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createAlert;
 
 public class RakalyWebHelper {
 

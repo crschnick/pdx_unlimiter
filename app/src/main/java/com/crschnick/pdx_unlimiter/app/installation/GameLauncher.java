@@ -5,10 +5,10 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.IronyHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.IronyHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,18 +19,17 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class GameLauncher {
 
     public static void startLauncher() {
         try {
-        var game = SavegameManagerState.get().current();
-        if (Settings.getInstance().launchIrony.getValue()) {
-            IronyHelper.launchEntry(game, false);
-        } else {
-            GameInstallation.ALL.get(game).getDistType().startLauncher();
-        }
+            var game = SavegameManagerState.get().current();
+            if (Settings.getInstance().launchIrony.getValue()) {
+                IronyHelper.launchEntry(game, false);
+            } else {
+                GameInstallation.ALL.get(game).getDistType().startLauncher();
+            }
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
         }
@@ -50,8 +49,8 @@ public class GameLauncher {
         }
     }
 
-    private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T,I> e) throws IOException {
-        var ctx = SavegameHelper.getContext(e);
+    private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T, I> e) throws IOException {
+        var ctx = SavegameContext.getContext(e);
         var path = ctx.getInstallation().getExportTarget(e);
         ctx.getStorage().copySavegameTo(e, path);
         ctx.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
@@ -75,7 +74,7 @@ public class GameLauncher {
     }
 
     private static void startDirectly(SavegameEntry<?, ?> e) {
-        SavegameHelper.withSavegame(e, ctx -> {
+        SavegameContext.withSavegame(e, ctx -> {
             if (ctx.getGame().equals(Game.STELLARIS)) {
                 var r = GuiIncompatibleWarning.showStellarisModWarning(
                         GameInstallation.ALL.get(Game.STELLARIS).getMods());
@@ -93,7 +92,7 @@ public class GameLauncher {
     }
 
     public static <T, I extends SavegameInfo<T>> void launchSavegame(SavegameEntry<T, I> e) {
-        SavegameHelper.withSavegame(e, ctx -> {
+        SavegameContext.withSavegame(e, ctx -> {
             if (!SavegameActions.isEntryCompatible(e)) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
                         ctx.getInstallation(), e);

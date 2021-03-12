@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class PdxuInstallation {
         if (Files.exists(legacyDataDir)) {
             INSTANCE.dataDir = legacyDataDir;
         } else {
-            INSTANCE.dataDir = InstallLocationHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+            INSTANCE.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
         }
 
         Path appInstallPath;

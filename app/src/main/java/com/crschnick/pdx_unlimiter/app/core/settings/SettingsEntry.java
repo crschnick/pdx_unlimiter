@@ -7,7 +7,7 @@ import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.InvalidInstallationException;
-import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.SteamHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -56,7 +55,7 @@ public abstract class SettingsEntry<T> {
     }
 
     private void setupLogger() {
-        this.value.addListener((c,o,n) -> {
+        this.value.addListener((c, o, n) -> {
             logger.info("Changing settings entry " + serializationName + " from " + o + " to " + n);
         });
     }
@@ -275,7 +274,7 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void setDefault() {
-            InstallLocationHelper.getSteamGameInstallPath(game.getFullName()).ifPresent(p -> {
+            SteamHelper.getSteamGameInstallPath(game.getFullName()).ifPresent(p -> {
                 this.set(p);
             });
         }

@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
@@ -9,9 +8,9 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,14 +32,14 @@ public abstract class GameInstallation {
 
     public static final BidiMap<Game, GameInstallation> ALL = new DualHashBidiMap<>();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final List<GameMod> mods = new ArrayList<>();
+    private final Path path;
+    private final List<GameDlc> dlcs = new ArrayList<>();
     private DistributionType distType;
     private Path userDir;
-    private final List<GameMod> mods = new ArrayList<>();
     private GameVersion version;
     private LocalisationHelper.Language language;
-    private final Path path;
     private Path executable;
-    private final List<GameDlc> dlcs = new ArrayList<>();
 
     public GameInstallation(Path path, Path executable) {
         this.path = path;
@@ -132,10 +131,10 @@ public abstract class GameInstallation {
     protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_WINDOWS) {
             value = value.replace("%USER_DOCUMENTS%",
-                    InstallLocationHelper.getUserDocumentsPath().toString());
+                    OsHelper.getUserDocumentsPath().toString());
         } else if (SystemUtils.IS_OS_LINUX) {
             value = value.replace("$LINUX_DATA_HOME",
-                    InstallLocationHelper.getUserDocumentsPath().toString());
+                    OsHelper.getUserDocumentsPath().toString());
         }
         return Path.of(value);
     }
@@ -194,7 +193,7 @@ public abstract class GameInstallation {
         }
     }
 
-    protected Path determineUserDir(JsonNode node) throws InvalidInstallationException{
+    protected Path determineUserDir(JsonNode node) throws InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
         String value = Optional.ofNullable(node.get("gameDataPath"))
                 .orElseThrow(() -> new InvalidInstallationException("GAME_DATA_PATH_NOT_FOUND", g.getAbbreviation()))

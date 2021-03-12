@@ -2,12 +2,16 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.util.*;
+import com.crschnick.pdx_unlimiter.app.util.integration.ConverterHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.Eu4SeHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.RakalyWebHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.SkanderbegHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
@@ -38,7 +42,7 @@ public class GuiSavegameEntry {
     private static <T, I extends SavegameInfo<T>> Region setupTopBar(SavegameEntry<T, I> e) {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
-        SavegameHelper.withSavegameAsync(e, ctx -> {
+        SavegameContext.withSavegameAsync(e, ctx -> {
             topBar.setBackground(ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
         });
 
@@ -46,7 +50,7 @@ public class GuiSavegameEntry {
             Label l = new Label(e.getDate().toDisplayString());
             l.getStyleClass().add(CLASS_DATE);
 
-            var tagImage = SavegameHelper.mapSavegame(e,
+            var tagImage = SavegameContext.mapSavegame(e,
                     ctx -> ctx.getGuiFactory().createImage(e));
             Pane tagPane = new Pane(tagImage.getValue());
             HBox tagBar = new HBox(tagPane, l);
@@ -124,7 +128,7 @@ public class GuiSavegameEntry {
             });
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            SavegameHelper.withSavegameAsync(e, ctx -> {
+            SavegameContext.withSavegameAsync(e, ctx -> {
                 if (ctx.getInfo().isBinary()) {
                     buttonBar.getChildren().add(0, melt);
                 }
@@ -153,7 +157,7 @@ public class GuiSavegameEntry {
             buttonBar.getChildren().add(uploadSkanderbeg);
         }
 
-        SavegameHelper.withSavegameAsync(e, ctx -> {
+        SavegameContext.withSavegameAsync(e, ctx -> {
             if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
                 Button eu4Se = new JFXButton();
                 eu4Se.setGraphic(new FontIcon());
@@ -197,7 +201,7 @@ public class GuiSavegameEntry {
             });
             edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
-            SavegameHelper.withSavegameAsync(e, ctx -> {
+            SavegameContext.withSavegameAsync(e, ctx -> {
                 if (!ctx.getInfo().isBinary()) {
                     buttonBar.getChildren().add(0, edit);
                 }
@@ -208,7 +212,7 @@ public class GuiSavegameEntry {
             Button del = new JFXButton();
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
-                if (DialogHelper.showSavegameDeleteDialog()) {
+                if (GuiDialogHelper.showSavegameDeleteDialog()) {
                     SavegameActions.delete(e);
                 }
             });
@@ -233,7 +237,7 @@ public class GuiSavegameEntry {
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
         stack.getChildren().add(container);
         if (entry.infoProperty().isNotNull().get()) {
-            SavegameHelper.withSavegame(entry, ctx -> {
+            SavegameContext.withSavegame(entry, ctx -> {
                 ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
             });
         } else {
@@ -248,7 +252,7 @@ public class GuiSavegameEntry {
 
         entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
-                SavegameHelper.withSavegame(entry, ctx -> {
+                SavegameContext.withSavegame(entry, ctx -> {
                     Platform.runLater(() -> {
                         loading.setVisible(false);
                         ctx.getGuiFactory().fillNodeContainer(n, container);

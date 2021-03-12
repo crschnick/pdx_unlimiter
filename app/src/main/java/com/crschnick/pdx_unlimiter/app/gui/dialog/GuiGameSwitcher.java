@@ -15,7 +15,7 @@ import javafx.scene.layout.HBox;
 public class GuiGameSwitcher {
 
     public static void showGameSwitchDialog() {
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setTitle("Select game");
 
         HBox games = new HBox();

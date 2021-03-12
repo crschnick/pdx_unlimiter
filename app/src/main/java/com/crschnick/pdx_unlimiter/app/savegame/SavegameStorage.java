@@ -11,7 +11,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.game.Hoi4SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.game.StellarisSavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -54,6 +54,7 @@ public abstract class SavegameStorage<
     private final SavegameParser parser;
     private final String infoChecksum;
     private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
+
     public SavegameStorage(
             String name,
             String fileEnding,

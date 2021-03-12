@@ -10,9 +10,8 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
-import com.crschnick.pdx_unlimiter.app.util.Eu4SeHelper;
-import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.Eu4SeHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.IronyHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -158,7 +157,7 @@ public final class Settings {
             "IRONY_DIR",
             "ironyDir",
             Path.of("IronyModManager.exe"),
-            () -> InstallLocationHelper.getIronyDefaultInstallPath().orElse(null)
+            () -> IronyHelper.getIronyDefaultInstallPath().orElse(null)
     );
     public final SettingsEntry.BooleanEntry enabledTimedImports = new SettingsEntry.BooleanEntry(
             "TIMED_IMPORTS",

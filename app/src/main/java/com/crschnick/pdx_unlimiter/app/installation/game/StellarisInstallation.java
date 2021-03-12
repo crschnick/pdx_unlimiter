@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation.game;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.installation.DistributionType;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
@@ -13,13 +12,11 @@ import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
@@ -34,7 +31,7 @@ public class StellarisInstallation extends GameInstallation {
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(SavegameEntry<T, I> e) {
         Path file;
-        Path dir = getSavegamesPath().resolve(SavegameStorage.<T,I>get(Game.STELLARIS).getEntryName(e));
+        Path dir = getSavegamesPath().resolve(SavegameStorage.<T, I>get(Game.STELLARIS).getEntryName(e));
         if (e.getInfo().isIronman()) {
             file = dir.resolve("ironman.sav");
         } else {

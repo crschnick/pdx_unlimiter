@@ -3,15 +3,14 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
+import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
-import com.crschnick.pdx_unlimiter.app.util.RakalyHelper;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
@@ -26,7 +25,7 @@ import java.util.Set;
 public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry) {
-        return Optional.ofNullable(SavegameHelper.mapSavegame(entry, ctx -> {
+        return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var sc = ctx.getStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(entry));
             try {
@@ -40,7 +39,7 @@ public class SavegameActions {
     }
 
     public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
-        return SavegameHelper.mapSavegame(entry, ctx -> {
+        return SavegameContext.mapSavegame(entry, ctx -> {
             var info = ctx.getInfo();
             if (info == null) {
                 return false;
@@ -71,13 +70,13 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void openSavegame(SavegameEntry<T, I> entry) {
-        SavegameHelper.withSavegame(entry, ctx -> {
+        SavegameContext.withSavegame(entry, ctx -> {
             ThreadHelper.open(ctx.getStorage().getSavegameDataDirectory(entry));
         });
     }
 
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportSavegame(SavegameEntry<T, I> e) {
-        return SavegameHelper.mapSavegame(e, ctx -> {
+        return SavegameContext.mapSavegame(e, ctx -> {
             try {
                 var path = ctx.getInstallation().getExportTarget(e);
                 ctx.getStorage().copySavegameTo(e, path);
@@ -92,14 +91,14 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(entry, ctx -> {
+            SavegameContext.withSavegame(entry, ctx -> {
                 ctx.getStorage().moveEntry(collection, entry);
             });
         }, false);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
-        return SavegameHelper.mapSavegame(entry, ctx -> {
+        return SavegameContext.mapSavegame(entry, ctx -> {
             return ctx.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
         });
     }
@@ -137,12 +136,12 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
-        if (!DialogHelper.showMeltDialog()) {
+        if (!GuiDialogHelper.showMeltDialog()) {
             return;
         }
 
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, ctx -> {
+            SavegameContext.withSavegame(e, ctx -> {
                 Path meltedFile;
                 try {
                     meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
@@ -160,7 +159,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, ctx -> {
+            SavegameContext.withSavegame(e, ctx -> {
                 if (SavegameManagerState.get().globalSelectedEntryProperty().get() == e) {
                     SavegameManagerState.get().selectEntry(null);
                 }
@@ -171,7 +170,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withCollection(c, ctx -> {
+            SavegameContext.withCollection(c, ctx -> {
                 if (SavegameManagerState.get().globalSelectedCampaignProperty().get() == c) {
                     SavegameManagerState.get().selectCollection(null);
                 }
@@ -182,7 +181,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, ctx -> {
+            SavegameContext.withSavegame(e, ctx -> {
                 var in = ctx.getStorage().getSavegameFile(e);
                 var target = EditTarget.create(in);
                 target.ifPresent(t -> {
@@ -195,7 +194,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, ctx -> {
+            SavegameContext.withSavegame(e, ctx -> {
                 ctx.getStorage().reloadSavegameAsync(e);
             });
         }, false);
@@ -203,7 +202,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
-            SavegameHelper.withSavegame(e, ctx -> {
+            SavegameContext.withSavegame(e, ctx -> {
                 var sgs = ctx.getStorage();
                 var in = sgs.getSavegameFile(e);
                 sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));

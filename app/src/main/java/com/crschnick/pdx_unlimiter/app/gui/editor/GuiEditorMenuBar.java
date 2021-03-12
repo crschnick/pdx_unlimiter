@@ -11,7 +11,6 @@ import javafx.scene.input.KeyCombination;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
 
 public class GuiEditorMenuBar {
 
@@ -24,7 +23,6 @@ public class GuiEditorMenuBar {
             state.save();
         });
         file.getItems().add(c);
-
 
 
         Menu editor = new Menu("Editor");

@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createAlert;
 
 public class GuiIncompatibleWarning {
 
@@ -62,7 +62,7 @@ public class GuiIncompatibleWarning {
         }
 
         alert.setHeaderText(builder.toString());
-        return DialogHelper.waitForResult(alert).orElse(ButtonType.CLOSE).equals(launch);
+        return GuiDialogHelper.waitForResult(alert).orElse(ButtonType.CLOSE).equals(launch);
     }
 
     public static Optional<Boolean> showStellarisModWarning(List<GameMod> enabledMods) {
@@ -80,7 +80,7 @@ public class GuiIncompatibleWarning {
                 .map(m -> "- " + m.getName())
                 .collect(Collectors.joining("\n"));
         alert.setHeaderText(builder);
-        var r = DialogHelper.waitForResult(alert);
+        var r = GuiDialogHelper.waitForResult(alert);
         if (r.isPresent()) {
             if (r.get().equals(launchButton)) return Optional.of(true);
             if (r.get().equals(changeModsButton)) return Optional.of(false);

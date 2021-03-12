@@ -16,7 +16,7 @@ import java.util.Set;
 public class GuiSettings {
 
     public static void showSettings() {
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.getButtonTypes().add(ButtonType.APPLY);
         alert.getButtonTypes().add(ButtonType.CANCEL);
         alert.setTitle(PdxuI18n.get("SETTINGS"));
