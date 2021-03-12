@@ -24,7 +24,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     private static final SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<>();
     private final SimpleObjectProperty<Game> current = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaign =
+    private final SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCollection =
             new SimpleObjectProperty<>();
     private final SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntry =
             new SimpleObjectProperty<>();
@@ -37,7 +37,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private SavegameManagerState() {
         var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
 
-        globalSelectedCampaign.addListener((c, o, n) -> {
+        globalSelectedCollection.addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegames().removeListener(cl);
                 unloadCollectionAsync(o);
@@ -46,10 +46,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             if (n != null) {
                 n.getSavegames().addListener(cl);
             }
-        });
-
-        currentGameProperty().addListener((c, o, n) -> {
-            SavedState.getInstance().setActiveGame(n);
         });
     }
 
@@ -73,6 +69,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         // If no active game is set, select the first one available (if existent)
         GameInstallation.ALL.entrySet().stream().findFirst().ifPresent(e -> {
             INSTANCE.selectGame(e.getKey());
+            SavedState.getInstance().setActiveGame(e.getKey());
         });
     }
 
@@ -90,12 +87,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return GameInstallation.ALL.get(current()).getLanguage();
     }
 
-    public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignProperty() {
-        return globalSelectedCampaign;
+    public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCollectionProperty() {
+        return globalSelectedCollection;
     }
 
     private SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignPropertyInternal() {
-        return globalSelectedCampaign;
+        return globalSelectedCollection;
     }
 
     public ReadOnlyObjectProperty<SavegameEntry<T, I>> globalSelectedEntryProperty() {
@@ -137,7 +134,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private void updateShownEntries() {
         GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
             // No integration or campaign selected means no entries are shown
-            if (current() == null || globalSelectedCampaign.get() == null) {
+            if (current() == null || globalSelectedCollection.get() == null) {
                 shownEntries.clear();
                 return;
             }
@@ -146,9 +143,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             var newEntries = FXCollections.observableArrayList(shownEntries.get());
 
             // Remove not contained entries
-            newEntries.removeIf(entry -> !globalSelectedCampaign.get().getSavegames().contains(entry));
+            newEntries.removeIf(entry -> !globalSelectedCollection.get().getSavegames().contains(entry));
 
-            var col = globalSelectedCampaign.get();
+            var col = globalSelectedCollection.get();
             col.getSavegames().forEach(entry -> {
                 if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
                     newEntries.add(entry);
@@ -162,6 +159,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
 
             shownEntries.set(newEntries);
+
+            if (globalSelectedEntry.isNotNull().get()) {
+                if (!shownEntries.contains(globalSelectedEntry.get())) {
+                    selectEntry(null);
+                }
+            }
         });
     }
 
@@ -189,6 +192,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             });
             newCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
             shownCollections.set(newCollections);
+
+            if (globalSelectedCollection.isNotNull().get()) {
+                if (!shownCollections.contains(globalSelectedCollection.get())) {
+                    selectCollection(null);
+                }
+            }
         });
     }
 
@@ -248,7 +257,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             return;
         }
 
-        if (globalSelectedCampaign.isNotNull().get() && globalSelectedCampaign.get().equals(c)) {
+        if (globalSelectedCollection.isNotNull().get() && globalSelectedCollection.get().equals(c)) {
             return;
         }
 

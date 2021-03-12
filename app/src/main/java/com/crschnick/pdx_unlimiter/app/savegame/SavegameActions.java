@@ -128,7 +128,7 @@ public class SavegameActions {
                             .getSavegameForChecksum(s.checksum)
                             .ifPresent(e -> {
                                 SavegameManagerState.get().selectEntry(e);
-                                GameLauncher.launchSavegame(e);
+                                GameLauncher.continueSavegame(e);
                             });
                 }
             });
@@ -160,9 +160,6 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegame(e, ctx -> {
-                if (SavegameManagerState.get().globalSelectedEntryProperty().get() == e) {
-                    SavegameManagerState.get().selectEntry(null);
-                }
                 ctx.getStorage().delete(e);
             });
         }, false);
@@ -171,9 +168,6 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withCollection(c, ctx -> {
-                if (SavegameManagerState.get().globalSelectedCampaignProperty().get() == c) {
-                    SavegameManagerState.get().selectCollection(null);
-                }
                 ctx.getStorage().delete(c);
             });
         }, false);

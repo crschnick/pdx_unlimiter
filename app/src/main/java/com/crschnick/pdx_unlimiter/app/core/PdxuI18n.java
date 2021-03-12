@@ -27,6 +27,8 @@ public final class PdxuI18n {
                 .resolve("settings.yml"), language);
         i18n.map.putAll(LocalisationHelper.loadTranslations(PdxuInstallation.getInstance().getLanguageLocation()
                 .resolve("install.yml"), language));
+        i18n.map.putAll(LocalisationHelper.loadTranslations(PdxuInstallation.getInstance().getLanguageLocation()
+                .resolve("launcher.yml"), language));
 
         ALL.put(language, i18n);
         return i18n;

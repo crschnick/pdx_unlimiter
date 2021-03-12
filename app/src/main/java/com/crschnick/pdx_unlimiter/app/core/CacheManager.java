@@ -37,7 +37,7 @@ public class CacheManager {
     }
 
     public void onSavegameLoad() {
-        if (SavegameManagerState.get().globalSelectedCampaignProperty().get() instanceof SavegameFolder) {
+        if (SavegameManagerState.get().globalSelectedCollectionProperty().get() instanceof SavegameFolder) {
             logger.debug("Clearing savegame collection caches");
             caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN));
         }

@@ -66,8 +66,12 @@
     -fx-icon-code: "mdi-step-forward-2";
 }
 
-.launch-button .ikonli-font-icon {
+.continue-button .ikonli-font-icon {
     -fx-icon-code: "mdi-play";
+}
+
+.launcher-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-play-circle-outline";
 }
 
 .folder {

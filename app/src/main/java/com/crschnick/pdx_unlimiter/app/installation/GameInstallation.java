@@ -35,7 +35,7 @@ public abstract class GameInstallation {
     private final List<GameMod> mods = new ArrayList<>();
     private final Path path;
     private final List<GameDlc> dlcs = new ArrayList<>();
-    private DistributionType distType;
+    private GameDistributionType distType;
     private Path userDir;
     private GameVersion version;
     private LocalisationHelper.Language language;
@@ -143,7 +143,7 @@ public abstract class GameInstallation {
         return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
-    public DistributionType getDistType() {
+    public GameDistributionType getDistType() {
         return distType;
     }
 
@@ -155,7 +155,7 @@ public abstract class GameInstallation {
 
     public abstract Optional<GameMod> getModForName(String name);
 
-    public abstract void startDirectly();
+    public abstract void startDirectly() throws IOException;
 
     public void loadData() throws IOException, InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
@@ -203,15 +203,15 @@ public abstract class GameInstallation {
 
     protected abstract GameVersion determineVersion(JsonNode node);
 
-    private DistributionType determineDistType(JsonNode node) throws IOException {
+    private GameDistributionType determineDistType(JsonNode node) throws IOException {
         String platform = node.required("distPlatform").textValue();
-        DistributionType d;
+        GameDistributionType d;
         if (platform.equals("steam")) {
             // Trim the id because sometimes it contains trailing new lines!
             var id = Files.readString(getSteamAppIdFile()).trim();
-            d = new DistributionType.Steam(Integer.parseInt(id));
+            d = new GameDistributionType.Steam(Integer.parseInt(id), this);
         } else {
-            d = new DistributionType.PdxLauncher(getLauncherDataPath());
+            d = new GameDistributionType.PdxLauncher(this);
         }
         return d;
     }

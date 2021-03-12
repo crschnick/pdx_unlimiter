@@ -2,4 +2,4 @@ l_english:
   LAUNCH: "Launch"
   CHANGE_MODS: "Change mods"
   STELLARIS_INFO_TITLE: "Stellaris mod information"
-  STELLARIS_INFO: "Stellaris savegames do not store which mods they require. Therefore, you have to verify manually, that you are using the correct ones.\nThe following Mods are enabled:\n"
+  STELLARIS_INFO: "Stellaris savegames do not store which mods they require.\nTherefore, you have to verify manually, that you are using the correct ones.\nThe following Mods are enabled:\n"

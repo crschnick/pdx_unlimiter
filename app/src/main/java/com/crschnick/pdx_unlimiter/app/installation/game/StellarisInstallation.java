@@ -57,12 +57,8 @@ public class StellarisInstallation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() {
-        try {
-            new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+    public void startDirectly() throws IOException {
+        new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
     }
 
     @Override

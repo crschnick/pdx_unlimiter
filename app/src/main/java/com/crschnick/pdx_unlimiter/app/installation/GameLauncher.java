@@ -38,22 +38,36 @@ public class GameLauncher {
     public static void startLauncherWithContinueGame(SavegameEntry<?, ?> e) {
         try {
             setupContinueGame(e);
-            var game = SavegameManagerState.get().current();
-            if (Settings.getInstance().launchIrony.getValue()) {
-                IronyHelper.launchEntry(game, true);
-            } else {
-                GameInstallation.ALL.get(game).getDistType().startLauncher();
-            }
+            startLauncherDirectly(e);
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
         }
+    }
+
+    public static <T, I extends SavegameInfo<T>> void continueSavegame(SavegameEntry<T, I> e) {
+        SavegameContext.withSavegame(e, ctx -> {
+            if (!SavegameActions.isEntryCompatible(e)) {
+                boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
+                        ctx.getInstallation(), e);
+                if (!startAnyway) {
+                    return;
+                }
+            }
+
+            try {
+                setupContinueGame(e);
+                startGameDirectly(e);
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+        });
     }
 
     private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T, I> e) throws IOException {
         var ctx = SavegameContext.getContext(e);
         var path = ctx.getInstallation().getExportTarget(e);
         ctx.getStorage().copySavegameTo(e, path);
-        ctx.getInstallation().writeLaunchConfig(e.getName(), ctx.getCollection().getLastPlayed(), path);
+        ctx.getInstallation().writeLaunchConfig(ctx.getStorage().getEntryName(e), ctx.getCollection().getLastPlayed(), path);
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
         var dlcs = e.getInfo().getDlcs().stream()
@@ -73,46 +87,49 @@ public class GameLauncher {
         }
     }
 
-    private static void startDirectly(SavegameEntry<?, ?> e) {
-        SavegameContext.withSavegame(e, ctx -> {
-            if (ctx.getGame().equals(Game.STELLARIS)) {
-                var r = GuiIncompatibleWarning.showStellarisModWarning(
-                        GameInstallation.ALL.get(Game.STELLARIS).getMods());
-            }
-            if (Settings.getInstance().launchIrony.getValue()) {
-                //IronyHelper.launchEntry(ctx.getGame(), true);
-            } else {
-                var install = ctx.getInstallation();
-                boolean doLaunch = install.getDistType().checkDirectLaunch();
-                if (doLaunch) {
+    public static void startLauncherDirectly(SavegameEntry<?, ?> e) throws IOException {
+        var game = SavegameManagerState.get().current();
+        if (Settings.getInstance().launchIrony.getValue()) {
+            IronyHelper.launchEntry(game, true);
+        } else {
+            GameInstallation.ALL.get(game).getDistType().startLauncher();
+        }
+    }
+
+    private static void startGameDirectly(SavegameEntry<?, ?> e) throws Exception {
+        var ctx = SavegameContext.getContext(e);
+        if (ctx.getGame().equals(Game.STELLARIS)) {
+            var r = GuiIncompatibleWarning.showStellarisModWarning(
+                    GameInstallation.ALL.get(Game.STELLARIS).getMods());
+            if (r.isPresent()) {
+                var b = r.get();
+                if (b) {
                     ctx.getInstallation().startDirectly();
+                } else {
+                    startLauncherDirectly(e);
                 }
             }
-        });
-    }
+            return;
+        }
 
-    public static <T, I extends SavegameInfo<T>> void launchSavegame(SavegameEntry<T, I> e) {
-        SavegameContext.withSavegame(e, ctx -> {
-            if (!SavegameActions.isEntryCompatible(e)) {
-                boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
-                        ctx.getInstallation(), e);
-                if (!startAnyway) {
-                    return;
-                }
+        if (Settings.getInstance().launchIrony.getValue()) {
+            IronyHelper.launchEntry(ctx.getGame(), true);
+        } else {
+            var install = ctx.getInstallation();
+            boolean doLaunch = install.getDistType().checkDirectLaunch();
+            if (doLaunch) {
+                ctx.getInstallation().startDirectly();
             }
-
-            //setupContinueGame(e);
-            startDirectly(e);
-        });
+        }
     }
 
-    static void writeStellarisDlcLoadFile(
+    private static void writeStellarisDlcLoadFile(
             GameInstallation installation, List<GameDlc> dlcs) throws IOException {
         var existingMods = installation.getMods();
         writeDlcLoadFile(installation, existingMods, dlcs);
     }
 
-    static void writeDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
+    private static void writeDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
         var file = installation.getUserPath().resolve("dlc_load.json");
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         n.putArray("enabled_mods").addAll(mods.stream()

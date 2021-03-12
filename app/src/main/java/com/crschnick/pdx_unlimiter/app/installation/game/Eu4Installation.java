@@ -78,12 +78,8 @@ public class Eu4Installation extends GameInstallation {
     }
 
     @Override
-    public void startDirectly() {
-        try {
-            new ProcessBuilder().command(getExecutable().toString(), "-continuelastsave").start();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+    public void startDirectly() throws IOException {
+        new ProcessBuilder().command(getExecutable().toString(), "-continuelastsave").start();
     }
 
     @Override

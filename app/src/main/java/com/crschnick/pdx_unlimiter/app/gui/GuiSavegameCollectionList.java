@@ -27,7 +27,7 @@ public class GuiSavegameCollectionList {
         ListView<Node> list = GuiListView.createViewOfList(
                 SavegameManagerState.<T, I>get().getShownCollections(),
                 GuiSavegameCollection::createCampaignButton,
-                SavegameManagerState.<T, I>get().globalSelectedCampaignProperty());
+                SavegameManagerState.<T, I>get().globalSelectedCollectionProperty());
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
         var top = createTopBar();

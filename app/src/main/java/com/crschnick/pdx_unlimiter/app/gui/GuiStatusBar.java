@@ -153,17 +153,31 @@ public class GuiStatusBar {
         }
 
         {
-            Button launch = new JFXButton("Launch");
+            Button launch = new JFXButton("Continue Game");
             launch.setGraphic(new FontIcon());
-            launch.getStyleClass().add(CLASS_LAUNCH);
+            launch.getStyleClass().add("continue-button");
             launch.setOnAction(event -> {
-                GameLauncher.launchSavegame(e);
+                GameLauncher.continueSavegame(e);
 
                 event.consume();
                 getStatusBar().hide();
             });
             buttons.getChildren().add(launch);
         }
+
+        {
+            Button launch = new JFXButton("Start Launcher");
+            launch.setGraphic(new FontIcon());
+            launch.getStyleClass().add("launcher-button");
+            launch.setOnAction(event -> {
+                GameLauncher.startLauncherWithContinueGame(e);
+
+                event.consume();
+                getStatusBar().hide();
+            });
+            buttons.getChildren().add(launch);
+        }
+
         return barPane;
     }
 
