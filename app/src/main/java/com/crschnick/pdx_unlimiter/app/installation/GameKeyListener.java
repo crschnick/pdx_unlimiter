@@ -1,12 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.util.concurrent.Semaphore;
 
 public class GameKeyListener implements NativeKeyListener {
 
@@ -25,12 +27,16 @@ public class GameKeyListener implements NativeKeyListener {
             if (e.getKeyCode() == NativeKeyEvent.VC_I) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
                 SavegameActions.importLatestSavegame();
-                Toolkit.getDefaultToolkit().beep();
+                if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
+                    Toolkit.getDefaultToolkit().beep();
+                }
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_R) {
                 TaskExecutor.getInstance().submitTask(() -> {
                     LoggerFactory.getLogger(GameKeyListener.class).debug("Reloading latest save");
-                    Toolkit.getDefaultToolkit().beep();
+                    if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
                     handle.kill();
                     SavegameActions.importLatestAndLaunch();
                 }, true);

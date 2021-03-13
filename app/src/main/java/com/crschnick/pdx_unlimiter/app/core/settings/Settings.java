@@ -73,6 +73,11 @@ public final class Settings {
             "deleteOnImport",
             false
     );
+    public final SettingsEntry.BooleanEntry playSoundOnBackgroundImport = new SettingsEntry.BooleanEntry(
+            "PLAY_SOUND_ON_BACKGROUND_IMPORT",
+            "playSoundOnBackgroundImport",
+            true
+    );
     public final SettingsEntry.BooleanEntry startSteam = new SettingsEntry.BooleanEntry(
             "START_STEAM",
             "startSteam",
