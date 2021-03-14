@@ -11,7 +11,6 @@ public abstract class SavegameInfo<T> {
     protected List<String> dlcs;
     protected GameVersion version;
     protected boolean ironman;
-    protected UUID campaignUuid;
     protected GameDate date;
     protected boolean binary;
 

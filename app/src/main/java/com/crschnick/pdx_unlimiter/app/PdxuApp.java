@@ -125,7 +125,7 @@ public class PdxuApp extends Application {
             layout = GuiLayout.createLayout();
 
             primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
-            Scene scene = new Scene(layout, 1000, 720);
+            Scene scene = new Scene(layout, 1200, 650);
             primaryStage.setScene(scene);
             GuiStyle.addStylesheets(primaryStage.getScene());
             ComponentManager.initialPlatformSetup();

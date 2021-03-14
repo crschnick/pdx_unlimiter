@@ -80,10 +80,8 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
 
     public static <T, I extends SavegameInfo<T>> void withSavegame(
             SavegameEntry<T, I> e, Consumer<SavegameContext<T, I>> con) {
-        mapSavegame(e, (ctx) -> {
-            con.accept(ctx);
-            return null;
-        });
+        var ctx = getContext(e);
+        con.accept(ctx);
     }
 
     public static <T, I extends SavegameInfo<T>> SavegameContext<T, I> getContext(

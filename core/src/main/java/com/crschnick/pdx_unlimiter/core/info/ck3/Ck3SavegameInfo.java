@@ -31,8 +31,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             long seed = n.getNodeForKey("random_seed").getLong();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
-            i.campaignUuid = UUID.nameUUIDFromBytes(b);
-            i.campaignHeuristic = i.campaignUuid;
+            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = Ck3Tag.fromNode(n);
             i.tag = Ck3Tag.getPlayerTag(n, i.allTags);
@@ -101,7 +100,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             }
 
             if (attackers.contains(tag) || defenders.contains(tag)) {
-                wars.add(new War<Ck3Tag>(title, attackers, defenders));
+                wars.add(new War<>(title, attackers, defenders));
             }
         });
         return wars;

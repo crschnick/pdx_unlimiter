@@ -18,8 +18,8 @@ public class StellarisSavegameParser extends SavegameParser {
             String checksum = checksum(Files.readAllBytes(input));
 
             var zipFile = new ZipFile(input.toFile());
-            ArrayNode gamestateNode = null;
-            ArrayNode metaNode = null;
+            ArrayNode gamestateNode;
+            ArrayNode metaNode;
 
             var gs = zipFile.getEntry("gamestate");
             if (gs == null) {

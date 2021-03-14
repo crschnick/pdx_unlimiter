@@ -25,13 +25,11 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.date = GameDateType.STELLARIS.fromString(n.getNodesForKey("date").get(0).getString());
 
             i.binary = false;
-            i.campaignUuid = UUID.randomUUID();
-            i.campaignHeuristic = i.campaignUuid;
 
             int seed = n.getNodeForKey("random_seed").getInteger();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
-            i.campaignUuid = UUID.nameUUIDFromBytes(b);
+            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new HashSet<>();
             n.getNodeForKey("country").forEach((k, v) -> {

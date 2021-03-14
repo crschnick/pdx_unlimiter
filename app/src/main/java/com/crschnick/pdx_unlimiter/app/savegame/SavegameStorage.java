@@ -344,6 +344,8 @@ public abstract class SavegameStorage<
         }
 
         this.collections.remove(c);
+
+        saveData();
     }
 
 
@@ -374,6 +376,14 @@ public abstract class SavegameStorage<
             return;
         }
 
+
+        var file = getSavegameFile(e);
+        // Remove savegame from collection if it somehow does not exist anymore
+//        if (!Files.exists(file)) {
+//            delete(e);
+//            return;
+//        }
+
         if (Files.exists(getSavegameInfoFile(e))) {
             logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
             try {
@@ -385,7 +395,6 @@ public abstract class SavegameStorage<
             }
         }
 
-        var file = getSavegameFile(e);
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
             @Override

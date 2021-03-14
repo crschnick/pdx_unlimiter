@@ -48,7 +48,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
-            e.campaignUuid = UUID.fromString(n.getNodeForKey("campaign_id").getString());
             e.campaignHeuristic = UUID.nameUUIDFromBytes(n.getNodeForKey("countries")
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
@@ -228,10 +227,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public Set<War> getWars() {
         return wars;
-    }
-
-    public UUID getCampaignUuid() {
-        return campaignUuid;
     }
 
     public Eu4Tag getTag() {
