@@ -1,8 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
@@ -13,15 +16,17 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class GameImage {
 
     private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
-    public static Image CK3_ICON;
+    public static final Map<Game, Image> GAME_ICONS = new HashMap<>();
     public static Image CK3_ICON_IRONMAN;
     public static Image CK3_ICON_RULER;
     public static Image CK3_ICON_HEIR;
@@ -44,11 +49,9 @@ public class GameImage {
     public static Image CK3_SKILL_LEARNING;
     public static Image CK3_SKILL_PROWESS;
 
-    public static Image STELLARIS_ICON;
     public static Image STELLARIS_ICON_IRONMAN;
     public static Image STELLARIS_BACKGROUND;
 
-    public static Image HOI4_ICON;
     public static Image HOI4_ICON_IRONMAN;
     public static Image HOI4_ICON_VERSION_WARNING;
     public static Image HOI4_ICON_DIFF_RECRUIT;
@@ -59,7 +62,6 @@ public class GameImage {
     public static Image HOI4_BACKGROUND;
     public static Image HOI4_FLAG_OVERLAY;
 
-    public static Image EU4_ICON;
     public static Image EU4_ICON_VASSAL;
     public static Image EU4_ICON_ALLIANCE;
     public static Image EU4_ICON_TRIBUTARY;
@@ -80,24 +82,60 @@ public class GameImage {
     public static Image EU4_ICON_MIL;
     public static Image EU4_BACKGROUND;
 
-    public static void init() throws IOException {
-        loadEu4Images();
-        loadHoi4Images();
-        loadStellarisImages();
-        loadCk3Images();
+    private static void resetImages() {
+        for (var field : GameImage.class.getFields()) {
+            if (field.getType().equals(Image.class)) {
+                try {
+                    field.set(null, ImageLoader.DEFAULT_IMAGE);
+                } catch (IllegalAccessException e) {
+                    ErrorHandler.handleException(e);
+                }
+            }
+        }
+    }
+
+    public static void init() {
+        loadGameIcons();
+        resetImages();
+    }
+
+    public static void loadGameImages(Game g) {
+        resetImages();
+        Map<Game,Runnable> loadFuncs = Map.of(
+                Game.EU4, GameImage::loadEu4Images,
+                Game.CK3, GameImage::loadCk3Images,
+                Game.HOI4, GameImage::loadHoi4Images,
+                Game.STELLARIS, GameImage::loadStellarisImages);
+
+        if (g != null) {
+            loadFuncs.get(g).run();
+        }
+    }
+
+    private static void loadGameIcons() {
+        Map<Game, Supplier<Image>> loadFuncs = Map.of(
+                Game.EU4, GameImage::loadEu4Icon,
+                Game.CK3, GameImage::loadCk3Icon,
+                Game.HOI4, GameImage::loadHoi4Icon,
+                Game.STELLARIS, GameImage::loadStellarisIcon);
+
+        for (var g : Game.values()) {
+            if (g.isEnabled()) {
+                GAME_ICONS.put(g, loadFuncs.get(g).get());
+            }
+        }
+    }
+
+    private static Image loadCk3Icon() {
+        var installPath = GameInstallation.ALL.get(Game.CK3).getPath();
+        return ImageLoader.loadImage(
+                installPath.resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
     }
 
     public static void loadCk3Images() {
-        if (!GameInstallation.ALL.containsKey(Game.CK3)) {
-            return;
-        }
-
         var installPath = GameInstallation.ALL.get(Game.CK3).getPath();
         Path p = installPath.resolve("game");
         Path i = p.resolve("gfx").resolve("interface").resolve("icons");
-
-        CK3_ICON = ImageLoader.loadImage(
-                installPath.resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
 
         CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
 
@@ -153,16 +191,16 @@ public class GameImage {
         CK3_ICON_ALLY = ImageLoader.loadImage(i.resolve("message_feed").resolve("alliance.dds"));
     }
 
-    public static void loadStellarisImages() {
-        if (!GameInstallation.ALL.containsKey(Game.STELLARIS)) {
-            return;
-        }
+    private static Image loadStellarisIcon() {
+        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getPath();
+        return ImageLoader.loadImage(
+                installPath.resolve("gfx").resolve("exe_icon.bmp"));
 
+    }
+
+    private static void loadStellarisImages() {
         var installPath = GameInstallation.ALL.get(Game.STELLARIS).getPath();
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
-
-        STELLARIS_ICON = ImageLoader.loadImage(
-                installPath.resolve("gfx").resolve("exe_icon.bmp"));
 
         STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
         STELLARIS_BACKGROUND = ImageLoader.loadImage(
@@ -170,15 +208,14 @@ public class GameImage {
 
     }
 
-    public static void loadHoi4Images() {
-        if (!GameInstallation.ALL.containsKey(Game.HOI4)) {
-            return;
-        }
+    private static Image loadHoi4Icon() {
+        var installPath = GameInstallation.ALL.get(Game.HOI4).getPath();
+        return ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("game-icon.png"));
+    }
 
+    private static void loadHoi4Images() {
         var installPath = GameInstallation.ALL.get(Game.HOI4).getPath();
         Path i = installPath.resolve("gfx").resolve("interface");
-
-        HOI4_ICON = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("game-icon.png"));
 
         HOI4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("warning_icon.dds"));
         HOI4_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
@@ -192,15 +229,14 @@ public class GameImage {
 
     }
 
-    public static void loadEu4Images() {
-        if (!GameInstallation.ALL.containsKey(Game.EU4)) {
-            return;
-        }
+    private static Image loadEu4Icon() {
+        var installPath = GameInstallation.ALL.get(Game.EU4).getPath();
+        return ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("icon.png"));
+    }
 
+    private static void loadEu4Images() {
         var installPath = GameInstallation.ALL.get(Game.EU4).getPath();
         Path i = installPath.resolve("gfx").resolve("interface");
-
-        EU4_ICON = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("icon.png"));
 
         EU4_ICON_VASSAL = ImageLoader.loadImage(i.resolve("icon_vassal.dds"));
         EU4_ICON_ALLIANCE = ImageLoader.loadImage(i.resolve("icon_alliance.dds"));

@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
@@ -33,6 +35,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             FXCollections.observableArrayList());
     private final ListProperty<SavegameEntry<T, I>> shownEntries = new SimpleListProperty<>(
             FXCollections.observableArrayList());
+    private final BooleanProperty storageEmpty = new SimpleBooleanProperty();
 
     private SavegameManagerState() {
         var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
@@ -47,6 +50,23 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 n.getSavegames().addListener(cl);
             }
         });
+    }
+
+    public void onGameChange(Consumer<Game> change) {
+        currentGameProperty().addListener((c,o,n) -> {
+            change.accept(n);
+        });
+        change.accept(current());
+    }
+
+    private void updateStorageEmptyProperty() {
+        if (current() == null) {
+            storageEmpty.set(false);
+            return;
+        }
+
+        int newSize = SavegameStorage.get(current()).getCollections().size();
+        storageEmpty.set(newSize == 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -198,6 +218,8 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                     selectCollection(null);
                 }
             }
+
+            updateStorageEmptyProperty();
         });
     }
 
@@ -298,6 +320,14 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 logger.debug("Selected campaign entry " + e.getName());
             }
         });
+    }
+
+    public boolean isStorageEmpty() {
+        return storageEmpty.get();
+    }
+
+    public BooleanProperty storageEmptyProperty() {
+        return storageEmpty;
     }
 
     public class Filter {

@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -24,8 +23,10 @@ public class PdxuApp extends Application {
     private static final Logger logger = LoggerFactory.getLogger(PdxuApp.class);
 
     private static PdxuApp APP;
+
+    private GuiLayout layout;
+    private Stage stage;
     private Image icon;
-    private StackPane layout;
     private boolean windowActive;
 
     public static PdxuApp getApp() {
@@ -36,14 +37,9 @@ public class PdxuApp extends Application {
         launch(args);
     }
 
-    public Scene getScene() {
-        return layout.getScene();
-    }
-
     public void setupWindowState() {
         Platform.runLater(() -> {
-            Scene scene = getScene();
-            Stage w = (Stage) getScene().getWindow();
+            var w = stage;
             var s = SavedState.getInstance();
 
             boolean inBounds = false;
@@ -69,25 +65,25 @@ public class PdxuApp extends Application {
                 logger.warn("Saved window was out of bounds");
             }
 
-            scene.getWindow().xProperty().addListener((c, o, n) -> {
+            stage.xProperty().addListener((c, o, n) -> {
                 if (windowActive) {
                     logger.debug("Changing window x to " + n.intValue());
                     s.setWindowX(n.intValue());
                 }
             });
-            scene.getWindow().yProperty().addListener((c, o, n) -> {
+            stage.yProperty().addListener((c, o, n) -> {
                 if (windowActive) {
                     logger.debug("Changing window y to " + n.intValue());
                     s.setWindowY(n.intValue());
                 }
             });
-            scene.getWindow().widthProperty().addListener((c, o, n) -> {
+            stage.widthProperty().addListener((c, o, n) -> {
                 if (windowActive) {
                     logger.debug("Changing window width to " + n.intValue());
                     s.setWindowWidth(n.intValue());
                 }
             });
-            scene.getWindow().heightProperty().addListener((c, o, n) -> {
+            stage.heightProperty().addListener((c, o, n) -> {
                 if (windowActive) {
                     logger.debug("Changing window height to " + n.intValue());
                     s.setWindowHeight(n.intValue());
@@ -105,10 +101,24 @@ public class PdxuApp extends Application {
         });
     }
 
+    public void setupBasicWindowContent() {
+        layout = new GuiLayout();
+        layout.setup();
+        stage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
+        Scene scene = new Scene(layout.getContent(), 1200, 650);
+        stage.setScene(scene);
+        GuiStyle.addStylesheets(scene);
+    }
+
+    public void setupCompleteWindowContent() {
+        layout.finishSetup();
+    }
+
     @Override
     public void start(Stage primaryStage) {
         try {
             APP = this;
+            stage = primaryStage;
             icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
             primaryStage.getIcons().add(icon);
             primaryStage.setOnCloseRequest(event -> {
@@ -117,22 +127,14 @@ public class PdxuApp extends Application {
                 ComponentManager.finalTeardown();
                 // Close other windows
                 Stage.getWindows().stream()
-                        .filter(w -> !w.equals(getScene().getWindow()))
+                        .filter(w -> !w.equals(stage))
                         .collect(Collectors.toList())
                         .forEach(w -> w.fireEvent(event));
             });
-
-            layout = GuiLayout.createLayout();
-
-            primaryStage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
-            Scene scene = new Scene(layout, 1200, 650);
-            primaryStage.setScene(scene);
-            GuiStyle.addStylesheets(primaryStage.getScene());
             ComponentManager.initialPlatformSetup();
         } catch (Exception ex) {
             ErrorHandler.handleTerminalException(ex);
         }
-
     }
 
     public Image getIcon() {

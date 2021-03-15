@@ -51,11 +51,6 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     }
 
     @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(GameImage.STELLARIS_ICON, CLASS_IMAGE_ICON);
-    }
-
-    @Override
     public Background createEntryInfoBackground(SavegameInfo<StellarisTag> info) {
         return new Background(new BackgroundFill(
                 Color.GRAY,

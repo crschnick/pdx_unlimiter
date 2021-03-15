@@ -53,7 +53,7 @@ public class GuiSavegameCollectionList {
         if (SavegameManagerState.get().current() == null) {
             create.setDisable(true);
         }
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             create.setDisable(n == null);
         });
 

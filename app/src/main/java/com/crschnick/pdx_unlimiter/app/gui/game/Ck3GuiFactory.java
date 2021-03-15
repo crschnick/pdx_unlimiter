@@ -112,11 +112,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     }
 
     @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(GameImage.CK3_ICON, CLASS_IMAGE_ICON);
-    }
-
-    @Override
     public Background createEntryInfoBackground(SavegameInfo<Ck3Tag> info) {
         return new Background(new BackgroundFill(
                 Color.CORAL,

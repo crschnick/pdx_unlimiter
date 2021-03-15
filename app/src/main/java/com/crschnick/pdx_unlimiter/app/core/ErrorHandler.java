@@ -62,7 +62,7 @@ public class ErrorHandler {
         Platform.startup(latch::countDown);
         try {
             latch.await();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
         startupCompleted = true;
     }
@@ -118,7 +118,7 @@ public class ErrorHandler {
         if (terminal) {
             try {
                 latch.await();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
             // Wait to send error report
             ThreadHelper.sleep(1000);

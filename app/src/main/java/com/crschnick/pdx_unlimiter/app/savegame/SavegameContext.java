@@ -59,15 +59,18 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
     public static <T, I extends SavegameInfo<T>> void withSavegameAsync(
             SavegameEntry<T, I> e,
             Consumer<SavegameContext<T, I>> con) {
-        if (e.getInfo() != null) {
-            withSavegame(e, con);
+        var ctx = getContext(e);
+        if (ctx.getInfo() != null) {
+            con.accept(ctx);
         } else {
             e.infoProperty().addListener(new javafx.beans.value.ChangeListener<I>() {
                 @Override
                 public void changed(ObservableValue<? extends I> observable, I oldValue, I newValue) {
                     if (newValue != null) {
+                        var ctx = getContext(e);
+                        ctx.info = newValue;
                         Platform.runLater(() -> {
-                            withSavegame(e, con);
+                            con.accept(ctx);
                         });
                     } else {
                         // Remove listener if info is unloaded

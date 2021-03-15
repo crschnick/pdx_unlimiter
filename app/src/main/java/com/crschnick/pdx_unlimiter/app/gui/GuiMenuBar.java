@@ -136,7 +136,7 @@ public class GuiMenuBar {
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
         m.setDisable(SavegameManagerState.get().current() == null);
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> m.setDisable(n == null));
         });
 
@@ -149,7 +149,7 @@ public class GuiMenuBar {
         importB.setGraphic(new FontIcon());
         importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
         importB.setDisable(SavegameManagerState.get().current() == null);
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> importB.setDisable(n == null));
         });
 
@@ -161,7 +161,7 @@ public class GuiMenuBar {
         launch.setGraphic(new FontIcon());
         launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
         launch.setDisable(SavegameManagerState.get().current() == null);
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> launch.setDisable(n == null));
         });
 
@@ -175,9 +175,8 @@ public class GuiMenuBar {
 
         StackPane spacer = new StackPane();
         Label game = new Label();
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
-            var current = SavegameManagerState.get().current();
-            var name = current != null ? SavegameManagerState.get().current().getFullName() : "None";
+        SavegameManagerState.get().onGameChange(n -> {
+            String name = n != null ? n.getFullName() : "None";
             Platform.runLater(() -> game.setText(name));
         });
         spacer.getChildren().add(game);

@@ -23,7 +23,7 @@ public class Eu4SavegameParser extends SavegameParser {
     private static final byte[] EU4_BINARY_HEADER = "EU4bin".getBytes(StandardCharsets.UTF_8);
 
     public boolean isCompressed(Path file) throws IOException {
-        boolean isZipped = false;
+        boolean isZipped;
         try (var in = Files.newInputStream(file);
              var zipIn = new ZipInputStream(in)) {
             isZipped = zipIn.getNextEntry() != null;
@@ -79,9 +79,9 @@ public class Eu4SavegameParser extends SavegameParser {
                 }
             } else {
                 try (var fs = FileSystems.newFileSystem(fileToParse)) {
-                    ArrayNode gamestateNode = null;
-                    ArrayNode metaNode = null;
-                    ArrayNode aiNode = null;
+                    ArrayNode gamestateNode;
+                    ArrayNode metaNode;
+                    ArrayNode aiNode;
 
                     var gs = fs.getPath("gamestate");
                     if (!Files.exists(gs)) {

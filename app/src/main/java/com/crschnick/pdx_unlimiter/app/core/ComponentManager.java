@@ -4,8 +4,8 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.editor.EditorExternalState;
-import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
@@ -42,17 +42,20 @@ public class ComponentManager {
     }
 
     public static void initialPlatformSetup() {
-        try {
-            SavedState.init();
-            PdxuApp.getApp().setupWindowState();
-            Settings.init();
-        } catch (Exception e) {
-            ErrorHandler.handleTerminalException(e);
-        }
-
         ErrorHandler.setPlatformInitialized();
         Platform.setImplicitExit(false);
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
+
+        try {
+            // Load saved state before window creation so that stored window coordinates can be used
+            SavedState.init();
+            PdxuApp.getApp().setupWindowState();
+            // Load settings after window setup since settings entries can create dialog windows to notify the user
+            Settings.init();
+            PdxuApp.getApp().setupBasicWindowContent();
+        } catch (Exception e) {
+            ErrorHandler.handleTerminalException(e);
+        }
 
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
@@ -80,24 +83,25 @@ public class ComponentManager {
     private static void init() {
         logger.debug("Initializing ...");
         try {
-            GuiLayout.init();
             GameInstallation.init();
+            SavegameStorage.init();
+            SavegameManagerState.init();
 
             GameImage.init();
-            SavegameStorage.init();
             SavegameWatcher.init();
 
             GameAppManager.init();
             FileImporter.init();
 
             CacheManager.init();
-            SavegameManagerState.init();
 
             FileWatchManager.init();
             EditorExternalState.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }
+
+            PdxuApp.getApp().setupCompleteWindowContent();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }

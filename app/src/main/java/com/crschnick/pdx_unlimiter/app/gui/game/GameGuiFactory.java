@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.GAME_ICONS;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
@@ -96,7 +97,9 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane background();
 
-    public abstract Pane createIcon();
+    public final Pane createIcon() {
+        return GameImage.imageNode(GAME_ICONS.get(ALL.inverseBidiMap().get(this)), CLASS_IMAGE_ICON);
+    }
 
     public abstract Background createEntryInfoBackground(SavegameInfo<T> info);
 

@@ -43,11 +43,6 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(GameImage.HOI4_ICON, CLASS_IMAGE_ICON);
-    }
-
-    @Override
     public Background createEntryInfoBackground(SavegameInfo<Hoi4Tag> info) {
         return new Background(new BackgroundFill(
                 ColorHelper.colorFromInt(0, 100),

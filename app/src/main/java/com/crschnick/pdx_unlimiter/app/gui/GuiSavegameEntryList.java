@@ -14,6 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -23,55 +25,42 @@ import java.util.function.Consumer;
 
 public class GuiSavegameEntryList {
 
-    private static void addNoCampaignNodeListeners(Pane pane, Node listNode) {
-        Consumer<Set<? extends SavegameCollection<?, ?>>> update = (s) -> {
-            int newSize = s.size();
-            Platform.runLater(() -> {
-                if (newSize > 0) {
-                    pane.getChildren().set(0, listNode);
-                } else {
-                    pane.getChildren().set(0, createNoCampaignNode(pane));
-                }
-            });
-        };
-
-        SetChangeListener<SavegameCollection<?, ?>> campaignListListener = (change) -> {
-            update.accept(change.getSet());
-        };
-
-        //TODO: change
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
-            if (o != null) {
-                var storage = SavegameStorage.get(o);
-                storage.getCollections().removeListener(campaignListListener);
-            }
-
-            if (n != null) {
-                var storage = SavegameStorage.get(n);
-                storage.getCollections().addListener(campaignListListener);
-                update.accept(storage.getCollections());
-            }
-        });
-    }
-
-    public static void createCampaignEntryList(Pane pane) {
+    public static Pane createCampaignEntryList() {
         ListView<Node> grid = GuiListView.createViewOfList(
                 SavegameManagerState.get().getShownEntries(),
                 GuiSavegameEntry::createSavegameEntryNode,
                 SavegameManagerState.get().globalSelectedEntryProperty());
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);
+
+        var ncn = createNoCampaignNode();
+        StackPane pane = new StackPane(ncn, grid);
+        ncn.prefWidthProperty().bind(pane.widthProperty());
+        ncn.prefHeightProperty().bind(pane.heightProperty());
         grid.prefWidthProperty().bind(pane.widthProperty());
         grid.prefHeightProperty().bind(pane.heightProperty());
 
-        addNoCampaignNodeListeners(pane, grid);
+        grid.setVisible(!SavegameManagerState.get().isStorageEmpty());
+        ncn.setVisible(SavegameManagerState.get().isStorageEmpty());
+        SavegameManagerState.get().storageEmptyProperty().addListener((c,o,n) -> {
+            grid.setVisible(!n);
+            ncn.setVisible(n);
+        });
+        return pane;
     }
 
-    private static Node createNoCampaignNode(Pane pane) {
+    private static Region createNoCampaignNode() {
         VBox v = new VBox();
-        Label text = new Label("It seems like there are no imported savegames for " +
-                SavegameManagerState.get().current().getFullName() + " yet.\n");
+        Label text = new Label();
         v.getChildren().add(text);
+        SavegameManagerState.get().onGameChange(n -> {
+            if (n != null) {
+                Platform.runLater(() -> {
+                    text.setText("It seems like there are no imported savegames for " +
+                            SavegameManagerState.get().current().getFullName() + " yet.\n");
+                });
+            }
+        });
 
         Button importB = new Button("Import savegames");
         importB.setOnAction(e -> {
@@ -100,8 +89,6 @@ public class GuiSavegameEntryList {
         v.setFillWidth(true);
         v.setSpacing(10);
         v.setAlignment(Pos.CENTER);
-        v.prefWidthProperty().bind(pane.widthProperty());
-        v.prefHeightProperty().bind(pane.heightProperty());
         return v;
     }
 }

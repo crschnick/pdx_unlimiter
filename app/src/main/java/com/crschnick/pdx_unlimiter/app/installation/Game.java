@@ -7,14 +7,18 @@ public enum Game {
     CK3("ck3", "CK3", "Crusader Kings III"),
     STELLARIS("stellaris", "Stellaris", "Stellaris");
 
-
     private final String id;
     private final String abbreviation;
     private final String fullName;
+
     Game(String id, String abbreviation, String fullName) {
         this.id = id;
         this.abbreviation = abbreviation;
         this.fullName = fullName;
+    }
+
+    public boolean isEnabled() {
+        return GameInstallation.ALL.containsKey(this);
     }
 
     public static Game byId(String id) {

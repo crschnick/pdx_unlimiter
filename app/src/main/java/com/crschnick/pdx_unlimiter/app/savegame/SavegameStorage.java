@@ -119,7 +119,8 @@ public abstract class SavegameStorage<
                 }
 
                 Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
-                Image image = ImageLoader.loadImage(getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
+                Image image = ImageLoader.loadImage(
+                        getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
                 collections.add(new SavegameCampaign<>(lastDate, name, id, date, image));
             }
         }
@@ -487,7 +488,6 @@ public abstract class SavegameStorage<
             logger.debug("Invalidating " + getSavegameInfoFile(e));
             try {
                 Files.delete(getSavegameInfoFile(e));
-                return;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }

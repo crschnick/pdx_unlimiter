@@ -113,11 +113,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(EU4_ICON, CLASS_IMAGE_ICON);
-    }
-
-    @Override
     public Background createEntryInfoBackground(SavegameInfo<Eu4Tag> info) {
         return new Background(new BackgroundFill(
                 ColorHelper.colorFromInt(info.getTag().getMapColor(), 100),
