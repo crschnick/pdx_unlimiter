@@ -26,7 +26,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
                 .filter(kv -> kv.getValue().contains(e))
                 .findFirst()
                 .map(v -> v.getKey());
-        return sg.orElseThrow(IllegalArgumentException::new);
+        return sg.orElse(null);
     }
 
     public static <T, I extends SavegameInfo<T>> Game getForCollection(SavegameCollection<T, I> col) {
@@ -34,7 +34,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
                 .filter(kv -> kv.getValue().getCollections().contains(col))
                 .findFirst()
                 .map(v -> v.getKey());
-        return sg.orElseThrow(IllegalArgumentException::new);
+        return sg.orElse(null);
     }
 
     public static <T, I extends SavegameInfo<T>> void withCollection(
@@ -42,7 +42,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
             Consumer<SavegameContext<T, I>> con) {
         var g = getForCollection(col);
         if (g == null) {
-            throw new IllegalStateException();
+            return;
         }
 
         var ctx = new SavegameContext<T, I>();
@@ -63,7 +63,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         if (ctx.getInfo() != null) {
             con.accept(ctx);
         } else {
-            e.infoProperty().addListener(new javafx.beans.value.ChangeListener<I>() {
+            e.infoProperty().addListener(new javafx.beans.value.ChangeListener<>() {
                 @Override
                 public void changed(ObservableValue<? extends I> observable, I oldValue, I newValue) {
                     if (newValue != null) {
@@ -83,15 +83,14 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
 
     public static <T, I extends SavegameInfo<T>> void withSavegame(
             SavegameEntry<T, I> e, Consumer<SavegameContext<T, I>> con) {
-        var ctx = getContext(e);
-        con.accept(ctx);
+        getContextIfExistent(e).ifPresent(con);
     }
 
-    public static <T, I extends SavegameInfo<T>> SavegameContext<T, I> getContext(
+    private static <T, I extends SavegameInfo<T>> Optional<SavegameContext<T, I>> getContextIfExistent(
             SavegameEntry<T, I> e) {
         var g = getForSavegame(e);
         if (g == null) {
-            throw new IllegalStateException();
+            return Optional.empty();
         }
 
         var ctx = new SavegameContext<T, I>();
@@ -104,10 +103,16 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
 
         var col = SavegameStorage.<T, I>get(g).getSavegameCollection(e);
         if (col == null) {
-            throw new IllegalStateException();
+            return Optional.empty();
         }
         ctx.collection = col;
-        return ctx;
+        return Optional.of(ctx);
+    }
+
+    public static <T, I extends SavegameInfo<T>> SavegameContext<T, I> getContext(
+            SavegameEntry<T, I> e) {
+        return getContextIfExistent(e).orElseThrow(
+                () -> new IllegalStateException("Savegame is not stored (anymore)"));
     }
 
     public static <T, I extends SavegameInfo<T>, R> R mapSavegame(
