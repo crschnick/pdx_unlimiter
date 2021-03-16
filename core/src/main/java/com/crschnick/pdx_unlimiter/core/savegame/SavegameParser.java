@@ -27,8 +27,7 @@ public abstract class SavegameParser {
             var hex = String.format("%02x", b.get());
             c.append(hex);
         }
-        String checksum = c.toString();
-        return checksum;
+        return c.toString();
     }
 
     @FunctionalInterface

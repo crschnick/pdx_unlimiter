@@ -114,7 +114,8 @@ public class Ck3CoatOfArms {
             c.file = n.getNodeForKey("texture").getString();
 
             c.colors = new ArrayList<>();
-            c.colors.add(n.getNodeForKey("color1").getString());
+            // Even color1 can sometimes be missing
+            n.getNodeForKeyIfExistent("color1").map(Node::getString).ifPresent(c.colors::add);
             n.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(c.colors::add);
 
             c.instances = n.getNodesForKey("instance").stream().map(i -> {

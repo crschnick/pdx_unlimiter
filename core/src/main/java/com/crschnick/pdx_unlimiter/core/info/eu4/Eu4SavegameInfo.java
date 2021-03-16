@@ -6,7 +6,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeFormatException;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,7 +34,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Ruler heir;
     private Set<War> wars = new HashSet<>();
 
-    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
+    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         try {
             GameDate date = GameDateType.EU4.fromString(n.getNodeForKey("date").getString());
             String tag = n.getNodeForKey("player").getString();
@@ -153,7 +153,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
             return e;
         } catch (NodeFormatException ex) {
-            throw new SavegameParseException("Error while creating savegame info", ex);
+            throw new ParseException("Error while creating savegame info", ex);
         }
     }
 

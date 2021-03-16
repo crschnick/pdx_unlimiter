@@ -48,7 +48,7 @@ public final class TextFormatParser extends FormatParser {
         this.context = null;
     }
 
-    public final ArrayNode parse(byte[] input) throws Exception {
+    public final ArrayNode parse(byte[] input) throws ParseException {
         try {
             this.tokenizer = new TextFormatTokenizer(input);
 
@@ -70,7 +70,7 @@ public final class TextFormatParser extends FormatParser {
             return r;
         } catch (Throwable t) {
             // Catch also errors!
-            throw new RuntimeException(t);
+            throw new ParseException(t);
         }
     }
 

@@ -15,7 +15,7 @@ import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -429,7 +429,7 @@ public abstract class SavegameStorage<
 
             @Override
             public void invalid(SavegameParser.Invalid iv) {
-                ErrorHandler.handleException(new SavegameParseException(iv.message), null, file);
+                ErrorHandler.handleException(new ParseException(iv.message), null, file);
             }
         });
     }
@@ -520,7 +520,7 @@ public abstract class SavegameStorage<
 
             @Override
             public void invalid(SavegameParser.Invalid iv) {
-                ErrorHandler.handleException(new SavegameParseException(iv.message));
+                ErrorHandler.handleException(new ParseException(iv.message));
             }
         });
     }

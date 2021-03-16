@@ -22,7 +22,23 @@ public final class SimpleArrayNode extends ArrayNode {
 
     @Override
     public String toString() {
-        return "SimpleArrayNode(" + values.size() + ")";
+        if (values.size() <= 10) {
+            StringBuilder sb = new StringBuilder("SimpleArrayNode(");
+            evaluateAllValueNodes();
+            for (int i = 0; i < values.size(); i++) {
+                if (hasKeyAtIndex(i)) {
+                    sb.append(context.evaluate(keyScalars[i]));
+                    sb.append("=");
+                }
+                sb.append(values.get(i).toString());
+                sb.append(", ");
+            }
+            sb.delete(sb.length() - 2, sb.length());
+            sb.append(")");
+            return sb.toString();
+        } else {
+            return "SimpleArrayNode(" + values.size() + ")";
+        }
     }
 
     @Override

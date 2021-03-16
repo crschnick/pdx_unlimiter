@@ -52,21 +52,22 @@ public class ColorHelper {
 
     public static Color fromColorNode(ColorNode node) {
         var c = node.getValues();
-        if (node.getColorName().equals("hsv")) {
-            return Color.hsb(
-                    c.get(0).getDouble(),
-                    c.get(1).getDouble(),
-                    c.get(2).getDouble());
-        } else if (node.getColorName().equals("hsv360")) {
-            return Color.hsb(
-                    c.get(0).getDouble() / 360.0,
-                    c.get(1).getDouble() / 360.0,
-                    c.get(2).getDouble() / 360.0);
-        } else if (node.getColorName().equals("rgb")) {
-            return Color.color(
-                    c.get(0).getDouble() / 255.0,
-                    c.get(1).getDouble() / 255.0,
-                    c.get(2).getDouble() / 255.0);
+        switch (node.getColorName()) {
+            case "hsv":
+                return Color.hsb(
+                        c.get(0).getDouble() * 360,
+                        c.get(1).getDouble(),
+                        c.get(2).getDouble());
+            case "hsv360":
+                return Color.hsb(
+                        c.get(0).getDouble(),
+                        c.get(1).getDouble() / 360.0,
+                        c.get(2).getDouble() / 360.0);
+            case "rgb":
+                return Color.color(
+                        c.get(0).getDouble() / 255.0,
+                        c.get(1).getDouble() / 255.0,
+                        c.get(2).getDouble() / 255.0);
         }
 
         throw new IllegalArgumentException();
