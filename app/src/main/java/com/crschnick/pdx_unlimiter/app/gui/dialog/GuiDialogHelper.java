@@ -2,18 +2,17 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.LogManager;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.scene.control.*;
-import javafx.stage.Modality;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 

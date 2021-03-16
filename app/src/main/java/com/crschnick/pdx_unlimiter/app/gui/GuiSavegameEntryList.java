@@ -2,12 +2,9 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
-import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -19,9 +16,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.Set;
-import java.util.function.Consumer;
 
 public class GuiSavegameEntryList {
 
@@ -42,7 +36,7 @@ public class GuiSavegameEntryList {
 
         grid.setVisible(!SavegameManagerState.get().isStorageEmpty());
         ncn.setVisible(SavegameManagerState.get().isStorageEmpty());
-        SavegameManagerState.get().storageEmptyProperty().addListener((c,o,n) -> {
+        SavegameManagerState.get().storageEmptyProperty().addListener((c, o, n) -> {
             grid.setVisible(!n);
             ncn.setVisible(n);
         });

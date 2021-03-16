@@ -8,7 +8,6 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.concurrent.Semaphore;
 
 public class GameKeyListener implements NativeKeyListener {
 

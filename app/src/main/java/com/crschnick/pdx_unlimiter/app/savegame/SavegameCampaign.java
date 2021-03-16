@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {

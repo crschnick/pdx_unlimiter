@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
@@ -52,23 +51,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         });
     }
 
-    public void onGameChange(Consumer<Game> change) {
-        currentGameProperty().addListener((c,o,n) -> {
-            change.accept(n);
-        });
-        change.accept(current());
-    }
-
-    private void updateStorageEmptyProperty() {
-        if (current() == null) {
-            storageEmpty.set(false);
-            return;
-        }
-
-        int newSize = SavegameStorage.get(current()).getCollections().size();
-        storageEmpty.set(newSize == 0);
-    }
-
     @SuppressWarnings("unchecked")
     public static <T, I extends SavegameInfo<T>> SavegameManagerState<T, I> get() {
         return (SavegameManagerState<T, I>) INSTANCE;
@@ -97,6 +79,23 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         if (INSTANCE.current() != null) {
             INSTANCE.selectGame(null);
         }
+    }
+
+    public void onGameChange(Consumer<Game> change) {
+        currentGameProperty().addListener((c, o, n) -> {
+            change.accept(n);
+        });
+        change.accept(current());
+    }
+
+    private void updateStorageEmptyProperty() {
+        if (current() == null) {
+            storageEmpty.set(false);
+            return;
+        }
+
+        int newSize = SavegameStorage.get(current()).getCollections().size();
+        storageEmpty.set(newSize == 0);
     }
 
     public LocalisationHelper.Language getActiveLanguage() {

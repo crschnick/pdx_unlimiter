@@ -109,7 +109,7 @@ public class TextFormatTokenizer {
             prev = i + 1;
         } else if (t != 0) {
             if (t == CLOSE_GROUP) {
-                assert arraySizeStack.size() > 0: "Encountered an additional close group token";
+                assert arraySizeStack.size() > 0 : "Encountered an additional close group token";
                 arraySizeStack.pop();
             } else if (t == EQUALS) {
                 arraySizes[arraySizeStack.peek()]--;

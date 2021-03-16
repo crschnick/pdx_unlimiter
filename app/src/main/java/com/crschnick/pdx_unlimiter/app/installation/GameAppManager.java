@@ -15,9 +15,8 @@ import java.time.temporal.ChronoUnit;
 public class GameAppManager {
 
     private static final GameAppManager INSTANCE = new GameAppManager();
-
-    private Instant lastImport;
     private final ObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
+    private Instant lastImport;
 
     private GameAppManager() {
     }
@@ -26,6 +25,14 @@ public class GameAppManager {
         TaskExecutor.getInstance().submitLoop(() -> {
             INSTANCE.update();
         });
+    }
+
+    private static boolean isInstanceOfGame(String cmd, GameInstallation install) {
+        return cmd.contains(install.getExecutable().toString());
+    }
+
+    public static GameAppManager getInstance() {
+        return INSTANCE;
     }
 
     private void update() {
@@ -71,14 +78,6 @@ public class GameAppManager {
             SavegameActions.importLatestSavegame();
             lastImport = Instant.now();
         }
-    }
-
-    private static boolean isInstanceOfGame(String cmd, GameInstallation install) {
-        return cmd.contains(install.getExecutable().toString());
-    }
-
-    public static GameAppManager getInstance() {
-        return INSTANCE;
     }
 
     public GameApp getActiveGame() {

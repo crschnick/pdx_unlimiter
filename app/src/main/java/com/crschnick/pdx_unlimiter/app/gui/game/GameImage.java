@@ -1,11 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
@@ -15,8 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +21,8 @@ import java.util.function.Supplier;
 
 public class GameImage {
 
-    private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     public static final Map<Game, Image> GAME_ICONS = new HashMap<>();
+    private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     public static Image CK3_ICON_IRONMAN;
     public static Image CK3_ICON_RULER;
     public static Image CK3_ICON_HEIR;
@@ -101,7 +97,7 @@ public class GameImage {
 
     public static void loadGameImages(Game g) {
         resetImages();
-        Map<Game,Runnable> loadFuncs = Map.of(
+        Map<Game, Runnable> loadFuncs = Map.of(
                 Game.EU4, GameImage::loadEu4Images,
                 Game.CK3, GameImage::loadCk3Images,
                 Game.HOI4, GameImage::loadHoi4Images,

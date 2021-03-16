@@ -12,12 +12,33 @@ import java.util.stream.Collectors;
 
 public abstract class GameDistributionType {
 
-    private final String name;
     protected final GameInstallation installation;
+    private final String name;
 
     public GameDistributionType(String name, GameInstallation installation) {
         this.name = name;
         this.installation = installation;
+    }
+
+    private static void startParadoxLauncher(Path launcherPath) throws IOException {
+        Path bootstrapper;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
+                    .resolve("Programs")
+                    .resolve("Paradox Interactive")
+                    .resolve("bootstrapper-v2.exe");
+        } else {
+            bootstrapper = Path.of(System.getProperty("user.home"))
+                    .resolve(".paradoxlauncher")
+                    .resolve("bootstrapper-v2");
+        }
+
+        new ProcessBuilder()
+                .directory(launcherPath.toFile())
+                .command(bootstrapper.toString(),
+                        "--pdxlGameDir", launcherPath.toString(),
+                        "--gameDir", launcherPath.toString())
+                .start();
     }
 
     public abstract boolean checkDirectLaunch();
@@ -87,26 +108,5 @@ public abstract class GameDistributionType {
         public List<Path> getSavegamePaths() {
             return List.of();
         }
-    }
-
-    private static void startParadoxLauncher(Path launcherPath) throws IOException {
-        Path bootstrapper;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
-                    .resolve("Programs")
-                    .resolve("Paradox Interactive")
-                    .resolve("bootstrapper-v2.exe");
-        } else {
-            bootstrapper = Path.of(System.getProperty("user.home"))
-                    .resolve(".paradoxlauncher")
-                    .resolve("bootstrapper-v2");
-        }
-
-        new ProcessBuilder()
-                .directory(launcherPath.toFile())
-                .command(bootstrapper.toString(),
-                        "--pdxlGameDir", launcherPath.toString(),
-                        "--gameDir", launcherPath.toString())
-                .start();
     }
 }

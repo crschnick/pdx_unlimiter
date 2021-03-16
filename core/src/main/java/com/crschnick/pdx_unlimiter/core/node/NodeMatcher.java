@@ -12,15 +12,6 @@ public final class NodeMatcher {
         this.matchString = matchString;
     }
 
-    public boolean matchesScalar(NodeContext ctx, int index) {
-        if (!ctx.getCharset().equals(currentCharset)) {
-            matchBytes = matchString.getBytes(ctx.getCharset());
-            currentCharset = ctx.getCharset();
-        }
-
-        return contains(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index], matchBytes);
-    }
-
     private static boolean contains(byte[] array, int start, short length, byte[] toFind) {
         for (int i = start; i < start + length - toFind.length; ++i) {
             boolean found = true;
@@ -35,5 +26,14 @@ public final class NodeMatcher {
             }
         }
         return false;
+    }
+
+    public boolean matchesScalar(NodeContext ctx, int index) {
+        if (!ctx.getCharset().equals(currentCharset)) {
+            matchBytes = matchString.getBytes(ctx.getCharset());
+            currentCharset = ctx.getCharset();
+        }
+
+        return contains(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index], matchBytes);
     }
 }

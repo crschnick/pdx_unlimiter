@@ -26,8 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
-
 public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisSavegameInfo> {
 
     private static final int IMG_SIZE = 256;

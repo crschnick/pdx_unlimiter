@@ -22,11 +22,6 @@ public final class ColorNode extends Node {
         this.values = Collections.unmodifiableList(values);
     }
 
-    public void set(ColorNode other) {
-        this.colorName = other.getColorName();
-        this.values = Collections.unmodifiableList(other.getValues());
-    }
-
     public static boolean isColorName(NodeContext ctx, int index) {
         var begin = ctx.getLiteralsBegin()[index];
         var length = ctx.getLiteralsLength()[index];
@@ -42,6 +37,11 @@ public final class ColorNode extends Node {
         return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end);
+    }
+
+    public void set(ColorNode other) {
+        this.colorName = other.getColorName();
+        this.values = Collections.unmodifiableList(other.getValues());
     }
 
     @Override

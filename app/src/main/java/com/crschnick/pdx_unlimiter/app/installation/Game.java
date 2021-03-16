@@ -17,10 +17,6 @@ public enum Game {
         this.fullName = fullName;
     }
 
-    public boolean isEnabled() {
-        return GameInstallation.ALL.containsKey(this);
-    }
-
     public static Game byId(String id) {
         for (Game g : values()) {
             if (g.getId().equals(id)) {
@@ -28,6 +24,10 @@ public enum Game {
             }
         }
         return null;
+    }
+
+    public boolean isEnabled() {
+        return GameInstallation.ALL.containsKey(this);
     }
 
     public String getAbbreviation() {
