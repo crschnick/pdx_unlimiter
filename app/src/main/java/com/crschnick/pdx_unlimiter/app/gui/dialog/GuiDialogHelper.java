@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
@@ -13,6 +14,7 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -83,7 +85,7 @@ public class GuiDialogHelper {
     }
 
     public static void setIcon(Alert a) {
-        if (PdxuApp.getApp() != null) {
+        if (PdxuApp.getApp() != null && PdxuApp.getApp().getIcon() != null) {
             ((Stage) a.getDialogPane().getScene().getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
         }
     }
@@ -91,7 +93,7 @@ public class GuiDialogHelper {
     public static void showText(String title, String header, String file) {
         String text;
         try {
-            text = new String(GuiLayout.class.getResourceAsStream(file).readAllBytes());
+            text = Files.readString(PdxuInstallation.getInstance().getResourceDir().resolve(file));
         } catch (IOException e) {
             ErrorHandler.handleException(e);
             return;

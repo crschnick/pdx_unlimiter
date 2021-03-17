@@ -41,7 +41,6 @@ public class ComponentManager {
     }
 
     public static void initialPlatformSetup() {
-        ErrorHandler.setPlatformInitialized();
         Platform.setImplicitExit(false);
         Platform.runLater(() -> ErrorHandler.registerThread(Thread.currentThread()));
 

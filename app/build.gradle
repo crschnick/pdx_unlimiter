@@ -225,7 +225,17 @@ task writeVersion(type: DefaultTask) {
     }
 }
 
-createImage.finalizedBy(writeVersion)
+task copyResources(type: Copy) {
+    into "${buildDir}/image/resources"
+    from "${projectDir}/resources"
+}
+
+task copyLang(type: Copy) {
+    into "${buildDir}/image/lang"
+    from "${projectDir}/lang"
+}
+
+createImage.finalizedBy(writeVersion, copyResources, copyLang)
 
 task createDist(type: Zip, dependsOn: createImage) {
     destinationDirectory = buildDir

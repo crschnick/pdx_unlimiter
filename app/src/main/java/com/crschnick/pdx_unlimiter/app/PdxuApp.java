@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -116,25 +118,30 @@ public class PdxuApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        try {
-            APP = this;
-            stage = primaryStage;
-            icon = new Image(PdxuApp.class.getResourceAsStream("logo.png"));
-            primaryStage.getIcons().add(icon);
-            primaryStage.setOnCloseRequest(event -> {
-                windowActive = false;
+        ErrorHandler.setPlatformInitialized();
 
-                ComponentManager.finalTeardown();
-                // Close other windows
-                Stage.getWindows().stream()
-                        .filter(w -> !w.equals(stage))
-                        .collect(Collectors.toList())
-                        .forEach(w -> w.fireEvent(event));
-            });
-            ComponentManager.initialPlatformSetup();
-        } catch (Exception ex) {
-            ErrorHandler.handleTerminalException(ex);
+        APP = this;
+        stage = primaryStage;
+
+        try (var in = Files.newInputStream(PdxuInstallation.getInstance().getResourceDir().resolve("logo.png"))) {
+            icon = new Image(in);
+            primaryStage.getIcons().add(icon);
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex);
         }
+
+        primaryStage.setOnCloseRequest(event -> {
+            windowActive = false;
+
+            ComponentManager.finalTeardown();
+            // Close other windows
+            Stage.getWindows().stream()
+                    .filter(w -> !w.equals(stage))
+                    .collect(Collectors.toList())
+                    .forEach(w -> w.fireEvent(event));
+        });
+
+        ComponentManager.initialPlatformSetup();
     }
 
     public Image getIcon() {

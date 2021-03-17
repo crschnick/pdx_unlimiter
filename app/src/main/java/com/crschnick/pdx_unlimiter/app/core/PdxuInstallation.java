@@ -25,6 +25,7 @@ public class PdxuInstallation {
     private boolean disableAllGames;
     private Path eu4SeDir;
     private Path languageDir;
+    private Path resourceDir;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -35,9 +36,11 @@ public class PdxuInstallation {
         INSTANCE.version = "unknown";
 
         if (INSTANCE.image) {
-            INSTANCE.languageDir = Path.of("lang");
-        } else {
             INSTANCE.languageDir = appPath.resolve("lang");
+            INSTANCE.resourceDir = appPath.resolve("resources");
+        } else {
+            INSTANCE.languageDir = Path.of("lang");
+            INSTANCE.resourceDir = Path.of("resources");
         }
 
         // Legacy support
@@ -219,5 +222,9 @@ public class PdxuInstallation {
 
     public boolean disableAllGames() {
         return disableAllGames;
+    }
+
+    public Path getResourceDir() {
+        return resourceDir;
     }
 }

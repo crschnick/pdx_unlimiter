@@ -1,6 +1,6 @@
-JDK 15 (http://jdk.java.net/15/) (GPL2 with the Classpath Exception)
+JDK 16 (http://jdk.java.net/16/) (GPL2 with the Classpath Exception)
 
-JavaFX 15 (https://openjfx.io/) (GPL v2)
+JavaFX 16 (https://openjfx.io/) (GPL v2)
 
 Rakaly (https://github.com/rakaly/cli) (MIT License)
 
@@ -10,7 +10,7 @@ Apache Commons Lang3 (https://commons.apache.org/proper/commons-lang/) (Apache L
 
 Apache Commons Collections4 (https://commons.apache.org/proper/commons-collections/) (Apache License v2.0)
 
-JNativeHook (https://github.com/kwhat/jnativehook) (GPL v3)
+JNativeHook (https://github.com/kwhat/jnativehook) (LGPL v3)
 
 ImageIO.tga (https://github.com/tmyroadctfig/com.realityinteractive.imageio.tga) (LGPL v2.1)
 

@@ -1,8 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import javafx.scene.Scene;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 public class GuiStyle {
@@ -23,20 +27,17 @@ public class GuiStyle {
     public static String CLASS_GUARANTEE = "guarantee";
     public static String CLASS_VASSAL = "vassal";
     public static String CLASS_TRUCE = "vassal";
-    public static String CLASS_CAMPAIGN = "campaign";
     public static String CLASS_IMAGE_ICON = "image-icon";
     public static String CLASS_POWER_ICON = "power-icon";
     public static String CLASS_RULER_ICON = "ruler-icon";
     public static String CLASS_TAG_ICON = "tag-icon";
     public static String CLASS_TEXT = "text";
-    public static String CLASS_UNKNOWN_TAG = "unknown-tag";
     public static String CLASS_TEXT_FIELD = "text-field";
     public static String CLASS_ENTRY_BAR = "entry-bar";
     public static String CLASS_ENTRY_LIST = "entry-list";
     public static String CLASS_ENTRY_LOADING = "entry-loading";
     public static String CLASS_STATUS_BAR = "status-bar";
     public static String CLASS_STATUS_RUNNING = "status-running";
-    public static String CLASS_STATUS_IMPORT = "status-import";
     public static String CLASS_STATUS_INCOMPATIBLE = "status-incompatible";
     public static String CLASS_EXPORT = "export-button";
     public static String CLASS_BROWSE = "browse-button";
@@ -55,7 +56,6 @@ public class GuiStyle {
     public static String CLASS_CONTENT = "content";
     public static String CLASS_NO_CAMPAIGN = "no-campaign";
     public static String CLASS_LOADING = "loading";
-    public static String CLASS_UPLOAD = "upload-button";
     public static String CLASS_CONVERT = "convert-button";
     public static String CLASS_MAP = "map-button";
     public static String CLASS_ANALYZE = "analyze-button";
@@ -73,17 +73,20 @@ public class GuiStyle {
     public static String CLASS_EDITOR_NAVIGATION = "editor-nav-bar";
     public static String CLASS_KEY = "key-button";
     public static String CLASS_VALUE = "value-button";
-    public static String CLASS_SAVE = "save-button";
     public static String CLASS_CLEAR = "clear-button";
 
     public static void addStylesheets(Scene scene) {
-        List.of("style.css", "scrollbar.css", "buttons.css",
-                "campaign.css", "status-bar.css", "game-switcher.css", "editor.css", "ck3.css").stream()
-                .map(s -> PdxuApp.class.getResource(s).toExternalForm())
-                .forEach(s -> scene.getStylesheets().add(s));
+        try {
+            Files.list(PdxuInstallation.getInstance().getResourceDir().resolve("style"))
+                    .map(p -> p.toUri().toString())
+                    .forEach(s -> scene.getStylesheets().add(s));
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     public static void makeEmptyAlert(Scene scene) {
-        scene.getStylesheets().add(PdxuApp.class.getResource("empty-alert.css").toExternalForm());
+        scene.getStylesheets().add(PdxuInstallation.getInstance().getResourceDir().resolve("style")
+                .resolve("empty-alert.css").toUri().toString());
     }
 }
