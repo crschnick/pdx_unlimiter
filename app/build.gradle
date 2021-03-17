@@ -4,8 +4,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 plugins {
     id 'application'
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
-    id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.22.3'
+    id 'org.beryx.jlink' version '2.23.3'
 }
 
 setVersion '2.4.0'
@@ -16,8 +15,8 @@ if (!file("${projectDir}/pdxu.properties").exists()) {
 
 java {
     modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 }
 
 List<String> runArgs = [
@@ -43,11 +42,6 @@ application {
     applicationDefaultJvmArgs = runArgs + ["-ea"]
 }
 
-javafx {
-    version = '15'
-    modules = ['javafx.controls', 'javafx.base']
-}
-
 repositories {
     mavenCentral()
     jcenter()
@@ -60,21 +54,36 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+def currentOS = DefaultNativePlatform.currentOperatingSystem;
+def platform
+if (currentOS.isWindows()) {
+    platform = 'win'
+} else if (currentOS.isLinux()) {
+    platform = 'linux'
+} else if (currentOS.isMacOsX()) {
+    platform = 'mac'
+}
+
 dependencies {
-    compile 'com.jfoenix:jfoenix:9.0.10'
+    implementation "org.openjfx:javafx-base:16:${platform}"
+    implementation "org.openjfx:javafx-controls:16:${platform}"
+    implementation "org.openjfx:javafx-graphics:16:${platform}"
+    implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-    implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
-    implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
-    implementation files("$buildDir/generated-modules/commons-lang3-3.11.jar")
-    implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
-    implementation files("$buildDir/generated-modules/commons-collections4-4.4.jar")
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
+
+    implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
+    implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
+    implementation files("$buildDir/generated-modules/commons-lang3-3.12.0.jar")
+    implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
+    implementation files("$buildDir/generated-modules/commons-collections4-4.4.jar")
     implementation files("$buildDir/generated-modules/sentry-4.3.0.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.0.2.jar")
+
     implementation project(':core')
 }
 
@@ -139,9 +148,9 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact 'org.apache.commons:commons-lang3:3.11'
+            artifact 'org.apache.commons:commons-lang3:3.12.0'
             moduleInfoSource = '''
-                module org.apache.commons.lang3 {
+                module org.apache.commons.lang {
                     exports org.apache.commons.lang3;
                     exports org.apache.commons.lang3.function;
                     exports org.apache.commons.lang3.arch;
@@ -218,11 +227,10 @@ task writeVersion(type: DefaultTask) {
 
 createImage.finalizedBy(writeVersion)
 
-OperatingSystem os = DefaultNativePlatform.currentOperatingSystem;
 task createDist(type: Zip, dependsOn: createImage) {
     destinationDirectory = buildDir
     archivesBaseName = "pdx_unlimiter"
-    archiveAppendix = os.windows ? "windows" : "linux"
+    archiveAppendix = currentOS.windows ? "windows" : "linux"
     archiveVersion = ""
     from "${buildDir}/image"
 }
