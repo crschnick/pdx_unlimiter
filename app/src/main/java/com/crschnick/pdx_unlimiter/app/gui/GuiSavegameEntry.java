@@ -25,6 +25,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
@@ -212,7 +213,11 @@ public class GuiSavegameEntry {
             Button del = new JFXButton();
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
-                if (GuiDialogHelper.showSavegameDeleteDialog()) {
+                if (GuiDialogHelper.showBlockingAlert(alert -> {
+                    alert.setAlertType(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Confirm deletion");
+                    alert.setHeaderText("Do you want to delete the selected savegame?");
+                }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
                     SavegameActions.delete(e);
                 }
             });

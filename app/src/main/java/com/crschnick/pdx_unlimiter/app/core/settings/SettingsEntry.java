@@ -1,8 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.core.settings;
 
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Alert;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,7 +247,7 @@ public abstract class SettingsEntry<T> {
 
         private void showInstallErrorMessage(String msg) {
             String fullMsg = PdxuI18n.get("GAME_DIR_ERROR", game.getFullName()) + ":\n" +
-                    msg + "\n\n" + PdxuI18n.get("GAME_DIR_ERROR_MSG");
+                    msg + "\n\n" + PdxuI18n.get("GAME_DIR_ERROR_MSG", game.getFullName());
             GuiErrorReporter.showSimpleErrorMessage(fullMsg);
         }
 
@@ -264,10 +267,14 @@ public abstract class SettingsEntry<T> {
                 GameInstallation.initTemporary(game, i);
                 super.set(newPath);
             } catch (InvalidInstallationException e) {
-                this.disabled = true;
-                showInstallErrorMessage(PdxuI18n.get(e.getMessageId()));
+                if (value.get() == null) {
+                    this.disabled = true;
+                }
+                showInstallErrorMessage(e.getLocalisedMessage());
             } catch (Exception e) {
-                this.disabled = true;
+                if (value.get() == null) {
+                    this.disabled = true;
+                }
                 showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
@@ -286,11 +293,23 @@ public abstract class SettingsEntry<T> {
             super(id, serializationName);
         }
 
+        private boolean showConfirmationDialog(String old, String newDir) {
+            return GuiDialogHelper.showBlockingAlert(a -> {
+                a.setAlertType(Alert.AlertType.CONFIRMATION);
+                a.setTitle(PdxuI18n.get("STORAGE_DIR_DIALOG_TITLE"));
+                a.setHeaderText(PdxuI18n.get("STORAGE_DIR_DIALOG_TEXT", old, newDir));
+            }).map(t -> t.getButtonData().isDefaultButton()).orElse(false);
+        }
+
         @Override
         public void set(Path newPath) {
             Objects.requireNonNull(newPath);
 
             if (newPath.equals(value.get())) {
+                return;
+            }
+
+            if (!showConfirmationDialog(value.get().toString(), newPath.toString())) {
                 return;
             }
 

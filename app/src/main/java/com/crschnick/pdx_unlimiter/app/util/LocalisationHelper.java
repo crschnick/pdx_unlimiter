@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class LocalisationHelper {
 
-    private static final String VAR_PATTERN = "\\$\\w+\\$";
+    private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\w+\\$");
 
     public static Map<String, String> loadTranslations(Path file, Language lang) {
         Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.id +
@@ -74,7 +74,8 @@ public class LocalisationHelper {
 
         s = s.replace("\\n", "\n");
         for (var v : vars) {
-            s = s.replaceAll(VAR_PATTERN, v);
+            var matcher = VAR_PATTERN.matcher(s);
+            s = matcher.replaceFirst(Matcher.quoteReplacement(v));
         }
         return s;
     }

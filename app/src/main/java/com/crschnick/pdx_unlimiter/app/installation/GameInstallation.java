@@ -52,9 +52,18 @@ public abstract class GameInstallation {
 
     public static void initTemporary(Game game, GameInstallation install) throws
             IOException, InvalidInstallationException {
+        var oldInstall = ALL.get(game);
+
         ALL.put(game, install);
-        install.loadData();
-        ALL.removeValue(game);
+        try {
+            install.loadData();
+        } finally {
+            if (oldInstall == null) {
+                ALL.remove(game);
+            } else {
+                ALL.put(game, oldInstall);
+            }
+        }
     }
 
     public static void init() throws Exception {
@@ -161,7 +170,7 @@ public abstract class GameInstallation {
         Game g = ALL.inverseBidiMap().get(this);
         LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getAbbreviation() + " installation ...");
         if (!Files.isRegularFile(getExecutable())) {
-            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation());
+            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), getExecutable().toString());
         }
 
         var ls = getLauncherDataPath().resolve("launcher-settings.json");

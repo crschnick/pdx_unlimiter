@@ -131,17 +131,6 @@ public class GuiImporter {
 
         var deleteType = new ButtonType("Delete", ButtonBar.ButtonData.RIGHT);
         alert.getButtonTypes().add(deleteType);
-        Button deleteB = (Button) alert.getDialogPane().lookupButton(deleteType);
-        deleteB.addEventFilter(
-                ActionEvent.ACTION,
-                e -> {
-                    if (GuiDialogHelper.showSavegameDeleteDialog()) {
-                        selected.forEach(FileImportTarget::delete);
-                    }
-                    e.consume();
-                }
-        );
-
         alert.show();
     }
 

@@ -11,7 +11,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.TransferMode;
@@ -20,6 +22,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
@@ -69,7 +73,11 @@ public class GuiSavegameCollection {
             del.setGraphic(new FontIcon());
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
-                if (GuiDialogHelper.showCampaignDeleteDialog()) {
+                if (GuiDialogHelper.showBlockingAlert(alert -> {
+                    alert.setAlertType(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Confirm deletion");
+                    alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");
+                }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
                     SavegameActions.delete(c);
                 }
             });

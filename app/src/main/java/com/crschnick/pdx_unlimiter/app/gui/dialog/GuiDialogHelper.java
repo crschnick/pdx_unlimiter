@@ -15,8 +15,32 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public class GuiDialogHelper {
+
+    public static Optional<ButtonType> showBlockingAlert(Consumer<Alert> c) {
+        AtomicReference<Optional<ButtonType>> result = new AtomicReference<>();
+        if (!Platform.isFxApplicationThread()) {
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.runLater(() -> {
+                Alert a = GuiDialogHelper.createAlert();
+                c.accept(a);
+                result.set(a.showAndWait());
+                latch.countDown();
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException ignored) {
+            }
+        } else {
+            Alert a = GuiDialogHelper.createAlert();
+            c.accept(a);
+            result.set(a.showAndWait());
+        }
+        return result.get();
+    }
 
     public static Optional<ButtonType> waitForResult(Alert alert) {
         final Optional<ButtonType>[] result = new Optional[]{Optional.empty()};
@@ -104,26 +128,6 @@ public class GuiDialogHelper {
                 The original savegame will not get modified.""");
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get().getButtonData().isDefaultButton();
-
-    }
-
-    public static boolean showSavegameDeleteDialog() {
-        Alert alert = createAlert();
-        alert.setAlertType(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm deletion");
-        alert.setHeaderText("Do you want to delete the selected savegame?");
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton();
-
-    }
-
-    public static boolean showCampaignDeleteDialog() {
-        Alert alert = createAlert();
-        alert.setAlertType(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm deletion");
-        alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton();
 
     }
 }
