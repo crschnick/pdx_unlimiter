@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.util.integration;
 
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +12,10 @@ import java.util.Optional;
 public class IronyHelper {
 
     public static Optional<Path> getIronyDefaultInstallPath() {
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            return Optional.empty();
+        }
+
         var dir = Path.of(System.getenv("LOCALAPPDATA"))
                 .resolve("Programs").resolve("Irony Mod Manager");
         if (Files.exists(dir)) {
