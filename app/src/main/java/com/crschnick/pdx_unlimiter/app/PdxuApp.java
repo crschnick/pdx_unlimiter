@@ -41,6 +41,11 @@ public class PdxuApp extends Application {
 
     public void setupWindowState() {
         var w = stage;
+
+        // Set size to default
+        w.setWidth(1200);
+        w.setHeight(700);
+
         var s = SavedState.getInstance();
 
         boolean inBounds = false;
@@ -105,7 +110,7 @@ public class PdxuApp extends Application {
         layout = new GuiLayout();
         layout.setup();
         stage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
-        Scene scene = new Scene(layout.getContent(), 1200, 650);
+        Scene scene = new Scene(layout.getContent());
         stage.setScene(scene);
         GuiStyle.addStylesheets(scene);
     }

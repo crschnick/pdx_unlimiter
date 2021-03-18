@@ -38,7 +38,7 @@ public class GameLauncher {
     public static void startLauncherWithContinueGame(SavegameEntry<?, ?> e) {
         try {
             setupContinueGame(e);
-            startLauncherDirectly(e);
+            startLauncherDirectly();
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
         }
@@ -87,7 +87,7 @@ public class GameLauncher {
         }
     }
 
-    public static void startLauncherDirectly(SavegameEntry<?, ?> e) throws IOException {
+    private static void startLauncherDirectly() throws IOException {
         var game = SavegameManagerState.get().current();
         if (Settings.getInstance().launchIrony.getValue()) {
             IronyHelper.launchEntry(game, true);
@@ -106,7 +106,7 @@ public class GameLauncher {
                 if (b) {
                     ctx.getInstallation().startDirectly();
                 } else {
-                    startLauncherDirectly(e);
+                    startLauncherDirectly();
                 }
             }
             return;

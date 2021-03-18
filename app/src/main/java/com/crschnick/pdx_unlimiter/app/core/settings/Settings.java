@@ -180,6 +180,7 @@ public final class Settings {
     public static void init() {
         INSTANCE = load();
         check();
+        save();
     }
 
     public static void check() {
