@@ -47,9 +47,9 @@ public class FileWatchManager {
     }
 
     private static class WatchedDirectory {
+        private final Map<Path, WatchService> watchers = new ConcurrentHashMap<>();
         private Path directory;
         private BiConsumer<Path, WatchEvent.Kind<Path>> listener;
-        private final Map<Path, WatchService> watchers = new ConcurrentHashMap<>();
 
         public static WatchedDirectory create(Path dir, BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
             var w = new WatchedDirectory();

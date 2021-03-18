@@ -10,8 +10,8 @@ public final class ValueNode extends Node {
     private static final byte DOUBLE_QUOTE_CHAR = 34;
     private static final Pattern LONG = Pattern.compile("-?[0-9]+");
     private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
-    private final NodeContext context;
-    private final int scalarIndex;
+    private NodeContext context;
+    private int scalarIndex;
 
     public ValueNode(String value) {
         this.context = new NodeContext(value);
@@ -21,6 +21,11 @@ public final class ValueNode extends Node {
     public ValueNode(NodeContext context, int scalarIndex) {
         this.context = context;
         this.scalarIndex = scalarIndex;
+    }
+
+    public void set(ValueNode newValue) {
+        this.context = newValue.context;
+        this.scalarIndex = newValue.scalarIndex;
     }
 
     public boolean isQuoted() {
@@ -36,7 +41,7 @@ public final class ValueNode extends Node {
 
     @Override
     public Descriptor describe() {
-        ValueType t = null;
+        ValueType t;
         if (isQuoted()) {
             t = ValueType.TEXT;
         } else {
@@ -107,5 +112,10 @@ public final class ValueNode extends Node {
     @Override
     public boolean isColor() {
         return false;
+    }
+
+    @Override
+    public boolean matches(NodeMatcher matcher) {
+        return matcher.matchesScalar(context, scalarIndex);
     }
 }

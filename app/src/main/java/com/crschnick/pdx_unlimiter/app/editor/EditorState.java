@@ -39,7 +39,7 @@ public class EditorState {
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
-            rootNodes.put(e.getKey(), new SimpleNode(null, e.getKey(), counter, counter, e.getValue()));
+            rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
     }
 
@@ -54,7 +54,7 @@ public class EditorState {
     }
 
     public List<EditorNode> createEditorNodes(EditorNode parent) {
-        var editorNodes = parent.open();
+        var editorNodes = parent.expand();
         var filtered = filter.filter(editorNodes);
         return filtered;
     }
@@ -69,9 +69,9 @@ public class EditorState {
                 continue;
             }
 
-            var newEditorNode = current.open().stream()
+            var newEditorNode = current.expand().stream()
                     .filter(en -> navEl.editorNode.getParentIndex() == en.getParentIndex() &&
-                            en.displayKeyName().equals(navEl.editorNode.displayKeyName()))
+                            en.getDisplayKeyName().equals(navEl.editorNode.getDisplayKeyName()))
                     .findFirst();
             if (newEditorNode.isPresent()) {
                 current = newEditorNode.get();

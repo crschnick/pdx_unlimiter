@@ -1,10 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.core.SavedState;
+import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.ColorAdjust;
@@ -13,20 +16,23 @@ import javafx.scene.layout.HBox;
 public class GuiGameSwitcher {
 
     public static void showGameSwitchDialog() {
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setTitle("Select game");
 
         HBox games = new HBox();
-        for (var integ : GameIntegration.ALL) {
-            var icon = integ.getGuiFactory().createIcon();
+        for (var game : Game.values()) {
+            if (!game.isEnabled()) {
+                continue;
+            }
+
+            var icon = GameGuiFactory.ALL.get(game).createIcon();
             ColorAdjust desaturate = new ColorAdjust();
             desaturate.setSaturation(-1);
             icon.getStyleClass().add(GuiStyle.CLASS_GAME_ICON);
 
-            GuiTooltips.install(icon, integ.getName());
+            GuiTooltips.install(icon, game.getFullName());
             icon.setOnMouseClicked(e -> {
-                SavegameManagerState.get().selectIntegration(integ);
-                SavedState.getInstance().setActiveGame(integ.getInstallation());
+                ComponentManager.switchGame(game);
                 alert.setResult(ButtonType.CLOSE);
             });
 

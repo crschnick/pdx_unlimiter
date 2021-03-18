@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -16,7 +16,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     protected StellarisTag tag;
     protected Set<StellarisTag> allTags;
 
-    public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameParseException {
+    public static StellarisSavegameInfo fromSavegame(Node n) throws ParseException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
         try {
             i.ironman = n.getNodeForKey("galaxy").getNodeForKeyIfExistent("ironman")
@@ -25,13 +25,11 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.date = GameDateType.STELLARIS.fromString(n.getNodesForKey("date").get(0).getString());
 
             i.binary = false;
-            i.campaignUuid = UUID.randomUUID();
-            i.campaignHeuristic = i.campaignUuid;
 
             int seed = n.getNodeForKey("random_seed").getInteger();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
-            i.campaignUuid = UUID.nameUUIDFromBytes(b);
+            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new HashSet<>();
             n.getNodeForKey("country").forEach((k, v) -> {
@@ -71,7 +69,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
 
         } catch (Exception e) {
-            throw new SavegameParseException("Could not create savegame info of savegame", e);
+            throw new ParseException("Could not create savegame info of savegame", e);
         }
         return i;
     }

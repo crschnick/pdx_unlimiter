@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
@@ -16,8 +17,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -25,24 +24,31 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.GAME_ICONS;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
-    private final String styleClass;
-    private final GameInstallation installation;
+    public static final BidiMap<Game, GameGuiFactory<?, ?>> ALL = new DualHashBidiMap<>();
 
-    public GameGuiFactory(String styleClass, GameInstallation installation) {
-        this.styleClass = styleClass;
-        this.installation = installation;
+    static {
+        ALL.put(Game.EU4, new Eu4GuiFactory());
+        ALL.put(Game.HOI4, new Hoi4GuiFactory());
+        ALL.put(Game.CK3, new Ck3GuiFactory());
+        ALL.put(Game.STELLARIS, new StellarisGuiFactory());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T, I extends SavegameInfo<T>> GameGuiFactory<T, I> get(Game g) {
+        return (GameGuiFactory<T, I>) ALL.get(g);
     }
 
     protected static void addNode(JFXMasonryPane pane, Region content) {
@@ -57,53 +63,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
                 () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
         p.setAlignment(Pos.CENTER);
     }
-
-    public boolean displayIncompatibleWarning(SavegameEntry<T, I> entry) {
-        var launch = new ButtonType("Launch anyway");
-        Alert alert = createAlert();
-        alert.setAlertType(Alert.AlertType.WARNING);
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().add(ButtonType.CLOSE);
-        alert.getButtonTypes().add(launch);
-        alert.setTitle("Incompatible savegame");
-
-        StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
-        if (!SavegameActions.isVersionCompatible(entry.getInfo())) {
-            builder.append("Incompatible versions:\n")
-                    .append("- Game version: " + installation.getVersion().toString()).append("\n")
-                    .append("- Savegame version: " + entry.getInfo().getVersion().toString());
-        }
-
-        boolean missingMods = entry.getInfo().getMods().stream()
-                .map(m -> installation.getModForName(m))
-                .anyMatch(Optional::isEmpty);
-        if (missingMods) {
-            builder.append("\nThe following Mods are missing:\n").append(entry.getInfo().getMods().stream()
-                    .map(s -> {
-                        var m = installation.getModForName(s);
-                        return (m.isPresent() ? null : "- " + s);
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n")));
-        }
-
-        boolean missingDlc = entry.getInfo().getDlcs().stream()
-                .map(m -> installation.getDlcForName(m))
-                .anyMatch(Optional::isEmpty);
-        if (missingDlc) {
-            builder.append("\nThe following DLCs are missing:\n").append(entry.getInfo().getDlcs().stream()
-                    .map(s -> {
-                        var m = installation.getDlcForName(s);
-                        return (m.isPresent() ? null : "- " + s);
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n")));
-        }
-
-        alert.setHeaderText(builder.toString());
-        return alert.showAndWait().orElse(ButtonType.CLOSE).equals(launch);
-    }
-
 
     public ObservableValue<Node> createImage(SavegameEntry<T, I> entry) {
         SimpleObjectProperty<Node> prop;
@@ -138,7 +97,9 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane background();
 
-    public abstract Pane createIcon();
+    public final Pane createIcon() {
+        return GameImage.imageNode(GAME_ICONS.get(ALL.inverseBidiMap().get(this)), CLASS_IMAGE_ICON);
+    }
 
     public abstract Background createEntryInfoBackground(SavegameInfo<T> info);
 
@@ -165,6 +126,8 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
     public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
+        var installation = GameInstallation.ALL.get(ALL.inverseBidiMap().get(this));
+        var styleClass = ALL.inverseBidiMap().get(this).getId();
         grid.getStyleClass().add(styleClass);
 
         Label version = createVersionInfo(info);

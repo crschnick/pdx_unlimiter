@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,7 +21,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     private List<War<Ck3Tag>> wars;
     private List<Ck3Tag> allies;
 
-    public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
+    public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
             i.ironman = melted;
@@ -31,8 +31,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             long seed = n.getNodeForKey("random_seed").getLong();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
-            i.campaignUuid = UUID.nameUUIDFromBytes(b);
-            i.campaignHeuristic = i.campaignUuid;
+            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = Ck3Tag.fromNode(n);
             i.tag = Ck3Tag.getPlayerTag(n, i.allTags);
@@ -74,7 +73,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             }
 
         } catch (Exception e) {
-            throw new SavegameParseException("Could not create savegame info of savegame", e);
+            throw new ParseException("Could not create savegame info of savegame", e);
         }
         return i;
     }
@@ -101,7 +100,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             }
 
             if (attackers.contains(tag) || defenders.contains(tag)) {
-                wars.add(new War<Ck3Tag>(title, attackers, defenders));
+                wars.add(new War<>(title, attackers, defenders));
             }
         });
         return wars;

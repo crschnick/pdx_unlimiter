@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.util.InstallLocationHelper;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +24,8 @@ public class PdxuInstallation {
     private boolean image;
     private boolean disableAllGames;
     private Path eu4SeDir;
+    private Path languageDir;
+    private Path resourceDir;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -33,13 +35,21 @@ public class PdxuInstallation {
         INSTANCE.production = INSTANCE.image;
         INSTANCE.version = "unknown";
 
+        if (INSTANCE.image) {
+            INSTANCE.languageDir = appPath.resolve("lang");
+            INSTANCE.resourceDir = appPath.resolve("resources");
+        } else {
+            INSTANCE.languageDir = Path.of("lang");
+            INSTANCE.resourceDir = Path.of("resources");
+        }
+
         // Legacy support
         var legacyDataDir = Path.of(System.getProperty("user.home"),
                 SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
         if (Files.exists(legacyDataDir)) {
             INSTANCE.dataDir = legacyDataDir;
         } else {
-            INSTANCE.dataDir = InstallLocationHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+            INSTANCE.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
         }
 
         Path appInstallPath;
@@ -79,6 +89,8 @@ public class PdxuInstallation {
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
+
+            INSTANCE.languageDir = Path.of("lang");
 
             var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
@@ -157,6 +169,10 @@ public class PdxuInstallation {
         }
     }
 
+    public Path getLanguageLocation() {
+        return languageDir;
+    }
+
     public Path getLogsLocation() {
         return dataDir.resolve("logs");
     }
@@ -178,10 +194,6 @@ public class PdxuInstallation {
 
     public Path getDefaultSavegamesLocation() {
         return getDataDir().resolve("savegames");
-    }
-
-    public Path getSavegamesLocation() {
-        return Settings.getInstance().getStorageDirectory().orElse(getDefaultSavegamesLocation());
     }
 
     public boolean isEu4SaveEditorInstalled() {
@@ -210,5 +222,9 @@ public class PdxuInstallation {
 
     public boolean disableAllGames() {
         return disableAllGames;
+    }
+
+    public Path getResourceDir() {
+        return resourceDir;
     }
 }

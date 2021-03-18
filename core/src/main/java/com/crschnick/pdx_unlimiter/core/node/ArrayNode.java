@@ -1,25 +1,55 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriterImpl;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.BiConsumer;
 
 public abstract class ArrayNode extends Node {
 
+    public static ArrayNode emptyArray() {
+        return new SimpleArrayNode(new NodeContext(), null, null, List.of());
+    }
+
     public static ArrayNode array(List<Node> values) {
-        return new SimpleArrayNode(null, null, null, values);
+        return new SimpleArrayNode(new NodeContext(), null, null, values);
+    }
+
+    public static ArrayNode sameKeyArray(String key, List<Node> values) {
+        var ctx = new NodeContext(key);
+        var ki = new int[values.size()];
+        Arrays.fill(ki, 0);
+        return new SimpleArrayNode(ctx, ki, null, values);
     }
 
     public static ArrayNode singleKeyNode(String key, Node value) {
         var ctx = new NodeContext(key);
         return new SimpleArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
     }
+
+    public final ArrayNode replacePart(ArrayNode toInsert, int beginIndex, int length) {
+        if (beginIndex == 0 && length == size()) {
+            return toInsert;
+        }
+
+        // Splice at begin only
+        if (beginIndex == 0) {
+            return new LinkedArrayNode(List.of(toInsert, splice(length, size() - length)));
+        }
+
+        // Splice at end only
+        if (beginIndex + length == size()) {
+            return new LinkedArrayNode(List.of(splice(0, beginIndex), toInsert));
+        }
+
+        var begin = splice(0, beginIndex);
+        var end = splice(beginIndex + length, size() - (beginIndex + length));
+        return new LinkedArrayNode(List.of(begin, toInsert, end));
+    }
+
+    public abstract int size();
 
     public abstract boolean isKeyAt(String key, int index);
 

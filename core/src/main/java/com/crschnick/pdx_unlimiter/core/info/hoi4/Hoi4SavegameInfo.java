@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.List;
 import java.util.Set;
@@ -18,13 +18,12 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     protected Hoi4Tag tag;
     protected Set<Hoi4Tag> allTags;
 
-    public static Hoi4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
+    public static Hoi4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
         try {
             i.tag = new Hoi4Tag(n.getNodeForKey("player").getString(), n.getNodeForKey("ideology").getString());
             i.date = GameDateType.HOI4.fromString(n.getNodeForKey("date").getString());
-            i.campaignUuid = UUID.fromString(n.getNodeForKey("game_unique_id").getString());
-            i.campaignHeuristic = i.campaignUuid;
+            i.campaignHeuristic = UUID.fromString(n.getNodeForKey("game_unique_id").getString());
             i.ironman = melted;
             i.binary = melted;
 
@@ -41,7 +40,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
             i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
 
         } catch (Exception e) {
-            throw new SavegameParseException("Could not create savegame info of savegame", e);
+            throw new ParseException("Could not create savegame info of savegame", e);
         }
         return i;
     }

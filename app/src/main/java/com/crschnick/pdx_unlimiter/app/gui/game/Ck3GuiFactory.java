@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
@@ -29,10 +30,6 @@ import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
 
 public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
-    public Ck3GuiFactory() {
-        super("ck3", GameInstallation.CK3);
-    }
-
     private static Region createRulerLabel(Ck3SavegameInfo info, Ck3Person ruler) {
         HBox rulerNode = new HBox();
         rulerNode.setSpacing(15);
@@ -47,14 +44,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 topBar.setSpacing(5);
                 topBar.setAlignment(Pos.CENTER);
                 topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
-                var name = new Label(info.getPlayerName() + " of " + info.getTag().getPrimaryTitle().getName());
-                name.getStyleClass().add("ruler-name");
-                topBar.getChildren().add(name);
-
                 int age = GameDate.yearsBetween(ruler.getBirth(), info.getDate());
-                var al = new Label(", " + age);
-                al.getStyleClass().add("ruler-name");
-                topBar.getChildren().add(al);
+                var title = new Label(info.getPlayerName() + " of " + info.getTag().getPrimaryTitle().getName() + ", " + age);
+                title.getStyleClass().add("ruler-name");
+                topBar.getChildren().add(title);
 
                 box.getChildren().add(topBar);
             }
@@ -91,7 +84,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     protected Label createVersionInfo(SavegameInfo<Ck3Tag> info) {
         var l = super.createVersionInfo(info);
         if (SavegameActions.isVersionCompatible(info)) {
-            l.setText(l.getText() + " " + GameInstallation.CK3.getVersion().getName());
+            l.setText(l.getText() + " " + GameInstallation.ALL.get(Game.CK3).getVersion().getName());
         }
         return l;
     }
@@ -103,7 +96,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Font font() throws IOException {
-        return Font.loadFont(Files.newInputStream(GameInstallation.CK3.getPath()
+        return Font.loadFont(Files.newInputStream(GameInstallation.ALL.get(Game.CK3).getPath()
                 .resolve("launcher").resolve("assets").resolve("fonts").resolve("CormorantGaramond-Regular.ttf")), 12);
     }
 
@@ -112,11 +105,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         var bg = GameImage.backgroundNode(CK3_BACKGROUND);
         bg.setOpacity(0.3);
         return bg;
-    }
-
-    @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(GameImage.CK3_ICON, CLASS_IMAGE_ICON);
     }
 
     @Override

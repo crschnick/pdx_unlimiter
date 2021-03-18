@@ -51,6 +51,8 @@ public abstract class Node {
 
     public abstract boolean isColor();
 
+    public abstract boolean matches(NodeMatcher matcher);
+
     public boolean hasKey(String key) {
         throw new UnsupportedOperationException();
     }

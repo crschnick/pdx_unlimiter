@@ -1,8 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.app.core.*;
-import com.crschnick.pdx_unlimiter.app.editor.EditTarget;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.editor.Editor;
+import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.application.Platform;
@@ -57,7 +61,7 @@ public class FileImporter {
             for (FileImportTarget t : targets) {
                 logger.debug("Starting to import target " + t.getName() + " from " + input);
                 t.importTarget(s -> {
-                    if (Settings.getInstance().deleteOnImport()) {
+                    if (Settings.getInstance().deleteOnImport.getValue()) {
                         logger.debug("Deleting import target " + t.getName());
                         t.delete();
                     }
@@ -78,7 +82,7 @@ public class FileImporter {
                 statusMap.put(t, s);
             }
 
-            if (Settings.getInstance().deleteOnImport()) {
+            if (Settings.getInstance().deleteOnImport.getValue()) {
                 logger.debug("Deleting import target " + t.getName());
                 t.delete();
             }

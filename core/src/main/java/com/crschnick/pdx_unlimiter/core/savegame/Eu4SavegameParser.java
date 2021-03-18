@@ -3,8 +3,7 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
@@ -24,7 +23,7 @@ public class Eu4SavegameParser extends SavegameParser {
     private static final byte[] EU4_BINARY_HEADER = "EU4bin".getBytes(StandardCharsets.UTF_8);
 
     public boolean isCompressed(Path file) throws IOException {
-        boolean isZipped = false;
+        boolean isZipped;
         try (var in = Files.newInputStream(file);
              var zipIn = new ZipInputStream(in)) {
             isZipped = zipIn.getNextEntry() != null;
@@ -80,9 +79,9 @@ public class Eu4SavegameParser extends SavegameParser {
                 }
             } else {
                 try (var fs = FileSystems.newFileSystem(fileToParse)) {
-                    ArrayNode gamestateNode = null;
-                    ArrayNode metaNode = null;
-                    ArrayNode aiNode = null;
+                    ArrayNode gamestateNode;
+                    ArrayNode metaNode;
+                    ArrayNode aiNode;
 
                     var gs = fs.getPath("gamestate");
                     if (!Files.exists(gs)) {
@@ -117,7 +116,7 @@ public class Eu4SavegameParser extends SavegameParser {
                         return new Invalid("Invalid header for ai");
                     }
 
-                    var node = new LinkedNode(List.of(metaNode, gamestateNode, aiNode));
+                    var node = new LinkedArrayNode(List.of(metaNode, gamestateNode, aiNode));
                     var info = Eu4SavegameInfo.fromSavegame(melted, node);
                     if (info.getVersion().compareTo(MIN_VERSION) < 0) {
                         return new Invalid("Savegame version " + info.getVersion() + " is not supported");

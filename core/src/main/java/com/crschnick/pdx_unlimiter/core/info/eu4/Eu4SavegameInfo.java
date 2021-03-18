@@ -6,7 +6,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeFormatException;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseException;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,14 +14,6 @@ import java.util.stream.Collectors;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
-    protected Eu4Tag tag;
-    protected Set<Eu4Tag> allTags;
-    private boolean randomNewWorld;
-    private boolean customNationInWorld;
-    private boolean releasedVassal;
-    private boolean observer;
-    private Ruler ruler;
-    private Ruler heir;
     private final Set<Eu4Tag> vassals = new HashSet<>();
     private final Set<Eu4Tag> allies = new HashSet<>();
     private final Set<Eu4Tag> marches = new HashSet<>();
@@ -32,9 +24,17 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private final Eu4Tag seniorPartner = null;
     private final Set<Eu4Tag> tributaryJuniors = new HashSet<>();
     private final Eu4Tag tributarySenior = null;
+    protected Eu4Tag tag;
+    protected Set<Eu4Tag> allTags;
+    private boolean randomNewWorld;
+    private boolean customNationInWorld;
+    private boolean releasedVassal;
+    private boolean observer;
+    private Ruler ruler;
+    private Ruler heir;
     private Set<War> wars = new HashSet<>();
 
-    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameParseException {
+    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         try {
             GameDate date = GameDateType.EU4.fromString(n.getNodeForKey("date").getString());
             String tag = n.getNodeForKey("player").getString();
@@ -48,7 +48,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
-            e.campaignUuid = UUID.fromString(n.getNodeForKey("campaign_id").getString());
             e.campaignHeuristic = UUID.nameUUIDFromBytes(n.getNodeForKey("countries")
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
@@ -154,7 +153,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
             return e;
         } catch (NodeFormatException ex) {
-            throw new SavegameParseException("Error while creating savegame info", ex);
+            throw new ParseException("Error while creating savegame info", ex);
         }
     }
 
@@ -228,10 +227,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public Set<War> getWars() {
         return wars;
-    }
-
-    public UUID getCampaignUuid() {
-        return campaignUuid;
     }
 
     public Eu4Tag getTag() {

@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
@@ -23,19 +24,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_IMAGE_ICON;
-
 public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
-
-
-    public Hoi4GuiFactory() {
-        super("hoi4", GameInstallation.HOI4);
-    }
 
     @Override
     public Font font() throws IOException {
         return Font.loadFont(
-                Files.newInputStream(GameInstallation.HOI4.getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+                Files.newInputStream(GameInstallation.ALL.get(Game.HOI4).getPath()
+                        .resolve("launcher-assets").resolve("font.ttf")), 12);
     }
 
     @Override
@@ -43,11 +38,6 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
         var bg = GameImage.backgroundNode(GameImage.HOI4_BACKGROUND);
         bg.setOpacity(0.4);
         return bg;
-    }
-
-    @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(GameImage.HOI4_ICON, CLASS_IMAGE_ICON);
     }
 
     @Override
@@ -64,7 +54,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     private Image hoi4TagNode(Path path, SavegameInfo<Hoi4Tag> info) {
         var in = CascadeDirectoryHelper.openFile(
-                path, info, GameInstallation.HOI4);
+                path, info, GameInstallation.ALL.get(Game.HOI4));
         return ImageLoader.loadImage(in.orElse(null), null);
     }
 

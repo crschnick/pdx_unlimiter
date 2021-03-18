@@ -1,12 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.gui.editor;
 
-import com.crschnick.pdx_unlimiter.app.editor.CollectorNode;
+import com.crschnick.pdx_unlimiter.app.editor.EditorCollectorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
+import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
-import com.crschnick.pdx_unlimiter.app.editor.SimpleNode;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
@@ -22,18 +21,18 @@ import org.kordamp.ikonli.javafx.FontIcon;
 public class GuiEditorNode {
 
     static Region createValueDisplay(EditorNode n, EditorState state) {
-        if (n.isReal() && ((SimpleNode) n).getBackingNode().isValue()) {
-            var tf = new TextField(((SimpleNode) n).getBackingNode().getString());
+        if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isValue()) {
+            var tf = new TextField(((EditorSimpleNode) n).getBackingNode().getString());
             tf.setAlignment(Pos.CENTER);
             tf.textProperty().addListener((c, o, ne) -> {
-                ((SimpleNode) n).updateText(ne);
+                ((EditorSimpleNode) n).updateText(ne);
                 state.onTextChanged();
             });
             return tf;
-        } else if (n.isReal() && ((SimpleNode) n).getBackingNode().isColor()) {
-            var picker = new JFXColorPicker(ColorHelper.fromColorNode((ColorNode) ((SimpleNode) n).getBackingNode()));
+        } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isColor()) {
+            var picker = new JFXColorPicker(ColorHelper.fromColorNode((ColorNode) ((EditorSimpleNode) n).getBackingNode()));
             picker.valueProperty().addListener((c, o, ne) -> {
-                ((SimpleNode) n).updateColor(ne);
+                ((EditorSimpleNode) n).updateColor(ne);
                 state.onColorChanged();
             });
             return picker;
@@ -48,8 +47,8 @@ public class GuiEditorNode {
         box.setSpacing(5);
 
         {
-            int length = n.isReal() ? ((SimpleNode) n).getBackingNode().getNodeArray().size() :
-                    ((CollectorNode) n).getNodes().size();
+            int length = n.isReal() ? ((EditorSimpleNode) n).getBackingNode().getNodeArray().size() :
+                    ((EditorCollectorNode) n).getNodes().size();
             int stringSize = String.valueOf(length).length();
             var lengthString = stringSize == 1 ? " " + length + " " :
                     (stringSize <= 3 ? " ".repeat(3 - stringSize) + length :

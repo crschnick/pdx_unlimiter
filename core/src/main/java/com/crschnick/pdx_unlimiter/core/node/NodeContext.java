@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.core.node;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public final class NodeContext {
 
@@ -11,6 +10,14 @@ public final class NodeContext {
     private final int[] literalsBegin;
     private final short[] literalsLength;
     private final int literalsCount;
+
+    public NodeContext() {
+        this.data = null;
+        this.charset = StandardCharsets.UTF_8;
+        this.literalsBegin = null;
+        this.literalsLength = null;
+        this.literalsCount = 0;
+    }
 
     public NodeContext(String data) {
         this.data = data.getBytes();
@@ -26,11 +33,6 @@ public final class NodeContext {
         this.literalsBegin = literalsBegin;
         this.literalsLength = literalsLength;
         this.literalsCount = literalsCount;
-    }
-
-    public byte[] getSubData(int literalIndex) {
-        return Arrays.copyOfRange(data, literalsBegin[literalIndex],
-                literalsBegin[literalIndex] + literalsLength[literalIndex]);
     }
 
     public String evaluate(int literalIndex) {
@@ -51,9 +53,5 @@ public final class NodeContext {
 
     public short[] getLiteralsLength() {
         return literalsLength;
-    }
-
-    public int getLiteralsCount() {
-        return literalsCount;
     }
 }

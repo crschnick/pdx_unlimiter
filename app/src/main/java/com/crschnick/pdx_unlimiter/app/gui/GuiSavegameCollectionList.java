@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXTextField;
 import javafx.geometry.Orientation;
@@ -26,7 +27,7 @@ public class GuiSavegameCollectionList {
         ListView<Node> list = GuiListView.createViewOfList(
                 SavegameManagerState.<T, I>get().getShownCollections(),
                 GuiSavegameCollection::createCampaignButton,
-                SavegameManagerState.<T, I>get().globalSelectedCampaignProperty());
+                SavegameManagerState.<T, I>get().globalSelectedCollectionProperty());
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
 
         var top = createTopBar();
@@ -45,14 +46,14 @@ public class GuiSavegameCollectionList {
         create.getStyleClass().add(GuiStyle.CLASS_NEW);
         create.setGraphic(new FontIcon());
         create.setOnAction(e -> {
-            SavegameManagerState.get().current().getSavegameStorage().addNewFolder("New Folder");
+            SavegameStorage.get(SavegameManagerState.get().current()).addNewFolder("New Folder");
             e.consume();
         });
 
         if (SavegameManagerState.get().current() == null) {
             create.setDisable(true);
         }
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             create.setDisable(n == null);
         });
 

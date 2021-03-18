@@ -2,8 +2,8 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.util.HttpHelper;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import org.apache.commons.io.FileUtils;
@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -24,7 +27,7 @@ import java.util.function.Consumer;
 public abstract class FileImportTarget {
 
     public static List<FileImportTarget> createTargets(String toImport) {
-        if (SavegameStorage.EU4 != null && toImport.startsWith("pdxu")) {
+        if (SavegameStorage.ALL.get(Game.EU4) != null && toImport.startsWith("pdxu")) {
             try {
                 URL url = new URL(toImport.replace("pdxu", "https"));
                 String id = Path.of(url.getPath()).getFileName().toString();
@@ -40,25 +43,25 @@ public abstract class FileImportTarget {
             RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
                 @Override
                 public void visitEu4(Path file) {
-                    if (SavegameStorage.EU4 == null) {
+                    if (SavegameStorage.ALL.get(Game.EU4) == null) {
                         return;
                     }
 
-                    targets.add(new StandardImportTarget(SavegameStorage.EU4, file));
+                    targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.EU4), file));
                 }
 
                 @Override
                 public void visitHoi4(Path file) {
-                    if (SavegameStorage.HOI4 == null) {
+                    if (SavegameStorage.ALL.get(Game.HOI4) == null) {
                         return;
                     }
 
-                    targets.add(new StandardImportTarget(SavegameStorage.HOI4, file));
+                    targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.HOI4), file));
                 }
 
                 @Override
                 public void visitStellaris(Path file) {
-                    if (SavegameStorage.STELLARIS == null) {
+                    if (SavegameStorage.ALL.get(Game.STELLARIS) == null) {
                         return;
                     }
 
@@ -71,11 +74,11 @@ public abstract class FileImportTarget {
 
                 @Override
                 public void visitCk3(Path file) {
-                    if (SavegameStorage.CK3 == null) {
+                    if (SavegameStorage.ALL.get(Game.CK3) == null) {
                         return;
                     }
 
-                    targets.add(new StandardImportTarget(SavegameStorage.CK3, file));
+                    targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.CK3), file));
                 }
 
                 @Override
@@ -118,13 +121,24 @@ public abstract class FileImportTarget {
 
         @Override
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
-            if (GameInstallation.EU4 == null) {
+            if (GameInstallation.ALL.containsKey(Game.EU4)) {
                 return;
             }
 
             TaskExecutor.getInstance().submitTask(() -> {
                 try {
-                    byte[] data = HttpHelper.executeGet(url);
+                    HttpClient client = HttpClient.newBuilder()
+                            .version(HttpClient.Version.HTTP_2)
+                            .followRedirects(HttpClient.Redirect.NORMAL)
+                            .build();
+
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(url.toURI())
+                            .GET()
+                            .build();
+
+                    HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+                    byte[] data = response.body();
 
                     String tempDir = System.getProperty("java.io.tmpdir");
                     this.downloadedFile = Paths.get(tempDir).resolve("pdxu")
@@ -132,7 +146,8 @@ public abstract class FileImportTarget {
                     FileUtils.forceMkdirParent(downloadedFile.toFile());
                     Files.write(downloadedFile, data);
 
-                    onFinish.accept(SavegameStorage.EU4.importSavegame(downloadedFile, null, true, null));
+                    onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
+                            .importSavegame(downloadedFile, null, true, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -172,8 +187,8 @@ public abstract class FileImportTarget {
 
     public static class StandardImportTarget extends FileImportTarget {
 
-        protected Path path;
         private final SavegameStorage<?, ?> savegameStorage;
+        protected Path path;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
             this.savegameStorage = savegameStorage;
@@ -224,7 +239,7 @@ public abstract class FileImportTarget {
     public static final class StellarisNormalImportTarget extends StandardImportTarget {
 
         public StellarisNormalImportTarget(Path path) {
-            super(SavegameStorage.STELLARIS, path);
+            super(SavegameStorage.ALL.get(Game.STELLARIS), path);
         }
 
         @Override
@@ -236,7 +251,7 @@ public abstract class FileImportTarget {
     public static final class StellarisIronmanImportTarget extends StandardImportTarget {
 
         public StellarisIronmanImportTarget(Path path) {
-            super(SavegameStorage.STELLARIS, path);
+            super(SavegameStorage.ALL.get(Game.STELLARIS), path);
         }
 
         @Override

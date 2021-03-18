@@ -1,12 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -15,7 +12,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.TransferMode;
@@ -25,6 +24,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Optional;
+
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiSavegameCollection {
@@ -32,14 +33,14 @@ public class GuiSavegameCollection {
     public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
             SavegameCollection<T, I> c) {
         HBox btn = new HBox();
-        btn.setOnMouseClicked((m) -> SavegameManagerState.<T, I>get().selectCollection(c));
+        btn.setOnMouseClicked((m) -> ComponentManager.selectCollection(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         {
             if (c instanceof SavegameCampaign) {
                 SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
-                SavegameHelper.withCollection(c, gi -> {
+                SavegameContext.withCollection(c, gi -> {
                     ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
                     prop.addListener((change, o, n) -> {
                         Platform.runLater(() -> {
@@ -73,7 +74,11 @@ public class GuiSavegameCollection {
             del.setGraphic(new FontIcon());
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
-                if (DialogHelper.showCampaignDeleteDialog()) {
+                if (GuiDialogHelper.showBlockingAlert(alert -> {
+                    alert.setAlertType(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Confirm deletion");
+                    alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");
+                }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
                     SavegameActions.delete(c);
                 }
             });
@@ -89,7 +94,7 @@ public class GuiSavegameCollection {
             if (c instanceof SavegameCampaign) {
                 SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
                 Label date = new Label();
-                SavegameHelper.withCollection(c, gi -> {
+                SavegameContext.withCollection(c, gi -> {
                     date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
                 });
                 date.getStyleClass().add(CLASS_DATE);

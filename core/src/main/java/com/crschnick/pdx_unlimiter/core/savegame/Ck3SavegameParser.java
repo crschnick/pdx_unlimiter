@@ -16,8 +16,8 @@ public class Ck3SavegameParser extends SavegameParser {
 
     private static final int MAX_SEARCH = 100000;
 
-    private static int indexOf(byte[] array, byte[] toFind, int maxSearch) {
-        for (int i = 0; i < maxSearch; ++i) {
+    private static int indexOf(byte[] array, byte[] toFind) {
+        for (int i = 0; i < MAX_SEARCH; ++i) {
             boolean found = true;
             for (int j = 0; j < toFind.length; ++j) {
                 if (array[i + j] != toFind[j]) {
@@ -32,21 +32,10 @@ public class Ck3SavegameParser extends SavegameParser {
         return -1;
     }
 
-    public static boolean isBinary(Path input) throws IOException {
-        var contentString = Files.readString(input);
-        var first = contentString.lines().findFirst();
-        if (first.isEmpty()) {
-            return false;
-        }
-        int metaStart = first.get().length() + 1;
-        return !contentString.startsWith("meta", metaStart);
-    }
-
     public static boolean isCompressed(Path file) throws IOException {
         var content = Files.readAllBytes(file);
-        int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH);
-        boolean compressed = zipContentStart != -1;
-        return compressed;
+        int zipContentStart = indexOf(content, "}\nPK".getBytes());
+        return zipContentStart != -1;
     }
 
     @Override
@@ -72,7 +61,7 @@ public class Ck3SavegameParser extends SavegameParser {
 
             content = Files.readAllBytes(fileToParse);
             byte[] savegameText;
-            int zipContentStart = indexOf(content, "}\nPK".getBytes(), MAX_SEARCH) + 2;
+            int zipContentStart = indexOf(content, "}\nPK".getBytes()) + 2;
             boolean compressed = zipContentStart != 1;
             if (compressed) {
                 byte[] zipContent = Arrays.copyOfRange(content, zipContentStart, content.length);

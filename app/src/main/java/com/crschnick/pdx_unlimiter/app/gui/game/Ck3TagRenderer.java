@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
@@ -29,15 +30,6 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_1 = 0x000080;
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
-
-    public static class ColorCache extends CacheManager.Cache {
-
-        private Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
-
-        public ColorCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
-        }
-    }
 
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -217,7 +209,7 @@ public class Ck3TagRenderer {
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
                     info,
-                    GameInstallation.CK3);
+                    GameInstallation.ALL.get(Game.CK3));
             patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
                 g.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE, null);
             });
@@ -249,7 +241,7 @@ public class Ck3TagRenderer {
                 Path.of("gfx", "coat_of_arms",
                         (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
                 info,
-                GameInstallation.CK3);
+                GameInstallation.ALL.get(Game.CK3));
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
             for (var instance : emblem.getInstances()) {
                 int width = (int) (instance.getScaleX() * IMG_SIZE);
@@ -265,5 +257,14 @@ public class Ck3TagRenderer {
                         null);
             }
         });
+    }
+
+    public static class ColorCache extends CacheManager.Cache {
+
+        private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
+
+        public ColorCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        }
     }
 }

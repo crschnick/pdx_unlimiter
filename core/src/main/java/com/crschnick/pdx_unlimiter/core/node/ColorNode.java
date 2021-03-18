@@ -4,19 +4,22 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//TODO: Adapt to context instead of string
 public final class ColorNode extends Node {
 
     private static final byte[] RGB = "rgb".getBytes();
     private static final byte[] HSV = "hsv".getBytes();
     private static final byte[] HSV360 = "hsv360".getBytes();
-    private final String colorName;
-    private final List<ValueNode> values;
+    private String colorName;
+    private List<ValueNode> values;
+
     public ColorNode(String colorName, List<ValueNode> values) {
         this.colorName = colorName;
-        this.values = values;
+        this.values = Collections.unmodifiableList(values);
     }
 
     public static boolean isColorName(NodeContext ctx, int index) {
@@ -34,6 +37,11 @@ public final class ColorNode extends Node {
         return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end);
+    }
+
+    public void set(ColorNode other) {
+        this.colorName = other.getColorName();
+        this.values = Collections.unmodifiableList(other.getValues());
     }
 
     @Override
@@ -80,5 +88,10 @@ public final class ColorNode extends Node {
     @Override
     public boolean isColor() {
         return true;
+    }
+
+    @Override
+    public boolean matches(NodeMatcher matcher) {
+        return matcher.matchesScalar(new NodeContext(colorName), 0);
     }
 }

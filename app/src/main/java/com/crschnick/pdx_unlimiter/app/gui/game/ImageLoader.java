@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class ImageLoader {
 
-    private static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
+    public static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();

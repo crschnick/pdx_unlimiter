@@ -26,7 +26,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
-        Alert alert = DialogHelper.createAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
@@ -93,7 +93,7 @@ public class GuiImporter {
     }
 
     private static void showNoSavegamesDialog() {
-        Alert alert = DialogHelper.createAlert();
+        Alert alert = GuiDialogHelper.createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.setTitle("No savegames found");
         alert.setHeaderText("It seems like there are no savegames to import!");
@@ -108,14 +108,13 @@ public class GuiImporter {
 
         Set<FileImportTarget> selected = new HashSet<>();
 
-        Alert alert = DialogHelper.createEmptyAlert();
+        Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import");
         alert.getDialogPane().setContent(create(watcher.getSavegames(), selected));
-        alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
         watcher.savegamesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                // Clear the selected savegames!!
+                // Clear the selected savegames!
                 selected.clear();
                 alert.getDialogPane().setContent(create(n, selected));
             });
@@ -132,17 +131,6 @@ public class GuiImporter {
 
         var deleteType = new ButtonType("Delete", ButtonBar.ButtonData.RIGHT);
         alert.getButtonTypes().add(deleteType);
-        Button deleteB = (Button) alert.getDialogPane().lookupButton(deleteType);
-        deleteB.addEventFilter(
-                ActionEvent.ACTION,
-                e -> {
-                    if (DialogHelper.showSavegameDeleteDialog()) {
-                        selected.forEach(FileImportTarget::delete);
-                    }
-                    e.consume();
-                }
-        );
-
         alert.show();
     }
 

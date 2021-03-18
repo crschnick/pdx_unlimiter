@@ -3,8 +3,11 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
+import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
@@ -54,7 +57,7 @@ public class GuiMenuBar {
 
         MenuItem sd = new MenuItem("Open storage directory");
         sd.setOnAction((a) -> {
-            ThreadHelper.open(PdxuInstallation.getInstance().getSavegamesLocation());
+            ThreadHelper.open(Settings.getInstance().storageDirectory.getValue());
         });
         savegames.getItems().add(sd);
 
@@ -68,11 +71,11 @@ public class GuiMenuBar {
 
         MenuItem lc = new MenuItem("License");
         lc.setOnAction((a) -> {
-            DialogHelper.showText("License", "License", "license.txt");
+            GuiDialogHelper.showText("License", "License", "license.txt");
         });
         MenuItem tc = new MenuItem("Third party software");
         tc.setOnAction((a) -> {
-            DialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
+            GuiDialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
         });
         about.getItems().add(src);
         about.getItems().add(lc);
@@ -95,7 +98,7 @@ public class GuiMenuBar {
 
         MenuItem log = new MenuItem("Show log");
         log.setOnAction((a) -> {
-            DialogHelper.showLogDialog();
+            GuiLog.showLogDialog();
         });
         help.getItems().add(log);
 
@@ -133,31 +136,32 @@ public class GuiMenuBar {
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
         m.setDisable(SavegameManagerState.get().current() == null);
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> m.setDisable(n == null));
         });
 
         JFXButton importB = new JFXButton("Import");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(SavegameManagerState.get().current().getSavegameWatcher());
+            GuiImporter.createImporterDialog(SavegameWatcher.ALL.get(
+                    SavegameManagerState.get().current()));
             e.consume();
         });
         importB.setGraphic(new FontIcon());
         importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
         importB.setDisable(SavegameManagerState.get().current() == null);
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> importB.setDisable(n == null));
         });
 
         JFXButton launch = new JFXButton("Launch");
         launch.setOnAction(e -> {
-            SavegameManagerState.get().current().getInstallation().startLauncher();
+            GameLauncher.startLauncher();
             e.consume();
         });
         launch.setGraphic(new FontIcon());
         launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
         launch.setDisable(SavegameManagerState.get().current() == null);
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
+        SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> launch.setDisable(n == null));
         });
 
@@ -171,9 +175,8 @@ public class GuiMenuBar {
 
         StackPane spacer = new StackPane();
         Label game = new Label();
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
-            var current = SavegameManagerState.get().current();
-            var name = current != null ? SavegameManagerState.get().current().getName() : "None";
+        SavegameManagerState.get().onGameChange(n -> {
+            String name = n != null ? n.getFullName() : "None";
             Platform.runLater(() -> game.setText(name));
         });
         spacer.getChildren().add(game);
@@ -186,7 +189,6 @@ public class GuiMenuBar {
         s.getStyleClass().add("menu-bar");
         s.getChildren().add(createRightBar());
 
-        HBox menubars = new HBox(leftBar, spacer, s);
-        return menubars;
+        return new HBox(leftBar, spacer, s);
     }
 }

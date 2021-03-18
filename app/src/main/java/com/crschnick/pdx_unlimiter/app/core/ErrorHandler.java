@@ -9,7 +9,6 @@ import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class ErrorHandler {
@@ -63,7 +62,7 @@ public class ErrorHandler {
         Platform.startup(latch::countDown);
         try {
             latch.await();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
         startupCompleted = true;
     }
@@ -119,7 +118,7 @@ public class ErrorHandler {
         if (terminal) {
             try {
                 latch.await();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
             // Wait to send error report
             ThreadHelper.sleep(1000);

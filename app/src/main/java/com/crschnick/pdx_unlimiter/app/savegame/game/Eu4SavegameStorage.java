@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.savegame.game;
 
 import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameLocalisation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;

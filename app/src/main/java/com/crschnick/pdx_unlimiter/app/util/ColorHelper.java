@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
@@ -51,21 +52,22 @@ public class ColorHelper {
 
     public static Color fromColorNode(ColorNode node) {
         var c = node.getValues();
-        if (node.getColorName().equals("hsv")) {
-            return Color.hsb(
-                    c.get(0).getDouble(),
-                    c.get(1).getDouble(),
-                    c.get(2).getDouble());
-        } else if (node.getColorName().equals("hsv360")) {
-            return Color.hsb(
-                    c.get(0).getDouble() / 360.0,
-                    c.get(1).getDouble() / 360.0,
-                    c.get(2).getDouble() / 360.0);
-        } else if (node.getColorName().equals("rgb")) {
-            return Color.color(
-                    c.get(0).getDouble() / 255.0,
-                    c.get(1).getDouble() / 255.0,
-                    c.get(2).getDouble() / 255.0);
+        switch (node.getColorName()) {
+            case "hsv":
+                return Color.hsb(
+                        c.get(0).getDouble() * 360,
+                        c.get(1).getDouble(),
+                        c.get(2).getDouble());
+            case "hsv360":
+                return Color.hsb(
+                        c.get(0).getDouble(),
+                        c.get(1).getDouble() / 360.0,
+                        c.get(2).getDouble() / 360.0);
+            case "rgb":
+                return Color.color(
+                        c.get(0).getDouble() / 255.0,
+                        c.get(1).getDouble() / 255.0,
+                        c.get(2).getDouble() / 255.0);
         }
 
         throw new IllegalArgumentException();
@@ -93,7 +95,7 @@ public class ColorHelper {
         var file = CascadeDirectoryHelper.openFile(
                 Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
                 info,
-                GameInstallation.CK3).get();
+                GameInstallation.ALL.get(Game.CK3)).get();
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
             return loadPredefinedCk3Colors(node);
@@ -105,7 +107,7 @@ public class ColorHelper {
 
     public static Map<String, Color> loadStellarisColors(SavegameInfo<StellarisTag> info) {
         var file = CascadeDirectoryHelper.openFile(
-                Path.of("flags").resolve("colors.txt"), info, GameInstallation.STELLARIS).get();
+                Path.of("flags").resolve("colors.txt"), info, GameInstallation.ALL.get(Game.STELLARIS)).get();
 
         try {
             Node node = TextFormatParser.textFileParser().parse(file);

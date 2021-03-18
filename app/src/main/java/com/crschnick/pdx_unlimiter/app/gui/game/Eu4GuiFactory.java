@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
@@ -29,10 +30,6 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
 
 public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
-
-    public Eu4GuiFactory() {
-        super("eu4", GameInstallation.EU4);
-    }
 
     private static Region createRulerLabel(Eu4SavegameInfo.Ruler ruler, boolean isRuler) {
         VBox box = new VBox();
@@ -107,17 +104,12 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public Font font() throws IOException {
         return Font.loadFont(
-                Files.newInputStream(GameInstallation.EU4.getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+                Files.newInputStream(GameInstallation.ALL.get(Game.EU4).getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
     }
 
     @Override
     public Pane background() {
         return GameImage.backgroundNode(EU4_BACKGROUND);
-    }
-
-    @Override
-    public Pane createIcon() {
-        return GameImage.imageNode(EU4_ICON, CLASS_IMAGE_ICON);
     }
 
     @Override
@@ -203,7 +195,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
     private Image eu4TagNode(Path path, SavegameInfo<Eu4Tag> info) {
         var in = CascadeDirectoryHelper.openFile(
-                path, info, GameInstallation.EU4);
+                path, info, GameInstallation.ALL.get(Game.EU4));
         return ImageLoader.loadImage(in.orElse(null), null);
     }
 
@@ -211,7 +203,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         Map<String, Image> tagImages = new HashMap<>();
 
         public Eu4TagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
         }
     }
 }

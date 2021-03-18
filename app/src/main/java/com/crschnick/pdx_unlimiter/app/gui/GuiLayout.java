@@ -1,19 +1,22 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.core.Settings;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 import java.io.File;
@@ -23,22 +26,78 @@ import java.util.stream.Collectors;
 
 public class GuiLayout {
 
-    private static BorderPane layout;
+    private StackPane stack;
+    private BorderPane layout;
+    private Pane loadingBg;
 
-    public static StackPane createLayout() {
+    public void setup() {
         layout = new BorderPane();
+
+        JFXSpinner loading = new JFXSpinner();
+        loadingBg = new StackPane(loading);
+        loadingBg.getStyleClass().add(GuiStyle.CLASS_LOADING);
+        loadingBg.setVisible(false);
+        TaskExecutor.getInstance().busyProperty().addListener((c, o, n) -> {
+            setBusy(n);
+        });
+        loadingBg.setMinWidth(Pane.USE_COMPUTED_SIZE);
+        loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
+
+        stack = new StackPane(new Pane(), layout, loadingBg);
+
+        // Set font size
+        layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
+        // Disable focus on startup
+        layout.requestFocus();
+
+        setupDragAndDrop();
+
+        fillLayout();
+    }
+
+    private void fillLayout() {
         var menu = GuiMenuBar.createMenu();
         layout.setTop(menu);
+
         layout.setBottom(GuiStatusBar.createStatusBar());
 
-        Pane pane = new Pane(new Label());
-        layout.setCenter(pane);
-        GuiSavegameEntryList.createCampaignEntryList(pane);
+        var pane = GuiSavegameEntryList.createCampaignEntryList();
         layout.setCenter(pane);
 
         layout.setLeft(GuiSavegameCollectionList.createCampaignList());
-        BorderPane.setAlignment(pane, Pos.CENTER);
+    }
 
+    private void setGameLookAndFeel(Game g) {
+        Platform.runLater(() -> {
+            if (g != null) {
+                var bg = GameGuiFactory.ALL.get(g).background();
+                stack.getChildren().set(0, bg);
+                try {
+                    stack.styleProperty().set("-fx-font-family: " +
+                            GameGuiFactory.ALL.get(g).font().getName() + ";");
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
+            } else {
+                stack.getChildren().set(0, new Pane());
+            }
+        });
+    }
+
+    private void setBusy(boolean busy) {
+        if (!busy) {
+            ThreadHelper.create("loading delay", true, () -> {
+                ThreadHelper.sleep(50);
+                if (!TaskExecutor.getInstance().isBusy()) {
+                    Platform.runLater(() -> loadingBg.setVisible(false));
+                }
+            }).start();
+        } else {
+            Platform.runLater(() -> loadingBg.setVisible(true));
+        }
+    }
+
+    private void setupDragAndDrop() {
         layout.setOnDragOver(event -> {
             if (event.getGestureSource() == null
                     && event.getDragboard().hasFiles()) {
@@ -61,49 +120,17 @@ public class GuiLayout {
             }
             event.consume();
         });
-
-        JFXSpinner loading = new JFXSpinner();
-        Pane loadingBg = new StackPane(loading);
-        loadingBg.getStyleClass().add(GuiStyle.CLASS_LOADING);
-        loadingBg.setVisible(false);
-        TaskExecutor.getInstance().busyProperty().addListener((c, o, n) -> {
-            if (!n) {
-                ThreadHelper.create("loading delay", true, () -> {
-                    ThreadHelper.sleep(50);
-                    if (!TaskExecutor.getInstance().isBusy()) {
-                        Platform.runLater(() -> loadingBg.setVisible(false));
-                    }
-                }).start();
-            } else {
-                Platform.runLater(() -> loadingBg.setVisible(true));
-            }
-        });
-        loadingBg.setMinWidth(Pane.USE_COMPUTED_SIZE);
-        loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
-
-        StackPane stack = new StackPane(new Pane(), layout, loadingBg);
-
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> Platform.runLater(() -> {
-            if (n != null) {
-                stack.getChildren().set(0, n.getGuiFactory().background());
-                try {
-                    menu.setOpacity(0.95);
-                    stack.styleProperty().set("-fx-font-family: " + n.getGuiFactory().font().getName() + ";");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }));
-
-        return stack;
     }
 
-    public static void init() {
-        Platform.runLater(() -> {
-            layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().getFontSize() + "pt;");
-
-            // Disable focus on startup
-            layout.requestFocus();
+    public void finishSetup() {
+        SavegameManagerState.get().onGameChange(n -> {
+            GameImage.loadGameImages(n);
+            setGameLookAndFeel(n);
         });
+
+    }
+
+    public Region getContent() {
+        return stack;
     }
 }

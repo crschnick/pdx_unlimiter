@@ -1,9 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -13,10 +16,8 @@ import java.util.stream.Stream;
 
 public class SavegameWatcher {
 
-    public static SavegameWatcher EU4;
-    public static SavegameWatcher HOI4;
-    public static SavegameWatcher STELLARIS;
-    public static SavegameWatcher CK3;
+    public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
+
     private final GameInstallation install;
     private final ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
 
@@ -25,29 +26,17 @@ public class SavegameWatcher {
     }
 
     public static void init() {
-        if (GameInstallation.EU4 != null) {
-            SavegameWatcher.EU4 = new SavegameWatcher(GameInstallation.EU4);
-            SavegameWatcher.EU4.initSavegames();
-        }
-        if (GameInstallation.HOI4 != null) {
-            SavegameWatcher.HOI4 = new SavegameWatcher(GameInstallation.HOI4);
-            SavegameWatcher.HOI4.initSavegames();
-        }
-        if (GameInstallation.STELLARIS != null) {
-            SavegameWatcher.STELLARIS = new SavegameWatcher(GameInstallation.STELLARIS);
-            SavegameWatcher.STELLARIS.initSavegames();
-        }
-        if (GameInstallation.CK3 != null) {
-            SavegameWatcher.CK3 = new SavegameWatcher(GameInstallation.CK3);
-            SavegameWatcher.CK3.initSavegames();
+        for (var g : Game.values()) {
+            var install = GameInstallation.ALL.get(g);
+            if (install != null) {
+                ALL.put(g, new SavegameWatcher(install));
+                ALL.get(g).initSavegames();
+            }
         }
     }
 
     public static void reset() {
-        EU4 = null;
-        HOI4 = null;
-        STELLARIS = null;
-        CK3 = null;
+        ALL.clear();
     }
 
     private void initSavegames() {

@@ -17,6 +17,12 @@ public class GuiListView {
             Function<T, Node> nodeFactory,
             ReadOnlyProperty<T> selectedProperty) {
         JFXListView<Node> listView = new JFXListView<Node>();
+
+        list.forEach(li -> {
+            var item = createForItem(li, nodeFactory);
+            listView.getItems().add(item);
+        });
+
         list.addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 var map = new HashMap<T, Node>();

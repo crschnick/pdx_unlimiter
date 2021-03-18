@@ -13,10 +13,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LocalisationHelper {
+
+    private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\w+\\$");
 
     public static Map<String, String> loadTranslations(Path file, Language lang) {
         Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.id +
@@ -66,6 +69,17 @@ public class LocalisationHelper {
         return map;
     }
 
+    public static String getValue(String s, String... vars) {
+        Objects.requireNonNull(s);
+
+        s = s.replace("\\n", "\n");
+        for (var v : vars) {
+            var matcher = VAR_PATTERN.matcher(s);
+            s = matcher.replaceFirst(Matcher.quoteReplacement(v));
+        }
+        return s;
+    }
+
     public enum Language {
         ENGLISH("l_english"),
         GERMAN("l_german");
@@ -74,6 +88,15 @@ public class LocalisationHelper {
 
         Language(String id) {
             this.id = id;
+        }
+
+        public static Language byId(String langId) {
+            for (var v : values()) {
+                if (v.id.equals(langId)) {
+                    return v;
+                }
+            }
+            return null;
         }
     }
 }

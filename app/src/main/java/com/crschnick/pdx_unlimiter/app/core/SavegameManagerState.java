@@ -1,10 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
+import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
-import com.crschnick.pdx_unlimiter.app.installation.GameIntegration;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
+import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -13,15 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
-import java.util.Optional;
+import java.util.function.Consumer;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SavegameManagerState.class);
 
-    private static final SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<Object, SavegameInfo<Object>>();
-    private final SimpleObjectProperty<GameIntegration<?, ? extends SavegameInfo<?>>> current = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaign =
+    private static final SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<>();
+    private final SimpleObjectProperty<Game> current = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCollection =
             new SimpleObjectProperty<>();
     private final SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntry =
             new SimpleObjectProperty<>();
@@ -30,11 +34,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             FXCollections.observableArrayList());
     private final ListProperty<SavegameEntry<T, I>> shownEntries = new SimpleListProperty<>(
             FXCollections.observableArrayList());
+    private final BooleanProperty storageEmpty = new SimpleBooleanProperty();
 
     private SavegameManagerState() {
         var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
 
-        globalSelectedCampaign.addListener((c, o, n) -> {
+        globalSelectedCollection.addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegames().removeListener(cl);
                 unloadCollectionAsync(o);
@@ -53,30 +58,60 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     public static void init() {
         SavedState s = SavedState.getInstance();
-        for (var gi : GameIntegration.ALL) {
-            if (s.getActiveGame().equals(gi.getInstallation())) {
-                INSTANCE.selectIntegration(gi);
+        if (s.getActiveGame() != null) {
+            // Check if stored active game is no longer valid
+            if (!GameInstallation.ALL.containsKey(s.getActiveGame())) {
+                SavedState.getInstance().setActiveGame(null);
+            } else {
+                INSTANCE.selectGame(s.getActiveGame());
                 return;
             }
         }
 
-        if (GameIntegration.ALL.size() > 0 && INSTANCE.current.isNull().get()) {
-            INSTANCE.selectIntegration(GameIntegration.ALL.get(0));
-        }
+        // If no active game is set, select the first one available (if existent)
+        GameInstallation.ALL.entrySet().stream().findFirst().ifPresent(e -> {
+            INSTANCE.selectGame(e.getKey());
+            SavedState.getInstance().setActiveGame(e.getKey());
+        });
     }
 
     public static void reset() {
         if (INSTANCE.current() != null) {
-            INSTANCE.selectIntegration(null);
+            INSTANCE.selectGame(null);
         }
     }
 
-    public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignProperty() {
-        return globalSelectedCampaign;
+    public void onGameChange(Consumer<Game> change) {
+        currentGameProperty().addListener((c, o, n) -> {
+            change.accept(n);
+        });
+        change.accept(current());
+    }
+
+    private void updateStorageEmptyProperty() {
+        if (current() == null) {
+            storageEmpty.set(false);
+            return;
+        }
+
+        int newSize = SavegameStorage.get(current()).getCollections().size();
+        storageEmpty.set(newSize == 0);
+    }
+
+    public LocalisationHelper.Language getActiveLanguage() {
+        if (current() == null) {
+            return LocalisationHelper.Language.ENGLISH;
+        }
+
+        return GameInstallation.ALL.get(current()).getLanguage();
+    }
+
+    public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCollectionProperty() {
+        return globalSelectedCollection;
     }
 
     private SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignPropertyInternal() {
-        return globalSelectedCampaign;
+        return globalSelectedCollection;
     }
 
     public ReadOnlyObjectProperty<SavegameEntry<T, I>> globalSelectedEntryProperty() {
@@ -92,12 +127,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> SavegameHelper.withSavegame(e, ctx -> {
-            var gi = ctx.getIntegration();
+        TaskExecutor.getInstance().submitTask(() -> SavegameContext.withSavegame(e, ctx -> {
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
-                            gi.getSavegameStorage().getSavegameCollection(e))) {
-                gi.getSavegameStorage().loadEntry(e);
+                            ctx.getStorage().getSavegameCollection(e))) {
+                ctx.getStorage().loadEntry(e);
             }
         }), false);
     }
@@ -119,7 +153,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private void updateShownEntries() {
         GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
             // No integration or campaign selected means no entries are shown
-            if (current() == null || globalSelectedCampaign.get() == null) {
+            if (current() == null || globalSelectedCollection.get() == null) {
                 shownEntries.clear();
                 return;
             }
@@ -128,9 +162,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             var newEntries = FXCollections.observableArrayList(shownEntries.get());
 
             // Remove not contained entries
-            newEntries.removeIf(entry -> !globalSelectedCampaign.get().getSavegames().contains(entry));
+            newEntries.removeIf(entry -> !globalSelectedCollection.get().getSavegames().contains(entry));
 
-            var col = globalSelectedCampaign.get();
+            var col = globalSelectedCollection.get();
             col.getSavegames().forEach(entry -> {
                 if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
                     newEntries.add(entry);
@@ -144,6 +178,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
 
             shownEntries.set(newEntries);
+
+            if (globalSelectedEntry.isNotNull().get()) {
+                if (!shownEntries.contains(globalSelectedEntry.get())) {
+                    selectEntry(null);
+                }
+            }
         });
     }
 
@@ -157,9 +197,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             // Work on copy to reduce list updates
             var newCollections = FXCollections.observableArrayList(shownCollections.get());
 
-            newCollections.removeIf(col -> !current().getSavegameStorage().getCollections().contains(col));
+            newCollections.removeIf(col -> !SavegameStorage.get(current()).getCollections().contains(col));
 
-            current().getSavegameStorage().getCollections().forEach(col -> {
+            SavegameStorage.<T, I>get(current()).getCollections().forEach(col -> {
                 if (!newCollections.contains(col) && filter.shouldShow(col)) {
                     newCollections.add(col);
                     return;
@@ -171,6 +211,14 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             });
             newCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
             shownCollections.set(newCollections);
+
+            if (globalSelectedCollection.isNotNull().get()) {
+                if (!shownCollections.contains(globalSelectedCollection.get())) {
+                    selectCollection(null);
+                }
+            }
+
+            updateStorageEmptyProperty();
         });
     }
 
@@ -182,14 +230,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return shownCollections;
     }
 
-    @SuppressWarnings("unchecked")
-    public GameIntegration<T, I> current() {
-        return (GameIntegration<T, I>) current.get();
+    public Game current() {
+        return current.get();
     }
 
-    @SuppressWarnings("unchecked")
-    public <G extends GameIntegration<T, I>> SimpleObjectProperty<G> currentGameProperty() {
-        return (SimpleObjectProperty<G>) current;
+    public SimpleObjectProperty<Game> currentGameProperty() {
+        return current;
     }
 
     private void unselectCampaignAndEntry() {
@@ -202,19 +248,20 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         });
     }
 
-    public boolean selectIntegration(GameIntegration<?, ?> newInt) {
-        if (current.get() == newInt) {
+    public boolean selectGame(Game newGame) {
+        if (current.get() == newGame) {
             return false;
         }
 
         GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
             unselectCampaignAndEntry();
 
-            current.set(newInt);
-            LoggerFactory.getLogger(GameIntegration.class).debug("Selected integration " + (newInt != null ? newInt.getName() : "null"));
+            current.set(newGame);
+            logger.debug("Selected game " +
+                    (newGame != null ? newGame.getFullName() : "null"));
             updateShownCollections();
-            if (newInt != null) {
-                newInt.getSavegameStorage().getCollections().addListener(
+            if (newGame != null) {
+                SavegameStorage.get(newGame).getCollections().addListener(
                         (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
                             updateShownCollections();
                         });
@@ -227,33 +274,25 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     public void selectCollection(SavegameCollection<T, I> c) {
         if (c == null) {
             unselectCampaignAndEntry();
-            LoggerFactory.getLogger(GameIntegration.class).debug("Unselected campaign");
+            logger.debug("Unselected campaign");
             return;
         }
 
-        if (globalSelectedCampaign.isNotNull().get() && globalSelectedCampaign.get().equals(c)) {
+        if (globalSelectedCollection.isNotNull().get() && globalSelectedCollection.get().equals(c)) {
             return;
         }
 
         GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
+            var game = SavegameContext.getForCollection(c);
 
-            Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
-                    .filter(i -> i.getSavegameStorage().getCollections().contains(c))
-                    .findFirst()
-                    .map(v -> (GameIntegration<T, I>) v);
-            gi.ifPresentOrElse(v -> {
-                // If we didn't change the game and an entry is already selected, unselect it
-                if (!selectIntegration(v) && globalSelectedEntryProperty().isNotNull().get()) {
-                    globalSelectedEntryPropertyInternal().set(null);
-                }
+            // If we didn't change the game and an entry is already selected, unselect it
+            if (!selectGame(game) && globalSelectedEntryProperty().isNotNull().get()) {
+                globalSelectedEntryPropertyInternal().set(null);
+            }
 
-                globalSelectedCampaignPropertyInternal().set(c);
-                updateShownEntries();
-                LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign " + c.getName());
-            }, () -> {
-                LoggerFactory.getLogger(GameIntegration.class).debug("No game integration found for campaign " + c.getName());
-                selectIntegration(null);
-            });
+            globalSelectedCampaignPropertyInternal().set(c);
+            updateShownEntries();
+            logger.debug("Selected campaign " + c.getName());
         });
     }
 
@@ -273,20 +312,21 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                     globalSelectedEntryPropertyInternal().set(null);
                 }
             } else {
-                Optional<GameIntegration<T, I>> gi = GameIntegration.ALL.stream()
-                        .filter(i -> i.getSavegameStorage().contains(e))
-                        .findFirst()
-                        .map(v -> (GameIntegration<T, I>) v);
-                gi.ifPresentOrElse(v -> {
-                    selectCollection(v.getSavegameStorage().getSavegameCollection(e));
+                var game = SavegameContext.getForSavegame(e);
+                selectCollection(SavegameStorage.<T, I>get(game).getSavegameCollection(e));
 
-                    globalSelectedEntryPropertyInternal().set(e);
-                    LoggerFactory.getLogger(GameIntegration.class).debug("Selected campaign entry " + e.getName());
-                }, () -> {
-                    LoggerFactory.getLogger(GameIntegration.class).debug("No game integration found for campaign entry " + e.getName());
-                });
+                globalSelectedEntryPropertyInternal().set(e);
+                logger.debug("Selected campaign entry " + e.getName());
             }
         });
+    }
+
+    public boolean isStorageEmpty() {
+        return storageEmpty.get();
+    }
+
+    public BooleanProperty storageEmptyProperty() {
+        return storageEmpty;
     }
 
     public class Filter {

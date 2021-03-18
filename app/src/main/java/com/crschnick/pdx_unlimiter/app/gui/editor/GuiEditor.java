@@ -79,7 +79,7 @@ public class GuiEditor {
                 }
 
                 l.forEach(en -> {
-                    var btn = new JFXButton(en.getEditorNode().navigationName());
+                    var btn = new JFXButton(en.getEditorNode().getNavigationName());
                     btn.setMnemonicParsing(false);
                     {
                         var sep = new Label(">");
@@ -160,7 +160,7 @@ public class GuiEditor {
         int nodeCount = Math.min(nodes.size(), 100);
         for (int i = 0; i < nodeCount; i++) {
             var n = nodes.get(i);
-            var kn = createGridElement(new Label(n.displayKeyName()), i);
+            var kn = createGridElement(new Label(n.getDisplayKeyName()), i);
             kn.setAlignment(Pos.CENTER_LEFT);
 
             grid.add(kn, 0, i);

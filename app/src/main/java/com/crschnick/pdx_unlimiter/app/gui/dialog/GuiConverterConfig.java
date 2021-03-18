@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.Settings;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -15,13 +15,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.DialogHelper.createAlert;
+import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createAlert;
 
 public class GuiConverterConfig {
 
@@ -91,7 +90,7 @@ public class GuiConverterConfig {
                 """);
         Button val = (Button) alert.getDialogPane().lookupButton(openLog);
         val.setOnAction(e -> {
-            ThreadHelper.open(Settings.getInstance().getCk3toEu4Dir().get().resolve("CK3toEU4").resolve("log.txt"));
+            ThreadHelper.open(Settings.getInstance().ck3toeu4Dir.getValue().resolve("CK3toEU4").resolve("log.txt"));
         });
         alert.showAndWait();
     }
@@ -146,9 +145,9 @@ public class GuiConverterConfig {
         Map<String, String> translations;
         try {
             configNode = TextFormatParser.textFileParser().parse(Files.readAllBytes(
-                    Settings.getInstance().getCk3toEu4Dir().get()
+                    Settings.getInstance().ck3toeu4Dir.getValue()
                             .resolve("Configuration").resolve("fronter-options.txt")));
-            translations = LocalisationHelper.loadTranslations(Settings.getInstance().getCk3toEu4Dir().get()
+            translations = LocalisationHelper.loadTranslations(Settings.getInstance().ck3toeu4Dir.getValue()
                     .resolve("Configuration").resolve("options.yml"), LocalisationHelper.Language.ENGLISH);
         } catch (Exception e) {
             ErrorHandler.handleException(e);
@@ -165,7 +164,7 @@ public class GuiConverterConfig {
         val.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-                    ThreadHelper.open(Settings.getInstance().getCk3toEu4Dir().get()
+                    ThreadHelper.open(Settings.getInstance().ck3toeu4Dir.getValue()
                             .resolve("CK3toEU4").resolve("configurables"));
                     e.consume();
                 });

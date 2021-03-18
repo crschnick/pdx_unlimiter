@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
@@ -58,12 +57,8 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
         return entryStream().findFirst().get();
     }
 
-    public int indexOf(SavegameEntry<T, I> e) {
-        return entryStream().collect(Collectors.toList()).indexOf(e);
-    }
-
     public Stream<SavegameEntry<T, I>> entryStream() {
-        var list = new ArrayList<SavegameEntry<T, I>>(getSavegames());
+        var list = new ArrayList<>(getSavegames());
         list.sort(Comparator.comparing(SavegameEntry::getDate));
         Collections.reverse(list);
         return list.stream();

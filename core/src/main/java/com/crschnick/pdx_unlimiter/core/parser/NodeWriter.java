@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;
 
 import java.io.*;

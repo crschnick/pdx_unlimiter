@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -46,12 +45,11 @@ public class JsonHelper {
         return mapper.readTree(in.toFile());
     }
 
-    public static void write(JsonNode node, OutputStream out) throws IOException {
+    public static void write(JsonNode node, Path out) throws IOException {
         JsonFactory f = new JsonFactory();
-        JsonGenerator g = f.createGenerator(out)
+        JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
                 .setPrettyPrinter(new DefaultPrettyPrinter());
         new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
                 .writeTree(g, node);
-        out.close();
     }
 }

@@ -3,10 +3,7 @@ package com.crschnick.pdx_unlimiter.core.node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public final class SimpleArrayNode extends ArrayNode {
@@ -17,15 +14,36 @@ public final class SimpleArrayNode extends ArrayNode {
     private final List<Node> values;
 
     SimpleArrayNode(NodeContext context, int[] keyScalars, int[] valueScalars, List<Node> values) {
-        this.context = context;
+        this.context = Objects.requireNonNull(context);
         this.keyScalars = keyScalars;
         this.valueScalars = valueScalars;
-        this.values = values;
+        this.values = Objects.requireNonNull(values);
     }
 
     @Override
     public String toString() {
-        return "{ (" + values.size() + ") }";
+        if (values.size() <= 10) {
+            StringBuilder sb = new StringBuilder("SimpleArrayNode(");
+            evaluateAllValueNodes();
+            for (int i = 0; i < values.size(); i++) {
+                if (hasKeyAtIndex(i)) {
+                    sb.append(context.evaluate(keyScalars[i]));
+                    sb.append("=");
+                }
+                sb.append(values.get(i).toString());
+                sb.append(", ");
+            }
+            sb.delete(sb.length() - 2, sb.length());
+            sb.append(")");
+            return sb.toString();
+        } else {
+            return "SimpleArrayNode(" + values.size() + ")";
+        }
+    }
+
+    @Override
+    public int size() {
+        return values.size();
     }
 
     @Override
@@ -53,6 +71,28 @@ public final class SimpleArrayNode extends ArrayNode {
     public List<Node> getNodeArray() {
         evaluateAllValueNodes();
         return Collections.unmodifiableList(values);
+    }
+
+    @Override
+    public boolean matches(NodeMatcher matcher) {
+        for (int i = 0; i < values.size(); i++) {
+            if (hasKeyAtIndex(i)) {
+                if (matcher.matchesScalar(context, keyScalars[i])) {
+                    return true;
+                }
+            }
+
+            if (values.get(i) == null) {
+                if (matcher.matchesScalar(context, valueScalars[i])) {
+                    return true;
+                }
+            } else {
+                if (values.get(i).matches(matcher)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

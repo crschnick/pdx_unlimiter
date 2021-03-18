@@ -1,11 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.util.SavegameHelper;
+import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
+import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -63,8 +62,8 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(SavegameManagerState.get().current().getName() + " (Running)",
-                SavegameManagerState.get().current().getGuiFactory().createIcon());
+        Label text = new Label(SavegameManagerState.get().current().getFullName() + " (Running)",
+                GameGuiFactory.get(SavegameManagerState.get().current()).createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
@@ -76,9 +75,10 @@ public class GuiStatusBar {
         javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> latest.setText("Latest: " + (n.size() > 0 ? n.get(0).getName() : "None")));
         };
-        SavegameManagerState.get().current().getSavegameWatcher().savegamesProperty().addListener(l);
-        l.changed(null, null,
-                SavegameManagerState.get().current().getSavegameWatcher().savegamesProperty().get());
+
+        var watcher = SavegameWatcher.ALL.get(SavegameManagerState.get().current());
+        watcher.savegamesProperty().addListener(l);
+        l.changed(null, null, watcher.savegamesProperty().get());
         barPane.setCenter(latest);
 
         Button importLatest = new JFXButton("Import");
@@ -111,16 +111,16 @@ public class GuiStatusBar {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
-        SavegameHelper.withSavegame(e, ctx -> {
+        SavegameContext.withSavegame(e, ctx -> {
             {
                 Label text = new Label(
-                        ctx.getIntegration().getName(),
-                        ctx.getIntegration().getGuiFactory().createIcon());
+                        ctx.getGame().getFullName(),
+                        ctx.getGuiFactory().createIcon());
                 barPane.setLeft(text);
                 BorderPane.setAlignment(text, Pos.CENTER);
             }
             {
-                Label name = new Label(ctx.getIntegration().getSavegameStorage().getEntryName(e));
+                Label name = new Label(ctx.getStorage().getEntryName(e));
                 name.setGraphic(new FontIcon());
                 name.getStyleClass().add(CLASS_TEXT);
                 if (SavegameActions.isEntryCompatible(e)) {
@@ -144,7 +144,7 @@ public class GuiStatusBar {
             export.setGraphic(new FontIcon());
             export.getStyleClass().add(CLASS_EXPORT);
             export.setOnAction(event -> {
-                SavegameActions.exportCampaignEntry(e);
+                SavegameActions.exportSavegame(e);
 
                 event.consume();
                 getStatusBar().hide();
@@ -153,23 +153,37 @@ public class GuiStatusBar {
         }
 
         {
-            Button launch = new JFXButton("Launch");
+            Button launch = new JFXButton("Continue Game");
             launch.setGraphic(new FontIcon());
-            launch.getStyleClass().add(CLASS_LAUNCH);
+            launch.getStyleClass().add("continue-button");
             launch.setOnAction(event -> {
-                SavegameActions.launchCampaignEntry(e);
+                GameLauncher.continueSavegame(e);
 
                 event.consume();
                 getStatusBar().hide();
             });
             buttons.getChildren().add(launch);
         }
+
+        {
+            Button launch = new JFXButton("Start Launcher");
+            launch.setGraphic(new FontIcon());
+            launch.getStyleClass().add("launcher-button");
+            launch.setOnAction(event -> {
+                GameLauncher.startLauncherWithContinueGame(e);
+
+                event.consume();
+                getStatusBar().hide();
+            });
+            buttons.getChildren().add(launch);
+        }
+
         return barPane;
     }
 
     public static class StatusBar {
-        private Status status;
         private final Pane pane;
+        private Status status;
 
         public StatusBar(Pane pane) {
             this.status = Status.NONE;
