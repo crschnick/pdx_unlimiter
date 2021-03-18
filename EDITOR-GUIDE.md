@@ -1,79 +1,4 @@
 
-## Structure
-
-A savegame consists out of many entries, where each entry can have a name,
-also called the key, and an associated value.
-If an entry has a key name, it is formatted as `<key name> = <value>` and look like this:
-
-![Entry](docs/data-entry.png)
-
-If an entry does not have a key, its index is displayed as its key:
-
-![No-Key](docs/nokey.png)
-
-### Primitives
-
-The associated values can be of one of the following primitive types:
-<p>
-<img align="left" src="docs/boolean.png" width=28/>
-Boolean, either <i>yes</i> or <i>no</i>
-</p>
-<p>
-<img align="left" src="docs/integer.png" width=28/>
-Integer, e.g. <i>124</i>
-</p>
-<p>
-<img align="left" src="docs/float.png" width=28/>
-Floating point number, e.g. <i>1.12</i>
-</p>
-<p>
-<img align="left" src="docs/text.png" width=28/>
-Text, e.g. <i>"Text value"</i>
-</p>
-<p>
-<img align="left" src="docs/game-value.png" width=28/>
-A game specific value, e.g. the relgion id <i>catholic</i> in eu4.
-While it looks like a normal Text value, the difference is
-that you can basically assign anything to a text value while
-you can only assign certain things to a game specific value without breaking the game
-</p>
-<p>
-<img align="left" src="docs/color.png" width=28/>
-Color
-</p>
-
-### Lists
-
-A value can also be a list of any type of the ones listed above and would look like this:
-
-![List-Entry](docs/list-entry.png)
-
-You can expand the list contents by clicking on it.
-
-<p>
-<img align="left" src="docs/complex.png" width=28/>
-Complex type, assigned if a list contains key-value pairs on its own, its type is described as complex
-</p>
-
-<p>
-<img align="left" src="docs/preview.png" width=28/>
-A button that you can hover over to get a preview of the list contents in text form.
-</p>
-
-### Objects
-
-
-### Synthetic lists
-
-It is also possible that there are multiple entries with the same key name.
-In this case, they are automatically merged into a synthetic list entry:
-
-![Synthetic-Entry](docs/synthetic.png)
-
-They are called synthetic, because these entries do not actually exist like this in the savegame.
-In the case shown above, there actually exist 732 entries with the key `rebel_faction` instead.
-This merging is done for readability.
-
 
 ## Navigation
 
@@ -124,3 +49,80 @@ Clears the active filter.
 <img align="left" src="docs/case.png" width=35/>
 Toggles case-sensitive matching mode for the search string.
 </p>
+
+
+## Structure
+
+A savegame consists out of many entries, where each entry can have a name,
+also called the key, and an associated value.
+If an entry has a key name, it is formatted as `<key name> = <value>` and look like this:
+
+![Entry](docs/data-entry.png)
+
+If an entry does not have a key, its index is displayed as its key:
+
+![No-Key](docs/nokey.png)
+
+### Primitives
+
+The associated values can be of one of the following primitive types:
+<p>
+<img align="left" src="docs/boolean.png" width=28/>
+Boolean, either <i>yes</i> or <i>no</i>
+</p>
+<p>
+<img align="left" src="docs/integer.png" width=28/>
+Integer, e.g. <i>124</i>
+</p>
+<p>
+<img align="left" src="docs/float.png" width=28/>
+Floating point number, e.g. <i>1.12</i>
+</p>
+<p>
+<img align="left" src="docs/text.png" width=28/>
+Text, e.g. <i>"Text value"</i>
+</p>
+<p>
+<img align="left" src="docs/game-value.png" width=28/>
+A game specific value, e.g. the relgion id <i>catholic</i> in eu4.
+While it looks like a normal Text value, the difference is
+that you can basically assign anything to a text value while
+you can only assign certain things to a game specific value without breaking the game
+</p>
+<p>
+<img align="left" src="docs/color.png" width=28/>
+Color
+</p>
+
+### Lists
+
+A value can also be a list of any of the primitive types of the ones listed above and would look like this:
+
+![List-Entry](docs/list-entry.png)
+
+You can expand the list contents by clicking on it.
+For any list, you can also use a preview feature to peek at its contents:
+<p>
+<img align="left" src="docs/preview.png" width=28/>
+A button that you can hover over to get a preview of the list contents in text form.
+</p>
+
+### Objects
+
+If entries of a list also have key names associated with them, they can be thought of as objects.
+A special type descriptor is then used to distinguish them from normal lists:
+<p>
+<img align="left" src="docs/complex.png" width=28/>
+Complex type, assigned if a list contains key-value pairs on its own, its type is described as complex
+</p>
+
+### Synthetic lists
+
+It is also possible that there are multiple entries with the same key name.
+In this case, they are automatically merged into a synthetic list entry:
+
+![Synthetic-Entry](docs/synthetic.png)
+
+They are called synthetic, because these entries do not actually exist like this in the savegame.
+In the case shown above, there actually exist 732 entries with the key `rebel_faction` instead.
+This merging is done for readability.
