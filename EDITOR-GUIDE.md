@@ -1,11 +1,17 @@
 
 ## Structure
 
-A savegame consists out of many entries, where each entry has a name,
+A savegame consists out of many entries, where each entry can have a name,
 also called the key, and an associated value.
-They are formatted as `<key name> = <value>` pairs and look like this:
+If an entry has a key name, it is formatted as `<key name> = <value>` and look like this:
 
 ![Entry](docs/data-entry.png)
+
+If an entry does not have a key, its index is displayed as its key:
+
+![No-Key](docs/nokey.png)
+
+### Primitives
 
 The associated values can be of one of the following primitive types:
 <p>
@@ -42,7 +48,7 @@ A value can also be a list of any type of the ones listed above and would look l
 
 ![List-Entry](docs/list-entry.png)
 
-You can open the list contents by clicking on it.
+You can expand the list contents by clicking on it.
 
 <p>
 <img align="left" src="docs/complex.png" width=28/>
@@ -54,8 +60,19 @@ Complex type, assigned if a list contains key-value pairs on its own, its type i
 A button that you can hover over to get a preview of the list contents in text form.
 </p>
 
-## aaa
+### Objects
 
+
+### Synthetic lists
+
+It is also possible that there are multiple entries with the same key name.
+In this case, they are automatically merged into a synthetic list entry:
+
+![Synthetic-Entry](docs/synthetic.png)
+
+They are called synthetic, because these entries do not actually exist like this in the savegame.
+In the case shown above, there actually exist 732 entries with the key `rebel_faction` instead.
+This merging is done for readability.
 
 
 ## Navigation
@@ -65,7 +82,6 @@ where you currently are in your savegame and also allows you go back up.
 It looks like this:
 
 ![Nav-Bar](docs/nav-bar.png)
-
 
 
 ## Filters

@@ -17,7 +17,8 @@ For every item of the list above, the Pdx-Unlimiter comes with a corresponding s
 You can find detailed information about that in the
 [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md).
 
-As a result, if you only play one campaign at a time and therefore do not switch between mod configurations,
+As a result, if you only play one campaign at a time,
+do not switch between mod configurations,
 do not make savegame backups to either savescum or protect against data loss,
 do not use any commonly used third party tools for Paradox games,
 and never edit your savegames to either experiment or do some multiplayer configuration changes,
@@ -26,18 +27,18 @@ then the Pdx-Unlimiter is not really useful to you!
 ### Is this a replacement for the Paradox Launcher?
 
 No, since it does not provide a user interface for enabling/disabling/installing
-mods or connecting your Paradox account. The primary focus lies on savegame management some other features.
+mods or connecting your Paradox account.
 
 
 ### What games are supported?
 
 - EU4: Full support
 - CK3: Full support
-- HOI4: Yes, but currently lacking a savegame information display like for EU4
-- Stellaris: Yes, but no mod integration since Stellaris savegames do not store mod information
+- HOI4: Yes, but currently lacking a savegame information display like for EU4 and CK3
+- Stellaris: Yes, but currently lacking a savegame information display like for EU4 and CK3
 
 Note that only installations using the Paradox Launcher are supported.
-I.e. old game versions do not work.
+I.e. very old game versions do not work.
 
 
 ### Can I use this in combination with other launchers?

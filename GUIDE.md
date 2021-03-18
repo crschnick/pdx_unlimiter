@@ -24,13 +24,14 @@ Afterwards, this guide will show you how to make the best use of all the functio
 ## Table of Contents
 
 - [Game Installation detection](#game-installations)
-- [Importing savegames](#savegame-storage)
+- [Importing savegames](#savegame-importing-and-storage)
 - [Managing campaigns and folders](#campaigns-and-folders)
 - [Managing savegames](#savegames)
 - [Launching savegames](#launching-savegames)
 - [Other things to do with savegames](#savegame-actions)
-- [How to savescum](#savescumming)
+- [How to savescum](#savegame-checkpoints-and-savescumming)
 - [Accessing the raw savegame files](#working-with-the-raw-savegame-files)
+- [Troubleshooting](#troubleshooting)
 
 
 ## Game Installations
@@ -39,9 +40,9 @@ Upon installation, you probably have a lot of savegames of different Paradox gam
 either saved in your documents directories or your Steam cloudsave directories.
 The Pdx-Unlimiter will try to automatically detect any of those game installation and save game directories.
 If any installation is not detected, you can set them manually in the settings menu.
-Note that only up-to-date installations of Paradox games with installed Paradox Launcher are supported!
+Note that only relatively up-to-date installations of Paradox games with the Paradox Launcher are supported!
 
-## Savegame storage
+## Savegame importing and storage
 
 The Pdx-Unlimiter has an internal savegame storage that is
 independent of these savegame directories of your installed games.
@@ -58,9 +59,9 @@ import any savegame that you want to manage.
 This separation means that changing or deleting a file from your savegame directory
 does not delete it from the Pdx-Unlimiter storage and vice-versa.
 
-In the settings menu you can change the storage location and
-enable the option `Delete on import` which specifies
-whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage.
+You can change the storage directory in the settings menu and
+also open it by clicking on `Storage` -> `Open storage directory` in the menu bar.
+
 
 ## Campaigns and folders
 
@@ -74,10 +75,10 @@ In addition to campaigns, you can also create folders by clicking on the **Add F
 shown in the picture.
 Next to it is a search bar that you can use to quickly find specific campaigns or savegames.
 A folder is meant to store various savegames that might belong to entirely different campaigns.
-An example is the **Melted Savegames** folder that stores any converted Ironman savegame.
+An example is the generated **Melted Savegames** folder that stores any converted Ironman savegame.
 
 The campaigns and folders are ordered by how recently a savegame
-of that campaign was directly launched from the Pdx-Unlimiter.
+of that campaign was launched from the Pdx-Unlimiter.
 
 The campaign name can be edited by clicking on it.
 You can also delete an entire campaign by clicking on the **Delete** button.
@@ -110,9 +111,13 @@ By clicking the **Export** button in the status bar,
 you can copy the savegame into the savegame directory of the current game.
 This will however not launch the game automatically.
 
-You can also launch the selected savegame directly by clicking the **Launch** button.
+You can also launch the selected savegame directly by clicking the **Continue Game** button.
 This direct launch will automatically attempt to enable every required mod and dlc.
 This will bypass the Paradox launcher and main menu, i.e. saving a lot of time.
+
+**Start Launcher** will start your active launcher, usually the Paradox Launcher,
+in which you can then click **Continue Game** to launch the selected savegame.
+This is useful, if you want to change your mod or dlc configurations.
 
 If some content is missing, or the game version is not compatible, a red status bar will be shown.
 You can still launch the savegame, but you will get a warning about which mod or dlc is missing.
@@ -167,7 +172,7 @@ For this to work, you first have to set your skanderbeg.pm <b>API key</b> in the
 Deletes the savegame.
 </p>
 
-## Savescumming
+## Savegame checkpoints and savescumming
 
 In case of any unfortunate ingame event that you want to revert,
 the Pdx-Unlimiter gives you the ability to savescum, i.e. reverting to a
@@ -176,11 +181,11 @@ While playing a supported game, a status bar that looks like will pop up:
 
 ![Running](docs/status-bar-running.png)
 
+### Shortcuts
 
 These previous savegame checkpoints can be created/imported while being ingame by
 clicking on **Import** button or pressing `CTRL+SHIFT+I`.
 This will import the latest savegame, shown in the center of the status bar.
-If the key combination is pressed, a confirmation sound will play
 
 By pressing either `CTRL+SHIFT+K` or **Kill** in the status bar,
 you can kill the currently running game without it having a chance to overwrite the latest savegame.
@@ -188,6 +193,19 @@ You can simply select your latest imported savegame in the Pdx-Unlimiter and lau
 
 If you just want to revert to the latest saved savegame, you can also use `CTRL+SHIFT+R`
 to combine these functions, i.e. import the latest savegame, kill the game process and launch it again.
+
+### Settings
+
+In the settings menu you can also enable time-based autoimports of savegames:
+- `Enabled timed imports` - Enables automatically importing the latest
+  savegame after a certain time has passed while playing.
+- `Timed imports interval` - The interval between automatic imports in minutes.
+
+
+If a key combination to import is pressed, a confirmation sound
+will play if the following option is enabled in the settings menu:
+- `Play sound on background import` - Play a beep sound when importing a savegame
+  while a game is open and the Pdx-Unlimiter is running in the background.
 
 ## Working with the raw savegame files
 
@@ -223,7 +241,8 @@ In case of any problems, you can do the following:
 
 - Use the automatic report functionality of the error reporter if it comes up
 - You can also open the issue reporter at 'Help' -> 'Report issue' in the menu bar
-- Alternatively, you can also open an issue on GitHub and describe the error in more detail
+- Alternatively, you can also open an issue on GitHub and describe the error
+  in more detail or visit the Pdx-Unlimiter Discord server
 - If the application does not even start, or you want to dig deeper into the error cause,
   you can find the different log files at `<documents directory>\Pdx-Unlimiter\logs`
   on Windows and `~/.local/share/.pdx-unlimiter/logs` on Linux.
