@@ -3,11 +3,8 @@
 The Pdx-Unlimiter is a tool for various Paradox games that provides a powerful savegame manager that allows
 you to organize, filter, and play all of your savegames with ease.
 Furthermore, it also comes with the ability to convert savegames to a non-ironman version,
-a powerful savegame and game data file editor, some savescumming tools, and integrations for various
-other great community-made tools like 
-[Rakaly](https://rakaly.com), [Skanderbeg](https://skanderbeg.pm) and the
-[CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
-Currently, the following games are supported:
+a powerful savegame and game data file editor, some savescumming tools, integrations for various
+other great community-made tools and full support for the following games:
 
 - Europa Universalis IV
 - Crusader Kings III
@@ -29,7 +26,7 @@ If you are facing these issues, click on "More info" and then "Run anyway".
 The main components of the Pdx-Unlimiter are:
 - [Savegame manager](#savegame-manager)
 - [Ironman converter](#ironman-converter)
-- [Savegame editor](#savegame-editor)
+- [Savegame editor and navigator](#savegame-editor-and-navigator)
 - [Savescumming tools](#savescumming-tools)
 - [Integrations for other Paradox tools](#third-party-tool-integration)
 
@@ -61,9 +58,10 @@ so that nothing can potentially corrupt your savegames.
 
 Usage guide: [Savegame management](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-storage)
 
-## Savegame editor
+## Savegame editor and navigator
 
-The Pdx-Unlimiter also comes with a savegame editor.
+The Pdx-Unlimiter also comes with a savegame editor,
+which can also be used as a savegame navigator to quickly find certain entries in a savegame.
 With this editor you can edit any file that is saved in a Paradox text format.
 This includes EU4 and CK3 non-ironman savegames, all Stellaris savegames, and
 any game data files for mods and other purposes.
@@ -102,7 +100,7 @@ ironman savegames into playable and editable non-ironman savegames.
 This is useful if you have ever encountered a situation in which you wanted to
 create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
 You can for example use the included ironman converter
-to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor).
+to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor-and-navigator).
 
 Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md)
 
@@ -134,6 +132,9 @@ The supported tools are:
   This means that you can interact with the converter from within the Pdx-Unlimiter
   and basically convert any managed savegame with just one click as well.
 
+- The [Irony Mod Manager](https://bcssov.github.io/IronyModManager/),
+  which can replace the mod-management capabilities of the Paradox-Launcher.
+
 Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md)
 
 ## Community and Support
@@ -147,14 +148,10 @@ You can also help the project by reporting issues, fixing bugs and making the pl
 
 ## Development
 
-To build this project, [JDK 15](https://openjdk.java.net/projects/jdk/15/) and gradle is required.
+To build this project, [JDK 16](https://openjdk.java.net/projects/jdk/16/) and gradle is required.
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
 For running, you can use `gradlew run`.
-
-To correctly run the Pdx-Unlimiter in a development environment,
-you can set the property `dataDir` in the `pdxu.properties` file to any directory such that your development
-environment does not interfere with your Pdx-Unlimiter installation data.
-If not set, the data directory of your Pdx-Unlimiter installation is used.
+You can use the generated file `pdxu.properties` to set some useful development options when needed.
 
 Any contribution is welcomed!
 There are no real formal contribution guidelines right now, they will maybe come later.
