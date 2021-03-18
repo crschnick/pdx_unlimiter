@@ -44,14 +44,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 topBar.setSpacing(5);
                 topBar.setAlignment(Pos.CENTER);
                 topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
-                var name = new Label(info.getPlayerName() + " of " + info.getTag().getPrimaryTitle().getName());
-                name.getStyleClass().add("ruler-name");
-                topBar.getChildren().add(name);
-
                 int age = GameDate.yearsBetween(ruler.getBirth(), info.getDate());
-                var al = new Label(", " + age);
-                al.getStyleClass().add("ruler-name");
-                topBar.getChildren().add(al);
+                var title = new Label(info.getPlayerName() + " of " + info.getTag().getPrimaryTitle().getName() + ", " + age);
+                title.getStyleClass().add("ruler-name");
+                topBar.getChildren().add(title);
 
                 box.getChildren().add(topBar);
             }

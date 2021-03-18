@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
@@ -32,7 +33,7 @@ public class GuiSavegameCollection {
     public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
             SavegameCollection<T, I> c) {
         HBox btn = new HBox();
-        btn.setOnMouseClicked((m) -> SavegameManagerState.<T, I>get().selectCollection(c));
+        btn.setOnMouseClicked((m) -> ComponentManager.selectCollection(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 

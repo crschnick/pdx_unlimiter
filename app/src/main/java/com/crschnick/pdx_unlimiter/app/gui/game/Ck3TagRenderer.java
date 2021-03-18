@@ -264,7 +264,7 @@ public class Ck3TagRenderer {
         private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
 
         public ColorCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN);
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
         }
     }
 }

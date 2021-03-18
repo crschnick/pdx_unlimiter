@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
+import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
@@ -20,7 +21,7 @@ public class GuiGameSwitcher {
 
         HBox games = new HBox();
         for (var game : Game.values()) {
-            if (GameInstallation.ALL.get(game) == null) {
+            if (!game.isEnabled()) {
                 continue;
             }
 
@@ -31,8 +32,7 @@ public class GuiGameSwitcher {
 
             GuiTooltips.install(icon, game.getFullName());
             icon.setOnMouseClicked(e -> {
-                SavegameManagerState.get().selectGame(game);
-                SavedState.getInstance().setActiveGame(game);
+                ComponentManager.switchGame(game);
                 alert.setResult(ButtonType.CLOSE);
             });
 

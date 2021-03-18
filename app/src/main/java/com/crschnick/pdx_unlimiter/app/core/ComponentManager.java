@@ -5,11 +5,14 @@ import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.editor.EditorExternalState;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
@@ -57,6 +60,17 @@ public class ComponentManager {
 
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
+    }
+
+    public static void switchGame(Game game) {
+        CacheManager.getInstance().onSelectedGameChange();
+        SavegameManagerState.get().selectGame(game);
+        SavedState.getInstance().setActiveGame(game);
+    }
+
+    public static <T, I extends SavegameInfo<T>> void selectCollection(SavegameCollection<T,I> col) {
+        CacheManager.getInstance().onSelectedSavegameCollectionChange();
+        SavegameManagerState.<T,I>get().selectCollection(col);
     }
 
     public static void reloadSettings(Runnable settingsUpdater) {

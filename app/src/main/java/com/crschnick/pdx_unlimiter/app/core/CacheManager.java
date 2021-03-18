@@ -26,29 +26,33 @@ public class CacheManager {
         return INSTANCE;
     }
 
-    public void onGameChange() {
+    public void onSelectedGameChange() {
         logger.debug("Clearing game caches");
         caches.clear();
     }
 
-    public void onSavegameCollectionChange() {
+    public void onSelectedSavegameCollectionChange() {
         logger.debug("Clearing savegame collection caches");
-        caches.entrySet().removeIf(e -> !e.getValue().scope.equals(Scope.GAME));
-    }
-
-    public void onSavegameLoad() {
-        if (SavegameManagerState.get().globalSelectedCollectionProperty().get() instanceof SavegameFolder) {
-            logger.debug("Clearing savegame collection caches");
-            caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN));
-        }
-        logger.debug("Clearing savegame caches");
-        caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME));
+        caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN_SPECIFIC));
     }
 
     @SuppressWarnings("unchecked")
     public <T extends Cache> T get(Class<T> clazz) {
+        var sc = SavegameManagerState.get().globalSelectedCollectionProperty().get();
+
         try {
-            return (T) caches.getOrDefault(clazz, (Cache) clazz.getConstructors()[0].newInstance());
+            // No caching when using savegame folders!
+            if (sc instanceof SavegameFolder) {
+                return (T) clazz.getConstructors()[0].newInstance();
+            }
+
+            if (caches.containsKey(clazz)) {
+                return (T) caches.get(clazz);
+            } else {
+                var cache = (T) clazz.getConstructors()[0].newInstance();
+                caches.put(clazz, cache);
+                return cache;
+            }
         } catch (Exception e) {
             ErrorHandler.handleException(e);
             return null;
@@ -56,9 +60,8 @@ public class CacheManager {
     }
 
     public enum Scope {
-        SAVEGAME,
-        SAVEGAME_CAMPAIGN,
-        GAME
+        SAVEGAME_CAMPAIGN_SPECIFIC,
+        GAME_SPECIFIC
     }
 
     public static class Cache {
