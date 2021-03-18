@@ -40,67 +40,65 @@ public class PdxuApp extends Application {
     }
 
     public void setupWindowState() {
-        Platform.runLater(() -> {
-            var w = stage;
-            var s = SavedState.getInstance();
+        var w = stage;
+        var s = SavedState.getInstance();
 
-            boolean inBounds = false;
-            for (Screen screen : Screen.getScreens()) {
-                Rectangle2D visualBounds = screen.getVisualBounds();
-                // Check whether the bounds intersect where the intersection is larger than 20 pixels!
-                if (visualBounds.intersects(new Rectangle2D(
-                        s.getWindowX() + 20,
-                        s.getWindowY() + 20,
-                        s.getWindowWidth() - 40,
-                        s.getWindowHeight() - 40))) {
-                    inBounds = true;
-                    break;
-                }
+        boolean inBounds = false;
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D visualBounds = screen.getVisualBounds();
+            // Check whether the bounds intersect where the intersection is larger than 20 pixels!
+            if (visualBounds.intersects(new Rectangle2D(
+                    s.getWindowX() + 20,
+                    s.getWindowY() + 20,
+                    s.getWindowWidth() - 40,
+                    s.getWindowHeight() - 40))) {
+                inBounds = true;
+                break;
             }
-            if (inBounds) {
-                if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
-                if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
-                if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
-                if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
-                if (s.isMaximized()) w.setMaximized(true);
-            } else {
-                logger.warn("Saved window was out of bounds");
+        }
+        if (inBounds) {
+            if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
+            if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
+            if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
+            if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
+            if (s.isMaximized()) w.setMaximized(true);
+        } else {
+            logger.warn("Saved window was out of bounds");
+        }
+
+        stage.xProperty().addListener((c, o, n) -> {
+            if (windowActive) {
+                logger.debug("Changing window x to " + n.intValue());
+                s.setWindowX(n.intValue());
             }
-
-            stage.xProperty().addListener((c, o, n) -> {
-                if (windowActive) {
-                    logger.debug("Changing window x to " + n.intValue());
-                    s.setWindowX(n.intValue());
-                }
-            });
-            stage.yProperty().addListener((c, o, n) -> {
-                if (windowActive) {
-                    logger.debug("Changing window y to " + n.intValue());
-                    s.setWindowY(n.intValue());
-                }
-            });
-            stage.widthProperty().addListener((c, o, n) -> {
-                if (windowActive) {
-                    logger.debug("Changing window width to " + n.intValue());
-                    s.setWindowWidth(n.intValue());
-                }
-            });
-            stage.heightProperty().addListener((c, o, n) -> {
-                if (windowActive) {
-                    logger.debug("Changing window height to " + n.intValue());
-                    s.setWindowHeight(n.intValue());
-                }
-            });
-            w.maximizedProperty().addListener((c, o, n) -> {
-                if (windowActive) {
-                    logger.debug("Changing window maximized to " + n);
-                    s.setMaximized(n);
-                }
-            });
-
-            w.show();
-            windowActive = true;
         });
+        stage.yProperty().addListener((c, o, n) -> {
+            if (windowActive) {
+                logger.debug("Changing window y to " + n.intValue());
+                s.setWindowY(n.intValue());
+            }
+        });
+        stage.widthProperty().addListener((c, o, n) -> {
+            if (windowActive) {
+                logger.debug("Changing window width to " + n.intValue());
+                s.setWindowWidth(n.intValue());
+            }
+        });
+        stage.heightProperty().addListener((c, o, n) -> {
+            if (windowActive) {
+                logger.debug("Changing window height to " + n.intValue());
+                s.setWindowHeight(n.intValue());
+            }
+        });
+        w.maximizedProperty().addListener((c, o, n) -> {
+            if (windowActive) {
+                logger.debug("Changing window maximized to " + n);
+                s.setMaximized(n);
+            }
+        });
+
+        w.show();
+        windowActive = true;
     }
 
     public void setupBasicWindowContent() {
