@@ -45,11 +45,6 @@ public class GuiLayout {
 
         stack = new StackPane(new Pane(), layout, loadingBg);
 
-        // Set font size
-        layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
-        // Disable focus on startup
-        layout.requestFocus();
-
         setupDragAndDrop();
 
         fillLayout();
@@ -128,6 +123,12 @@ public class GuiLayout {
             setGameLookAndFeel(n);
         });
 
+        Platform.runLater(() -> {
+            // Set font size
+            layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
+            // Disable focus on startup
+            layout.requestFocus();
+        });
     }
 
     public Region getContent() {

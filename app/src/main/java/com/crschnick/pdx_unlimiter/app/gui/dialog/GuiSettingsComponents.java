@@ -74,7 +74,7 @@ public class GuiSettingsComponents {
     private static Region integerEntryNode(SettingsEntry.IntegerEntry ie, Set<Runnable> applyFuncs) {
         JFXSlider slider = new JFXSlider(ie.getMin(), ie.getMax(), ie.getValue());
         applyFuncs.add(() -> {
-            ie.set((int) slider.getValue());
+            ie.set((int) Math.round(slider.getValue()));
         });
         return slider;
     }
