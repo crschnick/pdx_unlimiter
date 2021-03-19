@@ -11,6 +11,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -18,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,10 +46,6 @@ public class GuiLayout {
         loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
 
         stack = new StackPane(new Pane(), layout, loadingBg);
-
-        setupDragAndDrop();
-
-        fillLayout();
     }
 
     private void fillLayout() {
@@ -128,6 +126,14 @@ public class GuiLayout {
             layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
             // Disable focus on startup
             layout.requestFocus();
+
+            fillLayout();
+            setupDragAndDrop();
+
+            FadeTransition ft = new FadeTransition(Duration.millis(1000), stack);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            ft.play();
         });
     }
 
