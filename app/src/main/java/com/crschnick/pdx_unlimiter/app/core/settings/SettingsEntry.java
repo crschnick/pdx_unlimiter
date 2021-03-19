@@ -215,8 +215,7 @@ public abstract class SettingsEntry<T> {
                 this.disabled = true;
                 this.value.set(null);
             } else {
-                this.disabled = false;
-                this.value.set(Path.of(node.textValue()));
+                this.set(Path.of(node.textValue()));
             }
         }
 
@@ -287,10 +286,10 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class StorageDirectory extends DirectoryEntry {
+    public static class StorageDirectory extends SettingsEntry<Path> {
 
         public StorageDirectory(String id, String serializationName) {
-            super(id, serializationName);
+            super(id, serializationName, Type.PATH);
         }
 
         private boolean showConfirmationDialog(String old, String newDir) {
@@ -299,6 +298,16 @@ public abstract class SettingsEntry<T> {
                 a.setTitle(PdxuI18n.get("STORAGE_DIR_DIALOG_TITLE"));
                 a.setHeaderText(PdxuI18n.get("STORAGE_DIR_DIALOG_TEXT", old, newDir));
             }).map(t -> t.getButtonData().isDefaultButton()).orElse(false);
+        }
+
+        @Override
+        public void set(JsonNode node) {
+            this.value.set(Path.of(node.textValue()));
+        }
+
+        @Override
+        public JsonNode toNode() {
+            return new TextNode(this.value.get().toString());
         }
 
         @Override

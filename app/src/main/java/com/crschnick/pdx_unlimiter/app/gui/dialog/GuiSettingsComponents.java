@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class GuiSettingsComponents {
 
-    private static Region pathEntryNode(SettingsEntry.DirectoryEntry de, Set<Runnable> applyFuncs) {
+    private static Region pathEntryNode(SettingsEntry<Path> de, Set<Runnable> applyFuncs) {
         TextField textArea = new TextField();
         EventHandler<MouseEvent> eh = (m) -> {
             DirectoryChooser dirChooser = new DirectoryChooser();
@@ -103,7 +103,7 @@ public class GuiSettingsComponents {
 
             Region val;
             if (entry.getType().equals(SettingsEntry.Type.PATH)) {
-                val = pathEntryNode((SettingsEntry.DirectoryEntry) entry, applyFuncs);
+                val = pathEntryNode((SettingsEntry<Path>) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.BOOLEAN)) {
                 val = booleanEntryNode((SettingsEntry.BooleanEntry) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.INTEGER)) {
