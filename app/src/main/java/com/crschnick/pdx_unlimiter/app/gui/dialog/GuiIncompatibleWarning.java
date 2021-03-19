@@ -18,7 +18,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createA
 public class GuiIncompatibleWarning {
 
     public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {
-        StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n\n");
+        StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n");
         if (!SavegameActions.isVersionCompatible(entry.getInfo())) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
@@ -44,7 +44,7 @@ public class GuiIncompatibleWarning {
                 .map(m -> installation.getDlcForName(m))
                 .anyMatch(Optional::isEmpty);
         if (missingDlc) {
-            builder.append("\nThe following DLCs are missing:\n").append(entry.getInfo().getDlcs().stream()
+            builder.append("\n\nThe following DLCs are missing:\n").append(entry.getInfo().getDlcs().stream()
                     .map(s -> {
                         var m = installation.getDlcForName(s);
                         return (m.isPresent() ? null : "- " + s);

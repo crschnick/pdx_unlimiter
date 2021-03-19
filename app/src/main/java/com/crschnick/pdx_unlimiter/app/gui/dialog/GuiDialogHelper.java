@@ -67,7 +67,7 @@ public class GuiDialogHelper {
         // In case settings are not loaded yet
         if (Settings.getInstance() != null) {
             alert.getDialogPane().styleProperty().setValue(
-                    "-fx-font-size: " + (Settings.getInstance().fontSize.getValue() - 2) + "pt;");
+                    "-fx-font-size: " + (Settings.getInstance().fontSize.getValue() - 3) + "pt;");
         }
         setIcon(alert);
         GuiStyle.addStylesheets(alert.getDialogPane().getScene());
