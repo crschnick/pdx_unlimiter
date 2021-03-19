@@ -152,7 +152,8 @@ public abstract class SavegameStorage<
                     String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
                     GameDate date = dateType.fromString(entryNode.required("date").textValue());
                     String checksum = entryNode.required("checksum").textValue();
-                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date));
+                    SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
+                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Could not load campaign config of " + collection.getName(), null);
@@ -173,7 +174,8 @@ public abstract class SavegameStorage<
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
-                            .put("uuid", entry.getUuid().toString()))
+                            .put("uuid", entry.getUuid().toString())
+                            .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
             ConfigHelper.writeConfig(getSavegameDataDirectory()
@@ -205,7 +207,8 @@ public abstract class SavegameStorage<
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
-                            .put("uuid", entry.getUuid().toString()))
+                            .put("uuid", entry.getUuid().toString())
+                            .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
             ConfigHelper.writeConfig(getSavegameDataDirectory()
@@ -249,7 +252,8 @@ public abstract class SavegameStorage<
                 // directly after importing. It can be loaded later
                 null,
                 checksum,
-                info.getDate());
+                info.getDate(),
+                SavegameNotes.empty());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
@@ -275,7 +279,8 @@ public abstract class SavegameStorage<
                 entryUuid,
                 null,
                 checksum,
-                info.getDate());
+                info.getDate(),
+                SavegameNotes.empty());
         logger.debug("Adding new entry " + e.getName());
         col.getSavegames().add(e);
         col.onSavegamesChange();

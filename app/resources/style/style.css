@@ -1,3 +1,7 @@
+.savegame-notes * {
+-fx-spacing: 0.75em;
+}
+
 .entry {
 -fx-background-color: #AAAAAA55;
 }

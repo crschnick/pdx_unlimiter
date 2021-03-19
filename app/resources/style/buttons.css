@@ -38,6 +38,10 @@
     -fx-icon-code: "mdi-tooltip-outline";
 }
 
+.notes-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-tooltip-outline";
+}
+
 .case-sensitive-button .ikonli-font-icon {
     -fx-icon-code: "mdi-case-sensitive-alt";
 }

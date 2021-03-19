@@ -18,15 +18,17 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final boolean persistent;
     private final GameDate date;
     private String sourceFileChecksum;
+    private final SavegameNotes notes;
 
     public SavegameEntry(String name, UUID uuid, I info,
-                         String contentChecksum, GameDate date) {
+                         String contentChecksum, GameDate date, SavegameNotes notes) {
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
         this.info = new SimpleObjectProperty<>(info);
         this.persistent = true;
         this.date = date;
+        this.notes = notes;
     }
 
     @Override
@@ -64,5 +66,13 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
 
     public GameDate getDate() {
         return date;
+    }
+
+    public String getSourceFileChecksum() {
+        return sourceFileChecksum;
+    }
+
+    public SavegameNotes getNotes() {
+        return notes;
     }
 }
