@@ -33,11 +33,12 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
     private static Region createRulerLabel(Eu4SavegameInfo.Ruler ruler, boolean isRuler) {
         VBox box = new VBox();
-        if (isRuler) {
-            box.getChildren().add(new Label(ruler.getName(), imageNode(EU4_ICON_RULER, CLASS_RULER_ICON)));
-        } else {
-            box.getChildren().add(new Label(ruler.getName(), imageNode(EU4_ICON_HEIR, CLASS_RULER_ICON)));
-        }
+        var img = isRuler ? EU4_ICON_RULER : EU4_ICON_HEIR;
+
+        var hb = new HBox(imageNode(img, CLASS_RULER_ICON), new Label(ruler.getName()));
+        hb.setAlignment(Pos.CENTER);
+        hb.setSpacing(5);
+        box.getChildren().add(hb);
 
         box.alignmentProperty().set(Pos.CENTER);
         box.getChildren().add(createRulerStatsNode(ruler));
@@ -86,7 +87,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.setAlignment(Pos.CENTER);
         box.getChildren().add(icon);
         for (Eu4Tag tag : tags) {
-            Node n = GameImage.imageNode(eu4TagNode(info, tag), CLASS_TAG_ICON);
+            Node n = GameImage.imageNode(Eu4TagRenderer.smallShieldImage(info, tag), CLASS_TAG_ICON);
             box.getChildren().add(n);
         }
         box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
@@ -98,7 +99,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
-        return eu4TagNode(GameImage.getEu4TagPath(tag.getTag()), info);
+        return Eu4TagRenderer.shieldImage(info, tag);
     }
 
     @Override
@@ -186,24 +187,5 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
                 "Under personal union with ", "no country", CLASS_VASSAL);
 
         super.fillNodeContainer(i, grid);
-    }
-
-    private Image eu4TagNode(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
-        return CacheManager.getInstance().get(Eu4TagImageCache.class).tagImages.computeIfAbsent(
-                tag.getTag(), s -> eu4TagNode(GameImage.getEu4TagPath(s), info));
-    }
-
-    private Image eu4TagNode(Path path, SavegameInfo<Eu4Tag> info) {
-        var in = CascadeDirectoryHelper.openFile(
-                path, info, GameInstallation.ALL.get(Game.EU4));
-        return ImageLoader.loadImage(in.orElse(null), null);
-    }
-
-    public static class Eu4TagImageCache extends CacheManager.Cache {
-        Map<String, Image> tagImages = new HashMap<>();
-
-        public Eu4TagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
-        }
     }
 }
