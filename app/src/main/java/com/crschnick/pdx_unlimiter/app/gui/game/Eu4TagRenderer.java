@@ -4,12 +4,14 @@ import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,8 +24,31 @@ public class Eu4TagRenderer {
     private static final int SMALL_IMG_SIZE = 60;
     private static final int IMG_SIZE = 256;
 
+    private static BufferedImage createBasicFlagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+        if (tag.getType() == Eu4Tag.FlagType.NORMAL) {
+            return ImageLoader.fromFXImage(eu4TagImage(info, tag));
+        } else if (tag.getType() == Eu4Tag.FlagType.COLONIAL_FLAG) {
+            var ov = Eu4Tag.getTag(info.getAllTags(), tag.getColonialData().getOverlord());
+            BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, ov));
+            Graphics g = flagImage.getGraphics();
+
+            java.awt.Color awtColor = ColorHelper.awtColorFromInt(tag.getCountryColor(), 0xFF);
+            g.setColor(awtColor);
+            g.fillRect(flagImage.getWidth() / 2, 0, flagImage.getWidth() / 2, flagImage.getWidth());
+            return flagImage;
+        } else {
+            BufferedImage flagImage = new BufferedImage(SMALL_IMG_SIZE, SMALL_IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = flagImage.getGraphics();
+
+            var custom = tag.getCustomData();
+            var cache = CacheManager.getInstance().get(Eu4CustomFlagCache.class);
+            cache.renderTexture(flagImage, custom.getFlagId(), custom.getFlagColors());
+            return flagImage;
+        }
+    }
+
     public static Image smallShieldImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
-        BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, tag));
+        BufferedImage flagImage = createBasicFlagImage(info, tag);
         applyMask(flagImage, GameImage.EU4_SMALL_SHIELD_MASK);
 
         BufferedImage i = new BufferedImage(SMALL_IMG_SIZE, SMALL_IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -49,7 +74,7 @@ public class Eu4TagRenderer {
     }
 
     public static Image shieldImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
-        BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, tag));
+        BufferedImage flagImage = createBasicFlagImage(info, tag);
         applyMask(flagImage, GameImage.EU4_SHIELD_MASK);
 
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);

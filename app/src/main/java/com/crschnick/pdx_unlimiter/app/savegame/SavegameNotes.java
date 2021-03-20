@@ -28,6 +28,10 @@ public final class SavegameNotes {
     }
 
     public static SavegameNotes fromNode(JsonNode node) {
+        if (node == null) {
+            return empty();
+        }
+
         var text = Optional.ofNullable(node.get("text")).map(JsonNode::asText).orElse("");
         var b = Optional.ofNullable(node.get("remindMe")).map(JsonNode::asBoolean).orElse(false);
         return new SavegameNotes(text, b);

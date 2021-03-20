@@ -35,6 +35,14 @@ public class ColorHelper {
         return (color & 0xFF000000) >>> 24;
     }
 
+    public static java.awt.Color awtColorFromInt(int c, int alpha) {
+        Color fx = ColorHelper.colorFromInt(c, alpha);
+        return new java.awt.Color((float) fx.getRed(),
+                (float) fx.getGreen(),
+                (float) fx.getBlue(),
+                (float) fx.getOpacity());
+    }
+
     public static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
         return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
     }

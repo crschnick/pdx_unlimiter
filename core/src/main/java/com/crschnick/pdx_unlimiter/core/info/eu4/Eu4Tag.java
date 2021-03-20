@@ -5,10 +5,11 @@ import com.crschnick.pdx_unlimiter.core.node.Node;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class Eu4Tag {
 
-    private static final Pattern CUSTOM_FLAG_TAG_PATTERN = Pattern.compile("\\w\\d\\d");
+    private static final Pattern COLONIAL_FLAG_TAG_PATTERN = Pattern.compile("C\\d\\d");
 
     public static enum FlagType {
         NORMAL,
@@ -16,19 +17,13 @@ public final class Eu4Tag {
         CUSTOM_FLAG
     }
 
-    public static class ColonialData {
-        private String name;
+    public static class ColonialFlagData {
         private String overlord;
 
-        public ColonialData() {}
+        public ColonialFlagData() {}
 
-        public ColonialData(String name, String overlord) {
-            this.name = name;
+        public ColonialFlagData(String overlord) {
             this.overlord = overlord;
-        }
-
-        public String getName() {
-            return name;
         }
 
         public String getOverlord() {
@@ -36,24 +31,36 @@ public final class Eu4Tag {
         }
     }
 
-    public static class CustonNationData {
-        private String name;
-        private int points;
+    public static class CustomFlagData {
+        private int flagId;
+        private int colorId;
+        private int symbolId;
+        private List<Integer> flagColors;
 
-        public CustonNationData() {
+        public CustomFlagData() {
         }
 
-        public CustonNationData(String name, int points) {
-            this.name = name;
-            this.points = points;
+        public CustomFlagData(int flagId, int colorId, int symbolId, List<Integer> flagColors) {
+            this.flagId = flagId;
+            this.colorId = colorId;
+            this.symbolId = symbolId;
+            this.flagColors = flagColors;
         }
 
-        public String getName() {
-            return name;
+        public int getFlagId() {
+            return flagId;
         }
 
-        public int getPoints() {
-            return points;
+        public int getColorId() {
+            return colorId;
+        }
+
+        public int getSymbolId() {
+            return symbolId;
+        }
+
+        public List<Integer> getFlagColors() {
+            return flagColors;
         }
     }
 
@@ -62,18 +69,20 @@ public final class Eu4Tag {
     private int mapColor;
     private int countryColor;
     private String name;
-    private Object data;
+    private ColonialFlagData colonialFlagData;
+    private CustomFlagData customFlagData;
 
     public Eu4Tag() {
     }
 
-    public Eu4Tag(FlagType flagType, String tag, int mapColor, int countryColor, String name, Object data) {
+    public Eu4Tag(FlagType flagType, String tag, int mapColor, int countryColor, String name, ColonialFlagData colonialFlagData, CustomFlagData customFlagData) {
         this.flagType = flagType;
         this.tag = tag;
         this.mapColor = mapColor;
         this.countryColor = countryColor;
         this.name = name;
-        this.data = data;
+        this.colonialFlagData = colonialFlagData;
+        this.customFlagData = customFlagData;
     }
 
     public static Eu4Tag fromNode(String tag, Node n) {
@@ -85,24 +94,28 @@ public final class Eu4Tag {
                 n.getNodeForKey("name").getString() : null;
 
         FlagType t;
-        Object data;
-        if (n.hasKey("colonial_parent")) {
+        ColonialFlagData colonialFlagData = null;
+        CustomFlagData customFlagData = null;
+        if (COLONIAL_FLAG_TAG_PATTERN.matcher(tag).matches() && n.hasKey("colonial_parent")) {
             t = FlagType.COLONIAL_FLAG;
-            data = new ColonialData(
-                    n.getNodeForKey("name").getString(),
+            colonialFlagData = new ColonialFlagData(
                     n.getNodeForKey("colonial_parent").getString());
 
-        } else if(CUSTOM_FLAG_TAG_PATTERN.matcher(tag).matches()) {
+        } else if(n.getNodeForKey("colors").hasKey("custom_colors")) {
             t = FlagType.CUSTOM_FLAG;
-            data = new CustonNationData(
-                    n.getNodeForKey("name").getString(),
-                    n.getNodeForKey("custom_nation_points").getInteger());
+            var col = n.getNodeForKey("colors").getNodeForKey("custom_colors");
+            customFlagData = new CustomFlagData(
+                    col.getNodeForKey("flag").getInteger(),
+                    col.getNodeForKey("color").getInteger(),
+                    col.getNodeForKey("symbol_index").getInteger(),
+                    col.getNodeForKey("flag_colors").getNodeArray().stream()
+                            .map(Node::getInteger)
+                            .collect(Collectors.toList()));
         } else {
             t = FlagType.NORMAL;
-            data = null;
         }
 
-        return new Eu4Tag(t, tag, mColor, cColor, name, data);
+        return new Eu4Tag(t, tag, mColor, cColor, name, colonialFlagData, customFlagData);
     }
 
     public static Eu4Tag getTag(Set<Eu4Tag> tags, String name) {
@@ -137,7 +150,11 @@ public final class Eu4Tag {
         return flagType;
     }
 
-    public Object getData() {
-        return data;
+    public ColonialFlagData getColonialData() {
+        return colonialFlagData;
+    }
+
+    public CustomFlagData getCustomData() {
+        return customFlagData;
     }
 }
