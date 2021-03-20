@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.core.settings;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
@@ -186,31 +185,22 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static abstract class DirectoryEntry extends SettingsEntry<Path> {
+    public static abstract class FailablePathEntry extends SettingsEntry<Path> {
 
         protected boolean disabled;
 
-        public DirectoryEntry(String id, String serializationName) {
+        public FailablePathEntry(String id, String serializationName) {
             super(id, serializationName, Type.PATH);
             this.disabled = false;
         }
 
-        public DirectoryEntry(Supplier<String> name, Supplier<String> description, String serializationName) {
+        public FailablePathEntry(Supplier<String> name, Supplier<String> description, String serializationName) {
             super(name, description, serializationName, Type.PATH);
             this.disabled = false;
         }
 
         @Override
-        public void set(Path newPath) {
-            if (disabled && newPath != null) {
-                disabled = false;
-            }
-
-            this.value.set(newPath);
-        }
-
-        @Override
-        public void set(JsonNode node) {
+        public final void set(JsonNode node) {
             if (node.isNull()) {
                 this.disabled = true;
                 this.value.set(null);
@@ -220,7 +210,7 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public JsonNode toNode() {
+        public final JsonNode toNode() {
             if (disabled) {
                 return NullNode.getInstance();
             } else if (value.isNull().get()) {
@@ -231,7 +221,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class GameDirectory extends DirectoryEntry {
+    public static class GameDirectory extends FailablePathEntry {
 
         private final Game game;
         private final Class<? extends GameInstallation> installClass;
@@ -341,7 +331,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class ThirdPartyDirectory extends DirectoryEntry {
+    public static class ThirdPartyDirectory extends FailablePathEntry {
 
         private final Path checkFile;
         private final Supplier<Path> defaultValue;
