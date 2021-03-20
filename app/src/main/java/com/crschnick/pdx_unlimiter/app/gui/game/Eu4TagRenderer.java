@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Eu4TagRenderer {
 
-    private static final int SMALL_IMG_SIZE = 60;
+    private static final int SMALL_IMG_SIZE = 64;
     private static final int IMG_SIZE = 256;
 
     private static BufferedImage createBasicFlagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
@@ -37,12 +37,10 @@ public class Eu4TagRenderer {
             g.fillRect(flagImage.getWidth() / 2, 0, flagImage.getWidth() / 2, flagImage.getWidth());
             return flagImage;
         } else {
-            BufferedImage flagImage = new BufferedImage(SMALL_IMG_SIZE, SMALL_IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-            Graphics g = flagImage.getGraphics();
-
+            BufferedImage flagImage = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
             var custom = tag.getCustomData();
             var cache = CacheManager.getInstance().get(Eu4CustomFlagCache.class);
-            cache.renderTexture(flagImage, custom.getFlagId(), custom.getFlagColors());
+            cache.renderTexture(flagImage, custom.getFlagId(), custom.getFlagColors(), custom.getSymbolId());
             return flagImage;
         }
     }
@@ -84,14 +82,14 @@ public class Eu4TagRenderer {
                 32,
                 42,
                 i.getWidth() - 64,
-                i.getHeight() - 56,
+                i.getHeight() - 64,
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
         g.drawImage(ImageLoader.fromFXImage(GameImage.EU4_SHIELD_FRAME),
-                -20,
+                -25,
                 0,
-                i.getWidth() + 40,
+                i.getWidth() + 50,
                 i.getHeight() + 20,
                 new java.awt.Color(0, 0, 0, 0),
                 null);

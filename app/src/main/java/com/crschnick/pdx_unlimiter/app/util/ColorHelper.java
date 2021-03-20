@@ -19,6 +19,20 @@ import java.util.Map;
 
 public class ColorHelper {
 
+    public static int pickClosestColor(int input, int... colors) {
+        int minDist = Integer.MAX_VALUE;
+        int cMin = -1;
+        int counter = 0;
+        for (int c : colors) {
+            if (Math.abs(input - c) < minDist) {
+                minDist = Math.abs(input - c);
+                cMin = counter;
+            }
+            counter++;
+        }
+        return cMin;
+    }
+
     public static int getRed(int color) {
         return (color & 0x00FF0000) >>> 16;
     }

@@ -19,10 +19,12 @@ import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.getBlue;
 
 public class Eu4CustomFlagCache extends CacheManager.Cache {
 
+    private static final int EMBLEM_SIZE = 64;
+    private static final int EMBLEM_WIDTH = 32;
     private static final int PATTERN_SIZE = 128;
 
-    private static final int PATTERN_COLOR_1 = 0xFFFF0000;
     private static final int PATTERN_COLOR_2 = 0xFF00FF00;
+    private static final int PATTERN_COLOR_1 = 0xFFFF0000;
     private static final int PATTERN_COLOR_3 = 0xFF0000FF;
 
     record Texture(BufferedImage img, int x, int y, int frames, int colors) {
@@ -32,11 +34,15 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
     private List<Integer> colors = new ArrayList<>();
     private List<Integer> flagColors = new ArrayList<>();
     private List<Texture> textures = new ArrayList<>();
+    private BufferedImage emblems;
 
     public Eu4CustomFlagCache() {
         super(CacheManager.Scope.GAME_SPECIFIC);
 
         try {
+            emblems = ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getPath().resolve("gfx")
+                    .resolve("interface").resolve("client_state_symbols_large.dds"), null);
+
             var colorsFile = GameInstallation.ALL.get(Game.EU4).getPath().resolve("common")
                     .resolve("custom_country_colors").resolve("00_custom_country_colors.txt");
             var content = TextFormatParser.textFileParser().parse(colorsFile);
@@ -90,21 +96,10 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
         return ColorHelper.awtColorFromInt(flagColors.get(index), 0xFF);
     }
 
-    public void renderTexture(BufferedImage img, int flagIndex, List<Integer> flagColors) {
+    public void renderTexture(BufferedImage img, int flagIndex, List<Integer> flagColors, int emblemIndex) {
         Function<Integer, Color> patternFunction = (Integer rgb) -> {
-            if (rgb == PATTERN_COLOR_1) {
-                return getColor(flagColors.get(0));
-            }
-
-            if (rgb == PATTERN_COLOR_2) {
-                return getColor(flagColors.get(1));
-            }
-
-            if (rgb == PATTERN_COLOR_3) {
-                return getColor(flagColors.get(2));
-            }
-
-            return new Color(0, 0, 0, 0);
+            int id = ColorHelper.pickClosestColor(rgb, PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
+            return getFlagColor(flagColors.get(id));
         };
 
         int current = 0;
@@ -131,9 +126,36 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
                     }
                 }
 
-                return;
+                break;
             }
             current += tex.frames;
         }
+
+        renderEmblem(img, emblemIndex);
+    }
+
+    public void renderEmblem(BufferedImage img, int index) {
+        int xOff = index % EMBLEM_WIDTH;
+        int yOff = index / EMBLEM_WIDTH;
+
+        BufferedImage i = new BufferedImage(EMBLEM_SIZE, EMBLEM_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = i.getGraphics();
+        g.drawImage(
+                emblems,
+                -xOff * EMBLEM_SIZE,
+                -yOff * EMBLEM_SIZE,
+                emblems.getWidth(),
+                emblems.getHeight(),
+                new Color(0, 0, 0, 0),
+                null);
+
+        img.getGraphics().drawImage(
+                i,
+                (int) (0.2 * img.getWidth()),
+                (int) (0.2 * img.getWidth()),
+                (int) (0.6 * img.getWidth()),
+                (int) (0.6 * img.getHeight()),
+                new Color(0, 0, 0, 0),
+                null);
     }
 }
