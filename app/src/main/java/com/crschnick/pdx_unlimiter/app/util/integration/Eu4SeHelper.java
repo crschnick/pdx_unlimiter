@@ -91,6 +91,7 @@ public class Eu4SeHelper {
                 }
             }
 
+            @SuppressWarnings("unchecked")
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;
             String saveFile = "save_file=" + SavegameStorage.ALL.get(Game.EU4).getSavegameFile(eu4Entry).toString();
             String modsFolder = "mods_folder=" + GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod").toString();

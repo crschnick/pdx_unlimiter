@@ -25,24 +25,32 @@ public class Eu4TagRenderer {
     private static final int IMG_SIZE = 256;
 
     private static BufferedImage createBasicFlagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
-        if (tag.getType() == Eu4Tag.FlagType.NORMAL) {
-            return ImageLoader.fromFXImage(eu4TagImage(info, tag));
-        } else if (tag.getType() == Eu4Tag.FlagType.COLONIAL_FLAG) {
-            var ov = Eu4Tag.getTag(info.getAllTags(), tag.getColonialData().getOverlord());
-            BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, ov));
-            Graphics g = flagImage.getGraphics();
+        switch (tag.getType()) {
+            case OBSERVER -> {
+                return ImageLoader.fromFXImage(eu4TagImage(GameImage.getEu4TagPath("REB"), info));
+            }
+            case NORMAL -> {
+                return ImageLoader.fromFXImage(eu4TagImage(info, tag));
+            }
+            case COLONIAL_FLAG -> {
+                var ov = Eu4Tag.getTag(info.getAllTags(), tag.getColonialData().getOverlord());
+                BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, ov));
+                Graphics g = flagImage.getGraphics();
 
-            java.awt.Color awtColor = ColorHelper.awtColorFromInt(tag.getCountryColor(), 0xFF);
-            g.setColor(awtColor);
-            g.fillRect(flagImage.getWidth() / 2, 0, flagImage.getWidth() / 2, flagImage.getWidth());
-            return flagImage;
-        } else {
-            BufferedImage flagImage = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-            var custom = tag.getCustomData();
-            var cache = CacheManager.getInstance().get(Eu4CustomFlagCache.class);
-            cache.renderTexture(flagImage, custom.getFlagId(), custom.getFlagColors(), custom.getSymbolId());
-            return flagImage;
+                java.awt.Color awtColor = ColorHelper.awtColorFromInt(tag.getCountryColor(), 0xFF);
+                g.setColor(awtColor);
+                g.fillRect(flagImage.getWidth() / 2, 0, flagImage.getWidth() / 2, flagImage.getWidth());
+                return flagImage;
+            }
+            case CUSTOM_FLAG -> {
+                BufferedImage flagImage = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+                var custom = tag.getCustomData();
+                var cache = CacheManager.getInstance().get(Eu4CustomFlagCache.class);
+                cache.renderTexture(flagImage, custom.getFlagId(), custom.getFlagColors(), custom.getSymbolId());
+                return flagImage;
+            }
         }
+        throw new AssertionError();
     }
 
     public static Image smallShieldImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {

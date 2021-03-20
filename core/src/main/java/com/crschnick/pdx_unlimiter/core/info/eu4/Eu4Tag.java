@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 public final class Eu4Tag {
 
     private static final Pattern COLONIAL_FLAG_TAG_PATTERN = Pattern.compile("C\\d\\d");
+    private static final Pattern OBSERVER_FLAG_TAG_PATTERN = Pattern.compile("O\\d\\d");
 
     public static enum FlagType {
+        OBSERVER,
         NORMAL,
         COLONIAL_FLAG,
         CUSTOM_FLAG
@@ -111,6 +113,8 @@ public final class Eu4Tag {
                     col.getNodeForKey("flag_colors").getNodeArray().stream()
                             .map(Node::getInteger)
                             .collect(Collectors.toList()));
+        } else if (OBSERVER_FLAG_TAG_PATTERN.matcher(tag).matches()) {
+            t = FlagType.OBSERVER;
         } else {
             t = FlagType.NORMAL;
         }

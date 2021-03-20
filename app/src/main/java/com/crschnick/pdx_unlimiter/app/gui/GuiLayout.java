@@ -46,6 +46,7 @@ public class GuiLayout {
         loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
 
         stack = new StackPane(new Pane(), layout, loadingBg);
+        stack.setOpacity(0);
     }
 
     private void fillLayout() {
@@ -130,7 +131,7 @@ public class GuiLayout {
             fillLayout();
             setupDragAndDrop();
 
-            FadeTransition ft = new FadeTransition(Duration.millis(1000), stack);
+            FadeTransition ft = new FadeTransition(Duration.millis(500), stack);
             ft.setFromValue(0.0);
             ft.setToValue(1.0);
             ft.play();
