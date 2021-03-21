@@ -98,7 +98,7 @@ public class Eu4TagRenderer {
                 -25,
                 0,
                 i.getWidth() + 50,
-                i.getHeight() + 20,
+                i.getHeight() + 16,
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 

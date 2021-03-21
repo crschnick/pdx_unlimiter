@@ -80,14 +80,6 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
         }
     }
 
-    public Color getColor(int index) {
-        if (index >= colors.size()) {
-            return new Color(0, 0, 0, 0);
-        }
-
-        return ColorHelper.awtColorFromInt(colors.get(index), 0xFF);
-    }
-
     public Color getFlagColor(int index) {
         if (index >= flagColors.size()) {
             return new Color(0, 0, 0, 0);

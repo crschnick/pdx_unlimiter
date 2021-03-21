@@ -131,7 +131,7 @@ public class GuiLayout {
             fillLayout();
             setupDragAndDrop();
 
-            FadeTransition ft = new FadeTransition(Duration.millis(500), stack);
+            FadeTransition ft = new FadeTransition(Duration.millis(1500), stack);
             ft.setFromValue(0.0);
             ft.setToValue(1.0);
             ft.play();

@@ -39,7 +39,7 @@
 }
 
 .notes-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-tooltip-outline";
+    -fx-icon-code: "mdi-tooltip";
 }
 
 .case-sensitive-button .ikonli-font-icon {

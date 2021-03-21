@@ -21,7 +21,8 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final SavegameNotes notes;
 
     public SavegameEntry(String name, UUID uuid, I info,
-                         String contentChecksum, GameDate date, SavegameNotes notes) {
+                         String contentChecksum, GameDate date, SavegameNotes notes,
+            String sourceFileChecksum) {
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
@@ -29,6 +30,11 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         this.persistent = true;
         this.date = date;
         this.notes = notes;
+        this.sourceFileChecksum = sourceFileChecksum;
+    }
+
+    public void setSourceFileChecksum(String sourceFileChecksum) {
+        this.sourceFileChecksum = sourceFileChecksum;
     }
 
     @Override

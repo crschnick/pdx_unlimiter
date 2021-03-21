@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -15,14 +16,18 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.zip.Checksum;
 
 public abstract class FileImportTarget {
 
@@ -100,6 +105,15 @@ public abstract class FileImportTarget {
         return List.of();
     }
 
+    public final boolean hasImportedSourceFile() {
+        var cs = getSourceFileChecksum();
+        if (cs == null) {
+            return false;
+        }
+
+        return SavegameStorage.get(SavegameManagerState.get().current()).hasImportedSourceFile(cs);
+    }
+
     public abstract void importTarget(Consumer<SavegameParser.Status> onFinish);
 
     public abstract Instant getLastModified();
@@ -109,6 +123,8 @@ public abstract class FileImportTarget {
     public abstract String getName();
 
     public abstract Path getPath();
+
+    public abstract String getSourceFileChecksum();
 
     public static final class DownloadImportTarget extends FileImportTarget {
 
@@ -147,7 +163,8 @@ public abstract class FileImportTarget {
                     Files.write(downloadedFile, data);
 
                     onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, null, true, null));
+                            .importSavegame(downloadedFile, null, true,
+                                    getSourceFileChecksum(), null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -183,6 +200,25 @@ public abstract class FileImportTarget {
         public Path getPath() {
             return downloadedFile;
         }
+
+        @Override
+        public String getSourceFileChecksum() {
+            try {
+                var md = MessageDigest.getInstance("MD5");
+                md.update(url.toString().getBytes());
+
+                StringBuilder c = new StringBuilder();
+                ByteBuffer b = ByteBuffer.wrap(md.digest());
+                for (int i = 0; i < 16; i++) {
+                    var hex = String.format("%02x", b.get());
+                    c.append(hex);
+                }
+                return c.toString();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                return null;
+            }
+        }
     }
 
     public static class StandardImportTarget extends FileImportTarget {
@@ -197,7 +233,8 @@ public abstract class FileImportTarget {
 
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
-                onFinish.accept(savegameStorage.importSavegame(path, null, true, null));
+                onFinish.accept(savegameStorage.importSavegame(
+                        path, null, true, getSourceFileChecksum(), null));
             }, true);
         }
 
@@ -233,6 +270,33 @@ public abstract class FileImportTarget {
 
         public Path getPath() {
             return path;
+        }
+
+        @Override
+        public String getSourceFileChecksum() {
+            try {
+                var md = MessageDigest.getInstance("MD5");
+
+                // Don't use name, since this would introduce problems when importing two differently named
+                // copies of the same savegame. Size and date should be enough!
+                // md.update(getName().getBytes());
+
+
+                long timestamp = Files.getLastModifiedTime(path).toInstant().toEpochMilli();
+                md.update(Long.toString(timestamp).getBytes());
+                md.update(Long.toString(Files.size(path)).getBytes());
+
+                StringBuilder c = new StringBuilder();
+                ByteBuffer b = ByteBuffer.wrap(md.digest());
+                for (int i = 0; i < 16; i++) {
+                    var hex = String.format("%02x", b.get());
+                    c.append(hex);
+                }
+                return c.toString();
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+                return null;
+            }
         }
     }
 

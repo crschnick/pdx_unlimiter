@@ -153,7 +153,9 @@ public abstract class SavegameStorage<
                     GameDate date = dateType.fromString(entryNode.required("date").textValue());
                     String checksum = entryNode.required("checksum").textValue();
                     SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
-                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes));
+                    String sourceFileChecksum = Optional.ofNullable(entryNode.get("sourceFileChecksum"))
+                            .map(JsonNode::textValue).orElse(null);
+                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes, sourceFileChecksum));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Could not load campaign config of " + collection.getName(), null);
@@ -175,6 +177,7 @@ public abstract class SavegameStorage<
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString())
+                            .put("sourceFileChecksum", entry.getSourceFileChecksum())
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
@@ -208,6 +211,7 @@ public abstract class SavegameStorage<
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString())
+                            .put("sourceFileChecksum", entry.getSourceFileChecksum())
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
@@ -244,7 +248,13 @@ public abstract class SavegameStorage<
         return Optional.of(col);
     }
 
-    public synchronized void addNewEntryToCampaign(UUID campainUuid, UUID entryUuid, String checksum, I info, String name) {
+    public synchronized void addNewEntryToCampaign(
+            UUID campainUuid,
+            UUID entryUuid,
+            String checksum,
+            I info,
+            String name,
+            String sourceFileChecksum) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
@@ -253,7 +263,8 @@ public abstract class SavegameStorage<
                 null,
                 checksum,
                 info.getDate(),
-                SavegameNotes.empty());
+                SavegameNotes.empty(),
+                sourceFileChecksum);
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
@@ -273,14 +284,21 @@ public abstract class SavegameStorage<
         c.onSavegamesChange();
     }
 
-    public synchronized void addNewEntryToCollection(SavegameCollection<T, I> col, UUID entryUuid, String checksum, I info, String name) {
+    public synchronized void addNewEntryToCollection(
+            SavegameCollection<T, I> col,
+            UUID entryUuid,
+            String checksum,
+            I info,
+            String name,
+            String sourceFileChecksum) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 null,
                 checksum,
                 info.getDate(),
-                SavegameNotes.empty());
+                SavegameNotes.empty(),
+                sourceFileChecksum);
         logger.debug("Adding new entry " + e.getName());
         col.getSavegames().add(e);
         col.onSavegamesChange();
@@ -474,8 +492,13 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    protected SavegameParser.Status importSavegame(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> folder) {
-        var status = importSavegameData(file, name, checkDuplicate, folder);
+    protected SavegameParser.Status importSavegame(
+            Path file,
+            String name,
+            boolean checkDuplicate,
+            String sourceFileChecksum,
+            SavegameCollection<T, I> folder) {
+        var status = importSavegameData(file, name, checkDuplicate, sourceFileChecksum, folder);
         saveData();
         return status;
     }
@@ -530,7 +553,12 @@ public abstract class SavegameStorage<
         });
     }
 
-    private SavegameParser.Status importSavegameData(Path file, String name, boolean checkDuplicate, SavegameCollection<T, I> col) {
+    private SavegameParser.Status importSavegameData(
+            Path file,
+            String name,
+            boolean checkDuplicate,
+            String sourceFileChecksum,
+            SavegameCollection<T, I> col) {
         logger.debug("Parsing file " + file.toString());
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
@@ -542,7 +570,9 @@ public abstract class SavegameStorage<
                     var exists = getSavegameForChecksum(s.checksum);
                     if (exists.isPresent()) {
                         logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
-                        loadEntry(exists.get());
+                        if (sourceFileChecksum != null) {
+                            exists.get().setSourceFileChecksum(sourceFileChecksum);
+                        }
                         return;
                     } else {
                         logger.debug("No entry with checksum found");
@@ -572,9 +602,9 @@ public abstract class SavegameStorage<
                     }
 
                     if (col == null) {
-                        addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name);
+                        addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
                     } else {
-                        addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name);
+                        addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
                     }
                 }
             }
@@ -602,6 +632,12 @@ public abstract class SavegameStorage<
         String cn = getSavegameCollection(e).getName();
         String en = e.getName();
         return cn + " (" + en + ")";
+    }
+
+    public boolean hasImportedSourceFile(String sourceFileChecksum) {
+        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+                .filter(ch -> ch.getSourceFileChecksum() != null)
+                .anyMatch(ch -> ch.getSourceFileChecksum().equals(sourceFileChecksum));
     }
 
     public Path getSavegameDataDirectory() {
