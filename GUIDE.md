@@ -100,7 +100,7 @@ if you want to move a savegame to another campaigns or folder,
 you can do so by dragging and dropping into it.
 
 
-### Launching savegames
+## Launching savegames
 
 If you click on a savegame entry, a status bar will pop up from the bottom.
 It usually looks like this:
@@ -124,7 +124,7 @@ You can still launch the savegame, but you will get a warning about which mod or
 
 ![Invalid](docs/status-bar-invalid.png)
 
-### Savegame Actions
+## Savegame Actions
 
 The icon buttons located at the top right of a savegame entry
 indicate what kind of actions you can perform with it.

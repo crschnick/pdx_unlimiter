@@ -112,17 +112,6 @@ public class GuiSavegameEntry {
 
     private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {
         {
-            Button notes = new JFXButton();
-            notes.setGraphic(new FontIcon());
-            notes.setOnMouseClicked((m) -> {
-                GuiSavegameNotes.showSavegameNotesDialog(e.getNotes());
-            });
-            notes.getStyleClass().add("notes-button");
-            GuiTooltips.install(notes, "Edit savegame notes");
-            buttonBar.getChildren().add(notes);
-        }
-
-        {
             Button copy = new JFXButton();
             copy.setGraphic(new FontIcon());
             copy.setOnMouseClicked((m) -> {
@@ -219,6 +208,17 @@ public class GuiSavegameEntry {
                     buttonBar.getChildren().add(0, edit);
                 }
             });
+        }
+
+        {
+            Button notes = new JFXButton();
+            notes.setGraphic(new FontIcon());
+            notes.setOnMouseClicked((m) -> {
+                GuiSavegameNotes.showSavegameNotesDialog(e.getNotes());
+            });
+            notes.getStyleClass().add("notes-button");
+            GuiTooltips.install(notes, "Edit savegame notes");
+            buttonBar.getChildren().add(notes);
         }
 
         {
