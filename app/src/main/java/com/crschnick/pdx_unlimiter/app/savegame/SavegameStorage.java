@@ -479,7 +479,7 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized String getFileName(SavegameEntry<?, ?> e) {
+    public synchronized String getFileSystemCompatibleName(SavegameEntry<?, ?> e) {
         var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         return colName + " (" + sgName + ")." + fileEnding;

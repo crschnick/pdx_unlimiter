@@ -36,7 +36,7 @@ public class SkanderbegHelper {
                             SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry)));
                 }
 
-                String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4).getFileName(entry));
+                String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4).getFileSystemCompatibleName(entry));
                 ThreadHelper.browse("https://skanderbeg.pm/browse.php?id=" + saveId);
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());
