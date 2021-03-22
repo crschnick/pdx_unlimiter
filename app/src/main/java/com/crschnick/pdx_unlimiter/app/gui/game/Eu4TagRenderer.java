@@ -62,9 +62,9 @@ public class Eu4TagRenderer {
 
         g.drawImage(flagImage,
                 8,
-                8,
+                5,
                 i.getWidth() - 16,
-                i.getHeight() - 16,
+                i.getHeight() - 13,
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 

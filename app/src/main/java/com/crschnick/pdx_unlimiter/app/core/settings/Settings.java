@@ -88,11 +88,6 @@ public final class Settings {
             "confirmDeletion",
             true
     );
-    public final SettingsEntry.BooleanEntry showIncompatibleWarning = new SettingsEntry.BooleanEntry(
-            "SHOW_INCOMPATIBLE_WARNING",
-            "showIncompatibleWarning",
-            true
-    );
     public final SettingsEntry.BooleanEntry launchIrony = new SettingsEntry.BooleanEntry(
             "LAUNCH_IRONY",
             "launchIrony",

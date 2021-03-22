@@ -2,7 +2,10 @@
 -fx-padding: 0;
 -fx-spacing: 0;
 -fx-pref-width: 30em;
--fx-pref-height: 600px;
+}
+
+.import-content .scroll-pane {
+-fx-max-height: 600px;
 }
 
 .import-content .filter-bar {
