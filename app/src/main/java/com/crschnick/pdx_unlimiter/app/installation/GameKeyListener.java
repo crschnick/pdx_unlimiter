@@ -32,7 +32,7 @@ public class GameKeyListener implements NativeKeyListener {
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_R) {
                 TaskExecutor.getInstance().submitTask(() -> {
-                    LoggerFactory.getLogger(GameKeyListener.class).debug("Reloading latest save");
+                    LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");
                     if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
                         Toolkit.getDefaultToolkit().beep();
                     }
