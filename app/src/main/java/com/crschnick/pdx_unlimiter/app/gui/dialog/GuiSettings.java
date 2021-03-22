@@ -49,7 +49,7 @@ public class GuiSettings {
         var sp = new ScrollPane(vbox);
         sp.setFitToWidth(true);
         alert.getDialogPane().setContent(sp);
-        sp.setPrefWidth(550);
+        sp.setPrefWidth(650);
         sp.setPrefHeight(600);
         vbox.getStyleClass().add("settings-content");
         sp.getStyleClass().add("settings-container");

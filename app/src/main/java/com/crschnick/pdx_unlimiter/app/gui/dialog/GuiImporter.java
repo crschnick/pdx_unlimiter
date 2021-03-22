@@ -137,16 +137,26 @@ public class GuiImporter {
         JFXCheckBox cbAll = new JFXCheckBox();
         cbAll.selectedProperty().bindBidirectional(state.selectAllProperty());
 
+        var emptyLabel = new Label("There are no savegames available to import!");
+
         for (var e : state.getShownTargets()) {
             var n = createTargetNode(e);
             targets.getChildren().add(n);
         }
+        if (state.getShownTargets().size() == 0) {
+            targets.getChildren().add(emptyLabel);
+        }
 
         state.shownTargetsProperty().addListener((c,o,n) -> {
-            targets.getChildren().clear();
-            n.forEach(e -> {
-                var tn = createTargetNode(e);
-                targets.getChildren().add(tn);
+            Platform.runLater(() -> {
+                targets.getChildren().clear();
+                n.forEach(e -> {
+                    var tn = createTargetNode(e);
+                    targets.getChildren().add(tn);
+                });
+                if (n.size() == 0) {
+                    targets.getChildren().add(emptyLabel);
+                }
             });
         });
 

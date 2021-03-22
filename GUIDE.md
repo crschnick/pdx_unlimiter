@@ -1,26 +1,5 @@
 # Pdx-Unlimiter Guide
 
-The savegame manager interface will initially look pretty empty.
-This guide will show you first how to populate the Pdx-Unlimiter with your savegames,
-i.e. go from the left picture to the right picture.
-Afterwards, this guide will show you how to make the best use of all the functions, the Pdx-Unlimiter provides.
-
-<p>
-<img align="left" src="docs/empty.png" height="350"/>
-<img align="right" src="docs/screenshot.png" height="350"/>
-</p>
-
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-
 ## Table of Contents
 
 - [Game Installation detection](#game-installations)
@@ -39,28 +18,32 @@ Afterwards, this guide will show you how to make the best use of all the functio
 Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
 either saved in your documents directories or your Steam cloudsave directories.
 The Pdx-Unlimiter will try to automatically detect any of those game installation and save game directories.
-If any installation is not detected, you can set them manually in the settings menu.
 Note that only relatively up-to-date installations of Paradox games with the Paradox Launcher are supported!
+
+If any installation is not detected, you can set them manually in the settings menu:
+
+![Installations](docs/installations.png)
 
 ## Savegame importing and storage
 
 The Pdx-Unlimiter has an internal savegame storage that is
-independent of these savegame directories of your installed games.
+independent of the savegame directories of your installed games.
 To manage a savegame with the Pdx-Unlimiter, you therefore first have to import it.
 There are several different ways of doing that:
 
-- By clicking the import button in the menu bar, which will open a separate import dialog
+- By clicking the **Import** button in the menu bar, which will open a separate import window
 - Dragging and dropping the savegame files into the Pdx-Unlimiter. This also works for folders that contain savegames
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
   This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
 
 For performance reasons and to prevent the storage from bloating, you have to explicitly
-import any savegame that you want to manage.
+import any savegame that you want to manage, i.e. it will not
+automatically import all of the contents of your savegame directories.
 This separation means that changing or deleting a file from your savegame directory
 does not delete it from the Pdx-Unlimiter storage and vice-versa.
 
-You can change the storage directory in the settings menu and
-also open it by clicking on `Storage` -> `Open storage directory` in the menu bar.
+You can change the internal storage directory in the settings menu and
+also open it in the file explorer by clicking on `Storage` -> `Open storage directory` in the menu bar.
 
 
 ## Campaigns and folders
