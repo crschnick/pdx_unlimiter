@@ -28,26 +28,21 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
     public void onSavegameLoad(SavegameEntry<T, I> entry) {
         if (entry == getLatestEntry()) {
             imageProperty().set(SavegameActions.createImageForEntry(entry));
-            updateNameAndDate();
+            updateDate();
         }
     }
 
     @Override
     public void onSavegamesChange() {
-        updateNameAndDate();
+        updateDate();
     }
 
-    private void updateNameAndDate() {
+    private void updateDate() {
         getSavegames().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
                 .min(Comparator.naturalOrder())
                 .map(s -> s.getInfo().getDate())
                 .ifPresent(d -> dateProperty().setValue(d));
-
-        getSavegames().stream()
-                .filter(s -> s.infoProperty().isNotNull().get())
-                .min(Comparator.naturalOrder())
-                .ifPresent(e -> imageProperty().set(SavegameActions.createImageForEntry(e)));
     }
 
     public Image getImage() {
