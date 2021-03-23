@@ -11,11 +11,14 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import javafx.application.Platform;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +55,22 @@ public class ConverterHelper {
         return map;
     }
 
+    public static String getOutputName(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
+        var s = SavegameStorage.<Ck3Tag,Ck3SavegameInfo>get(Game.CK3).getFileSystemCompatibleName(entry);
+        s = FilenameUtils.getBaseName(s);
+        s = s.replace(" ", "_");
+        return s;
+    }
+
+    public static String getEu4ModDir() {
+        return GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod").toString();
+    }
+
+    public static String getModOutputPath(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
+        return Settings.getInstance().ck3toeu4Dir.getValue()
+                .resolve("CK3toEU4").resolve("output").resolve(getOutputName(entry)).toString();
+    }
+
     public static void writeConfig(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) {
         var config = Settings.getInstance().ck3toeu4Dir.getValue()
                 .resolve("CK3toEU4").resolve("configuration.txt");
@@ -60,8 +79,9 @@ public class ConverterHelper {
             writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserPath().toString());
             writeLine(writer, "CK3directory", GameInstallation.ALL.get(Game.CK3).getPath().toString());
             writeLine(writer, "EU4directory", GameInstallation.ALL.get(Game.EU4).getPath().toString());
-            writeLine(writer, "targetGameModPath", GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod").toString());
+            writeLine(writer, "targetGameModPath", getEu4ModDir());
             writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getSavegameFile(entry).toString());
+            writeLine(writer, "output_name", getOutputName(entry));
             for (var e : values.entrySet()) {
                 writeLine(writer, e.getKey(), e.getValue());
             }
@@ -99,6 +119,14 @@ public class ConverterHelper {
 
                 try {
                     int returnCode = handle.waitFor();
+
+                    FileUtils.copyDirectory(
+                            Path.of(getModOutputPath(entry)).toFile(),
+                            Path.of(getEu4ModDir()).resolve(getOutputName(entry)).toFile());
+                    FileUtils.copyFile(
+                            Path.of(getModOutputPath(entry) + ".mod").toFile(),
+                            Path.of(getEu4ModDir()).resolve(getOutputName(entry) + ".mod").toFile());
+
                     Platform.runLater(() -> {
                         if (returnCode == 0) {
                             GuiConverterConfig.showConversionSuccessDialog();
@@ -106,7 +134,8 @@ public class ConverterHelper {
                             GuiConverterConfig.showConversionErrorDialog();
                         }
                     });
-                } catch (InterruptedException ignored) {
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
                 }
 
             } catch (IOException e) {

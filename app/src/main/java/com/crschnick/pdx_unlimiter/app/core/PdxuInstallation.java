@@ -25,6 +25,7 @@ public class PdxuInstallation {
     private Path eu4SeDir;
     private Path languageDir;
     private Path resourceDir;
+    private boolean preRelease;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -112,6 +113,8 @@ public class PdxuInstallation {
         INSTANCE.nativeHookEnabled = Optional.ofNullable(props.get("enableJNativeHook"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
+
+        INSTANCE.preRelease = INSTANCE.version.contains("pre");
     }
 
     public static boolean shouldStart() {
@@ -216,5 +219,9 @@ public class PdxuInstallation {
 
     public Path getResourceDir() {
         return resourceDir;
+    }
+
+    public boolean isPreRelease() {
+        return preRelease;
     }
 }

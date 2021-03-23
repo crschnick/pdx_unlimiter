@@ -2,9 +2,8 @@ package com.crschnick.pdx_unlimiter.app.core;
 
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import io.sentry.Attachment;
-import io.sentry.Sentry;
-import io.sentry.UserFeedback;
+import io.sentry.*;
+import io.sentry.protocol.Message;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +21,12 @@ public class ErrorHandler {
             sentryOptions.setServerName(System.getProperty("os.name"));
             sentryOptions.setRelease(PdxuInstallation.getInstance().getVersion());
             sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262");
+
+            if (!PdxuInstallation.getInstance().isProduction()) {
+                sentryOptions.setTracesSampleRate(null);
+            } else if (PdxuInstallation.getInstance().isPreRelease()) {
+                sentryOptions.setTracesSampleRate(1.0);
+            }
         });
     }
 

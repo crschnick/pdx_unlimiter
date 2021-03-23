@@ -1,19 +1,26 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
+import com.crschnick.pdx_unlimiter.app.editor.EditorFilter;
+import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
+import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.effect.SepiaTone;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.HashSet;
 import java.util.List;
@@ -67,92 +74,115 @@ public class GuiImporter {
         return box;
     }
 
-    private static Region createTargetNode(Set<FileImportTarget> selected, CheckBox all, FileImportTarget target) {
-        Label name = new Label(target.getName());
+    private static Region createTargetNode(GuiImporterState.ImportEntry entry) {
+        Label name = new Label(entry.target().getName());
         name.setTextOverrun(OverrunStyle.ELLIPSIS);
-        JFXCheckBox cb = new JFXCheckBox();
-        name.setOnMouseClicked(e -> cb.setSelected(!cb.isSelected()));
-        cb.selectedProperty().addListener((c, o, n) -> {
-            if (n) {
-                selected.add(target);
-            } else {
-                selected.remove(target);
-            }
-        });
 
-        all.selectedProperty().addListener((c, o, n) -> {
-            cb.setSelected(n);
-            if (n) {
-                selected.add(target);
-            } else {
-                selected.remove(target);
-            }
-        });
+        JFXCheckBox cb = new JFXCheckBox();
+        cb.selectedProperty().bindBidirectional(entry.selected());
+        name.setOnMouseClicked(e -> cb.setSelected(!cb.isSelected()));
 
         return new HBox(cb, new Label("  "), name);
     }
 
-    private static void showNoSavegamesDialog() {
-        Alert alert = GuiDialogHelper.createAlert();
-        alert.setAlertType(Alert.AlertType.INFORMATION);
-        alert.setTitle("No savegames found");
-        alert.setHeaderText("It seems like there are no savegames to import!");
-        alert.showAndWait();
-    }
-
-    public static void createImporterDialog(SavegameWatcher watcher) {
-        if (watcher.getSavegames().size() == 0) {
-            showNoSavegamesDialog();
-            return;
-        }
-
-        Set<FileImportTarget> selected = new HashSet<>();
+    public static void createImporterDialog() {
+        GuiImporterState state = new GuiImporterState();
 
         Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.initModality(Modality.WINDOW_MODAL);
-        alert.setTitle("Import");
-        alert.getDialogPane().setContent(create(watcher.getSavegames(), selected));
-        watcher.savegamesProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                // Clear the selected savegames!
-                selected.clear();
-                alert.getDialogPane().setContent(create(n, selected));
-            });
-        });
-        alert.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
+        alert.setTitle("Import savegames");
+        alert.getDialogPane().setContent(createContent(state));
+        alert.getDialogPane().getScene().getWindow()
+                .setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
+
 
         var importType = new ButtonType("Import", ButtonBar.ButtonData.LEFT);
         alert.getButtonTypes().add(importType);
         Button importB = (Button) alert.getDialogPane().lookupButton(importType);
         importB.setOnAction(e -> {
-            FileImporter.importTargets(selected);
+            FileImporter.importTargets(state.getSelectedTargets());
             e.consume();
         });
 
+
         var deleteType = new ButtonType("Delete", ButtonBar.ButtonData.RIGHT);
         alert.getButtonTypes().add(deleteType);
+        Button deleteB = (Button) alert.getDialogPane().lookupButton(deleteType);
+        deleteB.setOnAction(e -> {
+            if (GuiDialogHelper.showBlockingAlert(dAlert -> {
+                dAlert.setAlertType(Alert.AlertType.CONFIRMATION);
+                dAlert.setTitle("Confirm deletion");
+                dAlert.setHeaderText("Do you want to delete the selected savegame(s)?");
+            }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
+                state.getSelectedTargets().forEach(FileImportTarget::delete);
+            }
+            e.consume();
+        });
+
         alert.show();
     }
 
-    private static Node create(List<FileImportTarget> savegames, Set<FileImportTarget> selected) {
+    private static Node createContent(GuiImporterState state) {
         VBox targets = new VBox();
-        targets.setSpacing(5);
-        JFXCheckBox cbAll = new JFXCheckBox();
+        targets.getStyleClass().add("import-targets");
 
-        for (var t : savegames) {
-            var n = createTargetNode(selected, cbAll, t);
+        JFXCheckBox cbAll = new JFXCheckBox();
+        cbAll.selectedProperty().bindBidirectional(state.selectAllProperty());
+
+        var emptyLabel = new Label("There are no savegames available to import!");
+
+        for (var e : state.getShownTargets()) {
+            var n = createTargetNode(e);
             targets.getChildren().add(n);
         }
+        if (state.getShownTargets().size() == 0) {
+            targets.getChildren().add(emptyLabel);
+        }
+
+        state.shownTargetsProperty().addListener((c,o,n) -> {
+            Platform.runLater(() -> {
+                targets.getChildren().clear();
+                n.forEach(e -> {
+                    var tn = createTargetNode(e);
+                    targets.getChildren().add(tn);
+                });
+                if (n.size() == 0) {
+                    targets.getChildren().add(emptyLabel);
+                }
+            });
+        });
 
         VBox layout = new VBox();
-        layout.setSpacing(8);
+        layout.getStyleClass().add("import-content");
+
+        layout.getChildren().add(createFilterBar(state));
+        layout.getChildren().add(new Separator());
+
         var sp = new ScrollPane(targets);
         sp.setFitToWidth(true);
-        sp.setPrefViewportWidth(250);
-        sp.setPrefViewportHeight(500);
         layout.getChildren().add(sp);
         layout.getChildren().add(new Separator());
-        layout.getChildren().add(createBottomNode(cbAll));
+
+        var selectAll = createBottomNode(cbAll);
+        selectAll.getStyleClass().add("select-all");
+        layout.getChildren().add(selectAll);
+
         return layout;
+    }
+
+    private static Region createFilterBar(GuiImporterState state) {
+        HBox box = new HBox();
+        box.setAlignment(Pos.CENTER);
+        box.getStyleClass().add("filter-bar");
+
+        var fLabel = new Label("Filter:  ");
+        fLabel.setAlignment(Pos.CENTER);
+        box.getChildren().add(fLabel);
+
+        TextField filter = new TextField();
+        filter.textProperty().bindBidirectional(state.filterProperty());
+        box.getChildren().add(filter);
+        HBox.setHgrow(filter, Priority.ALWAYS);
+        return box;
     }
 }

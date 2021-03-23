@@ -38,6 +38,10 @@
     -fx-icon-code: "mdi-tooltip-outline";
 }
 
+.notes-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-tooltip";
+}
+
 .case-sensitive-button .ikonli-font-icon {
     -fx-icon-code: "mdi-case-sensitive-alt";
 }
@@ -112,7 +116,7 @@
 }
 
 .browse-button .ikonli-font-icon {
-     -fx-icon-code: "mdi-content-save";
+     -fx-icon-code: "mdi-magnify";
      -jfx-button-type: RAISED;
 }
 

@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiIncompatibleWarning;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -36,6 +37,8 @@ public class GameLauncher {
     }
 
     public static void startLauncherWithContinueGame(SavegameEntry<?, ?> e) {
+        GuiSavegameNotes.showSavegameNotesReminderDialog(e.getNotes());
+
         try {
             setupContinueGame(e);
             startLauncherDirectly();
@@ -54,6 +57,8 @@ public class GameLauncher {
                 }
             }
 
+            GuiSavegameNotes.showSavegameNotesReminderDialog(e.getNotes());
+            
             try {
                 setupContinueGame(e);
                 startGameDirectly(e);

@@ -100,20 +100,20 @@ public final class Settings {
     ) {
         @Override
         public void set(Boolean newValue) {
-            if (newValue.equals(value.get())) {
-                return;
-            }
-
-            if (newValue) {
-                Eu4SeHelper.showEnabledDialog();
-            }
-
             Path eu4seFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("eu4saveeditor");
             try {
                 Files.writeString(eu4seFile, Boolean.toString(newValue));
                 super.set(newValue);
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
+            }
+
+            if (newValue.equals(value.get())) {
+                return;
+            }
+
+            if (newValue) {
+                Eu4SeHelper.showEnabledDialog();
             }
         }
     };

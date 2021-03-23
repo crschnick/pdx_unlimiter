@@ -77,6 +77,10 @@ public class GameImage {
     public static Image EU4_ICON_DIP;
     public static Image EU4_ICON_MIL;
     public static Image EU4_BACKGROUND;
+    public static Image EU4_SHIELD_MASK;
+    public static Image EU4_SHIELD_FRAME;
+    public static Image EU4_SMALL_SHIELD_MASK;
+    public static Image EU4_SMALL_SHIELD_FRAME;
 
     private static void resetImages() {
         for (var field : GameImage.class.getFields()) {
@@ -286,6 +290,11 @@ public class GameImage {
         EU4_ICON_RELEASED_VASSAL = ImageLoader.loadImage(
                 i.resolve("release_nation_icon.dds"));
         VIEWPORTS.put(EU4_ICON_RELEASED_VASSAL, new Rectangle2D(37, 0, 36, 30));
+
+        EU4_SHIELD_MASK = ImageLoader.loadImage(i.resolve("shield_mask.tga"));
+        EU4_SHIELD_FRAME = ImageLoader.loadImage(i.resolve("shield_frame.dds"));
+        EU4_SMALL_SHIELD_MASK = ImageLoader.loadImage(i.resolve("small_shield_mask.tga"));
+        EU4_SMALL_SHIELD_FRAME = ImageLoader.loadImage(i.resolve("small_shield_overlay.dds"));
 
         EU4_BACKGROUND = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("app-background.png"));
     }

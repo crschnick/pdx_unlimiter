@@ -111,7 +111,7 @@ public abstract class GameInstallation {
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(SavegameEntry<T, I> e) {
         return getSavegamesPath().resolve(SavegameStorage.get(
-                ALL.inverseBidiMap().get(this)).getFileName(e));
+                ALL.inverseBidiMap().get(this)).getFileSystemCompatibleName(e));
     }
 
     private void loadDlcs() throws IOException {

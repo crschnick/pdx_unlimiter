@@ -29,10 +29,10 @@ public class SavegameStorageIO {
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> cache, Path out) throws IOException {
         for (SavegameCollection<T, I> c : cache.getCollections()) {
             for (SavegameEntry<T, I> e : c.getSavegames()) {
-                Path fileOut = out.resolve(cache.getFileName(e));
+                Path fileOut = out.resolve(cache.getFileSystemCompatibleName(e));
                 int counter = 2;
                 while (Files.exists(fileOut)) {
-                    fileOut = fileOut.resolveSibling("(" + counter + ") " + cache.getFileName(e));
+                    fileOut = fileOut.resolveSibling("(" + counter + ") " + cache.getFileSystemCompatibleName(e));
                     counter++;
                 }
                 cache.copySavegameTo(e, fileOut);

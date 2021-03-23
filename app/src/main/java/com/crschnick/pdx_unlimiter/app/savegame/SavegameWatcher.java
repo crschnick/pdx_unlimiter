@@ -3,8 +3,11 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
@@ -19,7 +22,8 @@ public class SavegameWatcher {
     public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
 
     private final GameInstallation install;
-    private final ObjectProperty<List<FileImportTarget>> savegames = new SimpleObjectProperty<>();
+    private final ListProperty<FileImportTarget> savegames = new SimpleListProperty<>(
+            FXCollections.observableArrayList());
 
     private SavegameWatcher(GameInstallation install) {
         this.install = install;
@@ -40,11 +44,11 @@ public class SavegameWatcher {
     }
 
     private void initSavegames() {
-        savegames.set(getLatestSavegames());
+        savegames.get().setAll(getLatestSavegames());
 
         List<Path> savegameDirs = install.getAllSavegameDirectories();
         FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
-            savegames.set(getLatestSavegames());
+            savegames.get().setAll(getLatestSavegames());
         });
     }
 
@@ -62,7 +66,7 @@ public class SavegameWatcher {
         return savegames.get();
     }
 
-    public ObjectProperty<List<FileImportTarget>> savegamesProperty() {
+    public ListProperty<FileImportTarget> savegamesProperty() {
         return savegames;
     }
 }

@@ -48,6 +48,7 @@ public class GuiSavegameCollection {
                         });
                     });
                     Node w = prop.getValue();
+                    w.getStyleClass().add(CLASS_TAG_ICON);
                     btn.getChildren().add(w);
                 });
             } else {

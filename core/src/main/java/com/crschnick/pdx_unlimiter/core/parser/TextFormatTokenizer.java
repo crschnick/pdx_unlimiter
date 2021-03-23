@@ -31,19 +31,26 @@ public class TextFormatTokenizer {
         this.prev = 0;
         this.tokenCounter = 0;
 
+        int maxTokenCount;
+        int maxNodeCount;
         if (bytes.length < 300) {
             // Special case for small files
-            this.tokenTypes = new byte[bytes.length];
-            this.scalarsStart = new int[bytes.length];
-            this.scalarsLength = new short[bytes.length];
-            this.arraySizes = new int[bytes.length];
+
+            // Add 2 to include open and close group tokens that are always added
+            maxTokenCount = bytes.length + 2;
+
+            maxNodeCount = bytes.length;
         } else {
             // Pessimistic assumptions, should always hold!
-            this.tokenTypes = new byte[bytes.length / 2];
-            this.scalarsStart = new int[bytes.length / 5];
-            this.scalarsLength = new short[bytes.length / 5];
-            this.arraySizes = new int[bytes.length / 5];
+
+            maxTokenCount = bytes.length / 2;
+            maxNodeCount = bytes.length / 5;
         }
+
+        this.tokenTypes = new byte[maxTokenCount];
+        this.scalarsStart = new int[maxNodeCount];
+        this.scalarsLength = new short[maxNodeCount];
+        this.arraySizes = new int[maxNodeCount];
 
         this.arraySizeStack = new Stack<>();
         this.arraySizesCounter = 0;

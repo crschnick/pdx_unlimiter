@@ -64,7 +64,7 @@ public final class LinkedArrayNode extends ArrayNode {
         var localStartFirst = getLocalIndex(ls, begin);
         spliced.add(arrayNodes.get(ls).splice(localStartFirst, arrayNodes.get(ls).size() - localStartFirst));
 
-        for (int i = ls + 1; i < le - 1; i++) {
+        for (int i = ls + 1; i <= le - 1; i++) {
             spliced.add(arrayNodes.get(i));
         }
 

@@ -29,6 +29,10 @@ public final class ValueNode extends Node {
     }
 
     public boolean isQuoted() {
+        if (context.getData().length < 2) {
+            return false;
+        }
+
         var b = context.getLiteralsBegin()[scalarIndex];
         return context.getData()[b] == DOUBLE_QUOTE_CHAR &&
                 context.getData()[b + context.getLiteralsLength()[scalarIndex] - 1] == DOUBLE_QUOTE_CHAR;

@@ -27,7 +27,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry) {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var sc = ctx.getStorage();
-            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileName(entry));
+            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileSystemCompatibleName(entry));
             try {
                 sc.copySavegameTo(entry, out);
             } catch (IOException ioException) {
@@ -156,7 +156,7 @@ public class SavegameActions {
                 }
                 var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
                 folder.ifPresent(f -> {
-                    ctx.getStorage().importSavegame(meltedFile, null, true, f);
+                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
                 });
             });
         }, true);
@@ -204,7 +204,8 @@ public class SavegameActions {
             SavegameContext.withSavegame(e, ctx -> {
                 var sgs = ctx.getStorage();
                 var in = sgs.getSavegameFile(e);
-                sgs.importSavegame(in, "Copy of " + e.getName(), false, sgs.getSavegameCollection(e));
+                sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
+                        sgs.getSavegameCollection(e));
             });
         }, false);
     }

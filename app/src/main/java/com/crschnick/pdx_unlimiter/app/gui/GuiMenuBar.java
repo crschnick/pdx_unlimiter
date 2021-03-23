@@ -142,8 +142,7 @@ public class GuiMenuBar {
 
         JFXButton importB = new JFXButton("Import");
         importB.setOnAction(e -> {
-            GuiImporter.createImporterDialog(SavegameWatcher.ALL.get(
-                    SavegameManagerState.get().current()));
+            GuiImporter.createImporterDialog();
             e.consume();
         });
         importB.setGraphic(new FontIcon());

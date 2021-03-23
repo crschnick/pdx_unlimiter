@@ -19,6 +19,20 @@ import java.util.Map;
 
 public class ColorHelper {
 
+    public static int pickClosestColor(int input, int... colors) {
+        int minDist = Integer.MAX_VALUE;
+        int cMin = -1;
+        int counter = 0;
+        for (int c : colors) {
+            if (Math.abs(input - c) < minDist) {
+                minDist = Math.abs(input - c);
+                cMin = counter;
+            }
+            counter++;
+        }
+        return cMin;
+    }
+
     public static int getRed(int color) {
         return (color & 0x00FF0000) >>> 16;
     }
@@ -33,6 +47,14 @@ public class ColorHelper {
 
     public static int getAlpha(int color) {
         return (color & 0xFF000000) >>> 24;
+    }
+
+    public static java.awt.Color awtColorFromInt(int c, int alpha) {
+        Color fx = ColorHelper.colorFromInt(c, alpha);
+        return new java.awt.Color((float) fx.getRed(),
+                (float) fx.getGreen(),
+                (float) fx.getBlue(),
+                (float) fx.getOpacity());
     }
 
     public static javafx.scene.paint.Color colorFromInt(int c, int alpha) {

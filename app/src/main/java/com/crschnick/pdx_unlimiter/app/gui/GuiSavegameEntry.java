@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
@@ -207,6 +208,17 @@ public class GuiSavegameEntry {
                     buttonBar.getChildren().add(0, edit);
                 }
             });
+        }
+
+        {
+            Button notes = new JFXButton();
+            notes.setGraphic(new FontIcon());
+            notes.setOnMouseClicked((m) -> {
+                GuiSavegameNotes.showSavegameNotesDialog(e.getNotes());
+            });
+            notes.getStyleClass().add("notes-button");
+            GuiTooltips.install(notes, "Edit savegame notes");
+            buttonBar.getChildren().add(notes);
         }
 
         {

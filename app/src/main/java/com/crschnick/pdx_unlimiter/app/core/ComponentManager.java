@@ -59,7 +59,7 @@ public class ComponentManager {
         }
 
         TaskExecutor.getInstance().start();
-        TaskExecutor.getInstance().submitTask(ComponentManager::init, true);
+        TaskExecutor.getInstance().submitTask(ComponentManager::init, false);
     }
 
     public static void switchGame(Game game) {
