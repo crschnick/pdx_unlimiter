@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Comparable<SavegameEntry<T, I>> {
@@ -15,31 +17,25 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final UUID uuid;
     private final ObjectProperty<I> info;
     private final String contentChecksum;
-    private final boolean persistent;
     private final GameDate date;
     private final SavegameNotes notes;
-    private String sourceFileChecksum;
+    private final List<String> sourceFileChecksums;
 
     public SavegameEntry(String name, UUID uuid, I info,
                          String contentChecksum, GameDate date, SavegameNotes notes,
-                         String sourceFileChecksum) {
+                         List<String> sourceFileChecksums) {
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
         this.info = new SimpleObjectProperty<>(info);
-        this.persistent = true;
         this.date = date;
         this.notes = notes;
-        this.sourceFileChecksum = sourceFileChecksum;
+        this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
     }
 
     @Override
     public int compareTo(SavegameEntry<T, I> o) {
         return o.getDate().compareTo(getDate());
-    }
-
-    public boolean isPersistent() {
-        return persistent;
     }
 
     public String getName() {
@@ -70,12 +66,12 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         return date;
     }
 
-    public String getSourceFileChecksum() {
-        return sourceFileChecksum;
+    public List<String> getSourceFileChecksums() {
+        return sourceFileChecksums;
     }
 
-    public void setSourceFileChecksum(String sourceFileChecksum) {
-        this.sourceFileChecksum = sourceFileChecksum;
+    public void addSourceFileChecksum(String sourceFileChecksum) {
+        this.sourceFileChecksums.add(sourceFileChecksum);
     }
 
     public SavegameNotes getNotes() {

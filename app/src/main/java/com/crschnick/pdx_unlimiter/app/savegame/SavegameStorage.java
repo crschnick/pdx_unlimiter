@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.image.Image;
@@ -35,8 +36,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public abstract class SavegameStorage<
@@ -153,9 +156,12 @@ public abstract class SavegameStorage<
                     GameDate date = dateType.fromString(entryNode.required("date").textValue());
                     String checksum = entryNode.required("checksum").textValue();
                     SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
-                    String sourceFileChecksum = Optional.ofNullable(entryNode.get("sourceFileChecksum"))
-                            .map(JsonNode::textValue).orElse(null);
-                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes, sourceFileChecksum));
+                    List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
+                            .map(n -> StreamSupport.stream(n.spliterator(), false)
+                                        .map(sfc -> sfc.textValue())
+                                        .collect(Collectors.toList()))
+                            .orElse(List.of());
+                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes, sourceFileChecksums));
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Could not load campaign config of " + collection.getName(), null);
@@ -177,7 +183,10 @@ public abstract class SavegameStorage<
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString())
-                            .put("sourceFileChecksum", entry.getSourceFileChecksum())
+                            .<ObjectNode>set("sourceFileChecksums", JsonNodeFactory.instance.arrayNode().addAll(
+                                    entry.getSourceFileChecksums().stream()
+                                            .map(s -> new TextNode(s))
+                                            .collect(Collectors.toList())))
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
@@ -211,7 +220,10 @@ public abstract class SavegameStorage<
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString())
-                            .put("sourceFileChecksum", entry.getSourceFileChecksum())
+                            .<ObjectNode>set("sourceFileChecksums", JsonNodeFactory.instance.arrayNode().addAll(
+                                    entry.getSourceFileChecksums().stream()
+                                            .map(s -> new TextNode(s))
+                                            .collect(Collectors.toList())))
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
@@ -264,7 +276,7 @@ public abstract class SavegameStorage<
                 checksum,
                 info.getDate(),
                 SavegameNotes.empty(),
-                sourceFileChecksum);
+                List.of(sourceFileChecksum));
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
@@ -298,7 +310,7 @@ public abstract class SavegameStorage<
                 checksum,
                 info.getDate(),
                 SavegameNotes.empty(),
-                sourceFileChecksum);
+                List.of(sourceFileChecksum));
         logger.debug("Adding new entry " + e.getName());
         col.getSavegames().add(e);
         col.onSavegamesChange();
@@ -571,7 +583,7 @@ public abstract class SavegameStorage<
                     if (exists.isPresent()) {
                         logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                         if (sourceFileChecksum != null) {
-                            exists.get().setSourceFileChecksum(sourceFileChecksum);
+                            exists.get().addSourceFileChecksum(sourceFileChecksum);
                         }
                         return;
                     } else {
@@ -636,8 +648,7 @@ public abstract class SavegameStorage<
 
     public boolean hasImportedSourceFile(String sourceFileChecksum) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
-                .filter(ch -> ch.getSourceFileChecksum() != null)
-                .anyMatch(ch -> ch.getSourceFileChecksum().equals(sourceFileChecksum));
+                .anyMatch(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum));
     }
 
     public Path getSavegameDataDirectory() {
