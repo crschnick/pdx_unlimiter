@@ -66,7 +66,7 @@ public abstract class GameInstallation {
         }
     }
 
-    public static void init() throws Exception {
+    public static void init() {
         Settings s = Settings.getInstance();
         Optional.ofNullable(s.eu4.getValue()).ifPresent(
                 p -> ALL.put(Game.EU4, new Eu4Installation(p)));
@@ -76,9 +76,14 @@ public abstract class GameInstallation {
                 p -> ALL.put(Game.HOI4, new Hoi4Installation(p)));
         Optional.ofNullable(s.stellaris.getValue()).ifPresent(
                 p -> ALL.put(Game.STELLARIS, new StellarisInstallation(p)));
-        for (GameInstallation i : ALL.values()) {
-            i.loadData();
+        for (Game g : Game.values()) {
+            if (!ALL.containsKey(g)) {
+                continue;
+            }
+
+            var i = ALL.get(g);
             try {
+                i.loadData();
                 i.initOptional();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);

@@ -75,15 +75,13 @@ public class SavegameActions {
         });
     }
 
-    public static <T, I extends SavegameInfo<T>> Optional<Path> exportSavegame(SavegameEntry<T, I> e) {
-        return SavegameContext.mapSavegame(e, ctx -> {
+    public static <T, I extends SavegameInfo<T>> void exportSavegame(SavegameEntry<T, I> e) {
+        SavegameContext.withSavegame(e, ctx -> {
             try {
                 var path = ctx.getInstallation().getExportTarget(e);
                 ctx.getStorage().copySavegameTo(e, path);
-                return Optional.of(path);
             } catch (IOException ex) {
                 ErrorHandler.handleException(ex);
-                return Optional.empty();
             }
         });
     }
@@ -123,12 +121,19 @@ public class SavegameActions {
         savegames.get(0).importTarget(s -> {
             s.visit(new SavegameParser.StatusVisitor<>() {
                 @Override
+                @SuppressWarnings("unchecked")
                 public void success(SavegameParser.Success<SavegameInfo<?>> s) {
                     SavegameStorage.get(SavegameManagerState.get().current())
                             .getSavegameForChecksum(s.checksum)
                             .ifPresent(e -> {
-                                SavegameManagerState.get().selectEntry(e);
-                                GameLauncher.continueSavegame(e);
+                                // The info is loaded asynchronously when the savegame is opened in the gui.
+                                // This means that at this point, the info can either be null or not null
+                                // In case it is null, temporarily set it
+                                if (e.infoProperty().get() == null) {
+                                    e.infoProperty().set((SavegameInfo<Object>) s.info);
+                                    GameLauncher.continueSavegame(e);
+                                    e.infoProperty().set(null);
+                                }
                             });
                 }
             });
