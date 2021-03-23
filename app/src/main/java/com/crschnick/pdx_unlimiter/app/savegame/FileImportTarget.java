@@ -17,7 +17,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -27,7 +26,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.zip.Checksum;
 
 public abstract class FileImportTarget {
 

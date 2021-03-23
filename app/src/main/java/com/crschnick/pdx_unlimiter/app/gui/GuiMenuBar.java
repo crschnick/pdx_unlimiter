@@ -7,7 +7,6 @@ import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;

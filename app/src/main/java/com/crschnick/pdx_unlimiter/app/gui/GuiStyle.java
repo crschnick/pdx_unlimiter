@@ -1,13 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import javafx.scene.Scene;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 
 public class GuiStyle {
 

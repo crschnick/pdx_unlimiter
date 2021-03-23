@@ -2,8 +2,9 @@ package com.crschnick.pdx_unlimiter.app.core;
 
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import io.sentry.*;
-import io.sentry.protocol.Message;
+import io.sentry.Attachment;
+import io.sentry.Sentry;
+import io.sentry.UserFeedback;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 

@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;

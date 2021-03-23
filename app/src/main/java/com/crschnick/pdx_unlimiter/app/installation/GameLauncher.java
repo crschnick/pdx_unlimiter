@@ -58,7 +58,7 @@ public class GameLauncher {
             }
 
             GuiSavegameNotes.showSavegameNotesReminderDialog(e.getNotes());
-            
+
             try {
                 setupContinueGame(e);
                 startGameDirectly(e);

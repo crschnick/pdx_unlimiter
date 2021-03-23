@@ -11,61 +11,6 @@ public final class Eu4Tag {
 
     private static final Pattern COLONIAL_FLAG_TAG_PATTERN = Pattern.compile("C\\d\\d");
     private static final Pattern OBSERVER_FLAG_TAG_PATTERN = Pattern.compile("O\\d\\d");
-
-    public static enum FlagType {
-        OBSERVER,
-        NORMAL,
-        COLONIAL_FLAG,
-        CUSTOM_FLAG
-    }
-
-    public static class ColonialFlagData {
-        private String overlord;
-
-        public ColonialFlagData() {}
-
-        public ColonialFlagData(String overlord) {
-            this.overlord = overlord;
-        }
-
-        public String getOverlord() {
-            return overlord;
-        }
-    }
-
-    public static class CustomFlagData {
-        private int flagId;
-        private int colorId;
-        private int symbolId;
-        private List<Integer> flagColors;
-
-        public CustomFlagData() {
-        }
-
-        public CustomFlagData(int flagId, int colorId, int symbolId, List<Integer> flagColors) {
-            this.flagId = flagId;
-            this.colorId = colorId;
-            this.symbolId = symbolId;
-            this.flagColors = flagColors;
-        }
-
-        public int getFlagId() {
-            return flagId;
-        }
-
-        public int getColorId() {
-            return colorId;
-        }
-
-        public int getSymbolId() {
-            return symbolId;
-        }
-
-        public List<Integer> getFlagColors() {
-            return flagColors;
-        }
-    }
-
     private FlagType flagType;
     private String tag;
     private int mapColor;
@@ -73,10 +18,8 @@ public final class Eu4Tag {
     private String name;
     private ColonialFlagData colonialFlagData;
     private CustomFlagData customFlagData;
-
     public Eu4Tag() {
     }
-
     public Eu4Tag(FlagType flagType, String tag, int mapColor, int countryColor, String name, ColonialFlagData colonialFlagData, CustomFlagData customFlagData) {
         this.flagType = flagType;
         this.tag = tag;
@@ -103,7 +46,7 @@ public final class Eu4Tag {
             colonialFlagData = new ColonialFlagData(
                     n.getNodeForKey("colonial_parent").getString());
 
-        } else if(n.getNodeForKey("colors").hasKey("custom_colors")) {
+        } else if (n.getNodeForKey("colors").hasKey("custom_colors")) {
             t = FlagType.CUSTOM_FLAG;
             var col = n.getNodeForKey("colors").getNodeForKey("custom_colors");
             customFlagData = new CustomFlagData(
@@ -160,5 +103,60 @@ public final class Eu4Tag {
 
     public CustomFlagData getCustomData() {
         return customFlagData;
+    }
+
+    public static enum FlagType {
+        OBSERVER,
+        NORMAL,
+        COLONIAL_FLAG,
+        CUSTOM_FLAG
+    }
+
+    public static class ColonialFlagData {
+        private String overlord;
+
+        public ColonialFlagData() {
+        }
+
+        public ColonialFlagData(String overlord) {
+            this.overlord = overlord;
+        }
+
+        public String getOverlord() {
+            return overlord;
+        }
+    }
+
+    public static class CustomFlagData {
+        private int flagId;
+        private int colorId;
+        private int symbolId;
+        private List<Integer> flagColors;
+
+        public CustomFlagData() {
+        }
+
+        public CustomFlagData(int flagId, int colorId, int symbolId, List<Integer> flagColors) {
+            this.flagId = flagId;
+            this.colorId = colorId;
+            this.symbolId = symbolId;
+            this.flagColors = flagColors;
+        }
+
+        public int getFlagId() {
+            return flagId;
+        }
+
+        public int getColorId() {
+            return colorId;
+        }
+
+        public int getSymbolId() {
+            return symbolId;
+        }
+
+        public List<Integer> getFlagColors() {
+            return flagColors;
+        }
     }
 }

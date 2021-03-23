@@ -1,31 +1,20 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.editor.EditorFilter;
-import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.effect.SepiaTone;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
-import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 
@@ -139,7 +128,7 @@ public class GuiImporter {
             targets.getChildren().add(emptyLabel);
         }
 
-        state.shownTargetsProperty().addListener((c,o,n) -> {
+        state.shownTargetsProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 targets.getChildren().clear();
                 n.forEach(e -> {

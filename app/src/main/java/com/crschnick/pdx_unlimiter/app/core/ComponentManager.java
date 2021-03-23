@@ -68,9 +68,9 @@ public class ComponentManager {
         SavedState.getInstance().setActiveGame(game);
     }
 
-    public static <T, I extends SavegameInfo<T>> void selectCollection(SavegameCollection<T,I> col) {
+    public static <T, I extends SavegameInfo<T>> void selectCollection(SavegameCollection<T, I> col) {
         CacheManager.getInstance().onSelectedSavegameCollectionChange();
-        SavegameManagerState.<T,I>get().selectCollection(col);
+        SavegameManagerState.<T, I>get().selectCollection(col);
     }
 
     public static void reloadSettings(Runnable settingsUpdater) {

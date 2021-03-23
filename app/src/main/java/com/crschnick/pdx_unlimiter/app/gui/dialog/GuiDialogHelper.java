@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
-import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;

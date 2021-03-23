@@ -6,8 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.Optional;
-
 public class GuiSavegameNotes {
 
     public static void showSavegameNotesDialog(SavegameNotes notes) {

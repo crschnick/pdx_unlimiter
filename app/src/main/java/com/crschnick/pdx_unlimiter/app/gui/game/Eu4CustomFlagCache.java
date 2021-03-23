@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.*;
-import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.getBlue;
-
 public class Eu4CustomFlagCache extends CacheManager.Cache {
 
     private static final int EMBLEM_SIZE = 64;
@@ -26,16 +23,10 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
     private static final int PATTERN_COLOR_2 = 0xFF00FF00;
     private static final int PATTERN_COLOR_1 = 0xFFFF0000;
     private static final int PATTERN_COLOR_3 = 0xFF0000FF;
-
-    record Texture(BufferedImage img, int x, int y, int frames, int colors) {
-
-    }
-
     private List<Integer> colors = new ArrayList<>();
     private List<Integer> flagColors = new ArrayList<>();
     private List<Texture> textures = new ArrayList<>();
     private BufferedImage emblems;
-
     public Eu4CustomFlagCache() {
         super(CacheManager.Scope.GAME_SPECIFIC);
 
@@ -149,5 +140,9 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
                 (int) (0.6 * img.getHeight()),
                 new Color(0, 0, 0, 0),
                 null);
+    }
+
+    record Texture(BufferedImage img, int x, int y, int frames, int colors) {
+
     }
 }

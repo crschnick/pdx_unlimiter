@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
-import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -14,7 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.TransferMode;
@@ -23,8 +21,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.Optional;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 

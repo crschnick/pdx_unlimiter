@@ -1,9 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -17,13 +15,10 @@ import java.util.stream.Collectors;
 
 public class GuiImporterState {
 
-    record ImportEntry(FileImportTarget target, BooleanProperty selected) {}
-
     private final BooleanProperty selectAll;
     private final StringProperty filter;
     private final List<ImportEntry> allTargets;
     private final ListProperty<ImportEntry> shownTargets;
-
     public GuiImporterState() {
         selectAll = new SimpleBooleanProperty();
         filter = new SimpleStringProperty("");
@@ -38,11 +33,11 @@ public class GuiImporterState {
     }
 
     private void setupListeners() {
-        filter.addListener((c,o,n) -> {
+        filter.addListener((c, o, n) -> {
             updateShownTargets();
         });
 
-        SavegameWatcher.ALL.get(SavegameManagerState.get().current()).savegamesProperty().addListener((c,o,n) -> {
+        SavegameWatcher.ALL.get(SavegameManagerState.get().current()).savegamesProperty().addListener((c, o, n) -> {
             allTargets.clear();
             allTargets.addAll(n.stream()
                     .map(t -> new ImportEntry(t, new SimpleBooleanProperty(false)))
@@ -50,7 +45,7 @@ public class GuiImporterState {
             updateShownTargets();
         });
 
-        selectAll.addListener((c,o,n) -> {
+        selectAll.addListener((c, o, n) -> {
             allTargets.forEach(e -> e.selected.set(n));
         });
     }
@@ -108,5 +103,8 @@ public class GuiImporterState {
 
     public ListProperty<ImportEntry> shownTargetsProperty() {
         return shownTargets;
+    }
+
+    record ImportEntry(FileImportTarget target, BooleanProperty selected) {
     }
 }

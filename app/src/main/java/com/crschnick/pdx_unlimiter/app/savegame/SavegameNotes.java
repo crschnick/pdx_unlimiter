@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import javafx.beans.property.BooleanProperty;
@@ -11,6 +10,14 @@ import javafx.beans.property.StringProperty;
 import java.util.Optional;
 
 public final class SavegameNotes {
+
+    private final StringProperty text;
+    private final BooleanProperty remindMe;
+
+    private SavegameNotes(String text, boolean remindMe) {
+        this.text = new SimpleStringProperty(text);
+        this.remindMe = new SimpleBooleanProperty(remindMe);
+    }
 
     public static JsonNode toNode(SavegameNotes notes) {
         if (notes.textProperty().get().length() == 0 && !notes.remindMeProperty().get()) {
@@ -35,14 +42,6 @@ public final class SavegameNotes {
         var text = Optional.ofNullable(node.get("text")).map(JsonNode::asText).orElse("");
         var b = Optional.ofNullable(node.get("remindMe")).map(JsonNode::asBoolean).orElse(false);
         return new SavegameNotes(text, b);
-    }
-
-    private final StringProperty text;
-    private final BooleanProperty remindMe;
-
-    private SavegameNotes(String text, boolean remindMe) {
-        this.text = new SimpleStringProperty(text);
-        this.remindMe = new SimpleBooleanProperty(remindMe);
     }
 
     public StringProperty textProperty() {

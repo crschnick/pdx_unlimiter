@@ -6,12 +6,8 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -121,14 +117,6 @@ public class Eu4TagRenderer {
         }
     }
 
-    public static class Eu4TagImageCache extends CacheManager.Cache {
-        Map<String, Image> tagImages = new HashMap<>();
-
-        public Eu4TagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
-        }
-    }
-
     private static Image eu4TagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
         return CacheManager.getInstance().get(Eu4TagImageCache.class).tagImages.computeIfAbsent(
                 tag.getTag(), s -> eu4TagImage(GameImage.getEu4TagPath(s), info));
@@ -138,5 +126,13 @@ public class Eu4TagRenderer {
         var in = CascadeDirectoryHelper.openFile(
                 path, info, GameInstallation.ALL.get(Game.EU4));
         return ImageLoader.loadImage(in.orElse(null), null);
+    }
+
+    public static class Eu4TagImageCache extends CacheManager.Cache {
+        Map<String, Image> tagImages = new HashMap<>();
+
+        public Eu4TagImageCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        }
     }
 }

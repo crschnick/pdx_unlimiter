@@ -13,8 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper.createAlert;
-
 public class GuiIncompatibleWarning {
 
     public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {

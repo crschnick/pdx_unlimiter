@@ -56,7 +56,7 @@ enabled without having to use Paradox launcher configurations.
 It is also checked whether a mod is missing or incompatible with the current version,
 so that nothing can potentially corrupt your savegames.
 
-Usage guide: [Savegame management](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-storage)
+Usage guide: [Savegame management](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-importing-and-storage)
 
 ## Savegame editor and navigator
 
@@ -102,7 +102,7 @@ create a non-ironman copy of an ironman savegame, but couldn't because the games
 You can for example use the included ironman converter
 to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor-and-navigator).
 
-Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md)
+Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-actions)
 
 ## Savescumming tools
 
@@ -112,7 +112,7 @@ If you want to revert to a previous savegame checkpoint,
 you can also kill the currently running Paradox game and load the latest save using a keystroke.
 This feature allows you to easily savescum, which is kinda necessary for hard achievements.
 
-Usage guide: [Savescumming](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savescumming)
+Usage guide: [Savescumming](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-checkpoints-and-savescumming)
 
 ## Third party tool integration
 
@@ -135,7 +135,7 @@ The supported tools are:
 - The [Irony Mod Manager](https://bcssov.github.io/IronyModManager/),
   which can replace the mod-management capabilities of the Paradox-Launcher.
 
-Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md)
+Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-actions)
 
 ## Community and Support
 
