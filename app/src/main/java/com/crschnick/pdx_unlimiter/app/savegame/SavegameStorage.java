@@ -276,7 +276,7 @@ public abstract class SavegameStorage<
                 checksum,
                 info.getDate(),
                 SavegameNotes.empty(),
-                List.of(sourceFileChecksum));
+                sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
@@ -310,7 +310,7 @@ public abstract class SavegameStorage<
                 checksum,
                 info.getDate(),
                 SavegameNotes.empty(),
-                List.of(sourceFileChecksum));
+                sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
         logger.debug("Adding new entry " + e.getName());
         col.getSavegames().add(e);
         col.onSavegamesChange();
