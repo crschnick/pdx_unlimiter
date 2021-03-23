@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-- [Game Installation detection](#game-installations)
+- [Game Installations](#game-installations)
 - [Importing savegames](#savegame-importing-and-storage)
 - [Managing campaigns and folders](#campaigns-and-folders)
 - [Managing savegames](#savegames)
@@ -15,11 +15,12 @@
 
 ## Game Installations
 
-Upon installation, you probably have a lot of savegames of different Paradox games on your computer,
-either saved in your documents directories or your Steam cloudsave directories.
-The Pdx-Unlimiter will try to automatically detect any of those game installation and save game directories.
-Note that only relatively up-to-date installations of Paradox games with the Paradox Launcher are supported!
+Upon installation of the Pdx-Unlimiter, you probably have a couple of Paradox games
+installed where each one has saved a lot of savegames to your computer.
+These are either saved in your **Documents** directory or your Steam cloudsave directories.
+The Pdx-Unlimiter will try to automatically detect any of those game installations and save game directories.
 
+Note that only relatively up-to-date installations of Paradox games with the Paradox Launcher are supported.
 If any installation is not detected, you can set them manually in the settings menu:
 
 ![Installations](docs/installations.png)
@@ -31,19 +32,20 @@ independent of the savegame directories of your installed games.
 To manage a savegame with the Pdx-Unlimiter, you therefore first have to import it.
 There are several different ways of doing that:
 
-- By clicking the **Import** button in the menu bar, which will open a separate import window
-- Dragging and dropping the savegame files into the Pdx-Unlimiter. This also works for folders that contain savegames
+- By clicking the **Import** button in the menu bar, which will open a separate import window.
+- Dragging and dropping the savegame files into the Pdx-Unlimiter window.
+  This also works for folders that contain savegames.
 - Double clicking any savegame file if its extension is associated with the Pdx-Unlimiter.
   This includes `.eu4` `.hoi4`, `.ck3` and `.sav` files.
 
 For performance reasons and to prevent the storage from bloating, you have to explicitly
 import any savegame that you want to manage, i.e. it will not
-automatically import all of the contents of your savegame directories.
+automatically import all the contents of your savegame directories.
 This separation means that changing or deleting a file from your savegame directory
 does not delete it from the Pdx-Unlimiter storage and vice-versa.
 
 You can change the internal storage directory in the settings menu and
-also open it in the file explorer by clicking on `Storage` -> `Open storage directory` in the menu bar.
+also open it in the file explorer by clicking on **Storage** -> **Open storage directory** in the menu bar.
 
 
 ## Campaigns and folders
@@ -56,19 +58,22 @@ These campaigns are shown on the left and look like this:
 
 In addition to campaigns, you can also create folders by clicking on the **Add Folder** button
 shown in the picture.
-Next to it is a search bar that you can use to quickly find specific campaigns or savegames.
 A folder is meant to store various savegames that might belong to entirely different campaigns.
 An example is the generated **Melted Savegames** folder that stores any converted Ironman savegame.
+To move savegames into a folder, just drag and drop them there.
 
-The campaigns and folders are ordered by how recently a savegame
-of that campaign was launched from the Pdx-Unlimiter.
-
+At the top there is also a search bar that you can use to quickly find specific campaigns or savegames.
 The campaign name can be edited by clicking on it.
 You can also delete an entire campaign by clicking on the **Delete** button.
 
+The campaigns and folders below are ordered by
+how recently a savegame of that campaign was launched from the Pdx-Unlimiter.
+A campaign will automatically go to the top of the list if you launch a savegame from it.
+
 ## Savegames
 
-By clicking on a campaign or folder, you can see the contained savegames, ordered by their in-game dates.
+You can open a campaign or folder by clicking on it.
+Then you can see the contained savegames, ordered by their in-game dates.
 A savegame entry looks like this:
 
 <img src="docs/savegame.png" align="right" height="200"/>
@@ -151,6 +156,11 @@ For this to work, you first have to set your skanderbeg.pm <b>API key</b> in the
 </p>
 
 <p>
+<img align="left" src="docs/notes.png" width=35/>
+Add a note to the savegame that can pop up when you launch the savegame the next time.
+</p>
+
+<p>
 <img align="left" src="docs/delete.png" width=35/>
 Deletes the savegame.
 </p>
@@ -159,14 +169,12 @@ Deletes the savegame.
 
 In case of any unfortunate ingame event that you want to revert,
 the Pdx-Unlimiter gives you the ability to savescum, i.e. reverting to a
-previous savegame checkpoint while playing in ironman.
+previous savegame checkpoint while playing in Ironman.
 While playing a supported game, a status bar that looks like will pop up:
 
 ![Running](docs/status-bar-running.png)
 
-### Shortcuts
-
-These previous savegame checkpoints can be created/imported while being ingame by
+A savegame checkpoint can be created/imported at any time while being ingame by
 clicking on **Import** button or pressing `CTRL+SHIFT+I`.
 This will import the latest savegame, shown in the center of the status bar.
 
@@ -174,8 +182,9 @@ By pressing either `CTRL+SHIFT+K` or **Kill** in the status bar,
 you can kill the currently running game without it having a chance to overwrite the latest savegame.
 You can simply select your latest imported savegame in the Pdx-Unlimiter and launch it again.
 
-If you just want to revert to the latest saved savegame, you can also use `CTRL+SHIFT+R`
-to combine these functions, i.e. import the latest savegame, kill the game process and launch it again.
+If you just want to revert to the latest saved savegame a couple of months back,
+you can also use `CTRL+SHIFT+R` to combine the **Import** and **Kill** functions,
+i.e. import the latest savegame, kill the game process and launch it again.
 
 ### Settings
 
@@ -193,7 +202,7 @@ will play if the following option is enabled in the settings menu:
 ## Working with the raw savegame files
 
 When you import a savegame, its original savegame file is copied into the Pdx-Unlimiter storage.
-If you want to access that savegame file after importing it, you can still do so, since
+If you want to access that savegame file after importing it, you can easily do so, since
 a savegame entry in the Pdx-Unlimiter behaves like a normal file in the sense that
 you can drag and drop it as you would do with a normal file.
 So you can drag a savegame from the GUI outside the Pdx-Unlimiter window and drop it anywhere as a file.
@@ -223,7 +232,7 @@ If you want to disable this feature, you can do so in the settings menu.
 In case of any problems, you can do the following:
 
 - Use the automatic report functionality of the error reporter if it comes up
-- You can also open the issue reporter at 'Help' -> 'Report issue' in the menu bar
+- You can also open the issue reporter at **Help** -> **Report issue** in the menu bar
 - Alternatively, you can also open an issue on GitHub and describe the error
   in more detail or visit the Pdx-Unlimiter Discord server
 - If the application does not even start, or you want to dig deeper into the error cause,

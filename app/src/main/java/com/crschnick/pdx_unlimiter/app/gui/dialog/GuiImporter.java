@@ -85,14 +85,6 @@ public class GuiImporter {
         return new HBox(cb, new Label("  "), name);
     }
 
-    private static void showNoSavegamesDialog() {
-        Alert alert = GuiDialogHelper.createAlert();
-        alert.setAlertType(Alert.AlertType.INFORMATION);
-        alert.setTitle("No savegames found");
-        alert.setHeaderText("It seems like there are no savegames to import!");
-        alert.showAndWait();
-    }
-
     public static void createImporterDialog() {
         GuiImporterState state = new GuiImporterState();
 

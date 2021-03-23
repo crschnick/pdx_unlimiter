@@ -1,10 +1,11 @@
 ![Logo](docs/pdxu.png)
 
-The Pdx-Unlimiter is a tool for various Paradox games that provides a powerful savegame manager that allows
-you to organize, filter, and play all of your savegames with ease.
-Furthermore, it also comes with the ability to convert savegames to a non-ironman version,
-a powerful savegame and game data file editor, some savescumming tools, integrations for various
-other great community-made tools and full support for the following games:
+The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a
+powerful savegame manager to quickly organize and play all of your savegames with ease.
+Furthermore, it also comes with an Ironman converter,
+a powerful savegame editor and navigator,
+some savescumming tools, integrations for various other
+great community-made tools, and full support for the following games:
 
 - Europa Universalis IV
 - Crusader Kings III
@@ -20,7 +21,6 @@ If you are facing these issues, click on "More info" and then "Run anyway".
 
 ### [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
 
-
 # Features
 
 The main components of the Pdx-Unlimiter are:
@@ -30,7 +30,7 @@ The main components of the Pdx-Unlimiter are:
 - [Savescumming tools](#savescumming-tools)
 - [Integrations for other Paradox tools](#third-party-tool-integration)
 
-It you want to know how to use a certain feature, you can
+If you want to know how to use a certain feature, you can
 read about it in the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md).
 There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/FAQ.md)
 to answer some of your questions.
