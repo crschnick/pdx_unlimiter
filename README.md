@@ -140,8 +140,8 @@ Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/ma
 ## Community and Support
 
 If you have suggestions, need help, run into any issues or just want to talk to other friendly people,
-you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
-You can also help the project by reporting issues, fixing bugs and making the planned issues a reality.
+you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU) or visit the
+[Discussions on GitHub](https://github.com/crschnick/pdx_unlimiter/discussions).
 
 [![Banner](https://discordapp.com/api/guilds/786465137191682088/widget.png?style=banner3)](https://discord.gg/BVE4vxqFpU)
 
@@ -151,7 +151,7 @@ You can also help the project by reporting issues, fixing bugs and making the pl
 To build this project, [JDK 16](https://openjdk.java.net/projects/jdk/16/) and gradle is required.
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
 For running, you can use `gradlew run`.
-You can use the generated file `pdxu.properties` to set some useful development options when needed.
+You can use the generated file `app/pdxu.properties` to set some useful development options when needed.
 
 Any contribution is welcomed!
 There are no real formal contribution guidelines right now, they will maybe come later.
