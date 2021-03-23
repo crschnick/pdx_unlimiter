@@ -235,8 +235,20 @@ In case of any problems, you can do the following:
 - You can also open the issue reporter at **Help** -> **Report issue** in the menu bar
 - Alternatively, you can also open an issue on GitHub and describe the error
   in more detail or visit the Pdx-Unlimiter Discord server
+- If you want to try to reset all your settings, delete the directory
+  `<documents directory>\Pdx-Unlimiter\settings` on Windows
+  or `~/.local/share/.pdx-unlimiter/settings` on Linux
 - If the application does not even start, or you want to dig deeper into the error cause,
   you can find the different log files at `<documents directory>\Pdx-Unlimiter\logs`
   on Windows and `~/.local/share/.pdx-unlimiter/logs` on Linux.
   (If you are an older user, your install path may be your home directory instead of the documents directory)
   
+## Uninstallation
+
+To fully uninstall the Pdx-Unlimiter, you should do the following:
+- If you want to save all the savegames managed by the Pdx-Unlimiter somewhere,
+  use **Storage** -> **Export storage...** in the menu bar
+- Uninstall the program in the control panel as you would do with any other application
+- Delete the data directory that contains savegames and settings data at
+  `<documents directory>\Pdx-Unlimiter` on Windows or `~/.local/share/.pdx-unlimiter` on Linux
+- If you are using Windows, delete the directory `%LOCALAPPDATA%\Programs\Pdx-Unlimiter`
