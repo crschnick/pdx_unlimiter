@@ -18,6 +18,8 @@ great community-made tools, and full support for the following games:
 
 Note that there might be some issues with Windows SmartScreen blocking the installer.
 If you are facing these issues, click on "More info" and then "Run anyway".
+You can read [this post](https://security.stackexchange.com/a/139520) if you want to understand
+why this warning pops up.
 
 ### [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
 
