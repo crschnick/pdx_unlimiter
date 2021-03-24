@@ -109,6 +109,8 @@ public class TextFormatTokenizer {
             scalarsStart[scalarCounter] = offset;
             scalarsLength[scalarCounter] = length;
             scalarCounter++;
+
+            assert arraySizeStack.size() > 0: "Encountered unexpectedly large array at index " + i;
             arraySizes[arraySizeStack.peek()]++;
         }
 
@@ -116,7 +118,7 @@ public class TextFormatTokenizer {
             prev = i + 1;
         } else if (t != 0) {
             if (t == CLOSE_GROUP) {
-                assert arraySizeStack.size() > 0 : "Encountered an additional close group token";
+                assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
                 arraySizeStack.pop();
             } else if (t == EQUALS) {
                 arraySizes[arraySizeStack.peek()]--;

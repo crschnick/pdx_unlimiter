@@ -21,9 +21,14 @@ public interface NodeWriter {
     }
 
     static void write(OutputStream out, Charset charset, ArrayNode node, String indent) throws IOException {
-        try (var bout = new BufferedOutputStream(out, 1000000)) {
+        var bout = new BufferedOutputStream(out, 1000000);
+        try {
             var writer = new NodeWriterImpl(bout, charset, Integer.MAX_VALUE, indent);
             node.writeTopLevel(writer);
+            bout.flush();
+        } catch (IOException e) {
+            bout.close();
+            throw e;
         }
     }
 

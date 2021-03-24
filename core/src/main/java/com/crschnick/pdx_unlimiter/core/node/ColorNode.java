@@ -67,7 +67,7 @@ public final class ColorNode extends Node {
     @Override
     public void write(NodeWriter writer) throws IOException {
         writer.write(colorName);
-        writer.write("= {");
+        writer.write(" {");
         for (var v : values) {
             v.write(writer);
             writer.write(" ");

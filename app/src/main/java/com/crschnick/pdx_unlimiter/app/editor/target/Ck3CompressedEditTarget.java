@@ -56,15 +56,15 @@ public class Ck3CompressedEditTarget extends EditTarget {
         ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
         var metaHeader = ArrayNode.singleKeyNode("meta_data", meta);
 
-        try (var out = Files.newOutputStream(file);
-             var zout = new ZipOutputStream(out)) {
+        try (var out = Files.newOutputStream(file)) {
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             NodeWriter.write(out, StandardCharsets.UTF_8, metaHeader, "\t");
-            out.write("\n".getBytes(StandardCharsets.UTF_8));
 
-            zout.putNextEntry(new ZipEntry("gamestate"));
-            NodeWriter.write(out, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(meta, gamestate)), "\t");
-            zout.closeEntry();
+            try (var zout = new ZipOutputStream(out)) {
+                zout.putNextEntry(new ZipEntry("gamestate"));
+                NodeWriter.write(zout, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(meta, gamestate)), "\t");
+                zout.closeEntry();
+            }
         }
     }
 }
