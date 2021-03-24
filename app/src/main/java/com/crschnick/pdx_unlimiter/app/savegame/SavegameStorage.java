@@ -79,7 +79,7 @@ public abstract class SavegameStorage<
         return (SavegameStorage<T, I>) ALL.get(g);
     }
 
-    public static void init() {
+    public static void init() throws Exception {
         ALL.put(Game.EU4, new Eu4SavegameStorage());
         ALL.put(Game.HOI4, new Hoi4SavegameStorage());
         ALL.put(Game.CK3, new Ck3SavegameStorage());
@@ -96,13 +96,8 @@ public abstract class SavegameStorage<
         ALL.clear();
     }
 
-    private synchronized void loadData() {
-        try {
-            Files.createDirectories(getSavegameDataDirectory());
-        } catch (IOException e) {
-            ErrorHandler.handleTerminalException(e);
-            return;
-        }
+    private synchronized void loadData() throws Exception {
+        Files.createDirectories(getSavegameDataDirectory());
 
         JsonNode node;
         if (Files.exists(getDataFile())) {
@@ -145,27 +140,23 @@ public abstract class SavegameStorage<
 
 
         for (SavegameCollection<T, I> collection : collections) {
-            try {
-                String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
-                var colFile = getSavegameDataDirectory().resolve(
-                        collection.getUuid().toString()).resolve(typeName + ".json");
-                JsonNode campaignNode = JsonHelper.read(colFile);
-                StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
-                    UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
-                    String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
-                    GameDate date = dateType.fromString(entryNode.required("date").textValue());
-                    String checksum = entryNode.required("checksum").textValue();
-                    SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
-                    List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
-                            .map(n -> StreamSupport.stream(n.spliterator(), false)
-                                        .map(sfc -> sfc.textValue())
-                                        .collect(Collectors.toList()))
-                            .orElse(List.of());
-                    collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes, sourceFileChecksums));
-                });
-            } catch (Exception e) {
-                ErrorHandler.handleException(e, "Could not load campaign config of " + collection.getName(), null);
-            }
+            String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
+            var colFile = getSavegameDataDirectory().resolve(
+                    collection.getUuid().toString()).resolve(typeName + ".json");
+            JsonNode campaignNode = JsonHelper.read(colFile);
+            StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
+                UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
+                String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
+                GameDate date = dateType.fromString(entryNode.required("date").textValue());
+                String checksum = entryNode.required("checksum").textValue();
+                SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
+                List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
+                        .map(n -> StreamSupport.stream(n.spliterator(), false)
+                                    .map(sfc -> sfc.textValue())
+                                    .collect(Collectors.toList()))
+                        .orElse(List.of());
+                collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes, sourceFileChecksums));
+            });
         }
     }
 
