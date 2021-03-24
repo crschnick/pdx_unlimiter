@@ -40,7 +40,9 @@ public class EditorFilter {
     }
 
     public List<EditorNode> filter(List<EditorNode> input) {
-        var matcher = new NodeMatcher(filterString.get());
+        var matcher = caseSensitive.get() ?
+                new NodeMatcher.CaseSenstiveMatcher(filterString.get()) :
+                new NodeMatcher.CaseInsenstiveMatcher(filterString.get());
         return input.stream().filter(n -> {
             if (!filterKeys.get() && !filterValues.get()) {
                 return true;
@@ -66,16 +68,8 @@ public class EditorFilter {
         return caseSensitive;
     }
 
-    public boolean isFilterKeys() {
-        return filterKeys.get();
-    }
-
     public BooleanProperty filterKeysProperty() {
         return filterKeys;
-    }
-
-    public boolean isFilterValues() {
-        return filterValues.get();
     }
 
     public BooleanProperty filterValuesProperty() {

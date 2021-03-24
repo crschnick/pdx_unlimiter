@@ -28,7 +28,6 @@ public class ComponentManager {
     public static void initialSetup(String[] args) {
         try {
             PdxuInstallation.init();
-            if (true)throw new IllegalArgumentException();
             LogManager.init();
             logger = LoggerFactory.getLogger(ComponentManager.class);
             ErrorHandler.init();
