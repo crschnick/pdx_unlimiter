@@ -112,27 +112,16 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
         SavegameContext.withSavegame(e, ctx -> {
-            {
-                Label text = new Label(
-                        ctx.getGame().getFullName(),
-                        ctx.getGuiFactory().createIcon());
-                barPane.setLeft(text);
-                BorderPane.setAlignment(text, Pos.CENTER);
-            }
-            {
-                Label name = new Label(ctx.getStorage().getEntryName(e));
-                name.setGraphic(new FontIcon());
-                name.getStyleClass().add(CLASS_TEXT);
-                if (SavegameActions.isEntryCompatible(e)) {
-                    name.getStyleClass().add(CLASS_SAVEGAME);
-                } else {
-                    barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-                    name.getStyleClass().add(CLASS_ALERT);
-                    name.setText(name.getText() + " (Incompatible)");
-                }
-                barPane.setCenter(name);
-            }
+            Label text = new Label(
+                    ctx.getStorage().getEntryName(e),
+                    ctx.getGuiFactory().createIcon());
+            barPane.setLeft(text);
+            BorderPane.setAlignment(text, Pos.CENTER);
         });
+
+        if (!SavegameActions.isEntryCompatible(e)) {
+            barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+        }
 
         HBox buttons = new HBox();
         buttons.setSpacing(10);
