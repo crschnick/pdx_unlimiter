@@ -108,7 +108,14 @@ public class PdxuApp extends Application {
     public void setupBasicWindowContent() {
         layout = new GuiLayout();
         layout.setup();
-        stage.setTitle("Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")");
+        var title = "Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")";
+        var l = PdxuInstallation.getInstance().getLatestVersion();
+        if (PdxuInstallation.getInstance().isProduction() &&
+                l != null &&
+                !l.equals(PdxuInstallation.getInstance().getVersion())) {
+            title = title + "     OUTDATED: " + l + " available";
+        }
+        stage.setTitle(title);
         Scene scene = new Scene(layout.getContent());
         stage.setScene(scene);
         GuiStyle.addStylesheets(scene);

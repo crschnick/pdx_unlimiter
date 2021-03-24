@@ -26,6 +26,7 @@ public class PdxuInstallation {
     private Path languageDir;
     private Path resourceDir;
     private boolean preRelease;
+    private String latestVersion;
 
     public static void init() {
         INSTANCE = new PdxuInstallation();
@@ -64,6 +65,12 @@ public class PdxuInstallation {
         INSTANCE.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
         if (!Files.exists(INSTANCE.eu4SeDir)) {
             INSTANCE.eu4SeDir = null;
+        }
+
+        try {
+            INSTANCE.latestVersion = Files.readString(INSTANCE.dataDir.resolve("settings").resolve("latest"));
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
         }
 
         Properties props = new Properties();
@@ -223,5 +230,9 @@ public class PdxuInstallation {
 
     public boolean isPreRelease() {
         return preRelease;
+    }
+
+    public String getLatestVersion() {
+        return latestVersion;
     }
 }

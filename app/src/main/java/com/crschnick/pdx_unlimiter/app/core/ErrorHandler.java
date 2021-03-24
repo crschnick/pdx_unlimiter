@@ -8,6 +8,8 @@ import io.sentry.UserFeedback;
 import javafx.application.Platform;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
@@ -37,9 +39,17 @@ public class ErrorHandler {
         }
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Initializing error handler");
-        setOptions();
 
+        setOptions();
         registerThread(Thread.currentThread());
+
+        var f = PdxuInstallation.getInstance().getSettingsLocation().resolve("error_exit");
+        try {
+            Files.createDirectories(f.getParent());
+            Files.writeString(f, "false");
+        } catch (IOException ex) {
+            LoggerFactory.getLogger(ErrorHandler.class).error("Could not write error_exit file", ex);
+        }
 
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
     }
@@ -126,8 +136,21 @@ public class ErrorHandler {
                 latch.await();
             } catch (InterruptedException ignored) {
             }
+
+            if (PdxuInstallation.getInstance() != null &&
+                    PdxuInstallation.getInstance().getSettingsLocation() != null) {
+                var f = PdxuInstallation.getInstance().getSettingsLocation().resolve("error_exit");
+                try {
+                    Files.createDirectories(f.getParent());
+                    Files.writeString(f, "true");
+                } catch (IOException ioex) {
+                    LoggerFactory.getLogger(ErrorHandler.class).error("Could not write error_exit file", ioex);
+                }
+            }
+
             // Wait to send error report
             ThreadHelper.sleep(1000);
+
             System.exit(1);
         }
     }
