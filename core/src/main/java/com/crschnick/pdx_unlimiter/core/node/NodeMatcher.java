@@ -47,7 +47,7 @@ public abstract class NodeMatcher {
         }
 
         private boolean contains(byte[] array, int start, short length) {
-            for (int i = start; i < start + length - byteSize; ++i) {
+            for (int i = start; i <= start + length - byteSize; ++i) {
                 boolean found = true;
 
                 int byteIndex = i;
@@ -80,7 +80,7 @@ public abstract class NodeMatcher {
         }
 
         private boolean contains(byte[] array, int start, short length) {
-            for (int i = start; i < start + length - matchBytes.length; ++i) {
+            for (int i = start; i <= start + length - matchBytes.length; ++i) {
                 boolean found = true;
                 for (int j = 0; j < matchBytes.length; ++j) {
                     if (array[i + j] != matchBytes[j]) {
