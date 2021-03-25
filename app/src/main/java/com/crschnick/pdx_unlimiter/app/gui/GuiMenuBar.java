@@ -95,6 +95,12 @@ public class GuiMenuBar {
         });
         help.getItems().add(is);
 
+        MenuItem discord = new MenuItem("Discord server");
+        discord.setOnAction((a) -> {
+            ThreadHelper.browse("https://discord.com/invite/BVE4vxqFpU");
+        });
+        help.getItems().add(discord);
+
         MenuItem log = new MenuItem("Show log");
         log.setOnAction((a) -> {
             GuiLog.showLogDialog();
