@@ -98,13 +98,15 @@ public class ErrorHandler {
     private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
         if (!startupCompleted) {
             unpreparedStartup(ex);
+        } else {
+            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
         }
 
         CountDownLatch latch = new CountDownLatch(1);
         Runnable run = () -> {
-            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
-            if (PdxuInstallation.getInstance() == null ||
-                    PdxuInstallation.getInstance().isProduction() && !errorReporterShowing) {
+            boolean show = (PdxuInstallation.getInstance() == null ||
+                    PdxuInstallation.getInstance().isProduction()) && !errorReporterShowing;
+            if (show) {
                 errorReporterShowing = true;
                 boolean shouldSendDiagnostics = GuiErrorReporter.showException(ex, terminal);
                 if (shouldSendDiagnostics) {
@@ -143,8 +145,7 @@ public class ErrorHandler {
                 try {
                     Files.createDirectories(f.getParent());
                     Files.writeString(f, "true");
-                } catch (IOException ioex) {
-                    LoggerFactory.getLogger(ErrorHandler.class).error("Could not write error_exit file", ioex);
+                } catch (IOException ignored) {
                 }
             }
 

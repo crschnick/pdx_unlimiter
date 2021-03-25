@@ -29,28 +29,28 @@ public class PdxuInstallation {
     private String latestVersion;
 
     public static void init() {
-        INSTANCE = new PdxuInstallation();
+        var i = new PdxuInstallation();
 
         Path appPath = Path.of(System.getProperty("java.home"));
-        INSTANCE.image = Files.exists(appPath.resolve("version"));
-        INSTANCE.production = INSTANCE.image;
-        INSTANCE.version = "unknown";
+        i.image = Files.exists(appPath.resolve("version"));
+        i.production = i.image;
+        i.version = "unknown";
 
-        if (INSTANCE.image) {
-            INSTANCE.languageDir = appPath.resolve("lang");
-            INSTANCE.resourceDir = appPath.resolve("resources");
+        if (i.image) {
+            i.languageDir = appPath.resolve("lang");
+            i.resourceDir = appPath.resolve("resources");
         } else {
-            INSTANCE.languageDir = Path.of("lang");
-            INSTANCE.resourceDir = Path.of("resources");
+            i.languageDir = Path.of("lang");
+            i.resourceDir = Path.of("resources");
         }
 
         // Legacy support
         var legacyDataDir = Path.of(System.getProperty("user.home"),
                 SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
         if (Files.exists(legacyDataDir)) {
-            INSTANCE.dataDir = legacyDataDir;
+            i.dataDir = legacyDataDir;
         } else {
-            INSTANCE.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+            i.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
         }
 
         Path appInstallPath;
@@ -58,30 +58,33 @@ public class PdxuInstallation {
             appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
                     .resolve("Programs").resolve("Pdx-Unlimiter");
         } else {
-            appInstallPath = INSTANCE.dataDir;
+            appInstallPath = i.dataDir;
         }
-        INSTANCE.rakalyDir = appInstallPath.resolve("rakaly");
+        i.rakalyDir = appInstallPath.resolve("rakaly");
 
-        INSTANCE.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
-        if (!Files.exists(INSTANCE.eu4SeDir)) {
-            INSTANCE.eu4SeDir = null;
+        i.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
+        if (!Files.exists(i.eu4SeDir)) {
+            i.eu4SeDir = null;
         }
 
-        try {
-            INSTANCE.latestVersion = Files.readString(INSTANCE.dataDir.resolve("settings").resolve("latest"));
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
+        var latestFile = i.dataDir.resolve("settings").resolve("latest");
+        if (Files.exists(latestFile)) {
+            try {
+                i.latestVersion = Files.readString(i.dataDir.resolve("settings").resolve("latest"));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
         }
 
         Properties props = new Properties();
-        if (INSTANCE.production) {
+        if (i.production) {
             try {
-                INSTANCE.version = Files.readString(appPath.resolve("version"));
+                i.version = Files.readString(appPath.resolve("version"));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
 
-            Path propsFile = INSTANCE.dataDir.resolve("settings").resolve("pdxu.properties");
+            Path propsFile = i.dataDir.resolve("settings").resolve("pdxu.properties");
             if (Files.exists(propsFile)) {
                 try {
                     props.load(Files.newInputStream(propsFile));
@@ -90,38 +93,40 @@ public class PdxuInstallation {
                 }
             }
         } else {
-            INSTANCE.version = "dev";
+            i.version = "dev";
             try {
                 props.load(Files.newInputStream(Path.of("pdxu.properties")));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
 
-            INSTANCE.languageDir = Path.of("lang");
+            i.languageDir = Path.of("lang");
 
             var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
                     .filter(Path::isAbsolute);
-            customDir.ifPresent(path -> INSTANCE.dataDir = path);
+            customDir.ifPresent(path -> i.dataDir = path);
 
-            INSTANCE.production = Optional.ofNullable(props.get("simulateProduction"))
+            i.production = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
 
             Optional.ofNullable(props.get("rakalyDir"))
                     .map(val -> Path.of(val.toString()))
                     .filter(val -> val.isAbsolute() && Files.exists(val))
-                    .ifPresent(path -> INSTANCE.rakalyDir = path);
+                    .ifPresent(path -> i.rakalyDir = path);
         }
 
-        INSTANCE.developerMode = Optional.ofNullable(props.get("developerMode"))
+        i.developerMode = Optional.ofNullable(props.get("developerMode"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(false);
-        INSTANCE.nativeHookEnabled = Optional.ofNullable(props.get("enableJNativeHook"))
+        i.nativeHookEnabled = Optional.ofNullable(props.get("enableJNativeHook"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
                 .orElse(true);
 
-        INSTANCE.preRelease = INSTANCE.version.contains("pre");
+        i.preRelease = i.version.contains("pre");
+
+        INSTANCE = i;
     }
 
     public static boolean shouldStart() {
