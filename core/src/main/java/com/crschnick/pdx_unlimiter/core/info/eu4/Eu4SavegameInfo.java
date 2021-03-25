@@ -82,7 +82,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
             e.ruler = Ruler.fromCountryNode(e.date, n.getNodeForKey("countries").getNodeForKey(tag),
-                    "monarch_heir", "monarch", "queen").get();
+                    "monarch_heir", "monarch", "queen").orElse(
+                            new Ruler("MISSING", "MISSING RULER", -1, -1, -1));
             e.heir = Ruler.fromCountryNode(e.date,
                     n.getNodeForKey("countries").getNodeForKey(tag), "heir").orElse(null);
             for (Node dep : n.getNodeForKey("diplomacy").getNodesForKey("dependency")) {
