@@ -17,7 +17,10 @@ import static java.nio.file.StandardWatchEventKinds.*;
 public class FileWatchManager {
 
     private static final FileWatchManager INSTANCE = new FileWatchManager();
+
     private final Set<WatchedDirectory> watchedDirectories = new CopyOnWriteArraySet<>();
+    private Thread watcherThread;
+    private boolean active;
 
     public static FileWatchManager getInstance() {
         return INSTANCE;
@@ -28,32 +31,47 @@ public class FileWatchManager {
     }
 
     public static void reset() {
-        INSTANCE.watchedDirectories.forEach(WatchedDirectory::stop);
-        INSTANCE.watchedDirectories.clear();
+        INSTANCE.stopWatcher();
     }
 
     public void startWatchersInDirectories(
             List<Path> dirs,
-            BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
+            BiConsumer<Path,WatchEvent.Kind<Path>> listener) {
         dirs.forEach(d -> watchedDirectories.add(WatchedDirectory.create(d, listener)));
     }
 
     private void startWatcher() {
-        TaskExecutor.getInstance().submitLoop(() -> {
-            for (var wd : new HashSet<>(watchedDirectories)) {
-                wd.update();
+        active = true;
+        watcherThread = ThreadHelper.create("savegame watcher", true, () -> {
+            while (active) {
+                for (var wd : new HashSet<>(watchedDirectories)) {
+                    wd.update();
+                }
+
+                // Don't sleep, since polling the directories always sleeps for some ms
             }
         });
+        watcherThread.start();
+    }
+
+    private void stopWatcher() {
+        active = false;
+        watchedDirectories.forEach(WatchedDirectory::stop);
+        watchedDirectories.clear();
+
+        try {
+            watcherThread.join();
+        } catch (InterruptedException e) {
+            ErrorHandler.handleException(e);
+        }
     }
 
     private static class WatchedDirectory {
         private final Map<Path, WatchService> watchers = new ConcurrentHashMap<>();
-        private Path directory;
         private BiConsumer<Path, WatchEvent.Kind<Path>> listener;
 
         public static WatchedDirectory create(Path dir, BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
             var w = new WatchedDirectory();
-            w.directory = dir;
             w.listener = listener;
             w.watchers.putAll(createRecursiveWatchers(dir));
             return w;
@@ -80,7 +98,7 @@ public class FileWatchManager {
             for (var entry : watchers.entrySet()) {
                 WatchKey key;
                 try {
-                    key = entry.getValue().poll(100, TimeUnit.MILLISECONDS);
+                    key = entry.getValue().poll(10, TimeUnit.MILLISECONDS);
                 } catch (Exception ex) {
                     continue;
                 }
@@ -148,10 +166,6 @@ public class FileWatchManager {
                     ErrorHandler.handleException(ioException);
                 }
             }
-        }
-
-        public Path getDirectory() {
-            return directory;
         }
     }
 }

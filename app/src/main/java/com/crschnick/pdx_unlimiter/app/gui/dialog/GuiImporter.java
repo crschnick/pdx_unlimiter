@@ -24,7 +24,6 @@ public class GuiImporter {
     public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
         Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
-        alert.initModality(Modality.WINDOW_MODAL);
         alert.setTitle("Import results");
         alert.setHeaderText("The import of the selected savegames has finished.");
         alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
