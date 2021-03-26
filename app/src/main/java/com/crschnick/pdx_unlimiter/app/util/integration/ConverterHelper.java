@@ -56,7 +56,8 @@ public class ConverterHelper {
     }
 
     public static String getOutputName(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
-        var s = SavegameStorage.<Ck3Tag, Ck3SavegameInfo>get(Game.CK3).getFileSystemCompatibleName(entry);
+        var s = SavegameStorage.<Ck3Tag, Ck3SavegameInfo>get(Game.CK3)
+                .getFileSystemCompatibleName(entry, true);
         s = FilenameUtils.getBaseName(s);
         s = s.replace(" ", "_");
         return s;

@@ -27,7 +27,8 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry) {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var sc = ctx.getStorage();
-            var out = FileUtils.getTempDirectory().toPath().resolve(sc.getFileSystemCompatibleName(entry));
+            var out = FileUtils.getTempDirectory().toPath().resolve(
+                    sc.getFileSystemCompatibleName(entry, true));
             try {
                 sc.copySavegameTo(entry, out);
             } catch (IOException ioException) {

@@ -482,10 +482,10 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized String getFileSystemCompatibleName(SavegameEntry<?, ?> e) {
+    public synchronized String getFileSystemCompatibleName(SavegameEntry<?, ?> e, boolean includeEntryName) {
         var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
-        return colName + " (" + sgName + ")." + fileEnding;
+        return colName + (includeEntryName ? " (" + sgName + ")." : ".") + fileEnding;
     }
 
     public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
