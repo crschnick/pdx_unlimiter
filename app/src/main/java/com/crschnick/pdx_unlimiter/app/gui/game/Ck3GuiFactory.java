@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
@@ -110,7 +111,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Ck3Tag> info) {
         return new Background(new BackgroundFill(
-                Color.CORAL,
+                Ck3Backgrounds.getBackgroundColor(info),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 

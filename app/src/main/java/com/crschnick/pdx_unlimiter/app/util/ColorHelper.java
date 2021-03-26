@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.util;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
@@ -93,6 +94,24 @@ public class ColorHelper {
         }
 
         throw new IllegalArgumentException();
+    }
+
+    public static Color fromGameColor(GameColor color) {
+        var c = color.getValues();
+        return switch (color.getType()) {
+            case HSV -> Color.hsb(
+                    Double.parseDouble(c.get(0)) * 360,
+                    Double.parseDouble(c.get(1)),
+                    Double.parseDouble(c.get(2)));
+            case HSV360 -> Color.hsb(
+                    Double.parseDouble(c.get(0)),
+                    Double.parseDouble(c.get(1)) / 360.0,
+                    Double.parseDouble(c.get(2)) / 360.0);
+            case RGB -> Color.color(
+                    Double.parseDouble(c.get(0)) / 255.0,
+                    Double.parseDouble(c.get(1)) / 255.0,
+                    Double.parseDouble(c.get(2)) / 255.0);
+        };
     }
 
     private static Map<String, Color> loadPredefinedColors(Node node) {

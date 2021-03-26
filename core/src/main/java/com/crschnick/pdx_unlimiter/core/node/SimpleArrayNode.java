@@ -22,6 +22,10 @@ public final class SimpleArrayNode extends ArrayNode {
 
     @Override
     public String toString() {
+        if (values.size() == 0) {
+            return "SimpleArrayNode(0)";
+        }
+
         if (values.size() <= 10) {
             StringBuilder sb = new StringBuilder("SimpleArrayNode(");
             evaluateAllValueNodes();

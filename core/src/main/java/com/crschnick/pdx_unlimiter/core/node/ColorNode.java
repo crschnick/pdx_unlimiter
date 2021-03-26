@@ -76,6 +76,11 @@ public final class ColorNode extends Node {
     }
 
     @Override
+    public ColorNode getColorNode() {
+        return this;
+    }
+
+    @Override
     public boolean isValue() {
         return false;
     }

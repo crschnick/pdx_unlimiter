@@ -71,6 +71,15 @@ public class TextFormatTokenizer {
     private void tokenizeIteration() {
         // Add extra new line at the end to simulate end of token
         char c = i == bytes.length ? '\n' : (char) bytes[i];
+
+        if (isInComment) {
+            if (c == '\n') {
+                isInComment = false;
+            }
+            prev = i + 1;
+            return;
+        }
+
         byte t = 0;
         if (isInQuotes && c != '"') {
             return;
@@ -82,14 +91,6 @@ public class TextFormatTokenizer {
             t = CLOSE_GROUP;
         } else if (c == '=') {
             t = EQUALS;
-        }
-
-        if (isInComment) {
-            if (c == '\n') {
-                isInComment = false;
-            }
-            prev = i + 1;
-            return;
         }
 
         boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');

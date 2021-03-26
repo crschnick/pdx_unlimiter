@@ -21,6 +21,8 @@ public abstract class Node {
 
     public abstract void write(NodeWriter writer) throws IOException;
 
+    public ColorNode getColorNode() { throw new UnsupportedOperationException();}
+
     public List<Node> getNodeArray() {
         throw new UnsupportedOperationException();
     }

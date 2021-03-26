@@ -143,15 +143,18 @@ public final class TextFormatParser extends FormatParser {
 
                 Node result = parseNodeIfNotSimpleValue();
                 if (result == null) {
+                    // System.out.println("key: " + context.evaluate(keyIndex));
+                    // System.out.println("val: " + context.evaluate(slIndex));
+
                     builder.putKeyAndScalarValue(keyIndex, slIndex);
                     index++;
                     slIndex++;
                 } else {
+                    // System.out.println("key: " + context.evaluate(keyIndex));
+                    // System.out.println("val: " + result.toString());
+
                     builder.putKeyAndNodeValue(keyIndex, result);
                 }
-
-                //System.out.println("key: " + context.evaluate(start, length));
-                //System.out.println("val: " + result.toString());
 
                 continue;
             }

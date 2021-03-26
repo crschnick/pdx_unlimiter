@@ -1,5 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.info.ck3;
 
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
+import com.crschnick.pdx_unlimiter.core.node.ColorNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 
@@ -9,14 +11,18 @@ import java.util.Optional;
 
 public class Ck3Title {
 
+    private String key;
     private String name;
+    private GameColor color;
     private Ck3CoatOfArms coatOfArms;
 
     public Ck3Title() {
     }
 
-    public Ck3Title(String name, Ck3CoatOfArms coatOfArms) {
+    public Ck3Title(String key, String name, GameColor color, Ck3CoatOfArms coatOfArms) {
+        this.key = key;
         this.name = name;
+        this.color = color;
         this.coatOfArms = coatOfArms;
     }
 
@@ -38,9 +44,14 @@ public class Ck3Title {
         }
 
         var name = n.getNodeForKey("name").getString();
+        var key = n.getNodeForKey("key").getString();
         var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
+        var color = n.getNodeForKeyIfExistent("color")
+                .map(Node::getColorNode)
+                .map(GameColor::fromColorNode)
+                .orElse(null);
         var coatOfArms = coaMap.get(coaId);
-        return Optional.of(new Ck3Title(name, coatOfArms));
+        return Optional.of(new Ck3Title(key, name, color, coatOfArms));
     }
 
     public String getName() {
@@ -49,5 +60,13 @@ public class Ck3Title {
 
     public Ck3CoatOfArms getCoatOfArms() {
         return coatOfArms;
+    }
+
+    public Optional<GameColor> getColor() {
+        return Optional.ofNullable(color);
+    }
+
+    public String getKey() {
+        return key;
     }
 }
