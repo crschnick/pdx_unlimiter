@@ -103,6 +103,10 @@ public class PdxuApp extends Application {
 
         w.show();
         windowActive = true;
+
+        // Fix bug with DPI scaling.
+        // Window only calculates its right content size when resized AFTER being shown
+        w.setWidth(w.getWidth() + 1);
     }
 
     public void setupBasicWindowContent() {
@@ -119,6 +123,7 @@ public class PdxuApp extends Application {
         Scene scene = new Scene(layout.getContent());
         stage.setScene(scene);
         GuiStyle.addStylesheets(scene);
+        layout.getContent().requestLayout();
     }
 
     public void setupCompleteWindowContent() {
