@@ -31,8 +31,19 @@ public class GameImage {
     public static Image CK3_ICON_WAR;
     public static Image CK3_ICON_ALLY;
     public static Image CK3_BACKGROUND;
+
     public static Image CK3_REALM_MASK;
+    public static Image CK3_REALM_CLAN_MASK;
+    public static Image CK3_REALM_REPUBLIC_MASK;
+    public static Image CK3_REALM_THEOCRACY_MASK;
+    public static Image CK3_REALM_TRIBAL_MASK;
+
     public static Image CK3_REALM_FRAME;
+    public static Image CK3_REALM_CLAN_FRAME;
+    public static Image CK3_REALM_REPUBLIC_FRAME;
+    public static Image CK3_REALM_THEOCRACY_FRAME;
+    public static Image CK3_REALM_TRIBAL_FRAME;
+
     public static Image CK3_TITLE_MASK;
     public static Image CK3_TITLE_FRAME;
     public static Image CK3_HOUSE_MASK;
@@ -181,7 +192,16 @@ public class GameImage {
         CK3_ICON_CLAIMS = ImageLoader.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
 
         CK3_REALM_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("_default.dds"));
+        CK3_REALM_CLAN_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("clan_government.dds"));
+        CK3_REALM_REPUBLIC_MASK= ImageLoader.loadImage(i.resolve("realm_masks").resolve("republic_government.dds"));
+        CK3_REALM_THEOCRACY_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("theocracy_government.dds"));
+        CK3_REALM_TRIBAL_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("tribal_government.dds"));
+
         CK3_REALM_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("_default_115.dds"));
+        CK3_REALM_CLAN_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("clan_government_115.dds"));
+        CK3_REALM_REPUBLIC_FRAME= ImageLoader.loadImage(i.resolve("realm_frames").resolve("republic_government_115.dds"));
+        CK3_REALM_THEOCRACY_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("theocracy_government_115.dds"));
+        CK3_REALM_TRIBAL_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("tribal_government_115.dds"));
 
         CK3_COA_OVERLAY = ImageLoader.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")

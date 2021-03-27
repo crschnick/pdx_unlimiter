@@ -52,6 +52,10 @@
 -fx-font-size: 1.15em;
 }
 
+.campaign-list-entry .delete-button {
+-fx-font-size: 1.2em;
+}
+
 .campaign-list-entry {
 -fx-padding: 0.25em;
 -fx-max-width: 18em;

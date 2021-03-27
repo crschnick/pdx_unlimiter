@@ -31,7 +31,8 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
+    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
+        Ck3CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
 
@@ -52,12 +53,23 @@ public class Ck3TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-
-        applyMask(i, GameImage.CK3_REALM_MASK);
+        var masks = Map.of(
+                "clan_government", GameImage.CK3_REALM_CLAN_MASK,
+                "republic_government", GameImage.CK3_REALM_REPUBLIC_MASK,
+                "theocracy_government", GameImage.CK3_REALM_THEOCRACY_MASK,
+                "tribal_government", GameImage.CK3_REALM_THEOCRACY_MASK);
+        var useMask = masks.getOrDefault(tag.getGovernmentName(), GameImage.CK3_REALM_MASK);
+        applyMask(i, useMask);
         brighten(i);
 
 
-        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_REALM_FRAME),
+        var frames = Map.of(
+                "clan_government", GameImage.CK3_REALM_CLAN_FRAME,
+                "republic_government", GameImage.CK3_REALM_REPUBLIC_FRAME,
+                "theocracy_government", GameImage.CK3_REALM_THEOCRACY_FRAME,
+                "tribal_government", GameImage.CK3_REALM_THEOCRACY_FRAME);
+        var useFrame = frames.getOrDefault(tag.getGovernmentName(), GameImage.CK3_REALM_FRAME);
+        g.drawImage(ImageLoader.fromFXImage(useFrame),
                 3,
                 -12,
                 i.getWidth() - 6,

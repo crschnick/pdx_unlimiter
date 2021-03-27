@@ -11,15 +11,17 @@ public class Ck3Tag {
     private Ck3Person ruler;
     private List<Ck3Title> titles;
     private List<Ck3Title> claims;
+    private String governmentName;
 
     public Ck3Tag() {
     }
 
-    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims) {
+    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName) {
         this.id = id;
         this.ruler = ruler;
         this.titles = titles;
         this.claims = claims;
+        this.governmentName = governmentName;
     }
 
     public static Optional<Ck3Tag> getTag(Set<Ck3Tag> tags, long id) {
@@ -48,7 +50,8 @@ public class Ck3Tag {
                     titles.get(c.getNodeForKey("title").getLong())).collect(Collectors.toList()));
         });
 
-        var tag = new Ck3Tag(id, person, tagTitles, tagClaims);
+        var gv = personNode.getNodeForKey("landed_data").getNodeForKey("government").getString();
+        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv);
         allTags.removeIf(t -> t.id == id);
         allTags.add(tag);
         return tag;
@@ -69,7 +72,8 @@ public class Ck3Tag {
             long id = Long.parseLong(k);
             var domain = v.getNodeForKey("landed_data").getNodeForKey("domain");
             var primary = domain.getNodeArray().get(0).getLong();
-            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)), null));
+            var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
+            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)), null, gv));
         });
         return allTags;
     }
@@ -92,5 +96,9 @@ public class Ck3Tag {
 
     public long getId() {
         return id;
+    }
+
+    public String getGovernmentName() {
+        return governmentName;
     }
 }

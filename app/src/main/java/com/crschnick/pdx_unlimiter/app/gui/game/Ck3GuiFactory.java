@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
@@ -19,12 +18,13 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.*;
@@ -92,7 +92,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
-        return Ck3TagRenderer.realmImage(info, tag.getPrimaryTitle().getCoatOfArms());
+        return Ck3TagRenderer.realmImage(info, tag);
     }
 
     @Override
@@ -135,36 +135,29 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         return b.toString();
     }
 
-    private void createDiplomacyRow(
+    private void createTitleRow(
             JFXMasonryPane pane,
             SavegameInfo<Ck3Tag> info,
-            Node icon,
-            List<Ck3Title> tags,
-            String tooltipStart,
-            String none,
-            String style) {
-        if (tags.size() == 0) {
+            Region icon,
+            List<Ck3Title> titles,
+            String tooltip) {
+        if (titles.size() == 0) {
             return;
         }
 
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        box.getChildren().add(icon);
-        int counter = 0;
-        for (Ck3Title tag : tags) {
-            Node n = GameImage.imageNode(Ck3TagRenderer.titleImage(info, tag.getCoatOfArms()), CLASS_TAG_ICON);
-            box.getChildren().add(n);
-            if (counter > 6) {
-                box.getChildren().add(new Label("..."));
-                break;
-            }
-            counter++;
-        }
-        box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
-        box.getStyleClass().add(style);
-        box.setSpacing(6);
-        GuiTooltips.install(box, tooltipStart + (tags.size() > 0 ? getTitlesTooltip(tags) : none));
-        addNode(pane, box);
+        var list = titles.stream()
+                .sorted(Comparator.comparingInt(t -> t.getClaimCount()))
+                .collect(Collectors.toList());
+        var row = TagRows.createTagRow(
+                icon,
+                tooltip,
+                list,
+                t -> t.getName(),
+                t -> GameImage.imageNode(Ck3TagRenderer.titleImage(info, t.getCoatOfArms()), CLASS_TAG_ICON));
+
+        row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
+        row.getStyleClass().add("title-row");
+        addNode(pane, row);
     }
 
     private void createDiplomacyRealmRow(
@@ -182,12 +175,13 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
         box.getChildren().add(icon);
+
         int counter = 0;
         for (Ck3Tag tag : tags) {
             Node n = GameImage.imageNode(Ck3TagRenderer.realmImage(
-                    info, tag.getPrimaryTitle().getCoatOfArms()), CLASS_TAG_ICON);
+                    info, tag), CLASS_TAG_ICON);
             box.getChildren().add(n);
-            if (counter > 6) {
+            if (counter > 15) {
                 box.getChildren().add(new Label("..."));
                 break;
             }
@@ -204,10 +198,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
         addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
 
-        createDiplomacyRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
-                info.getTag().getTitles(), "Titles: ", "No titles", "title-row");
-        createDiplomacyRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
-                info.getTag().getClaims(), "Claims: ", "No claims", "title-row");
+        createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
+                info.getTag().getTitles(), "Titles");
+        createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
+                info.getTag().getClaims(), "Claims");
 
         for (War<Ck3Tag> war : ((Ck3SavegameInfo) info).getWars()) {
             createDiplomacyRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),

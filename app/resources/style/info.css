@@ -5,7 +5,11 @@
 }
 
 .diplomacy-row {
--fx-spacing: 0.5em;
+-fx-spacing: 0.3em;
+}
+
+.diplomacy-row * {
+-fx-spacing: 0.3em;
 }
 
 .compatible {
