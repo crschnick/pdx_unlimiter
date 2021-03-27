@@ -36,10 +36,10 @@ public class Ck3CoatOfArms {
         var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
 
         List<String> colors = new ArrayList<>();
-        n.getNodeForKeyIfExistent("color1").map(Node::getString).ifPresent(colors::add);
-        n.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(colors::add);
-        n.getNodeForKeyIfExistent("color3").map(Node::getString).ifPresent(colors::add);
-        n.getNodeForKeyIfExistent("color4").map(Node::getString).ifPresent(colors::add);
+        n.getNodeForKeyIfExistent("color1").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+        n.getNodeForKeyIfExistent("color2").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+        n.getNodeForKeyIfExistent("color3").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+        n.getNodeForKeyIfExistent("color4").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
 
         List<Emblem> emblems = new ArrayList<>();
         emblems.addAll(n.getNodesForKey("colored_emblem").stream()
