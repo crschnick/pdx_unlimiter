@@ -15,17 +15,15 @@ public class Ck3Title {
     private String name;
     private GameColor color;
     private Ck3CoatOfArms coatOfArms;
-    private int claimCount;
 
     public Ck3Title() {
     }
 
-    public Ck3Title(String key, String name, GameColor color, Ck3CoatOfArms coatOfArms, int claimCount) {
+    public Ck3Title(String key, String name, GameColor color, Ck3CoatOfArms coatOfArms) {
         this.key = key;
         this.name = name;
         this.color = color;
         this.coatOfArms = coatOfArms;
-        this.claimCount = claimCount;
     }
 
     public static Map<Long, Ck3Title> createTitleMap(Node node, Map<Long, Ck3CoatOfArms> coaMap) {
@@ -45,7 +43,6 @@ public class Ck3Title {
             return Optional.empty();
         }
 
-        var claims = n.getNodeForKeyIfExistent("claims").map(cn -> cn.getNodeArray().size()).orElse(0);
         var name = n.getNodeForKey("name").getString();
         var key = n.getNodeForKey("key").getString();
         var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
@@ -54,7 +51,7 @@ public class Ck3Title {
                 .map(GameColor::fromColorNode)
                 .orElse(null);
         var coatOfArms = coaMap.get(coaId);
-        return Optional.of(new Ck3Title(key, name, color, coatOfArms, claims));
+        return Optional.of(new Ck3Title(key, name, color, coatOfArms));
     }
 
     public String getName() {
@@ -71,9 +68,5 @@ public class Ck3Title {
 
     public String getKey() {
         return key;
-    }
-
-    public int getClaimCount() {
-        return claimCount;
     }
 }

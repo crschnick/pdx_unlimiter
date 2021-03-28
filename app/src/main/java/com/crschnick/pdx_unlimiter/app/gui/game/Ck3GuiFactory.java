@@ -22,6 +22,7 @@ import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 topBar.setAlignment(Pos.CENTER);
                 topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
                 int age = GameDate.yearsBetween(ruler.getBirth(), info.getDate());
-                var title = new Label(info.getPlayerName() + " of " + info.getTag().getPrimaryTitle().getName() + ", " + age);
+                var title = new Label(info.getPlayerName() + " of " + info.getTag().getName() + ", " + age);
                 title.getStyleClass().add("ruler-name");
                 topBar.getChildren().add(title);
 
@@ -116,26 +117,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 
-    private String getTitlesTooltip(List<Ck3Title> titles) {
-        StringBuilder b = new StringBuilder();
-        for (Ck3Title t : titles) {
-            b.append(t.getName());
-            b.append(", ");
-        }
-        b.delete(b.length() - 2, b.length());
-        return b.toString();
-    }
-
-    private String getTagsTooltip(List<Ck3Tag> tags) {
-        StringBuilder b = new StringBuilder();
-        for (Ck3Tag t : tags) {
-            b.append(t.getPrimaryTitle().getName());
-            b.append(", ");
-        }
-        b.delete(b.length() - 2, b.length());
-        return b.toString();
-    }
-
     private void createTitleRow(
             JFXMasonryPane pane,
             SavegameInfo<Ck3Tag> info,
@@ -147,13 +128,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             return;
         }
 
-        var list = titles.stream()
-                .sorted(Comparator.comparingInt(t -> -t.getClaimCount()))
-                .collect(Collectors.toList());
         var row = TagRows.createTagRow(
                 icon,
                 tooltip,
-                list,
+                titles,
                 t -> t.getName(),
                 t -> GameImage.imageNode(Ck3TagRenderer.titleImage(info, t.getCoatOfArms()), CLASS_TAG_ICON));
 
@@ -174,14 +152,11 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             return;
         }
 
-        var list = tags.stream()
-                .sorted(Comparator.comparingInt(t -> -t.getPrimaryTitle().getClaimCount()))
-                .collect(Collectors.toList());
-        var row = TagRows.<Ck3Tag>createTagRow(
+        var row = TagRows.createTagRow(
                 icon,
                 tooltip,
-                list,
-                t -> t.getPrimaryTitle().getName(),
+                tags,
+                t -> t.getName(),
                 t -> GameImage.imageNode(Ck3TagRenderer.realmImage(info, t), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);

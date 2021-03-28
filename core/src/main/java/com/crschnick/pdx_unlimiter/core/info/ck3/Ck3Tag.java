@@ -8,21 +8,24 @@ import java.util.stream.Collectors;
 public class Ck3Tag {
 
     private long id;
-    private Ck3CoatOfArms coa;
     private Ck3Person ruler;
     private List<Ck3Title> titles;
     private List<Ck3Title> claims;
     private String governmentName;
+    private Ck3CoatOfArms coatOfArms;
+    private String name;
 
     public Ck3Tag() {
     }
 
-    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName) {
+    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, Ck3CoatOfArms coatOfArms, String name) {
         this.id = id;
         this.ruler = ruler;
         this.titles = titles;
         this.claims = claims;
         this.governmentName = governmentName;
+        this.coatOfArms = coatOfArms;
+        this.name = name;
     }
 
     @Override
@@ -64,8 +67,12 @@ public class Ck3Tag {
                     titles.get(c.getNodeForKey("title").getLong())).collect(Collectors.toList()));
         });
 
+        var coa = Ck3CoatOfArms.fromNode(
+                n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"));
+        var name = n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
+
         var gv = personNode.getNodeForKey("landed_data").getNodeForKey("government").getString();
-        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv);
+        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name);
         allTags.removeIf(t -> t.id == id);
         allTags.add(tag);
         return tag;
@@ -87,7 +94,7 @@ public class Ck3Tag {
             var domain = v.getNodeForKey("landed_data").getNodeForKey("domain");
             var primary = domain.getNodeArray().get(0).getLong();
             var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
-            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)), null, gv));
+            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)), null, gv, null, null));
         });
         return allTags;
     }
@@ -114,5 +121,13 @@ public class Ck3Tag {
 
     public String getGovernmentName() {
         return governmentName;
+    }
+
+    public Ck3CoatOfArms getCoatOfArms() {
+        return coatOfArms != null ? coatOfArms : getPrimaryTitle().getCoatOfArms();
+    }
+
+    public String getName() {
+        return name != null ? name : getPrimaryTitle().getName();
     }
 }

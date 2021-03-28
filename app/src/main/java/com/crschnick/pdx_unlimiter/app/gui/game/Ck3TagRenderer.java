@@ -32,7 +32,7 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
-        Ck3CoatOfArms coa = tag.getPrimaryTitle().getCoatOfArms();
+        Ck3CoatOfArms coa = tag.getCoatOfArms();
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics coaG = coaImg.getGraphics();
 
