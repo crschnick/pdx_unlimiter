@@ -30,3 +30,15 @@
 -fx-max-height: 2.5em;
 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
+
+.ck3 .ruler-info {
+-fx-background-color: #dddddd88;
+}
+
+.ck3 .titles {
+      -fx-background-color: #ba9f5c;
+}
+
+.ck3 .claims {
+      -fx-background-color: #966e6a;
+}

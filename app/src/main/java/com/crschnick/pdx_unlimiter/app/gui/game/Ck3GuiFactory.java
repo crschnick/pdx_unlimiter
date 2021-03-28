@@ -35,6 +35,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         HBox rulerNode = new HBox();
         rulerNode.setSpacing(15);
         rulerNode.setAlignment(Pos.CENTER);
+        rulerNode.getStyleClass().add("ruler-info");
         {
             VBox box = new VBox();
             box.setSpacing(5);
@@ -140,13 +141,14 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             SavegameInfo<Ck3Tag> info,
             Region icon,
             List<Ck3Title> titles,
-            String tooltip) {
+            String tooltip,
+            String style) {
         if (titles.size() == 0) {
             return;
         }
 
         var list = titles.stream()
-                .sorted(Comparator.comparingInt(t -> t.getClaimCount()))
+                .sorted(Comparator.comparingInt(t -> -t.getClaimCount()))
                 .collect(Collectors.toList());
         var row = TagRows.createTagRow(
                 icon,
@@ -157,41 +159,35 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("title-row");
+        row.getStyleClass().add(style);
         addNode(pane, row);
     }
 
-    private void createDiplomacyRealmRow(
+    private void createRealmRow(
             JFXMasonryPane pane,
             SavegameInfo<Ck3Tag> info,
-            Node icon,
+            Region icon,
             List<Ck3Tag> tags,
-            String tooltipStart,
-            String none,
+            String tooltip,
             String style) {
         if (tags.size() == 0) {
             return;
         }
 
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        box.getChildren().add(icon);
+        var list = tags.stream()
+                .sorted(Comparator.comparingInt(t -> -t.getPrimaryTitle().getClaimCount()))
+                .collect(Collectors.toList());
+        var row = TagRows.<Ck3Tag>createTagRow(
+                icon,
+                tooltip,
+                list,
+                t -> t.getPrimaryTitle().getName(),
+                t -> GameImage.imageNode(Ck3TagRenderer.realmImage(info, t), CLASS_TAG_ICON));
 
-        int counter = 0;
-        for (Ck3Tag tag : tags) {
-            Node n = GameImage.imageNode(Ck3TagRenderer.realmImage(
-                    info, tag), CLASS_TAG_ICON);
-            box.getChildren().add(n);
-            if (counter > 15) {
-                box.getChildren().add(new Label("..."));
-                break;
-            }
-            counter++;
-        }
-        box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
-        box.getStyleClass().add(style);
-        box.setSpacing(6);
-        GuiTooltips.install(box, tooltipStart + (tags.size() > 0 ? getTagsTooltip(tags) : none));
-        addNode(pane, box);
+        row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
+        row.getStyleClass().add("realm-row");
+        row.getStyleClass().add(style);
+        addNode(pane, row);
     }
 
     @Override
@@ -199,19 +195,19 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
 
         createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
-                info.getTag().getTitles(), "Titles");
+                info.getTag().getTitles(), "Titles", "titles");
         createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
-                info.getTag().getClaims(), "Claims");
+                info.getTag().getClaims(), "Claims", "claims");
 
         for (War<Ck3Tag> war : ((Ck3SavegameInfo) info).getWars()) {
-            createDiplomacyRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),
+            createRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),
                     war.isAttacker(info.getTag()) ? war.getDefenders() : war.getAttackers(),
-                    "Fighting in the " + war.getTitle() + " against ", "", CLASS_WAR);
+                    war.getTitle(), CLASS_WAR);
         }
 
-        createDiplomacyRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
+        createRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
                 ((Ck3SavegameInfo) info).getAllies(),
-                "Allied with ", "", CLASS_ALLIANCE);
+                "Allies", CLASS_ALLIANCE);
 
         if (info.isIronman()) {
             var ironman = new StackPane(imageNode(CK3_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
