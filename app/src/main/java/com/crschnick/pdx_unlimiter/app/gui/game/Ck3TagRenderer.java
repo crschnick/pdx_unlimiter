@@ -11,6 +11,7 @@ import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import javafx.scene.image.Image;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class Ck3TagRenderer {
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
         Ck3CoatOfArms coa = tag.getCoatOfArms();
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics coaG = coaImg.getGraphics();
+        Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
 
 
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -82,7 +83,7 @@ public class Ck3TagRenderer {
 
     public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics coaG = coaImg.getGraphics();
+        Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
 
 
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -120,7 +121,7 @@ public class Ck3TagRenderer {
 
     public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics coaG = coaImg.getGraphics();
+        Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
 
 
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -228,7 +229,7 @@ public class Ck3TagRenderer {
         }
     }
 
-    private static void emblem(Graphics g, Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
+    private static void emblem(Graphics2D g, Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(ColorCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(ColorHelper.loadCk3(info));
@@ -256,17 +257,22 @@ public class Ck3TagRenderer {
                 GameInstallation.ALL.get(Game.CK3));
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
             for (var instance : emblem.getInstances()) {
-                int width = (int) (instance.getScaleX() * IMG_SIZE);
-                int height = (int) (instance.getScaleY() * IMG_SIZE);
-                int startX = (int) ((instance.getX() * IMG_SIZE) - (width / 2.0));
-                int startY = (int) ((instance.getY() * IMG_SIZE) - (height / 2.0));
-                g.drawImage(img,
-                        startX,
-                        startY,
-                        width,
-                        height,
-                        new java.awt.Color(0, 0, 0, 0),
-                        null);
+                var scaleX = ((double) IMG_SIZE / img.getWidth()) * instance.getScaleX();
+                var scaleY = ((double) IMG_SIZE / img.getHeight()) * instance.getScaleY();
+
+                AffineTransform trans = new AffineTransform();
+
+                trans.translate(IMG_SIZE * instance.getX(), IMG_SIZE * instance.getY());
+                trans.scale(scaleX, scaleY);
+                trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
+
+                if (instance.getRotation() != 0) {
+                    trans.translate(img.getWidth() / 2.0, img.getHeight() / 2.0);
+                    trans.rotate(Math.signum(scaleX) * Math.signum(scaleY) * Math.toRadians(instance.getRotation()));
+                    trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
+                }
+
+                g.drawImage(img, trans, null);
             }
         });
     }

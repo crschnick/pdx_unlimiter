@@ -68,7 +68,7 @@ public class Ck3Tag {
         });
 
         var coa = Ck3CoatOfArms.fromNode(
-                n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"));
+                n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"));
         var name = n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
         var gv = personNode.getNodeForKey("landed_data").getNodeForKey("government").getString();
