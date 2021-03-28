@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public class Ck3Tag {
 
     private long id;
+    private Ck3CoatOfArms coa;
     private Ck3Person ruler;
     private List<Ck3Title> titles;
     private List<Ck3Title> claims;
@@ -22,6 +23,19 @@ public class Ck3Tag {
         this.titles = titles;
         this.claims = claims;
         this.governmentName = governmentName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ck3Tag ck3Tag = (Ck3Tag) o;
+        return id == ck3Tag.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public static Optional<Ck3Tag> getTag(Set<Ck3Tag> tags, long id) {
