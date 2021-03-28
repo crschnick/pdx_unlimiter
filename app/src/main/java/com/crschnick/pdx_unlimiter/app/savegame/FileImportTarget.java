@@ -231,6 +231,11 @@ public abstract class FileImportTarget {
 
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
+                // File might no longer exist, since this is executed asynchronously in the task executor queue
+                if (!Files.exists(path)) {
+                    return;
+                }
+
                 onFinish.accept(savegameStorage.importSavegame(
                         path, null, true, getSourceFileChecksum(), null));
             }, true);
