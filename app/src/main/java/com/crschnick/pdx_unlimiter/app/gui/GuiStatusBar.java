@@ -49,6 +49,9 @@ public class GuiStatusBar {
                 bar.stopRunning();
             }
         });
+        if (GameAppManager.getInstance().activeGameProperty().get() != null) {
+            bar.setRunning();
+        }
 
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
             bar.hide();
