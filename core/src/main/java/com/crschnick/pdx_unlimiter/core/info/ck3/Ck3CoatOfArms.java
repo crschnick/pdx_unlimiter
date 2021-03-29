@@ -74,6 +74,8 @@ public class Ck3CoatOfArms {
 
         private int rotation = 0;
 
+        private int depth = 0;
+
         public double getX() {
             return x;
         }
@@ -93,11 +95,16 @@ public class Ck3CoatOfArms {
         public int getRotation() {
             return rotation;
         }
+
+        public int getDepth() {
+            return depth;
+        }
     }
 
     public static class Emblem {
 
         private String file;
+        private List<Integer> mask;
         private List<String> colors;
         private List<Instance> instances;
 
@@ -106,6 +113,11 @@ public class Ck3CoatOfArms {
             c.file = n.getNodeForKey("texture").getString();
             c.colors = new ArrayList<>();
             c.instances = List.of(new Instance());
+            
+            n.getNodeForKeyIfExistent("mask").ifPresentOrElse(r -> {
+                c.mask = r.getNodeArray().stream().map(Node::getInteger).collect(Collectors.toList());
+            }, () -> c.mask = new ArrayList<>());
+
             return c;
         }
 
@@ -117,6 +129,10 @@ public class Ck3CoatOfArms {
             // Even color1 can sometimes be missing
             n.getNodeForKeyIfExistent("color1").map(Node::getString).ifPresent(c.colors::add);
             n.getNodeForKeyIfExistent("color2").map(Node::getString).ifPresent(c.colors::add);
+
+            n.getNodeForKeyIfExistent("mask").ifPresentOrElse(r -> {
+                c.mask = r.getNodeArray().stream().map(Node::getInteger).collect(Collectors.toList());
+            }, () -> c.mask = new ArrayList<>());
 
             c.instances = n.getNodesForKey("instance").stream().map(i -> {
                 Instance instance = new Instance();
@@ -130,6 +146,9 @@ public class Ck3CoatOfArms {
                 });
                 i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
                     instance.rotation = r.getInteger();
+                });
+                i.getNodeForKeyIfExistent("depth").ifPresent(r -> {
+                    instance.depth = r.getInteger();
                 });
                 return instance;
             }).collect(Collectors.toList());
@@ -149,6 +168,10 @@ public class Ck3CoatOfArms {
 
         public List<Instance> getInstances() {
             return instances;
+        }
+
+        public List<Integer> getMask() {
+            return mask;
         }
     }
 }

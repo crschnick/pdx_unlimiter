@@ -16,7 +16,9 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -63,9 +65,9 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        pattern(coaG, coa, info);
+        var rawPatternImg = pattern(coaG, coa, info);
         for (var emblem : coa.getEmblems()) {
-            emblem(coaG, emblem, info);
+            emblem(coaImg, rawPatternImg, emblem, info);
         }
 
         g.drawImage(coaImg,
@@ -120,9 +122,9 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        pattern(coaG, coa, info);
+        var rawPatternImg = pattern(coaG, coa, info);
         for (var emblem : coa.getEmblems()) {
-            emblem(coaG, emblem, info);
+            emblem(coaImg, rawPatternImg, emblem, info);
         }
 
         applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
@@ -167,9 +169,9 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        pattern(coaG, coa, info);
+        var rawPatternImg = pattern(coaG, coa, info);
         for (var emblem : coa.getEmblems()) {
-            emblem(coaG, emblem, info);
+            emblem(coaImg, rawPatternImg, emblem, info);
         }
 
         applyMask(coaImg, GameImage.CK3_TITLE_MASK);
@@ -209,6 +211,23 @@ public class Ck3TagRenderer {
         }
     }
 
+    private static void applyCullingMask(BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
+        double xF = (double) patternImage.getWidth() / emblemImage.getWidth();
+        double yF = (double) patternImage.getHeight() / emblemImage.getHeight();
+        for (int x = 0; x < emblemImage.getWidth(); x++) {
+            for (int y = 0; y < emblemImage.getHeight(); y++) {
+                int maskArgb = patternImage.getRGB(
+                        (int) Math.floor(xF * x), (int) Math.floor(yF * y));
+                int maskRgb = 0x00FFFFFF & maskArgb;
+                int maskIndex = 1 + ColorHelper.pickClosestColor(maskRgb,
+                        PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
+                if (!indices.contains(maskIndex)) {
+                    emblemImage.setRGB(x, y, 0);
+                }
+            }
+        }
+    }
+
     private static void applyMask(BufferedImage awtImage, Image mask) {
         double xF = mask.getWidth() / awtImage.getWidth();
         double yF = mask.getHeight() / awtImage.getHeight();
@@ -227,21 +246,8 @@ public class Ck3TagRenderer {
         }
     }
 
-    private static int pickClosestColor(int input, int... colors) {
-        int minDist = Integer.MAX_VALUE;
-        int cMin = -1;
-        int counter = 0;
-        for (int c : colors) {
-            if (Math.abs(input - c) < minDist) {
-                minDist = Math.abs(input - c);
-                cMin = counter;
-            }
-            counter++;
-        }
-        return cMin;
-    }
 
-    private static void pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
+    private static BufferedImage pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(ColorHelper.loadCk3(info));
@@ -268,10 +274,15 @@ public class Ck3TagRenderer {
             patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
                 g.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE, null);
             });
+            return patternFile.map(p -> ImageLoader.loadAwtImage(p, null)).orElse(null);
+        } else {
+            return null;
         }
     }
 
-    private static void emblem(Graphics2D g, Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
+    private static void emblem(BufferedImage currentImage,
+                               BufferedImage rawPatternImage,
+                               Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(ColorHelper.loadCk3(info));
@@ -298,7 +309,16 @@ public class Ck3TagRenderer {
                 info,
                 GameInstallation.ALL.get(Game.CK3));
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
-            for (var instance : emblem.getInstances()) {
+
+            boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
+            BufferedImage emblemToCullImage = null;
+            if (hasMask) {
+                emblemToCullImage = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+            }
+            Graphics2D usedGraphics = hasMask ? (Graphics2D) emblemToCullImage.getGraphics() :
+                    (Graphics2D) currentImage.getGraphics();
+
+            emblem.getInstances().stream().sorted(Comparator.comparingInt(i -> i.getDepth())).forEach(instance -> {
                 var scaleX = ((double) IMG_SIZE / img.getWidth()) * instance.getScaleX();
                 var scaleY = ((double) IMG_SIZE / img.getHeight()) * instance.getScaleY();
 
@@ -314,7 +334,12 @@ public class Ck3TagRenderer {
                     trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
                 }
 
-                g.drawImage(img, trans, null);
+                usedGraphics.drawImage(img, trans, null);
+            });
+
+            if (hasMask) {
+                applyCullingMask(emblemToCullImage, rawPatternImage, emblem.getMask());
+                currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new Color(0,0,0,0), null);
             }
         });
     }
