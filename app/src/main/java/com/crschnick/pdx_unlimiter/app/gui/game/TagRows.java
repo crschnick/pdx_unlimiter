@@ -84,7 +84,6 @@ public class TagRows {
         }
 
         var rows = new VBox(first, second);
-        rows.setFillWidth(true);
         rows.setAlignment(Pos.CENTER);
         return rows;
     }
