@@ -7,7 +7,9 @@ import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3House;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -32,7 +34,27 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
+
+    public static class CoatOfArmsCache extends CacheManager.Cache {
+
+        private final Map<Ck3Tag, Image> realms = new HashMap<>();
+        private final Map<Ck3Title, Image> titles = new HashMap<>();
+        private final Map<Ck3House, Image> houses = new HashMap<>();
+        private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
+
+        public CoatOfArmsCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        }
+    }
+
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
+        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
+        var cachedImg = cache.realms.get(tag);
+        if (cachedImg != null) {
+            return cachedImg;
+        }
+
+
         Ck3CoatOfArms coa = tag.getCoatOfArms();
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
@@ -78,10 +100,19 @@ public class Ck3TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        return ImageLoader.toFXImage(i);
+        var img = ImageLoader.toFXImage(i);
+        cache.realms.put(tag, img);
+        return img;
     }
 
-    public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
+    public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3House house) {
+        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
+        var cachedImg = cache.houses.get(house);
+        if (cachedImg != null) {
+            return cachedImg;
+        }
+
+        Ck3CoatOfArms coa = house.getCoatOfArms();
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
 
@@ -116,10 +147,19 @@ public class Ck3TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        return ImageLoader.toFXImage(i);
+        var img = ImageLoader.toFXImage(i);
+        cache.houses.put(house, img);
+        return img;
     }
 
-    public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3CoatOfArms coa) {
+    public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3Title title) {
+        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
+        var cachedImg = cache.titles.get(title);
+        if (cachedImg != null) {
+            return cachedImg;
+        }
+
+        Ck3CoatOfArms coa = title.getCoatOfArms();
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
 
@@ -151,7 +191,9 @@ public class Ck3TagRenderer {
                 null);
 
 
-        return ImageLoader.toFXImage(i);
+        var img = ImageLoader.toFXImage(i);
+        cache.titles.put(title, img);
+        return img;
     }
 
     private static void brighten(BufferedImage awtImage) {
@@ -200,7 +242,7 @@ public class Ck3TagRenderer {
     }
 
     private static void pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
-        var cache = CacheManager.getInstance().get(ColorCache.class);
+        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(ColorHelper.loadCk3(info));
         }
@@ -230,7 +272,7 @@ public class Ck3TagRenderer {
     }
 
     private static void emblem(Graphics2D g, Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
-        var cache = CacheManager.getInstance().get(ColorCache.class);
+        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(ColorHelper.loadCk3(info));
         }
@@ -275,14 +317,5 @@ public class Ck3TagRenderer {
                 g.drawImage(img, trans, null);
             }
         });
-    }
-
-    public static class ColorCache extends CacheManager.Cache {
-
-        private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
-
-        public ColorCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
-        }
     }
 }

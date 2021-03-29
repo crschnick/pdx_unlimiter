@@ -60,7 +60,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             rulerNode.getChildren().add(box);
         }
         {
-            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, ruler.getHouse().getCoatOfArms()),
+            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, ruler.getHouse()),
                     "house-icon");
             GuiTooltips.install(house, "House " + info.getHouseName());
             rulerNode.getChildren().add(house);
@@ -133,7 +133,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 titles,
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagRenderer.titleImage(info, t.getCoatOfArms()), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3TagRenderer.titleImage(info, t), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("title-row");
