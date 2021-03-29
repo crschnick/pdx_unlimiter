@@ -267,17 +267,22 @@ public class GuiSavegameEntry {
             }
         });
 
-        entry.infoProperty().addListener((c, o, n) -> {
+        entry.stateProperty().addListener((c, o, n) -> {
+            boolean showLoad = n == SavegameEntry.State.LOADING;
+            Platform.runLater(() -> {
+                loading.setVisible(showLoad);
+            });
+        });
+
+        entry.infoProperty().addListener((c,o,n) -> {
             if (n != null) {
                 SavegameContext.withSavegame(entry, ctx -> {
                     Platform.runLater(() -> {
-                        loading.setVisible(false);
                         ctx.getGuiFactory().fillNodeContainer(n, container);
                     });
                 });
             } else {
                 Platform.runLater(() -> {
-                    loading.setVisible(true);
                     container.getChildren().clear();
                 });
             }

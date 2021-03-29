@@ -155,7 +155,7 @@ public abstract class SavegameStorage<
                                     .map(sfc -> sfc.textValue())
                                     .collect(Collectors.toList()))
                         .orElse(List.of());
-                collection.add(new SavegameEntry<>(name, eId, null, checksum, date, notes, sourceFileChecksums));
+                collection.add(new SavegameEntry<>(name, eId,  checksum, date, notes, sourceFileChecksums));
             });
         }
     }
@@ -261,9 +261,6 @@ public abstract class SavegameStorage<
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
-                // Set info to null, since we don't want to store it
-                // directly after importing. It can be loaded later
-                null,
                 checksum,
                 info.getDate(),
                 SavegameNotes.empty(),
@@ -297,7 +294,6 @@ public abstract class SavegameStorage<
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
-                null,
                 checksum,
                 info.getDate(),
                 SavegameNotes.empty(),
@@ -399,7 +395,7 @@ public abstract class SavegameStorage<
     }
 
     public synchronized void loadEntry(SavegameEntry<T, I> e) {
-        if (e.infoProperty().isNotNull().get()) {
+        if (!e.canLoad()) {
             return;
         }
 
@@ -414,7 +410,8 @@ public abstract class SavegameStorage<
         if (Files.exists(getSavegameInfoFile(e))) {
             logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
             try {
-                e.infoProperty().set(JsonHelper.readObject(infoClass, getSavegameInfoFile(e)));
+                e.startLoading();
+                e.load(JsonHelper.readObject(infoClass, getSavegameInfoFile(e)));
                 getSavegameCollection(e).onSavegameLoad(e);
                 return;
             } catch (Exception ex) {
@@ -422,12 +419,13 @@ public abstract class SavegameStorage<
             }
         }
 
+        e.startLoading();
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
             @Override
             public void success(SavegameParser.Success<I> s) {
                 logger.debug("Parsing was successful");
-                e.infoProperty().set(s.info);
+                e.load(s.info);
                 getSavegameCollection(e).onSavegameLoad(e);
 
                 try {
@@ -449,12 +447,14 @@ public abstract class SavegameStorage<
             }
 
             @Override
-            public void error(SavegameParser.Error e) {
-                ErrorHandler.handleException(e.error, null, file);
+            public void error(SavegameParser.Error er) {
+                e.fail();
+                ErrorHandler.handleException(er.error, null, file);
             }
 
             @Override
             public void invalid(SavegameParser.Invalid iv) {
+                e.fail();
                 ErrorHandler.handleException(new ParseException(iv.message), null, file);
             }
         });
@@ -527,7 +527,8 @@ public abstract class SavegameStorage<
 
     void reloadSavegameAsync(SavegameEntry<T, I> e) {
         logger.debug("Reloading savegame");
-        e.infoProperty().set(null);
+        e.unload();
+        e.startLoading();
         var status = parser.parse(getSavegameFile(e), RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
             @Override
@@ -536,7 +537,7 @@ public abstract class SavegameStorage<
                 synchronized (SavegameStorage.this) {
                     try {
                         JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
-                        e.infoProperty().set(s.info);
+                        e.load(s.info);
                         getSavegameCollection(e).onSavegameLoad(e);
                     } catch (IOException ioException) {
                         ErrorHandler.handleException(ioException);

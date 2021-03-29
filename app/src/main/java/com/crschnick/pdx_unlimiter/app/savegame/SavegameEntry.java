@@ -2,10 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +10,14 @@ import java.util.UUID;
 
 public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Comparable<SavegameEntry<T, I>> {
 
+    public static enum State {
+        UNLOADED,
+        LOADING,
+        LOADED,
+        LOAD_FAILED
+    }
+
+    private final ObjectProperty<State> state;
     private final StringProperty name;
     private final UUID uuid;
     private final ObjectProperty<I> info;
@@ -21,16 +26,39 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final SavegameNotes notes;
     private final List<String> sourceFileChecksums;
 
-    public SavegameEntry(String name, UUID uuid, I info,
+    public SavegameEntry(String name, UUID uuid,
                          String contentChecksum, GameDate date, SavegameNotes notes,
                          List<String> sourceFileChecksums) {
+        this.state = new SimpleObjectProperty<>(State.UNLOADED);
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
-        this.info = new SimpleObjectProperty<>(info);
+        this.info = new SimpleObjectProperty<>(null);
         this.date = date;
         this.notes = notes;
         this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
+    }
+
+    public void startLoading() {
+        state.set(State.LOADING);
+    }
+
+    public void fail() {
+        state.set(State.LOAD_FAILED);
+    }
+
+    public void load(I newInfo) {
+        state.set(State.LOADED);
+        info.set(newInfo);
+    }
+
+    public void unload() {
+        state.set(State.UNLOADED);
+        info.set(null);
+    }
+
+    public boolean canLoad() {
+        return state.get().equals(State.UNLOADED);
     }
 
     @Override
@@ -54,7 +82,7 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         return info.get();
     }
 
-    public ObjectProperty<I> infoProperty() {
+    public ReadOnlyObjectProperty<I> infoProperty() {
         return info;
     }
 
@@ -76,5 +104,13 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
 
     public SavegameNotes getNotes() {
         return notes;
+    }
+
+    public State getState() {
+        return state.get();
+    }
+
+    public ReadOnlyObjectProperty<State> stateProperty() {
+        return state;
     }
 }

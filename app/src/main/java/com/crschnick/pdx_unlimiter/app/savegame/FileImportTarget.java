@@ -277,6 +277,10 @@ public abstract class FileImportTarget {
 
         @Override
         public String getSourceFileChecksum() {
+            if (!Files.exists(path)) {
+                return null;
+            }
+
             try {
                 var md = MessageDigest.getInstance("MD5");
 

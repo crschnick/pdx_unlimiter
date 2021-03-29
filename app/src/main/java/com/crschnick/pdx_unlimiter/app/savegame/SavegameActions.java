@@ -131,9 +131,9 @@ public class SavegameActions {
                                 // This means that at this point, the info can either be null or not null
                                 // In case it is null, temporarily set it
                                 if (e.infoProperty().get() == null) {
-                                    e.infoProperty().set((SavegameInfo<Object>) s.info);
+                                    e.load((SavegameInfo<Object>) s.info);
                                     GameLauncher.continueSavegame(e);
-                                    e.infoProperty().set(null);
+                                    e.unload();
                                 }
                             });
                 }

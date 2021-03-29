@@ -145,7 +145,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
             logger.debug("Unloading collection " + col.getName());
             for (var e : col.getSavegames()) {
-                e.infoProperty().set(null);
+                e.unload();
             }
         }, false);
     }
