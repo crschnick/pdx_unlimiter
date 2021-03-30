@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PdxuInstallation {
@@ -18,115 +19,118 @@ public class PdxuInstallation {
     private Path dataDir;
     private String version;
     private boolean production;
-    private Path rakalyDir;
-    private boolean developerMode;
-    private boolean nativeHookEnabled;
     private boolean image;
+    private Path rakalyDir;
     private Path eu4SeDir;
     private Path languageDir;
     private Path resourceDir;
-    private boolean preRelease;
     private String latestVersion;
+    private PdxuProperties properties;
+    private UUID userId;
 
-    public static void init() {
-        var i = new PdxuInstallation();
+    private PdxuInstallation() {
+        initEnvironment();
+        initDefaultDataDir();
 
+        properties = new PdxuProperties(production, getSettingsLocation());
+        production = properties.isSimulateProduction() || production;
+
+        initVersion();
+        initLatestVersion();
+        initResourceDirs();
+        initThirdPartyDirs();
+        initUserId();
+    }
+
+    private void initEnvironment() {
         Path appPath = Path.of(System.getProperty("java.home"));
-        i.image = Files.exists(appPath.resolve("version"));
-        i.production = i.image;
-        i.version = "unknown";
+        image = Files.exists(appPath.resolve("version"));
+        production = image;
+    }
 
-        if (i.image) {
-            i.languageDir = appPath.resolve("lang");
-            i.resourceDir = appPath.resolve("resources");
-        } else {
-            i.languageDir = Path.of("lang");
-            i.resourceDir = Path.of("resources");
-        }
-
-        // Legacy support
-        var legacyDataDir = Path.of(System.getProperty("user.home"),
-                SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
-        if (Files.exists(legacyDataDir)) {
-            i.dataDir = legacyDataDir;
-        } else {
-            i.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
-        }
-
+    private void initThirdPartyDirs() {
         Path appInstallPath;
         if (SystemUtils.IS_OS_WINDOWS) {
             appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
                     .resolve("Programs").resolve("Pdx-Unlimiter");
         } else {
-            appInstallPath = i.dataDir;
-        }
-        i.rakalyDir = appInstallPath.resolve("rakaly");
-
-        i.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
-        if (!Files.exists(i.eu4SeDir)) {
-            i.eu4SeDir = null;
+            appInstallPath = dataDir;
         }
 
-        var latestFile = i.dataDir.resolve("settings").resolve("latest");
-        if (Files.exists(latestFile)) {
+        rakalyDir = properties.getCustomRakalyDir().orElse(appInstallPath.resolve("rakaly"));
+
+        eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
+        if (!Files.exists(eu4SeDir)) {
+            eu4SeDir = null;
+        }
+    }
+
+    private void initDefaultDataDir() {
+        // Legacy support
+        var legacyDataDir = Path.of(System.getProperty("user.home"),
+                SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
+        if (Files.exists(legacyDataDir)) {
+            dataDir = legacyDataDir;
+        } else {
+            dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+        }
+    }
+
+    private void initUserId() {
+        var idFile = getSettingsLocation().resolve("user");
+        if (Files.exists(idFile)) {
             try {
-                i.latestVersion = Files.readString(i.dataDir.resolve("settings").resolve("latest"));
-            } catch (IOException e) {
+                userId = UUID.fromString(Files.readString(idFile));
+            } catch (Exception e) {
                 ErrorHandler.handleException(e);
-            }
-        }
-
-        Properties props = new Properties();
-        if (i.production) {
-            try {
-                i.version = Files.readString(appPath.resolve("version"));
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-
-            Path propsFile = i.dataDir.resolve("settings").resolve("pdxu.properties");
-            if (Files.exists(propsFile)) {
-                try {
-                    props.load(Files.newInputStream(propsFile));
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
             }
         } else {
-            i.version = "dev";
+            userId = UUID.randomUUID();
             try {
-                props.load(Files.newInputStream(Path.of("pdxu.properties")));
+                Files.writeString(idFile, userId.toString());
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        }
+    }
+
+    private void initLatestVersion() {
+        var latestFile = getSettingsLocation().resolve("latest");
+        if (Files.exists(latestFile)) {
+            try {
+                latestVersion = Files.readString(latestFile);
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
-
-            i.languageDir = Path.of("lang");
-
-            var customDir = Optional.ofNullable(props.get("dataDir"))
-                    .map(val -> Path.of(val.toString()))
-                    .filter(Path::isAbsolute);
-            customDir.ifPresent(path -> i.dataDir = path);
-
-            i.production = Optional.ofNullable(props.get("simulateProduction"))
-                    .map(val -> Boolean.parseBoolean(val.toString()))
-                    .orElse(false);
-
-            Optional.ofNullable(props.get("rakalyDir"))
-                    .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute() && Files.exists(val))
-                    .ifPresent(path -> i.rakalyDir = path);
         }
+    }
 
-        i.developerMode = Optional.ofNullable(props.get("developerMode"))
-                .map(val -> Boolean.parseBoolean(val.toString()))
-                .orElse(false);
-        i.nativeHookEnabled = Optional.ofNullable(props.get("enableJNativeHook"))
-                .map(val -> Boolean.parseBoolean(val.toString()))
-                .orElse(true);
+    private void initVersion() {
+        if (production) {
+            try {
+                Path appPath = Path.of(System.getProperty("java.home"));
+                version = Files.readString(appPath.resolve("version"));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+        } else {
+            version = "dev";
+        }
+    }
 
-        i.preRelease = i.version.contains("pre");
+    private void initResourceDirs() {
+        if (image) {
+            Path appPath = Path.of(System.getProperty("java.home"));
+            languageDir = appPath.resolve("lang");
+            resourceDir = appPath.resolve("resources");
+        } else {
+            languageDir = Path.of("lang");
+            resourceDir = Path.of("resources");
+        }
+    }
 
-        INSTANCE = i;
+    public static void init() {
+        INSTANCE = new PdxuInstallation();
     }
 
     public static boolean shouldStart() {
@@ -164,7 +168,7 @@ public class PdxuInstallation {
     }
 
     public boolean isNativeHookEnabled() {
-        return nativeHookEnabled;
+        return properties.isNativeHookEnabled();
     }
 
     public Path getExecutableLocation() {
@@ -222,7 +226,7 @@ public class PdxuInstallation {
     }
 
     public boolean isDeveloperMode() {
-        return developerMode;
+        return properties.isDeveloperMode();
     }
 
     public boolean isImage() {
@@ -233,11 +237,11 @@ public class PdxuInstallation {
         return resourceDir;
     }
 
-    public boolean isPreRelease() {
-        return preRelease;
-    }
-
     public String getLatestVersion() {
         return latestVersion;
+    }
+
+    public UUID getUserId() {
+        return userId;
     }
 }
