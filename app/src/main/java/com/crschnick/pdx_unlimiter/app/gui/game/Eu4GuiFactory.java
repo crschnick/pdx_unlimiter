@@ -56,7 +56,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.getChildren().add(mil);
         return box;
     }
-    
+
     private void createDiplomacyRow(
             JFXMasonryPane pane,
             SavegameInfo<Eu4Tag> info,
