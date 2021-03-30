@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
 
     protected Hoi4Tag tag;
-    protected Set<Hoi4Tag> allTags;
+    protected List<Hoi4Tag> allTags;
 
     public static Hoi4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
@@ -51,7 +51,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     }
 
     @Override
-    public Set<Hoi4Tag> getAllTags() {
+    public List<Hoi4Tag> getAllTags() {
         return allTags;
     }
 }

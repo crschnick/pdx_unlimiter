@@ -19,6 +19,7 @@ import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Set;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -55,41 +56,24 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         box.getChildren().add(mil);
         return box;
     }
-
-    private static String getCountryTooltip(SavegameInfo<Eu4Tag> info, Set<Eu4Tag> tags) {
-        StringBuilder b = new StringBuilder();
-        for (Eu4Tag t : tags) {
-            b.append(GameLocalisation.getTagNameForEntry(info, t));
-            b.append(", ");
-        }
-        b.delete(b.length() - 2, b.length());
-        return b.toString();
-    }
-
+    
     private void createDiplomacyRow(
             JFXMasonryPane pane,
             SavegameInfo<Eu4Tag> info,
-            Node icon,
-            Set<Eu4Tag> tags,
-            String tooltipStart,
-            String none,
+            Region icon,
+            List<Eu4Tag> tags,
+            String tooltip,
             String style) {
         if (tags.size() == 0) {
             return;
         }
 
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        box.getChildren().add(icon);
-        for (Eu4Tag tag : tags) {
-            Node n = GameImage.imageNode(Eu4TagRenderer.smallShieldImage(info, tag), CLASS_TAG_ICON);
-            box.getChildren().add(n);
-        }
-        box.getStyleClass().add(CLASS_DIPLOMACY_ROW);
-        box.getStyleClass().add(style);
-        box.setSpacing(6);
-        GuiTooltips.install(box, tooltipStart + (tags.size() > 0 ? getCountryTooltip(info, tags) : none));
-        addNode(pane, box);
+        var row = TagRows.createTagRow(icon, tooltip, tags,
+                t -> GameLocalisation.getTagNameForEntry(info, t),
+                t -> GameImage.imageNode(Eu4TagRenderer.smallShieldImage(info, t), CLASS_TAG_ICON));
+        row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
+        row.getStyleClass().add(style);
+        addNode(pane, row);
     }
 
     @Override
@@ -158,28 +142,23 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
         for (Eu4SavegameInfo.War war : info.getWars()) {
             createDiplomacyRow(grid, i, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),
-                    "Fighting in the " + war.getTitle() + " against ", "", CLASS_WAR);
+                    war.getTitle(), CLASS_WAR);
         }
 
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ALLIANCE, CLASS_IMAGE_ICON), info.getAllies(),
-                "Allies: ", "None", CLASS_ALLIANCE);
+                "Allies", CLASS_ALLIANCE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ROYAL_MARRIAGE, CLASS_IMAGE_ICON), info.getMarriages(),
-                "Royal marriages: ", "None", CLASS_MARRIAGE);
+                "Royal marriages", CLASS_MARRIAGE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_GUARANTEE, CLASS_IMAGE_ICON), info.getGuarantees(),
-                "Guarantees: ", "None", CLASS_GUARANTEE);
+                "Guarantees", CLASS_GUARANTEE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getVassals(),
-                "Vassals: ", "None", CLASS_VASSAL);
+                "Vassals", CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getJuniorPartners(),
-                "Personal union junior partners: ", "none", CLASS_VASSAL);
+                "Personal union junior partners", CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRIBUTARY, CLASS_IMAGE_ICON), info.getTributaryJuniors(),
-                "Tributaries: ", "None", CLASS_VASSAL);
+                "Tributaries", CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_MARCH, CLASS_IMAGE_ICON), info.getMarches(),
-                "Marches: ", "None", CLASS_VASSAL);
-        createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRUCE, CLASS_IMAGE_ICON),
-                info.getTruces().keySet(), "Truces: ", "None", CLASS_TRUCE);
-        createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON),
-                info.getSeniorPartner().map(Set::of).orElse(Set.of()),
-                "Under personal union with ", "no country", CLASS_VASSAL);
+                "Marches", CLASS_VASSAL);
 
         super.fillNodeContainer(i, grid);
     }

@@ -14,25 +14,25 @@ import java.util.stream.Collectors;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
-    private final Set<Eu4Tag> vassals = new HashSet<>();
-    private final Set<Eu4Tag> allies = new HashSet<>();
-    private final Set<Eu4Tag> marches = new HashSet<>();
-    private final Set<Eu4Tag> marriages = new HashSet<>();
-    private final Set<Eu4Tag> guarantees = new HashSet<>();
+    private final List<Eu4Tag> vassals = new ArrayList<>();
+    private final List<Eu4Tag> allies = new ArrayList<>();
+    private final List<Eu4Tag> marches = new ArrayList<>();
+    private final List<Eu4Tag> marriages = new ArrayList<>();
+    private final List<Eu4Tag> guarantees = new ArrayList<>();
     private final Eu4Tag overlord = null;
-    private final Set<Eu4Tag> juniorPartners = new HashSet<>();
+    private final List<Eu4Tag> juniorPartners = new ArrayList<>();
     private final Eu4Tag seniorPartner = null;
-    private final Set<Eu4Tag> tributaryJuniors = new HashSet<>();
+    private final List<Eu4Tag> tributaryJuniors = new ArrayList<>();
     private final Eu4Tag tributarySenior = null;
     protected Eu4Tag tag;
-    protected Set<Eu4Tag> allTags;
+    protected List<Eu4Tag> allTags;
     private boolean randomNewWorld;
     private boolean customNationInWorld;
     private boolean releasedVassal;
     private boolean observer;
     private Ruler ruler;
     private Ruler heir;
-    private Set<War> wars = new HashSet<>();
+    private List<War> wars = new ArrayList<>();
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         try {
@@ -51,7 +51,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             e.campaignHeuristic = UUID.nameUUIDFromBytes(n.getNodeForKey("countries")
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
-            e.allTags = new HashSet<>();
+            e.allTags = new ArrayList<>();
             n.getNodeForKey("countries").forEach((k, v) -> {
                 e.allTags.add(Eu4Tag.fromNode(k, v));
                 if (v.hasKey("custom_nation_points")) {
@@ -182,23 +182,23 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return Optional.ofNullable(heir);
     }
 
-    public Set<Eu4Tag> getVassals() {
+    public List<Eu4Tag> getVassals() {
         return vassals;
     }
 
-    public Set<Eu4Tag> getAllies() {
+    public List<Eu4Tag> getAllies() {
         return allies;
     }
 
-    public Set<Eu4Tag> getMarches() {
+    public List<Eu4Tag> getMarches() {
         return marches;
     }
 
-    public Set<Eu4Tag> getMarriages() {
+    public List<Eu4Tag> getMarriages() {
         return marriages;
     }
 
-    public Set<Eu4Tag> getGuarantees() {
+    public List<Eu4Tag> getGuarantees() {
         return guarantees;
     }
 
@@ -206,7 +206,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return Optional.ofNullable(overlord);
     }
 
-    public Set<Eu4Tag> getJuniorPartners() {
+    public List<Eu4Tag> getJuniorPartners() {
         return juniorPartners;
     }
 
@@ -214,7 +214,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return Optional.ofNullable(seniorPartner);
     }
 
-    public Set<Eu4Tag> getTributaryJuniors() {
+    public List<Eu4Tag> getTributaryJuniors() {
         return tributaryJuniors;
     }
 
@@ -226,7 +226,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return Map.of();
     }
 
-    public Set<War> getWars() {
+    public List<War> getWars() {
         return wars;
     }
 
@@ -234,7 +234,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return tag;
     }
 
-    public Set<Eu4Tag> getAllTags() {
+    public List<Eu4Tag> getAllTags() {
         return allTags;
     }
 
@@ -280,7 +280,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                             }
                         }
 
-                        // If we have a new heir, but the heir has already succeeded, set the current heir to null
+                        // If we have a new heir, but the heir has already succeeded, List the current heir to null
                         boolean succeeded = type.equals("heir") && r.hasKey("succeeded");
                         if (succeeded) {
                             current.set(Optional.empty());
@@ -330,25 +330,25 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
         private String title;
         private boolean attacker;
-        private Set<Eu4Tag> allies;
-        private Set<Eu4Tag> enemies;
+        private List<Eu4Tag> allies;
+        private List<Eu4Tag> enemies;
 
         public War() {
         }
 
-        public War(String title, boolean attacker, Set<Eu4Tag> allies, Set<Eu4Tag> enemies) {
+        public War(String title, boolean attacker, List<Eu4Tag> allies, List<Eu4Tag> enemies) {
             this.title = title;
             this.attacker = attacker;
             this.allies = allies;
             this.enemies = enemies;
         }
 
-        public static Set<War> fromActiveWarsNode(Set<Eu4Tag> tags, String tag, Node n) {
-            Set<War> wars = new HashSet<>();
+        public static List<War> fromActiveWarsNode(List<Eu4Tag> tags, String tag, Node n) {
+            List<War> wars = new ArrayList<>();
             for (Node war : n.getNodesForKey("active_war")) {
                 String title = war.getNodeForKey("name").getString();
                 boolean isAttacker = false;
-                Set<Eu4Tag> attackers = new HashSet<>();
+                List<Eu4Tag> attackers = new ArrayList<>();
                 if (war.hasKey("attackers")) {
                     for (Node atk : war.getNodeForKey("attackers").getNodeArray()) {
                         String attacker = atk.getString();
@@ -361,7 +361,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                 }
 
                 boolean isDefender = false;
-                Set<Eu4Tag> defenders = new HashSet<>();
+                List<Eu4Tag> defenders = new ArrayList<>();
                 if (war.hasKey("defenders")) {
                     for (Node def : war.getNodeForKey("defenders").getNodeArray()) {
                         String defender = def.getString();
@@ -386,7 +386,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             return title;
         }
 
-        public Set<Eu4Tag> getEnemies() {
+        public List<Eu4Tag> getEnemies() {
             return enemies;
         }
     }

@@ -36,7 +36,7 @@ public abstract class SavegameInfo<T> {
         return version;
     }
 
-    public abstract Set<T> getAllTags();
+    public abstract List<T> getAllTags();
 
     public boolean isBinary() {
         return binary;

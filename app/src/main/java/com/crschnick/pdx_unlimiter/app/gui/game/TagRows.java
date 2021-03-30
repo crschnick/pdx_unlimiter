@@ -65,10 +65,12 @@ public class TagRows {
         int secondRow = displayedSize / 2 + (even ? 0 : 1);
 
         var first = new HBox();
+        first.setAlignment(Pos.CENTER);
         first.getChildren().add(img);
         first.getChildren().addAll(list.subList(0, firstRow));
 
         var second = new HBox();
+        second.setAlignment(Pos.CENTER);
         var spacer = new Region();
         spacer.minWidthProperty().bind(Bindings.createDoubleBinding(
                 () -> list.get(0).getMinWidth() / 2,
@@ -84,6 +86,7 @@ public class TagRows {
         }
 
         var rows = new VBox(first, second);
+        rows.setFillWidth(true);
         rows.setAlignment(Pos.CENTER);
         return rows;
     }

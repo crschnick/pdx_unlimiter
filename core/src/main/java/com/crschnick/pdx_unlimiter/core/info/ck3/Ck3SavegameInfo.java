@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
     protected Ck3Tag tag;
-    protected Set<Ck3Tag> allTags;
+    protected List<Ck3Tag> allTags;
     private String playerName;
     private String houseName;
     private List<War<Ck3Tag>> wars;
@@ -96,7 +96,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
         return String.join(" ", validParts);
     }
 
-    private static List<War<Ck3Tag>> fromActiveWarsNode(Set<Ck3Tag> tags, Ck3Tag tag, Node n) {
+    private static List<War<Ck3Tag>> fromActiveWarsNode(List<Ck3Tag> tags, Ck3Tag tag, Node n) {
         List<War<Ck3Tag>> wars = new ArrayList<>();
         n.getNodeForKey("wars").getNodeForKey("active_wars").getNodeArray().forEach(v -> {
             if (v.isValue() && v.getString().equals("none")) {
@@ -130,7 +130,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     }
 
     @Override
-    public Set<Ck3Tag> getAllTags() {
+    public List<Ck3Tag> getAllTags() {
         return allTags;
     }
 

@@ -41,11 +41,11 @@ public class Ck3Tag {
         return Objects.hash(id);
     }
 
-    public static Optional<Ck3Tag> getTag(Set<Ck3Tag> tags, long id) {
+    public static Optional<Ck3Tag> getTag(List<Ck3Tag> tags, long id) {
         return tags.stream().filter(t -> t.id == id).findFirst();
     }
 
-    public static Ck3Tag getPlayerTag(Node n, Set<Ck3Tag> allTags) {
+    public static Ck3Tag getPlayerTag(Node n, List<Ck3Tag> allTags) {
         long id = n.getNodeForKey("currently_played_characters").getNodeArray().get(0).getLong();
         var personNode = n.getNodeForKey("living").getNodeForKey(String.valueOf(id));
         var house = new Ck3House(
@@ -78,13 +78,13 @@ public class Ck3Tag {
         return tag;
     }
 
-    public static Set<Ck3Tag> fromNode(Node n) {
+    public static List<Ck3Tag> fromNode(Node n) {
         var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
                 .getNodeForKey("coat_of_arms_manager_database"));
         Map<Long, Ck3Title> titleIds = Ck3Title.createTitleMap(n, coaMap);
 
         var living = n.getNodeForKey("living");
-        Set<Ck3Tag> allTags = new HashSet<>();
+        List<Ck3Tag> allTags = new ArrayList<>();
         living.forEach((k, v) -> {
             if (!v.hasKey("landed_data")) {
                 return;

@@ -65,7 +65,7 @@ public final class Eu4Tag {
         return new Eu4Tag(t, tag, mColor, cColor, name, colonialFlagData, customFlagData);
     }
 
-    public static Eu4Tag getTag(Set<Eu4Tag> tags, String name) {
+    public static Eu4Tag getTag(List<Eu4Tag> tags, String name) {
         return tags.stream().filter(t -> t.tag.equals(name)).findFirst().get();
     }
 

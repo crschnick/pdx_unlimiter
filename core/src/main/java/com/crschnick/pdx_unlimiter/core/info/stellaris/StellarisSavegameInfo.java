@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
     protected StellarisTag tag;
-    protected Set<StellarisTag> allTags;
+    protected List<StellarisTag> allTags;
 
     public static StellarisSavegameInfo fromSavegame(Node n) throws ParseException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
@@ -31,7 +31,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             new Random(seed).nextBytes(b);
             i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
-            i.allTags = new HashSet<>();
+            i.allTags = new ArrayList<>();
             n.getNodeForKey("country").forEach((k, v) -> {
                 // Invalid country node
                 if (v.isValue()) {
@@ -79,7 +79,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
         return tag;
     }
 
-    public Set<StellarisTag> getAllTags() {
+    public List<StellarisTag> getAllTags() {
         return allTags;
     }
 }
