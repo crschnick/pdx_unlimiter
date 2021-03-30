@@ -46,7 +46,7 @@ public abstract class FileImportTarget {
             RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
                 @Override
                 public void visitEu4(Path file) {
-                    if (SavegameStorage.ALL.get(Game.EU4) == null) {
+                    if (!Game.EU4.isEnabled()) {
                         return;
                     }
 
@@ -55,7 +55,7 @@ public abstract class FileImportTarget {
 
                 @Override
                 public void visitHoi4(Path file) {
-                    if (SavegameStorage.ALL.get(Game.HOI4) == null) {
+                    if (!Game.HOI4.isEnabled()) {
                         return;
                     }
 
@@ -64,7 +64,7 @@ public abstract class FileImportTarget {
 
                 @Override
                 public void visitStellaris(Path file) {
-                    if (SavegameStorage.ALL.get(Game.STELLARIS) == null) {
+                    if (!Game.STELLARIS.isEnabled()) {
                         return;
                     }
 
@@ -77,7 +77,7 @@ public abstract class FileImportTarget {
 
                 @Override
                 public void visitCk3(Path file) {
-                    if (SavegameStorage.ALL.get(Game.CK3) == null) {
+                    if (!Game.CK3.isEnabled()) {
                         return;
                     }
 
