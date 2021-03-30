@@ -246,7 +246,6 @@ public abstract class FileImportTarget {
                 return Files.getLastModifiedTime(path).toInstant();
             } catch (IOException e) {
                 // In some conditions, the import target may already not exist anymore.
-
                 return Instant.MIN;
             }
         }
@@ -301,7 +300,8 @@ public abstract class FileImportTarget {
                 }
                 return c.toString();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                // Even the exists check before is no guarantee that an IO exception
+                // will be thrown because the file doesn't exist anymore
                 return null;
             }
         }
