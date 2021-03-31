@@ -50,6 +50,8 @@ within the Pdx-Unlimiter without needing to visit the main menu.
 
 ![Example](docs/screenshot.png)
 
+![Example](docs/ck3_screenshot.png)
+
 Savegames that use mods are also fully supported.
 This includes displaying modded country information in the savegame manager and mod installation support.
 When you launch a savegame from within the Pdx-Unlimiter, the required mods and DLCs are automatically
