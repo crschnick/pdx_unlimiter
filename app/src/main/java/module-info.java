@@ -21,5 +21,7 @@ module com.crschnick.pdx_unlimiter.app {
     requires java.desktop;
     requires java.net.http;
 
-    exports com.crschnick.pdx_unlimiter.app to javafx.graphics;
+    exports com.crschnick.pdx_unlimiter.app;
+    exports com.crschnick.pdx_unlimiter.app.core;
+    exports com.crschnick.pdx_unlimiter.app.util;
 }

@@ -1,10 +1,10 @@
-package com.crschnick.pdx_unlimiter.app.gui.editor;
+package com.crschnick.pdx_unlimiter.editor.gui;
+
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.OsHelper;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import com.crschnick.pdx_unlimiter.editor.core.EditorState;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;

@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+apply from: "../javafx.gradle"
+
+dependencies {
+    implementation project(':core')
+    implementation project(':editor')
+}

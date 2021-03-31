@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.editor;
+package com.crschnick.pdx_unlimiter.editor.core;
 
 import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
 import javafx.beans.property.BooleanProperty;
