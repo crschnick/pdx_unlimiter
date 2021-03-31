@@ -77,12 +77,14 @@ public final class TextFormatParser extends FormatParser {
     private Node parseNodeIfNotSimpleValue() {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
-            boolean isColor = ColorNode.isColorName(context, slIndex);
+            boolean isColor = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP &&
+                    ColorNode.isColorName(context, slIndex);
 
             if (isColor) {
                 var type = context.evaluate(slIndex);
                 index++;
                 slIndex++;
+
                 var cn = new ColorNode(type, List.of(
                         new ValueNode(
                                 context,
