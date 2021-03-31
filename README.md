@@ -11,7 +11,7 @@ great community-made tools, and full support for the following games:
 * Hearts of Iron IV
 * Stellaris
 
-## Download
+# Download
 
 ### [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi)
 
@@ -139,7 +139,7 @@ The supported tools are:
 
 **Usage guide:** [Savegame tools](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-actions)
 
-## Community and Support
+# Community and Support
 
 If you have suggestions, need help, run into any issues or just want to talk to other friendly people,
 you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU) or visit the
@@ -148,7 +148,7 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU) or visit
 [![Banner](https://discordapp.com/api/guilds/786465137191682088/widget.png?style=banner3)](https://discord.gg/BVE4vxqFpU)
 
 
-## Development
+# Development
 
 To build this project, [JDK 16](https://openjdk.java.net/projects/jdk/16/) and gradle is required.
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
