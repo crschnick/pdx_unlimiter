@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.editor.gui;
 
-import com.crschnick.pdx_unlimiter.app.editor.EditorCollectorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorState;
+import com.crschnick.pdx_unlimiter.editor.core.EditorCollectorNode;
+import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
+import com.crschnick.pdx_unlimiter.editor.core.EditorSimpleNode;
+import com.crschnick.pdx_unlimiter.editor.core.EditorState;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;

@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.editor.gui;
 
-import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
+import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
+import com.crschnick.pdx_unlimiter.editor.core.EditorSimpleNode;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import javafx.geometry.Insets;

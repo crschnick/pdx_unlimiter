@@ -1,6 +1,8 @@
 package com.crschnick.pdx_unlimiter.editor.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
+import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.editor.core.EditorFilter;
 import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
 import com.crschnick.pdx_unlimiter.editor.core.EditorState;
