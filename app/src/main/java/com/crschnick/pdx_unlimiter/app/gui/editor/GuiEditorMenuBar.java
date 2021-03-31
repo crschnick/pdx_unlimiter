@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.editor;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.scene.control.Menu;
@@ -41,7 +42,7 @@ public class GuiEditorMenuBar {
 
         MenuItem guide = new MenuItem("Editor Guide");
         guide.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/EDITOR-GUIDE.md");
+            Hyperlinks.open(Hyperlinks.EDITOR_GUIDE);
         });
         help.getItems().add(guide);
 

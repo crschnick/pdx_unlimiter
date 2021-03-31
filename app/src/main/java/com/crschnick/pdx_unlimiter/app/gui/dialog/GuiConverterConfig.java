@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.node.Node;
@@ -50,7 +51,7 @@ public class GuiConverterConfig {
         alert.getButtonTypes().add(download);
         Button val = (Button) alert.getDialogPane().lookupButton(download);
         val.setOnAction(e -> {
-            ThreadHelper.browse("https://github.com/ParadoxGameConverters/CK3toEU4/releases");
+            Hyperlinks.open(Hyperlinks.CK3_TO_EU4_DOWNLOADS);
         });
 
         alert.setAlertType(Alert.AlertType.INFORMATION);

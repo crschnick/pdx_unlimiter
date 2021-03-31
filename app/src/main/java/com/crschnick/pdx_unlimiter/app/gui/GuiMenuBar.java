@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
@@ -65,7 +66,7 @@ public class GuiMenuBar {
 
         MenuItem src = new MenuItem("Contribute");
         src.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/");
+            Hyperlinks.open(Hyperlinks.MAIN_PAGE);
         });
 
         MenuItem lc = new MenuItem("License");
@@ -83,9 +84,9 @@ public class GuiMenuBar {
 
         Menu help = new Menu("Help");
 
-        MenuItem guide = new MenuItem("Guide");
+        MenuItem guide = new MenuItem("User Guide");
         guide.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md");
+            Hyperlinks.open(Hyperlinks.GUIDE);
         });
         help.getItems().add(guide);
 
@@ -97,7 +98,7 @@ public class GuiMenuBar {
 
         MenuItem discord = new MenuItem("Discord server");
         discord.setOnAction((a) -> {
-            ThreadHelper.browse("https://discord.com/invite/BVE4vxqFpU");
+            Hyperlinks.open(Hyperlinks.DISCORD);
         });
         help.getItems().add(discord);
 

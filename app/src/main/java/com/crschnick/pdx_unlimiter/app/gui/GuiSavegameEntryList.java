@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -71,9 +72,9 @@ public class GuiSavegameEntryList {
         text2.setTextAlignment(TextAlignment.CENTER);
         v.getChildren().add(text2);
 
-        Button guide = new Button("Read the guide");
+        Button guide = new Button("User Guide");
         guide.setOnAction((a) -> {
-            ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md");
+            Hyperlinks.open(Hyperlinks.GUIDE);
         });
         v.getChildren().add(guide);
 

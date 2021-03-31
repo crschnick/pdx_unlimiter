@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -29,7 +30,7 @@ public class RakalyWebHelper {
         alert.getButtonTypes().add(open);
         Button val = (Button) alert.getDialogPane().lookupButton(open);
         val.setOnAction(e -> {
-            ThreadHelper.browse("https://rakaly.com/eu4");
+            Hyperlinks.open(Hyperlinks.RAKALY_MAIN_PAGE);
         });
 
         alert.setAlertType(Alert.AlertType.INFORMATION);

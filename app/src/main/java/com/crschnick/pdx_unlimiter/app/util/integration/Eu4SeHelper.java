@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
@@ -45,7 +46,7 @@ public class Eu4SeHelper {
         alert.getButtonTypes().add(open);
         Button val = (Button) alert.getDialogPane().lookupButton(open);
         val.setOnAction(e -> {
-            ThreadHelper.browse("https://github.com/Osallek/Eu4SaveEditor");
+            Hyperlinks.open(Hyperlinks.EU4_SE_MAIN_PAGE);
         });
 
         alert.setAlertType(Alert.AlertType.INFORMATION);

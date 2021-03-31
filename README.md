@@ -6,11 +6,10 @@ Furthermore, it also comes with an Ironman converter,
 a powerful savegame editor and navigator,
 some savescumming tools, integrations for various other
 great community-made tools, and full support for the following games:
-
-- Europa Universalis IV
-- Crusader Kings III
-- Hearts of Iron IV
-- Stellaris
+* Europa Universalis IV
+* Crusader Kings III
+* Hearts of Iron IV
+* Stellaris
 
 ## Download
 
@@ -28,13 +27,13 @@ why this warning pops up.
 The main components of the Pdx-Unlimiter are:
 - [Savegame manager](#savegame-manager)
 - [Ironman converter](#ironman-converter)
-- [Savegame editor and navigator](#savegame-editor-and-navigator)
+- [Savegame editor](#savegame-editor)
 - [Savescumming tools](#savescumming-tools)
 - [Integrations for other Paradox tools](#third-party-tool-integration)
 
 If you want to know how to use a certain feature, you can
-read about it in the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md).
-There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/blob/master/FAQ.md)
+read about it in the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide).
+There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/wiki/Frequenly-Asked-Questions)
 to answer some of your questions.
 
 
@@ -58,9 +57,9 @@ enabled without having to use Paradox launcher configurations.
 It is also checked whether a mod is missing or incompatible with the current version,
 so that nothing can potentially corrupt your savegames.
 
-Usage guide: [Savegame management](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-importing-and-storage)
+**Usage guide:** [Savegame management](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-importing-and-storage)
 
-## Savegame editor and navigator
+## Savegame editor
 
 The Pdx-Unlimiter also comes with a savegame editor,
 which can also be used as a savegame navigator to quickly find certain entries in a savegame.
@@ -90,6 +89,7 @@ with a text editor, using the Pdx-Unlimiter editor has the following advantages:
 
 ![Editor](docs/editor.png)
 
+**Usage guide:** [Editing savegames](https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide)
 
 ## Ironman converter
 
@@ -102,9 +102,9 @@ ironman savegames into playable and editable non-ironman savegames.
 This is useful if you have ever encountered a situation in which you wanted to
 create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
 You can for example use the included ironman converter
-to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor-and-navigator).
+to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor).
 
-Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-actions)
+**Usage guide:** [Ironman Converter](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-actions)
 
 ## Savescumming tools
 
@@ -114,7 +114,7 @@ If you want to revert to a previous savegame checkpoint,
 you can also kill the currently running Paradox game and load the latest save using a keystroke.
 This feature allows you to easily savescum, which is kinda necessary for hard achievements.
 
-Usage guide: [Savescumming](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-checkpoints-and-savescumming)
+**Usage guide:** [Savescumming](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-checkpoints-and-savescumming)
 
 ## Third party tool integration
 
@@ -122,7 +122,7 @@ The Pdx-Unlimiter is also built as an application that gives you easy access to 
 other great community-made tools.
 The supported tools are:
 
-- [Rakaly](https://rakaly.com),
+- [Rakaly](https://rakaly.com/eu4),
   a website to analyze and share your eu4 achievements and compete against other players.
   It is possible to upload your EU4 savegames to rakaly and analyze them from there.
 
@@ -137,7 +137,7 @@ The supported tools are:
 - The [Irony Mod Manager](https://bcssov.github.io/IronyModManager/),
   which can replace the mod-management capabilities of the Paradox-Launcher.
 
-Usage Guide: [Savegame tools](https://github.com/crschnick/pdx_unlimiter/blob/master/GUIDE.md#savegame-actions)
+**Usage guide:** [Savegame tools](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-actions)
 
 ## Community and Support
 

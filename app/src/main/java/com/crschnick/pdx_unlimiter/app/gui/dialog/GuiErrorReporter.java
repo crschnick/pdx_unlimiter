@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -77,7 +78,7 @@ public class GuiErrorReporter {
 
             Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
             reportButton.addEventFilter(ActionEvent.ACTION, event -> {
-                ThreadHelper.browse("https://github.com/crschnick/pdx_unlimiter/issues/new");
+                Hyperlinks.open(Hyperlinks.NEW_ISSUE);
                 event.consume();
             });
         }
