@@ -24,4 +24,7 @@ module com.crschnick.pdx_unlimiter.app {
     exports com.crschnick.pdx_unlimiter.app;
     exports com.crschnick.pdx_unlimiter.app.core;
     exports com.crschnick.pdx_unlimiter.app.util;
+    exports com.crschnick.pdx_unlimiter.app.savegame;
+    exports com.crschnick.pdx_unlimiter.app.gui;
+    uses com.crschnick.pdx_unlimiter.app.savegame.EditorProvider;
 }

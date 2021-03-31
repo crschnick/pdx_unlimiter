@@ -6,5 +6,5 @@ apply from: "../javafx.gradle"
 
 dependencies {
     implementation project(':core')
-    implementation project(':editor')
+    implementation project(':app')
 }

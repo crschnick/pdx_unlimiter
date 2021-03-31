@@ -5,8 +5,6 @@ import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
-import com.crschnick.pdx_unlimiter.app.editor.Editor;
-import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.application.Platform;
@@ -55,7 +53,7 @@ public class FileImporter {
         var targets = FileImportTarget.createTargets(input);
         if (targets.size() == 0) {
             logger.debug("No targets to import. Trying editor targets ...");
-            EditTarget.create(Path.of(input)).ifPresent(Editor::createNewEditor);
+            EditorProvider.openFile(Path.of(input));
 
         } else {
             for (FileImportTarget t : targets) {
