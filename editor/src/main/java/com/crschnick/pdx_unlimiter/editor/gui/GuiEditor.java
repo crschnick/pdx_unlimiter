@@ -1,11 +1,9 @@
-package com.crschnick.pdx_unlimiter.app.gui.editor;
+package com.crschnick.pdx_unlimiter.editor.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.editor.EditorFilter;
-import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorState;
-import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.editor.core.EditorFilter;
+import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
+import com.crschnick.pdx_unlimiter.editor.core.EditorState;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Insets;

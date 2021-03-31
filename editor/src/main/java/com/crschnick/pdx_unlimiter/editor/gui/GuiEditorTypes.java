@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.gui.editor;
+package com.crschnick.pdx_unlimiter.editor.gui;
 
 import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;

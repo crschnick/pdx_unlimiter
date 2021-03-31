@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.editor.target;
+package com.crschnick.pdx_unlimiter.editor.target;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
