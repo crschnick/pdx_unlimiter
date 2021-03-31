@@ -3,9 +3,6 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.editor.Editor;
-import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
-import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
@@ -180,16 +177,7 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegame(e, ctx -> {
-                var in = ctx.getStorage().getSavegameFile(e);
-                var target = EditTarget.create(in);
-                target.ifPresent(t -> {
-                    var storageTarget = new StorageEditTarget<>(ctx.getStorage(), e, t);
-                    Editor.createNewEditor(storageTarget);
-                });
-            });
-        }, true);
+        EditorProvider.openEntry(e);
     }
 
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {

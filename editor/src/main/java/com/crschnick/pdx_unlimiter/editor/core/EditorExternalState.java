@@ -5,7 +5,6 @@ import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,42 +14,34 @@ import java.util.*;
 
 public class EditorExternalState {
 
-    private static final Path TEMP = FileUtils.getTempDirectory().toPath()
+    private static final Path TEMP = Path.of(System.getProperty("java.io.tmpdir"))
             .resolve("pdxu").resolve("editor");
     private final Set<Entry> openEntries = new HashSet<>();
 
     public static void init() {
-        try {
-            FileUtils.forceMkdir(TEMP.toFile());
-            // Remove old editor files in dir
-            FileUtils.cleanDirectory(TEMP.toFile());
-
-            FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
-                if (!Files.exists(changed)) {
-                    removeForFile(changed);
-                } else {
-                    getForFile(changed).ifPresent(e -> {
-                        try {
-                            // Wait for first write
-                            if (!e.registered) {
-                                if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                                    e.registered = true;
-                                }
-                                return;
+        FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
+            if (!Files.exists(changed)) {
+                removeForFile(changed);
+            } else {
+                getForFile(changed).ifPresent(e -> {
+                    try {
+                        // Wait for first write
+                        if (!e.registered) {
+                            if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                                e.registered = true;
                             }
-
-                            ArrayNode newNode = e.state.getParser().parse(changed);
-                            e.editorNode.update(newNode);
-                            e.state.onFileChanged();
-                        } catch (Exception ex) {
-                            ErrorHandler.handleException(ex, null, changed);
+                            return;
                         }
-                    });
-                }
-            });
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
+
+                        ArrayNode newNode = e.state.getParser().parse(changed);
+                        e.editorNode.update(newNode);
+                        e.state.onFileChanged();
+                    } catch (Exception ex) {
+                        ErrorHandler.handleException(ex, null, changed);
+                    }
+                });
+            }
+        });
     }
 
     private static void removeForFile(Path file) {
@@ -87,6 +78,8 @@ public class EditorExternalState {
                 TEMP.resolve(UUID.randomUUID().toString() + ".pdxt"));
 
         try {
+            Files.createDirectories(file.getParent());
+
             ex.ifPresentOrElse(e -> {
                 e.registered = false;
             }, () -> {
@@ -98,6 +91,16 @@ public class EditorExternalState {
             ThreadHelper.open(file);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
+        }
+    }
+
+    public void cleanup() {
+        for (var es : openEntries) {
+            try {
+                Files.delete(es.file);
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
         }
     }
 

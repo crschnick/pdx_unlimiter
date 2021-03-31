@@ -8,12 +8,12 @@ import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.Map;
 
-public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
+public class StorageEditTarget extends EditTarget {
 
-    private final SavegameEntry<T, I> entry;
+    private final SavegameEntry<?,?> entry;
     private final EditTarget target;
 
-    public StorageEditTarget(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry, EditTarget target) {
+    public StorageEditTarget(SavegameStorage<?,?> storage, SavegameEntry<?,?> entry, EditTarget target) {
         super(storage.getSavegameFile(entry), target.getParser());
         this.entry = entry;
         this.target = target;
