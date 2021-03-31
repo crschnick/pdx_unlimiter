@@ -107,7 +107,7 @@ public class ComponentManager {
 
             CacheManager.init();
 
-            EditorExternalState.init();
+            FileWatchManager.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }
