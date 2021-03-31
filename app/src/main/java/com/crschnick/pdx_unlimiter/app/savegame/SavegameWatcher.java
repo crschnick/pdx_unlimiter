@@ -56,7 +56,7 @@ public class SavegameWatcher {
                 .map(FileImportTarget::createTargets)
                 .map(List::stream)
                 .flatMap(Stream::distinct)
-                .sorted(Comparator.comparingLong(t -> -t.getLastModified().toEpochMilli()))
+                .sorted(Comparator.<FileImportTarget>comparingLong(t -> t.getLastModified().toEpochMilli()).reversed())
                 .collect(Collectors.toList());
     }
 
