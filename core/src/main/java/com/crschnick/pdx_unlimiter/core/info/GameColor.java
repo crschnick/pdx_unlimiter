@@ -13,11 +13,13 @@ public final class GameColor {
                 .map(Node::getString)
                 .collect(Collectors.toList()));
     }
+
     public static GameColor fromColorNode(Node n) {
         Type t = switch (n.getColorNode().getColorName()) {
             case "rgb" -> Type.RGB;
             case "hsv" -> Type.HSV;
             case "hsv360" -> Type.HSV360;
+            case "hex" -> Type.HEX;
             default -> throw new IllegalArgumentException("Invalid color type " + n.getColorNode());
         };
 
@@ -29,7 +31,8 @@ public final class GameColor {
     public enum Type {
         RGB,
         HSV,
-        HSV360
+        HSV360,
+        HEX
     }
 
     private Type type;

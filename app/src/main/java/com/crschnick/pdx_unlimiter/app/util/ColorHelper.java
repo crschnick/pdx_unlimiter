@@ -111,6 +111,7 @@ public class ColorHelper {
                     Double.parseDouble(c.get(0)) / 255.0,
                     Double.parseDouble(c.get(1)) / 255.0,
                     Double.parseDouble(c.get(2)) / 255.0);
+            case HEX -> Color.valueOf("#" + color.getValues().get(0));
         };
     }
 

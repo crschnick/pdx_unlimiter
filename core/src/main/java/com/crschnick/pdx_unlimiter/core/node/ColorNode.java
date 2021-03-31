@@ -14,6 +14,8 @@ public final class ColorNode extends Node {
     private static final byte[] RGB = "rgb".getBytes();
     private static final byte[] HSV = "hsv".getBytes();
     private static final byte[] HSV360 = "hsv360".getBytes();
+    private static final byte[] HEX = "hex".getBytes();
+
     private String colorName;
     private List<ValueNode> values;
 
@@ -36,7 +38,8 @@ public final class ColorNode extends Node {
         var end = begin + length;
         return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, end) ||
                 Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, end) ||
-                Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end);
+                Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end) ||
+                Arrays.equals(HEX, 0, HEX.length, ctx.getData(), begin, end);
     }
 
     public void set(ColorNode other) {
