@@ -1,4 +1,4 @@
-![Logo](docs/pdxu.png)
+![Logo](misc/pdxu.png)
 
 The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a
 powerful savegame manager to quickly organize and play all of your savegames with ease.
@@ -48,9 +48,9 @@ This works for both Ironman and Non-Ironman savegames.
 All savegames can be also launched directly from
 within the Pdx-Unlimiter without needing to visit the main menu.
 
-![Example](docs/screenshot.png)
+![Example](misc/screenshot.png)
 
-![Example](docs/ck3_screenshot.png)
+![Example](misc/ck3_screenshot.png)
 
 Savegames that use mods are also fully supported.
 This includes displaying modded country information in the savegame manager and mod installation support.
@@ -89,7 +89,7 @@ with a text editor, using the Pdx-Unlimiter editor has the following advantages:
 - You can easily navigate the hierarchical data with filters compared to the
   laborious process of locating a specific entry with a text editor search function
 
-![Editor](docs/editor.png)
+![Editor](misc/editor.png)
 
 **Usage guide:** [Editing savegames](https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide)
 
