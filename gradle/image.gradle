@@ -1,0 +1,50 @@
+
+apply from: "gradle/jvm_args.gradle"
+
+jlink {
+    imageDir = file("$buildDir/image")
+    options = [
+            // '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages']
+    launcher {
+        name = 'pdxu'
+        moduleName = 'com.crschnick.pdx_unlimiter.app'
+        jvmArgs = pdxuJvmArgs
+    }
+
+    customImage {
+        appModules = [
+                'com.crschnick.pdx_unlimiter.editor',
+                'com.crschnick.pdx_unlimiter.app',
+                'org.slf4j',
+                'org.slf4j.simple',
+                'jdk.crypto.ec',
+                'org.kordamp.ikonli.materialdesign',
+                'jdk.zipfs'
+        ]
+    }
+}
+
+task createImage(type: DefaultTask, dependsOn: jlink) {
+}
+
+task writeVersion(type: DefaultTask) {
+    doLast {
+        mkdir "${buildDir}/image/"
+        file("${buildDir}/image/version").write(String.valueOf(version))
+    }
+}
+
+task copyResources(type: Copy) {
+    into "${buildDir}/image/resources"
+    from "${projectDir}/app/resources"
+}
+
+task copyLang(type: Copy) {
+    into "${buildDir}/image/lang"
+    from "${projectDir}/app/lang"
+}
+
+createImage.finalizedBy(writeVersion, copyResources, copyLang)

@@ -124,8 +124,8 @@ public class PdxuInstallation {
             languageDir = appPath.resolve("lang");
             resourceDir = appPath.resolve("resources");
         } else {
-            languageDir = Path.of("lang");
-            resourceDir = Path.of("resources");
+            languageDir = Path.of("app", "lang");
+            resourceDir = Path.of("app", "resources");
         }
     }
 
