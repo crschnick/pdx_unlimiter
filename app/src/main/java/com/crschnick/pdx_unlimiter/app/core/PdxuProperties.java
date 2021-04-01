@@ -26,7 +26,7 @@ public class PdxuProperties {
                 }
             }
         } else {
-            try (var in = Files.newInputStream(Path.of("pdxu.properties"))) {
+            try (var in = Files.newInputStream(Path.of("app", "pdxu.properties"))) {
                 props.load(in);
             } catch (IOException e) {
                 ErrorHandler.handleException(e);

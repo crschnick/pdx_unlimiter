@@ -1,8 +1,10 @@
 plugins {
     id 'java'
+    id "org.moditect.gradleplugin"
 }
 
-apply from: "../javafx.gradle"
+apply from: "$rootDir/gradle/module_gen.gradle"
+apply from: "$rootDir/gradle/dependencies.gradle"
 
 dependencies {
     implementation project(':core')
