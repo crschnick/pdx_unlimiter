@@ -18,6 +18,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Hoi4Tag> info) {
         return new Background(new BackgroundFill(
-                ColorHelper.colorFromInt(0, 100),
+                Color.DARKGRAY,
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 

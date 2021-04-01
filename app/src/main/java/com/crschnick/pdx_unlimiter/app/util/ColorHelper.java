@@ -34,6 +34,10 @@ public class ColorHelper {
         return cMin;
     }
 
+    public static Color withAlpha(Color c, double alpha) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
+    }
+
     public static int getRed(int color) {
         return (color & 0x00FF0000) >>> 16;
     }
@@ -50,16 +54,11 @@ public class ColorHelper {
         return (color & 0xFF000000) >>> 24;
     }
 
-    public static java.awt.Color awtColorFromInt(int c, int alpha) {
-        Color fx = ColorHelper.colorFromInt(c, alpha);
+    public static java.awt.Color toAwtColor(Color fx) {
         return new java.awt.Color((float) fx.getRed(),
                 (float) fx.getGreen(),
                 (float) fx.getBlue(),
                 (float) fx.getOpacity());
-    }
-
-    public static javafx.scene.paint.Color colorFromInt(int c, int alpha) {
-        return Color.rgb(c >>> 24, (c >>> 16) & 255, (c >>> 8) & 255, alpha / 255.0);
     }
 
     public static int intFromColor(Color c) {
@@ -67,33 +66,10 @@ public class ColorHelper {
     }
 
     public static ColorNode toColorNode(Color c) {
-        return new ColorNode("rgb", List.of(
+        return new ColorNode(GameColor.Type.RGB, List.of(
                 new ValueNode(String.valueOf((int) (c.getRed() * 255))),
                 new ValueNode(String.valueOf((int) (c.getGreen() * 255))),
                 new ValueNode(String.valueOf((int) (c.getBlue() * 255)))));
-    }
-
-    public static Color fromColorNode(ColorNode node) {
-        var c = node.getValues();
-        switch (node.getColorName()) {
-            case "hsv":
-                return Color.hsb(
-                        c.get(0).getDouble() * 360,
-                        c.get(1).getDouble(),
-                        c.get(2).getDouble());
-            case "hsv360":
-                return Color.hsb(
-                        c.get(0).getDouble(),
-                        c.get(1).getDouble() / 360.0,
-                        c.get(2).getDouble() / 360.0);
-            case "rgb":
-                return Color.color(
-                        c.get(0).getDouble() / 255.0,
-                        c.get(1).getDouble() / 255.0,
-                        c.get(2).getDouble() / 255.0);
-        }
-
-        throw new IllegalArgumentException();
     }
 
     public static Color fromGameColor(GameColor color) {
@@ -119,7 +95,7 @@ public class ColorHelper {
         Map<String, Color> map = new HashMap<>();
         node.getNodeForKey("colors").forEach((k, v) -> {
             ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
-            map.put(k, fromColorNode(colorData));
+            map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
         });
         return map;
     }
@@ -128,7 +104,7 @@ public class ColorHelper {
         Map<String, Color> map = new HashMap<>();
         node.getNodeForKey("colors").forEach((k, v) -> {
             ColorNode colorData = (ColorNode) v;
-            map.put(k, fromColorNode(colorData));
+            map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
         });
         return map;
     }

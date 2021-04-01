@@ -95,7 +95,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Eu4Tag> info) {
         return new Background(new BackgroundFill(
-                ColorHelper.colorFromInt(info.getTag().getMapColor(), 100),
+                ColorHelper.withAlpha(ColorHelper.fromGameColor(info.getTag().getMapColor()), 0.33),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 

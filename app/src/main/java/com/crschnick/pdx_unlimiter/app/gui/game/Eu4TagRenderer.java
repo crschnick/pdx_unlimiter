@@ -33,7 +33,7 @@ public class Eu4TagRenderer {
                 BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, ov));
                 Graphics g = flagImage.getGraphics();
 
-                java.awt.Color awtColor = ColorHelper.awtColorFromInt(tag.getCountryColor(), 0xFF);
+                java.awt.Color awtColor = ColorHelper.toAwtColor(ColorHelper.fromGameColor(tag.getCountryColor()));
                 g.setColor(awtColor);
                 g.fillRect(flagImage.getWidth() / 2, 0, flagImage.getWidth() / 2, flagImage.getWidth());
                 return flagImage;

@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
@@ -11,51 +12,28 @@ import java.util.stream.Collectors;
 //TODO: Adapt to context instead of string
 public final class ColorNode extends Node {
 
-    private static final byte[] RGB = "rgb".getBytes();
-    private static final byte[] HSV = "hsv".getBytes();
-    private static final byte[] HSV360 = "hsv360".getBytes();
-    private static final byte[] HEX = "hex".getBytes();
-
-    private String colorName;
+    private GameColor.Type colorType;
     private List<ValueNode> values;
 
-    public ColorNode(String colorName, List<ValueNode> values) {
-        this.colorName = colorName;
-        this.values = Collections.unmodifiableList(values);
-    }
-
-    public static boolean isColorName(NodeContext ctx, int index) {
-        var begin = ctx.getLiteralsBegin()[index];
-        var length = ctx.getLiteralsLength()[index];
-        if (length != 3 && length != 6) {
-            return false;
-        }
-
-        if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h') {
-            return false;
-        }
-
-        var end = begin + length;
-        return Arrays.equals(RGB, 0, RGB.length, ctx.getData(), begin, end) ||
-                Arrays.equals(HSV, 0, HSV.length, ctx.getData(), begin, end) ||
-                Arrays.equals(HSV360, 0, HSV360.length, ctx.getData(), begin, end) ||
-                Arrays.equals(HEX, 0, HEX.length, ctx.getData(), begin, end);
+    public ColorNode(GameColor.Type colorType, List<ValueNode> values) {
+        this.colorType = colorType;
+        this.values = values;
     }
 
     public void set(ColorNode other) {
-        this.colorName = other.getColorName();
+        this.colorType = other.getColorType();
         this.values = Collections.unmodifiableList(other.getValues());
     }
 
     @Override
     public String toString() {
-        return colorName + "{ " + values.stream()
+        return colorType.getId() + " {" + values.stream()
                 .map(ValueNode::toString)
-                .collect(Collectors.joining(" ")) + " }";
+                .collect(Collectors.joining(" ")) + "}";
     }
 
-    public String getColorName() {
-        return colorName;
+    public GameColor.Type getColorType() {
+        return colorType;
     }
 
     public List<ValueNode> getValues() {
@@ -69,7 +47,7 @@ public final class ColorNode extends Node {
 
     @Override
     public void write(NodeWriter writer) throws IOException {
-        writer.write(colorName);
+        writer.write(colorType.getId());
         writer.write(" {");
         for (var v : values) {
             v.write(writer);
@@ -100,6 +78,6 @@ public final class ColorNode extends Node {
 
     @Override
     public boolean matches(NodeMatcher matcher) {
-        return matcher.matchesScalar(new NodeContext(colorName), 0);
+        return matcher.matchesScalar(new NodeContext(colorType.getId()), 0);
     }
 }

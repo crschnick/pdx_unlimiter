@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
@@ -30,7 +31,8 @@ public class GuiEditorNode {
             });
             return tf;
         } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isColor()) {
-            var picker = new JFXColorPicker(ColorHelper.fromColorNode((ColorNode) ((EditorSimpleNode) n).getBackingNode()));
+            var picker = new JFXColorPicker(ColorHelper.fromGameColor(GameColor.fromColorNode(
+                    ((EditorSimpleNode) n).getBackingNode())));
             picker.valueProperty().addListener((c, o, ne) -> {
                 ((EditorSimpleNode) n).updateColor(ne);
                 state.onColorChanged();

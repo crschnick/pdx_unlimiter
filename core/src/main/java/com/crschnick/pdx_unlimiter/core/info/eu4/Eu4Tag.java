@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info.eu4;
 
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.List;
@@ -13,14 +14,14 @@ public final class Eu4Tag {
     private static final Pattern OBSERVER_FLAG_TAG_PATTERN = Pattern.compile("O\\d\\d");
     private FlagType flagType;
     private String tag;
-    private int mapColor;
-    private int countryColor;
+    private GameColor mapColor;
+    private GameColor countryColor;
     private String name;
     private ColonialFlagData colonialFlagData;
     private CustomFlagData customFlagData;
     public Eu4Tag() {
     }
-    public Eu4Tag(FlagType flagType, String tag, int mapColor, int countryColor, String name, ColonialFlagData colonialFlagData, CustomFlagData customFlagData) {
+    public Eu4Tag(FlagType flagType, String tag, GameColor mapColor, GameColor countryColor, String name, ColonialFlagData colonialFlagData, CustomFlagData customFlagData) {
         this.flagType = flagType;
         this.tag = tag;
         this.mapColor = mapColor;
@@ -31,12 +32,9 @@ public final class Eu4Tag {
     }
 
     public static Eu4Tag fromNode(String tag, Node n) {
-        List<Node> mc = n.getNodeForKey("colors").getNodeForKey("map_color").getNodeArray();
-        int mColor = (mc.get(0).getInteger() << 24) + (mc.get(1).getInteger() << 16) + (mc.get(2).getInteger() << 8);
-        List<Node> cc = n.getNodeForKey("colors").getNodeForKey("country_color").getNodeArray();
-        int cColor = (cc.get(0).getInteger() << 24) + (cc.get(1).getInteger() << 16) + (cc.get(2).getInteger() << 8);
-        String name = n.hasKey("name") ?
-                n.getNodeForKey("name").getString() : null;
+        var mColor = GameColor.fromRgbArray(n.getNodeForKey("colors").getNodeForKey("map_color"));
+        var cColor = GameColor.fromRgbArray(n.getNodeForKey("colors").getNodeForKey("country_color"));
+        String name = n.hasKey("name") ? n.getNodeForKey("name").getString() : null;
 
         FlagType t;
         ColonialFlagData colonialFlagData = null;
@@ -73,11 +71,11 @@ public final class Eu4Tag {
         return tag;
     }
 
-    public int getMapColor() {
+    public GameColor getMapColor() {
         return mapColor;
     }
 
-    public int getCountryColor() {
+    public GameColor getCountryColor() {
         return countryColor;
     }
 

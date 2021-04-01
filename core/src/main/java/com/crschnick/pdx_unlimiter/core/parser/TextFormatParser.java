@@ -1,10 +1,12 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TextFormatParser extends FormatParser {
@@ -77,32 +79,34 @@ public final class TextFormatParser extends FormatParser {
     private Node parseNodeIfNotSimpleValue() {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
-            boolean isColor = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP &&
-                    ColorNode.isColorName(context, slIndex);
+            var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ?
+                    GameColor.getColorType(context, slIndex) : null;
 
-            if (isColor) {
-                var type = context.evaluate(slIndex);
+            if (colorType != null) {
+                assert tt[index + 1] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
+                assert tt[index + 1 + colorType.getComponents() + 1] == TextFormatTokenizer.CLOSE_GROUP : "Expected }";
+
+                // Move other color id
                 index++;
                 slIndex++;
 
-                var cn = new ColorNode(type, List.of(
-                        new ValueNode(
-                                context,
-                                slIndex),
-                        new ValueNode(
-                                context,
-                                slIndex + 1),
-                        new ValueNode(
-                                context,
-                                slIndex + 2)));
+                // Move over opening {
+                index++;
+
+                List<ValueNode> components = new ArrayList<>(colorType.getComponents());
+                for (int i = 0; i < colorType.getComponents(); i++) {
+                    components.add(new ValueNode(context, slIndex));
+                    slIndex++;
+                    index++;
+                }
+
+                // Move over closing }
+                index++;
 
                 // A color is also an array, so we have to move the array index!
                 arrayIndex++;
 
-                slIndex += 3;
-                index += 5;
-
-                return cn;
+                return new ColorNode(colorType, components);
             }
         } else {
             assert tt[index] != TextFormatTokenizer.EQUALS : "Encountered unexpected =";

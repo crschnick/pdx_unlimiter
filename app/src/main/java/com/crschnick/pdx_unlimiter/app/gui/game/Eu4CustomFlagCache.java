@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.awt.*;
@@ -23,9 +24,9 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
     private static final int PATTERN_COLOR_2 = 0xFF00FF00;
     private static final int PATTERN_COLOR_1 = 0xFFFF0000;
     private static final int PATTERN_COLOR_3 = 0xFF0000FF;
-    private List<Integer> colors = new ArrayList<>();
-    private List<Integer> flagColors = new ArrayList<>();
-    private List<Texture> textures = new ArrayList<>();
+
+    private final List<GameColor> flagColors = new ArrayList<>();
+    private final List<Texture> textures = new ArrayList<>();
     private BufferedImage emblems;
     public Eu4CustomFlagCache() {
         super(CacheManager.Scope.GAME_SPECIFIC);
@@ -38,22 +39,8 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
                     .resolve("custom_country_colors").resolve("00_custom_country_colors.txt");
             var content = TextFormatParser.textFileParser().parse(colorsFile);
             content.forEach((k, v) -> {
-                if (k.equals("color")) {
-                    var mc = v.getNodeArray();
-                    int color =
-                            (mc.get(0).getInteger() << 24) +
-                                    (mc.get(1).getInteger() << 16) +
-                                    (mc.get(2).getInteger() << 8) + 0xFF;
-                    colors.add(color);
-                }
-
                 if (k.equals("flag_color")) {
-                    var mc = v.getNodeArray();
-                    int color =
-                            (mc.get(0).getInteger() << 24) +
-                                    (mc.get(1).getInteger() << 16) +
-                                    (mc.get(2).getInteger() << 8) + 0xFF;
-                    flagColors.add(color);
+                    flagColors.add(GameColor.fromRgbArray(v));
                 }
             });
             content.getNodeForKey("textures").forEach((k, v) -> {
@@ -76,7 +63,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
             return new Color(0, 0, 0, 0);
         }
 
-        return ColorHelper.awtColorFromInt(flagColors.get(index), 0xFF);
+        return ColorHelper.toAwtColor(ColorHelper.fromGameColor(flagColors.get(index)));
     }
 
     public void renderTexture(BufferedImage img, int flagIndex, List<Integer> flagColors, int emblemIndex) {

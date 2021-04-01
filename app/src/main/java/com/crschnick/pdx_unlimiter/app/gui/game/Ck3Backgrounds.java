@@ -59,6 +59,6 @@ public class Ck3Backgrounds {
 
         var key = info.getTag().getPrimaryTitle().getKey();
         var color = cache.colors.containsKey(key) ? ColorHelper.fromGameColor(cache.colors.get(key)) : Color.TRANSPARENT;
-        return Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.5);
+        return ColorHelper.withAlpha(color, 0.33);
     }
 }
