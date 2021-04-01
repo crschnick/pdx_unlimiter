@@ -7,4 +7,6 @@ module com.crschnick.pdx_unlimiter.editor {
     requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
     requires com.jfoenix;
+
+    provides com.crschnick.pdx_unlimiter.app.savegame.EditorProvider with com.crschnick.pdx_unlimiter.editor.EditorImpl;
 }
