@@ -20,7 +20,7 @@ public final class LinkedArrayNode extends ArrayNode {
 
     @Override
     public String toString() {
-        return "LinkedArrayNode(" + joined.size() + ") }";
+        return "LinkedArrayNode(" + getNodeArray().size() + ") }";
     }
 
     @Override

@@ -56,10 +56,14 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     public ArrayNode splice(int begin, int length) {
-        int[] ks = new int[length];
+        int[] ks = keyScalars != null ? new int[length] : null;
+        if (keyScalars != null) {
+            System.arraycopy(keyScalars, begin, ks, 0, length);
+        }
+
         int[] vs = new int[length];
-        System.arraycopy(keyScalars, begin, ks, 0, length);
         System.arraycopy(valueScalars, begin, vs, 0, length);
+
         return new SimpleArrayNode(context, ks, vs, values.subList(begin, begin + length));
     }
 

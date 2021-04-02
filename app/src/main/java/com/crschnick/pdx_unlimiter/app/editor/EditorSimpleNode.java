@@ -30,13 +30,24 @@ public final class EditorSimpleNode extends EditorNode {
         cn.set(newColorNode);
     }
 
+    private void updateParentNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
+        ArrayNode ar = (ArrayNode) backingNode;
+
+        var replacement = toInsertKeyName != null ?
+                ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
+        this.backingNode = ar.replacePart(replacement, index, 1);
+        if (getDirectParent() != null) {
+            getRealParent().updateParentNodeAtIndex(this.backingNode, keyName, getKeyIndex());
+        }
+    }
+
     public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
         ArrayNode ar = (ArrayNode) backingNode;
         this.backingNode = ar.replacePart(toInsert, beginIndex, length);
 
         // Update parent node to reflect change
         if (getDirectParent() != null) {
-            getRealParent().replacePart((ArrayNode) this.backingNode, getKeyIndex(), 1);
+            getRealParent().updateParentNodeAtIndex(this.backingNode, keyName, getKeyIndex());
         }
     }
 
