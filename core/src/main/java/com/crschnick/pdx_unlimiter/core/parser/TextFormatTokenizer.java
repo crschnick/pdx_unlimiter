@@ -39,7 +39,8 @@ public class TextFormatTokenizer {
             // Add 2 to include open and close group tokens that are always added
             maxTokenCount = bytes.length + 2;
 
-            maxNodeCount = bytes.length;
+            // Add 1 in case bytes.length is 0. We then still have one empty array node
+            maxNodeCount = bytes.length + 1;
         } else {
             // Pessimistic assumptions, should always hold!
 
