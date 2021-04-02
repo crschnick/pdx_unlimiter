@@ -19,6 +19,19 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
+    public void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
+        getRealParent().updateNodeAtIndex(replacementValue, keyName, firstNodeIndex + index);
+    }
+
+    @Override
+    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
+        getRealParent().replacePart(
+                ArrayNode.sameKeyArray(keyName, toInsert.getNodeArray()),
+                firstNodeIndex + beginIndex,
+                length);
+    }
+
+    @Override
     public void delete() {
         getRealParent().replacePart(
                 ArrayNode.emptyArray(),

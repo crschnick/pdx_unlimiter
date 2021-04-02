@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
 
 import java.util.ArrayList;
@@ -71,6 +72,10 @@ public abstract class EditorNode {
         }, true);
         return result;
     }
+
+    public abstract void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index);
+
+    public abstract void replacePart(ArrayNode toInsert, int beginIndex, int length);
 
     public abstract void delete();
 

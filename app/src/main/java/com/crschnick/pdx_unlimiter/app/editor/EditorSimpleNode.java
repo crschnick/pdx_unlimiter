@@ -30,14 +30,14 @@ public final class EditorSimpleNode extends EditorNode {
         cn.set(newColorNode);
     }
 
-    private void updateParentNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
+    public void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
         ArrayNode ar = (ArrayNode) backingNode;
 
         var replacement = toInsertKeyName != null ?
                 ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
         this.backingNode = ar.replacePart(replacement, index, 1);
         if (getDirectParent() != null) {
-            getRealParent().updateParentNodeAtIndex(this.backingNode, keyName, getKeyIndex());
+            getDirectParent().updateNodeAtIndex(this.backingNode, keyName, getKeyIndex());
         }
     }
 
@@ -47,14 +47,14 @@ public final class EditorSimpleNode extends EditorNode {
 
         // Update parent node to reflect change
         if (getDirectParent() != null) {
-            getRealParent().updateParentNodeAtIndex(this.backingNode, keyName, getKeyIndex());
+            getDirectParent().updateNodeAtIndex(this.backingNode, keyName, getKeyIndex());
         }
     }
 
     @Override
     public void delete() {
         if (getDirectParent() != null) {
-            getRealParent().replacePart(ArrayNode.emptyArray(), getKeyIndex(), 1);
+            getDirectParent().replacePart(ArrayNode.emptyArray(), getKeyIndex(), 1);
         }
     }
 
@@ -108,9 +108,7 @@ public final class EditorSimpleNode extends EditorNode {
 
             // Update parent node to reflect change
             if (getDirectParent() != null) {
-                var replacement = getKeyName().map(k -> ArrayNode.singleKeyNode(k, this.backingNode))
-                        .orElse(ArrayNode.array(this.backingNode.getNodeArray()));
-                getRealParent().replacePart(replacement, getKeyIndex(), 1);
+                getDirectParent().updateNodeAtIndex(this.backingNode, keyName, getKeyIndex());
             }
         } else {
             var nodeToUse = newNode.getNodeArray().get(0);
