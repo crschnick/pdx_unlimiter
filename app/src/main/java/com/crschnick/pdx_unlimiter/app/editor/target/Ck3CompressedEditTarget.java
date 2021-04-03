@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.crschnick.pdx_unlimiter.core.savegame.Ck3SavegameParser;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +30,12 @@ public class Ck3CompressedEditTarget extends EditTarget {
 
     @Override
     public Map<String, Node> parse() throws Exception {
-        header = Files.lines(file).findFirst().orElse("");
+        var it = FileUtils.lineIterator(file.toFile());
+        if (!it.hasNext()) {
+            throw new IllegalArgumentException("Empty file");
+        }
+
+        header = it.nextLine();
 
         var s = new Ck3SavegameParser().parse(file, null);
         Map<String, Node> map = new HashMap<>();

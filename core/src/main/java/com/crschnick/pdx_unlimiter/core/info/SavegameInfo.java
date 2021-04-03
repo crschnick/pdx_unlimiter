@@ -13,6 +13,8 @@ public abstract class SavegameInfo<T> {
     protected boolean ironman;
     protected GameDate date;
     protected boolean binary;
+    protected boolean observer;
+    protected boolean multiplayer;
 
     public List<String> getMods() {
         return mods;
@@ -44,5 +46,17 @@ public abstract class SavegameInfo<T> {
 
     public UUID getCampaignHeuristic() {
         return campaignHeuristic;
+    }
+
+    public boolean hasOnePlayerTag() {
+        return getTag() != null;
+    }
+
+    public boolean isObserver() {
+        return observer;
+    }
+
+    public boolean isMultiplayer() {
+        return multiplayer;
     }
 }

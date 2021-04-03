@@ -45,7 +45,17 @@ public class Ck3Tag {
         return tags.stream().filter(t -> t.id == id).findFirst();
     }
 
-    public static Ck3Tag getPlayerTag(Node n, List<Ck3Tag> allTags) {
+    public static Optional<Ck3Tag> getPlayerTag(Node n, List<Ck3Tag> allTags) {
+        // Observer check
+        if (!n.hasKey("currently_played_characters")) {
+            return Optional.empty();
+        }
+
+        // Multiplayer check
+        if (n.getNodeForKey("currently_played_characters").getNodeArray().size() > 1) {
+            return Optional.empty();
+        }
+
         long id = n.getNodeForKey("currently_played_characters").getNodeArray().get(0).getLong();
         var personNode = n.getNodeForKey("living").getNodeForKey(String.valueOf(id));
         var house = new Ck3House(
@@ -75,7 +85,7 @@ public class Ck3Tag {
         var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name);
         allTags.removeIf(t -> t.id == id);
         allTags.add(tag);
-        return tag;
+        return Optional.of(tag);
     }
 
     public static List<Ck3Tag> fromNode(Node n) {

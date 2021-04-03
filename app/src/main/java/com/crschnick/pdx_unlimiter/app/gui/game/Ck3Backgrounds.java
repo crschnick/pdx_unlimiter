@@ -44,6 +44,10 @@ public class Ck3Backgrounds {
     }
 
     public static Color getBackgroundColor(SavegameInfo<Ck3Tag> info) {
+        if (!info.hasOnePlayerTag()) {
+            return ColorHelper.withAlpha(Color.BEIGE, 0.33);
+        }
+
         var cache = CacheManager.getInstance().get(BackgroundColorCache.class);
         if (cache.colors.size() == 0) {
             var file = GameInstallation.ALL.get(Game.CK3).getPath().resolve("game")

@@ -94,6 +94,10 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
+        if (tag == null) {
+            return ImageLoader.DEFAULT_IMAGE;
+        }
+
         return Ck3TagRenderer.realmImage(info, tag);
     }
 
@@ -167,22 +171,24 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
-        addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
+        if (info.hasOnePlayerTag()) {
+            addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
 
-        createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
-                info.getTag().getTitles(), "Titles", "titles");
-        createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
-                info.getTag().getClaims(), "Claims", "claims");
+            createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
+                    info.getTag().getTitles(), "Titles", "titles");
+            createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
+                    info.getTag().getClaims(), "Claims", "claims");
 
-        for (War<Ck3Tag> war : ((Ck3SavegameInfo) info).getWars()) {
-            createRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),
-                    war.isAttacker(info.getTag()) ? war.getDefenders() : war.getAttackers(),
-                    war.getTitle(), CLASS_WAR);
+            for (War<Ck3Tag> war : ((Ck3SavegameInfo) info).getWars()) {
+                createRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),
+                        war.isAttacker(info.getTag()) ? war.getDefenders() : war.getAttackers(),
+                        war.getTitle(), CLASS_WAR);
+            }
+
+            createRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
+                    ((Ck3SavegameInfo) info).getAllies(),
+                    "Allies", CLASS_ALLIANCE);
         }
-
-        createRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
-                ((Ck3SavegameInfo) info).getAllies(),
-                "Allies", CLASS_ALLIANCE);
 
         if (info.isIronman()) {
             var ironman = new StackPane(imageNode(CK3_ICON_IRONMAN, CLASS_IMAGE_ICON, null));

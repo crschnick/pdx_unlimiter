@@ -29,7 +29,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private boolean randomNewWorld;
     private boolean customNationInWorld;
     private boolean releasedVassal;
-    private boolean observer;
     private Ruler ruler;
     private Ruler heir;
     private List<War> wars = new ArrayList<>();
@@ -156,10 +155,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         } catch (NodeFormatException ex) {
             throw new ParseException("Error while creating savegame info", ex);
         }
-    }
-
-    public boolean isObserver() {
-        return observer;
     }
 
     public boolean isRandomNewWorld() {

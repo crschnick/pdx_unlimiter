@@ -18,8 +18,8 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     protected List<Ck3Tag> allTags;
     private String playerName;
     private String houseName;
-    private List<War<Ck3Tag>> wars;
-    private List<Ck3Tag> allies;
+    private List<War<Ck3Tag>> wars = new ArrayList<>();
+    private List<Ck3Tag> allies = new ArrayList<>();
 
     public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
@@ -34,48 +34,63 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = Ck3Tag.fromNode(n);
-            i.tag = Ck3Tag.getPlayerTag(n, i.allTags);
+            i.tag = Ck3Tag.getPlayerTag(n, i.allTags).orElse(null);
+            i.observer = i.tag == null;
+            i.multiplayer = n.getNodeForKey("currently_played_characters").getNodeArray().size() > 1;
 
-            i.mods = n.getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of())
+            i.mods = n.getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
+                    .map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
-            i.dlcs = List.of();
-
-            i.playerName = n.getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString();
-            i.houseName = n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString();
-
-            Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
-            Matcher m = p.matcher(n.getNodeForKey("meta_data").getNodeForKey("version").getString());
-            m.matches();
-            i.version = new GameVersion(
-                    Integer.parseInt(m.group(1)),
-                    Integer.parseInt(m.group(2)),
-                    Integer.parseInt(m.group(3)),
-                    0,
-                    null);
-
-            i.wars = fromActiveWarsNode(i.allTags, i.tag, n);
-
-            i.allies = new ArrayList<>();
-            for (Node rel : n.getNodeForKey("relations").getNodeForKey("active_relations").getNodeArray()) {
-                if (!rel.hasKey("alliances")) {
-                    continue;
-                }
-
-                var first = rel.getNodeForKey("first").getLong();
-                var second = rel.getNodeForKey("second").getLong();
-                if (first == i.tag.getId()) {
-                    Ck3Tag.getTag(i.allTags, second).ifPresent(t -> i.allies.add(t));
-                }
-                if (second == i.tag.getId()) {
-                    Ck3Tag.getTag(i.allTags, first).ifPresent(t -> i.allies.add(t));
-                }
-            }
-
+            i.dlcs = n.getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
+                    .map(Node::getNodeArray).orElse(List.of())
+                    .stream().map(Node::getString)
+                    .collect(Collectors.toList());
+            
+            i.initVersion(n);
+            i.initPlayerData(n);
         } catch (Exception e) {
             throw new ParseException("Could not create savegame info of savegame", e);
         }
         return i;
+    }
+
+    private void initVersion(Node n) {
+        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+        Matcher m = p.matcher(n.getNodeForKey("meta_data").getNodeForKey("version").getString());
+        m.matches();
+        version = new GameVersion(
+                Integer.parseInt(m.group(1)),
+                Integer.parseInt(m.group(2)),
+                Integer.parseInt(m.group(3)),
+                0,
+                null);
+    }
+
+    private void initPlayerData(Node n) {
+        if (isObserver()) {
+            return;
+        }
+
+        playerName = n.getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString();
+        houseName = n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString();
+
+        wars = fromActiveWarsNode(allTags, tag, n);
+
+        for (Node rel : n.getNodeForKey("relations").getNodeForKey("active_relations").getNodeArray()) {
+            if (!rel.hasKey("alliances")) {
+                continue;
+            }
+
+            var first = rel.getNodeForKey("first").getLong();
+            var second = rel.getNodeForKey("second").getLong();
+            if (first == tag.getId()) {
+                Ck3Tag.getTag(allTags, second).ifPresent(t -> allies.add(t));
+            }
+            if (second == tag.getId()) {
+                Ck3Tag.getTag(allTags, first).ifPresent(t -> allies.add(t));
+            }
+        }
     }
 
     private static final String WAR_METADATA_END = String.valueOf(new char[] {21, '!', 21, '!', 21, '!'});
