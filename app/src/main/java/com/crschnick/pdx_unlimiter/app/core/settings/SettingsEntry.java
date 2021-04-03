@@ -254,7 +254,8 @@ public abstract class SettingsEntry<T> {
             try {
                 var i = (GameInstallation) installClass.getDeclaredConstructors()[0].newInstance(newPath);
                 GameInstallation.initTemporary(game, i);
-                super.set(newPath);
+                this.value.set(newPath);
+                this.disabled = false;
             } catch (InvalidInstallationException e) {
                 if (value.get() == null) {
                     this.disabled = true;
