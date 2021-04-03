@@ -115,6 +115,10 @@ public abstract class GameInstallation {
     }
 
     private void loadDlcs() throws IOException {
+        if (!Files.isDirectory(getDlcPath())) {
+            return;
+        }
+
         Files.list(getDlcPath()).forEach(f -> {
             try {
                 GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
