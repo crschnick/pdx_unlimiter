@@ -63,10 +63,13 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
-            Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)");
+            Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
             Matcher m = p.matcher(n.getNodesForKey("version").get(0).getString());
             m.matches();
-            i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
+            i.version = new GameVersion(
+                    Integer.parseInt(m.group(2)),
+                    Integer.parseInt(m.group(3)),
+                    m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0, 0, m.group(1));
 
         } catch (Exception e) {
             throw new ParseException("Could not create savegame info of savegame", e);
