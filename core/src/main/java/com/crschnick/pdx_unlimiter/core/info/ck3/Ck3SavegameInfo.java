@@ -36,7 +36,6 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             i.allTags = Ck3Tag.fromNode(n);
             i.tag = Ck3Tag.getPlayerTag(n, i.allTags).orElse(null);
             i.observer = i.tag == null;
-            i.multiplayer = n.getNodeForKey("currently_played_characters").getNodeArray().size() > 1;
 
             i.mods = n.getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
                     .map(Node::getNodeArray).orElse(List.of())
@@ -46,7 +45,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
                     .map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
-            
+
             i.initVersion(n);
             i.initPlayerData(n);
         } catch (Exception e) {

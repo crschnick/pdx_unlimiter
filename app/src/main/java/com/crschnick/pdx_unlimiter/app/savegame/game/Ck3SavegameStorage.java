@@ -21,12 +21,14 @@ public class Ck3SavegameStorage extends SavegameStorage<Ck3Tag, Ck3SavegameInfo>
 
     @Override
     protected String getDefaultCampaignName(Ck3SavegameInfo info) {
-        if (info.isMultiplayer()) {
-            return "Multiplayer";
-        }
         if (info.isObserver()) {
             return "Observer";
         }
+
+        if (!info.hasOnePlayerTag()) {
+            return "Unknown";
+        }
+
         return info.getTag().getName();
     }
 }
