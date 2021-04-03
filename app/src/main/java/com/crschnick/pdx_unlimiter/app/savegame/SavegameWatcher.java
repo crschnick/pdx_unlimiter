@@ -10,6 +10,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class SavegameWatcher {
                 .map(FileImportTarget::createTargets)
                 .map(List::stream)
                 .flatMap(Stream::distinct)
-                .sorted(Comparator.<FileImportTarget>comparingLong(t -> t.getLastModified().toEpochMilli()).reversed())
+                .sorted(Comparator.<FileImportTarget, Instant>comparing(t -> t.getLastModified()).reversed())
                 .collect(Collectors.toList());
     }
 
