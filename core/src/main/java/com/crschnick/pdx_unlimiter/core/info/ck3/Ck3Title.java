@@ -77,7 +77,11 @@ public class Ck3Title {
             return Optional.empty();
         }
 
+        if (!n.hasKey("coat_of_arms_id")) {
+            return Optional.empty();
+        }
         var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
+
         var color = n.getNodeForKeyIfExistent("color")
                 .map(Node::getColorNode)
                 .map(GameColor::fromColorNode)
