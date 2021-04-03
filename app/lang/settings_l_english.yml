@@ -11,7 +11,7 @@ l_english:
  GAME_DIR: "$GAME$ installation"
  GAME_DIR_DESC: "The $GAME$ installation directory.\n\nNote that this should be the installation directory that contains the game executable and assets.\nNOT the user directory that contains your savegames and mods."
  STORAGE_DIR: "Storage directory"
- STORAGE_DIR_DESC: "The directory where the Pdx-Unlimiter stores all imported savegames."
+ STORAGE_DIR_DESC: "The directory where the Pdx-Unlimiter stores all the imported savegames.\nNote that this is completely independet from your savegame directories of your Paradox games!"
  STORAGE_DIR_DIALOG_TITLE: "Confirm storage move"
  STORAGE_DIR_DIALOG_TEXT: "You are trying to move your savegame storage from $FROM$\nto $TO$.\nThis will move all savegame files and may take a while."
  EU4SE: "Eu4SaveEditor"
