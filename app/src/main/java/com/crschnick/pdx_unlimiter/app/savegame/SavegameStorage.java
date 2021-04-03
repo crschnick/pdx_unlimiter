@@ -600,15 +600,14 @@ public abstract class SavegameStorage<
                         FileUtils.forceMkdir(entryPath.toFile());
                         FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
                         JsonHelper.writeObject(s.info, entryPath.resolve(getInfoFileName()));
+
+                        if (col == null) {
+                            addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
+                        } else {
+                            addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
+                        }
                     } catch (Exception e) {
                         ErrorHandler.handleException(e);
-                        return;
-                    }
-
-                    if (col == null) {
-                        addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
-                    } else {
-                        addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
                     }
                 }
             }

@@ -103,6 +103,13 @@ public class TextFormatTokenizer {
         if (marksEndOfPreviousToken) {
             int offset = prev;
             short length = (short) ((i - 1) - prev + 1);
+
+            // Check for length overflow
+            if (length < 0) {
+                throw new IndexOutOfBoundsException(
+                        "Encountered scalar with length " + ((i - 1) - prev + 1) + ", which is too big");
+            }
+
             if (bytes[prev] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
                 tokenTypes[tokenCounter++] = STRING_QUOTED;
             } else {

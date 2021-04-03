@@ -130,12 +130,16 @@ public abstract class ArrayNode extends Node {
         }
 
         public void putScalarValue(int scalarIndex) {
+            checkFull();
+
             valueScalars[index] = scalarIndex;
             values.add(null);
             index++;
         }
 
         public void putKeyAndScalarValue(int keyIndex, int scalarIndex) {
+            checkFull();
+
             initKeys();
             keyScalars[index] = keyIndex;
             valueScalars[index] = scalarIndex;
@@ -144,12 +148,16 @@ public abstract class ArrayNode extends Node {
         }
 
         public void putNodeValue(Node node) {
+            checkFull();
+
             valueScalars[index] = -1;
             values.add(node);
             index++;
         }
 
         public void putKeyAndNodeValue(int keyIndex, Node node) {
+            checkFull();
+
             initKeys();
             keyScalars[index] = keyIndex;
             valueScalars[index] = -1;
@@ -157,8 +165,22 @@ public abstract class ArrayNode extends Node {
             index++;
         }
 
+        private void checkFull() {
+            if (isFull()) {
+                throw new IndexOutOfBoundsException("Node " + build().toString() + " is already full");
+            }
+        }
+
+        public boolean isFull() {
+            return getUsedSize() == getMaxSize();
+        }
+
         public int getUsedSize() {
             return index;
+        }
+
+        public int getMaxSize() {
+            return maxSize;
         }
     }
 }
