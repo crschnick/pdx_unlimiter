@@ -85,7 +85,7 @@ public class GuiErrorReporter {
 
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Pdx-Unlimiter");
-        alert.setHeaderText((msg != null ? msg : "An error occured") + (reportable ? """
+        alert.setHeaderText((msg != null ? msg.substring(0, Math.min(msg.length(), 300)) : "An error occured") + (reportable ? """
 
 
                 You can notify the developers of this error automatically by clicking the 'Report automatically' button. (This will send some diagnostics data.)
