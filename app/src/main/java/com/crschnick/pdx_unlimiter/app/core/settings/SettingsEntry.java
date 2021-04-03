@@ -312,7 +312,7 @@ public abstract class SettingsEntry<T> {
                 return;
             }
 
-            if (FileUtils.listFiles(newPath.toFile(), null, false).size() > 0) {
+            if (FileUtils.listFiles(newPath.toFile(), null, true).size() > 0) {
                 GuiErrorReporter.showSimpleErrorMessage("New storage directory " + newPath + " must be empty!");
             } else {
                 try {
