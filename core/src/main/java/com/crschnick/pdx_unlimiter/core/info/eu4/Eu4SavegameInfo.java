@@ -57,7 +57,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     e.customNationInWorld = true;
                 }
             });
-            e.observer = !n.hasKey("not_observer") || !n.getNodeForKey("not_observer").getBoolean();
+            e.observer = !n.getNodeForKeyIfExistent("not_observer").map(Node::getBoolean).orElse(false);
             e.randomNewWorld = n.getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
             e.ironman = melted;
             e.binary = e.ironman;
