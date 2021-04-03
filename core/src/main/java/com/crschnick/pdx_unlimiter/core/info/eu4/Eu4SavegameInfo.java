@@ -341,7 +341,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         public static List<War> fromActiveWarsNode(List<Eu4Tag> tags, String tag, Node n) {
             List<War> wars = new ArrayList<>();
             for (Node war : n.getNodesForKey("active_war")) {
-                String title = war.getNodeForKey("name").getString();
+                String title = war.getNodeForKeyIfExistent("name").map(Node::getString).orElse("MISSING NAME");
                 boolean isAttacker = false;
                 List<Eu4Tag> attackers = new ArrayList<>();
                 if (war.hasKey("attackers")) {
