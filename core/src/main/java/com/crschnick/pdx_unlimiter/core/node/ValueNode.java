@@ -10,11 +10,12 @@ public final class ValueNode extends Node {
     private static final byte DOUBLE_QUOTE_CHAR = 34;
     private static final Pattern LONG = Pattern.compile("-?[0-9]+");
     private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
+
     private NodeContext context;
     private int scalarIndex;
 
-    public ValueNode(String value) {
-        this.context = new NodeContext(value);
+    public ValueNode(String value, boolean quoted) {
+        this.context = new NodeContext(value, quoted);
         this.scalarIndex = 0;
     }
 

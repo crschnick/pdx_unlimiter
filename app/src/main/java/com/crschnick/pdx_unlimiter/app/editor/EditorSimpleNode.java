@@ -20,8 +20,7 @@ public final class EditorSimpleNode extends EditorNode {
 
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
-        var val = bn.isQuoted() ? "\"" + text + "\"" : text;
-        bn.set(new ValueNode(val));
+        bn.set(new ValueNode(text, bn.isQuoted()));
     }
 
     public void updateColor(Color c) {

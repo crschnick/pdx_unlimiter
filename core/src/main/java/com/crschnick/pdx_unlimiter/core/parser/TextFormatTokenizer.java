@@ -25,6 +25,7 @@ public class TextFormatTokenizer {
     private int tokenCounter;
     private int scalarCounter;
     private int arraySizesCounter;
+    private boolean escapeChar;
 
     public TextFormatTokenizer(byte[] bytes) {
         this.bytes = bytes;
@@ -69,37 +70,61 @@ public class TextFormatTokenizer {
         tokenTypes[tokenCounter] = CLOSE_GROUP;
     }
 
-    private void tokenizeIteration() {
-        // Add extra new line at the end to simulate end of token
-        char c = i == bytes.length ? '\n' : (char) bytes[i];
-
-        if (isInComment) {
-            if (c == '\n') {
-                isInComment = false;
+    private boolean checkCommentCase(char c) {
+        if (!isInComment) {
+            if (c == '#') {
+                isInComment = true;
+                return true;
+            } else {
+                return false;
             }
-            prev = i + 1;
+        }
+
+        if (c == '\n') {
+            isInComment = false;
+        }
+        prev = i + 1;
+        return true;
+    }
+
+    private boolean checkQuoteCase(char c) {
+        if (!isInQuotes) {
+            if (c == '"') {
+                isInQuotes = true;
+            }
+
+            return false;
+        }
+
+        boolean hasSeenEscapeChar = escapeChar;
+        if (hasSeenEscapeChar) {
+            escapeChar = false;
+            if (c == '"' || c == '\\') {
+                return true;
+            }
+        } else {
+            escapeChar = c == '\\';
+            if (c == '"') {
+                isInQuotes = false;
+            }
+        }
+
+        return true;
+    }
+
+    private void checkForEndOfPreviousToken(char c, byte controlToken) {
+        boolean hasPreviousToken = prev < i;
+        if (!hasPreviousToken) {
             return;
         }
 
-        byte t = 0;
-        if (isInQuotes && c != '"') {
-            return;
-        } else if (c == '"') {
-            isInQuotes = !isInQuotes;
-        } else if (c == '{') {
-            t = OPEN_GROUP;
-        } else if (c == '}') {
-            t = CLOSE_GROUP;
-        } else if (c == '=') {
-            t = EQUALS;
-        }
-
-        boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+        boolean isNewStringBegin = c == '"';
+        boolean isWhitespace = (c == '\n' || c == '\r' || c == ' ' || c == '\t');
         boolean isComment = c == '#';
-        boolean marksEndOfPreviousToken =
-                (t != 0 && prev < i)                // New token finishes old token
-                        || (isWhitespace && prev < i)          // Whitespace finishes old token
-                        || (isComment && prev < i);            // New comment finishes old token
+        boolean marksEndOfPreviousToken = (isNewStringBegin) // New string finishes old token
+                || (controlToken != 0)                     // New token finishes old token
+                || (isWhitespace)               // Whitespace finishes old token
+                || (isComment);                 // New comment finishes old token
         if (marksEndOfPreviousToken) {
             int offset = prev;
             short length = (short) ((i - 1) - prev + 1);
@@ -121,26 +146,53 @@ public class TextFormatTokenizer {
 
             assert arraySizeStack.size() > 0: "Encountered unexpectedly large array at index " + i;
             arraySizes[arraySizeStack.peek()]++;
+
+            prev = i + 1;
         }
+    }
+
+    private void checkForNewControlToken(byte controlToken) {
+        if (controlToken == 0) {
+            return;
+        }
+
+        if (controlToken == CLOSE_GROUP) {
+            assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
+            arraySizeStack.pop();
+        } else if (controlToken == EQUALS) {
+            arraySizes[arraySizeStack.peek()]--;
+        } else if (controlToken == OPEN_GROUP) {
+            arraySizes[arraySizeStack.peek()]++;
+            arraySizeStack.add(arraySizesCounter++);
+        }
+
+        tokenTypes[tokenCounter++] = controlToken;
+        prev = i + 1;
+    }
+
+    private void tokenizeIteration() {
+        // Add extra new line at the end to simulate end of token
+        char c = i == bytes.length ? '\n' : (char) bytes[i];
+
+        if (checkCommentCase(c)) return;
+        if (checkQuoteCase(c)) return;
+
+        byte controlToken = 0;
+        if (c == '{') {
+            controlToken = OPEN_GROUP;
+        } else if (c == '}') {
+            controlToken = CLOSE_GROUP;
+        } else if (c == '=') {
+            controlToken = EQUALS;
+        }
+
+        checkForEndOfPreviousToken(c, controlToken);
 
         if (isWhitespace) {
             prev = i + 1;
-        } else if (t != 0) {
-            if (t == CLOSE_GROUP) {
-                assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
-                arraySizeStack.pop();
-            } else if (t == EQUALS) {
-                arraySizes[arraySizeStack.peek()]--;
-            } else if (t == OPEN_GROUP) {
-                arraySizes[arraySizeStack.peek()]++;
-                arraySizeStack.add(arraySizesCounter++);
-            }
-
-            tokenTypes[tokenCounter++] = t;
-            prev = i + 1;
-        } else if (isComment) {
-            isInComment = true;
         }
+
+        checkForNewControlToken(controlToken);
     }
 
     public byte[] getTokenTypes() {

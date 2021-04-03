@@ -18,14 +18,14 @@ public abstract class ArrayNode extends Node {
     }
 
     public static ArrayNode sameKeyArray(String key, List<Node> values) {
-        var ctx = new NodeContext(key);
+        var ctx = new NodeContext(key, false);
         var ki = new int[values.size()];
         Arrays.fill(ki, 0);
         return new SimpleArrayNode(ctx, ki, null, values);
     }
 
     public static ArrayNode singleKeyNode(String key, Node value) {
-        var ctx = new NodeContext(key);
+        var ctx = new NodeContext(key, false);
         return new SimpleArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
     }
 

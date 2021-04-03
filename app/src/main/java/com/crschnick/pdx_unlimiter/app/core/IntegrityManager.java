@@ -47,8 +47,8 @@ public class IntegrityManager {
 
     private static String calc(Path pack, String game) throws Exception {
         MessageDigest d = MessageDigest.getInstance("MD5");
-        update(d, pack);
         update(d, pack.resolve(game));
+        update(d, pack);
         return checksum(d);
     }
 
