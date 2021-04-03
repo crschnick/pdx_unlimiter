@@ -136,7 +136,12 @@ public final class LinkedArrayNode extends ArrayNode {
 
     @Override
     public boolean hasKey(String key) {
-        return super.hasKey(key);
+        for (var ar : arrayNodes) {
+            if (ar.hasKey(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
