@@ -7,10 +7,8 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class GuiImporterState {
@@ -22,7 +20,7 @@ public class GuiImporterState {
     public GuiImporterState() {
         selectAll = new SimpleBooleanProperty();
         filter = new SimpleStringProperty("");
-        allTargets = new ArrayList<>();
+        allTargets = new CopyOnWriteArrayList<>();
         shownTargets = new SimpleListProperty<>(FXCollections.observableArrayList());
         setupListeners();
 
