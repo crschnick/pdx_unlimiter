@@ -84,6 +84,11 @@ public class Eu4Installation extends GameInstallation {
 
     @Override
     public Optional<GameMod> getModForName(String name) {
+        // Check whether it is a mod path, and not a mod name
+        if (!name.startsWith("mod")) {
+            return Optional.empty();
+        }
+
         return getMods().stream().filter(d -> getUserPath().relativize(d.getModFile()).equals(Path.of(name))).findAny();
     }
 }
