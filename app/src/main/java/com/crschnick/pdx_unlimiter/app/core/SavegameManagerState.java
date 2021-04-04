@@ -138,11 +138,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     public void unloadCollectionAsync(SavegameCollection<T, I> col) {
         TaskExecutor.getInstance().submitTask(() -> {
-            boolean loaded = col.getSavegames().stream().anyMatch(e -> e.getInfo() != null);
-            if (!loaded) {
-                return;
-            }
-
             logger.debug("Unloading collection " + col.getName());
             for (var e : col.getSavegames()) {
                 e.unload();
