@@ -14,7 +14,7 @@ import java.util.zip.ZipInputStream;
 
 public class Ck3SavegameParser extends SavegameParser {
 
-    private static final int MAX_SEARCH = 100000;
+    private static final int MAX_SEARCH = 150000;
 
     private static int indexOf(byte[] array, byte[] toFind) {
         for (int i = 0; i < MAX_SEARCH; ++i) {
@@ -31,10 +31,11 @@ public class Ck3SavegameParser extends SavegameParser {
         }
         return -1;
     }
+    private static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
 
     public static boolean isCompressed(Path file) throws IOException {
         var content = Files.readAllBytes(file);
-        int zipContentStart = indexOf(content, "}\nPK".getBytes());
+        int zipContentStart = indexOf(content, ZIP_HEADER);
         return zipContentStart != -1;
     }
 
@@ -61,11 +62,11 @@ public class Ck3SavegameParser extends SavegameParser {
 
             content = Files.readAllBytes(fileToParse);
             byte[] savegameText;
-            int zipContentStart = indexOf(content, "}\nPK".getBytes()) + 2;
-            boolean compressed = zipContentStart != 1;
+            int zipContentStart = indexOf(content, ZIP_HEADER);
+            boolean compressed = zipContentStart != -1;
             if (compressed) {
-                byte[] zipContent = Arrays.copyOfRange(content, zipContentStart, content.length);
-                var zipIn = new ZipInputStream(new ByteArrayInputStream(zipContent));
+                var zipIn = new ZipInputStream(new ByteArrayInputStream(content,
+                        zipContentStart, content.length - zipContentStart));
                 zipIn.getNextEntry();
                 savegameText = zipIn.readAllBytes();
                 zipIn.close();

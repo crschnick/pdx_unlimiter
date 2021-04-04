@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.info.ck3;
 
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,10 @@ public class Ck3CoatOfArms {
         this.patternFile = patternFile;
         this.colors = colors;
         this.emblems = emblems;
+    }
+
+    static Ck3CoatOfArms empty() {
+        return new Ck3CoatOfArms("pattern_solid.dds", List.of("black", "black"), List.of(Emblem.empty()));
     }
 
     public static Map<Long, Ck3CoatOfArms> createCoaMap(Node node) {
@@ -107,6 +112,15 @@ public class Ck3CoatOfArms {
         private List<Integer> mask;
         private List<String> colors;
         private List<Instance> instances;
+
+        private static Emblem empty() {
+            Emblem c = new Emblem();
+            c.file = "_default.dds";
+            c.mask = new ArrayList<>();
+            c.colors = List.of();
+            c.instances = List.of(new Instance());
+            return c;
+        }
 
         private static Emblem fromTexturedEmblemNode(Node n) {
             Emblem c = new Emblem();
