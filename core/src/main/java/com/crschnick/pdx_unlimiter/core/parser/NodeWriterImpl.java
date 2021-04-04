@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;
+import com.crschnick.pdx_unlimiter.core.node.StringValues;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -54,8 +55,7 @@ public final class NodeWriterImpl implements NodeWriter {
         if (ctx.getCharset().equals(charset)) {
             out.write(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index]);
         } else {
-            var s = ctx.evaluate(index);
-            out.write(s.getBytes(charset));
+            out.write(ctx.evaluateRaw(index).getBytes(charset));
         }
     }
 

@@ -78,6 +78,6 @@ public final class ColorNode extends Node {
 
     @Override
     public boolean matches(NodeMatcher matcher) {
-        return matcher.matchesScalar(new NodeContext(colorType.getId()), 0);
+        return matcher.matchesScalar(new NodeContext(colorType.getId(), false), 0);
     }
 }

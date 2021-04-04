@@ -67,9 +67,9 @@ public class ColorHelper {
 
     public static ColorNode toColorNode(Color c) {
         return new ColorNode(GameColor.Type.RGB, List.of(
-                new ValueNode(String.valueOf((int) (c.getRed() * 255))),
-                new ValueNode(String.valueOf((int) (c.getGreen() * 255))),
-                new ValueNode(String.valueOf((int) (c.getBlue() * 255)))));
+                new ValueNode(String.valueOf((int) (c.getRed() * 255)), false),
+                new ValueNode(String.valueOf((int) (c.getGreen() * 255)), false),
+                new ValueNode(String.valueOf((int) (c.getBlue() * 255)), false)));
     }
 
     public static Color fromGameColor(GameColor color) {

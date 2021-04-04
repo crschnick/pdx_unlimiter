@@ -20,15 +20,16 @@ public class TextFormatTokenizer {
     private final int[] arraySizes;
     private boolean isInQuotes;
     private boolean isInComment;
-    private int prev;
+    private int nextScalarStart;
     private int i;
     private int tokenCounter;
     private int scalarCounter;
     private int arraySizesCounter;
+    private boolean escapeChar;
 
     public TextFormatTokenizer(byte[] bytes) {
         this.bytes = bytes;
-        this.prev = 0;
+        this.nextScalarStart = 0;
         this.tokenCounter = 0;
 
         int maxTokenCount;
@@ -69,78 +70,137 @@ public class TextFormatTokenizer {
         tokenTypes[tokenCounter] = CLOSE_GROUP;
     }
 
+    private void moveScalarStartToNext() {
+        nextScalarStart = i + 1;
+    }
+
+    private boolean checkCommentCase(char c) {
+        if (isInQuotes) {
+            return false;
+        }
+
+        if (!isInComment) {
+            if (c == '#') {
+                isInComment = true;
+                finishCurrentToken();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        if (c == '\n') {
+            isInComment = false;
+            moveScalarStartToNext();
+        }
+        return true;
+    }
+
+    private boolean checkQuoteCase(char c) {
+        if (!isInQuotes) {
+            if (c == '"') {
+                isInQuotes = true;
+                finishCurrentToken();
+                return true;
+            }
+
+            return false;
+        }
+
+        boolean hasSeenEscapeChar = escapeChar;
+        if (hasSeenEscapeChar) {
+            escapeChar = false;
+            if (c == '"' || c == '\\') {
+                return true;
+            }
+        } else {
+            escapeChar = c == '\\';
+            if (c == '"') {
+                isInQuotes = false;
+            }
+        }
+
+        return true;
+    }
+
+    private void finishCurrentToken() {
+        boolean isCurrentToken = nextScalarStart < i;
+        if (!isCurrentToken) {
+            return;
+        }
+
+        short length = (short) ((i - 1) - nextScalarStart + 1);
+
+        // Check for length overflow
+        if (length < 0) {
+            throw new IndexOutOfBoundsException(
+                    "Encountered scalar with length " + ((i - 1) - nextScalarStart + 1) + ", which is too big");
+        }
+
+        assert length > 0: "Scalar must be of length at least 1";
+
+        if (bytes[nextScalarStart] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
+            tokenTypes[tokenCounter++] = STRING_QUOTED;
+        } else {
+            tokenTypes[tokenCounter++] = STRING_UNQUOTED;
+        }
+        scalarsStart[scalarCounter] = nextScalarStart;
+        scalarsLength[scalarCounter] = length;
+        scalarCounter++;
+
+        assert arraySizeStack.size() > 0: "Encountered unexpectedly large array at index " + i;
+        arraySizes[arraySizeStack.peek()]++;
+
+        nextScalarStart = i;
+    }
+
+    private void checkForNewControlToken(byte controlToken) {
+        if (controlToken == 0) {
+            return;
+        }
+
+        finishCurrentToken();
+        moveScalarStartToNext();
+
+        if (controlToken == CLOSE_GROUP) {
+            assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
+            arraySizeStack.pop();
+        } else if (controlToken == EQUALS) {
+            arraySizes[arraySizeStack.peek()]--;
+        } else if (controlToken == OPEN_GROUP) {
+            arraySizes[arraySizeStack.peek()]++;
+            arraySizeStack.add(arraySizesCounter++);
+        }
+
+        tokenTypes[tokenCounter++] = controlToken;
+    }
+
+    private void checkWhitespace(char c) {
+        boolean isWhitespace = (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+        if (isWhitespace) {
+            finishCurrentToken();
+            moveScalarStartToNext();
+        }
+    }
+
     private void tokenizeIteration() {
         // Add extra new line at the end to simulate end of token
         char c = i == bytes.length ? '\n' : (char) bytes[i];
 
-        if (isInComment) {
-            if (c == '\n') {
-                isInComment = false;
-            }
-            prev = i + 1;
-            return;
-        }
+        if (checkCommentCase(c)) return;
+        if (checkQuoteCase(c)) return;
 
-        byte t = 0;
-        if (isInQuotes && c != '"') {
-            return;
-        } else if (c == '"') {
-            isInQuotes = !isInQuotes;
-        } else if (c == '{') {
-            t = OPEN_GROUP;
+        byte controlToken = 0;
+        if (c == '{') {
+            controlToken = OPEN_GROUP;
         } else if (c == '}') {
-            t = CLOSE_GROUP;
+            controlToken = CLOSE_GROUP;
         } else if (c == '=') {
-            t = EQUALS;
+            controlToken = EQUALS;
         }
 
-        boolean isWhitespace = !isInQuotes && (c == '\n' || c == '\r' || c == ' ' || c == '\t');
-        boolean isComment = c == '#';
-        boolean marksEndOfPreviousToken =
-                (t != 0 && prev < i)                // New token finishes old token
-                        || (isWhitespace && prev < i)          // Whitespace finishes old token
-                        || (isComment && prev < i);            // New comment finishes old token
-        if (marksEndOfPreviousToken) {
-            int offset = prev;
-            short length = (short) ((i - 1) - prev + 1);
-
-            // Check for length overflow
-            if (length < 0) {
-                throw new IndexOutOfBoundsException(
-                        "Encountered scalar with length " + ((i - 1) - prev + 1) + ", which is too big");
-            }
-
-            if (bytes[prev] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
-                tokenTypes[tokenCounter++] = STRING_QUOTED;
-            } else {
-                tokenTypes[tokenCounter++] = STRING_UNQUOTED;
-            }
-            scalarsStart[scalarCounter] = offset;
-            scalarsLength[scalarCounter] = length;
-            scalarCounter++;
-
-            assert arraySizeStack.size() > 0: "Encountered unexpectedly large array at index " + i;
-            arraySizes[arraySizeStack.peek()]++;
-        }
-
-        if (isWhitespace) {
-            prev = i + 1;
-        } else if (t != 0) {
-            if (t == CLOSE_GROUP) {
-                assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
-                arraySizeStack.pop();
-            } else if (t == EQUALS) {
-                arraySizes[arraySizeStack.peek()]--;
-            } else if (t == OPEN_GROUP) {
-                arraySizes[arraySizeStack.peek()]++;
-                arraySizeStack.add(arraySizesCounter++);
-            }
-
-            tokenTypes[tokenCounter++] = t;
-            prev = i + 1;
-        } else if (isComment) {
-            isInComment = true;
-        }
+        checkForNewControlToken(controlToken);
+        checkWhitespace(c);
     }
 
     public byte[] getTokenTypes() {

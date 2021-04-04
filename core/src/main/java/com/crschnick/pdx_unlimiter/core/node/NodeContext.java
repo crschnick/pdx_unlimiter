@@ -19,11 +19,12 @@ public final class NodeContext {
         this.literalsCount = 0;
     }
 
-    public NodeContext(String data) {
-        this.data = data.getBytes();
+    public NodeContext(String data, boolean quoted) {
+        this.data = quoted ? ("\"" + StringValues.escapeStringContent(data) + "\"").getBytes() :
+                StringValues.escapeStringContent(data).getBytes();
         this.charset = StandardCharsets.UTF_8;
         this.literalsBegin = new int[]{0};
-        this.literalsLength = new short[]{(short) data.length()};
+        this.literalsLength = new short[]{(short) this.data.length};
         this.literalsCount = 1;
     }
 
@@ -36,7 +37,11 @@ public final class NodeContext {
     }
 
     public String evaluate(int literalIndex) {
-        return new String(data, literalsBegin[literalIndex], literalsLength[literalIndex], charset);
+        return StringValues.unescapeScalarValue(this, literalIndex);
+    }
+
+    public String evaluateRaw(int literalIndex) {
+        return new String(getData(), literalsBegin[literalIndex], literalsLength[literalIndex], getCharset());
     }
 
     public byte[] getData() {
