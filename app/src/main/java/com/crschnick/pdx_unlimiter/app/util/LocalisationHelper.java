@@ -74,6 +74,7 @@ public class LocalisationHelper {
 
         s = s.replace("\\n", "\n");
         for (var v : vars) {
+            v = v != null ? v : "null";
             var matcher = VAR_PATTERN.matcher(s);
             s = matcher.replaceFirst(Matcher.quoteReplacement(v));
         }

@@ -17,7 +17,7 @@ public final class InvalidInstallationException extends Exception {
     public InvalidInstallationException(Throwable cause) {
         super(cause);
         this.msgId = "ERROR_OCCURED";
-        this.variables = new String[0];
+        this.variables = new String[] {cause.getMessage()};
     }
 
     public String getMessageId() {
