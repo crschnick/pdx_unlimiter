@@ -103,7 +103,8 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             return LocalisationHelper.Language.ENGLISH;
         }
 
-        return GameInstallation.ALL.get(current()).getLanguage();
+        var l = GameInstallation.ALL.get(current()).getLanguage();
+        return l != null ? l : LocalisationHelper.Language.ENGLISH;
     }
 
     public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCollectionProperty() {
