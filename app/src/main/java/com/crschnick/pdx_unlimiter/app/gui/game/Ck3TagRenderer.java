@@ -82,7 +82,7 @@ public class Ck3TagRenderer {
                 "clan_government", GameImage.CK3_REALM_CLAN_MASK,
                 "republic_government", GameImage.CK3_REALM_REPUBLIC_MASK,
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_MASK,
-                "tribal_government", GameImage.CK3_REALM_THEOCRACY_MASK);
+                "tribal_government", GameImage.CK3_REALM_TRIBAL_MASK);
         var useMask = masks.getOrDefault(tag.getGovernmentName(), GameImage.CK3_REALM_MASK);
         applyMask(i, useMask);
         brighten(i);
@@ -92,7 +92,7 @@ public class Ck3TagRenderer {
                 "clan_government", GameImage.CK3_REALM_CLAN_FRAME,
                 "republic_government", GameImage.CK3_REALM_REPUBLIC_FRAME,
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_FRAME,
-                "tribal_government", GameImage.CK3_REALM_THEOCRACY_FRAME);
+                "tribal_government", GameImage.CK3_REALM_TRIBAL_FRAME);
         var useFrame = frames.getOrDefault(tag.getGovernmentName(), GameImage.CK3_REALM_FRAME);
         g.drawImage(ImageLoader.fromFXImage(useFrame),
                 3,
