@@ -72,6 +72,10 @@ public class Eu4Installation extends GameInstallation {
     @Override
     protected LocalisationHelper.Language determineLanguage() throws Exception {
         var sf = getUserPath().resolve("settings.txt");
+        if (!Files.exists(sf)) {
+            return LocalisationHelper.Language.ENGLISH;
+        }
+
         var node = TextFormatParser.textFileParser().parse(sf);
         var langId = node.getNodeForKey("language").getString();
         return LocalisationHelper.Language.byId(langId);
