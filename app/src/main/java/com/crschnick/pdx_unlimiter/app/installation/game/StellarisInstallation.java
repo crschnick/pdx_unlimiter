@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
@@ -76,6 +77,10 @@ public class StellarisInstallation extends GameInstallation {
     @Override
     protected LocalisationHelper.Language determineLanguage() throws Exception {
         var sf = getUserPath().resolve("settings.txt");
+        if (!Files.exists(sf)) {
+            return null;
+        }
+
         var node = TextFormatParser.textFileParser().parse(sf);
         var langId = node.getNodeForKey("language").getString();
         return LocalisationHelper.Language.byId(langId);

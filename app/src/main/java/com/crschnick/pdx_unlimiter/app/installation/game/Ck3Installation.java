@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -42,6 +43,10 @@ public class Ck3Installation extends GameInstallation {
     @Override
     protected LocalisationHelper.Language determineLanguage() throws Exception {
         var sf = getUserPath().resolve("pdx_settings.txt");
+        if (!Files.exists(sf)) {
+            return null;
+        }
+
         var node = TextFormatParser.textFileParser().parse(sf);
         var langId = node.getNodeForKey("\"System\"")
                 .getNodeForKey("\"language\"").getNodeForKey("value").getString();
