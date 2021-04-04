@@ -77,16 +77,19 @@ public class Ck3Title {
             return Optional.empty();
         }
 
-        if (!n.hasKey("coat_of_arms_id")) {
-            return Optional.empty();
+        Ck3CoatOfArms coatOfArms;
+        if (n.hasKey("coat_of_arms_id")) {
+            var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
+            coatOfArms = coaMap.get(coaId);
+        } else {
+            coatOfArms = Ck3CoatOfArms.empty();
         }
-        var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
 
         var color = n.getNodeForKeyIfExistent("color")
                 .map(Node::getColorNode)
                 .map(GameColor::fromColorNode)
                 .orElse(null);
-        var coatOfArms = coaMap.get(coaId);
+
         return Optional.of(new Ck3Title(id, key, name, color, coatOfArms, type));
     }
 
