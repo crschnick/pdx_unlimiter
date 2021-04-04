@@ -31,12 +31,12 @@ public class IntegrityManager {
             infoPackage = FileSystems.getFileSystem(URI.create("jrt:/")).getPath(
                     "modules",
                     "com.crschnick.pdx_unlimiter.core",
-                    "com/crschnick/pdx_unlimiter/core/info");
+                    "com/crschnick/pdx_unlimiter/core");
         } else {
             var uri = new URI("jar:" + SavegameInfo.class.getProtectionDomain().getCodeSource()
                     .getLocation().toURI().toString());
             infoPackage = FileSystems.newFileSystem(uri, Map.of())
-                    .getPath("/com/crschnick/pdx_unlimiter/core/info");
+                    .getPath("/com/crschnick/pdx_unlimiter/core");
         }
 
         INSTANCE.eu4Checksum = calc(infoPackage, "eu4");
@@ -47,8 +47,9 @@ public class IntegrityManager {
 
     private static String calc(Path pack, String game) throws Exception {
         MessageDigest d = MessageDigest.getInstance("MD5");
-        update(d, pack);
-        update(d, pack.resolve(game));
+        update(d, pack.resolve("parser"));
+        update(d, pack.resolve("info"));
+        update(d, pack.resolve("info").resolve(game));
         return checksum(d);
     }
 
