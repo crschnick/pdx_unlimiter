@@ -100,6 +100,7 @@ public class ComponentManager {
             SavegameManagerState.init();
 
             GameImage.init();
+            FileWatchManager.init();
             SavegameWatcher.init();
 
             GameAppManager.init();
@@ -107,7 +108,6 @@ public class ComponentManager {
 
             CacheManager.init();
 
-            FileWatchManager.init();
             EditorExternalState.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
