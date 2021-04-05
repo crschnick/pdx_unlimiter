@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.core.parser;
 
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.*;
+import io.sentry.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -51,28 +52,32 @@ public final class TextFormatParser extends FormatParser {
     }
 
     public final ArrayNode parse(byte[] input) throws ParseException {
+        var t = Sentry.getSpan() != null ? Sentry.getSpan().startChild("parse") : NoOpSpan.getInstance();
+        t.setTag("sizeCategory", input.length > 10_000_000 ? "big" : "small");
+        t.setTag("size", String.valueOf(input.length));
+
         try {
+            ISpan span = t.startChild("tokenize");
             this.tokenizer = new TextFormatTokenizer(input);
-
-            var now = Instant.now();
             this.tokenizer.tokenize();
-            // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+            span.finish();
 
+            span = t.startChild("createNodes");
             this.context = new NodeContext(input, charset,
                     tokenizer.getScalarsStart(),
                     tokenizer.getScalarsLength(),
                     tokenizer.getScalarCount());
-
-            now = Instant.now();
             ArrayNode r = parseArray();
-            // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
-
             reset();
-
+            span.finish();
+            t.finish(SpanStatus.OK);
             return r;
-        } catch (Throwable t) {
+        } catch (Throwable th) {
+            t.setThrowable(th);
+            t.finish(SpanStatus.INTERNAL_ERROR);
+
             // Catch also errors!
-            throw new ParseException(t);
+            throw new ParseException(th);
         }
     }
 

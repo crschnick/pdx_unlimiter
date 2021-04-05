@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import io.sentry.Breadcrumb;
+import io.sentry.Sentry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.image.Image;
@@ -564,6 +566,11 @@ public abstract class SavegameStorage<
             String sourceFileChecksum,
             SavegameCollection<T, I> col) {
         logger.debug("Parsing file " + file.toString());
+        Sentry.addBreadcrumb(new Breadcrumb("Tesst1"));
+        var t = Sentry.startTransaction("import", "parse");
+        Sentry.configureScope(scope -> scope.setTransaction(t));
+        Sentry.captureMessage("Tesst");
+
         var status = parser.parse(file, RakalyHelper::meltSavegame);
         status.visit(new SavegameParser.StatusVisitor<I>() {
             @Override
@@ -614,7 +621,7 @@ public abstract class SavegameStorage<
 
             @Override
             public void error(SavegameParser.Error e) {
-                logger.error("An error occured during parsing: " + e.error.getMessage());
+                Sentry.captureException(e.error);
             }
 
             @Override
@@ -622,6 +629,7 @@ public abstract class SavegameStorage<
                 logger.error("Savegame is invalid: " + iv.message);
             }
         });
+        t.finish();
         return status;
     }
 

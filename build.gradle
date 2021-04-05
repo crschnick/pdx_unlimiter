@@ -1,6 +1,5 @@
 plugins {
     id 'application'
-    id "org.moditect.gradleplugin" version "1.0.0-rc3"
     id 'org.beryx.jlink' version '2.23.5'
 }
 
@@ -16,7 +15,7 @@ java {
 
 apply from: "gradle/jvm_args.gradle"
 apply from: "gradle/image.gradle"
-apply from: "gradle/module_gen.gradle"
+apply from: "gradle/dependencies.gradle"
 
 application {
     mainModule = 'com.crschnick.pdx_unlimiter.app'

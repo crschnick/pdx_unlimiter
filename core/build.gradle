@@ -1,11 +1,7 @@
 plugins {
     id 'java'
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-}
+apply from: "$rootDir/gradle/module_gen.gradle"
+apply from: "$rootDir/gradle/dependencies.gradle"
