@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
@@ -31,9 +32,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             new SimpleObjectProperty<>();
     private final Filter filter = new Filter();
     private final ListProperty<SavegameCollection<T, I>> shownCollections = new SimpleListProperty<>(
-            FXCollections.observableArrayList());
+            FXCollections.observableList(new CopyOnWriteArrayList<>()));
     private final ListProperty<SavegameEntry<T, I>> shownEntries = new SimpleListProperty<>(
-            FXCollections.observableArrayList());
+            FXCollections.observableList(new CopyOnWriteArrayList<>()));
     private final BooleanProperty storageEmpty = new SimpleBooleanProperty();
 
     private SavegameManagerState() {
