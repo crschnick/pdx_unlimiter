@@ -4,6 +4,8 @@ module com.crschnick.pdx_unlimiter.core {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 
+    requires io.sentry;
+
     exports com.crschnick.pdx_unlimiter.core.parser;
     exports com.crschnick.pdx_unlimiter.core.savegame;
     exports com.crschnick.pdx_unlimiter.core.node;

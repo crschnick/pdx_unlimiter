@@ -1,5 +1,9 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import io.sentry.Breadcrumb;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
+
 import java.util.Stack;
 
 public class TextFormatTokenizer {
@@ -59,15 +63,25 @@ public class TextFormatTokenizer {
     }
 
     public void tokenize() {
-        tokenTypes[0] = OPEN_GROUP;
-        arraySizes[0] = 0;
-        arraySizeStack.add(0);
-        arraySizesCounter++;
-        tokenCounter = 1;
-        for (i = 0; i <= bytes.length; i++) {
-            tokenizeIteration();
+        try {
+            tokenTypes[0] = OPEN_GROUP;
+            arraySizes[0] = 0;
+            arraySizeStack.add(0);
+            arraySizesCounter++;
+            tokenCounter = 1;
+            for (i = 0; i <= bytes.length; i++) {
+                tokenizeIteration();
+            }
+            tokenTypes[tokenCounter] = CLOSE_GROUP;
+        } catch (Throwable t) {
+            var bc = new Breadcrumb(t.toString());
+            bc.setLevel(SentryLevel.ERROR);
+            bc.setData("offset", i);
+            bc.setData("tokens", tokenCounter);
+            bc.setData("scalars", scalarCounter);
+            Sentry.addBreadcrumb(bc);
+            throw t;
         }
-        tokenTypes[tokenCounter] = CLOSE_GROUP;
     }
 
     private void moveScalarStartToNext() {

@@ -31,11 +31,11 @@ public class PdxuInstallation {
     private PdxuInstallation() {
         initEnvironment();
         initDefaultDataDir();
+        initVersion();
 
         properties = new PdxuProperties(production, getSettingsLocation());
         production = properties.isSimulateProduction() || production;
 
-        initVersion();
         initLatestVersion();
         initResourceDirs();
         initThirdPartyDirs();

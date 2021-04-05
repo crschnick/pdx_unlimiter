@@ -24,6 +24,16 @@ public class ErrorHandler {
             sentryOptions.setServerName(System.getProperty("os.name"));
             sentryOptions.setRelease(PdxuInstallation.getInstance().getVersion());
             sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262");
+
+            sentryOptions.setTracesSampleRate(1.0);
+
+            sentryOptions.setBeforeBreadcrumb((breadcrumb, hint) -> {
+                if ("a.spammy.Logger".equals(breadcrumb.getCategory())) {
+                    return null;
+                } else {
+                    return breadcrumb;
+                }
+            });
         });
     }
 
