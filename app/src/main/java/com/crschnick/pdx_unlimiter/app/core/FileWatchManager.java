@@ -1,6 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -17,6 +19,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 public class FileWatchManager {
 
     private static final FileWatchManager INSTANCE = new FileWatchManager();
+    private static final Logger logger = LoggerFactory.getLogger(FileWatchManager.class);
 
     private final Set<WatchedDirectory> watchedDirectories = new CopyOnWriteArraySet<>();
     private WatchService watchService;
@@ -97,6 +100,7 @@ public class FileWatchManager {
             this.baseDir = dir;
             this.listener = listener;
             createRecursiveWatchers(dir);
+            logger.trace("Created watched directory for " + dir);
         }
 
         private void createRecursiveWatchers(Path dir) {
@@ -166,6 +170,8 @@ public class FileWatchManager {
             }
 
             // Handle event
+            logger.trace("WatchEvent " + event.kind().name() + " of file " +
+                    baseDir.relativize(file) + " in dir " + baseDir);
             listener.accept(file, ev.kind());
         }
 
