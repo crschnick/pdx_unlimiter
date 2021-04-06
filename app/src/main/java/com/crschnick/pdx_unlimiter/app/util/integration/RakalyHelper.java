@@ -10,19 +10,21 @@ import java.nio.file.Path;
 
 public class RakalyHelper {
 
-    public static Path meltSavegame(Path file) throws IOException {
+    public static Path meltSavegame(Path file) throws Exception {
         var proc = new ProcessBuilder(
                 PdxuInstallation.getInstance().getRakalyExecutable().toString(),
                 "melt",
                 "--unknown-key", "stringify",
                 "--to-stdout",
-                file.toString()).start();
+                file.toString())
+                .redirectError(ProcessBuilder.Redirect.DISCARD)
+                .start();
         var b = proc.getInputStream().readAllBytes();
+        proc.waitFor();
         int returnCode = proc.exitValue();
 
-        if (returnCode == 2) {
-            String errorMsg = new String(proc.getErrorStream().readAllBytes());
-            throw new IOException(errorMsg);
+        if (returnCode != 0) {
+            throw new IOException("Rakaly melter failed with exit code " + returnCode);
         }
 
         Path temp = FileUtils.getTempDirectory().toPath()
