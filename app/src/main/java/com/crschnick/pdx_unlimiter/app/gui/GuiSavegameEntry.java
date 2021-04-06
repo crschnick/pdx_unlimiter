@@ -103,7 +103,14 @@ public class GuiSavegameEntry {
         entryNode.setOnMouseClicked(event -> SavegameManagerState.<T, I>get().selectEntry(e));
 
         setupDragAndDrop(entryNode, e);
-        entryNode.getChildren().add(setupTopBar(e));
+
+        var topBar = setupTopBar(e);
+        entryNode.getChildren().add(topBar);
+        // Important!
+        // Set view order to force top bar to be in front of the savegame info node
+        // In case the masonry pane overflows, the top bar can not be blocked that way
+        topBar.setViewOrder(-1);
+
         Node content = createSavegameInfoNode(e);
         entryNode.getChildren().add(content);
 
