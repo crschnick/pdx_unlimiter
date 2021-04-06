@@ -179,7 +179,7 @@ public class GuiSavegameEntry {
             }
         });
 
-        if (SavegameStorage.ALL.get(Game.CK3) != null && SavegameStorage.ALL.get(Game.CK3).contains(e)) {
+        if (SavegameStorage.ALL.get(Game.CK3).contains(e)) {
             SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
             Button convert = new JFXButton();
             convert.setGraphic(new FontIcon());
