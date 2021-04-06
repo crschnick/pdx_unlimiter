@@ -138,7 +138,8 @@ public abstract class GameInstallation {
                 GameMod.fromFile(f).ifPresent(m -> {
                     if (Files.exists(m.getPath())) mods.add(m);
                     LoggerFactory.getLogger(getClass()).debug("Found mod " + m.getName() +
-                            " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(m.getPath()));
+                            " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(m.getPath()) +
+                            ". Legacy: " + m.isLegacyArchive());
                 });
             } catch (Exception e) {
                 ErrorHandler.handleException(e);

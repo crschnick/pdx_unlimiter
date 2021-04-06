@@ -8,14 +8,12 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -42,8 +40,7 @@ public class CascadeDirectoryHelper {
         List<Path> dirs = new ArrayList<>();
         dirs.addAll(info.getMods().stream()
                 .map(install::getModForName)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .map(GameMod::getPath)
                 .collect(Collectors.toList()));
 
@@ -83,7 +80,9 @@ public class CascadeDirectoryHelper {
         for (Path dir : cascadingDirectories) {
             Optional<Path> r;
             if (Files.isRegularFile(dir)) {
-                r = fromZip(file, dir);
+                // We don't read from zip files because it is almost never required
+                // So just ignore zip files
+                continue;
             } else {
                 r = fromDir(file, dir);
             }
@@ -103,30 +102,6 @@ public class CascadeDirectoryHelper {
         } catch (Exception e) {
             LoggerFactory.getLogger(CascadeDirectoryHelper.class)
                     .trace("Exception while loading file " + file + " from directory " + dir, e);
-        }
-        return Optional.empty();
-    }
-
-    private static Path pathTransform(FileSystem fs, Path path) {
-        Path ret = fs.getPath(path.isAbsolute() ? fs.getSeparator() : "");
-        for (final Path component : path) {
-            ret = ret.resolve(component.getFileName().toString());
-        }
-        return ret;
-    }
-
-    private static Optional<Path> fromZip(Path file, Path zip) {
-        try {
-            try (var fs = FileSystems.newFileSystem(zip)) {
-                var entry = fs.getRootDirectories().iterator().next().resolve(pathTransform(fs, file));
-                if (Files.exists(entry)) {
-                    return Optional.of(entry);
-                }
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            LoggerFactory.getLogger(CascadeDirectoryHelper.class)
-                    .error("Exception while loading zip file " + zip.getFileName().toString(), e);
         }
         return Optional.empty();
     }
