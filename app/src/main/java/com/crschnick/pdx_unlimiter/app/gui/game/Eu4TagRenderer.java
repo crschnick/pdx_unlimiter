@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Eu4TagRenderer {
 
@@ -129,7 +130,7 @@ public class Eu4TagRenderer {
     }
 
     public static class Eu4TagImageCache extends CacheManager.Cache {
-        Map<String, Image> tagImages = new HashMap<>();
+        Map<String, Image> tagImages = new ConcurrentHashMap<>();
 
         public Eu4TagImageCache() {
             super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);

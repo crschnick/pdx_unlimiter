@@ -19,8 +19,10 @@ public class GuiListView {
         JFXListView<Node> listView = new JFXListView<Node>();
 
         list.forEach(li -> {
-            var item = createForItem(li, nodeFactory);
-            listView.getItems().add(item);
+            Platform.runLater(() -> {
+                var item = createForItem(li, nodeFactory);
+                listView.getItems().add(item);
+            });
         });
 
         list.addListener((c, o, n) -> {

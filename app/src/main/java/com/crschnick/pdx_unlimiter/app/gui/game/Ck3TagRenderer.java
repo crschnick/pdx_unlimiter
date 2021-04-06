@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.*;
@@ -39,10 +40,10 @@ public class Ck3TagRenderer {
 
     public static class CoatOfArmsCache extends CacheManager.Cache {
 
-        private final Map<Ck3Tag, Image> realms = new HashMap<>();
-        private final Map<Ck3Title, Image> titles = new HashMap<>();
-        private final Map<Ck3House, Image> houses = new HashMap<>();
-        private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
+        private final Map<Ck3Tag, Image> realms = new ConcurrentHashMap<>();
+        private final Map<Ck3Title, Image> titles = new ConcurrentHashMap<>();
+        private final Map<Ck3House, Image> houses = new ConcurrentHashMap<>();
+        private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
 
         public CoatOfArmsCache() {
             super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
