@@ -25,9 +25,10 @@ import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class FileImportTarget {
+public abstract class FileImportTarget implements Comparable<FileImportTarget> {
 
     public static List<FileImportTarget> createTargets(String toImport) {
         if (SavegameStorage.ALL.get(Game.EU4) != null && toImport.startsWith("pdxu")) {
@@ -112,6 +113,16 @@ public abstract class FileImportTarget {
         return SavegameStorage.get(SavegameManagerState.get().current()).hasImportedSourceFile(cs);
     }
 
+    @Override
+    public int compareTo(FileImportTarget o) {
+        var time = getLastModified().compareTo(o.getLastModified());
+        if (time != 0) {
+            return time;
+        }
+
+        return getName().compareTo(o.getName());
+    }
+
     public abstract void importTarget(Consumer<SavegameParser.Status> onFinish);
 
     public abstract Instant getLastModified();
@@ -170,6 +181,19 @@ public abstract class FileImportTarget {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DownloadImportTarget that = (DownloadImportTarget) o;
+            return Objects.equals(url, that.url);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(url);
+        }
+
+        @Override
         public Instant getLastModified() {
             return Instant.now();
         }
@@ -191,7 +215,7 @@ public abstract class FileImportTarget {
 
         @Override
         public String getName() {
-            return "Rakaly.com savegame";
+            return url.toString();
         }
 
         @Override
@@ -239,6 +263,19 @@ public abstract class FileImportTarget {
                 onFinish.accept(savegameStorage.importSavegame(
                         path, null, true, getSourceFileChecksum(), null));
             }, true);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            StandardImportTarget that = (StandardImportTarget) o;
+            return Objects.equals(path, that.path);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path);
         }
 
         public Instant getLastModified() {
