@@ -1,9 +1,7 @@
-package com.crschnick.pdx_unlimiter.app.gui;
+package com.crschnick.pdx_unlimiter.gui_utils;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
+import com.crschnick.pdx_unlimiter.sentry_utils.ErrorHandler;
 import javafx.application.Platform;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -25,7 +23,6 @@ public class GuiPlatformHelper {
             return;
         }
 
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Waiting for platform thread");
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(latch::countDown);
         try {
@@ -36,7 +33,6 @@ public class GuiPlatformHelper {
         } catch (InterruptedException e) {
             ErrorHandler.handleException(e);
         }
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Synced with platform thread");
     }
 
     public static void doWhilePlatformIsPaused(Runnable r) {
@@ -57,7 +53,6 @@ public class GuiPlatformHelper {
 
         waitForPlatform();
 
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Pausing platform thread");
         Platform.runLater(() -> {
             try {
                 if (!semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
@@ -68,7 +63,10 @@ public class GuiPlatformHelper {
             }
         });
         while (semaphore.getQueueLength() == 0) {
-            ThreadHelper.sleep(1);
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ignored) {
+            }
         }
     }
 
@@ -82,7 +80,6 @@ public class GuiPlatformHelper {
             return;
         }
 
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Continuing platform thread");
         semaphore.release();
     }
 }

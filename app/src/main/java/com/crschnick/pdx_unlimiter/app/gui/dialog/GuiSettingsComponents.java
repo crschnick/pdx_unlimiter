@@ -3,7 +3,7 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.settings.SettingsEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiTooltips;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
 import javafx.event.EventHandler;

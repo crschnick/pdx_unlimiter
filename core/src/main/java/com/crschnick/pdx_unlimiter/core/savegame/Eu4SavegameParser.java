@@ -7,8 +7,8 @@ import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdx_unlimiter.sentry_utils.SentryHelper;
 import io.sentry.ISpan;
-import io.sentry.Sentry;
 import io.sentry.SpanStatus;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class Eu4SavegameParser extends SavegameParser {
 
     @Override
     public Status parse(Path input, Melter melter) {
-        var span = Sentry.getSpan();
+        var span = SentryHelper.getSpan();
         ISpan op = null;
 
         try {

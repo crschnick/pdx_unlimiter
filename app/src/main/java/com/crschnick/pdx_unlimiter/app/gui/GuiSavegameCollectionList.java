@@ -3,6 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiListView;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiTooltips;
 import com.jfoenix.controls.JFXTextField;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;

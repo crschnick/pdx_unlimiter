@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.gui;
+package com.crschnick.pdx_unlimiter.gui_utils;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;

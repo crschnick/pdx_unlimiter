@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.info;
 
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;
 

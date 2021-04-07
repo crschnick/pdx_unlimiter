@@ -20,6 +20,7 @@ module com.crschnick.pdx_unlimiter.app {
     requires org.apache.commons.collections4;
     requires java.desktop;
     requires java.net.http;
+    requires com.crschnick.pdx_unlimiter.gui_utils;
 
     exports com.crschnick.pdx_unlimiter.app;
     exports com.crschnick.pdx_unlimiter.app.core;

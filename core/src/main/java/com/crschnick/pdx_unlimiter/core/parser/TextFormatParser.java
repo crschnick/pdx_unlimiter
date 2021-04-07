@@ -2,11 +2,13 @@ package com.crschnick.pdx_unlimiter.core.parser;
 
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.*;
-import io.sentry.*;
+import io.sentry.ISpan;
+import io.sentry.NoOpSpan;
+import io.sentry.Sentry;
+import io.sentry.SpanStatus;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +93,7 @@ public final class TextFormatParser extends FormatParser {
                 assert tt[index + 1] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
                 assert tt[index + 1 + colorType.getComponents() + 1] == TextFormatTokenizer.CLOSE_GROUP : "Expected }";
 
-                // Move other color id
+                // Move over color id
                 index++;
                 slIndex++;
 

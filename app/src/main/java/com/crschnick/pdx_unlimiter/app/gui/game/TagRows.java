@@ -1,28 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
-import com.jfoenix.controls.JFXMasonryPane;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiTooltips;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import org.slf4j.helpers.LegacyAbstractLogger;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_DIPLOMACY_ROW;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public class TagRows {
 

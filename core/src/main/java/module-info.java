@@ -3,6 +3,7 @@ module com.crschnick.pdx_unlimiter.core {
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
+    requires com.crschnick.pdx_unlimiter.sentry_utils;
 
     requires io.sentry;
 
