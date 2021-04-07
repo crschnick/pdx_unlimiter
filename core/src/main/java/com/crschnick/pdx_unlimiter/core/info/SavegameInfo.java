@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public abstract class SavegameInfo<T> {

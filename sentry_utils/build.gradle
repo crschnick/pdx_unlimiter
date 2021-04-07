@@ -1,0 +1,6 @@
+plugins {
+    id 'java'
+}
+
+apply from: "$rootDir/gradle/dependencies.gradle"
+

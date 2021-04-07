@@ -10,4 +10,5 @@ if (!file("${projectDir}/pdxu.properties").exists()) {
 
 dependencies {
     implementation project(':core')
+    implementation project(':gui_utils')
 }

@@ -7,4 +7,5 @@ apply from: "$rootDir/gradle/dependencies.gradle"
 dependencies {
     implementation project(':core')
     implementation project(':app')
+    implementation project(':gui_utils')
 }

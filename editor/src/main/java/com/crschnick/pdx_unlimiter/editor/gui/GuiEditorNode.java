@@ -1,13 +1,12 @@
 package com.crschnick.pdx_unlimiter.editor.gui;
 
+import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.editor.core.EditorCollectorNode;
 import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
 import com.crschnick.pdx_unlimiter.editor.core.EditorSimpleNode;
 import com.crschnick.pdx_unlimiter.editor.core.EditorState;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import javafx.geometry.Pos;

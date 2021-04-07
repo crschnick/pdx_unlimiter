@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.editor.gui;
 
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
 import com.crschnick.pdx_unlimiter.editor.core.EditorSimpleNode;
-import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiTooltips;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

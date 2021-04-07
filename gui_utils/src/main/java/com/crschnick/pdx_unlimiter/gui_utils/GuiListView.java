@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.gui;
+package com.crschnick.pdx_unlimiter.gui_utils;
 
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
