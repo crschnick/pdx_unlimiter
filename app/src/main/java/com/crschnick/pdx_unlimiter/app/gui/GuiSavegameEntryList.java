@@ -25,7 +25,7 @@ public class GuiSavegameEntryList {
                 GuiSavegameEntry::createSavegameEntryNode,
                 SavegameManagerState.get().globalSelectedEntryProperty());
         grid.setOpacity(0.9);
-        grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);
+        grid.getStyleClass().add(PdxuStyle.CLASS_ENTRY_LIST);
 
         var ncn = createNoCampaignNode();
         StackPane pane = new StackPane(ncn, grid);
@@ -62,7 +62,7 @@ public class GuiSavegameEntryList {
             e.consume();
         });
         importB.setGraphic(new FontIcon());
-        importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
+        importB.getStyleClass().add(PdxuStyle.CLASS_IMPORT);
         v.getChildren().add(importB);
 
         v.getChildren().add(new Label());
@@ -78,7 +78,7 @@ public class GuiSavegameEntryList {
         });
         v.getChildren().add(guide);
 
-        v.getStyleClass().add(GuiStyle.CLASS_NO_CAMPAIGN);
+        v.getStyleClass().add(PdxuStyle.CLASS_NO_CAMPAIGN);
         v.setFillWidth(true);
         v.setSpacing(10);
         v.setAlignment(Pos.CENTER);

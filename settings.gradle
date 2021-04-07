@@ -4,3 +4,6 @@ include 'app'
 include 'editor'
 include 'gui_utils'
 include 'sentry_utils'
+include 'melter'
+include 'converters'
+

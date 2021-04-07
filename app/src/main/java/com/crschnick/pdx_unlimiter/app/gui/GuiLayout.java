@@ -37,7 +37,7 @@ public class GuiLayout {
 
         JFXSpinner loading = new JFXSpinner();
         loadingBg = new StackPane(loading);
-        loadingBg.getStyleClass().add(GuiStyle.CLASS_LOADING);
+        loadingBg.getStyleClass().add(PdxuStyle.CLASS_LOADING);
         loadingBg.setVisible(false);
         TaskExecutor.getInstance().busyProperty().addListener((c, o, n) -> {
             setBusy(n);

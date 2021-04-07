@@ -3,12 +3,13 @@ package com.crschnick.pdx_unlimiter.app.core.settings;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdx_unlimiter.app.gui.PdxuStyle;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.InvalidInstallationException;
 import com.crschnick.pdx_unlimiter.app.util.integration.SteamHelper;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiAlertHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -284,7 +285,7 @@ public abstract class SettingsEntry<T> {
         }
 
         private boolean showConfirmationDialog(String old, String newDir) {
-            return GuiDialogHelper.showBlockingAlert(a -> {
+            return GuiAlertHelper.showBlockingAlert(PdxuStyle.get(), a -> {
                 a.setAlertType(Alert.AlertType.CONFIRMATION);
                 a.setTitle(PdxuI18n.get("STORAGE_DIR_DIALOG_TITLE"));
                 a.setHeaderText(PdxuI18n.get("STORAGE_DIR_DIALOG_TEXT", old, newDir));

@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+apply from: "$rootDir/gradle/dependencies.gradle"
+
+dependencies {
+    implementation project(':app')
+    implementation project(':core')
+}

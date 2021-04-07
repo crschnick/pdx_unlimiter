@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiAlertHelper;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
@@ -22,7 +22,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.PdxuStyle.*;
 
 public class GuiSavegameCollection {
 
@@ -71,7 +71,7 @@ public class GuiSavegameCollection {
             del.setGraphic(new FontIcon());
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
-                if (GuiDialogHelper.showBlockingAlert(alert -> {
+                if (GuiAlertHelper.showBlockingAlert(PdxuStyle.get(), alert -> {
                     alert.setAlertType(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Confirm deletion");
                     alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");

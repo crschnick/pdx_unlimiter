@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.editor.gui;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
+import com.crschnick.pdx_unlimiter.app.gui.PdxuStyle;
 import com.crschnick.pdx_unlimiter.editor.core.EditorFilter;
 import com.crschnick.pdx_unlimiter.editor.core.EditorNode;
 import com.crschnick.pdx_unlimiter.editor.core.EditorState;
@@ -35,7 +35,7 @@ public class GuiEditor {
         });
 
         stage.setScene(new Scene(GuiEditor.create(state), 720, 600));
-        GuiStyle.addStylesheets(stage.getScene());
+        PdxuStyle.addStylesheets(stage.getScene());
         stage.show();
         return stage;
     }
@@ -65,7 +65,7 @@ public class GuiEditor {
     private static Region createNavigationBar(EditorState edState) {
         HBox bar = new HBox();
         bar.setAlignment(Pos.CENTER_LEFT);
-        bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
+        bar.getStyleClass().add(PdxuStyle.CLASS_EDITOR_NAVIGATION);
 
         Consumer<List<EditorState.NavEntry>> updateBar = l -> {
             Platform.runLater(() -> {
@@ -95,7 +95,7 @@ public class GuiEditor {
                 if (l.size() > 0) {
                     Button edit = new JFXButton();
                     edit.setGraphic(new FontIcon());
-                    edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+                    edit.getStyleClass().add(PdxuStyle.CLASS_EDIT);
                     edit.setOnAction(e -> {
                         edState.getExternalState().startEdit(edState, l.get(l.size() - 1).getEditorNode());
                     });
@@ -150,7 +150,7 @@ public class GuiEditor {
 
     private static GridPane createNodeList(EditorState state, List<EditorNode> nodes) {
         GridPane grid = new GridPane();
-        grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
+        grid.getStyleClass().add(PdxuStyle.CLASS_EDITOR_GRID);
         var cc = new ColumnConstraints();
         cc.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(
@@ -174,7 +174,7 @@ public class GuiEditor {
 
                 Button edit = new JFXButton();
                 edit.setGraphic(new FontIcon());
-                edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+                edit.getStyleClass().add(PdxuStyle.CLASS_EDIT);
                 edit.setOnAction(e -> {
                     state.getExternalState().startEdit(state, n);
                 });
@@ -183,7 +183,7 @@ public class GuiEditor {
 
                 Button del = new JFXButton();
                 del.setGraphic(new FontIcon());
-                del.getStyleClass().add(GuiStyle.CLASS_DELETE);
+                del.getStyleClass().add(PdxuStyle.CLASS_DELETE);
                 del.setOnAction(e -> {
                     n.delete();
                     state.onDelete();
@@ -201,12 +201,12 @@ public class GuiEditor {
 
     private static Region createFilterBar(EditorFilter edFilter) {
         HBox box = new HBox();
-        box.getStyleClass().add(GuiStyle.CLASS_EDITOR_FILTER);
+        box.getStyleClass().add(PdxuStyle.CLASS_EDITOR_FILTER);
         box.setSpacing(8);
 
         {
             ToggleButton filterKeys = new ToggleButton();
-            filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
+            filterKeys.getStyleClass().add(PdxuStyle.CLASS_KEY);
             filterKeys.setGraphic(new FontIcon());
             filterKeys.selectedProperty().bindBidirectional(edFilter.filterKeysProperty());
             GuiTooltips.install(filterKeys, "Include keys in search");
@@ -215,7 +215,7 @@ public class GuiEditor {
 
         {
             ToggleButton filterValues = new ToggleButton();
-            filterValues.getStyleClass().add(GuiStyle.CLASS_VALUE);
+            filterValues.getStyleClass().add(PdxuStyle.CLASS_VALUE);
             filterValues.setGraphic(new FontIcon());
             filterValues.selectedProperty().bindBidirectional(edFilter.filterValuesProperty());
             edFilter.filterValuesProperty().addListener((c, o, n) -> {
@@ -253,7 +253,7 @@ public class GuiEditor {
                     filter.setEffect(null);
                 });
                 search.setGraphic(new FontIcon());
-                search.getStyleClass().add(GuiStyle.CLASS_FILTER);
+                search.getStyleClass().add(PdxuStyle.CLASS_FILTER);
                 textBar.getChildren().add(search);
             }
 
@@ -265,7 +265,7 @@ public class GuiEditor {
                     filter.setEffect(null);
                 });
                 clear.setGraphic(new FontIcon());
-                clear.getStyleClass().add(GuiStyle.CLASS_CLEAR);
+                clear.getStyleClass().add(PdxuStyle.CLASS_CLEAR);
                 textBar.getChildren().add(clear);
             }
         }
@@ -275,7 +275,7 @@ public class GuiEditor {
 
         {
             ToggleButton cs = new ToggleButton();
-            cs.getStyleClass().add(GuiStyle.CLASS_CASE_SENSITIVE);
+            cs.getStyleClass().add(PdxuStyle.CLASS_CASE_SENSITIVE);
             cs.setGraphic(new FontIcon());
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
             GuiTooltips.install(cs, "Case sensitive");

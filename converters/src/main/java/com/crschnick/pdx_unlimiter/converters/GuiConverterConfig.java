@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.gui.dialog;
+package com.crschnick.pdx_unlimiter.converters;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;

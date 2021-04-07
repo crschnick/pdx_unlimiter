@@ -1,11 +1,13 @@
 plugins {
     id 'java'
-    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
 apply from: "$rootDir/gradle/dependencies.gradle"
 
+
 dependencies {
     implementation project(':sentry_utils')
+    implementation project(':gui_utils')
+    implementation project(':app')
+    implementation project(':core')
 }
-

@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdx_unlimiter.app.core.SavegameTool;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
@@ -18,6 +18,7 @@ import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiAlertHelper;
 import com.crschnick.pdx_unlimiter.gui_utils.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -38,7 +39,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.PdxuStyle.*;
 
 public class GuiSavegameEntry {
 
@@ -119,6 +120,25 @@ public class GuiSavegameEntry {
     }
 
     private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {
+        SavegameTool.ALL.forEach(t -> {
+            Button b = new JFXButton();
+
+            var fi = new FontIcon();
+            fi.setIconLiteral(t.getIconId());
+            b.setGraphic(fi);
+
+            b.setOnMouseClicked((m) -> {
+                t.onClick(e);
+            });
+            GuiTooltips.install(b, t.getTooltip());
+            SavegameContext.withSavegameAsync(e, ctx -> {
+                if (t.shouldShow(e, ctx.getInfo())) {
+                    buttonBar.getChildren().add(0, b);
+                }
+            });
+        });
+
+
         {
             Button copy = new JFXButton();
             copy.setGraphic(new FontIcon());
@@ -130,20 +150,6 @@ public class GuiSavegameEntry {
             buttonBar.getChildren().add(copy);
         }
 
-        {
-            Button melt = new JFXButton();
-            melt.setGraphic(new FontIcon());
-            melt.setOnMouseClicked((m) -> {
-                SavegameActions.meltSavegame(e);
-            });
-            melt.getStyleClass().add(CLASS_MELT);
-            GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            SavegameContext.withSavegameAsync(e, ctx -> {
-                if (ctx.getInfo().isBinary()) {
-                    buttonBar.getChildren().add(0, melt);
-                }
-            });
-        }
 
         if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(e)) {
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
@@ -233,7 +239,7 @@ public class GuiSavegameEntry {
             Button del = new JFXButton();
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
-                if (GuiDialogHelper.showBlockingAlert(alert -> {
+                if (GuiAlertHelper.showBlockingAlert(PdxuStyle.get(), alert -> {
                     alert.setAlertType(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Confirm deletion");
                     alert.setHeaderText("Do you want to delete the selected savegame?");

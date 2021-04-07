@@ -11,7 +11,6 @@ import com.crschnick.pdx_unlimiter.app.savegame.game.Hoi4SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.game.StellarisSavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -233,7 +232,7 @@ public abstract class SavegameStorage<
         ConfigHelper.writeConfig(getDataFile(), n);
     }
 
-    synchronized Optional<SavegameFolder<T, I>> getOrCreateFolder(String name) {
+    public synchronized Optional<SavegameFolder<T, I>> getOrCreateFolder(String name) {
         return this.collections.stream()
                 .filter(f -> f instanceof SavegameFolder && f.getName().equals(name))
                 .map(f -> (SavegameFolder<T, I>) f)
@@ -497,7 +496,7 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    protected SavegameParser.Status importSavegame(
+    public SavegameParser.Status importSavegame(
             Path file,
             String name,
             boolean checkDuplicate,

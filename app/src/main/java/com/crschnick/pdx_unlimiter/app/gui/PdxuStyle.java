@@ -1,13 +1,37 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
+import com.crschnick.pdx_unlimiter.gui_utils.GuiStyle;
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class GuiStyle {
+public class PdxuStyle {
+
+    private static GuiStyle STYLE;
+
+    public static void init() {
+        STYLE = GuiStyle.create(PdxuInstallation.getInstance().getResourceDir().resolve("style"), (s, isAlert) -> {
+            if (Settings.getInstance() != null) {
+                var fs = isAlert ? Settings.getInstance().fontSize.getValue() - 3 :
+                        Settings.getInstance().fontSize.getValue();
+                s.getRoot().styleProperty().setValue("-fx-font-size: " + fs + "pt;");
+            }
+
+            if (PdxuApp.getApp() != null && PdxuApp.getApp().getIcon() != null) {
+                ((Stage) s.getWindow()).getIcons().add(PdxuApp.getApp().getIcon());
+            }
+        });
+    }
+
+    public static GuiStyle get() {
+        return STYLE;
+    }
 
     public static String CLASS_CAMPAIGN_LIST = "campaign-list";
     public static String CLASS_DIPLOMACY_ROW = "diplomacy-row";

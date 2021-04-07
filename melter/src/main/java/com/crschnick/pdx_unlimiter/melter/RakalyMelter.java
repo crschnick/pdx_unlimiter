@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.util.integration;
+package com.crschnick.pdx_unlimiter.melter;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import org.apache.commons.io.FileUtils;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class RakalyHelper {
+public class RakalyMelter {
 
     public static Path meltSavegame(Path file) throws Exception {
         var proc = new ProcessBuilder(

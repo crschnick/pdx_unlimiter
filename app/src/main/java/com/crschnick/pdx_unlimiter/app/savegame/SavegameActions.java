@@ -3,11 +3,9 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
@@ -136,28 +134,6 @@ public class SavegameActions {
                 }
             });
         });
-    }
-
-    public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
-        if (!GuiDialogHelper.showMeltDialog()) {
-            return;
-        }
-
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegame(e, ctx -> {
-                Path meltedFile;
-                try {
-                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                    return;
-                }
-                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
-                folder.ifPresent(f -> {
-                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
-                });
-            });
-        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {

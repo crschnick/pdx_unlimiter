@@ -16,7 +16,7 @@ import javafx.stage.Modality;
 
 import java.util.Map;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
+import static com.crschnick.pdx_unlimiter.app.gui.PdxuStyle.CLASS_CONTENT_DIALOG;
 
 
 public class GuiImporter {

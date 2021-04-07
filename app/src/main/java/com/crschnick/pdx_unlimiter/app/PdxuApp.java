@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiLayout;
-import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
+import com.crschnick.pdx_unlimiter.app.gui.PdxuStyle;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -122,7 +122,7 @@ public class PdxuApp extends Application {
         stage.setTitle(title);
         Scene scene = new Scene(layout.getContent());
         stage.setScene(scene);
-        GuiStyle.addStylesheets(scene);
+        PdxuStyle.addStylesheets(scene);
         layout.getContent().requestLayout();
     }
 

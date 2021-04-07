@@ -1,3 +1,5 @@
+import com.crschnick.pdx_unlimiter.app.core.SavegameTool;
+
 module com.crschnick.pdx_unlimiter.app {
     requires com.crschnick.pdx_unlimiter.core;
     requires com.realityinteractive.imageio.tga;
@@ -27,5 +29,8 @@ module com.crschnick.pdx_unlimiter.app {
     exports com.crschnick.pdx_unlimiter.app.util;
     exports com.crschnick.pdx_unlimiter.app.savegame;
     exports com.crschnick.pdx_unlimiter.app.gui;
+    exports com.crschnick.pdx_unlimiter.app.core.settings;
+    exports com.crschnick.pdx_unlimiter.app.installation;
     uses com.crschnick.pdx_unlimiter.app.savegame.EditorProvider;
+    uses SavegameTool;
 }

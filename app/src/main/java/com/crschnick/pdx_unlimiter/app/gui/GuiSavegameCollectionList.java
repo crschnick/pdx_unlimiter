@@ -19,8 +19,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CAMPAIGN_LIST;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CAMPAIGN_TOP_BAR;
+import static com.crschnick.pdx_unlimiter.app.gui.PdxuStyle.CLASS_CAMPAIGN_LIST;
+import static com.crschnick.pdx_unlimiter.app.gui.PdxuStyle.CLASS_CAMPAIGN_TOP_BAR;
 
 public class GuiSavegameCollectionList {
 
@@ -45,7 +45,7 @@ public class GuiSavegameCollectionList {
         box.getStyleClass().add(CLASS_CAMPAIGN_TOP_BAR);
         box.setAlignment(Pos.CENTER);
         Button create = new Button();
-        create.getStyleClass().add(GuiStyle.CLASS_NEW);
+        create.getStyleClass().add(PdxuStyle.CLASS_NEW);
         create.setGraphic(new FontIcon());
         create.setOnAction(e -> {
             SavegameStorage.get(SavegameManagerState.get().current()).addNewFolder("New Folder");

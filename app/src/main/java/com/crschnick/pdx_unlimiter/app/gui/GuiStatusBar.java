@@ -19,7 +19,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
 
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
+import static com.crschnick.pdx_unlimiter.app.gui.PdxuStyle.*;
 
 public class GuiStatusBar {
 

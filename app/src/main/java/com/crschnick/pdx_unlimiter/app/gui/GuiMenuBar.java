@@ -139,7 +139,7 @@ public class GuiMenuBar {
     private static Node createRightBar() {
         JFXButton m = new JFXButton("Switch game");
         m.setGraphic(new FontIcon());
-        m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
+        m.getStyleClass().add(PdxuStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
         m.setDisable(SavegameManagerState.get().current() == null);
         SavegameManagerState.get().onGameChange(n -> {
@@ -152,7 +152,7 @@ public class GuiMenuBar {
             e.consume();
         });
         importB.setGraphic(new FontIcon());
-        importB.getStyleClass().add(GuiStyle.CLASS_IMPORT);
+        importB.getStyleClass().add(PdxuStyle.CLASS_IMPORT);
         importB.setDisable(SavegameManagerState.get().current() == null);
         SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> importB.setDisable(n == null));
@@ -164,7 +164,7 @@ public class GuiMenuBar {
             e.consume();
         });
         launch.setGraphic(new FontIcon());
-        launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
+        launch.getStyleClass().add(PdxuStyle.CLASS_LAUNCH);
         launch.setDisable(SavegameManagerState.get().current() == null);
         SavegameManagerState.get().onGameChange(n -> {
             Platform.runLater(() -> launch.setDisable(n == null));

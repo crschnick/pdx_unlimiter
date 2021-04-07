@@ -6,21 +6,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class GuiStyle {
 
-    private final Consumer<Scene> sceneConsumer;
+    private final BiConsumer<Scene,Boolean> sceneConsumer;
     private final List<String> stylesheets;
 
-    public GuiStyle(Consumer<Scene> sceneConsumer, List<String> stylesheets) {
+    public GuiStyle(BiConsumer<Scene,Boolean> sceneConsumer, List<String> stylesheets) {
         this.sceneConsumer = sceneConsumer;
         this.stylesheets = new ArrayList<>(stylesheets);
         this.stylesheets.add(GuiStyle.class.getResource("com.crschnick.pdx_unlimiter.gui_style.empty-alert.css").toString());
@@ -28,15 +26,15 @@ public class GuiStyle {
 
     public void applyToAlert(Alert a) {
         a.getDialogPane().getScene().getStylesheets().addAll(stylesheets);
-        sceneConsumer.accept(a.getDialogPane().getScene());
+        sceneConsumer.accept(a.getDialogPane().getScene(), true);
     }
 
     public void applyToScene(Scene scene) {
         scene.getStylesheets().addAll(stylesheets);
-        sceneConsumer.accept(scene);
+        sceneConsumer.accept(scene, false);
     }
 
-    public static GuiStyle create(Path style, Consumer<Scene> sceneConsumer) {
+    public static GuiStyle create(Path style, BiConsumer<Scene,Boolean> sceneConsumer) {
         if (Files.isDirectory(style)) {
             try {
                 var s = Files.list(style)
