@@ -4,9 +4,9 @@ import com.crschnick.pdx_unlimiter.app.editor.EditorCollectorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
+import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
@@ -66,7 +66,8 @@ public class GuiEditorNode {
             preview.getStyleClass().add("preview");
             preview.setGraphic(new FontIcon());
             preview.setOnMouseEntered(e -> {
-                var tt = new Tooltip(NodeWriter.writeToString(n.toWritableNode(), 15, "  "));
+                var tt = GuiTooltips.createTooltip(NodeWriter.writeToString(
+                        n.toWritableNode(), 15, "  "));
                 tt.setShowDelay(Duration.ZERO);
                 Tooltip.install(preview, tt);
             });

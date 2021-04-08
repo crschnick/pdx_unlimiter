@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ReadOnlyProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 
@@ -14,8 +13,7 @@ public class GuiListView {
 
     public static <T> ListView<Node> createViewOfList(
             ListProperty<T> list,
-            Function<T, Node> nodeFactory,
-            ReadOnlyProperty<T> selectedProperty) {
+            Function<T, Node> nodeFactory) {
         JFXListView<Node> listView = new JFXListView<Node>();
 
         list.forEach(li -> {
@@ -39,16 +37,6 @@ public class GuiListView {
 
                 // Bug in JFoenix? We have to set this everytime we update the list view
                 listView.setExpanded(true);
-            });
-        });
-        selectedProperty.addListener((c, o, ne) -> {
-            Platform.runLater(() -> {
-                listView.getSelectionModel().clearSelection();
-                if (ne != null) {
-                    var map = new HashMap<T, Node>();
-                    listView.getItems().forEach(n -> map.put((T) n.getProperties().get("list-item"), n));
-                    listView.getSelectionModel().select(map.get(ne));
-                }
             });
         });
         return listView;

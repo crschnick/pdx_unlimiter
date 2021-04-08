@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,8 +21,7 @@ public class GuiSavegameEntryList {
     public static Pane createCampaignEntryList() {
         ListView<Node> grid = GuiListView.createViewOfList(
                 SavegameManagerState.get().getShownEntries(),
-                GuiSavegameEntry::createSavegameEntryNode,
-                SavegameManagerState.get().globalSelectedEntryProperty());
+                GuiSavegameEntry::createSavegameEntryNode);
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);
 
