@@ -3,8 +3,9 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
+import com.crschnick.pdx_unlimiter.app.lang.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -149,7 +150,7 @@ public class GuiConverterConfig {
                     Settings.getInstance().ck3toeu4Dir.getValue()
                             .resolve("Configuration").resolve("fronter-options.txt")));
             translations = LocalisationHelper.loadTranslations(Settings.getInstance().ck3toeu4Dir.getValue()
-                    .resolve("Configuration").resolve("options.yml"), LocalisationHelper.Language.ENGLISH);
+                    .resolve("Configuration").resolve("options.yml"), Language.ENGLISH);
         } catch (Exception e) {
             ErrorHandler.handleException(e);
             return false;

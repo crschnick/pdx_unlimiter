@@ -8,7 +8,6 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -97,15 +96,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
         int newSize = SavegameStorage.get(current()).getCollections().size();
         storageEmpty.set(newSize == 0);
-    }
-
-    public LocalisationHelper.Language getActiveLanguage() {
-        if (current() == null) {
-            return LocalisationHelper.Language.ENGLISH;
-        }
-
-        var l = GameInstallation.ALL.get(current()).getLanguage();
-        return l != null ? l : LocalisationHelper.Language.ENGLISH;
     }
 
     public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCollectionProperty() {

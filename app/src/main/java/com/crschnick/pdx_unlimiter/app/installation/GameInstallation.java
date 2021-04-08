@@ -6,10 +6,10 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
+import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -38,7 +38,7 @@ public abstract class GameInstallation {
     private GameDistributionType distType;
     private Path userDir;
     private GameVersion version;
-    private LocalisationHelper.Language language;
+    private Language language;
     private Path executable;
 
     public GameInstallation(Path path, Path executable) {
@@ -203,7 +203,7 @@ public abstract class GameInstallation {
             logger.debug(g.getAbbreviation() + " distribution type: " + this.distType.getName());
             this.language = determineLanguage();
             logger.debug(g.getAbbreviation() + " language: " +
-                    (this.language != null ? this.language.name() : "unknown"));
+                    (this.language != null ? this.language.getDisplayName() : "unknown"));
             LoggerFactory.getLogger(getClass()).debug("Finished initialization");
         } catch (InvalidInstallationException e) {
             throw e;
@@ -235,7 +235,7 @@ public abstract class GameInstallation {
         return d;
     }
 
-    protected abstract LocalisationHelper.Language determineLanguage() throws Exception;
+    protected abstract Language determineLanguage() throws Exception;
 
     public Path getSteamAppIdFile() {
         return getPath().resolve("steam_appid.txt");
@@ -277,7 +277,7 @@ public abstract class GameInstallation {
         return dlcs;
     }
 
-    public LocalisationHelper.Language getLanguage() {
+    public Language getLanguage() {
         return language;
     }
 }

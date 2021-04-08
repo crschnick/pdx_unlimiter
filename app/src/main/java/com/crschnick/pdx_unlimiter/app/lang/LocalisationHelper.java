@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.app.util;
+package com.crschnick.pdx_unlimiter.app.lang;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import org.apache.commons.io.ByteOrderMark;
@@ -22,7 +22,7 @@ public class LocalisationHelper {
     private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\w+\\$");
 
     public static Map<String, String> loadTranslations(Path file, Language lang) {
-        Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.id +
+        Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.getId() +
                 "." + FilenameUtils.getExtension(file.toString()));
         return loadTranslations(langFile);
     }
@@ -31,7 +31,7 @@ public class LocalisationHelper {
         try {
             try (var reader = new BufferedReader(new FileReader(file.toFile()))) {
                 String line = reader.readLine();
-                return line.contains(lang.id);
+                return line.contains(lang.getId());
             }
         } catch (Exception e) {
             ErrorHandler.handleException(e);
@@ -79,25 +79,5 @@ public class LocalisationHelper {
             s = matcher.replaceFirst(Matcher.quoteReplacement(v));
         }
         return s;
-    }
-
-    public enum Language {
-        ENGLISH("l_english"),
-        GERMAN("l_german");
-
-        private final String id;
-
-        Language(String id) {
-            this.id = id;
-        }
-
-        public static Language byId(String langId) {
-            for (var v : values()) {
-                if (v.id.equals(langId)) {
-                    return v;
-                }
-            }
-            return null;
-        }
     }
 }

@@ -1,50 +1,58 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
+import com.crschnick.pdx_unlimiter.app.lang.LocalisationHelper;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class PdxuI18n {
 
-    private static final Map<LocalisationHelper.Language, PdxuI18n> ALL = new HashMap<>();
+    private static final Map<String, String> defaultMap = new HashMap<>();
+    private static final Map<String, String> map = new HashMap<>();
 
-    private Map<String, String> map = new HashMap<>();
+    public static void initDefault() {
+        try {
+            Files.list(PdxuInstallation.getInstance().getLanguageLocation()).forEach(p -> {
+                if (LocalisationHelper.isLanguage(p, LanguageManager.DEFAULT)) {
+                    defaultMap.putAll(LocalisationHelper.loadTranslations(p));
+                }
+            });
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+    }
 
+    public static void init() {
+        try {
+            Files.list(PdxuInstallation.getInstance().getLanguageLocation()).forEach(p -> {
+                if (LocalisationHelper.isLanguage(p, LanguageManager.getInstance().getActiveLanguage())) {
+                    map.putAll(LocalisationHelper.loadTranslations(p));
+                }
+            });
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+    }
+
+    public static void reset() {
+        map.clear();
+    }
 
     public static String get(String s, String... vars) {
-        return get(LocalisationHelper.Language.ENGLISH).getLocalised(s, vars);
+        return getLocalised(s, vars);
     }
 
-    public static PdxuI18n get(LocalisationHelper.Language language) {
-        if (ALL.containsKey(language)) {
-            return ALL.get(language);
-        }
-
-        var i18n = new PdxuI18n();
-        i18n.map = LocalisationHelper.loadTranslations(PdxuInstallation.getInstance().getLanguageLocation()
-                .resolve("settings.yml"), language);
-        i18n.map.putAll(LocalisationHelper.loadTranslations(PdxuInstallation.getInstance().getLanguageLocation()
-                .resolve("install.yml"), language));
-        i18n.map.putAll(LocalisationHelper.loadTranslations(PdxuInstallation.getInstance().getLanguageLocation()
-                .resolve("launcher.yml"), language));
-
-        ALL.put(language, i18n);
-        return i18n;
-    }
-
-    public String getLocalised(String s, String... vars) {
-        var localisedString = getMap().get(s);
+    private static String getLocalised(String s, String... vars) {
+        var localisedString = map.get(s);
         if (localisedString == null) {
-            LoggerFactory.getLogger(PdxuI18n.class).error("No localisation found for key " + s);
-            return s;
+            LoggerFactory.getLogger(PdxuI18n.class).warn("No localisation found for key " + s);
+            var def = defaultMap.get(s);
+            return def != null ? LocalisationHelper.getValue(def, vars) : s;
         }
 
         return LocalisationHelper.getValue(localisedString, vars);
-    }
-
-    public Map<String, String> getMap() {
-        return map;
     }
 }

@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
@@ -28,8 +29,11 @@ public class ComponentManager {
     public static void initialSetup(String[] args) {
         try {
             PdxuInstallation.init();
+
             LogManager.init();
             logger = LoggerFactory.getLogger(ComponentManager.class);
+
+            PdxuI18n.initDefault();
             ErrorHandler.init();
             IntegrityManager.init();
 
@@ -51,6 +55,8 @@ public class ComponentManager {
             // Load saved state before window creation so that stored window coordinates can be used
             SavedState.init();
             PdxuApp.getApp().setupWindowState();
+            // Load languages after window setup since it can create error windows to notify the user
+            LanguageManager.init();
             // Load settings after window setup since settings entries can create dialog windows to notify the user
             Settings.init();
             PdxuApp.getApp().setupBasicWindowContent();
@@ -93,6 +99,7 @@ public class ComponentManager {
     private static void init() {
         logger.debug("Initializing ...");
         try {
+            PdxuI18n.init();
             GameInstallation.init();
             SavegameStorage.init();
             SavegameManagerState.init();
@@ -140,6 +147,7 @@ public class ComponentManager {
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.unregisterNativeHook();
             }
+            PdxuI18n.reset();
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }

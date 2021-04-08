@@ -6,9 +6,11 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
+import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -19,6 +21,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
+import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
@@ -79,6 +82,27 @@ public class GuiSettingsComponents {
         return slider;
     }
 
+    private static <T> Region choiceEntryNode(SettingsEntry.ChoiceEntry<T> ce, Set<Runnable> applyFuncs) {
+        var list = FXCollections.observableArrayList(ce.getMapping().keySet());
+        var cb = new ChoiceBox<>(list);
+        cb.setValue(ce.getValue());
+        applyFuncs.add(() -> {
+            ce.set(cb.getValue());
+        });
+        cb.setConverter(new StringConverter<T>() {
+            @Override
+            public String toString(T object) {
+                return ce.getDisplayNameFunc().apply(object);
+            }
+
+            @Override
+            public T fromString(String string) {
+                return ce.getMapping().inverseBidiMap().get(string);
+            }
+        });
+        return cb;
+    }
+
     private static Region stringEntryNode(SettingsEntry.StringEntry se, Set<Runnable> applyFuncs) {
         TextField tf = new TextField();
         applyFuncs.add(() -> {
@@ -110,6 +134,8 @@ public class GuiSettingsComponents {
                 val = integerEntryNode((SettingsEntry.IntegerEntry) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.STRING)) {
                 val = stringEntryNode((SettingsEntry.StringEntry) entry, applyFuncs);
+            } else if (entry.getType().equals(SettingsEntry.Type.CHOICE)) {
+                val = choiceEntryNode((SettingsEntry.ChoiceEntry<?>) entry, applyFuncs);
             } else {
                 throw new IllegalArgumentException();
             }

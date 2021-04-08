@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 
 public final class InvalidInstallationException extends Exception {
 
@@ -9,7 +8,7 @@ public final class InvalidInstallationException extends Exception {
     private final String[] variables;
 
     public InvalidInstallationException(String msgId, String... vars) {
-        super(PdxuI18n.get(LocalisationHelper.Language.ENGLISH).getLocalised(msgId, vars));
+        super(PdxuI18n.get(msgId, vars));
         this.msgId = msgId;
         this.variables = vars;
     }

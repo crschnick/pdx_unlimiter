@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Alert;
+import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class SettingsEntry<T> {
@@ -96,7 +98,8 @@ public abstract class SettingsEntry<T> {
         BOOLEAN,
         INTEGER,
         STRING,
-        PATH
+        PATH,
+        CHOICE
     }
 
 
@@ -182,6 +185,45 @@ public abstract class SettingsEntry<T> {
         @Override
         public JsonNode toNode() {
             return new TextNode(value.get());
+        }
+    }
+
+    public static class ChoiceEntry<T> extends SimpleEntry<T> {
+
+        private final Function<T,String> displayNameFunc;
+        private final BidiMap<T,String> mapping;
+
+        public ChoiceEntry(String id, String serializationName, T defaultValue, BidiMap<T,String> mapping, Function<T,String> displayNameFunc) {
+            super(id, serializationName, Type.CHOICE, defaultValue);
+            this.mapping = mapping;
+            this.displayNameFunc = displayNameFunc;
+        }
+
+        @Override
+        public void set(JsonNode node) {
+            var name = node.textValue();
+            var val = mapping.inverseBidiMap().get(name);
+
+            if (val != null) {
+                this.value.set(val);
+            } else {
+                String fullMsg = PdxuI18n.get("CHOICE_VALUE_ERROR", name);
+                GuiErrorReporter.showSimpleErrorMessage(fullMsg);
+                this.value.set(mapping.keySet().iterator().next());
+            }
+        }
+
+        @Override
+        public JsonNode toNode() {
+            return new TextNode(mapping.get(value.get()));
+        }
+
+        public BidiMap<T, String> getMapping() {
+            return mapping;
+        }
+
+        public Function<T, String> getDisplayNameFunc() {
+            return displayNameFunc;
         }
     }
 

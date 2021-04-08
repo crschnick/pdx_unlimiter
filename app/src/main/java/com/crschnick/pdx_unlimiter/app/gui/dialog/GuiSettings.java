@@ -34,7 +34,7 @@ public class GuiSettings {
                         s.timedImportsInterval,
                         s.playSoundOnBackgroundImport),
                 new Separator(),
-                GuiSettingsComponents.section("INTERFACE", applyFuncs, s.fontSize, s.confirmDeletion),
+                GuiSettingsComponents.section("INTERFACE", applyFuncs, s.fontSize, s.confirmDeletion, s.language),
                 new Separator(),
                 GuiSettingsComponents.section("IRONY", applyFuncs, s.ironyDir, s.launchIrony),
                 new Separator(),

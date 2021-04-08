@@ -9,6 +9,8 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
+import com.crschnick.pdx_unlimiter.app.lang.Language;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.IronyHelper;
 import javafx.application.Platform;
@@ -151,6 +153,13 @@ public final class Settings extends AbstractSettings {
             15,
             1,
             60
+    );
+    public final SettingsEntry.ChoiceEntry<Language> language = new SettingsEntry.ChoiceEntry<>(
+            "LANGUAGE",
+            "language",
+            LanguageManager.DEFAULT,
+            LanguageManager.getInstance().getLanguages().inverseBidiMap(),
+            l -> l.getDisplayName()
     );
 
     public static void init() {

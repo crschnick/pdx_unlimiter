@@ -1,7 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
+import com.crschnick.pdx_unlimiter.app.lang.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
 
@@ -34,7 +35,7 @@ public class GameLocalisation {
             Map<String, String> i18n = new HashMap<>();
 
             CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), info, GameInstallation.ALL.get(Game.EU4), file -> {
-                if (!LocalisationHelper.isLanguage(file, LocalisationHelper.Language.ENGLISH)) {
+                if (!LocalisationHelper.isLanguage(file, Language.ENGLISH)) {
                     return;
                 }
 

@@ -3,10 +3,11 @@ package com.crschnick.pdx_unlimiter.app.installation.game;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
+import com.crschnick.pdx_unlimiter.app.lang.Language;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.LocalisationHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -75,7 +76,7 @@ public class StellarisInstallation extends GameInstallation {
     }
 
     @Override
-    protected LocalisationHelper.Language determineLanguage() throws Exception {
+    protected Language determineLanguage() throws Exception {
         var sf = getUserPath().resolve("settings.txt");
         if (!Files.exists(sf)) {
             return null;
@@ -83,6 +84,6 @@ public class StellarisInstallation extends GameInstallation {
 
         var node = TextFormatParser.textFileParser().parse(sf);
         var langId = node.getNodeForKey("language").getString();
-        return LocalisationHelper.Language.byId(langId);
+        return LanguageManager.getInstance().byId(langId);
     }
 }
