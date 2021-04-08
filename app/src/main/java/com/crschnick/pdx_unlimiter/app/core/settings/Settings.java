@@ -78,6 +78,8 @@ public final class Settings extends AbstractSettings {
     ) {
         @Override
         public void set(Boolean newValue) {
+            boolean changedToTrue = !newValue.equals(value.get()) && newValue;
+
             Path eu4seFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("eu4saveeditor");
             try {
                 Files.writeString(eu4seFile, Boolean.toString(newValue));
@@ -86,11 +88,7 @@ public final class Settings extends AbstractSettings {
                 ErrorHandler.handleException(e);
             }
 
-            if (newValue.equals(value.get())) {
-                return;
-            }
-
-            if (newValue) {
+            if (changedToTrue) {
                 Eu4SeHelper.showEnabledDialog();
             }
         }
