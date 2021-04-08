@@ -14,7 +14,6 @@ import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -22,8 +21,6 @@ import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +45,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 topBar.setAlignment(Pos.CENTER);
                 topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
                 int age = GameDate.yearsBetween(ruler.getBirth(), info.getDate());
-                var title = new Label(info.getPlayerName() + " of " + info.getTag().getName() + ", " + age);
+                var title = new Label(info.getPlayerName() + ", " + age);
                 title.getStyleClass().add("ruler-name");
                 topBar.getChildren().add(title);
 
