@@ -56,7 +56,7 @@ public class SettingsIO {
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         ObjectNode i = n.putObject("settings");
 
-        for (var field : Settings.class.getFields()) {
+        for (var field : s.getClass().getFields()) {
             if (!SettingsEntry.class.isAssignableFrom(field.getType())) {
                 continue;
             }
