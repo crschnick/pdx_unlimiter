@@ -9,42 +9,18 @@ import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
-import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.IronyHelper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.application.Platform;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
-import java.util.Set;
 
-public final class Settings {
+public final class Settings extends AbstractSettings {
 
     private static Settings INSTANCE;
-    private static final Set<SettingsCheck> CHECKS = Set.of(
-            s -> {
-                boolean hasNoValidInstallation =
-                        s.eu4.getValue() == null && s.ck3.getValue() == null &&
-                                s.hoi4.getValue() == null && s.stellaris.getValue() == null;
-                if (hasNoValidInstallation) {
-                    GuiErrorReporter.showSimpleErrorMessage("""
-                            Welcome to the Pdx-Unlimiter!
-                                                    
-                            The automatic game detection did not detect any supported Paradox game.
-                            To get started, you can set the installation directories of games manually in the settings menu.
 
-                            Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
-                                                """);
-                    Platform.runLater(GuiSettings::showSettings);
-                }
-            }
-    );
     public final SettingsEntry.GameDirectory eu4 = new SettingsEntry.GameDirectory(
             "eu4",
             Game.EU4,
@@ -178,70 +154,34 @@ public final class Settings {
     );
 
     public static void init() {
-        INSTANCE = load();
-        check();
-        save();
-    }
-
-    public static void check() {
-        CHECKS.forEach(c -> c.check(INSTANCE));
+        INSTANCE = new Settings();
+        INSTANCE.load();
     }
 
     public static Settings getInstance() {
         return INSTANCE;
     }
 
-    private static Settings load() {
-        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
-        JsonNode sNode;
-        if (Files.exists(file)) {
-            JsonNode node = ConfigHelper.readConfig(file);
-            sNode = Optional.ofNullable(node.get("settings")).orElse(JsonNodeFactory.instance.objectNode());
-        } else {
-            sNode = JsonNodeFactory.instance.objectNode();
-        }
-
-        Settings s = new Settings();
-        for (var field : Settings.class.getFields()) {
-            try {
-                SettingsEntry<?> e = (SettingsEntry<?>) field.get(s);
-                var node = sNode.get(e.getSerializationName());
-                if (node != null) {
-                    e.set(node);
-                } else {
-                    e.setDefault();
-                }
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        }
-        return s;
+    @Override
+    protected String createName() {
+        return "settings";
     }
 
-    public static void save() {
-        Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("settings.json");
-        try {
-            FileUtils.forceMkdirParent(file.toFile());
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return;
-        }
+    @Override
+    public void check() {
+        boolean hasNoValidInstallation =
+                eu4.getValue() == null && ck3.getValue() == null &&
+                        hoi4.getValue() == null && stellaris.getValue() == null;
+        if (hasNoValidInstallation) {
+            GuiErrorReporter.showSimpleErrorMessage("""
+                            Welcome to the Pdx-Unlimiter!
+                                                    
+                            The automatic game detection did not detect any supported Paradox game.
+                            To get started, you can set the installation directories of games manually in the settings menu.
 
-        ObjectNode n = JsonNodeFactory.instance.objectNode();
-        ObjectNode i = n.putObject("settings");
-
-        Settings s = Settings.INSTANCE;
-        for (var field : Settings.class.getFields()) {
-            try {
-                SettingsEntry<?> e = (SettingsEntry<?>) field.get(s);
-                var node = e.toNode();
-                if (node != null) {
-                    i.set(e.getSerializationName(), node);
-                }
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
+                            Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
+                                                """);
+            Platform.runLater(GuiSettings::showSettings);
         }
-        ConfigHelper.writeConfig(file, n);
     }
 }

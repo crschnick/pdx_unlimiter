@@ -78,9 +78,7 @@ public class ComponentManager {
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(() -> {
             reset();
-            settingsUpdater.run();
-            Settings.check();
-            Settings.save();
+            Settings.getInstance().update(settingsUpdater);
             init();
         }, true);
     }
