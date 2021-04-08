@@ -7,7 +7,9 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -67,12 +69,12 @@ public class GuiImporterState {
                 newShownTargets.remove(entry);
             }
         });
-        newShownTargets.sort(Comparator.comparing(e -> e.target().getLastModified(), Comparator.reverseOrder()));
+        newShownTargets.sort(Comparator.comparing(e -> e.target(), Comparator.reverseOrder()));
 
         shownTargets.set(newShownTargets);
     }
 
-    public Collection<FileImportTarget> getSelectedTargets() {
+    public Collection<FileImportTarget.StandardImportTarget> getSelectedTargets() {
         return allTargets.stream()
                 .filter(e -> e.selected.get())
                 .map(e -> e.target).collect(Collectors.toList());
@@ -103,6 +105,6 @@ public class GuiImporterState {
         return shownTargets;
     }
 
-    record ImportEntry(FileImportTarget target, BooleanProperty selected) {
+    record ImportEntry(FileImportTarget.StandardImportTarget target, BooleanProperty selected) {
     }
 }

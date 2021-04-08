@@ -75,7 +75,7 @@ public class GuiStatusBar {
         latest.setGraphic(new FontIcon());
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
-        javafx.beans.value.ChangeListener<List<FileImportTarget>> l = (c, o, n) -> {
+        javafx.beans.value.ChangeListener<List<FileImportTarget.StandardImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> latest.setText("Latest: " + (n.size() > 0 ? n.get(0).getName() : "None")));
         };
 

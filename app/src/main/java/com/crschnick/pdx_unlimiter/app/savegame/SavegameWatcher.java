@@ -10,7 +10,6 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +20,7 @@ public class SavegameWatcher {
     public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
 
     private final GameInstallation install;
-    private final ListProperty<FileImportTarget> savegames = new SimpleListProperty<>(
+    private final ListProperty<FileImportTarget.StandardImportTarget> savegames = new SimpleListProperty<>(
             FXCollections.observableArrayList());
 
     private SavegameWatcher(GameInstallation install) {
@@ -51,21 +50,21 @@ public class SavegameWatcher {
         });
     }
 
-    private List<FileImportTarget> getLatestSavegames() {
+    private List<FileImportTarget.StandardImportTarget> getLatestSavegames() {
         return install.getAllSavegameDirectories().stream()
                 .map(Path::toString)
-                .map(FileImportTarget::createTargets)
+                .map(FileImportTarget::createStandardImportsTargets)
                 .map(List::stream)
                 .flatMap(Stream::distinct)
                 .sorted(Comparator.reverseOrder())
                 .collect(Collectors.toList());
     }
 
-    public List<FileImportTarget> getSavegames() {
+    public List<FileImportTarget.StandardImportTarget> getSavegames() {
         return savegames.get();
     }
 
-    public ListProperty<FileImportTarget> savegamesProperty() {
+    public ListProperty<FileImportTarget.StandardImportTarget> savegamesProperty() {
         return savegames;
     }
 }

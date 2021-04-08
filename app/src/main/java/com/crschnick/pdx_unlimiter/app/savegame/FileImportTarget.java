@@ -28,9 +28,75 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class FileImportTarget implements Comparable<FileImportTarget> {
+public abstract class FileImportTarget {
 
-    public static List<FileImportTarget> createTargets(String toImport) {
+    public static List<StandardImportTarget> createStandardImportsTargets(String toImport) {
+        Path p;
+        try {
+            p = Path.of(toImport);
+        } catch (InvalidPathException ignored) {
+            LoggerFactory.getLogger(FileImportTarget.class).warn("Unable to determine import target for " + toImport);
+            return List.of();
+        }
+
+        List<StandardImportTarget> targets = new ArrayList<>();
+        RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
+            @Override
+            public void visitEu4(Path file) {
+                if (!Game.EU4.isEnabled()) {
+                    return;
+                }
+
+                targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.EU4), file));
+            }
+
+            @Override
+            public void visitHoi4(Path file) {
+                if (!Game.HOI4.isEnabled()) {
+                    return;
+                }
+
+                targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.HOI4), file));
+            }
+
+            @Override
+            public void visitStellaris(Path file) {
+                if (!Game.STELLARIS.isEnabled()) {
+                    return;
+                }
+
+                if (file.getFileName().toString().equals("ironman.sav")) {
+                    targets.add(new StellarisIronmanImportTarget(file));
+                } else {
+                    targets.add(new StellarisNormalImportTarget(file));
+                }
+            }
+
+            @Override
+            public void visitCk3(Path file) {
+                if (!Game.CK3.isEnabled()) {
+                    return;
+                }
+
+                targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.CK3), file));
+            }
+
+            @Override
+            public void visitOther(Path file) {
+                if (Files.isDirectory(file)) {
+                    try {
+                        Files.list(file).forEach(f -> targets.addAll(
+                                FileImportTarget.createStandardImportsTargets(f.toString())));
+                    } catch (IOException e) {
+                        ErrorHandler.handleException(e);
+                    }
+                }
+            }
+        });
+        return targets;
+    }
+
+    public static List<? extends FileImportTarget> createTargets(String toImport) {
         if (SavegameStorage.ALL.get(Game.EU4) != null && toImport.startsWith("pdxu")) {
             try {
                 URL url = new URL(toImport.replace("pdxu", "https"));
@@ -41,91 +107,10 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
             }
         }
 
-        try {
-            List<FileImportTarget> targets = new ArrayList<>();
-            Path p = Path.of(toImport);
-            RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
-                @Override
-                public void visitEu4(Path file) {
-                    if (!Game.EU4.isEnabled()) {
-                        return;
-                    }
-
-                    targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.EU4), file));
-                }
-
-                @Override
-                public void visitHoi4(Path file) {
-                    if (!Game.HOI4.isEnabled()) {
-                        return;
-                    }
-
-                    targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.HOI4), file));
-                }
-
-                @Override
-                public void visitStellaris(Path file) {
-                    if (!Game.STELLARIS.isEnabled()) {
-                        return;
-                    }
-
-                    if (file.getFileName().toString().equals("ironman.sav")) {
-                        targets.add(new StellarisIronmanImportTarget(file));
-                    } else {
-                        targets.add(new StellarisNormalImportTarget(file));
-                    }
-                }
-
-                @Override
-                public void visitCk3(Path file) {
-                    if (!Game.CK3.isEnabled()) {
-                        return;
-                    }
-
-                    targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.CK3), file));
-                }
-
-                @Override
-                public void visitOther(Path file) {
-                    if (Files.isDirectory(file)) {
-                        try {
-                            Files.list(file).forEach(f -> targets.addAll(FileImportTarget.createTargets(f.toString())));
-                        } catch (IOException e) {
-                            ErrorHandler.handleException(e);
-                        }
-                    }
-                }
-            });
-            return targets;
-        } catch (InvalidPathException ignored) {
-        }
-
-        LoggerFactory.getLogger(FileImportTarget.class).warn("Unable to determine import target for " + toImport);
-        return List.of();
-    }
-
-    public final boolean hasImportedSourceFile() {
-        var cs = getSourceFileChecksum();
-        if (cs == null) {
-            return false;
-        }
-
-        return SavegameStorage.get(SavegameManagerState.get().current()).hasImportedSourceFile(cs);
-    }
-
-    @Override
-    public int compareTo(FileImportTarget o) {
-        var time = getLastModified().compareTo(o.getLastModified());
-        if (time != 0) {
-            return time;
-        }
-
-        return getName().compareTo(o.getName());
+        return createStandardImportsTargets(toImport);
     }
 
     public abstract void importTarget(Consumer<SavegameParser.Status> onFinish);
-
-    public abstract Instant getLastModified();
 
     public abstract void delete();
 
@@ -133,7 +118,6 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
 
     public abstract Path getPath();
 
-    public abstract String getSourceFileChecksum();
 
     public static final class DownloadImportTarget extends FileImportTarget {
 
@@ -172,8 +156,7 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
                     Files.write(downloadedFile, data);
 
                     onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, null, true,
-                                    getSourceFileChecksum(), null));
+                            .importSavegame(downloadedFile, null, true,null, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -191,11 +174,6 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
         @Override
         public int hashCode() {
             return Objects.hash(url);
-        }
-
-        @Override
-        public Instant getLastModified() {
-            return Instant.now();
         }
 
         @Override
@@ -222,35 +200,44 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
         public Path getPath() {
             return downloadedFile;
         }
-
-        @Override
-        public String getSourceFileChecksum() {
-            try {
-                var md = MessageDigest.getInstance("MD5");
-                md.update(url.toString().getBytes());
-
-                StringBuilder c = new StringBuilder();
-                ByteBuffer b = ByteBuffer.wrap(md.digest());
-                for (int i = 0; i < 16; i++) {
-                    var hex = String.format("%02x", b.get());
-                    c.append(hex);
-                }
-                return c.toString();
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-                return null;
-            }
-        }
     }
 
-    public static class StandardImportTarget extends FileImportTarget {
+    public static class StandardImportTarget extends FileImportTarget implements Comparable<StandardImportTarget> {
 
         private final SavegameStorage<?, ?> savegameStorage;
         protected Path path;
+        private Instant timestamp;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
             this.savegameStorage = savegameStorage;
             this.path = path;
+
+            // Calculate timestamp once, since it can change later on and mess up the comparator logic
+            try {
+                timestamp = Files.getLastModifiedTime(path).toInstant();
+            } catch (IOException e) {
+                // In some conditions, the import target may already not exist anymore.
+                timestamp = Instant.EPOCH;
+            }
+        }
+
+        public final boolean hasImportedSourceFile() {
+            var cs = getSourceFileChecksum();
+            if (cs == null) {
+                return false;
+            }
+
+            return SavegameStorage.get(SavegameManagerState.get().current()).hasImportedSourceFile(cs);
+        }
+
+        @Override
+        public int compareTo(StandardImportTarget o) {
+            var time = timestamp.compareTo(o.timestamp);
+            if (time != 0) {
+                return time;
+            }
+
+            return getName().compareTo(o.getName());
         }
 
         public void importTarget(Consumer<SavegameParser.Status> onFinish) {
@@ -263,28 +250,6 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
                 onFinish.accept(savegameStorage.importSavegame(
                         path, null, true, getSourceFileChecksum(), null));
             }, true);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            StandardImportTarget that = (StandardImportTarget) o;
-            return Objects.equals(path, that.path);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(path);
-        }
-
-        public Instant getLastModified() {
-            try {
-                return Files.getLastModifiedTime(path).toInstant();
-            } catch (IOException e) {
-                // In some conditions, the import target may already not exist anymore.
-                return Instant.EPOCH;
-            }
         }
 
         @Override
@@ -311,7 +276,6 @@ public abstract class FileImportTarget implements Comparable<FileImportTarget> {
             return path;
         }
 
-        @Override
         public String getSourceFileChecksum() {
             if (!Files.exists(path)) {
                 return null;

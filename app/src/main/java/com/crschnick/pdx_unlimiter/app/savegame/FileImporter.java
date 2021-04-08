@@ -73,7 +73,7 @@ public class FileImporter {
         FileUtils.deleteQuietly(queueFile.toFile());
     }
 
-    public static void importTargets(Collection<FileImportTarget> targets) {
+    public static void importTargets(Collection<? extends FileImportTarget> targets) {
         Map<FileImportTarget, SavegameParser.Status> statusMap = new HashMap<>();
         targets.forEach(t -> t.importTarget(s -> {
             // Only save non success results
