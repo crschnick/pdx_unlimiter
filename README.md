@@ -26,6 +26,7 @@ why this warning pops up.
 
 The main components of the Pdx-Unlimiter are:
 - [Savegame manager](#savegame-manager)
+- [Smart savegame launcher](#smart-launcher)
 - [Ironman converter](#ironman-converter)
 - [Savegame editor](#savegame-editor)
 - [Savescumming tools](#savescumming-tools)
@@ -43,23 +44,32 @@ Since keeping track of all your savegames is getting more complicated
 with every new savegame you start or backup you revert to,
 the Pdx-Unlimiter provides you with an easy-to-use interface for choosing the right save file.
 This is done by collecting all savegames and creating a browsable and editable
-savegame history so you can load any prior saved version of a campaign. 
-This works for both Ironman and Non-Ironman savegames.
-All savegames can be also launched directly from
-within the Pdx-Unlimiter without needing to visit the main menu.
+savegame history so you can load any prior saved version of a campaign.
+All types of savegames are supported, including Ironman and modded savegames.
 
 ![Example](misc/screenshot.png)
 
-![Example](misc/ck3_screenshot.png)
-
-Savegames that use mods are also fully supported.
-This includes displaying modded country information in the savegame manager and mod installation support.
-When you launch a savegame from within the Pdx-Unlimiter, the required mods and DLCs are automatically
-enabled without having to use Paradox launcher configurations.
-It is also checked whether a mod is missing or incompatible with the current version,
-so that nothing can potentially corrupt your savegames.
+![ExampleCK3](misc/ck3_screenshot.png)
 
 **Usage guide:** [Savegame management](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-importing-and-storage)
+
+
+## Smart launcher
+
+The problem of playing modded savegames it that you need to enable the right mods in the Paradox Launcher.
+The concept of the Pdx-Unlimiter to fix this problem is that it is a *smart* launcher
+that is fully aware of which mods and DLCs are needed for a certain savegame.
+
+All savegames can be launched directly from
+within the Pdx-Unlimiter without needing to visit the main menu ever again.
+When you directly launch a savegame from within the Pdx-Unlimiter,
+the required mods and DLCs are automatically enabled without having to use Paradox launcher configurations.
+It is also checked whether a mod is missing or incompatible with the current version,
+so that nothing can potentially corrupt your savegames.
+This means that you never have to worry about keeping track of your mod
+configurations if you regularly switch between them.
+
+**Usage guide:** [Launching savegames](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#launching-savegames)
 
 ## Savegame editor
 
