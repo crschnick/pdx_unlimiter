@@ -78,14 +78,13 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
         };
 
         var in = CascadeDirectoryHelper.openFile(
-                Path.of("flags", "backgrounds").resolve(path), info, GameInstallation.ALL.get(Game.STELLARIS));
+                Path.of("flags", "backgrounds").resolve(path), info);
         in.map(stream -> ImageLoader.loadAwtImage(stream, customFilter))
                 .ifPresent(pattern -> g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE, null));
 
         Image icon = null;
         var iconIn = CascadeDirectoryHelper.openFile(
-                Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile()),
-                info, GameInstallation.ALL.get(Game.STELLARIS));
+                Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile()), info);
         iconIn.map(stream -> ImageLoader.loadAwtImage(stream, null))
                 .ifPresent(pattern -> g.drawImage(pattern, 0, 0, IMG_SIZE, IMG_SIZE,
                         new java.awt.Color(0, 0, 0, 0), null));

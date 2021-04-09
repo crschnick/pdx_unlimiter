@@ -45,6 +45,10 @@ public class LanguageManager {
             return current;
         }
 
+        if (!Settings.getInstance().useGameLanguage.getValue()) {
+            return current;
+        }
+
         var l = GameInstallation.ALL.get(SavegameManagerState.get().current()).getLanguage();
         return l != null ? l : current;
     }

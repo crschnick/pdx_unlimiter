@@ -26,6 +26,14 @@ public class CacheManager {
         return INSTANCE;
     }
 
+    public void onEntryLoadFinish() {
+        var sc = SavegameManagerState.get().globalSelectedCollectionProperty().get();
+        if (sc instanceof SavegameFolder) {
+            logger.debug("Clearing savegame folder caches after load");
+            caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN_SPECIFIC));
+        }
+    }
+
     public void onSelectedGameChange() {
         logger.debug("Clearing game caches");
         caches.clear();
@@ -41,11 +49,6 @@ public class CacheManager {
         var sc = SavegameManagerState.get().globalSelectedCollectionProperty().get();
 
         try {
-            // No caching when using savegame folders!
-            if (sc instanceof SavegameFolder) {
-                return (T) clazz.getConstructors()[0].newInstance();
-            }
-
             if (caches.containsKey(clazz)) {
                 return (T) caches.get(clazz);
             } else {

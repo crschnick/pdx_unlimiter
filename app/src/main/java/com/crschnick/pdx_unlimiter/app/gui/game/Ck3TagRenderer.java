@@ -1,8 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
-import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -17,7 +15,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -270,8 +267,7 @@ public class Ck3TagRenderer {
             };
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
-                    info,
-                    GameInstallation.ALL.get(Game.CK3));
+                    info);
             patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
                 g.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE, null);
             });
@@ -307,8 +303,7 @@ public class Ck3TagRenderer {
         var path = CascadeDirectoryHelper.openFile(
                 Path.of("gfx", "coat_of_arms",
                         (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
-                info,
-                GameInstallation.ALL.get(Game.CK3));
+                info);
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
 
             boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);

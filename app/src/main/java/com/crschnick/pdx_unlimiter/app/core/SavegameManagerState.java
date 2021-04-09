@@ -123,7 +123,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
                             ctx.getStorage().getSavegameCollection(e))) {
-                ctx.getStorage().loadEntry(e);
+
+                if (ctx.getStorage().loadEntry(e)) {
+                    // Wait for all triggered platform thread operations to finish before clearing caches!
+                    GuiPlatformHelper.waitForPlatform();
+                    CacheManager.getInstance().onEntryLoadFinish();
+                }
             }
         }), false);
     }

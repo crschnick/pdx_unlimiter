@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame.game;
 
 import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
-import com.crschnick.pdx_unlimiter.app.installation.GameLocalisation;
+import com.crschnick.pdx_unlimiter.app.lang.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
@@ -28,6 +28,6 @@ public class Eu4SavegameStorage extends SavegameStorage<
 
     @Override
     protected String getDefaultCampaignName(Eu4SavegameInfo info) {
-        return GameLocalisation.getTagNameForEntry(info, info.getTag());
+        return GameLocalisation.getLocalisedValue(info.getTag().getTag(), info);
     }
 }

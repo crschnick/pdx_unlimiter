@@ -159,6 +159,11 @@ public final class Settings extends AbstractSettings {
             LanguageManager.getInstance().getLanguages().inverseBidiMap(),
             l -> l.getDisplayName()
     );
+    public final SettingsEntry.BooleanEntry useGameLanguage = new SettingsEntry.BooleanEntry(
+            "USE_GAME_LANGUAGE",
+            "useGameLanguage",
+            true
+    );
 
     public static void init() {
         INSTANCE = new Settings();

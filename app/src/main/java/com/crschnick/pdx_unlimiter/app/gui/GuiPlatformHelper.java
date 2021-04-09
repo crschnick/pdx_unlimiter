@@ -16,7 +16,7 @@ public class GuiPlatformHelper {
     private static final AtomicInteger otherPauses = new AtomicInteger(0);
     private static final Semaphore semaphore = new Semaphore(0);
 
-    private static void waitForPlatform() {
+    public static void waitForPlatform() {
         if (Platform.isFxApplicationThread()) {
             return;
         }
@@ -25,7 +25,7 @@ public class GuiPlatformHelper {
             return;
         }
 
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Waiting for platform thread");
+        LoggerFactory.getLogger(GuiPlatformHelper.class).trace("Waiting for platform thread");
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(latch::countDown);
         try {
@@ -36,7 +36,7 @@ public class GuiPlatformHelper {
         } catch (InterruptedException e) {
             ErrorHandler.handleException(e);
         }
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Synced with platform thread");
+        LoggerFactory.getLogger(GuiPlatformHelper.class).trace("Synced with platform thread");
     }
 
     public static void doWhilePlatformIsPaused(Runnable r) {
@@ -57,7 +57,7 @@ public class GuiPlatformHelper {
 
         waitForPlatform();
 
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Pausing platform thread");
+        LoggerFactory.getLogger(GuiPlatformHelper.class).trace("Pausing platform thread");
         Platform.runLater(() -> {
             try {
                 if (!semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
@@ -82,7 +82,7 @@ public class GuiPlatformHelper {
             return;
         }
 
-        LoggerFactory.getLogger(GuiPlatformHelper.class).debug("Continuing platform thread");
+        LoggerFactory.getLogger(GuiPlatformHelper.class).trace("Continuing platform thread");
         semaphore.release();
     }
 }

@@ -1,8 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
-import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -12,7 +10,6 @@ import javafx.scene.image.Image;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -124,8 +121,7 @@ public class Eu4TagRenderer {
     }
 
     private static Image eu4TagImage(Path path, SavegameInfo<Eu4Tag> info) {
-        var in = CascadeDirectoryHelper.openFile(
-                path, info, GameInstallation.ALL.get(Game.EU4));
+        var in = CascadeDirectoryHelper.openFile(path, info);
         return ImageLoader.loadImage(in.orElse(null), null);
     }
 

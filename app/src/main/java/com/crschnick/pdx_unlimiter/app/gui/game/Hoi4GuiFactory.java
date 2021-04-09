@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
@@ -54,8 +53,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     }
 
     private Image hoi4TagNode(Path path, SavegameInfo<Hoi4Tag> info) {
-        var in = CascadeDirectoryHelper.openFile(
-                path, info, GameInstallation.ALL.get(Game.HOI4));
+        var in = CascadeDirectoryHelper.openFile(path, info);
         return ImageLoader.loadImage(in.orElse(null), null);
     }
 

@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.apache.commons.io.FileUtils;
@@ -8,12 +8,12 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -21,26 +21,27 @@ public class CascadeDirectoryHelper {
 
     public static void traverseDirectory(
             Path dir,
-            SavegameInfo<?> info,
-            GameInstallation install,
+            GameFileContext ctx,
             Consumer<Path> consumer) {
-        traverseDir(dir, getCascadingDirectories(info, install), consumer);
+        traverseDir(dir, getCascadingDirectories(ctx), consumer);
     }
 
     public static Optional<Path> openFile(
             Path file,
-            SavegameInfo<?> info,
-            GameInstallation install) {
-        return openFile(file, getCascadingDirectories(info, install));
+            SavegameInfo<?> info) {
+        return openFile(file, getCascadingDirectories(GameFileContext.fromInfo(info)));
+    }
+
+    public static Optional<Path> openFile(
+            Path file,
+            GameFileContext ctx) {
+        return openFile(file, getCascadingDirectories(ctx));
     }
 
     private static List<Path> getCascadingDirectories(
-            SavegameInfo<?> info,
-            GameInstallation install) {
+            GameFileContext ctx) {
         List<Path> dirs = new ArrayList<>();
-        dirs.addAll(info.getMods().stream()
-                .map(install::getModForName)
-                .flatMap(Optional::stream)
+        dirs.addAll(ctx.getMods().stream()
                 .map(GameMod::getPath)
                 .collect(Collectors.toList()));
 
@@ -51,7 +52,7 @@ public class CascadeDirectoryHelper {
 //                .map(GameDlc::getDataPath)
 //                .collect(Collectors.toList()));
 
-        dirs.add(install.getModBasePath());
+        dirs.add(ctx.getInstall().getModBasePath());
         return dirs;
     }
 
