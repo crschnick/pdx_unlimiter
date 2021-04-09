@@ -57,8 +57,9 @@ All types of savegames are supported, including Ironman and modded savegames.
 ## Smart launcher
 
 The problem of playing modded savegames it that you need to enable the right mods in the Paradox Launcher.
-The concept of the Pdx-Unlimiter to fix this problem is that it is a *smart* launcher
-that is fully aware of which mods and DLCs are needed for a certain savegame.
+The solution to this problem is that the Pdx-Unlimiter is a *smart* launcher
+that is fully aware of which mods and DLCs are needed for a certain savegame,
+*before* you start the game.
 
 All savegames can be launched directly from
 within the Pdx-Unlimiter without needing to visit the main menu ever again.
