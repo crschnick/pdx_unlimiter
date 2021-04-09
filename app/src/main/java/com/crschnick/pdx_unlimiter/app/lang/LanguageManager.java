@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.lang3.LocaleUtils;
 
 public class LanguageManager {
 
@@ -30,7 +31,8 @@ public class LanguageManager {
         try {
             var n = JsonHelper.read(PdxuInstallation.getInstance().getLanguageLocation().resolve("languages.json"));
             n.get("languages").fields().forEachRemaining(e -> {
-                languages.put(e.getKey(), new Language(e.getKey(), e.getValue().textValue()));
+                var loc = LocaleUtils.toLocale(e.getValue().textValue());
+                languages.put(e.getKey(), new Language(loc, e.getKey(), loc.getDisplayName(loc)));
             });
         } catch (Exception e) {
             ErrorHandler.handleException(e);

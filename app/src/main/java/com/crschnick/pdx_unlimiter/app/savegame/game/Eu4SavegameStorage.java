@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.savegame.game;
 
 import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
 import com.crschnick.pdx_unlimiter.app.lang.GameLocalisation;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
@@ -23,7 +24,7 @@ public class Eu4SavegameStorage extends SavegameStorage<
 
     @Override
     protected String getDefaultEntryName(Eu4SavegameInfo info) {
-        return info.getDate().toDisplayString();
+        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
     }
 
     @Override

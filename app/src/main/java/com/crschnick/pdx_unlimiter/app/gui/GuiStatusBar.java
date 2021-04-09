@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
@@ -65,7 +66,7 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(SavegameManagerState.get().current().getFullName() + " (Running)",
+        Label text = new Label(SavegameManagerState.get().current().getFullName() + " (" + PdxuI18n.get("RUNNING") + ")",
                 GameGuiFactory.get(SavegameManagerState.get().current()).createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
@@ -76,7 +77,7 @@ public class GuiStatusBar {
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
         javafx.beans.value.ChangeListener<List<FileImportTarget.StandardImportTarget>> l = (c, o, n) -> {
-            Platform.runLater(() -> latest.setText("Latest: " + (n.size() > 0 ? n.get(0).getName() : "None")));
+            Platform.runLater(() -> latest.setText(PdxuI18n.get("LATEST") + ": " + (n.size() > 0 ? n.get(0).getName() : PdxuI18n.get("NONE"))));
         };
 
         var watcher = SavegameWatcher.ALL.get(SavegameManagerState.get().current());
@@ -84,7 +85,7 @@ public class GuiStatusBar {
         l.changed(null, null, watcher.savegamesProperty().get());
         barPane.setCenter(latest);
 
-        Button importLatest = new JFXButton("Import");
+        Button importLatest = new JFXButton(PdxuI18n.get("IMPORT"));
         importLatest.setGraphic(new FontIcon());
         importLatest.getStyleClass().add(CLASS_IMPORT);
         importLatest.setOnAction(event -> {
@@ -92,7 +93,7 @@ public class GuiStatusBar {
             event.consume();
         });
 
-        Button b = new JFXButton("Kill");
+        Button b = new JFXButton(PdxuI18n.get("KILL"));
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(CLASS_KILL);
         b.setOnAction(event -> {
@@ -132,7 +133,7 @@ public class GuiStatusBar {
         buttons.setAlignment(Pos.CENTER);
         barPane.setRight(buttons);
         {
-            Button export = new JFXButton("Export");
+            Button export = new JFXButton(PdxuI18n.get("EXPORT"));
             export.setGraphic(new FontIcon());
             export.getStyleClass().add(CLASS_EXPORT);
             export.setOnAction(event -> {
@@ -145,7 +146,7 @@ public class GuiStatusBar {
         }
 
         {
-            Button launch = new JFXButton("Continue Game");
+            Button launch = new JFXButton(PdxuI18n.get("CONTINUE_GAME"));
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add("continue-button");
             launch.setOnAction(event -> {
@@ -158,7 +159,7 @@ public class GuiStatusBar {
         }
 
         {
-            Button launch = new JFXButton("Start Launcher");
+            Button launch = new JFXButton(PdxuI18n.get("START_LAUNCHER"));
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add("launcher-button");
             launch.setOnAction(event -> {

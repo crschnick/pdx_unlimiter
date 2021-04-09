@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -49,7 +50,7 @@ public class GuiSavegameEntry {
         });
 
         {
-            Label l = new Label(e.getDate().toDisplayString());
+            Label l = new Label(e.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale()));
             l.getStyleClass().add(CLASS_DATE);
 
             var tagImage = SavegameContext.mapSavegame(e,

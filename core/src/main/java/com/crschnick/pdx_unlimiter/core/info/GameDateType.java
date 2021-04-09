@@ -40,8 +40,8 @@ public abstract class GameDateType {
         }
 
         @Override
-        public String toLongString(GameDate date) {
-            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + date.getYear();
+        public String toLongString(Locale l, GameDate date) {
+            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
         }
     };
     public static final GameDateType CK3 = EU4;
@@ -68,8 +68,8 @@ public abstract class GameDateType {
         }
 
         @Override
-        public String toLongString(GameDate date) {
-            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + date.getYear();
+        public String toLongString(Locale l, GameDate date) {
+            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
         }
     };
     public static final GameDateType HOI4 = new GameDateType() {
@@ -95,9 +95,9 @@ public abstract class GameDateType {
         }
 
         @Override
-        public String toLongString(GameDate date) {
+        public String toLongString(Locale l, GameDate date) {
             return date.getHour() + ":00, " + date.getDay() + " " +
-                    Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, Locale.ENGLISH) + ", " + date.getYear();
+                    Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
         }
     };
 
@@ -109,7 +109,7 @@ public abstract class GameDateType {
 
     public abstract String toShortString(GameDate date);
 
-    public abstract String toLongString(GameDate date);
+    public abstract String toLongString(Locale l, GameDate date);
 
     private int getDay(int m, long days) {
         int sum = 0;

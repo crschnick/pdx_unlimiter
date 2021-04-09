@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
@@ -31,17 +32,17 @@ public class GuiMenuBar {
 
     private static MenuBar createMenuBar() {
 
-        Menu settings = new Menu("Settings");
-        MenuItem c = new MenuItem("Change settings");
+        Menu settings = new Menu(PdxuI18n.get("SETTINGS"));
+        MenuItem c = new MenuItem(PdxuI18n.get("CHANGE_SETTINGS"));
         c.setOnAction((a) -> {
             GuiSettings.showSettings();
         });
         settings.getItems().add(c);
 
 
-        Menu savegames = new Menu("Storage");
+        Menu savegames = new Menu(PdxuI18n.get("STORAGE"));
 
-        MenuItem menuItem2 = new MenuItem("Export storage...");
+        MenuItem menuItem2 = new MenuItem(PdxuI18n.get("EXPORT_STORAGE"));
         menuItem2.setOnAction((a) -> {
             Optional<Path> path = GuiSavegameIO.showExportDialog();
             path.ifPresent(p -> {
@@ -55,54 +56,57 @@ public class GuiMenuBar {
         });
         savegames.getItems().add(menuItem2);
 
-        MenuItem sd = new MenuItem("Open storage directory");
+        MenuItem sd = new MenuItem(PdxuI18n.get("OPEN_STORAGE"));
         sd.setOnAction((a) -> {
             ThreadHelper.open(Settings.getInstance().storageDirectory.getValue());
         });
         savegames.getItems().add(sd);
 
 
-        Menu about = new Menu("About");
+        Menu about = new Menu(PdxuI18n.get("ABOUT"));
 
-        MenuItem src = new MenuItem("Contribute");
+        MenuItem src = new MenuItem(PdxuI18n.get("CONTRIBUTE"));
         src.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.MAIN_PAGE);
         });
 
-        MenuItem lc = new MenuItem("License");
+        MenuItem lc = new MenuItem(PdxuI18n.get("LICENSE"));
         lc.setOnAction((a) -> {
-            GuiDialogHelper.showText("License", "License", "license.txt");
+            GuiDialogHelper.showText(PdxuI18n.get("LICENSE"), PdxuI18n.get("LICENSE"), "license.txt");
         });
-        MenuItem tc = new MenuItem("Third party software");
+        MenuItem tc = new MenuItem(PdxuI18n.get("THIRD_PARTY"));
         tc.setOnAction((a) -> {
-            GuiDialogHelper.showText("Third party information", "A list of all software used to create the Pdx-Unlimiter", "third_party.txt");
+            GuiDialogHelper.showText(
+                    PdxuI18n.get("THIRD_PARTY_TITLE"),
+                    PdxuI18n.get("THIRD_PARTY_INFO"),
+                    "third_party.txt");
         });
         about.getItems().add(src);
         about.getItems().add(lc);
         about.getItems().add(tc);
 
 
-        Menu help = new Menu("Help");
+        Menu help = new Menu(PdxuI18n.get("HELP"));
 
-        MenuItem guide = new MenuItem("User Guide");
+        MenuItem guide = new MenuItem(PdxuI18n.get("USER_GUIDE"));
         guide.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.GUIDE);
         });
         help.getItems().add(guide);
 
-        MenuItem is = new MenuItem("Report an issue");
+        MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
         is.setOnAction((a) -> {
             ErrorHandler.reportIssue();
         });
         help.getItems().add(is);
 
-        MenuItem discord = new MenuItem("Discord server");
+        MenuItem discord = new MenuItem(PdxuI18n.get("DISCORD"));
         discord.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.DISCORD);
         });
         help.getItems().add(discord);
 
-        MenuItem log = new MenuItem("Show log");
+        MenuItem log = new MenuItem(PdxuI18n.get("SHOW_LOG"));
         log.setOnAction((a) -> {
             GuiLog.showLogDialog();
         });
@@ -137,7 +141,7 @@ public class GuiMenuBar {
     }
 
     private static Node createRightBar() {
-        JFXButton m = new JFXButton("Switch game");
+        JFXButton m = new JFXButton(PdxuI18n.get("SWITCH_GAME"));
         m.setGraphic(new FontIcon());
         m.getStyleClass().add(GuiStyle.CLASS_SWTICH_GAME);
         m.setOnAction(a -> GuiGameSwitcher.showGameSwitchDialog());
@@ -146,7 +150,7 @@ public class GuiMenuBar {
             Platform.runLater(() -> m.setDisable(n == null));
         });
 
-        JFXButton importB = new JFXButton("Import");
+        JFXButton importB = new JFXButton(PdxuI18n.get("IMPORT"));
         importB.setOnAction(e -> {
             GuiImporter.createImporterDialog();
             e.consume();
@@ -158,7 +162,7 @@ public class GuiMenuBar {
             Platform.runLater(() -> importB.setDisable(n == null));
         });
 
-        JFXButton launch = new JFXButton("Launch");
+        JFXButton launch = new JFXButton(PdxuI18n.get("LAUNCH"));
         launch.setOnAction(e -> {
             GameLauncher.startLauncher();
             e.consume();
@@ -181,7 +185,7 @@ public class GuiMenuBar {
         StackPane spacer = new StackPane();
         Label game = new Label();
         SavegameManagerState.get().onGameChange(n -> {
-            String name = n != null ? n.getFullName() : "None";
+            String name = n != null ? n.getFullName() : PdxuI18n.get("NO_GAME");
             Platform.runLater(() -> game.setText(name));
         });
         spacer.getChildren().add(game);

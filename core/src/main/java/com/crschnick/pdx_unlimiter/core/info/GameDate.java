@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info;
 
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 public final class GameDate implements Comparable<GameDate> {
@@ -48,8 +49,8 @@ public final class GameDate implements Comparable<GameDate> {
         return type.toShortString(this);
     }
 
-    public String toDisplayString() {
-        return type.toLongString(this);
+    public String toDisplayString(Locale l) {
+        return type.toLongString(l, this);
     }
 
     public long toLong() {

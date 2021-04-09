@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame.game;
 
 import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
@@ -20,7 +21,7 @@ public class Hoi4SavegameStorage extends SavegameStorage<Hoi4Tag, Hoi4SavegameIn
 
     @Override
     protected String getDefaultEntryName(Hoi4SavegameInfo info) {
-        return info.getDate().toDisplayString();
+        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
     }
 
     @Override

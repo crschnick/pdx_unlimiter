@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame.game;
 
 import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
@@ -16,7 +17,7 @@ public class Ck3SavegameStorage extends SavegameStorage<Ck3Tag, Ck3SavegameInfo>
 
     @Override
     protected String getDefaultEntryName(Ck3SavegameInfo info) {
-        return info.getDate().toDisplayString();
+        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
     }
 
     @Override

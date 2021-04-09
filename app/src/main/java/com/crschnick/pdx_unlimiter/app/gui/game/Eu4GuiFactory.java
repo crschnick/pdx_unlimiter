@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
+import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -113,28 +114,28 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         if (info.isIronman()) {
             var ironman = new StackPane(imageNode(EU4_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
             ironman.setAlignment(Pos.CENTER);
-            GuiTooltips.install(ironman, "Ironman savegame");
+            GuiTooltips.install(ironman, PdxuI18n.get("IRONMAN"));
             addNode(grid, ironman);
         }
 
         if (info.isRandomNewWorld()) {
             var rnw = new StackPane(imageNode(EU4_ICON_RANDOM_NEW_WORLD, CLASS_IMAGE_ICON, null));
             rnw.setAlignment(Pos.CENTER);
-            GuiTooltips.install(rnw, "Random new world enabled");
+            GuiTooltips.install(rnw, PdxuI18n.get("RNW"));
             addNode(grid, rnw);
         }
 
         if (info.isCustomNationInWorld()) {
             var cn = new StackPane(imageNode(EU4_ICON_CUSTOM_NATION, CLASS_IMAGE_ICON, null));
             cn.setAlignment(Pos.CENTER);
-            GuiTooltips.install(cn, "A custom nation exists in the world");
+            GuiTooltips.install(cn, PdxuI18n.get("CUSTOM_NATION"));
             addNode(grid, cn);
         }
 
         if (info.isReleasedVassal()) {
             var rv = new StackPane(imageNode(EU4_ICON_RELEASED_VASSAL, CLASS_IMAGE_ICON, null));
             rv.setAlignment(Pos.CENTER);
-            GuiTooltips.install(rv, "Is playing as a released vassal");
+            GuiTooltips.install(rv, PdxuI18n.get("RELEASED_VASSAL"));
             addNode(grid, rv);
         }
 
@@ -144,19 +145,19 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         }
 
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ALLIANCE, CLASS_IMAGE_ICON), info.getAllies(),
-                "Allies", CLASS_ALLIANCE);
+                PdxuI18n.get("ALLIES"), CLASS_ALLIANCE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ROYAL_MARRIAGE, CLASS_IMAGE_ICON), info.getMarriages(),
-                "Royal marriages", CLASS_MARRIAGE);
+                PdxuI18n.get("ROYAL_MARRIAGES"), CLASS_MARRIAGE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_GUARANTEE, CLASS_IMAGE_ICON), info.getGuarantees(),
-                "Guarantees", CLASS_GUARANTEE);
+                PdxuI18n.get("GUARANTEES"), CLASS_GUARANTEE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getVassals(),
-                "Vassals", CLASS_VASSAL);
+                PdxuI18n.get("VASSALS"), CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getJuniorPartners(),
-                "Personal union junior partners", CLASS_VASSAL);
+                PdxuI18n.get("PU_JUNIOR_PARTNERS"), CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRIBUTARY, CLASS_IMAGE_ICON), info.getTributaryJuniors(),
-                "Tributaries", CLASS_VASSAL);
+                PdxuI18n.get("TRIBUTARIES"), CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_MARCH, CLASS_IMAGE_ICON), info.getMarches(),
-                "Marches", CLASS_VASSAL);
+                PdxuI18n.get("MARCHES"), CLASS_VASSAL);
 
         super.fillNodeContainer(i, grid);
     }
