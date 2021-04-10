@@ -1,7 +1,7 @@
 ![Logo](misc/pdxu.png)
 
 The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a
-powerful savegame manager to quickly organize and play all of your savegames with ease.
+powerful and smart savegame manager to quickly organize and play all of your savegames with ease.
 Furthermore, it also comes with an Ironman converter,
 a powerful savegame editor and navigator,
 some savescumming tools, integrations for various other
@@ -158,8 +158,7 @@ The supported tools are:
 # Community and Support
 
 If you have suggestions, need help, run into any issues or just want to talk to other friendly people,
-you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU) or visit the
-[Discussions on GitHub](https://github.com/crschnick/pdx_unlimiter/discussions).
+you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 [![Banner](https://discordapp.com/api/guilds/786465137191682088/widget.png?style=banner3)](https://discord.gg/BVE4vxqFpU)
 
