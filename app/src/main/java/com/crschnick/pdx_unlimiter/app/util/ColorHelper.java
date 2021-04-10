@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.util;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
@@ -89,35 +88,15 @@ public class ColorHelper {
         };
     }
 
-    private static Map<String, Color> loadPredefinedColors(Node node) {
+    private static Map<String, Color> loadPredefinedStellarisColors(Node node) {
         Map<String, Color> map = new HashMap<>();
-        node.getNodeForKey("colors").forEach((k, v) -> {
-            ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
-            map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
+        node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
+            n.forEach((k, v) -> {
+                ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
+                map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
+            });
         });
         return map;
-    }
-
-    private static Map<String, Color> loadPredefinedCk3Colors(Node node) {
-        Map<String, Color> map = new HashMap<>();
-        node.getNodeForKey("colors").forEach((k, v) -> {
-            ColorNode colorData = (ColorNode) v;
-            map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
-        });
-        return map;
-    }
-
-    public static Map<String, Color> loadCk3(SavegameInfo<Ck3Tag> info) {
-        var file = CascadeDirectoryHelper.openFile(
-                Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
-                info).get();
-        try {
-            Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedCk3Colors(node);
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
-            return Map.of();
-        }
     }
 
     public static Map<String, Color> loadStellarisColors(SavegameInfo<StellarisTag> info) {
@@ -126,7 +105,7 @@ public class ColorHelper {
 
         try {
             Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedColors(node);
+            return loadPredefinedStellarisColors(node);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return Map.of();

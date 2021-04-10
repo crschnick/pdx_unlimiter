@@ -1,13 +1,18 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
+import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3House;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
+import com.crschnick.pdx_unlimiter.core.node.ColorNode;
+import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -15,6 +20,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +51,33 @@ public class Ck3TagRenderer {
         public CoatOfArmsCache() {
             super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
         }
+    }
+
+    private static Map<String, javafx.scene.paint.Color> loadPredefinedColors(Node node) {
+        Map<String, javafx.scene.paint.Color> map = new HashMap<>();
+        node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
+            n.forEach((k, v) -> {
+                ColorNode colorData = (ColorNode) v;
+                map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
+            });
+        });
+        return map;
+    }
+
+    private static Map<String, javafx.scene.paint.Color> loadPredefinedColorsForSavegame(SavegameInfo<Ck3Tag> info) {
+        var file = CascadeDirectoryHelper.openFile(
+                Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
+                info);
+        if (file.isPresent()) {
+            try {
+                Node node = TextFormatParser.textFileParser().parse(file.get());
+                return loadPredefinedColors(node);
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+        }
+
+        return Map.of();
     }
 
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
@@ -248,7 +281,7 @@ public class Ck3TagRenderer {
     private static BufferedImage pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
-            cache.colors.putAll(ColorHelper.loadCk3(info));
+            cache.colors.putAll(loadPredefinedColorsForSavegame(info));
         }
 
         if (coa.getPatternFile() != null) {
@@ -282,7 +315,7 @@ public class Ck3TagRenderer {
                                Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
-            cache.colors.putAll(ColorHelper.loadCk3(info));
+            cache.colors.putAll(loadPredefinedColorsForSavegame(info));
         }
 
         int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(cache.colors
