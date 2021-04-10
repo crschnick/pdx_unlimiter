@@ -29,7 +29,7 @@ public class GuiPlatformHelper {
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(latch::countDown);
         try {
-            if (!latch.await(7, TimeUnit.SECONDS)) {
+            if (!latch.await(10, TimeUnit.SECONDS)) {
                 ErrorHandler.handleException(
                         new TimeoutException("Wait for platform thread timed out. Possible deadlock"));
             }
