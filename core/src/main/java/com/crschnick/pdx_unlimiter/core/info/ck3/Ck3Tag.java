@@ -103,6 +103,10 @@ public class Ck3Tag {
                 return;
             }
 
+            if (!v.getNodeForKey("landed_data").hasKey("domain")) {
+                return;
+            }
+
             long id = Long.parseLong(k);
             var domain = v.getNodeForKey("landed_data").getNodeForKey("domain");
             var primary = domain.getNodeArray().get(0).getLong();
