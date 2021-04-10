@@ -46,6 +46,8 @@ the Pdx-Unlimiter provides you with an easy-to-use interface for choosing the ri
 This is done by collecting all savegames and creating a browsable and editable
 savegame history so you can load any prior saved version of a campaign.
 All types of savegames are supported, including Ironman and modded savegames.
+The smart launcher also allows you instantly continue a savegame
+without having to visit the Paradox Launcher or main menu.
 
 ![Example](misc/screenshot.png)
 
@@ -56,7 +58,8 @@ All types of savegames are supported, including Ironman and modded savegames.
 
 ## Smart launcher
 
-The problem of playing modded savegames it that you need to enable the right mods in the Paradox Launcher.
+The problem of playing modded savegames it that you always need to enable the right mods in the Paradox Launcher.
+It can become tedious to always keep track of which mods are required by which savegame.
 The solution to this problem is that the Pdx-Unlimiter is a *smart* launcher
 that is fully aware of which mods and DLCs are needed for a certain savegame,
 *before* you start the game.
