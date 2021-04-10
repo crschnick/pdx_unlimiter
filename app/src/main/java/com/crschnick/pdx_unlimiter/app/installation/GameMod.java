@@ -34,13 +34,13 @@ public class GameMod {
             if (ar.isPresent()) {
                 mod.legacyArchive = true;
                 // Sometimes, mod paths are messed up with a missing end quote
-                mod.path = Path.of(ar.get().getString().replace("\"", ""));
+                mod.path = Path.of(ar.get().getString().trim().replace("\"", ""));
             } else {
                 return Optional.empty();
             }
         } else {
             // Sometimes, mod paths are messed up with a missing end quote
-            mod.path = Path.of(path.get().getString().replace("\"", ""));
+            mod.path = Path.of(path.get().getString().trim().replace("\"", ""));
         }
 
         mod.supportedVersion = node.getNodeForKeyIfExistent("supported_version").map(Node::getString).orElse("*");
