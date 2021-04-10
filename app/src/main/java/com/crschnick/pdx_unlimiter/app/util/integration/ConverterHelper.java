@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,12 +122,22 @@ public class ConverterHelper {
                 try {
                     int returnCode = handle.waitFor();
 
-                    FileUtils.copyDirectory(
-                            Path.of(getModOutputPath(entry)).toFile(),
-                            Path.of(getEu4ModDir()).resolve(getOutputName(entry)).toFile());
-                    FileUtils.copyFile(
-                            Path.of(getModOutputPath(entry) + ".mod").toFile(),
-                            Path.of(getEu4ModDir()).resolve(getOutputName(entry) + ".mod").toFile());
+                    var latestDir = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
+                            .resolve("CK3toEU4").resolve("output"))
+                            .filter(Files::isDirectory)
+                            .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                    var latestFile = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
+                            .resolve("CK3toEU4").resolve("output"))
+                            .filter(Files::isRegularFile)
+                            .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                    if (latestDir.isPresent() && latestFile.isPresent()) {
+                        FileUtils.moveDirectory(
+                                latestDir.get().toFile(),
+                                Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName()).toFile());
+                        FileUtils.moveFile(
+                                latestFile.get().toFile(),
+                                Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName()).toFile());
+                    }
 
                     Platform.runLater(() -> {
                         if (returnCode == 0) {
