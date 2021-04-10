@@ -66,16 +66,19 @@ public class Ck3Tag {
                 .getNodeForKey("coat_of_arms_manager_database"));
         var titles = Ck3Title.createTitleMap(n, coaMap);
 
-        var domain = personNode.getNodeForKey("landed_data").getNodeForKey("domain");
-        var tagTitles = domain.getNodeArray().stream()
-                .map(idNode -> titles.get(idNode.getLong()))
-                .collect(Collectors.toList());
+        var tagTitles = new ArrayList<Ck3Title>();
         var tagClaims = new ArrayList<Ck3Title>();
-        personNode.getNodeForKey("alive_data")
-                .getNodeForKeyIfExistent("claim").ifPresent(claims -> {
-            tagClaims.addAll(claims.getNodeArray().stream().map(c ->
-                    titles.get(c.getNodeForKey("title").getLong())).collect(Collectors.toList()));
+        personNode.getNodeForKey("landed_data").getNodeForKeyIfExistent("domain").ifPresent(domain -> {
+            tagTitles.addAll(domain.getNodeArray().stream()
+                    .map(idNode -> titles.get(idNode.getLong()))
+                    .collect(Collectors.toList()));
+            personNode.getNodeForKey("alive_data").getNodeForKeyIfExistent("claim").ifPresent(claims -> {
+                tagClaims.addAll(claims.getNodeArray().stream()
+                        .map(c -> titles.get(c.getNodeForKey("title").getLong()))
+                        .collect(Collectors.toList()));
+            });
         });
+
 
         var coa = Ck3CoatOfArms.fromNode(
                 n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"));
