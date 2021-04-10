@@ -4,13 +4,11 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
-import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -42,8 +40,8 @@ public class GuiMenuBar {
 
         Menu savegames = new Menu(PdxuI18n.get("STORAGE"));
 
-        MenuItem menuItem2 = new MenuItem(PdxuI18n.get("EXPORT_STORAGE"));
-        menuItem2.setOnAction((a) -> {
+        MenuItem export = new MenuItem(PdxuI18n.get("EXPORT_STORAGE"));
+        export.setOnAction((a) -> {
             Optional<Path> path = GuiSavegameIO.showExportDialog();
             path.ifPresent(p -> {
                 if (FileUtils.listFiles(p.toFile(), null, false).size() > 0) {
@@ -54,13 +52,7 @@ public class GuiMenuBar {
                 SavegameStorageIO.exportSavegameStorage(p);
             });
         });
-        savegames.getItems().add(menuItem2);
-
-        MenuItem sd = new MenuItem(PdxuI18n.get("OPEN_STORAGE"));
-        sd.setOnAction((a) -> {
-            ThreadHelper.open(Settings.getInstance().storageDirectory.getValue());
-        });
-        savegames.getItems().add(sd);
+        savegames.getItems().add(export);
 
 
         Menu about = new Menu(PdxuI18n.get("ABOUT"));
@@ -127,6 +119,14 @@ public class GuiMenuBar {
         });
         dev.getItems().add(gc);
 
+        Menu tr = new Menu("Translate");
+
+        MenuItem tri = new MenuItem("Translate");
+        tri.setOnAction((a) -> {
+            GuiTranslate.showTranslatationAlert();
+        });
+        tr.getItems().add(tri);
+
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
@@ -137,6 +137,7 @@ public class GuiMenuBar {
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
             menuBar.getMenus().add(dev);
         }
+        menuBar.getMenus().add(tr);
         return menuBar;
     }
 
