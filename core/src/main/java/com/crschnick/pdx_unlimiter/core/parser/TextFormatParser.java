@@ -67,12 +67,13 @@ public final class TextFormatParser extends FormatParser {
             ArrayNode r = parseArray();
             // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
-            reset();
-
             return r;
         } catch (Throwable t) {
             // Catch also errors!
             throw new ParseException(t);
+        } finally {
+            // Always reset!
+            reset();
         }
     }
 
