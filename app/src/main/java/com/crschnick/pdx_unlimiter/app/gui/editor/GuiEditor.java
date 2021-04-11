@@ -1,9 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.editor;
 
 import com.crschnick.pdx_unlimiter.app.PdxuApp;
-import com.crschnick.pdx_unlimiter.app.editor.EditorFilter;
-import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorState;
+import com.crschnick.pdx_unlimiter.app.editor.*;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -171,6 +169,18 @@ public class GuiEditor {
             if (n.getDirectParent() != null) {
                 HBox actions = new HBox();
                 actions.setFillHeight(true);
+
+                if (n.isReal()) {
+                    EditorNodePointers.create(state, (EditorSimpleNode) n).ifPresent(np -> {
+                        var b = new JFXButton();
+                        b.setGraphic(new FontIcon());
+                        b.getStyleClass().add("jump-to-def-button");
+                        GuiTooltips.install(b, "Jump to definition");
+                        b.setOnAction(e -> state.navigateTo(np));
+                        actions.getChildren().add(b);
+                        b.prefHeightProperty().bind(actions.heightProperty());
+                    });
+                }
 
                 Button edit = new JFXButton();
                 edit.setGraphic(new FontIcon());
