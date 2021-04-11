@@ -401,11 +401,10 @@ public abstract class SavegameStorage<
 
 
         var file = getSavegameFile(e);
-        // Remove savegame from collection if it somehow does not exist anymore
-//        if (!Files.exists(file)) {
-//            delete(e);
-//            return;
-//        }
+        if (!Files.exists(file)) {
+            e.fail();
+            return true;
+        }
 
         if (Files.exists(getSavegameInfoFile(e))) {
             logger.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
