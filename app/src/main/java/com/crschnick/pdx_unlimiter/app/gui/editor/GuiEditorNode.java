@@ -20,9 +20,15 @@ import org.kordamp.ikonli.javafx.FontIcon;
 public class GuiEditorNode {
 
     static Region createValueDisplay(EditorNode n, EditorState state) {
+        HBox box = new HBox();
+        box.setFillHeight(true);
+        if (n.isReal()) {
+            GuiEditorNodeTagFactory.createTag(state, (EditorSimpleNode) n).ifPresent(node -> {
+                box.getChildren().add(node);
+            });
+        }
+
         if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isValue()) {
-            HBox box = new HBox();
-            box.setFillHeight(true);
             var tf = new JFXTextField(((EditorSimpleNode) n).getBackingNode().getString());
             tf.setAlignment(Pos.CENTER);
             tf.textProperty().addListener((c, o, ne) -> {
@@ -31,18 +37,6 @@ public class GuiEditorNode {
             });
             box.getChildren().add(tf);
             HBox.setHgrow(tf, Priority.ALWAYS);
-
-            EditorNodePointers.create(state, (EditorSimpleNode) n).ifPresent(np -> {
-                var b = new JFXButton();
-                b.setGraphic(new FontIcon());
-                b.getStyleClass().add("jump-to-def-button");
-                GuiTooltips.install(b, "Jump to definition");
-                b.setOnAction(e -> state.navigateTo(np));
-                box.getChildren().add(b);
-                b.prefHeightProperty().bind(box.heightProperty());
-            });
-
-            return box;
         } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isColor()) {
             var picker = new JFXColorPicker(ColorHelper.fromGameColor(GameColor.fromColorNode(
                     ((EditorSimpleNode) n).getBackingNode())));
@@ -50,10 +44,11 @@ public class GuiEditorNode {
                 ((EditorSimpleNode) n).updateColor(ne);
                 state.onColorChanged();
             });
-            return picker;
+            box.getChildren().add(picker);
         } else {
-            return createArrayDisplay(n, state);
+            box.getChildren().add(createArrayDisplay(n, state));
         }
+        return box;
     }
 
     private static Region createArrayDisplay(EditorNode n, EditorState state) {

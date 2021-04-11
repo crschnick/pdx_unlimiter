@@ -144,6 +144,8 @@ public class FileWatchManager {
             WatchEvent<Path> ev = (WatchEvent<Path>) event;
             Path file = path.resolve(ev.context());
 
+            // Check for duplicate modifications
+            // See https://stackoverflow.com/questions/16777869/java-7-watchservice-ignoring-multiple-occurrences-of-the-same-event
             if (ev.kind().equals(ENTRY_MODIFY) && lastModified.containsKey(file)) {
                 logger.trace("Discarding double modify event of file " +
                         baseDir.relativize(file) + " in dir " + baseDir);
