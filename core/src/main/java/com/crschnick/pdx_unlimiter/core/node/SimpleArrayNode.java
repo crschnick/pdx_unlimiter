@@ -61,8 +61,10 @@ public final class SimpleArrayNode extends ArrayNode {
             System.arraycopy(keyScalars, begin, ks, 0, length);
         }
 
-        int[] vs = new int[length];
-        System.arraycopy(valueScalars, begin, vs, 0, length);
+        int[] vs = valueScalars != null ? new int[length] : null;
+        if (valueScalars != null) {
+            System.arraycopy(valueScalars, begin, vs, 0, length);
+        }
 
         return new SimpleArrayNode(context, ks, vs, values.subList(begin, begin + length));
     }

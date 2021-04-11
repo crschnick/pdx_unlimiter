@@ -22,8 +22,11 @@ public class EditorExternalState {
     public static void init() {
         try {
             FileUtils.forceMkdir(TEMP.toFile());
-            // Remove old editor files in dir
-            FileUtils.cleanDirectory(TEMP.toFile());
+
+            try {
+                // Remove old editor files in dir
+                FileUtils.cleanDirectory(TEMP.toFile());
+            } catch (IOException ignored) {}
 
             FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
                 if (!Files.exists(changed)) {

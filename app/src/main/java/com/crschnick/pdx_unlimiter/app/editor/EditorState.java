@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class EditorState {
 
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
-        navPath = new SimpleListProperty<>(FXCollections.observableArrayList());
+        navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<NavEntry>()));
         filter = new EditorFilter(this);
         content = new SimpleListProperty<>(FXCollections.observableArrayList());
 
