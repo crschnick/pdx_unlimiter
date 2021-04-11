@@ -1,20 +1,18 @@
 package com.crschnick.pdx_unlimiter.app.gui.editor;
 
-import com.crschnick.pdx_unlimiter.app.editor.EditorCollectorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
-import com.crschnick.pdx_unlimiter.app.editor.EditorState;
+import com.crschnick.pdx_unlimiter.app.editor.*;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
+import com.jfoenix.controls.JFXTextField;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -23,13 +21,28 @@ public class GuiEditorNode {
 
     static Region createValueDisplay(EditorNode n, EditorState state) {
         if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isValue()) {
-            var tf = new TextField(((EditorSimpleNode) n).getBackingNode().getString());
+            HBox box = new HBox();
+            box.setFillHeight(true);
+            var tf = new JFXTextField(((EditorSimpleNode) n).getBackingNode().getString());
             tf.setAlignment(Pos.CENTER);
             tf.textProperty().addListener((c, o, ne) -> {
                 ((EditorSimpleNode) n).updateText(ne);
                 state.onTextChanged();
             });
-            return tf;
+            box.getChildren().add(tf);
+            HBox.setHgrow(tf, Priority.ALWAYS);
+
+            EditorNodePointers.create(state, (EditorSimpleNode) n).ifPresent(np -> {
+                var b = new JFXButton();
+                b.setGraphic(new FontIcon());
+                b.getStyleClass().add("jump-to-def-button");
+                GuiTooltips.install(b, "Jump to definition");
+                b.setOnAction(e -> state.navigateTo(np));
+                box.getChildren().add(b);
+                b.prefHeightProperty().bind(box.heightProperty());
+            });
+
+            return box;
         } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isColor()) {
             var picker = new JFXColorPicker(ColorHelper.fromGameColor(GameColor.fromColorNode(
                     ((EditorSimpleNode) n).getBackingNode())));

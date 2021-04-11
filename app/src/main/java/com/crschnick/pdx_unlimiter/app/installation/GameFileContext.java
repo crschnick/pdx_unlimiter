@@ -19,26 +19,36 @@ public class GameFileContext {
             Hoi4SavegameInfo.class, Game.HOI4,
             StellarisSavegameInfo.class, Game.STELLARIS);
 
+    public static GameFileContext empty() {
+        return new GameFileContext(null, List.of());
+    }
+
+    public static GameFileContext forGame(Game g) {
+        return new GameFileContext(g, List.of());
+    }
+
     public static GameFileContext fromInfo(SavegameInfo<?> info) {
-        var install = GameInstallation.ALL.get(INFO_MAP.get(info.getClass()));
-        return new GameFileContext(
-                install,
-                info.getMods().stream()
-                .map(install::getModForName)
+        var g = INFO_MAP.get(info.getClass());
+        return new GameFileContext(g, info.getMods().stream()
+                .map(GameInstallation.ALL.get(g)::getModForName)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList()));
     }
 
-    private final GameInstallation install;
+    private final Game game;
     private final List<GameMod> mods;
 
-    public GameFileContext(GameInstallation install, List<GameMod> mods) {
-        this.install = install;
+    public GameFileContext(Game game, List<GameMod> mods) {
+        this.game = game;
         this.mods = mods;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public GameInstallation getInstall() {
-        return install;
+        return game != null ? GameInstallation.ALL.get(game) : null;
     }
 
     public List<GameMod> getMods() {

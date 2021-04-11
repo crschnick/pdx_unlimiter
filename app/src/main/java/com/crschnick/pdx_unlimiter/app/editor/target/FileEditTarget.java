@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor.target;
 
+import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
@@ -11,12 +12,12 @@ import java.util.Map;
 
 public class FileEditTarget extends EditTarget {
 
-    public FileEditTarget(Path file) {
-        super(file, TextFormatParser.textFileParser());
+    public FileEditTarget(GameFileContext context, Path file) {
+        super(context, file, TextFormatParser.textFileParser());
     }
 
-    public FileEditTarget(Path file, TextFormatParser parser) {
-        super(file, parser);
+    public FileEditTarget(GameFileContext context, Path file, TextFormatParser parser) {
+        super(context, file, parser);
     }
 
     @Override
@@ -29,5 +30,10 @@ public class FileEditTarget extends EditTarget {
         try (var out = Files.newOutputStream(file)) {
             NodeWriter.write(out, getParser().getCharset(), (ArrayNode) nodeMap.get("root"), "\t");
         }
+    }
+
+    @Override
+    public String getName() {
+        return file.getFileName().toString();
     }
 }

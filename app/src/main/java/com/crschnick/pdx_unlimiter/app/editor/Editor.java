@@ -22,7 +22,7 @@ public class Editor {
             ErrorHandler.handleException(e, null, target.getFile());
             return;
         }
-        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {
+        EditorState state = new EditorState(target.getName(), target.getFileContext(), nodes, target.getParser(), n -> {
             try {
                 target.write(n);
             } catch (Exception e) {

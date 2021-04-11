@@ -52,7 +52,9 @@ public class CascadeDirectoryHelper {
 //                .map(GameDlc::getDataPath)
 //                .collect(Collectors.toList()));
 
-        dirs.add(ctx.getInstall().getModBasePath());
+        if (ctx.getInstall() != null) {
+            dirs.add(ctx.getInstall().getModBasePath());
+        }
         return dirs;
     }
 

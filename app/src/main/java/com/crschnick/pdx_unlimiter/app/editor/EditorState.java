@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
+import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import javafx.beans.property.*;
@@ -25,12 +26,14 @@ public class EditorState {
     private final EditorFilter filter;
     private final ListProperty<EditorNode> content;
     private final Consumer<Map<String, Node>> saveFunc;
+    private final ObjectProperty<GameFileContext> fileContext;
 
-    public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
+    public EditorState(String fileName, GameFileContext fileContext, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
 
+        this.fileContext = new SimpleObjectProperty<>(fileContext);
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
         navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<NavEntry>()));
@@ -111,6 +114,13 @@ public class EditorState {
                 selected != null ? createEditorNodes(selected.editorNode) : rootNodes.values()));
     }
 
+    public void navigateTo(EditorNodePointer pointer) {
+        pointer.createNavPath(this).ifPresent(n -> {
+            this.navPath.set(FXCollections.observableArrayList(n));
+        });
+        update(false);
+    }
+
     public void navigateTo(EditorNode newNode) {
         if (newNode == null) {
             navPath.clear();
@@ -165,11 +175,19 @@ public class EditorState {
         return parser;
     }
 
+    public GameFileContext getFileContext() {
+        return fileContext.get();
+    }
+
+    public ObjectProperty<GameFileContext> fileContextProperty() {
+        return fileContext;
+    }
+
     public static class NavEntry {
         private final EditorNode editorNode;
         private final DoubleProperty scroll;
 
-        private NavEntry(EditorNode editorNode, double scroll) {
+        NavEntry(EditorNode editorNode, double scroll) {
             this.editorNode = editorNode;
             this.scroll = new SimpleDoubleProperty(scroll);
         }
@@ -185,5 +203,9 @@ public class EditorState {
         public DoubleProperty scrollProperty() {
             return scroll;
         }
+    }
+
+    public Map<String, EditorNode> getRootNodes() {
+        return rootNodes;
     }
 }
