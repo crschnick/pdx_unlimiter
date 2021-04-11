@@ -78,7 +78,7 @@ public final class EditorSimpleNode extends EditorNode {
 
     @Override
     public String getNavigationName() {
-        return getKeyName().orElseGet(() -> getDirectParent().getNavigationName() + "[" + keyIndex + "]");
+        return getKeyName().orElseGet(() -> "[" + keyIndex + "]");
     }
 
     @Override

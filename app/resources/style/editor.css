@@ -48,7 +48,7 @@
 .editor-grid .text-field {
 -fx-padding: 0.25em 0.2em 0.25em 0.2em;
 -fx-border-width: 0 1em 0 1em;
-  -fx-font-family: "monospaced";
+-jfx-unfocus-color: transparent;
 }
 
 .jfx-color-picker .color-label {

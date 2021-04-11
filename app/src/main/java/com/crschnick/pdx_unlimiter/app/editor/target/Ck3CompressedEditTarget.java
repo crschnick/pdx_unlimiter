@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor.target;
 
+import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
@@ -24,8 +25,8 @@ public class Ck3CompressedEditTarget extends EditTarget {
 
     private String header;
 
-    public Ck3CompressedEditTarget(Path file) {
-        super(file, TextFormatParser.ck3SavegameParser());
+    public Ck3CompressedEditTarget(GameFileContext context, Path file) {
+        super(context, file, TextFormatParser.ck3SavegameParser());
     }
 
     @Override
@@ -56,6 +57,11 @@ public class Ck3CompressedEditTarget extends EditTarget {
     @Override
     public void write(Map<String, Node> nodeMap) throws Exception {
         write(file, (ArrayNode) nodeMap.get("gamestate"));
+    }
+
+    @Override
+    public String getName() {
+        return file.getFileName().toString();
     }
 
     private void write(Path file, ArrayNode gamestate) throws IOException {

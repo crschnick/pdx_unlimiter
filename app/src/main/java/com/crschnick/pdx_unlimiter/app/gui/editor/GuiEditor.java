@@ -71,9 +71,9 @@ public class GuiEditor {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
                 {
-                    var initBtn = new JFXButton(edState.getFileName());
+                    var initBtn = new JFXButton("(root)");
                     initBtn.setOnAction(e -> {
-                        edState.navigateTo(null);
+                        edState.navigateTo((EditorNode) null);
                     });
                     bar.getChildren().add(initBtn);
                 }

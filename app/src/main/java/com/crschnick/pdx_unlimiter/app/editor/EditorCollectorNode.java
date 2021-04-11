@@ -56,7 +56,7 @@ public final class EditorCollectorNode extends EditorNode {
 
     @Override
     public String getNavigationName() {
-        return keyName;
+        return keyName + "(s)";
     }
 
     @Override

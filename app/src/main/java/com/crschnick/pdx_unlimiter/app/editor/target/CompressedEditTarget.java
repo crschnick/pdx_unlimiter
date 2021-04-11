@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor.target;
 
+import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
@@ -16,8 +17,8 @@ public class CompressedEditTarget extends EditTarget {
 
     private final Set<String> entries;
 
-    public CompressedEditTarget(Path file, TextFormatParser parser, Set<String> entries) {
-        super(file, parser);
+    public CompressedEditTarget(GameFileContext context, Path file, TextFormatParser parser, Set<String> entries) {
+        super(context, file, parser);
         this.entries = entries;
     }
 
@@ -43,5 +44,10 @@ public class CompressedEditTarget extends EditTarget {
                 }
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return file.getFileName().toString();
     }
 }

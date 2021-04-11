@@ -6,6 +6,10 @@
  -fx-icon-code: "mdi-content-save";
 }
 
+.jump-to-def-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-export";
+}
+
 .clear-button .ikonli-font-icon {
  -fx-icon-code: "mdi-filter-remove";
 }
