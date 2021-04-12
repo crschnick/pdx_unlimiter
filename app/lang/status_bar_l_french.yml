@@ -1,0 +1,9 @@
+l_french:
+  EXPORT: "Exporter"
+  CONTINUE_GAME: "Reprendre"
+  START_LAUNCHER: "Démarrer le lanceur"
+  RUNNING: "En cours"
+  LATEST: "Dernière"
+  NONE: "Aucun"
+  IMPORT: "Importer"
+  KILL: "Terminer"
