@@ -49,7 +49,7 @@ public class GuiSavegameEntryList {
             if (n != null) {
                 Platform.runLater(() -> {
                     text.setText("It seems like there are no imported savegames for " +
-                            SavegameManagerState.get().current().getFullName() + " yet.\n");
+                            n.getFullName() + " yet.\n");
                 });
             }
         });

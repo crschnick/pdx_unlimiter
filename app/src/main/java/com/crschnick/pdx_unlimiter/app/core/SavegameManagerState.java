@@ -152,7 +152,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         // No integration or campaign selected means no entries are shown
         if (current() == null || globalSelectedCollection.get() == null) {
             shownEntries.clear();
-            GuiPlatformHelper.waitForPlatform();
 
             return;
         }
@@ -183,13 +182,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 globalSelectedEntryPropertyInternal().set(null);
             }
         }
-        GuiPlatformHelper.waitForPlatform();
     }
 
     private void updateShownCollections() {
         if (current() == null) {
             shownCollections.clear();
-            GuiPlatformHelper.waitForPlatform();
             return;
         }
 
@@ -218,7 +215,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         updateStorageEmptyProperty();
-        GuiPlatformHelper.waitForPlatform();
     }
 
     private void updateStorageEmptyProperty() {
