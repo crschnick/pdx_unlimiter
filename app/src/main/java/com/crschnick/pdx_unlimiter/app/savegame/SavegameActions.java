@@ -208,6 +208,6 @@ public class SavegameActions {
                 sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
                         sgs.getSavegameCollection(e));
             });
-        }, false);
+        }, true);
     }
 }

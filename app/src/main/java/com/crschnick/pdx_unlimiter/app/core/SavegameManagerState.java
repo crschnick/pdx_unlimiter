@@ -269,7 +269,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
         TaskExecutor.getInstance().submitTask(() -> {
             GuiPlatformHelper.waitForPlatform();
-            CacheManager.getInstance().onSelectedSavegameCollectionChange();
+            CacheManager.getInstance().onSelectedGameChange();
             selectGame(newGame);
         }, false);
     }

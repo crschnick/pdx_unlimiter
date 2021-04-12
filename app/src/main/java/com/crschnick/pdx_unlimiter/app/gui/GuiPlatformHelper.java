@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class GuiPlatformHelper {
 
@@ -19,9 +18,9 @@ public class GuiPlatformHelper {
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(latch::countDown);
         try {
-            if (!latch.await(7, TimeUnit.SECONDS)) {
-                ErrorHandler.handleException(
-                        new TimeoutException("Wait for platform thread timed out. Possible deadlock"));
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                LoggerFactory.getLogger(GuiPlatformHelper.class).warn(
+                        "Wait for platform thread timed out. Possible deadlock");
             }
         } catch (InterruptedException e) {
             ErrorHandler.handleException(e);

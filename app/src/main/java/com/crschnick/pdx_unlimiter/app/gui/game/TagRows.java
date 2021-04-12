@@ -1,28 +1,16 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
-import com.jfoenix.controls.JFXMasonryPane;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import org.slf4j.helpers.LegacyAbstractLogger;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_DIPLOMACY_ROW;
-import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public class TagRows {
 
@@ -37,14 +25,14 @@ public class TagRows {
             Function<T, Region> gen) {
         GuiTooltips.install(img, tooltip);
 
-        var list = tags.stream()
+        var list = tags.subList(0, Math.min(tags.size(), MAX_DISPLAY_COUNT)).stream()
                 .map(t -> {
                     var node = gen.apply(t);
                     GuiTooltips.install(node, tooltipGen.apply(t));
                     return node;
                 })
                 .collect(Collectors.toList());
-        if (list.size() <= WRAP_COUNT) {
+        if (tags.size() <= WRAP_COUNT) {
             var box = new HBox();
             box.getChildren().add(img);
             box.getChildren().addAll(list);
@@ -55,8 +43,7 @@ public class TagRows {
 
         boolean exceeded = false;
         int displayedSize = list.size();
-        if (list.size() > MAX_DISPLAY_COUNT) {
-            displayedSize = MAX_DISPLAY_COUNT;
+        if (tags.size() > MAX_DISPLAY_COUNT) {
             exceeded = true;
         }
 
