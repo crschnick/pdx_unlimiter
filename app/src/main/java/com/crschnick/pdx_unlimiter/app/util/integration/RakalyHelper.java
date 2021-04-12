@@ -23,7 +23,7 @@ public class RakalyHelper {
         proc.waitFor();
         int returnCode = proc.exitValue();
 
-        if (returnCode != 0) {
+        if (returnCode != 0 && returnCode != 1) {
             throw new IOException("Rakaly melter failed with exit code " + returnCode);
         }
 
