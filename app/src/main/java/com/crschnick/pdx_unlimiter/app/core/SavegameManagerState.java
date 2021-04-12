@@ -37,8 +37,24 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private final BooleanProperty storageEmpty = new SimpleBooleanProperty();
 
     private SavegameManagerState() {
-        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
+        addShownContentChangeListeners();
+    }
 
+    private void addShownContentChangeListeners() {
+        var colListener = (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
+            updateShownCollections();
+        };
+        current.addListener((c,o,n) -> {
+            if (o != null) {
+                SavegameStorage.get(o).getCollections().removeListener(colListener);
+            }
+            if (n != null) {
+                SavegameStorage.get(n).getCollections().addListener(colListener);
+            }
+        });
+
+
+        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
         globalSelectedCollection.addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegames().removeListener(cl);
@@ -88,16 +104,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         change.accept(current());
     }
 
-    private void updateStorageEmptyProperty() {
-        if (current() == null) {
-            storageEmpty.set(false);
-            return;
-        }
-
-        int newSize = SavegameStorage.get(current()).getCollections().size();
-        storageEmpty.set(newSize == 0);
-    }
-
     public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCollectionProperty() {
         return globalSelectedCollection;
     }
@@ -143,75 +149,86 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     private void updateShownEntries() {
-        GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            // No integration or campaign selected means no entries are shown
-            if (current() == null || globalSelectedCollection.get() == null) {
-                shownEntries.clear();
+        // No integration or campaign selected means no entries are shown
+        if (current() == null || globalSelectedCollection.get() == null) {
+            shownEntries.clear();
+            GuiPlatformHelper.waitForPlatform();
+
+            return;
+        }
+
+        // Work on copy to reduce list updates
+        var newEntries = FXCollections.observableArrayList(shownEntries.get());
+
+        // Remove not contained entries
+        newEntries.removeIf(entry -> !globalSelectedCollection.get().getSavegames().contains(entry));
+
+        var col = globalSelectedCollection.get();
+        col.getSavegames().forEach(entry -> {
+            if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
+                newEntries.add(entry);
                 return;
             }
 
-            // Work on copy to reduce list updates
-            var newEntries = FXCollections.observableArrayList(shownEntries.get());
-
-            // Remove not contained entries
-            newEntries.removeIf(entry -> !globalSelectedCollection.get().getSavegames().contains(entry));
-
-            var col = globalSelectedCollection.get();
-            col.getSavegames().forEach(entry -> {
-                if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
-                    newEntries.add(entry);
-                    return;
-                }
-
-                if (newEntries.contains(entry) && !filter.shouldShow(entry)) {
-                    newEntries.remove(entry);
-                }
-            });
-            newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
-
-            shownEntries.set(newEntries);
-
-            if (globalSelectedEntry.isNotNull().get()) {
-                if (!shownEntries.contains(globalSelectedEntry.get())) {
-                    selectEntry(null);
-                }
+            if (newEntries.contains(entry) && !filter.shouldShow(entry)) {
+                newEntries.remove(entry);
             }
         });
+        newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
+
+        shownEntries.set(newEntries);
+
+        if (globalSelectedEntry.isNotNull().get()) {
+            if (!shownEntries.contains(globalSelectedEntry.get())) {
+                globalSelectedEntryPropertyInternal().set(null);
+            }
+        }
+        GuiPlatformHelper.waitForPlatform();
     }
 
     private void updateShownCollections() {
-        GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            if (current() == null) {
-                shownCollections.clear();
+        if (current() == null) {
+            shownCollections.clear();
+            GuiPlatformHelper.waitForPlatform();
+            return;
+        }
+
+        // Work on copy to reduce list updates
+        var newCollections = FXCollections.observableArrayList(shownCollections.get());
+
+        newCollections.removeIf(col -> !SavegameStorage.get(current()).getCollections().contains(col));
+
+        SavegameStorage.<T, I>get(current()).getCollections().forEach(col -> {
+            if (!newCollections.contains(col) && filter.shouldShow(col)) {
+                newCollections.add(col);
                 return;
             }
 
-            // Work on copy to reduce list updates
-            var newCollections = FXCollections.observableArrayList(shownCollections.get());
-
-            newCollections.removeIf(col -> !SavegameStorage.get(current()).getCollections().contains(col));
-
-            SavegameStorage.<T, I>get(current()).getCollections().forEach(col -> {
-                if (!newCollections.contains(col) && filter.shouldShow(col)) {
-                    newCollections.add(col);
-                    return;
-                }
-
-                if (newCollections.contains(col) && !filter.shouldShow(col)) {
-                    newCollections.remove(col);
-                }
-            });
-            newCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
-            shownCollections.set(newCollections);
-
-            if (globalSelectedCollection.isNotNull().get()) {
-                if (!shownCollections.contains(globalSelectedCollection.get())) {
-                    selectCollection(null);
-                }
+            if (newCollections.contains(col) && !filter.shouldShow(col)) {
+                newCollections.remove(col);
             }
-
-            updateStorageEmptyProperty();
         });
+        newCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
+        shownCollections.set(newCollections);
+
+        if (globalSelectedCollection.isNotNull().get()) {
+            if (!shownCollections.contains(globalSelectedCollection.get())) {
+                unselectCollectionAndEntry();
+            }
+        }
+
+        updateStorageEmptyProperty();
+        GuiPlatformHelper.waitForPlatform();
+    }
+
+    private void updateStorageEmptyProperty() {
+        if (current() == null) {
+            storageEmpty.set(false);
+            return;
+        }
+
+        int newSize = SavegameStorage.get(current()).getCollections().size();
+        storageEmpty.set(newSize == 0);
     }
 
     public ListProperty<SavegameEntry<T, I>> getShownEntries() {
@@ -230,62 +247,61 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return current;
     }
 
-    private void unselectCampaignAndEntry() {
-        GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            if (current.isNotNull().get()) {
-                globalSelectedEntryPropertyInternal().set(null);
-                globalSelectedCampaignPropertyInternal().set(null);
-            }
-            updateShownEntries();
-        });
-    }
-
-    public boolean selectGame(Game newGame) {
-        if (current.get() == newGame) {
-            return false;
+    private void unselectCollectionAndEntry() {
+        if (current.isNotNull().get()) {
+            globalSelectedEntryPropertyInternal().set(null);
+            globalSelectedCampaignPropertyInternal().set(null);
         }
-
-        GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            unselectCampaignAndEntry();
-
-            current.set(newGame);
-            logger.debug("Selected game " +
-                    (newGame != null ? newGame.getFullName() : "null"));
-            updateShownCollections();
-            if (newGame != null) {
-                SavegameStorage.get(newGame).getCollections().addListener(
-                        (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
-                            updateShownCollections();
-                        });
-            }
-        });
-
-        return true;
+        updateShownEntries();
     }
 
-    public void selectCollection(SavegameCollection<T, I> c) {
-        if (c == null) {
-            unselectCampaignAndEntry();
-            logger.debug("Unselected campaign");
+    private void selectGame(Game newGame) {
+        if (current.get() == newGame) {
             return;
         }
 
+        unselectCollectionAndEntry();
+        current.set(newGame);
+        logger.debug("Selected game " + (newGame != null ? newGame.getFullName() : "null"));
+        updateShownCollections();
+    }
+
+    public void selectGameAsync(Game newGame) {
+        if (current.get() == newGame) {
+            return;
+        }
+
+        TaskExecutor.getInstance().submitTask(() -> {
+            GuiPlatformHelper.waitForPlatform();
+            CacheManager.getInstance().onSelectedSavegameCollectionChange();
+            selectGame(newGame);
+        }, false);
+    }
+
+    public void selectCollectionAsync(SavegameCollection<T, I> c) {
         if (globalSelectedCollection.isNotNull().get() && globalSelectedCollection.get().equals(c)) {
             return;
         }
 
-        GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            var game = SavegameContext.getForCollection(c);
+        TaskExecutor.getInstance().submitTask(() -> {
+            GuiPlatformHelper.waitForPlatform();
+            CacheManager.getInstance().onSelectedSavegameCollectionChange();
 
-            // If we didn't change the game and an entry is already selected, unselect it
-            if (!selectGame(game) && globalSelectedEntryProperty().isNotNull().get()) {
+            if (c == null || !shownCollections.contains(c)) {
+                unselectCollectionAndEntry();
+                logger.debug("Unselected campaign");
+                return;
+            }
+
+            // If an entry is already selected, unselect it
+            if (globalSelectedEntryProperty().isNotNull().get()) {
                 globalSelectedEntryPropertyInternal().set(null);
             }
 
             globalSelectedCampaignPropertyInternal().set(c);
             updateShownEntries();
             logger.debug("Selected campaign " + c.getName());
-        });
+        }, false);
     }
 
     public void selectEntry(SavegameEntry<T, I> e) {
@@ -298,19 +314,20 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             return;
         }
 
-        GuiPlatformHelper.doWhilePlatformIsPaused(() -> {
-            if (e == null) {
-                if (current.isNotNull().get()) {
-                    globalSelectedEntryPropertyInternal().set(null);
+        if (e == null) {
+            if (current.isNotNull().get()) {
+                globalSelectedEntryPropertyInternal().set(null);
+            }
+        } else {
+            SavegameContext.withSavegame(e, ctx -> {
+                if (!ctx.getCollection().equals(globalSelectedCollection.get())) {
+                    return;
                 }
-            } else {
-                var game = SavegameContext.getForSavegame(e);
-                selectCollection(SavegameStorage.<T, I>get(game).getSavegameCollection(e));
 
                 globalSelectedEntryPropertyInternal().set(e);
                 logger.debug("Selected campaign entry " + e.getName());
-            }
-        });
+            });
+        }
     }
 
     public boolean isStorageEmpty() {

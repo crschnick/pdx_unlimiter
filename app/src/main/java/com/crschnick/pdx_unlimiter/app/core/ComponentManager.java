@@ -10,10 +10,8 @@ import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameWatcher;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
@@ -69,14 +67,8 @@ public class ComponentManager {
     }
 
     public static void switchGame(Game game) {
-        CacheManager.getInstance().onSelectedGameChange();
-        SavegameManagerState.get().selectGame(game);
         SavedState.getInstance().setActiveGame(game);
-    }
-
-    public static <T, I extends SavegameInfo<T>> void selectCollection(SavegameCollection<T, I> col) {
-        CacheManager.getInstance().onSelectedSavegameCollectionChange();
-        SavegameManagerState.<T, I>get().selectCollection(col);
+        SavegameManagerState.get().selectGameAsync(game);
     }
 
     public static void reloadSettings(Runnable settingsUpdater) {
@@ -99,6 +91,7 @@ public class ComponentManager {
     private static void init() {
         logger.debug("Initializing ...");
         try {
+            CacheManager.init();
             PdxuI18n.init();
             GameInstallation.init();
             SavegameStorage.init();
@@ -110,8 +103,6 @@ public class ComponentManager {
 
             GameAppManager.init();
             FileImporter.init();
-
-            CacheManager.init();
 
             EditorExternalState.init();
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
@@ -132,7 +123,6 @@ public class ComponentManager {
 
             FileWatchManager.reset();
             SavegameManagerState.reset();
-            CacheManager.reset();
 
             logger.debug("Waiting for platform thread");
             // Sync with platform thread after GameIntegration reset
@@ -148,6 +138,7 @@ public class ComponentManager {
                 GlobalScreen.unregisterNativeHook();
             }
             PdxuI18n.reset();
+            CacheManager.reset();
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }

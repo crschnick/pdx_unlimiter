@@ -48,7 +48,7 @@ public class GameAppManager {
             if (process.isPresent()) {
                 activeGame.set(process.get());
                 activeGame.get().onStart();
-                SavegameManagerState.get().selectGame(
+                SavegameManagerState.get().selectGameAsync(
                         GameInstallation.ALL.inverseBidiMap().get(process.get().getInstallation()));
             }
         } else {

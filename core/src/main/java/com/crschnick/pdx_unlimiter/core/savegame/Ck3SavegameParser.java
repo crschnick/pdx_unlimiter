@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
 public class Ck3SavegameParser extends SavegameParser {
@@ -65,11 +64,11 @@ public class Ck3SavegameParser extends SavegameParser {
             int zipContentStart = indexOf(content, ZIP_HEADER);
             boolean compressed = zipContentStart != -1;
             if (compressed) {
-                var zipIn = new ZipInputStream(new ByteArrayInputStream(content,
-                        zipContentStart, content.length - zipContentStart));
-                zipIn.getNextEntry();
-                savegameText = zipIn.readAllBytes();
-                zipIn.close();
+                try (var zipIn = new ZipInputStream(new ByteArrayInputStream(content,
+                        zipContentStart, content.length - zipContentStart))) {
+                    zipIn.getNextEntry();
+                    savegameText = zipIn.readAllBytes();
+                }
             } else {
                 savegameText = content;
             }
