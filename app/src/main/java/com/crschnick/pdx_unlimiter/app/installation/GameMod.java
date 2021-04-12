@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.nio.file.Path;
@@ -19,7 +20,13 @@ public class GameMod {
             return Optional.empty();
         }
 
-        Node node = TextFormatParser.textFileParser().parse(p);
+        Node node;
+        try {
+            node = TextFormatParser.textFileParser().parse(p);
+        } catch (ParseException ex) {
+            throw new ParseException("Could not parse malformed mod file " + p.toString(), ex);
+        }
+
         // Quick check if mod data seems valid
         if (node.getNodeForKeyIfExistent("name").isEmpty()) {
             return Optional.empty();
