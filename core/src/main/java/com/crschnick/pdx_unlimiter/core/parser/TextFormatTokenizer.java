@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 public class TextFormatTokenizer {
@@ -58,13 +59,26 @@ public class TextFormatTokenizer {
         this.arraySizesCounter = 0;
     }
 
+    private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+
+    private void checkBom() {
+        if (Arrays.equals(bytes, 0, 3, UTF_8_BOM, 0, 3)) {
+            this.nextScalarStart = 3;
+            this.i = 3;
+        } else {
+            this.nextScalarStart = 0;
+            this.i = 0;
+        }
+    }
+
     public void tokenize() {
         tokenTypes[0] = OPEN_GROUP;
         arraySizes[0] = 0;
         arraySizeStack.add(0);
         arraySizesCounter++;
         tokenCounter = 1;
-        for (i = 0; i <= bytes.length; i++) {
+        checkBom();
+        for (; i <= bytes.length; i++) {
             tokenizeIteration();
         }
         tokenTypes[tokenCounter] = CLOSE_GROUP;

@@ -140,6 +140,12 @@ public class FileWatchManager {
         private void handleWatchEvent(Path path, WatchEvent<?> event) {
             @SuppressWarnings("unchecked")
             WatchEvent<Path> ev = (WatchEvent<Path>) event;
+
+            // Context may be null for whatever reason
+            if (ev.context() == null) {
+                return;
+            }
+
             Path file = path.resolve(ev.context());
 
             // Only wait for write access for new files
