@@ -59,7 +59,7 @@ public class Ck3Tag {
         long id = n.getNodeForKey("currently_played_characters").getNodeArray().get(0).getLong();
         var personNode = n.getNodeForKey("living").getNodeForKey(String.valueOf(id));
         var house = new Ck3House(
-                n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString(),
+                Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString()),
                 Ck3CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms")));
         var person = Ck3Person.fromNode(personNode, house);
         var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")

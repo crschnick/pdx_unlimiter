@@ -19,14 +19,13 @@ public class Ck3Person {
     public static Ck3Person fromNode(Node n, Ck3House house) {
         Ck3Person p = new Ck3Person();
         if (n.hasKey("dynasty_house")) {
-            var id = n.getNodeForKey("dynasty_house").getInteger();
             p.house = house;
         }
         p.birth = GameDateType.CK3.fromString(n.getNodeForKey("birth").getString());
         p.skills = n.getNodeForKey("skill").getNodeArray().stream()
                 .map(Node::getInteger)
                 .collect(Collectors.toList());
-        p.firstName = n.getNodeForKey("first_name").getString();
+        p.firstName = Ck3Strings.cleanCk3FormatData(n.getNodeForKey("first_name").getString());
         return p;
     }
 

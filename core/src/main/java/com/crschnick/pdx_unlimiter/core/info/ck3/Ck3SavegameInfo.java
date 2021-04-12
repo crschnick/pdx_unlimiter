@@ -92,24 +92,6 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
         }
     }
 
-    private static final String WAR_METADATA_END = String.valueOf(new char[] {21, '!', 21, '!', 21, '!'});
-
-    private static String extractWarTitle(String title) {
-        var validParts = new ArrayList<String>();
-        for (var part : title.split(" ")) {
-            if (part.length() == 0) {
-                continue;
-            }
-
-            if (part.charAt(0) == 21) {
-                continue;
-            }
-
-            validParts.add(part.replace(WAR_METADATA_END, ""));
-        }
-        return String.join(" ", validParts);
-    }
-
     private static List<War<Ck3Tag>> fromActiveWarsNode(List<Ck3Tag> tags, Ck3Tag tag, Node n) {
         List<War<Ck3Tag>> wars = new ArrayList<>();
         n.getNodeForKey("wars").getNodeForKey("active_wars").getNodeArray().forEach(v -> {
@@ -132,7 +114,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             }
 
             if (attackers.contains(tag) || defenders.contains(tag)) {
-                wars.add(new War<>(extractWarTitle(title), attackers, defenders));
+                wars.add(new War<>(Ck3Strings.cleanCk3FormatData(title), attackers, defenders));
             }
         });
         return wars;
