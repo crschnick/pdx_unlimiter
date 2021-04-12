@@ -4,8 +4,10 @@ import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.util.integration.SteamHelper;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +22,7 @@ public abstract class GameDistributionType {
         this.installation = installation;
     }
 
-    private static void startParadoxLauncher(Path launcherPath) throws IOException {
+    private static Path getBootstrapper() throws IOException {
         Path bootstrapper;
         if (SystemUtils.IS_OS_WINDOWS) {
             bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
@@ -32,6 +34,25 @@ public abstract class GameDistributionType {
                     .resolve(".paradoxlauncher")
                     .resolve("bootstrapper-v2");
         }
+
+        if (!Files.exists(bootstrapper)) {
+            try {
+                LoggerFactory.getLogger(GameDistributionType.class).error("Pdx-Dir: " +
+                        Files.list(bootstrapper.getParent())
+                                .map(Path::toString)
+                                .collect(Collectors.joining(", ")));
+            } catch (Exception ignored) {}
+
+            throw new IOException("Paradox Launcher bootstrapper not found.\n" +
+                    "Please try to enable 'Start through Steam' in the settings menu.\n" +
+                    "If you don't use Steam or believe that this an error, please report it.");
+        }
+
+        return bootstrapper;
+    }
+
+    private static void startParadoxLauncher(Path launcherPath) throws IOException {
+        Path bootstrapper = getBootstrapper();
 
         new ProcessBuilder()
                 .directory(launcherPath.toFile())

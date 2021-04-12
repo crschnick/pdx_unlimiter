@@ -29,7 +29,7 @@ l_english:
  ENABLE_AUTOUPDATE_DESC: "Specifies whether to automatically update the Pdx-Unlimiter and its components when launching it."
  CONFIRM_DELETION: "Confirm deletion"
  CONFIRM_DELETION_DESC: "Specifies whether to ask for confirmation when deleting a campaign or savegame."
- START_STEAM: "Start steam"
+ START_STEAM: "Start through Steam"
  START_STEAM_DESC: "Specifies whether to start Steam when launching a game through the Pdx-Unlimiter.\n\nIf you disable this, Steam might not register your achievements while playing."
  DELETE_ON_IMPORT: "Delete after import"
  DELETE_ON_IMPORT_DESC: "Specifies whether to delete savegames after succesfully importing it into the Pdx-Unlimiter storage."
