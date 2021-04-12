@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -96,10 +96,12 @@ public class FileWatchManager {
     private class WatchedDirectory {
         private final BiConsumer<Path, WatchEvent.Kind<Path>> listener;
         private final Path baseDir;
+        private final Map<Path, Instant> lastModified;
 
         private WatchedDirectory(Path dir, BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
             this.baseDir = dir;
             this.listener = listener;
+            this.lastModified = new HashMap<>();
             createRecursiveWatchers(dir);
             logger.trace("Created watched directory for " + dir);
         }
@@ -126,7 +128,13 @@ public class FileWatchManager {
 
             while (true) {
                 var baseDir = key.watchable();
-                for (WatchEvent<?> event : key.pollEvents()) {
+
+                var events = key.pollEvents();
+                if (events.size() == 0) {
+                    break;
+                }
+
+                for (WatchEvent<?> event : events) {
                     handleWatchEvent((Path) baseDir, event);
                 }
 
@@ -145,8 +153,21 @@ public class FileWatchManager {
             if (ev.context() == null) {
                 return;
             }
-
             Path file = path.resolve(ev.context());
+
+            // Check for duplicate modifications
+            // See https://stackoverflow.com/questions/16777869/java-7-watchservice-ignoring-multiple-occurrences-of-the-same-event
+            if (ev.kind().equals(ENTRY_MODIFY) && lastModified.containsKey(file)) {
+                if (Duration.between(Instant.now(),
+                        lastModified.get(file)).compareTo(Duration.ofSeconds(2)) < 0) {
+                    logger.trace("Discarding double modify event of file " +
+                            baseDir.relativize(file) + " in dir " + baseDir);
+                    return;
+                }
+            }
+            if (ev.kind().equals(ENTRY_MODIFY)) {
+                lastModified.put(file, Instant.now());
+            }
 
             // Only wait for write access for new files
             if (Files.exists(file) && !Files.isDirectory(file)) {
