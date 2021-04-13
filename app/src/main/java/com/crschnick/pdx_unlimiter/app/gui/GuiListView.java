@@ -8,6 +8,7 @@ import javafx.scene.control.ListView;
 
 import java.util.HashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GuiListView {
 
@@ -16,11 +17,11 @@ public class GuiListView {
             Function<T, Node> nodeFactory) {
         JFXListView<Node> listView = new JFXListView<Node>();
 
-        list.forEach(li -> {
-            Platform.runLater(() -> {
-                var item = createForItem(li, nodeFactory);
-                listView.getItems().add(item);
-            });
+        Platform.runLater(() -> {
+            var newItems = list.stream()
+                    .map(li -> createForItem(li, nodeFactory))
+                    .collect(Collectors.toList());
+            listView.getItems().setAll(newItems);
         });
 
         list.addListener((c, o, n) -> {
@@ -28,12 +29,10 @@ public class GuiListView {
                 var map = new HashMap<T, Node>();
                 listView.getItems().forEach(node -> map.put((T) node.getProperties().get("list-item"), node));
 
-                listView.getItems().clear();
-
-                n.forEach(li -> {
-                    var item = map.getOrDefault(li, createForItem(li, nodeFactory));
-                    listView.getItems().add(item);
-                });
+                var newItems = n.stream()
+                        .map(li -> map.getOrDefault(li, createForItem(li, nodeFactory)))
+                        .collect(Collectors.toList());
+                listView.getItems().setAll(newItems);
 
                 // Bug in JFoenix? We have to set this everytime we update the list view
                 listView.setExpanded(true);
