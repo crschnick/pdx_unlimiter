@@ -363,7 +363,9 @@ public abstract class SavegameStorage<
         try {
             FileUtils.deleteDirectory(campaignPath.toFile());
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            // Don't show the user this error. It sometimes happens when the file is
+            // used by another process or even an antivirus program
+            logger.error("Could not delete collection " + c.getName(), c);
         }
 
         this.collections.remove(c);
@@ -382,7 +384,9 @@ public abstract class SavegameStorage<
         try {
             FileUtils.deleteDirectory(campaignPath.resolve(e.getUuid().toString()).toFile());
         } catch (IOException ex) {
-            ErrorHandler.handleException(ex);
+            // Don't show the user this error. It sometimes happens when the file is
+            // used by another process or even an antivirus program
+            logger.error("Could not delete entry " + e.getName() , ex);
         }
 
         c.getSavegames().remove(e);

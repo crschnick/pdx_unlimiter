@@ -1,6 +1,6 @@
 l_english:
   ERROR_OCCURED: "An unexpected error occured: $CAUSE$"
   GAME_DATA_PATH_NOT_FOUND: "Couldn't find game data path in $GAME$ launcher config file"
-  GAME_DATA_PATH_DOES_NOT_EXIST: "$GAME$ user data directory $DIR$ does not exist. To fix this problem, please run the game once to generate it"
+  GAME_DATA_PATH_DOES_NOT_EXIST: "$GAME$ user data directory $DIR$ does not exist. To fix this problem, please run the game once to generate it."
   EXECUTABLE_NOT_FOUND: "$GAME$ executable $FILE$ not found"
   LAUNCHER_SETTINGS_NOT_FOUND: "Missing Paradox launcher settings. Only $GAME$ installations using the Paradox Launcher are supported."
