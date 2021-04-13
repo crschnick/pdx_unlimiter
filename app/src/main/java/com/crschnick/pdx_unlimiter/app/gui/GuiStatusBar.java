@@ -3,7 +3,9 @@ package com.crschnick.pdx_unlimiter.app.gui;
 import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -45,13 +47,14 @@ public class GuiStatusBar {
 
         GameAppManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
             if (n != null) {
-                bar.setRunning();
+                bar.setRunning(GameInstallation.ALL.inverseBidiMap().get(n.getInstallation()));
             } else {
                 bar.stopRunning();
             }
         });
-        if (GameAppManager.getInstance().activeGameProperty().get() != null) {
-            bar.setRunning();
+        var g = GameAppManager.getInstance().activeGameProperty().get();
+        if (g != null) {
+            bar.setRunning(GameInstallation.ALL.inverseBidiMap().get(g.getInstallation()));
         }
 
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
@@ -61,13 +64,13 @@ public class GuiStatusBar {
         return pane;
     }
 
-    private static Region createRunningBar() {
+    private static Region createRunningBar(Game g) {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(SavegameManagerState.get().current().getFullName() + " (" + PdxuI18n.get("RUNNING") + ")",
-                GameGuiFactory.get(SavegameManagerState.get().current()).createIcon());
+        Label text = new Label(g.getFullName() + " (" + PdxuI18n.get("RUNNING") + ")",
+                GameGuiFactory.get(g).createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
         BorderPane.setAlignment(text, Pos.CENTER);
@@ -80,7 +83,7 @@ public class GuiStatusBar {
             Platform.runLater(() -> latest.setText(PdxuI18n.get("LATEST") + ": " + (n.size() > 0 ? n.get(0).getName() : PdxuI18n.get("NONE"))));
         };
 
-        var watcher = SavegameWatcher.ALL.get(SavegameManagerState.get().current());
+        var watcher = SavegameWatcher.ALL.get(g);
         watcher.savegamesProperty().addListener(l);
         l.changed(null, null, watcher.savegamesProperty().get());
         barPane.setCenter(latest);
@@ -191,14 +194,18 @@ public class GuiStatusBar {
         }
 
         private void hide() {
+            if (status == Status.RUNNING) {
+                return;
+            }
+
             Platform.runLater(() -> {
                 pane.getChildren().clear();
             });
         }
 
-        private void setRunning() {
+        private void setRunning(Game g) {
             // Create node before Platform thread to avoid async issues!
-            Region bar = createRunningBar();
+            Region bar = createRunningBar(g);
             Platform.runLater(() -> {
                 getStatusBar().show(bar);
                 status = Status.RUNNING;
