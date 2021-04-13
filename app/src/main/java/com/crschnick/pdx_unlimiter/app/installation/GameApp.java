@@ -6,13 +6,13 @@ import org.jnativehook.keyboard.NativeKeyListener;
 
 public class GameApp {
 
-    private final GameInstallation installation;
+    private final Game game;
     private final ProcessHandle process;
     private NativeKeyListener listener;
 
-    public GameApp(ProcessHandle process, GameInstallation installation) {
+    public GameApp(ProcessHandle process, Game game) {
         this.process = process;
-        this.installation = installation;
+        this.game = game;
     }
 
     public void onStart() {
@@ -29,8 +29,8 @@ public class GameApp {
         }
     }
 
-    public GameInstallation getInstallation() {
-        return installation;
+    public Game getGame() {
+        return game;
     }
 
     public ProcessHandle getProcess() {

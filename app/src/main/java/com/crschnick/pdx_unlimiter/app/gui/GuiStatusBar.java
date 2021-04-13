@@ -5,7 +5,6 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -47,14 +46,14 @@ public class GuiStatusBar {
 
         GameAppManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
             if (n != null) {
-                bar.setRunning(GameInstallation.ALL.inverseBidiMap().get(n.getInstallation()));
+                bar.setRunning(n.getGame());
             } else {
                 bar.stopRunning();
             }
         });
         var g = GameAppManager.getInstance().activeGameProperty().get();
         if (g != null) {
-            bar.setRunning(GameInstallation.ALL.inverseBidiMap().get(g.getInstallation()));
+            bar.setRunning(g.getGame());
         }
 
         SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {

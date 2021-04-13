@@ -6,11 +6,13 @@ import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 public class GameAppManager {
 
@@ -27,8 +29,9 @@ public class GameAppManager {
         });
     }
 
-    private static boolean isInstanceOfGame(String cmd, GameInstallation install) {
-        return cmd.contains(install.getExecutable().toString());
+    private static boolean isInstanceOfGame(String cmd, Game game) {
+        var install = GameInstallation.ALL.get(game);
+        return install != null && cmd.contains(install.getExecutable().toString());
     }
 
     public static GameAppManager getInstance() {
@@ -37,7 +40,7 @@ public class GameAppManager {
 
     private void update() {
         if ((activeGame.get() == null)) {
-            var process = GameInstallation.ALL.values().stream()
+            var process = Arrays.stream(Game.values())
                     .map(g -> new GameApp(ProcessHandle.allProcesses()
                             .filter(p -> p.info().command()
                                     .map(cs -> isInstanceOfGame(cs, g)).orElse(false))
@@ -48,8 +51,7 @@ public class GameAppManager {
             if (process.isPresent()) {
                 activeGame.set(process.get());
                 activeGame.get().onStart();
-                SavegameManagerState.get().selectGameAsync(
-                        GameInstallation.ALL.inverseBidiMap().get(process.get().getInstallation()));
+                SavegameManagerState.get().selectGameAsync(process.get().getGame());
             }
         } else {
             updateImportTimer();
@@ -72,6 +74,8 @@ public class GameAppManager {
 
         if (Duration.between(lastImport, Instant.now()).compareTo(
                 Duration.of(Settings.getInstance().timedImportsInterval.getValue(), ChronoUnit.MINUTES)) > 0) {
+            LoggerFactory.getLogger(GameAppManager.class).info(
+                    "Importing latest savegame because timed imports is enabled");
             if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
                 Toolkit.getDefaultToolkit().beep();
             }
