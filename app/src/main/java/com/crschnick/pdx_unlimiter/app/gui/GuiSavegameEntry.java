@@ -286,6 +286,7 @@ public class GuiSavegameEntry {
                         CacheManager.getInstance().onEntryLoadFinish();
 
                         Platform.runLater(() -> {
+                            loading.setVisible(false);
                             stack.getChildren().set(1, container);
                             container.layout();
                         });
@@ -303,9 +304,18 @@ public class GuiSavegameEntry {
 
         entry.stateProperty().addListener((c, o, n) -> {
             boolean showLoad = n == SavegameEntry.State.LOADING;
-            Platform.runLater(() -> {
-                loading.setVisible(showLoad);
-            });
+            if (showLoad) {
+                Platform.runLater(() -> {
+                    loading.setVisible(true);
+                });
+            }
+
+            boolean failed = n == SavegameEntry.State.LOAD_FAILED;
+            if (failed) {
+                Platform.runLater(() -> {
+                    loading.setVisible(false);
+                });
+            }
         });
 
         entry.infoProperty().addListener((c,o,n) -> {
