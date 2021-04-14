@@ -121,24 +121,7 @@ public class ConverterHelper {
 
                 try {
                     int returnCode = handle.waitFor();
-
-                    var latestDir = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
-                            .resolve("CK3toEU4").resolve("output"))
-                            .filter(Files::isDirectory)
-                            .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
-                    var latestFile = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
-                            .resolve("CK3toEU4").resolve("output"))
-                            .filter(Files::isRegularFile)
-                            .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
-                    if (latestDir.isPresent() && latestFile.isPresent()) {
-                        FileUtils.moveDirectory(
-                                latestDir.get().toFile(),
-                                Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName()).toFile());
-                        FileUtils.moveFile(
-                                latestFile.get().toFile(),
-                                Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName()).toFile());
-                    }
-
+                    
                     Platform.runLater(() -> {
                         if (returnCode == 0) {
                             GuiConverterConfig.showConversionSuccessDialog();
@@ -146,6 +129,25 @@ public class ConverterHelper {
                             GuiConverterConfig.showConversionErrorDialog();
                         }
                     });
+
+                    if (returnCode == 0) {
+                        var latestDir = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
+                                .resolve("CK3toEU4").resolve("output"))
+                                .filter(Files::isDirectory)
+                                .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                        var latestFile = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
+                                .resolve("CK3toEU4").resolve("output"))
+                                .filter(Files::isRegularFile)
+                                .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                        if (latestDir.isPresent() && latestFile.isPresent()) {
+                            FileUtils.moveDirectory(
+                                    latestDir.get().toFile(),
+                                    Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName()).toFile());
+                            FileUtils.moveFile(
+                                    latestFile.get().toFile(),
+                                    Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName()).toFile());
+                        }
+                    }
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
