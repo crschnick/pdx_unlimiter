@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.settings.SettingsEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;

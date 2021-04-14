@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.core.settings;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;

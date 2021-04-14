@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
-import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
