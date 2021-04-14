@@ -132,7 +132,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                 }
             }
 
-            for (Node rm : n.getNodeForKey("diplomacy").getNodesForKey("royal_marriages")) {
+            for (Node rm : n.getNodeForKey("diplomacy").getNodesForKey("royal_marriage")) {
                 String first = rm.getNodeForKey("first").getString();
                 String second = rm.getNodeForKey("second").getString();
                 if (first.equals(tag)) {
@@ -143,7 +143,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                 }
             }
 
-            for (Node guar : n.getNodeForKey("diplomacy").getNodesForKey("guarantees")) {
+            for (Node guar : n.getNodeForKey("diplomacy").getNodesForKey("guarantee")) {
                 String first = guar.getNodeForKey("first").getString();
                 String second = guar.getNodeForKey("second").getString();
                 if (first.equals(tag)) {
