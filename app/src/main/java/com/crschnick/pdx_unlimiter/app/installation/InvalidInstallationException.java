@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 
 public final class InvalidInstallationException extends Exception {
 

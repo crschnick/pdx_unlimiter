@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.app.core.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;

@@ -1,7 +1,7 @@
-package com.crschnick.pdx_unlimiter.app.core;
+package com.crschnick.pdx_unlimiter.app.lang;
 
-import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
-import com.crschnick.pdx_unlimiter.app.lang.LocalisationHelper;
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
@@ -48,7 +48,7 @@ public final class PdxuI18n {
     private static String getLocalised(String s, String... vars) {
         var localisedString = map.get(s);
         if (localisedString == null) {
-            LoggerFactory.getLogger(PdxuI18n.class).warn("No localisation found for key " + s);
+            LoggerFactory.getLogger(PdxuI18n.class).trace("No localisation found for key " + s);
             var def = defaultMap.get(s);
             return def != null ? LocalisationHelper.getValue(def, vars) : s;
         }
