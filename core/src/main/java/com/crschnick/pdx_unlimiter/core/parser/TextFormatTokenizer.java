@@ -62,7 +62,7 @@ public class TextFormatTokenizer {
     private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 
     private void checkBom() {
-        if (Arrays.equals(bytes, 0, 3, UTF_8_BOM, 0, 3)) {
+        if (bytes.length >= 3 && Arrays.equals(bytes, 0, 3, UTF_8_BOM, 0, 3)) {
             this.nextScalarStart = 3;
             this.i = 3;
         } else {
