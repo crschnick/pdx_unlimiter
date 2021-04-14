@@ -528,36 +528,13 @@ public abstract class SavegameStorage<
         }
     }
 
-    void reloadSavegameAsync(SavegameEntry<T, I> e) {
+    void reloadSavegame(SavegameEntry<T, I> e) {
         logger.debug("Reloading savegame");
         e.unload();
-        e.startLoading();
-        var status = parser.parse(getSavegameFile(e), RakalyHelper::meltSavegame);
-        status.visit(new SavegameParser.StatusVisitor<I>() {
-            @Override
-            public void success(SavegameParser.Success<I> s) {
-                logger.debug("Reloading was successful");
-                synchronized (SavegameStorage.this) {
-                    try {
-                        JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
-                        e.load(s.info);
-                        getSavegameCollection(e).onSavegameLoad(e);
-                    } catch (IOException ioException) {
-                        ErrorHandler.handleException(ioException);
-                    }
-                }
-            }
 
-            @Override
-            public void error(SavegameParser.Error e) {
-                ErrorHandler.handleException(e.error);
-            }
+        invalidateSavegameInfo(e);
 
-            @Override
-            public void invalid(SavegameParser.Invalid iv) {
-                ErrorHandler.handleException(new ParseException(iv.message));
-            }
-        });
+        loadEntry(e);
     }
 
     private SavegameParser.Status importSavegameData(

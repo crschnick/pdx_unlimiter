@@ -195,7 +195,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegame(e, ctx -> {
-                ctx.getStorage().reloadSavegameAsync(e);
+                ctx.getStorage().reloadSavegame(e);
             });
         }, false);
     }

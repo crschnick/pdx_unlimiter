@@ -5,7 +5,6 @@ import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.node.NodeFormatException;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
@@ -152,7 +151,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             }
 
             return e;
-        } catch (NodeFormatException ex) {
+        } catch (Exception ex) {
             throw new ParseException("Error while creating savegame info", ex);
         }
     }
