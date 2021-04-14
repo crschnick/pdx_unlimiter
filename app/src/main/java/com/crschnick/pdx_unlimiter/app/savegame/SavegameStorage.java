@@ -398,16 +398,16 @@ public abstract class SavegameStorage<
         saveData();
     }
 
-    public synchronized boolean loadEntry(SavegameEntry<T, I> e) {
+    public synchronized void loadEntry(SavegameEntry<T, I> e) {
         if (!e.canLoad()) {
-            return false;
+            return;
         }
 
 
         var file = getSavegameFile(e);
         if (!Files.exists(file)) {
             e.fail();
-            return true;
+            return;
         }
 
         if (Files.exists(getSavegameInfoFile(e))) {
@@ -416,7 +416,7 @@ public abstract class SavegameStorage<
                 e.startLoading();
                 e.load(JsonHelper.readObject(infoClass, getSavegameInfoFile(e)));
                 getSavegameCollection(e).onSavegameLoad(e);
-                return true;
+                return;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
@@ -461,7 +461,6 @@ public abstract class SavegameStorage<
                 ErrorHandler.handleException(new ParseException(iv.message), null, file);
             }
         });
-        return true;
     }
 
     public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {

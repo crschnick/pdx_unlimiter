@@ -17,6 +17,7 @@ public class TaskExecutor {
     private final BooleanProperty busy = new SimpleBooleanProperty(false);
     private boolean active = false;
     private ExecutorService executorService;
+    private Thread thread;
 
     public static TaskExecutor getInstance() {
         return INSTANCE;
@@ -25,7 +26,10 @@ public class TaskExecutor {
     public void start() {
         active = true;
         executorService = Executors.newSingleThreadExecutor(
-                r -> ThreadHelper.create("Task Executor", false, r));
+                r -> {
+                    thread = ThreadHelper.create("Task Executor", false, r);
+                    return thread;
+                });
     }
 
     public void stopAndWait() {
@@ -67,6 +71,14 @@ public class TaskExecutor {
 
         if (!executorService.isShutdown()) {
             executorService.submit(loopRunner);
+        }
+    }
+
+    public void submitOrRun(Runnable r) {
+        if (Thread.currentThread().equals(thread)) {
+            r.run();
+        } else {
+            submitTask(r, false);
         }
     }
 

@@ -1,7 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
+import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
@@ -247,27 +249,51 @@ public class GuiSavegameEntry {
         }
     }
 
-    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(SavegameEntry<T, I> entry) {
-        StackPane stack = new StackPane();
+    private static JFXMasonryPane createEmptyContainer() {
         JFXMasonryPane container = new JFXMasonryPane();
         container.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);
         container.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
         container.setHSpacing(10);
         container.setVSpacing(10);
         container.minHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> 3 * container.getCellHeight() + 2 * container.getVSpacing() + container.getPadding().getBottom() + container.getPadding().getTop(), container.paddingProperty()));
+                () -> 3 * container.getCellHeight() +
+                        2 * container.getVSpacing() +
+                        container.getPadding().getBottom() +
+                        container.getPadding().getTop(), container.paddingProperty()));
         container.setLimitRow(3);
+        return container;
+    }
+
+    private static <T, I extends SavegameInfo<T>> Node createSavegameInfoNode(SavegameEntry<T, I> entry) {
+        StackPane stack = new StackPane();
 
         JFXSpinner loading = new JFXSpinner();
         loading.getStyleClass().add(CLASS_ENTRY_LOADING);
-        stack.getChildren().add(container);
-        if (entry.infoProperty().isNotNull().get()) {
+        loading.setVisible(false);
+
+        stack.getChildren().add(loading);
+        StackPane.setAlignment(loading, Pos.CENTER);
+        stack.getChildren().add(createEmptyContainer());
+
+        Runnable loadEntry = () -> {
             SavegameContext.withSavegame(entry, ctx -> {
-                ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+                if (ctx.getInfo() != null) {
+                    TaskExecutor.getInstance().submitOrRun(() -> {
+                        var container = createEmptyContainer();
+                        ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+
+                        // Clear caches if necessary after being done with loading
+                        CacheManager.getInstance().onEntryLoadFinish();
+
+                        Platform.runLater(() -> {
+                            stack.getChildren().set(1, container);
+                            container.layout();
+                        });
+                    });
+                }
             });
-        } else {
-            stack.getChildren().add(loading);
-        }
+        };
+        loadEntry.run();
 
         stack.sceneProperty().addListener((c, o, n) -> {
             if (n != null) {
@@ -284,14 +310,10 @@ public class GuiSavegameEntry {
 
         entry.infoProperty().addListener((c,o,n) -> {
             if (n != null) {
-                SavegameContext.withSavegame(entry, ctx -> {
-                    Platform.runLater(() -> {
-                        ctx.getGuiFactory().fillNodeContainer(n, container);
-                    });
-                });
+                loadEntry.run();
             } else {
                 Platform.runLater(() -> {
-                    container.getChildren().clear();
+                    stack.getChildren().set(1, createEmptyContainer());
                 });
             }
         });

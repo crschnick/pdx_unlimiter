@@ -5,10 +5,8 @@ import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -19,7 +17,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 public class GuiSavegameEntryList {
 
     public static Pane createCampaignEntryList() {
-        ListView<Node> grid = GuiListView.createViewOfList(
+        Region grid = GuiListView.createViewOfList(
                 SavegameManagerState.get().getShownEntries(),
                 GuiSavegameEntry::createSavegameEntryNode);
         grid.setOpacity(0.9);

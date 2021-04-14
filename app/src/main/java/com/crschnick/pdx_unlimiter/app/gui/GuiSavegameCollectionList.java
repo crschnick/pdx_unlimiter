@@ -8,7 +8,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -24,7 +23,7 @@ public class GuiSavegameCollectionList {
 
 
     public static <T, I extends SavegameInfo<T>> Node createCampaignList() {
-        ListView<Node> list = GuiListView.createViewOfList(
+        Region list = GuiListView.createViewOfList(
                 SavegameManagerState.<T, I>get().getShownCollections(),
                 GuiSavegameCollection::createCampaignButton);
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);

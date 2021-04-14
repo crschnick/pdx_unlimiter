@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
 import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
-import com.crschnick.pdx_unlimiter.app.gui.GuiPlatformHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
@@ -130,11 +129,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                     globalSelectedCampaignPropertyInternal().get().equals(
                             ctx.getStorage().getSavegameCollection(e))) {
 
-                if (ctx.getStorage().loadEntry(e)) {
-                    // Wait for all triggered platform thread operations to finish before clearing caches!
-                    GuiPlatformHelper.waitForPlatform();
-                    CacheManager.getInstance().onEntryLoadFinish();
-                }
+                ctx.getStorage().loadEntry(e);
             }
         }), false);
     }
@@ -268,7 +263,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         TaskExecutor.getInstance().submitTask(() -> {
-            GuiPlatformHelper.waitForPlatform();
             CacheManager.getInstance().onSelectedGameChange();
             selectGame(newGame);
         }, false);
@@ -280,7 +274,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
 
         TaskExecutor.getInstance().submitTask(() -> {
-            GuiPlatformHelper.waitForPlatform();
             CacheManager.getInstance().onSelectedSavegameCollectionChange();
 
             if (c == null || !shownCollections.contains(c)) {
