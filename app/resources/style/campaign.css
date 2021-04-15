@@ -21,7 +21,7 @@
 }
 
 
-.campaign-list {
+.campaign-list .jfx-list-view {
 -fx-background-color: #FFFFFFDD;
 -fx-min-width: 20em;
  -fx-padding: 0;
