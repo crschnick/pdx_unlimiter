@@ -35,7 +35,10 @@ public abstract class GuiEditorNodeTagFactory {
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
             GuiTooltips.install(b, "Open in coat of arms designer");
-            b.setOnAction(e -> GuiCk3CoaViewer.createStage(state));
+            b.setOnAction(e -> {
+                var viewer = new GuiCk3CoaViewer(state, node);
+                viewer.createStage();
+            });
             return b;
         }
     });

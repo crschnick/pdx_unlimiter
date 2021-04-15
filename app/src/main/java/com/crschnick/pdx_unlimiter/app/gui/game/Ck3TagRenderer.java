@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
@@ -53,25 +54,21 @@ public class Ck3TagRenderer {
         }
     }
 
-    private static Map<String, javafx.scene.paint.Color> loadPredefinedColors(Node node) {
-        Map<String, javafx.scene.paint.Color> map = new HashMap<>();
-        node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
-            n.forEach((k, v) -> {
-                ColorNode colorData = (ColorNode) v;
-                map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
-            });
-        });
-        return map;
-    }
-
-    private static Map<String, javafx.scene.paint.Color> loadPredefinedColorsForSavegame(SavegameInfo<Ck3Tag> info) {
+    private static Map<String, javafx.scene.paint.Color> loadPredefinedColors(GameFileContext ctx) {
         var file = CascadeDirectoryHelper.openFile(
                 Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
-                info);
+                ctx);
         if (file.isPresent()) {
             try {
                 Node node = TextFormatParser.textFileParser().parse(file.get());
-                return loadPredefinedColors(node);
+                Map<String, javafx.scene.paint.Color> map = new HashMap<>();
+                node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
+                    n.forEach((k, v) -> {
+                        ColorNode colorData = (ColorNode) v;
+                        map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
+                    });
+                });
+                return map;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
@@ -80,15 +77,19 @@ public class Ck3TagRenderer {
         return Map.of();
     }
 
-    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
-        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
-        var cachedImg = cache.realms.get(tag);
-        if (cachedImg != null) {
-            return cachedImg;
+    public static Image renderImage(Ck3CoatOfArms coa, GameFileContext ctx, int size) {
+        BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = i.getGraphics();
+
+        var rawPatternImg = pattern(g, coa, ctx, size);
+        for (var emblem : coa.getEmblems()) {
+            emblem(i, rawPatternImg, emblem, ctx, size);
         }
 
+        return ImageLoader.toFXImage(i);
+    }
 
-        Ck3CoatOfArms coa = tag.getCoatOfArms();
+    public static Image renderRealmImage(Ck3CoatOfArms coa, String governmentShape, GameFileContext ctx) {
         BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
 
@@ -96,9 +97,9 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        var rawPatternImg = pattern(coaG, coa, info);
+        var rawPatternImg = pattern(coaG, coa, ctx, IMG_SIZE);
         for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, info);
+            emblem(coaImg, rawPatternImg, emblem, ctx, IMG_SIZE);
         }
 
         g.drawImage(coaImg,
@@ -114,7 +115,7 @@ public class Ck3TagRenderer {
                 "republic_government", GameImage.CK3_REALM_REPUBLIC_MASK,
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_MASK,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_MASK);
-        var useMask = masks.getOrDefault(tag.getGovernmentName(), GameImage.CK3_REALM_MASK);
+        var useMask = masks.getOrDefault(governmentShape, GameImage.CK3_REALM_MASK);
         applyMask(i, useMask);
         brighten(i);
 
@@ -124,7 +125,7 @@ public class Ck3TagRenderer {
                 "republic_government", GameImage.CK3_REALM_REPUBLIC_FRAME,
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_FRAME,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_FRAME);
-        var useFrame = frames.getOrDefault(tag.getGovernmentName(), GameImage.CK3_REALM_FRAME);
+        var useFrame = frames.getOrDefault(governmentShape, GameImage.CK3_REALM_FRAME);
         g.drawImage(ImageLoader.fromFXImage(useFrame),
                 3,
                 -12,
@@ -132,13 +133,24 @@ public class Ck3TagRenderer {
                 i.getHeight() + 24,
                 new java.awt.Color(0, 0, 0, 0),
                 null);
+        return ImageLoader.toFXImage(i);
+    }
 
-        var img = ImageLoader.toFXImage(i);
+    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
+        var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
+        var cachedImg = cache.realms.get(tag);
+        if (cachedImg != null) {
+            return cachedImg;
+        }
+
+
+        Ck3CoatOfArms coa = tag.getCoatOfArms();
+        var img = renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromInfo(info));
         cache.realms.put(tag, img);
         return img;
     }
 
-    public static Image houseImage(SavegameInfo<Ck3Tag> info, Ck3House house) {
+    public static Image houseImage(Ck3House house, GameFileContext ctx) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         var cachedImg = cache.houses.get(house);
         if (cachedImg != null) {
@@ -153,9 +165,9 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        var rawPatternImg = pattern(coaG, coa, info);
+        var rawPatternImg = pattern(coaG, coa, ctx, IMG_SIZE);
         for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, info);
+            emblem(coaImg, rawPatternImg, emblem, ctx, IMG_SIZE);
         }
 
         applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
@@ -185,7 +197,7 @@ public class Ck3TagRenderer {
         return img;
     }
 
-    public static Image titleImage(SavegameInfo<Ck3Tag> info, Ck3Title title) {
+    public static Image titleImage(Ck3Title title, GameFileContext ctx) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         var cachedImg = cache.titles.get(title);
         if (cachedImg != null) {
@@ -200,9 +212,9 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        var rawPatternImg = pattern(coaG, coa, info);
+        var rawPatternImg = pattern(coaG, coa, ctx, IMG_SIZE);
         for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, info);
+            emblem(coaImg, rawPatternImg, emblem, ctx, IMG_SIZE);
         }
 
         applyMask(coaImg, GameImage.CK3_TITLE_MASK);
@@ -278,10 +290,10 @@ public class Ck3TagRenderer {
     }
 
 
-    private static BufferedImage pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
+    private static BufferedImage pattern(Graphics g, Ck3CoatOfArms coa, GameFileContext ctx, int size) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
-            cache.colors.putAll(loadPredefinedColorsForSavegame(info));
+            cache.colors.putAll(loadPredefinedColors(ctx));
         }
 
         if (coa.getPatternFile() != null) {
@@ -300,9 +312,9 @@ public class Ck3TagRenderer {
             };
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
-                    info);
+                    ctx);
             patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
-                g.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE, null);
+                g.drawImage(img, 0, 0, size, size, null);
             });
             return patternFile.map(p -> ImageLoader.loadAwtImage(p, null)).orElse(null);
         } else {
@@ -312,10 +324,12 @@ public class Ck3TagRenderer {
 
     private static void emblem(BufferedImage currentImage,
                                BufferedImage rawPatternImage,
-                               Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
+                               Ck3CoatOfArms.Emblem emblem,
+                               GameFileContext ctx,
+                               int size) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
-            cache.colors.putAll(loadPredefinedColorsForSavegame(info));
+            cache.colors.putAll(loadPredefinedColors(ctx));
         }
 
         int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(cache.colors
@@ -336,24 +350,24 @@ public class Ck3TagRenderer {
         var path = CascadeDirectoryHelper.openFile(
                 Path.of("gfx", "coat_of_arms",
                         (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
-                info);
+                ctx);
         path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
 
             boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
             BufferedImage emblemToCullImage = null;
             if (hasMask) {
-                emblemToCullImage = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
+                emblemToCullImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
             }
             Graphics2D usedGraphics = hasMask ? (Graphics2D) emblemToCullImage.getGraphics() :
                     (Graphics2D) currentImage.getGraphics();
 
             emblem.getInstances().stream().sorted(Comparator.comparingInt(i -> i.getDepth())).forEach(instance -> {
-                var scaleX = ((double) IMG_SIZE / img.getWidth()) * instance.getScaleX();
-                var scaleY = ((double) IMG_SIZE / img.getHeight()) * instance.getScaleY();
+                var scaleX = ((double) size / img.getWidth()) * instance.getScaleX();
+                var scaleY = ((double) size / img.getHeight()) * instance.getScaleY();
 
                 AffineTransform trans = new AffineTransform();
 
-                trans.translate(IMG_SIZE * instance.getX(), IMG_SIZE * instance.getY());
+                trans.translate(size * instance.getX(), size * instance.getY());
                 trans.scale(scaleX, scaleY);
                 trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 

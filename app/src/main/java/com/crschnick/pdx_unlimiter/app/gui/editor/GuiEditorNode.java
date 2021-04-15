@@ -45,8 +45,11 @@ public class GuiEditorNode {
                 state.onColorChanged();
             });
             box.getChildren().add(picker);
+            HBox.setHgrow(picker, Priority.ALWAYS);
         } else {
-            box.getChildren().add(createArrayDisplay(n, state));
+            var ar = createArrayDisplay(n, state);
+            box.getChildren().add(ar);
+            HBox.setHgrow(ar, Priority.ALWAYS);
         }
         return box;
     }
@@ -59,11 +62,11 @@ public class GuiEditorNode {
         {
             int length = n.isReal() ? ((EditorSimpleNode) n).getBackingNode().getNodeArray().size() :
                     ((EditorCollectorNode) n).getNodes().size();
-            int stringSize = String.valueOf(length).length();
-            var lengthString = stringSize == 1 ? " " + length + " " :
-                    (stringSize <= 3 ? " ".repeat(3 - stringSize) + length :
-                            String.valueOf(length));
-            var btn = new JFXButton("List[" + lengthString + "]");
+            var btn = new JFXButton("List (" + length + ")");
+            var icon = new FontIcon();
+            GuiTooltips.install(icon, "Expand node");
+            btn.getStyleClass().add("list-expand-button");
+            btn.setGraphic(icon);
             btn.setAlignment(Pos.CENTER);
             btn.setOnAction(e -> state.navigateTo(n));
             box.getChildren().add(btn);
