@@ -27,6 +27,7 @@ public class EditorState {
     private final ListProperty<EditorNode> content;
     private final Consumer<Map<String, Node>> saveFunc;
     private final ObjectProperty<GameFileContext> fileContext;
+    private EditorNavHistory navHistory;
 
     public EditorState(String fileName, GameFileContext fileContext, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
         this.parser = parser;
@@ -45,6 +46,7 @@ public class EditorState {
         for (var e : nodes.entrySet()) {
             rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
+        this.navHistory = new EditorNavHistory(rootNodes);
     }
 
     public void save() {
