@@ -74,6 +74,11 @@ public final class EditorCollectorNode extends EditorNode {
         return EditorNode.create(this, ArrayNode.array(nodes));
     }
 
+    @Override
+    public ArrayNode getContent() {
+        return ArrayNode.sameKeyArray(keyName, nodes);
+    }
+
     public ArrayNode toWritableNode() {
         return ArrayNode.array(nodes);
     }

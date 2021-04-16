@@ -82,7 +82,7 @@ public class ImageLoader {
         }
     }
 
-    static Image toFXImage(BufferedImage image) {
+    public static WritableImage toFXImage(BufferedImage image) {
         WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
         var iArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
         PixelWriter pw = img.getPixelWriter();

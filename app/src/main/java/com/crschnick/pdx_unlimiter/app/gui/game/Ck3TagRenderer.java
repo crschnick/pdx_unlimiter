@@ -77,7 +77,7 @@ public class Ck3TagRenderer {
         return Map.of();
     }
 
-    public static Image renderImage(Ck3CoatOfArms coa, GameFileContext ctx, int size) {
+    public static BufferedImage renderImage(Ck3CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
@@ -86,29 +86,16 @@ public class Ck3TagRenderer {
             emblem(i, rawPatternImg, emblem, ctx, size);
         }
 
-        return ImageLoader.toFXImage(i);
-    }
-
-    public static Image renderRealmImage(Ck3CoatOfArms coa, String governmentShape, GameFileContext ctx) {
-        BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
-
-
-        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = i.getGraphics();
-
-        var rawPatternImg = pattern(coaG, coa, ctx, IMG_SIZE);
-        for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, ctx, IMG_SIZE);
+        if (cloth) {
+            applyMask(i, GameImage.CK3_COA_OVERLAY);
+            brighten(i);
         }
 
-        g.drawImage(coaImg,
-                0,
-                0,
-                i.getWidth(),
-                i.getHeight(),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+        return i;
+    }
+
+    public static Image renderRealmImage(Ck3CoatOfArms coa, String governmentShape, GameFileContext ctx, int size, boolean cloth) {
+        var realmImg = renderImage(coa, ctx, size, false);
 
         var masks = Map.of(
                 "clan_government", GameImage.CK3_REALM_CLAN_MASK,
@@ -116,9 +103,20 @@ public class Ck3TagRenderer {
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_MASK,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_MASK);
         var useMask = masks.getOrDefault(governmentShape, GameImage.CK3_REALM_MASK);
-        applyMask(i, useMask);
-        brighten(i);
+        applyMask(realmImg, useMask);
+        brighten(realmImg);
 
+        int scaleFactor = size / IMG_SIZE;
+        BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) i.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(realmImg,
+                scaleFactor,
+                4 * scaleFactor,
+                realmImg.getWidth() - scaleFactor,
+                realmImg.getHeight() - (4 * scaleFactor),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
 
         var frames = Map.of(
                 "clan_government", GameImage.CK3_REALM_CLAN_FRAME,
@@ -127,12 +125,13 @@ public class Ck3TagRenderer {
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_FRAME);
         var useFrame = frames.getOrDefault(governmentShape, GameImage.CK3_REALM_FRAME);
         g.drawImage(ImageLoader.fromFXImage(useFrame),
-                3,
-                -12,
-                i.getWidth() - 6,
-                i.getHeight() + 24,
+                3 * scaleFactor,
+                -8 * scaleFactor,
+                realmImg.getWidth() - (6 * scaleFactor),
+                realmImg.getHeight() + (20 * scaleFactor),
                 new java.awt.Color(0, 0, 0, 0),
                 null);
+
         return ImageLoader.toFXImage(i);
     }
 
@@ -145,9 +144,37 @@ public class Ck3TagRenderer {
 
 
         Ck3CoatOfArms coa = tag.getCoatOfArms();
-        var img = renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromInfo(info));
+        var img = renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromInfo(info), IMG_SIZE, true);
         cache.realms.put(tag, img);
         return img;
+    }
+
+    public static Image renderHouseImage(Ck3CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
+        var houseImg = renderImage(coa, ctx, size, cloth);
+        applyMask(houseImg, GameImage.CK3_HOUSE_MASK);
+
+        BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) i.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        int scaleFactor = size / IMG_SIZE;
+        g.drawImage(houseImg,
+                20 * scaleFactor,
+                20 * scaleFactor,
+                i.getWidth() - (40 * scaleFactor),
+                i.getHeight() - (40 * scaleFactor),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+        g.drawImage(
+                ImageLoader.fromFXImage(GameImage.CK3_HOUSE_FRAME),
+                -25 * scaleFactor,
+                -15 * scaleFactor,
+                houseImg.getWidth() + (33 * scaleFactor),
+                houseImg.getHeight() + (30 * scaleFactor),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+
+        return ImageLoader.toFXImage(i);
     }
 
     public static Image houseImage(Ck3House house, GameFileContext ctx) {
@@ -157,44 +184,37 @@ public class Ck3TagRenderer {
             return cachedImg;
         }
 
-        Ck3CoatOfArms coa = house.getCoatOfArms();
-        BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
-
-
-        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = i.getGraphics();
-
-        var rawPatternImg = pattern(coaG, coa, ctx, IMG_SIZE);
-        for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, ctx, IMG_SIZE);
-        }
-
-        applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
-
-        g.drawImage(coaImg,
-                20,
-                20,
-                i.getWidth() - 40,
-                i.getHeight() - 40,
-                new java.awt.Color(0, 0, 0, 0),
-                null);
-
-
-        applyMask(i, GameImage.CK3_COA_OVERLAY);
-        brighten(i);
-
-        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_HOUSE_FRAME),
-                -25,
-                -15,
-                i.getWidth() + 33,
-                i.getHeight() + 30,
-                new java.awt.Color(0, 0, 0, 0),
-                null);
-
-        var img = ImageLoader.toFXImage(i);
+        var img = renderHouseImage(house.getCoatOfArms(), ctx, IMG_SIZE, true);
         cache.houses.put(house, img);
         return img;
+    }
+
+    public static Image renderTitleImage(Ck3CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
+        var titleImg = renderImage(coa, ctx, size, cloth);
+        applyMask(titleImg, GameImage.CK3_TITLE_MASK);
+
+        BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) i.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        int scaleFactor = size / IMG_SIZE;
+        g.drawImage(titleImg,
+                13 * scaleFactor,
+                13 * scaleFactor,
+                i.getWidth() - (28 * scaleFactor),
+                i.getHeight() - (28 * scaleFactor),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+        g.drawImage(
+                ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
+                -6 * scaleFactor,
+                -4 * scaleFactor,
+                titleImg.getWidth() + (11 * scaleFactor),
+                titleImg.getHeight() + (11 * scaleFactor),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
+
+        return ImageLoader.toFXImage(i);
     }
 
     public static Image titleImage(Ck3Title title, GameFileContext ctx) {
@@ -205,38 +225,7 @@ public class Ck3TagRenderer {
         }
 
         Ck3CoatOfArms coa = title.getCoatOfArms();
-        BufferedImage coaImg = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D coaG = (Graphics2D) coaImg.getGraphics();
-
-
-        BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = i.getGraphics();
-
-        var rawPatternImg = pattern(coaG, coa, ctx, IMG_SIZE);
-        for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, ctx, IMG_SIZE);
-        }
-
-        applyMask(coaImg, GameImage.CK3_TITLE_MASK);
-
-        g.drawImage(coaImg,
-                20,
-                20,
-                i.getWidth() - 40,
-                i.getHeight() - 40,
-                new java.awt.Color(0, 0, 0, 0),
-                null);
-
-        g.drawImage(ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
-                -9,
-                -6,
-                i.getWidth() + 17,
-                i.getHeight() + 17,
-                new java.awt.Color(0, 0, 0, 0),
-                null);
-
-
-        var img = ImageLoader.toFXImage(i);
+        var img = renderTitleImage(coa, ctx, IMG_SIZE, true);
         cache.titles.put(title, img);
         return img;
     }
@@ -246,9 +235,9 @@ public class Ck3TagRenderer {
             for (int y = 0; y < awtImage.getHeight(); y++) {
                 int argb = awtImage.getRGB(x, y);
                 int color = (getAlpha(argb) << 24) +
-                        (Math.min((int) (1.6 * getRed(argb)), 255) << 16) +
-                        (Math.min((int) (1.6 * getGreen(argb)), 255) << 8) +
-                        (Math.min((int) (1.6 * getBlue(argb)), 255));
+                        (Math.min((int) (1.8 * getRed(argb)), 255) << 16) +
+                        (Math.min((int) (1.8 * getGreen(argb)), 255) << 8) +
+                        (Math.min((int) (1.8 * getBlue(argb)), 255));
                 awtImage.setRGB(x, y, color);
             }
         }

@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.NodePointer;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -114,8 +115,8 @@ public class EditorState {
                 selected != null ? createEditorNodes(selected.editorNode) : rootNodes.values()));
     }
 
-    public void navigateTo(EditorNodePointer pointer) {
-        pointer.createNavPath(this).ifPresent(n -> {
+    public void navigateTo(NodePointer pointer) {
+        EditorNavPath.createNavPath(this, pointer).ifPresent(n -> {
             this.navPath.set(FXCollections.observableArrayList(n));
         });
         update(false);
