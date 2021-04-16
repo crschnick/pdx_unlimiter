@@ -98,6 +98,12 @@ public final class EditorSimpleNode extends EditorNode {
         return EditorNode.create(this, (ArrayNode) getBackingNode());
     }
 
+    @Override
+    public ArrayNode getContent() {
+        return getKeyName().map(s -> ArrayNode.singleKeyNode(s, getBackingNode()))
+                .orElse(ArrayNode.array(List.of(getBackingNode())));
+    }
+
     public ArrayNode toWritableNode() {
         return getBackingNode().isArray() ? (ArrayNode) getBackingNode() :
                 ArrayNode.array(List.of(getBackingNode()));

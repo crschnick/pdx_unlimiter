@@ -93,6 +93,8 @@ public abstract class EditorNode {
 
     public abstract List<EditorNode> expand();
 
+    public abstract ArrayNode getContent();
+
     public abstract ArrayNode toWritableNode();
 
     public abstract void update(ArrayNode newNode);

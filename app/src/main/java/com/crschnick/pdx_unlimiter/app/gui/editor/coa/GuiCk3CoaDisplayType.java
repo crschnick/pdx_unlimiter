@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.gui.editor.coa;
 
 import com.crschnick.pdx_unlimiter.app.gui.game.Ck3TagRenderer;
+import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
 import javafx.beans.property.*;
@@ -48,7 +49,8 @@ public abstract class GuiCk3CoaDisplayType {
 
         @Override
         public Image render(Ck3CoatOfArms coa, GameFileContext ctx) {
-            return Ck3TagRenderer.renderImage(coa, ctx, size.get());
+            return ImageLoader.toFXImage(
+                    Ck3TagRenderer.renderImage(coa, ctx, size.get(), clothPattern.get()));
         }
     };
 
@@ -56,7 +58,7 @@ public abstract class GuiCk3CoaDisplayType {
 
         @Override
         public Image render(Ck3CoatOfArms coa, GameFileContext ctx) {
-            return Ck3TagRenderer.renderRealmImage(coa, "clan_government", ctx);
+            return Ck3TagRenderer.renderHouseImage(coa, ctx, size.get(), clothPattern.get());
         }
     };
 
@@ -64,7 +66,7 @@ public abstract class GuiCk3CoaDisplayType {
 
         @Override
         public Image render(Ck3CoatOfArms coa, GameFileContext ctx) {
-            return Ck3TagRenderer.renderRealmImage(coa, "clan_government", ctx);
+            return Ck3TagRenderer.renderRealmImage(coa, "clan_government", ctx, size.get(), clothPattern.get());
         }
     };
 
@@ -72,7 +74,7 @@ public abstract class GuiCk3CoaDisplayType {
 
         @Override
         public Image render(Ck3CoatOfArms coa, GameFileContext ctx) {
-            return Ck3TagRenderer.renderRealmImage(coa, "clan_government", ctx);
+            return Ck3TagRenderer.renderTitleImage(coa, ctx, size.get(), clothPattern.get());
         }
     };
 
@@ -93,7 +95,7 @@ public abstract class GuiCk3CoaDisplayType {
 
         @Override
         public Image render(Ck3CoatOfArms coa, GameFileContext ctx) {
-            return Ck3TagRenderer.renderRealmImage(coa, governmentType.get(), ctx);
+            return Ck3TagRenderer.renderRealmImage(coa, governmentType.get(), ctx, size.get(), clothPattern.get());
         }
     };
 
@@ -116,6 +118,7 @@ public abstract class GuiCk3CoaDisplayType {
     }
 
     protected final IntegerProperty size = new SimpleIntegerProperty();
+    protected final BooleanProperty clothPattern = new SimpleBooleanProperty();
 
     protected <T> void addChoice(GuiCk3CoaViewerState state, HBox box, String type, T defValue, Map<String,T> choices, Property<T> prop) {
         prop.setValue(defValue);
@@ -129,6 +132,9 @@ public abstract class GuiCk3CoaDisplayType {
         addChoice(state, box, "Size", 256, Map.of(
                 "256 x 256", 256,
                 "512 x 512", 512), size);
+        addChoice(state, box, "Cloth pattern", true, Map.of(
+                "enable", true,
+                "disable", false), clothPattern);
     }
 
     public abstract Image render(Ck3CoatOfArms coa, GameFileContext ctx);
