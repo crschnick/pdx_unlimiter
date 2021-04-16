@@ -158,8 +158,8 @@ public class FileWatchManager {
             // Check for duplicate modifications
             // See https://stackoverflow.com/questions/16777869/java-7-watchservice-ignoring-multiple-occurrences-of-the-same-event
             if (ev.kind().equals(ENTRY_MODIFY) && lastModified.containsKey(file)) {
-                if (Duration.between(Instant.now(),
-                        lastModified.get(file)).compareTo(Duration.ofSeconds(2)) < 0) {
+                if (Duration.between(lastModified.get(file), Instant.now())
+                        .compareTo(Duration.ofSeconds(2)) < 0) {
                     logger.trace("Discarding double modify event of file " +
                             baseDir.relativize(file) + " in dir " + baseDir);
                     return;
