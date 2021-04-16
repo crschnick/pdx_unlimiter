@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,15 +39,15 @@ public class EditorNavPath {
 
     private List<NavEntry> path;
 
-    private EditorNavPath(List<NavEntry> path) {
+    public EditorNavPath(List<NavEntry> path) {
         this.path = path;
     }
 
-    public static Optional<EditorNavPath> createNavPath(EditorState state, NodePointer pointer) {
+    public static Optional<EditorNavPath> createNavPath(Collection<EditorNode> rootNodes, NodePointer pointer) {
         EditorNode current = null;
         List<NavEntry> newPath = new ArrayList<>();
 
-        for (var e : state.getRootNodes().values()) {
+        for (var e : rootNodes) {
             var found = pointer.sub(0, 1).isValid(e.getContent());
             if (found) {
                 current = e;
@@ -74,6 +75,31 @@ public class EditorNavPath {
         }
 
         return Optional.of(new EditorNavPath(newPath));
+    }
+
+
+    public static EditorNavPath verify(EditorNavPath input, Collection<EditorNode> rootNodes) {
+        EditorNode current = null;
+        List<EditorNavPath.NavEntry> newPath = new ArrayList<>();
+        for (var navEl : input.getPath()) {
+            if (current == null) {
+                current = navEl.getEditorNode();
+                newPath.add(new EditorNavPath.NavEntry(current, 0));
+                continue;
+            }
+
+            var newEditorNode = current.expand().stream()
+                    .filter(en -> navEl.getEditorNode().getParentIndex() == en.getParentIndex() &&
+                            en.getDisplayKeyName().equals(navEl.getEditorNode().getDisplayKeyName()))
+                    .findFirst();
+            if (newEditorNode.isPresent()) {
+                current = newEditorNode.get();
+                newPath.add(new EditorNavPath.NavEntry(newEditorNode.get(), navEl.getScroll()));
+            } else {
+                break;
+            }
+        }
+        return new EditorNavPath(newPath);
     }
 
     public List<NavEntry> getPath() {
