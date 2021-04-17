@@ -79,8 +79,22 @@ public class GameAppManager {
             if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
                 Toolkit.getDefaultToolkit().beep();
             }
-            SavegameActions.importLatestSavegame();
+            importLatest();
             lastImport = Instant.now();
+        }
+    }
+
+    public void importLatest() {
+        var g = getActiveGame();
+        if (g != null) {
+            SavegameActions.importLatestSavegame(g.getGame());
+        }
+    }
+
+    public void kill() {
+        var g = getActiveGame();
+        if (g != null) {
+            g.kill();
         }
     }
 

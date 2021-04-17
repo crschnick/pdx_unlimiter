@@ -7,6 +7,7 @@ import com.crschnick.pdx_unlimiter.app.editor.Editor;
 import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -102,9 +103,8 @@ public class SavegameActions {
         });
     }
 
-    public static void importLatestSavegame() {
-        var savegames = SavegameWatcher.ALL.get(
-                SavegameManagerState.get().current()).getSavegames();
+    public static void importLatestSavegame(Game g) {
+        var savegames = SavegameWatcher.ALL.get(g).getSavegames();
         if (savegames.size() == 0) {
             return;
         }

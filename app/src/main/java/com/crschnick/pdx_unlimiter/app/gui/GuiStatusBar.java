@@ -91,7 +91,7 @@ public class GuiStatusBar {
         importLatest.setGraphic(new FontIcon());
         importLatest.getStyleClass().add(CLASS_IMPORT);
         importLatest.setOnAction(event -> {
-            SavegameActions.importLatestSavegame();
+            GameAppManager.getInstance().importLatest();
             event.consume();
         });
 
@@ -99,8 +99,8 @@ public class GuiStatusBar {
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(CLASS_KILL);
         b.setOnAction(event -> {
+            GameAppManager.getInstance().kill();
             event.consume();
-            GameAppManager.getInstance().getActiveGame().kill();
         });
 
         HBox buttons = new HBox(importLatest);

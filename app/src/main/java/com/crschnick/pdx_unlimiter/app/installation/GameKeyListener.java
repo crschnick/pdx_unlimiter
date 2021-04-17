@@ -25,7 +25,7 @@ public class GameKeyListener implements NativeKeyListener {
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
-                SavegameActions.importLatestSavegame();
+                GameAppManager.getInstance().importLatest();
                 if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
                     Toolkit.getDefaultToolkit().beep();
                 }
