@@ -43,15 +43,19 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     private static Region createRulerStatsNode(Eu4SavegameInfo.Ruler ruler) {
+        return createPowersNode(ruler.getAdm(), ruler.getDip(), ruler.getMil());
+    }
+
+    private static Region createPowersNode(int admP, int dipP, int milP) {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
-        Label adm = new Label(ruler.getAdm() + "  ", imageNode(EU4_ICON_ADM, CLASS_POWER_ICON));
+        Label adm = new Label(admP + "  ", imageNode(EU4_ICON_ADM, CLASS_POWER_ICON));
         box.getChildren().add(adm);
 
-        Label dip = new Label(ruler.getDip() + "  ", imageNode(EU4_ICON_DIP, CLASS_POWER_ICON));
+        Label dip = new Label(dipP + "  ", imageNode(EU4_ICON_DIP, CLASS_POWER_ICON));
         box.getChildren().add(dip);
 
-        Label mil = new Label(String.valueOf(ruler.getMil()), imageNode(EU4_ICON_MIL, CLASS_POWER_ICON));
+        Label mil = new Label(String.valueOf(milP), imageNode(EU4_ICON_MIL, CLASS_POWER_ICON));
         box.getChildren().add(mil);
         return box;
     }
@@ -73,6 +77,59 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add(style);
         addNode(pane, row);
+    }
+
+    private void addIntegerEntry(
+            JFXMasonryPane pane,
+            Image icon, int value, String tooltip, boolean showPlus) {
+        var text = (showPlus && value > 0 ? "+" + value : String.valueOf(value));
+        var ironman = new StackPane(new Label(text, GameImage.imageNode(icon, CLASS_IMAGE_ICON)));
+        ironman.setAlignment(Pos.CENTER);
+        GuiTooltips.install(ironman, tooltip);
+        ironman.getStyleClass().add("number");
+        addNode(pane, ironman);
+    }
+
+    private void addManpowerEntry(
+            JFXMasonryPane pane,
+            int value, int max) {
+        var label = new Label(value + "k / " + max + "k",
+                GameImage.imageNode(EU4_ICON_MANPOWER, CLASS_IMAGE_ICON));
+        label.setMinWidth(Region.USE_PREF_SIZE);
+        label.setEllipsisString("");
+
+        var stack = new StackPane(label);
+        stack.setAlignment(Pos.CENTER);
+        stack.getStyleClass().add("number");
+        stack.setMinWidth(label.getPrefWidth());
+        GuiTooltips.install(stack, "Manpower / Max Manpower");
+        addNode(pane, stack);
+    }
+
+    private void addDucatsEntry(
+            JFXMasonryPane pane,
+            int value, int loans) {
+        var label = new Label(value + (loans != 0 ?  " / -" + loans : ""),
+                GameImage.imageNode(EU4_ICON_DUCATS, CLASS_IMAGE_ICON));
+        label.setMinWidth(Region.USE_PREF_SIZE);
+        label.setEllipsisString("");
+
+        var stack = new StackPane(label);
+        stack.setAlignment(Pos.CENTER);
+        stack.setMinWidth(label.getPrefWidth());
+        stack.getStyleClass().add("number");
+        GuiTooltips.install(stack, "Ducats in treasury" + (loans != 0 ? " / Owed ducats for loans" : ""));
+        addNode(pane, stack);
+    }
+
+    private void addPowersEntry(
+            JFXMasonryPane pane, int adm, int dip, int mil) {
+        var label = createPowersNode(adm, dip, mil);
+        var stack = new StackPane(label);
+        stack.setAlignment(Pos.CENTER);
+        stack.setMinWidth(label.getPrefWidth());
+        stack.getStyleClass().add("number");
+        addNode(pane, stack);
     }
 
     @Override
@@ -144,6 +201,8 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
                     war.getTitle(), CLASS_WAR);
         }
 
+        super.fillNodeContainer(i, grid);
+
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ALLIANCE, CLASS_IMAGE_ICON), info.getAllies(),
                 PdxuI18n.get("ALLIES"), CLASS_ALLIANCE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ROYAL_MARRIAGE, CLASS_IMAGE_ICON), info.getMarriages(),
@@ -152,13 +211,20 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
                 PdxuI18n.get("GUARANTEES"), CLASS_GUARANTEE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getVassals(),
                 PdxuI18n.get("VASSALS"), CLASS_VASSAL);
-        createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getJuniorPartners(),
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_UNION_SENIOR, CLASS_IMAGE_ICON), info.getJuniorPartners(),
                 PdxuI18n.get("PU_JUNIOR_PARTNERS"), CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRIBUTARY, CLASS_IMAGE_ICON), info.getTributaryJuniors(),
                 PdxuI18n.get("TRIBUTARIES"), CLASS_VASSAL);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_MARCH, CLASS_IMAGE_ICON), info.getMarches(),
                 PdxuI18n.get("MARCHES"), CLASS_VASSAL);
+        createDiplomacyRow(grid, i, imageNode(EU4_ICON_DEV, CLASS_IMAGE_ICON), info.getMarches(),
+                PdxuI18n.get("MARCHES"), CLASS_VASSAL);
 
-        super.fillNodeContainer(i, grid);
+        addIntegerEntry(grid, EU4_ICON_DEV, info.getTotalDev(), "Development", false);
+        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
+        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
+        addManpowerEntry(grid, info.getManpower(), info.getMaxManpower());
+        addDucatsEntry(grid, info.getTreasuryMoney(), info.getLoanedMoney());
+        addPowersEntry(grid, info.getAdm(), info.getDip(), info.getMil());
     }
 }

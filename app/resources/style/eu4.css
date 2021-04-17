@@ -31,5 +31,9 @@
 }
 
 .eu4 .marriage {
-      -fx-background-color: #6f3b73;
+      -fx-background-color: #6f3b73BB;
+}
+
+.eu4 .number {
+    -fx-background-color: #0d7dbb55;
 }

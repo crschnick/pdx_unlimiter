@@ -8,6 +8,7 @@ import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,16 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private boolean releasedVassal;
     private Ruler ruler;
     private Ruler heir;
+    private int treasuryMoney;
+    private int loanedMoney;
+    private int manpower;
+    private int maxManpower;
+    private int totalDev;
+    private int prestige;
+    private int stability;
+    private int adm;
+    private int dip;
+    private int mil;
     private List<War> wars = new ArrayList<>();
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
@@ -64,19 +75,46 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .getNodeForKeyIfExistent("has_switched_nation").map(Node::getBoolean).orElse(false);
             e.date = date;
 
-            Node v = n.getNodeForKey("savegame_version");
+            Node ver = n.getNodeForKey("savegame_version");
             e.version = new GameVersion(
-                    v.getNodeForKey("first").getInteger(),
-                    v.getNodeForKey("second").getInteger(),
-                    v.getNodeForKey("third").getInteger(),
-                    v.getNodeForKey("forth").getInteger(),
-                    v.getNodeForKey("name").getString());
+                    ver.getNodeForKey("first").getInteger(),
+                    ver.getNodeForKey("second").getInteger(),
+                    ver.getNodeForKey("third").getInteger(),
+                    ver.getNodeForKey("forth").getInteger(),
+                    ver.getNodeForKey("name").getString());
 
             e.tag = Eu4Tag.getTag(e.allTags, tag);
 
             if (e.observer) {
                 return e;
             }
+
+            AtomicInteger loans = new AtomicInteger();
+            n.getNodeForKey("countries").getNodeForKey(tag).forEach((k,v) -> {
+                if (k.equals("loan")) {
+                    loans.addAndGet(v.getNodeForKey("amount").getInteger());
+                }
+            });
+            e.loanedMoney = loans.get();
+
+            e.treasuryMoney = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("treasury").getDouble();
+
+
+            e.manpower = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("manpower").getDouble();
+            e.maxManpower = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("max_manpower").getDouble();
+
+
+            e.stability = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("stability").getDouble();
+
+
+            e.adm = n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(0).getInteger();
+            e.dip = n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(1).getInteger();
+            e.mil = n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(2).getInteger();
+
+
+            e.prestige = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("prestige").getDouble();
+            e.totalDev = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("realm_development").getDouble();
+
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
             e.ruler = Ruler.fromCountryNode(e.date, n.getNodeForKey("countries").getNodeForKey(tag),
@@ -383,5 +421,45 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         public List<Eu4Tag> getEnemies() {
             return enemies;
         }
+    }
+
+    public int getTreasuryMoney() {
+        return treasuryMoney;
+    }
+
+    public int getLoanedMoney() {
+        return loanedMoney;
+    }
+
+    public int getManpower() {
+        return manpower;
+    }
+
+    public int getMaxManpower() {
+        return maxManpower;
+    }
+
+    public int getStability() {
+        return stability;
+    }
+
+    public int getTotalDev() {
+        return totalDev;
+    }
+
+    public int getPrestige() {
+        return prestige;
+    }
+
+    public int getAdm() {
+        return adm;
+    }
+
+    public int getDip() {
+        return dip;
+    }
+
+    public int getMil() {
+        return mil;
     }
 }

@@ -87,6 +87,13 @@ public class GameImage {
     public static Image EU4_ICON_ADM;
     public static Image EU4_ICON_DIP;
     public static Image EU4_ICON_MIL;
+    public static Image EU4_ICON_UNION_SENIOR;
+    public static Image EU4_ICON_UNION_JUNIOR;
+    public static Image EU4_ICON_DUCATS;
+    public static Image EU4_ICON_DEV;
+    public static Image EU4_ICON_MANPOWER;
+    public static Image EU4_ICON_PRESTIGE;
+    public static Image EU4_ICON_STABILITY;
     public static Image EU4_BACKGROUND;
     public static Image EU4_SHIELD_MASK;
     public static Image EU4_SHIELD_FRAME;
@@ -275,6 +282,15 @@ public class GameImage {
         EU4_ICON_ADM = ImageLoader.loadImage(i.resolve("icon_powers_administrative_in_text.dds"));
         EU4_ICON_DIP = ImageLoader.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
         EU4_ICON_MIL = ImageLoader.loadImage(i.resolve("icon_powers_military_in_text.dds"));
+
+
+        EU4_ICON_UNION_SENIOR = ImageLoader.loadImage(i.resolve("icon_diplomacy_leadunions.dds"));
+        EU4_ICON_UNION_JUNIOR = ImageLoader.loadImage(i.resolve("icon_diplomacy_inunion.dds"));
+        EU4_ICON_MANPOWER = ImageLoader.loadImage(i.resolve("icon_manpower2.dds"));
+        EU4_ICON_DEV = ImageLoader.loadImage(i.resolve("development_icon.dds"));
+        EU4_ICON_DUCATS = ImageLoader.loadImage(i.resolve("icon_gold.dds"));
+        EU4_ICON_PRESTIGE = ImageLoader.loadImage(i.resolve("icon_prestige.dds"));
+        EU4_ICON_STABILITY = ImageLoader.loadImage(i.resolve("icon_stability.dds"));
 
         Function<Integer, Integer> rnwFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
