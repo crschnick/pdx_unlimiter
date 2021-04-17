@@ -27,13 +27,17 @@
 }
 
 .eu4 .guarantee {
-      -fx-background-color: #74a7c7;
+      -fx-background-color: #631aa999;
 }
 
 .eu4 .marriage {
-      -fx-background-color: #6f3b73BB;
+      -fx-background-color: #631aa999;
 }
 
 .eu4 .number {
-    -fx-background-color: #0d7dbb55;
+    -fx-background-color: #dddddd11;
+}
+
+.eu4 .subject {
+    -fx-background-color: #2daba3AA;
 }

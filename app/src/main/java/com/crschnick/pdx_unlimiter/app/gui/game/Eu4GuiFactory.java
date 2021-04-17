@@ -168,6 +168,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
             addNode(grid, createRulerLabel(info.getHeir().get(), false));
         }
 
+
         if (info.isIronman()) {
             var ironman = new StackPane(imageNode(EU4_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
             ironman.setAlignment(Pos.CENTER);
@@ -196,12 +197,18 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
             addNode(grid, rv);
         }
 
+        addIntegerEntry(grid, EU4_ICON_DEV, info.getTotalDev(), "Development", false);
+        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
+        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
+        addManpowerEntry(grid, info.getManpower(), info.getMaxManpower());
+        addDucatsEntry(grid, info.getTreasuryMoney(), info.getLoanedMoney());
+        addPowersEntry(grid, info.getAdm(), info.getDip(), info.getMil());
+
+
         for (Eu4SavegameInfo.War war : info.getWars()) {
             createDiplomacyRow(grid, i, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),
                     war.getTitle(), CLASS_WAR);
         }
-
-        super.fillNodeContainer(i, grid);
 
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_ALLIANCE, CLASS_IMAGE_ICON), info.getAllies(),
                 PdxuI18n.get("ALLIES"), CLASS_ALLIANCE);
@@ -210,21 +217,14 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_GUARANTEE, CLASS_IMAGE_ICON), info.getGuarantees(),
                 PdxuI18n.get("GUARANTEES"), CLASS_GUARANTEE);
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_VASSAL, CLASS_IMAGE_ICON), info.getVassals(),
-                PdxuI18n.get("VASSALS"), CLASS_VASSAL);
+                PdxuI18n.get("VASSALS"), "subject");
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_UNION_SENIOR, CLASS_IMAGE_ICON), info.getJuniorPartners(),
-                PdxuI18n.get("PU_JUNIOR_PARTNERS"), CLASS_VASSAL);
+                PdxuI18n.get("PU_JUNIOR_PARTNERS"), "subject");
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_TRIBUTARY, CLASS_IMAGE_ICON), info.getTributaryJuniors(),
-                PdxuI18n.get("TRIBUTARIES"), CLASS_VASSAL);
+                PdxuI18n.get("TRIBUTARIES"), "subject");
         createDiplomacyRow(grid, i, imageNode(EU4_ICON_MARCH, CLASS_IMAGE_ICON), info.getMarches(),
-                PdxuI18n.get("MARCHES"), CLASS_VASSAL);
-        createDiplomacyRow(grid, i, imageNode(EU4_ICON_DEV, CLASS_IMAGE_ICON), info.getMarches(),
-                PdxuI18n.get("MARCHES"), CLASS_VASSAL);
+                PdxuI18n.get("MARCHES"), "subject");
 
-        addIntegerEntry(grid, EU4_ICON_DEV, info.getTotalDev(), "Development", false);
-        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
-        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
-        addManpowerEntry(grid, info.getManpower(), info.getMaxManpower());
-        addDucatsEntry(grid, info.getTreasuryMoney(), info.getLoanedMoney());
-        addPowersEntry(grid, info.getAdm(), info.getDip(), info.getMil());
+        super.fillNodeContainer(i, grid);
     }
 }

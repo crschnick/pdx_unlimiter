@@ -42,7 +42,7 @@ public class PdxuApp extends Application {
         var w = stage;
 
         // Set size to default
-        w.setWidth(1350);
+        w.setWidth(1550);
         w.setHeight(700);
 
         var s = SavedState.getInstance();
