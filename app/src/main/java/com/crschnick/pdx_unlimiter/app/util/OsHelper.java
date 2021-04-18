@@ -8,11 +8,6 @@ import java.nio.file.Paths;
 
 public class OsHelper {
 
-    public static void openFileAssociationDialog(Path file) {
-        //TODO
-    }
-
-
     public static Path getUserDocumentsPath() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return Path.of(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());

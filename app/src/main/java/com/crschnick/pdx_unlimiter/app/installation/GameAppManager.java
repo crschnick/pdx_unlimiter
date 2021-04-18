@@ -90,7 +90,7 @@ public class GameAppManager {
 
     public void importLatest() {
         var g = getActiveGame();
-        if (g != null) {
+        if (g != null && g.getGame().isEnabled()) {
             logger.info("Importing latest savegame");
             SavegameActions.importLatestSavegame(g.getGame());
         }
@@ -98,7 +98,7 @@ public class GameAppManager {
 
     public void kill() {
         var g = getActiveGame();
-        if (g != null) {
+        if (g != null && g.getGame().isEnabled()) {
             logger.info("Killing active game");
             g.kill();
         }

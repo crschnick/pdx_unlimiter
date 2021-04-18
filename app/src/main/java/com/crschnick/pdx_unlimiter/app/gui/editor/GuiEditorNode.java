@@ -69,6 +69,7 @@ public class GuiEditorNode {
                 var tt = GuiTooltips.createTooltip(NodeWriter.writeToString(
                         n.toWritableNode(), 15, "  "));
                 tt.setShowDelay(Duration.ZERO);
+                tt.setHideDelay(Duration.INDEFINITE);
                 Tooltip.install(preview, tt);
             });
             box.getChildren().add(preview);

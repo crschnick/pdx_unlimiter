@@ -14,11 +14,13 @@ public class Ck3Tag {
     private String governmentName;
     private Ck3CoatOfArms coatOfArms;
     private String name;
+    private int balance;
+    private int strength;
 
     public Ck3Tag() {
     }
 
-    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, Ck3CoatOfArms coatOfArms, String name) {
+    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, Ck3CoatOfArms coatOfArms, String name, int balance, int strength) {
         this.id = id;
         this.ruler = ruler;
         this.titles = titles;
@@ -26,6 +28,8 @@ public class Ck3Tag {
         this.governmentName = governmentName;
         this.coatOfArms = coatOfArms;
         this.name = name;
+        this.balance = balance;
+        this.strength = strength;
     }
 
     @Override
@@ -84,8 +88,13 @@ public class Ck3Tag {
                 n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"));
         var name = n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
-        var gv = personNode.getNodeForKey("landed_data").getNodeForKey("government").getString();
-        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name);
+        var landedNode = personNode.getNodeForKey("landed_data");
+        var gv = landedNode.getNodeForKey("government").getString();
+        var balance = landedNode.getNodeForKeyIfExistent("balance")
+                .map(Node::getDouble).orElse(0.0).intValue();
+        var strength = landedNode.getNodeForKeyIfExistent("strength")
+                .map(Node::getDouble).orElse(0.0).intValue();
+        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name, balance, strength);
         allTags.removeIf(t -> t.id == id);
         allTags.add(tag);
         return Optional.of(tag);
@@ -107,11 +116,17 @@ public class Ck3Tag {
                 return;
             }
 
+            var landedNode = v.getNodeForKey("landed_data");
             long id = Long.parseLong(k);
             var domain = v.getNodeForKey("landed_data").getNodeForKey("domain");
             var primary = domain.getNodeArray().get(0).getLong();
             var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
-            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)), null, gv, null, null));
+            var balance = landedNode.getNodeForKeyIfExistent("balance")
+                    .map(Node::getDouble).orElse(0.0).intValue();
+            var strength = landedNode.getNodeForKeyIfExistent("strength")
+                    .map(Node::getDouble).orElse(0.0).intValue();
+            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)),
+                    null, gv, null, null, balance, strength));
         });
         return allTags;
     }

@@ -5,8 +5,6 @@ import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
-import com.crschnick.pdx_unlimiter.app.editor.Editor;
-import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.application.Platform;
@@ -43,7 +41,7 @@ public class FileImporter {
     }
 
     private static void importFromQueue(Path queueFile) {
-        String input = null;
+        String input;
         try {
             input = Files.readString(queueFile);
         } catch (IOException e) {
@@ -54,8 +52,7 @@ public class FileImporter {
         logger.debug("Starting to import " + input + " from queue file " + queueFile);
         var targets = FileImportTarget.createTargets(input);
         if (targets.size() == 0) {
-            logger.debug("No targets to import. Trying editor targets ...");
-            EditTarget.create(Path.of(input)).ifPresent(Editor::createNewEditor);
+            logger.debug("No targets to import.");
 
         } else {
             for (FileImportTarget t : targets) {
@@ -102,19 +99,6 @@ public class FileImporter {
 
                     Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
                 }, false);
-    }
-
-
-    public static void addToLazyImportQueue(Path toImport) {
-        try {
-            Files.createDirectories(PdxuInstallation.getInstance().getLazyImportStorageLocation());
-            var path = PdxuInstallation.getInstance().getLazyImportStorageLocation()
-                    .resolve(UUID.randomUUID().toString());
-            logger.debug("Copying file to " + path + " for lazy import target " + toImport);
-            Files.copy(toImport, path);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
     }
 
     public static void addToImportQueue(String toImport) {
