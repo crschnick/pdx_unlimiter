@@ -6,11 +6,13 @@ import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
+import java.time.Instant;
 import java.util.*;
 
 public class EditorExternalState {
@@ -18,6 +20,8 @@ public class EditorExternalState {
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
     private final Set<Entry> openEntries = new HashSet<>();
+
+    private static final Logger logger = LoggerFactory.getLogger(EditorExternalState.class);
 
     public static void init() {
         try {
@@ -34,17 +38,18 @@ public class EditorExternalState {
                 } else {
                     getForFile(changed).ifPresent(e -> {
                         try {
-                            // Wait for first write
-                            if (!e.registered) {
-                                if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                                    e.registered = true;
-                                }
-                                return;
-                            }
+                            logger.trace("Registering modification for file " + TEMP.relativize(e.file));
+                            logger.trace("Last modification for file: " + e.lastModified.toString() +
+                                    " vs current one: " + e.getLastModified());
+                            if (e.hasChanged()) {
+                                logger.trace("Registering change for file " + TEMP.relativize(e.file) +
+                                        " for editor node " + e.editorNode.getDisplayKeyName());
 
-                            ArrayNode newNode = e.state.getParser().parse(changed);
-                            e.editorNode.update(newNode);
-                            e.state.onFileChanged();
+                                e.registerChange();
+                                ArrayNode newNode = e.state.getParser().parse(changed);
+                                e.editorNode.update(newNode);
+                                e.state.onFileChanged();
+                            }
                         } catch (Exception ex) {
                             ErrorHandler.handleException(ex, null, changed);
                         }
@@ -85,22 +90,21 @@ public class EditorExternalState {
     }
 
     public void startEdit(EditorState state, EditorNode node) {
-        var ex = getForNode(node);
-        Path file = ex.map(e -> e.file).orElse(
-                TEMP.resolve(UUID.randomUUID().toString() + ".pdxt"));
+        var ext = getForNode(node);
+        if (ext.isPresent()) {
+            ThreadHelper.open(ext.get().file);
+            return;
+        }
 
-        try {
-            ex.ifPresentOrElse(e -> {
-                e.registered = false;
-            }, () -> {
-                openEntries.add(new Entry(file, node, state));
-            });
-            try (var out = Files.newOutputStream(file)) {
-                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
-            }
+        Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
+        try (var out = Files.newOutputStream(file)) {
+            NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
+            var entry = new Entry(file, node, state);
+            entry.registerChange();
+            openEntries.add(entry);
             ThreadHelper.open(file);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex);
         }
     }
 
@@ -108,12 +112,33 @@ public class EditorExternalState {
         private final Path file;
         private final EditorNode editorNode;
         private final EditorState state;
-        private boolean registered;
+        private Instant lastModified;
 
         public Entry(Path file, EditorNode editorNode, EditorState state) {
             this.file = file;
             this.editorNode = editorNode;
             this.state = state;
+        }
+
+        public boolean hasChanged() {
+            try {
+                var newDate = Files.getLastModifiedTime(file).toInstant();
+                return !newDate.equals(lastModified);
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+        public Instant getLastModified() {
+            try {
+                return Files.getLastModifiedTime(file).toInstant();
+            } catch (IOException e) {
+                return Instant.EPOCH;
+            }
+        }
+
+        public void registerChange() {
+            lastModified = getLastModified();
         }
     }
 }

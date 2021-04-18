@@ -110,6 +110,10 @@ public final class EditorSimpleNode extends EditorNode {
                 getDirectParent().updateNodeAtIndex(this.backingNode, keyName, getKeyIndex());
             }
         } else {
+            if (newNode.getNodeArray().size() != 1) {
+                throw new IllegalArgumentException("Can't assign array with size != 1 to value node");
+            }
+
             var nodeToUse = newNode.getNodeArray().get(0);
             if (nodeToUse.isColor()) {
                 ((ColorNode) backingNode).set((ColorNode) nodeToUse);

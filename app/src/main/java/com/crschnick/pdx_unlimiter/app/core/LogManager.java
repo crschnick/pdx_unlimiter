@@ -45,6 +45,8 @@ public class LogManager {
             }
         }
 
+        System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
+        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "HH:mm:ss");
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
 
@@ -93,7 +95,7 @@ public class LogManager {
 
     private void setLogLevels(boolean debug) {
         if (true) { //if (debug) {
-            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
 
         // Debug output for platform
