@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.PdxuApp;
 import com.crschnick.pdx_unlimiter.app.core.settings.SavedState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.editor.EditorExternalState;
-import com.crschnick.pdx_unlimiter.app.gui.game.GameImage;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
@@ -65,6 +64,7 @@ public class ComponentManager {
 
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init, false);
+        TaskExecutor.getInstance().submitTask(() -> PdxuApp.getApp().setupCompleteWindowContent(), false);
     }
 
     public static void switchGame(Game game) {
@@ -98,7 +98,6 @@ public class ComponentManager {
             SavegameStorage.init();
             SavegameManagerState.init();
 
-            GameImage.init();
             FileWatchManager.init();
             SavegameWatcher.init();
 
@@ -109,8 +108,6 @@ public class ComponentManager {
             if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
                 GlobalScreen.registerNativeHook();
             }
-
-            PdxuApp.getApp().setupCompleteWindowContent();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }

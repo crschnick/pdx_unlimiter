@@ -87,7 +87,7 @@ public class GuiSavegameEntry {
 
     private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(Region r, SavegameEntry<T, I> e) {
         r.setOnDragDetected(me -> {
-            var out = SavegameActions.exportToTemp(e);
+            var out = SavegameActions.exportToTemp(e, true);
             out.ifPresent(p -> {
                 Dragboard db = r.startDragAndDrop(TransferMode.COPY);
                 var cc = new ClipboardContent();

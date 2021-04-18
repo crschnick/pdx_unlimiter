@@ -92,7 +92,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             AtomicInteger loans = new AtomicInteger();
             n.getNodeForKey("countries").getNodeForKey(tag).forEach((k,v) -> {
                 if (k.equals("loan")) {
-                    loans.addAndGet(v.getNodeForKey("amount").getInteger());
+                    loans.addAndGet((int) v.getNodeForKey("amount").getDouble());
                 }
             });
             e.loanedMoney = loans.get();

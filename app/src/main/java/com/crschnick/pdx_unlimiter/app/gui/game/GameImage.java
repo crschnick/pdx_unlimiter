@@ -112,12 +112,8 @@ public class GameImage {
         }
     }
 
-    public static void init() {
-        loadGameIcons();
-        resetImages();
-    }
-
     public static void loadGameImages(Game g) {
+        loadGameIcons();
         resetImages();
         Map<Game, Runnable> loadFuncs = Map.of(
                 Game.EU4, GameImage::loadEu4Images,

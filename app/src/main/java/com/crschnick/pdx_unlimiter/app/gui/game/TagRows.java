@@ -38,7 +38,10 @@ public class TagRows {
             box.getChildren().addAll(list);
             box.setFillHeight(true);
             box.setAlignment(Pos.CENTER);
-            return box;
+            var vbox = new VBox(box);
+            vbox.setFillWidth(true);
+            vbox.setAlignment(Pos.CENTER);
+            return vbox;
         }
 
         boolean exceeded = false;
@@ -60,8 +63,8 @@ public class TagRows {
         second.setAlignment(Pos.CENTER);
         var spacer = new Region();
         spacer.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> list.get(0).getMinWidth() / 2,
-                list.get(0).minWidthProperty()));
+                () -> (list.get(0).getMinWidth() / 2) - (first.getSpacing()),
+                list.get(0).minWidthProperty(), first.spacingProperty()));
         second.getChildren().add(spacer);
         second.getChildren().addAll(list.subList(firstRow, firstRow + secondRow));
         if (exceeded) {
