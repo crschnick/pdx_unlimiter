@@ -64,7 +64,12 @@ public class ComponentManager {
 
         TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init, false);
-        TaskExecutor.getInstance().submitTask(() -> PdxuApp.getApp().setupCompleteWindowContent(), false);
+        TaskExecutor.getInstance().submitTask(ComponentManager::initialFinalSetup, false);
+    }
+
+    private static void initialFinalSetup() {
+        PdxuApp.getApp().setupCompleteWindowContent();
+        GameAppManager.init();
     }
 
     public static void switchGame(Game game) {
@@ -101,7 +106,6 @@ public class ComponentManager {
             FileWatchManager.init();
             SavegameWatcher.init();
 
-            GameAppManager.init();
             FileImporter.init();
 
             EditorExternalState.init();

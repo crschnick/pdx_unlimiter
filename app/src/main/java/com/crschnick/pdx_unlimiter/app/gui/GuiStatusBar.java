@@ -56,10 +56,6 @@ public class GuiStatusBar {
             bar.setRunning(g.getGame());
         }
 
-        SavegameManagerState.get().currentGameProperty().addListener((c, o, n) -> {
-            bar.hide();
-        });
-
         return pane;
     }
 
@@ -193,10 +189,6 @@ public class GuiStatusBar {
         }
 
         private void hide() {
-            if (status == Status.RUNNING) {
-                return;
-            }
-
             Platform.runLater(() -> {
                 pane.getChildren().clear();
             });
@@ -206,7 +198,7 @@ public class GuiStatusBar {
             // Create node before Platform thread to avoid async issues!
             Region bar = createRunningBar(g);
             Platform.runLater(() -> {
-                getStatusBar().show(bar);
+                show(bar);
                 status = Status.RUNNING;
             });
         }
@@ -221,7 +213,6 @@ public class GuiStatusBar {
         }
 
         private <T, I extends SavegameInfo<T>> void select(SavegameEntry<T, I> e) {
-            // Create node before Platform thread to avoid async issues!
             Region bar = createEntryStatusBar(e);
             Platform.runLater(() -> {
                 if (status == Status.RUNNING) {

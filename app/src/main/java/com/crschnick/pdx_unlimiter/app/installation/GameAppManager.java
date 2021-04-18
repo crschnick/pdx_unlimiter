@@ -1,11 +1,12 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 
 public class GameAppManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(GameAppManager.class);
     private static final GameAppManager INSTANCE = new GameAppManager();
     private final ObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
     private Instant lastImport;
@@ -24,9 +26,12 @@ public class GameAppManager {
     }
 
     public static void init() {
-        TaskExecutor.getInstance().submitLoop(() -> {
-            INSTANCE.update();
-        });
+        ThreadHelper.create("game watcher", true, () -> {
+            while (true) {
+                INSTANCE.update();
+                ThreadHelper.sleep(20);
+            }
+        }).start();
     }
 
     private static boolean isInstanceOfGame(String cmd, Game game) {
@@ -74,8 +79,7 @@ public class GameAppManager {
 
         if (Duration.between(lastImport, Instant.now()).compareTo(
                 Duration.of(Settings.getInstance().timedImportsInterval.getValue(), ChronoUnit.MINUTES)) > 0) {
-            LoggerFactory.getLogger(GameAppManager.class).info(
-                    "Importing latest savegame because timed imports is enabled");
+            logger.info("Importing latest savegame because timed imports is enabled");
             if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
                 Toolkit.getDefaultToolkit().beep();
             }
@@ -87,6 +91,7 @@ public class GameAppManager {
     public void importLatest() {
         var g = getActiveGame();
         if (g != null) {
+            logger.info("Importing latest savegame");
             SavegameActions.importLatestSavegame(g.getGame());
         }
     }
@@ -94,6 +99,7 @@ public class GameAppManager {
     public void kill() {
         var g = getActiveGame();
         if (g != null) {
+            logger.info("Killing active game");
             g.kill();
         }
     }
