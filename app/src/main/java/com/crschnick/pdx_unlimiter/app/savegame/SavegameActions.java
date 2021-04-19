@@ -103,6 +103,30 @@ public class SavegameActions {
         });
     }
 
+    public static void loadLatestSavegameCheckpoint(Game g) {
+        var savegames = SavegameWatcher.ALL.get(g).getSavegames();
+        if (savegames.size() == 0) {
+            return;
+        }
+
+        SavegameStorage.get(g).getParser().parse(savegames.get(0).path, RakalyHelper::meltSavegame).visit(
+            new SavegameParser.StatusVisitor<>() {
+            @Override
+            public void success(SavegameParser.Success<SavegameInfo<?>> s) {
+                var campaignId = s.info.getCampaignHeuristic();
+                SavegameStorage.get(g).getSavegameCollection(campaignId)
+                        .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
+                    TaskExecutor.getInstance().submitTask(() -> {
+                        SavegameStorage.get(g).loadEntry(entry);
+                        SavegameContext.withSavegame(entry, ctx -> {
+                            GameLauncher.continueSavegame(entry);
+                        });
+                    }, true);
+                });
+            }
+        });
+    }
+
     public static void importLatestSavegame(Game g) {
         var savegames = SavegameWatcher.ALL.get(g).getSavegames();
         if (savegames.size() == 0) {

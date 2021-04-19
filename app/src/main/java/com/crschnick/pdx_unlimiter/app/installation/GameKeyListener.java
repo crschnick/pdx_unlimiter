@@ -30,6 +30,10 @@ public class GameKeyListener implements NativeKeyListener {
                     Toolkit.getDefaultToolkit().beep();
                 }
             }
+            if (e.getKeyCode() == NativeKeyEvent.VC_C) {
+                LoggerFactory.getLogger(GameKeyListener.class).debug("Checkpoint key pressed");
+                GameAppManager.getInstance().loadLatestCheckpoint();
+            }
             if (e.getKeyCode() == NativeKeyEvent.VC_R) {
                 TaskExecutor.getInstance().submitTask(() -> {
                     LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");

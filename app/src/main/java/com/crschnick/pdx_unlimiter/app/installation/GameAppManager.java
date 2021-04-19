@@ -96,6 +96,15 @@ public class GameAppManager {
         }
     }
 
+    public void loadLatestCheckpoint() {
+        var g = getActiveGame();
+        if (g != null && g.getGame().isEnabled()) {
+            logger.info("Loading latest checkpoint");
+            g.kill();
+            SavegameActions.loadLatestSavegameCheckpoint(g.getGame());
+        }
+    }
+
     public void kill() {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {
