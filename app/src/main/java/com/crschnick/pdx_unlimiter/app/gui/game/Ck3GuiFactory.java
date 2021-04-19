@@ -170,6 +170,20 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
         if (info.hasOnePlayerTag()) {
             addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
+        }
+
+        if (info.isIronman()) {
+            var ironman = new StackPane(imageNode(CK3_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
+            ironman.setAlignment(Pos.CENTER);
+            GuiTooltips.install(ironman, "Ironman savegame");
+            addNode(grid, ironman);
+        }
+
+        if (info.hasOnePlayerTag()) {
+            // addIntegerEntry(grid, CK3_ICON_GOLD, info.getTag().getGold(), "Gold", false);
+            addIntegerEntry(grid, CK3_ICON_PRESTIGE, info.getTag().getPrestige(), "Prestige", false);
+            addIntegerEntry(grid, CK3_ICON_PIETY, info.getTag().getPiety(), "Piety", false);
+            addIntegerEntry(grid, CK3_ICON_SOLDIERS, info.getTag().getStrength(), "Total soldiers", false);
 
             createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
                     info.getTag().getTitles(), "Titles", "titles");
@@ -185,13 +199,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             createRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
                     ((Ck3SavegameInfo) info).getAllies(),
                     "Allies", CLASS_ALLIANCE);
-        }
-
-        if (info.isIronman()) {
-            var ironman = new StackPane(imageNode(CK3_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
-            ironman.setAlignment(Pos.CENTER);
-            GuiTooltips.install(ironman, "Ironman savegame");
-            addNode(grid, ironman);
         }
 
         super.fillNodeContainer(info, grid);

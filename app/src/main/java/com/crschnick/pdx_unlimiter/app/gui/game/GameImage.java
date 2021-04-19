@@ -56,6 +56,12 @@ public class GameImage {
     public static Image CK3_SKILL_LEARNING;
     public static Image CK3_SKILL_PROWESS;
 
+    public static Image CK3_ICON_GOLD;
+    public static Image CK3_ICON_PRESTIGE;
+    public static Image CK3_ICON_SOLDIERS;
+    public static Image CK3_ICON_PIETY;
+    public static Image CK3_ICON_RENOWN;
+
     public static Image STELLARIS_ICON_IRONMAN;
     public static Image STELLARIS_BACKGROUND;
 
@@ -212,6 +218,11 @@ public class GameImage {
 
         CK3_ICON_WAR = ImageLoader.loadImage(i.resolve("map_coa").resolve("icon_at_war_big.dds"));
         CK3_ICON_ALLY = ImageLoader.loadImage(i.resolve("message_feed").resolve("alliance.dds"));
+        CK3_ICON_GOLD = ImageLoader.loadImage(i.resolve("icon_gold.dds"));
+        CK3_ICON_PRESTIGE = ImageLoader.loadImage(i.resolve("currencies").resolve("icon_prestige_01.dds"));
+        CK3_ICON_PIETY = ImageLoader.loadImage(i.resolve("currencies").resolve("icon_piety_christian_01.dds"));
+        CK3_ICON_SOLDIERS = ImageLoader.loadImage(i.resolve("icon_soldier.dds"));
+        CK3_ICON_RENOWN = ImageLoader.loadImage(i.resolve("currencies").resolve("icon_dynasty_prestige_01.dds"));
     }
 
     private static Image loadStellarisIcon() {

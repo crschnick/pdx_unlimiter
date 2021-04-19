@@ -63,6 +63,17 @@ public abstract class Node {
         throw new UnsupportedOperationException();
     }
 
+    public Optional<Node> getNodeForKeysIfExistent(String... keys) {
+        var current = this;
+        for (var key : keys) {
+            current = current.getNodeForKeyIfExistent(key).orElse(null);
+            if (current == null) {
+                return Optional.empty();
+            }
+        }
+        return Optional.of(current);
+    }
+
     public Optional<Node> getNodeForKeyIfExistent(String key) {
         throw new UnsupportedOperationException();
     }

@@ -79,17 +79,6 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         addNode(pane, row);
     }
 
-    private void addIntegerEntry(
-            JFXMasonryPane pane,
-            Image icon, int value, String tooltip, boolean showPlus) {
-        var text = (showPlus && value > 0 ? "+" + value : String.valueOf(value));
-        var ironman = new StackPane(new Label(text, GameImage.imageNode(icon, CLASS_IMAGE_ICON)));
-        ironman.setAlignment(Pos.CENTER);
-        GuiTooltips.install(ironman, tooltip);
-        ironman.getStyleClass().add("number");
-        addNode(pane, ironman);
-    }
-
     private void addManpowerEntry(
             JFXMasonryPane pane,
             int value, int max) {

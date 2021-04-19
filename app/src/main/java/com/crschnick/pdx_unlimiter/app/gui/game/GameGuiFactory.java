@@ -51,7 +51,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         return (GameGuiFactory<T, I>) ALL.get(g);
     }
 
-    protected static void addNode(JFXMasonryPane pane, Region content) {
+    protected void addNode(JFXMasonryPane pane, Region content) {
         content.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTENT);
         StackPane p = new StackPane(content);
         p.setAlignment(Pos.CENTER);
@@ -66,6 +66,18 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         content.prefHeightProperty().bind(Bindings.createDoubleBinding(
                 () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
     }
+
+
+    protected void addIntegerEntry(JFXMasonryPane pane,
+            Image icon, int value, String tooltip, boolean showPlus) {
+        var text = (showPlus && value > 0 ? "+" + value : String.valueOf(value));
+        var ironman = new StackPane(new Label(text, GameImage.imageNode(icon, CLASS_IMAGE_ICON)));
+        ironman.setAlignment(Pos.CENTER);
+        GuiTooltips.install(ironman, tooltip);
+        ironman.getStyleClass().add("number");
+        addNode(pane, ironman);
+    }
+
 
     public ObservableValue<Node> createImage(SavegameEntry<T, I> entry) {
         SimpleObjectProperty<Node> prop;

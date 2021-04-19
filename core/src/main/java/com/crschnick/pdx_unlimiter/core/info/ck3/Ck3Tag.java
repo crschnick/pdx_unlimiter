@@ -16,11 +16,15 @@ public class Ck3Tag {
     private String name;
     private int balance;
     private int strength;
+    private int gold;
+    private int income;
+    private int piety;
+    private int prestige;
 
     public Ck3Tag() {
     }
 
-    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, Ck3CoatOfArms coatOfArms, String name, int balance, int strength) {
+    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, Ck3CoatOfArms coatOfArms, String name, int balance, int strength, int gold, int income, int piety, int prestige) {
         this.id = id;
         this.ruler = ruler;
         this.titles = titles;
@@ -30,6 +34,10 @@ public class Ck3Tag {
         this.name = name;
         this.balance = balance;
         this.strength = strength;
+        this.gold = gold;
+        this.income = income;
+        this.piety = piety;
+        this.prestige = prestige;
     }
 
     @Override
@@ -90,12 +98,12 @@ public class Ck3Tag {
 
         var landedNode = personNode.getNodeForKey("landed_data");
         var gv = landedNode.getNodeForKey("government").getString();
-        var balance = landedNode.getNodeForKeyIfExistent("balance")
-                .map(Node::getDouble).orElse(0.0).intValue();
-        var strength = landedNode.getNodeForKeyIfExistent("strength")
-                .map(Node::getDouble).orElse(0.0).intValue();
-        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name, balance, strength);
-        allTags.removeIf(t -> t.id == id);
+        var existingTag = allTags.stream().filter(t -> t.id == id).findAny().orElseThrow();
+        allTags.remove(existingTag);
+
+        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name,
+                existingTag.balance, existingTag.strength, existingTag.gold,
+                existingTag.income, existingTag.piety, existingTag.prestige);
         allTags.add(tag);
         return Optional.of(tag);
     }
@@ -125,8 +133,14 @@ public class Ck3Tag {
                     .map(Node::getDouble).orElse(0.0).intValue();
             var strength = landedNode.getNodeForKeyIfExistent("strength")
                     .map(Node::getDouble).orElse(0.0).intValue();
+
+            var aliveNode = v.getNodeForKey("alive_data");
+            var gold = aliveNode.getNodeForKeyIfExistent("gold").map(Node::getDouble).orElse(0.0).intValue();
+            var income = aliveNode.getNodeForKeyIfExistent("income").map(Node::getDouble).orElse(0.0).intValue();
+            var piety = aliveNode.getNodeForKeysIfExistent("piety", "currency").map(Node::getDouble).orElse(0.0).intValue();
+            var prestige = aliveNode.getNodeForKeysIfExistent("prestige", "currency").map(Node::getDouble).orElse(0.0).intValue();
             allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)),
-                    null, gv, null, null, balance, strength));
+                    null, gv, null, null, balance, strength, gold, income, piety, prestige));
         });
         return allTags;
     }
@@ -161,5 +175,29 @@ public class Ck3Tag {
 
     public String getName() {
         return name != null ? name : getPrimaryTitle().getName();
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public int getStrength() {
+        return strength;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public int getIncome() {
+        return income;
+    }
+
+    public int getPiety() {
+        return piety;
+    }
+
+    public int getPrestige() {
+        return prestige;
     }
 }
