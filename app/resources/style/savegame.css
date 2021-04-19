@@ -62,7 +62,7 @@
 }
 
 .node-container {
--fx-padding: 0.6em 0.4em 0.4em 0.4em;
+-fx-padding: 0.6em;
 }
 
 .node-container .image-icon {
@@ -76,7 +76,7 @@
 .node-container .node {
 -fx-background-radius: 0.1em;
 -fx-background-color: #ffffff55;
--fx-padding: 0.3em;
+-fx-padding: 0.35em;
 }
 
 .node-container .node-content {

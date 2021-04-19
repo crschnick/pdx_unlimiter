@@ -186,13 +186,12 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
             addNode(grid, rv);
         }
 
-        addIntegerEntry(grid, EU4_ICON_DEV, info.getTotalDev(), "Development", false);
-        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
-        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
-        addManpowerEntry(grid, info.getManpower(), info.getMaxManpower());
         addDucatsEntry(grid, info.getTreasuryMoney(), info.getLoanedMoney());
+        addManpowerEntry(grid, info.getManpower(), info.getMaxManpower());
+        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
+        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
         addPowersEntry(grid, info.getAdm(), info.getDip(), info.getMil());
-
+        addIntegerEntry(grid, EU4_ICON_DEV, info.getTotalDev(), "Development", false);
 
         for (Eu4SavegameInfo.War war : info.getWars()) {
             createDiplomacyRow(grid, i, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),
