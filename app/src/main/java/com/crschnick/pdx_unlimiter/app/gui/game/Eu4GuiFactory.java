@@ -30,7 +30,11 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         VBox box = new VBox();
         var img = isRuler ? EU4_ICON_RULER : EU4_ICON_HEIR;
 
-        var hb = new HBox(imageNode(img, CLASS_RULER_ICON), new Label(ruler.getName()));
+        var label = new Label(ruler.getName());
+        label.setMinWidth(Region.USE_PREF_SIZE);
+        label.setEllipsisString("");
+
+        var hb = new HBox(imageNode(img, CLASS_RULER_ICON), label);
         hb.setAlignment(Pos.CENTER);
         hb.setSpacing(5);
         box.getChildren().add(hb);
