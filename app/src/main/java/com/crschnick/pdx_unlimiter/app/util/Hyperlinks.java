@@ -4,6 +4,8 @@ public class Hyperlinks {
 
     public static final String MAIN_PAGE = "https://github.com/crschnick/pdx_unlimiter/";
     public static final String GUIDE = "https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide";
+    public static final String LAUNCH_GUIDE = "https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#launching-savegames";
+    public static final String SAVESCUM_GUIDE = "https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-checkpoints-and-savescumming";
     public static final String EDITOR_GUIDE = "https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide";
     public static final String DISCORD = "https://discord.com/invite/BVE4vxqFpU";
     public static final String NEW_ISSUE = "https://github.com/crschnick/pdx_unlimiter/issues/new";

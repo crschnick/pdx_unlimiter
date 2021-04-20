@@ -7,6 +7,8 @@ import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
+import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
+import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -102,6 +104,17 @@ public class GuiStatusBar {
         HBox buttons = new HBox(importLatest);
         buttons.getChildren().add(b);
 
+        {
+            Button help = new JFXButton();
+            help.setGraphic(new FontIcon());
+            help.getStyleClass().add("help-button");
+            help.setOnAction(event -> {
+                ThreadHelper.browse(Hyperlinks.SAVESCUM_GUIDE);
+                event.consume();
+            });
+            buttons.getChildren().add(help);
+        }
+
         buttons.setFillHeight(true);
         buttons.setAlignment(Pos.CENTER);
 
@@ -167,6 +180,17 @@ public class GuiStatusBar {
                 getStatusBar().hide();
             });
             buttons.getChildren().add(launch);
+        }
+
+        {
+            Button help = new JFXButton();
+            help.setGraphic(new FontIcon());
+            help.getStyleClass().add("help-button");
+            help.setOnAction(event -> {
+                ThreadHelper.browse(Hyperlinks.LAUNCH_GUIDE);
+                event.consume();
+            });
+            buttons.getChildren().add(help);
         }
 
         return barPane;
