@@ -7,8 +7,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class EditorNavHistory {
 
@@ -28,7 +26,6 @@ public class EditorNavHistory {
 
 
     public void goForward() {
-        history.remo
     }
 
     private void changeNavPath(EditorNavPath p) {

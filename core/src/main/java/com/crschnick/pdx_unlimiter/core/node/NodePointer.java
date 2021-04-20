@@ -97,7 +97,7 @@ public final class NodePointer {
         }
 
         if (e.name != null) {
-            return Optional.ofNullable(current.getNodeForKey(e.name));
+            return current.getNodeForKeyIfExistent(e.name);
         }
 
         return Optional.empty();

@@ -27,7 +27,7 @@ public class EditorNodePointers {
 
     public static Optional<NodePointer> create(EditorState state, EditorSimpleNode node) {
         if (state.getFileContext().getGame() == Game.EU4) {
-            return createEu4(state, node).filter(p -> EditorNavPath.createNavPath(state, p).isPresent());
+            return createEu4(state, node).filter(p -> EditorNavPath.createNavPath(state.getRootNodes().values(), p).isPresent());
         }
 
         return Optional.empty();

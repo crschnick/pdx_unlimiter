@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.editor;
 
+import com.crschnick.pdx_unlimiter.app.editor.EditorNavPath;
 import com.crschnick.pdx_unlimiter.app.editor.EditorNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
@@ -65,7 +66,7 @@ public class GuiEditorNavBar {
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
 
-        Consumer<List<EditorState.NavEntry>> updateBar = l -> {
+        Consumer<List<EditorNavPath.NavEntry>> updateBar = l -> {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
                 {
@@ -112,7 +113,7 @@ public class GuiEditorNavBar {
         edit.setPadding(new Insets(4, 4, 2, 4));
         p.getChildren().setAll(edit);
 
-        Consumer<List<EditorState.NavEntry>> updateBar = l -> {
+        Consumer<List<EditorNavPath.NavEntry>> updateBar = l -> {
             Platform.runLater(() -> {
                 edit.setDisable(l.size() == 0);
             });
