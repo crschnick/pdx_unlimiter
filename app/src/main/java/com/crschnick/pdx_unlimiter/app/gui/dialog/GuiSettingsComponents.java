@@ -126,7 +126,7 @@ public class GuiSettingsComponents {
             grid.add(new Label(entry.getName() + ":"), 1, row);
 
             Region val;
-            if (entry.getType().equals(SettingsEntry.Type.PATH)) {
+            if (entry.getType().equals(SettingsEntry.Type.DIRECTORY)) {
                 val = pathEntryNode((SettingsEntry<Path>) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.BOOLEAN)) {
                 val = booleanEntryNode((SettingsEntry.BooleanEntry) entry, applyFuncs);

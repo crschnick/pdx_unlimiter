@@ -33,13 +33,38 @@ public abstract class SettingsEntry<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(SettingsEntry.class);
 
+    /**
+     * Supplies the displayed name of this entry in the settings menu.
+     */
     protected final Supplier<String> name;
+
+    /**
+     * Supplies the displayed description of this entry in the settings menu.
+     */
     protected final Supplier<String> description;
+
+    /**
+     * The key name that will be used for the entry when being saved to a file.
+     */
     protected final String serializationName;
+
+    /**
+     * The value type of this settings entry.
+     */
     protected final Type type;
+
+    /**
+     * The value of this settings entry.
+     */
     protected ObjectProperty<T> value;
 
-
+    /**
+     * Creates a new settings entry using an i18n key name, a serialization name, and a type.
+     *
+     * @param id the i18n key name
+     * @param serializationName the key name that will be used for the entry when being saved to a file
+     * @param type the type of the entry
+     */
     public SettingsEntry(String id, String serializationName, Type type) {
         this.name = () -> PdxuI18n.get(id);
         this.serializationName = serializationName;
@@ -49,6 +74,16 @@ public abstract class SettingsEntry<T> {
         setupLogger();
     }
 
+    /**
+     * Creates a new settings entry with support for a dynamic name and description.
+     *
+     * @param name a supplier for the displayed name (should be localized)
+     * @param description a supplier for the displayed description (should be localized)
+     * @param serializationName the key name that will be used for the entry when being saved to a file
+     * @param type the type of the entry
+     *
+     * @see SettingsEntry#SettingsEntry(String, String, Type)
+     */
     public SettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type) {
         this.name = name;
         this.description = description;
@@ -60,37 +95,59 @@ public abstract class SettingsEntry<T> {
 
     private void setupLogger() {
         this.value.addListener((c, o, n) -> {
-            logger.info("Changing settings entry " + serializationName + " from " + o + " to " + n);
+            logger.trace("Changing settings entry " + serializationName + " from " + o + " to " + n);
         });
     }
 
+    /**
+     * Sets the value using a Json node.
+     *
+     * @param node the json node
+     */
     public abstract void set(JsonNode node);
 
+    /**
+     * Converts the value into a Json node.
+     * Should be compatible with {@link #set(JsonNode)}.
+     *
+     * @return the json node
+     */
     public abstract JsonNode toNode();
 
+    /**
+     * Sets the value of this entry.
+     * This method can be overridden to enable custom behaviour when changing the value.
+     *
+     * @param newValue the new value
+     */
     public void set(T newValue) {
         value.set(newValue);
     }
 
+    /**
+     * Sets the value of this entry to a default value.
+     * This method will be called when no value has been
+     * set for this entry when parsing a settings file.
+     */
     public abstract void setDefault();
 
-    public String getName() {
+    public final String getName() {
         return name.get();
     }
 
-    public String getDescription() {
+    public final String getDescription() {
         return description.get();
     }
 
-    public Type getType() {
+    public final Type getType() {
         return type;
     }
 
-    public T getValue() {
+    public final T getValue() {
         return value.get();
     }
 
-    public String getSerializationName() {
+    public final String getSerializationName() {
         return serializationName;
     }
 
@@ -98,7 +155,7 @@ public abstract class SettingsEntry<T> {
         BOOLEAN,
         INTEGER,
         STRING,
-        PATH,
+        DIRECTORY,
         CHOICE
     }
 
@@ -148,8 +205,8 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Integer newValue) {
-            //TODO check range
-            super.set(newValue);
+            int usedValue = Math.max(min, Math.min(newValue, max));
+            super.set(usedValue);
         }
 
         @Override
@@ -227,17 +284,17 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static abstract class FailablePathEntry extends SettingsEntry<Path> {
+    public static abstract class FailableDirectoryEntry extends SettingsEntry<Path> {
 
         protected boolean disabled;
 
-        public FailablePathEntry(String id, String serializationName) {
-            super(id, serializationName, Type.PATH);
+        public FailableDirectoryEntry(String id, String serializationName) {
+            super(id, serializationName, Type.DIRECTORY);
             this.disabled = false;
         }
 
-        public FailablePathEntry(Supplier<String> name, Supplier<String> description, String serializationName) {
-            super(name, description, serializationName, Type.PATH);
+        public FailableDirectoryEntry(Supplier<String> name, Supplier<String> description, String serializationName) {
+            super(name, description, serializationName, Type.DIRECTORY);
             this.disabled = false;
         }
 
@@ -263,7 +320,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class GameDirectory extends FailablePathEntry {
+    public static class GameDirectory extends FailableDirectoryEntry {
 
         private final Game game;
         private final Class<? extends GameInstallation> installClass;
@@ -322,7 +379,7 @@ public abstract class SettingsEntry<T> {
     public static class StorageDirectory extends SettingsEntry<Path> {
 
         public StorageDirectory(String id, String serializationName) {
-            super(id, serializationName, Type.PATH);
+            super(id, serializationName, Type.DIRECTORY);
         }
 
         private boolean showConfirmationDialog(String old, String newDir) {
@@ -374,7 +431,7 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class ThirdPartyDirectory extends FailablePathEntry {
+    public static class ThirdPartyDirectory extends FailableDirectoryEntry {
 
         private final Path checkFile;
         private final Supplier<Path> defaultValue;
