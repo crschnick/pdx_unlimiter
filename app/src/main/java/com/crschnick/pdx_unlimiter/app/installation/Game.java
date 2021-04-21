@@ -1,20 +1,26 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.installation.game.GameInstallType;
+
 public enum Game {
 
-    EU4("eu4", "EU4", "Europa Universalis IV"),
-    HOI4("hoi4", "HOI4", "Hearts of Iron IV"),
-    CK3("ck3", "CK3", "Crusader Kings III"),
-    STELLARIS("stellaris", "Stellaris", "Stellaris");
+    EU4("eu4", "EU4", "Europa Universalis IV", null, new GameInstallType.StandardInstallType()),
+    HOI4("hoi4", "HOI4", "Hearts of Iron IV", null, new GameInstallType.StandardInstallType()),
+    CK3("ck3", "CK3", "Crusader Kings III", "ParadoxInteractive.ProjectTitus", new GameInstallType.StandardInstallType()),
+    STELLARIS("stellaris", "Stellaris", "Stellaris", "ParadoxInteractive.Stellaris-MicrosoftStoreEdition", new GameInstallType.StandardInstallType());
 
     private final String id;
     private final String abbreviation;
     private final String fullName;
+    private final String windowsStoreName;
+    private final GameInstallType installType;
 
-    Game(String id, String abbreviation, String fullName) {
+    Game(String id, String abbreviation, String fullName, String windowsStoreName, GameInstallType installType) {
         this.id = id;
         this.abbreviation = abbreviation;
         this.fullName = fullName;
+        this.windowsStoreName = windowsStoreName;
+        this.installType = installType;
     }
 
     public static Game byId(String id) {
@@ -40,5 +46,13 @@ public enum Game {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getWindowsStoreName() {
+        return windowsStoreName;
+    }
+
+    public GameInstallType getInstallType() {
+        return installType;
     }
 }

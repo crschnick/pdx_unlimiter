@@ -2,6 +2,9 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistType;
+import com.crschnick.pdx_unlimiter.app.installation.dist.PdxLauncherDist;
+import com.crschnick.pdx_unlimiter.app.installation.dist.SteamDist;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
 import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
@@ -35,7 +38,7 @@ public abstract class GameInstallation {
     private final List<GameMod> mods = new ArrayList<>();
     private final Path path;
     private final List<GameDlc> dlcs = new ArrayList<>();
-    private GameDistributionType distType;
+    private GameDistType distType;
     private Path userDir;
     private GameVersion version;
     private Language language;
@@ -98,7 +101,7 @@ public abstract class GameInstallation {
     public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
         savegameDirs.add(getSavegamesPath());
-        savegameDirs.addAll(getDistType().getSavegamePaths());
+        savegameDirs.addAll(getDistType().getAdditionalSavegamePaths());
         return savegameDirs;
     }
 
@@ -162,7 +165,7 @@ public abstract class GameInstallation {
         return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
-    public GameDistributionType getDistType() {
+    public GameDistType getDistType() {
         return distType;
     }
 
@@ -222,15 +225,15 @@ public abstract class GameInstallation {
 
     protected abstract GameVersion determineVersion(JsonNode node);
 
-    private GameDistributionType determineDistType(JsonNode node) throws IOException {
+    private GameDistType determineDistType(JsonNode node) throws IOException {
         String platform = node.required("distPlatform").textValue();
-        GameDistributionType d;
+        GameDistType d;
         if (platform.equals("steam")) {
             // Trim the id because sometimes it contains trailing new lines!
             var id = Files.readString(getSteamAppIdFile()).trim();
-            d = new GameDistributionType.Steam(Integer.parseInt(id), this);
+            d = new SteamDist(Integer.parseInt(id), this);
         } else {
-            d = new GameDistributionType.PdxLauncher(this);
+            d = new PdxLauncherDist(this);
         }
         return d;
     }
