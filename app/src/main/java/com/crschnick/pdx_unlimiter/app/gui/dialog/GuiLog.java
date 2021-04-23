@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 public class GuiLog {
@@ -30,7 +31,8 @@ public class GuiLog {
                 e -> {
                     if (LogManager.getInstance().getLogFile().isPresent()) {
                         try {
-                            textArea.setText(Files.readString(LogManager.getInstance().getLogFile().get()));
+                            textArea.setText(Files.readString(
+                                    LogManager.getInstance().getLogFile().get(), Charset.defaultCharset()));
                         } catch (IOException ex) {
                             ErrorHandler.handleException(ex);
                         }
