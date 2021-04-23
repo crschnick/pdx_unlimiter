@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 
 public class GameImage {
 
-    public static final Map<Game, Image> GAME_ICONS = new HashMap<>();
     private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     public static Image CK3_ICON_IRONMAN;
     public static Image CK3_ICON_RULER;
@@ -119,7 +118,6 @@ public class GameImage {
     }
 
     public static void loadGameImages(Game g) {
-        loadGameIcons();
         resetImages();
         Map<Game, Runnable> loadFuncs = Map.of(
                 Game.EU4, GameImage::loadEu4Images,
@@ -132,18 +130,13 @@ public class GameImage {
         }
     }
 
-    private static void loadGameIcons() {
+    public static Image getGameIcon(Game g) {
         Map<Game, Supplier<Image>> loadFuncs = Map.of(
                 Game.EU4, GameImage::loadEu4Icon,
                 Game.CK3, GameImage::loadCk3Icon,
                 Game.HOI4, GameImage::loadHoi4Icon,
                 Game.STELLARIS, GameImage::loadStellarisIcon);
-
-        for (var g : Game.values()) {
-            if (g.isEnabled()) {
-                GAME_ICONS.put(g, loadFuncs.get(g).get());
-            }
-        }
+        return loadFuncs.get(g).get();
     }
 
     private static Image loadCk3Icon() {

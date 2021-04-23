@@ -69,7 +69,6 @@ public class ComponentManager {
 
     private static void initialFinalSetup() {
         PdxuApp.getApp().setupCompleteWindowContent();
-        GameAppManager.init();
     }
 
     public static void switchGame(Game game) {
@@ -105,6 +104,7 @@ public class ComponentManager {
 
             FileWatchManager.init();
             SavegameWatcher.init();
+            GameAppManager.init();
 
             FileImporter.init();
 
@@ -133,6 +133,7 @@ public class ComponentManager {
             latch.await();
             logger.debug("Synced with platform thread");
 
+            GameAppManager.reset();
             SavegameWatcher.reset();
             SavegameStorage.reset();
             GameInstallation.reset();
