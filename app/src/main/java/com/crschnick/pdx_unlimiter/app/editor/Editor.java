@@ -7,12 +7,12 @@ import com.crschnick.pdx_unlimiter.core.node.Node;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Editor {
 
-    private static final Map<EditorState, Stage> editors = new HashMap<>();
+    private static final Map<EditorState, Stage> editors = new ConcurrentHashMap<>();
 
     public static void createNewEditor(EditTarget target) {
         Map<String, Node> nodes;

@@ -60,12 +60,16 @@ public class FileWatchManager {
                     if (key == null) {
                         continue;
                     }
-                } catch (Exception ex) {
-                    break;
-                }
 
-                for (var wd : new HashSet<>(watchedDirectories)) {
-                    wd.update(key);
+                    for (var wd : new HashSet<>(watchedDirectories)) {
+                        wd.update(key);
+                    }
+                } catch (ClosedWatchServiceException ex) {
+                    // Exit loop if watch service is closed
+                    break;
+                } catch (Exception ex) {
+                    // Catch all other exceptions to not terminate this thread if an error occurs!
+                    ErrorHandler.handleException(ex);
                 }
 
                 // Don't sleep, since polling the directories always sleeps for some ms

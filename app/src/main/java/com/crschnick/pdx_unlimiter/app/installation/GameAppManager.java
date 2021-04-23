@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
+import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -39,8 +40,13 @@ public final class GameAppManager {
         active = true;
         thread = ThreadHelper.create("game watcher", true, () -> {
             while (active) {
-                update();
-                ThreadHelper.sleep(20);
+                try {
+                    update();
+                    ThreadHelper.sleep(20);
+                } catch (Exception ex) {
+                    // Catch all exceptions to not terminate this thread if an error occurs!
+                    ErrorHandler.handleException(ex);
+                }
             }
         });
         thread.start();
