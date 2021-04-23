@@ -14,12 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class EditorExternalState {
 
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
-    private final Set<Entry> openEntries = new HashSet<>();
+    private final Set<Entry> openEntries = new CopyOnWriteArraySet<>();
 
     private static final Logger logger = LoggerFactory.getLogger(EditorExternalState.class);
 
