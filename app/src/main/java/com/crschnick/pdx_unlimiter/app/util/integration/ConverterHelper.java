@@ -140,12 +140,17 @@ public class ConverterHelper {
                                 .filter(Files::isRegularFile)
                                 .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
                         if (latestDir.isPresent() && latestFile.isPresent()) {
-                            FileUtils.moveDirectory(
-                                    latestDir.get().toFile(),
-                                    Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName()).toFile());
-                            FileUtils.moveFile(
-                                    latestFile.get().toFile(),
-                                    Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName()).toFile());
+                            var outDir = Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName());
+                            if (Files.exists(outDir)) {
+                                GuiConverterConfig.showAlreadyExistsDialog(latestDir.get().getFileName().toString());
+                            } else {
+                                FileUtils.moveDirectory(
+                                        latestDir.get().toFile(),
+                                        outDir.toFile());
+                                FileUtils.moveFile(
+                                        latestFile.get().toFile(),
+                                        Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName()).toFile());
+                            }
                         }
                     }
                 } catch (Exception e) {

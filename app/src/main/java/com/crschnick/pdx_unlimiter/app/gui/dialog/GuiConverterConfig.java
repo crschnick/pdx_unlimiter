@@ -64,6 +64,14 @@ public class GuiConverterConfig {
         alert.showAndWait();
     }
 
+    public static void showAlreadyExistsDialog(String name) {
+        GuiDialogHelper.showBlockingAlert(alert -> {
+            alert.setAlertType(Alert.AlertType.INFORMATION);
+            alert.setTitle("Mod already exists");
+            alert.setHeaderText("A converted mod with the name " + name + " already exists in your mod directory.");
+        });
+    }
+
     public static void showConversionSuccessDialog() {
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
