@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +60,11 @@ public class StellarisInstallation extends GameInstallation {
 
     @Override
     public void startDirectly() throws IOException {
-        new ProcessBuilder().command("cmd", "/C", getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            new ProcessBuilder().command("cmd", "/C", getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+        } else {
+            new ProcessBuilder().command(getExecutable().toString(), "-gdpr-compliant", "--continuelastsave").start();
+        }
     }
 
     @Override
