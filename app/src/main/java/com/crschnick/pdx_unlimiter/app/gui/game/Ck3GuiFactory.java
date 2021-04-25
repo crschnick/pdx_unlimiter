@@ -142,6 +142,26 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         addNode(pane, row);
     }
 
+    private void addGoldEntry(
+            JFXMasonryPane pane,
+            int value,
+            int income) {
+        var valueDisplay = new Label(" " + value + " / " + (income > 0 ? "+" : "") + income);
+        valueDisplay.setMinWidth(Region.USE_PREF_SIZE);
+        valueDisplay.setEllipsisString("");
+
+        HBox hbox = new HBox(GameImage.imageNode(CK3_ICON_GOLD, CLASS_IMAGE_ICON), valueDisplay);
+        hbox.setAlignment(Pos.CENTER);
+        hbox.setMinWidth(Region.USE_PREF_SIZE);
+
+        var stack = new StackPane(hbox);
+        stack.setAlignment(Pos.CENTER);
+        stack.setMinWidth(Region.USE_PREF_SIZE);
+        stack.getStyleClass().add("number");
+        GuiTooltips.install(stack, "Gold in treasury / Monthly income");
+        addNode(pane, stack);
+    }
+
     private void createRealmRow(
             JFXMasonryPane pane,
             SavegameInfo<Ck3Tag> info,
@@ -180,7 +200,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         }
 
         if (info.hasOnePlayerTag()) {
-            // addIntegerEntry(grid, CK3_ICON_GOLD, info.getTag().getGold(), "Gold", false);
+            addGoldEntry(grid, info.getTag().getGold(), info.getTag().getIncome());
             addIntegerEntry(grid, CK3_ICON_PRESTIGE, info.getTag().getPrestige(), "Prestige", false);
             addIntegerEntry(grid, CK3_ICON_PIETY, info.getTag().getPiety(), "Piety", false);
             addIntegerEntry(grid, CK3_ICON_SOLDIERS, info.getTag().getStrength(), "Total soldiers", false);

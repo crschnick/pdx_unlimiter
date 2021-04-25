@@ -50,6 +50,16 @@ public class IntegrityManager {
         update(d, pack.resolve("parser"));
         update(d, pack.resolve("info"));
         update(d, pack.resolve("info").resolve(game));
+
+        // Rebuild caches if ironman converter changes
+        try {
+            var exec = PdxuInstallation.getInstance().getRakalyExecutable();
+            if (Files.exists(exec)) {
+                d.update(Files.readAllBytes(exec));
+            }
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex);
+        }
         return checksum(d);
     }
 

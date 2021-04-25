@@ -90,7 +90,8 @@ public class GuiErrorReporter {
                 You can notify the developers of this error automatically by clicking the 'Report automatically' button. (This will send some diagnostics data.)
                 Alternatively, you can also report it on GitHub to provide some information about the issue and get notified about the status of your reported issue.
 
-                """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter." : "") : ""));
+                """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter.\n" +
+                "However, if something is no longer working correctly, you should try to restart the Pdx-Unlimiter." : "") : ""));
 
         VBox dialogPaneContent = new VBox();
 
