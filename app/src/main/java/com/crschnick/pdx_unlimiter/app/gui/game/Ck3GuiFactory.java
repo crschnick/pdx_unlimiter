@@ -200,7 +200,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         }
 
         if (info.hasOnePlayerTag()) {
-            addGoldEntry(grid, info.getTag().getGold(), info.getTag().getIncome());
+            // addGoldEntry(grid, info.getTag().getGold(), info.getTag().getIncome());
             addIntegerEntry(grid, CK3_ICON_PRESTIGE, info.getTag().getPrestige(), "Prestige", false);
             addIntegerEntry(grid, CK3_ICON_PIETY, info.getTag().getPiety(), "Piety", false);
             addIntegerEntry(grid, CK3_ICON_SOLDIERS, info.getTag().getStrength(), "Total soldiers", false);
