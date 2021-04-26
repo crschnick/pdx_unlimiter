@@ -33,7 +33,9 @@ public class StellarisInstallation extends GameInstallation {
 
     public <T, I extends SavegameInfo<T>> Path getExportTarget(SavegameEntry<T, I> e) {
         Path file;
-        Path dir = getSavegamesPath().resolve(SavegameStorage.<T, I>get(Game.STELLARIS).getEntryName(e));
+        Path dir = getSavegamesPath().resolve(SavegameStorage.<T, I>get(Game.STELLARIS)
+                .getFileSystemCompatibleName(e, false));
+        dir = Path.of(FilenameUtils.removeExtension(dir.toString()));
         if (e.getInfo().isIronman()) {
             file = dir.resolve("ironman.sav");
         } else {
@@ -55,7 +57,12 @@ public class StellarisInstallation extends GameInstallation {
 
     @Override
     public Optional<GameMod> getModForName(String name) {
-        return Optional.empty();
+        // Check whether it is a mod path, and not a mod name
+        if (!name.startsWith("mod")) {
+            return Optional.empty();
+        }
+
+        return getMods().stream().filter(d -> getUserPath().relativize(d.getModFile()).equals(Path.of(name))).findAny();
     }
 
     @Override

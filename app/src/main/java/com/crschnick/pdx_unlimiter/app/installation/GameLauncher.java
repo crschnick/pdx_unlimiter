@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class GameLauncher {
 
@@ -42,7 +43,7 @@ public class GameLauncher {
         try {
             setupContinueGame(e);
             startLauncherDirectly();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ErrorHandler.handleException(ex);
         }
     }
@@ -68,7 +69,7 @@ public class GameLauncher {
         });
     }
 
-    private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T, I> e) throws IOException {
+    private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T, I> e) throws Exception {
         var ctx = SavegameContext.getContext(e);
         var path = ctx.getInstallation().getExportTarget(e);
         ctx.getStorage().copySavegameTo(e, path);
@@ -105,7 +106,7 @@ public class GameLauncher {
         var ctx = SavegameContext.getContext(e);
         if (ctx.getGame().equals(Game.STELLARIS)) {
             var r = GuiIncompatibleWarning.showStellarisModWarning(
-                    GameInstallation.ALL.get(Game.STELLARIS).getMods());
+                    getEnabledMods(GameInstallation.ALL.get(Game.STELLARIS)));
             if (r.isPresent()) {
                 var b = r.get();
                 if (b) {
@@ -129,8 +130,8 @@ public class GameLauncher {
     }
 
     private static void writeStellarisDlcLoadFile(
-            GameInstallation installation, List<GameDlc> dlcs) throws IOException {
-        var existingMods = installation.getMods();
+            GameInstallation installation, List<GameDlc> dlcs) throws Exception {
+        var existingMods = getEnabledMods(installation);
         writeDlcLoadFile(installation, existingMods, dlcs);
     }
 
@@ -149,5 +150,14 @@ public class GameLauncher {
                 .map(JsonNodeFactory.instance::textNode)
                 .collect(Collectors.toList()));
         JsonHelper.write(n, file);
+    }
+
+    private static List<GameMod> getEnabledMods(GameInstallation installation) throws Exception {
+        var file = installation.getUserPath().resolve("dlc_load.json");
+        var node = JsonHelper.read(file);
+        return StreamSupport.stream(node.required("enabled_mods").spliterator(), false)
+                .map(n -> installation.getModForName(n.textValue()))
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList());
     }
 }

@@ -77,6 +77,9 @@ public class GuiIncompatibleWarning {
             String builder = PdxuI18n.get("STELLARIS_INFO") + enabledMods.stream()
                     .map(m -> "- " + m.getName())
                     .collect(Collectors.joining("\n"));
+            if (enabledMods.size() == 0) {
+                builder = builder + "<None>";
+            }
             alert.setHeaderText(builder);
         });
 
