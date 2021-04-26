@@ -63,6 +63,8 @@ public class GameImage {
     public static Image CK3_ICON_HEALTH;
 
     public static Image STELLARIS_ICON_IRONMAN;
+    public static Image STELLARIS_FLAG_MASK;
+    public static Image STELLARIS_FLAG_FRAME;
     public static Image STELLARIS_BACKGROUND;
 
     public static Image HOI4_ICON_IRONMAN;
@@ -230,8 +232,11 @@ public class GameImage {
     private static void loadStellarisImages() {
         var installPath = GameInstallation.ALL.get(Game.STELLARIS).getPath();
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
+        Path f = installPath.resolve("gfx").resolve("interface").resolve("flags");
 
         STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
+        STELLARIS_FLAG_MASK = ImageLoader.loadImage(f.resolve("empire_flag_200_mask.dds"));
+        STELLARIS_FLAG_FRAME = ImageLoader.loadImage(f.resolve("empire_flag_200_frame.dds"));
         STELLARIS_BACKGROUND = ImageLoader.loadImage(
                 installPath.resolve("launcher-assets").resolve("app-background.png"));
 

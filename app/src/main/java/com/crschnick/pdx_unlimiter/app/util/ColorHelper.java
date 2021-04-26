@@ -1,19 +1,11 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.node.ValueNode;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import javafx.scene.paint.Color;
 
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ColorHelper {
 
@@ -86,29 +78,5 @@ public class ColorHelper {
                     Double.parseDouble(c.get(2)) / 255.0);
             case HEX -> Color.valueOf("#" + color.getValues().get(0));
         };
-    }
-
-    private static Map<String, Color> loadPredefinedStellarisColors(Node node) {
-        Map<String, Color> map = new HashMap<>();
-        node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
-            n.forEach((k, v) -> {
-                ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
-                map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
-            });
-        });
-        return map;
-    }
-
-    public static Map<String, Color> loadStellarisColors(SavegameInfo<StellarisTag> info) {
-        var file = CascadeDirectoryHelper.openFile(
-                Path.of("flags").resolve("colors.txt"), info).get();
-
-        try {
-            Node node = TextFormatParser.textFileParser().parse(file);
-            return loadPredefinedStellarisColors(node);
-        } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
-            return Map.of();
-        }
     }
 }

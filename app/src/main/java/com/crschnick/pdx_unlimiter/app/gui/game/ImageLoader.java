@@ -15,9 +15,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
+import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.*;
+import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.getBlue;
+
 public class ImageLoader {
 
     public static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
+    public static final BufferedImage DEFAULT_AWT_IMAGE = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
@@ -78,7 +82,7 @@ public class ImageLoader {
             return image;
         } catch (IOException e) {
             ErrorHandler.handleException(e);
-            return null;
+            return DEFAULT_AWT_IMAGE;
         }
     }
 
@@ -115,5 +119,23 @@ public class ImageLoader {
         }
 
         ImageIO.write(swingImage, "png", out.toFile());
+    }
+
+    static void applyAlphaMask(BufferedImage awtImage, Image mask) {
+        double xF = mask.getWidth() / awtImage.getWidth();
+        double yF = mask.getHeight() / awtImage.getHeight();
+        for (int x = 0; x < awtImage.getWidth(); x++) {
+            for (int y = 0; y < awtImage.getHeight(); y++) {
+                int argb = awtImage.getRGB(x, y);
+                int maskArgb = mask.getPixelReader().getArgb(
+                        (int) Math.floor(xF * x), (int) Math.floor(yF * y));
+
+                int color = ((getAlpha(maskArgb)) << 24) +
+                        (getRed(argb) << 16) +
+                        (getGreen(argb) << 8) +
+                        getBlue(argb);
+                awtImage.setRGB(x, y, color);
+            }
+        }
     }
 }
