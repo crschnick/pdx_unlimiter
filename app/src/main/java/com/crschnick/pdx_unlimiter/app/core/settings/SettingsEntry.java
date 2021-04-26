@@ -303,11 +303,13 @@ public abstract class SettingsEntry<T> {
                     this.disabled = true;
                 }
                 showInstallErrorMessage(e.getLocalisedMessage());
+                ErrorHandler.reportError(e, false, null);
             } catch (Exception e) {
                 if (value.get() == null) {
                     this.disabled = true;
                 }
                 showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
+                ErrorHandler.reportError(e, false, null);
             }
         }
 

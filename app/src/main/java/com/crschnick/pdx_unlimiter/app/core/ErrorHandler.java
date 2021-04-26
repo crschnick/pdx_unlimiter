@@ -109,19 +109,7 @@ public class ErrorHandler {
             if (show) {
                 errorReporterShowing = true;
                 boolean shouldSendDiagnostics = GuiErrorReporter.showException(ex, terminal);
-                if (shouldSendDiagnostics) {
-                    Sentry.withScope(scope -> {
-                        LogManager.getInstance().getLogFile().ifPresent(l -> {
-                            scope.addAttachment(new Attachment(l.toString()));
-                        });
-                        if (attachFile != null) {
-                            scope.addAttachment(new Attachment(attachFile.toString()));
-                        }
-                        Sentry.captureException(ex);
-                    });
-                } else {
-                    Sentry.captureException(ex);
-                }
+                reportError(ex, shouldSendDiagnostics, attachFile);
                 errorReporterShowing = false;
             }
 
@@ -153,6 +141,22 @@ public class ErrorHandler {
             ThreadHelper.sleep(1000);
 
             System.exit(1);
+        }
+    }
+
+    public static void reportError(Throwable t, boolean diag, Path attachFile) {
+        if (diag) {
+            Sentry.withScope(scope -> {
+                LogManager.getInstance().getLogFile().ifPresent(l -> {
+                    scope.addAttachment(new Attachment(l.toString()));
+                });
+                if (attachFile != null) {
+                    scope.addAttachment(new Attachment(attachFile.toString()));
+                }
+                Sentry.captureException(t);
+            });
+        } else {
+            Sentry.captureException(t);
         }
     }
 
