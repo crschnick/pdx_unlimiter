@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
@@ -10,12 +9,12 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public final class WindowsStoreDist extends GameDistType {
+public final class WindowsStoreDist extends GameDist {
 
     private static final Pattern PACKAGE_FAMILY_NAME_PATTERN = Pattern.compile("^PackageFamilyName\\s+:\\s*([^\\s]*)$");
     private static final Pattern LOCATION_PATTERN = Pattern.compile("^InstallLocation\\s+:\\s*([^\\s]*)$");
 
-    public static Optional<GameDistType> getDist(Game g, JsonNode node) {
+    public static Optional<GameDist> getDist(Game g, Path dir) {
         if (g.getWindowsStoreName() == null) {
             return Optional.empty();
         }

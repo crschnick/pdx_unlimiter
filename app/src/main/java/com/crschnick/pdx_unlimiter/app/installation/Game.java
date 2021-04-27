@@ -4,10 +4,10 @@ import com.crschnick.pdx_unlimiter.app.installation.game.GameInstallType;
 
 public enum Game {
 
-    EU4("eu4", "EU4", "Europa Universalis IV", null, new GameInstallType.StandardInstallType()),
-    HOI4("hoi4", "HOI4", "Hearts of Iron IV", null, new GameInstallType.StandardInstallType()),
-    CK3("ck3", "CK3", "Crusader Kings III", "ParadoxInteractive.ProjectTitus", new GameInstallType.StandardInstallType()),
-    STELLARIS("stellaris", "Stellaris", "Stellaris", "ParadoxInteractive.Stellaris-MicrosoftStoreEdition", new GameInstallType.StandardInstallType());
+    EU4("eu4", "EU4", "Europa Universalis IV", null, GameInstallType.EU4),
+    HOI4("hoi4", "HOI4", "Hearts of Iron IV", null, GameInstallType.HOI4),
+    CK3("ck3", "CK3", "Crusader Kings III", "ParadoxInteractive.ProjectTitus", GameInstallType.CK3),
+    STELLARIS("stellaris", "Stellaris", "Stellaris", "ParadoxInteractive.Stellaris-MicrosoftStoreEdition", GameInstallType.STELLARIS);
 
     private final String id;
     private final String abbreviation;

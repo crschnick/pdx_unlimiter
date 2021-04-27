@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.integration.SteamHelper;
 
 import java.io.IOException;
@@ -16,14 +15,21 @@ import java.util.stream.Collectors;
 
 public class SteamDist extends PdxLauncherDist {
 
-    public static Optional<SteamDist> getDist(Game g) {
-        Optional<Path> steamDir = SteamHelper.getSteamPath();
-        var installDir = steamDir.map(d -> d.resolve("steamapps")
-                .resolve("common").resolve(g.getFullName()))
-                .filter(Files::exists);
-        if (installDir.isPresent()) {
+    public static Optional<GameDist> getDist(Game g, Path dir) {
+        var installDir = dir;
+        if (dir == null) {
+            Optional<Path> steamDir = SteamHelper.getSteamPath();
+            installDir = steamDir.map(d -> d.resolve("steamapps")
+                    .resolve("common").resolve(g.getFullName()))
+                    .filter(Files::exists)
+                    .orElse(null);
+        }
+        if (installDir != null) {
             try {
-                return Optional.of(installDir.get().toRealPath());
+                var appIdString = Files.readString(g.getInstallType().getSteamAppIdFile(installDir));
+                // Trim the id because sometimes it contains trailing new lines!
+                var appId = Integer.parseInt(appIdString.trim());
+                return Optional.of(new SteamDist(g, dir, appId));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -39,14 +45,14 @@ public class SteamDist extends PdxLauncherDist {
     }
 
     @Override
-    public boolean checkDirectLaunch() {
+    public boolean directLaunch() {
         if (!SteamHelper.isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
             GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
                     "Please start Steam first before launching the game");
             return false;
         }
 
-        return true;
+        return super.directLaunch();
     }
 
     @Override

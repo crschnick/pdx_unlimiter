@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
-import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistType;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
 import com.crschnick.pdx_unlimiter.app.installation.dist.PdxLauncherDist;
 import com.crschnick.pdx_unlimiter.app.installation.dist.SteamDist;
 import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
@@ -38,7 +38,7 @@ public abstract class GameInstallation {
     private final List<GameMod> mods = new ArrayList<>();
     private final Path path;
     private final List<GameDlc> dlcs = new ArrayList<>();
-    private GameDistType distType;
+    private GameDist distType;
     private Path userDir;
     private GameVersion version;
     private Language language;
@@ -165,7 +165,7 @@ public abstract class GameInstallation {
         return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
-    public GameDistType getDistType() {
+    public GameDist getDistType() {
         return distType;
     }
 
@@ -225,9 +225,9 @@ public abstract class GameInstallation {
 
     protected abstract GameVersion determineVersion(JsonNode node);
 
-    private GameDistType determineDistType(JsonNode node) throws IOException {
+    private GameDist determineDistType(JsonNode node) throws IOException {
         String platform = node.required("distPlatform").textValue();
-        GameDistType d;
+        GameDist d;
         if (platform.equals("steam")) {
             // Trim the id because sometimes it contains trailing new lines!
             var id = Files.readString(getSteamAppIdFile()).trim();

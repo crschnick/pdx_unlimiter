@@ -1,29 +1,33 @@
 package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class PdxLauncherDist extends GameDistType {
+public class PdxLauncherDist extends GameDist {
 
-    public static Optional<GameDistType> getDist(Game g, JsonNode node) {
-        if (!node.has("location")) {
+    public static Optional<GameDist> getDist(Game g, Path dir) {
+        if (dir == null) {
             return Optional.empty();
         }
 
-        var loc = Path.of(node.get("location").textValue());
-        return Optional.of(new PdxLauncherDist(g, "Paradox Launcher", loc));
+        if (!Files.exists(g.getInstallType().getLauncherDataPath(dir).resolve("launcher-settings.json"))) {
+            return Optional.empty();
+        }
+
+        if (!Files.exists(getBootstrapper())) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new PdxLauncherDist(g, "Paradox Launcher", dir));
     }
 
-    private static Path getBootstrapper() throws IOException {
+    private static Path getBootstrapper() {
         Path bootstrapper;
         if (SystemUtils.IS_OS_WINDOWS) {
             bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
@@ -35,20 +39,6 @@ public class PdxLauncherDist extends GameDistType {
                     .resolve(".paradoxlauncher")
                     .resolve("bootstrapper-v2");
         }
-
-        if (!Files.exists(bootstrapper)) {
-            try {
-                LoggerFactory.getLogger(GameDistType.class).error("Pdx-Dir: " +
-                        Files.list(bootstrapper.getParent())
-                                .map(Path::toString)
-                                .collect(Collectors.joining(", ")));
-            } catch (Exception ignored) {}
-
-            throw new IOException("Paradox Launcher bootstrapper not found.\n" +
-                    "Please try to enable 'Start through Steam' in the settings menu.\n" +
-                    "If you don't use Steam or believe that this an error, please report it.");
-        }
-
         return bootstrapper;
     }
 
