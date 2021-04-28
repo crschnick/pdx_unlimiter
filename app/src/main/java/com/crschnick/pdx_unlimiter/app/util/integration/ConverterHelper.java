@@ -65,7 +65,7 @@ public class ConverterHelper {
     }
 
     public static String getEu4ModDir() {
-        return GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod").toString();
+        return GameInstallation.ALL.get(Game.EU4).getUserDir().resolve("mod").toString();
     }
 
     public static String getModOutputPath(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
@@ -78,7 +78,7 @@ public class ConverterHelper {
                 .resolve("CK3toEU4").resolve("configuration.txt");
         try {
             var writer = Files.newBufferedWriter(config);
-            writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserPath().toString());
+            writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserDir().toString());
             writeLine(writer, "CK3directory", GameInstallation.ALL.get(Game.CK3).getPath().toString());
             writeLine(writer, "EU4directory", GameInstallation.ALL.get(Game.EU4).getPath().toString());
             writeLine(writer, "targetGameModPath", getEu4ModDir());

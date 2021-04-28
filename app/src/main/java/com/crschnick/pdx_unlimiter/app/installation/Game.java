@@ -1,7 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.installation.game.GameInstallType;
-
 public enum Game {
 
     EU4("eu4", "EU4", "Europa Universalis IV", null, GameInstallType.EU4),

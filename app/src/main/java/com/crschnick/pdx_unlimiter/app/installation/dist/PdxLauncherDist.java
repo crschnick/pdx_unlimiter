@@ -1,6 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -55,6 +58,36 @@ public class PdxLauncherDist extends GameDist {
 
     public PdxLauncherDist(Game g, String name, Path installLocation) {
         super(g, name, installLocation);
+    }
+
+    private Path getLauncherSettings() {
+        return getGame().getInstallType().getLauncherDataPath(getInstallLocation()).resolve("launcher-settings.json");
+    }
+
+    private Path replaceVariablesInPath(String value) {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            value = value.replace("%USER_DOCUMENTS%",
+                    OsHelper.getUserDocumentsPath().toString());
+        } else if (SystemUtils.IS_OS_LINUX) {
+            value = value.replace("$LINUX_DATA_HOME",
+                    OsHelper.getUserDocumentsPath().toString());
+        }
+        return Path.of(value);
+    }
+
+    @Override
+    public Optional<String> determineVersion() throws IOException {
+        JsonNode node = JsonHelper.read(getLauncherSettings());
+        return Optional.ofNullable(node.get("version")).map(JsonNode::textValue);
+    }
+
+    @Override
+    public Path determineUserDir() throws IOException {
+        JsonNode node = JsonHelper.read(getLauncherSettings());
+        return Optional.ofNullable(node.get("gameDataPath"))
+                .map(JsonNode::textValue)
+                .map(this::replaceVariablesInPath)
+                .orElse(super.determineUserDir());
     }
 
     @Override

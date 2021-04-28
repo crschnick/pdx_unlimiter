@@ -156,13 +156,13 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
                     "Requires the following " + info.getMods().size() + " mods:\n" +
                             info.getMods().stream()
                                     .map(s -> {
-                                        var m = installation.getModForName(s);
+                                        var m = installation.getModForId(s);
                                         return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
                                     })
                                     .collect(Collectors.joining("\n")));
 
             boolean missing = info.getMods().stream()
-                    .map(m -> installation.getModForName(m))
+                    .map(m -> installation.getModForId(m))
                     .anyMatch(Optional::isEmpty);
             mods.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
             mods.setAlignment(Pos.CENTER);

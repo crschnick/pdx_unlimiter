@@ -14,8 +14,8 @@ public class GameDists {
     private static final Map<String, BiFunction<Game, Path, Optional<GameDist>>> TYPES = new LinkedHashMap<>();
 
     static {
-        TYPES.put("windows-store", WindowsStoreDist::getDist);
         TYPES.put("steam", SteamDist::getDist);
+        TYPES.put("windows-store", WindowsStoreDist::getDist);
         TYPES.put("pdx", PdxLauncherDist::getDist);
         TYPES.put("legacy", LegacyLauncherDist::getDist);
         TYPES.put("no-launcher", NoLauncherDist::getDist);

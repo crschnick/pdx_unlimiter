@@ -3,30 +3,16 @@ package com.crschnick.pdx_unlimiter.app.installation;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
-import com.crschnick.pdx_unlimiter.app.installation.dist.PdxLauncherDist;
-import com.crschnick.pdx_unlimiter.app.installation.dist.SteamDist;
-import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
-import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.lang.Language;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
-import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,26 +21,25 @@ public abstract class GameInstallation {
 
     public static final BidiMap<Game, GameInstallation> ALL = new DualHashBidiMap<>();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private final List<GameMod> mods = new ArrayList<>();
-    private final Path path;
+
+    private final Path dir;
+    private final GameInstallType type;
+    private final GameDist dist;
+
     private final List<GameDlc> dlcs = new ArrayList<>();
-    private GameDist distType;
+    private final List<GameMod> mods = new ArrayList<>();
+
     private Path userDir;
     private GameVersion version;
     private Language language;
-    private Path executable;
 
-    public GameInstallation(Path path, Path executable) {
-        this.path = path;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            this.executable = getPath().resolve(executable).resolveSibling(executable.getFileName().toString() + ".exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            this.executable = getPath().resolve(executable);
-        }
+    public GameInstallation(Path dir, GameInstallType type, GameDist dist) {
+        this.dir = dir;
+        this.type = type;
+        this.dist = dist;
     }
 
-    public static void initTemporary(Game game, GameInstallation install) throws
-            IOException, InvalidInstallationException {
+    public static void initTemporary(Game game, GameInstallation install) throws InvalidInstallationException {
         var oldInstall = ALL.get(game);
 
         ALL.put(game, install);
@@ -100,8 +85,8 @@ public abstract class GameInstallation {
 
     public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
-        savegameDirs.add(getSavegamesPath());
-        savegameDirs.addAll(getDistType().getAdditionalSavegamePaths());
+        savegameDirs.add(getSavegamesDir());
+        savegameDirs.addAll(dist.getAdditionalSavegamePaths());
         return savegameDirs;
     }
 
@@ -112,17 +97,12 @@ public abstract class GameInstallation {
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
-    public <T, I extends SavegameInfo<T>> Path getExportTarget(SavegameEntry<T, I> e) {
-        return getSavegamesPath().resolve(SavegameStorage.get(
-                ALL.inverseBidiMap().get(this)).getFileSystemCompatibleName(e, false));
-    }
-
     private void loadDlcs() throws IOException {
-        if (!Files.isDirectory(getDlcPath())) {
+        if (!Files.isDirectory(type.getDlcPath(dir))) {
             return;
         }
 
-        Files.list(getDlcPath()).forEach(f -> {
+        Files.list(type.getDlcPath(dir)).forEach(f -> {
             try {
                 GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
             } catch (Exception e) {
@@ -132,11 +112,11 @@ public abstract class GameInstallation {
     }
 
     private void loadMods() throws IOException {
-        if (!Files.isDirectory(getUserPath().resolve("mod"))) {
+        if (!Files.isDirectory(getUserDir().resolve("mod"))) {
             return;
         }
 
-        Files.list(getUserPath().resolve("mod")).forEach(f -> {
+        Files.list(getUserDir().resolve("mod")).forEach(f -> {
             try {
                 GameMod.fromFile(f).ifPresent(m -> {
                     if (Files.exists(m.getPath())) mods.add(m);
@@ -150,61 +130,47 @@ public abstract class GameInstallation {
         });
     }
 
-    protected Path replaceVariablesInPath(String value) {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            value = value.replace("%USER_DOCUMENTS%",
-                    OsHelper.getUserDocumentsPath().toString());
-        } else if (SystemUtils.IS_OS_LINUX) {
-            value = value.replace("$LINUX_DATA_HOME",
-                    OsHelper.getUserDocumentsPath().toString());
-        }
-        return Path.of(value);
-    }
-
     public Optional<GameDlc> getDlcForName(String name) {
         return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 
-    public GameDist getDistType() {
-        return distType;
+    public GameDist getDist() {
+        return dist;
     }
 
-    public Path getDlcPath() {
-        return getPath().resolve("dlc");
+    public Optional<GameMod> getModForId(String id) {
+        return getMods().stream().filter(m -> type.getModId(userDir, m).equals(id)).findAny();
+    }
+    public void startDirectly(boolean debug) throws IOException {
+        var args = new ArrayList<>(type.getLaunchArguments());
+        if (debug) {
+            args.add(type.debugModeSwitch().get());
+        }
+        dist.startDirectly(type.getExecutable(dir), args);
     }
 
-    public abstract void writeLaunchConfig(String name, Instant lastPlayed, Path path) throws IOException;
-
-    public abstract Optional<GameMod> getModForName(String name);
-
-    public abstract void startDirectly() throws IOException;
-
-    public void loadData() throws IOException, InvalidInstallationException {
+    public void loadData() throws InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
         LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getAbbreviation() + " installation ...");
-        if (!Files.isRegularFile(getExecutable())) {
-            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), getExecutable().toString());
+        if (!Files.isRegularFile(type.getExecutable(dir))) {
+            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), type.getExecutable(dir).toString());
         }
 
-        var ls = getLauncherDataPath().resolve("launcher-settings.json");
-        if (!Files.exists(ls)) {
-            throw new InvalidInstallationException("LAUNCHER_SETTINGS_NOT_FOUND", g.getAbbreviation());
-        }
+        logger.debug(g.getAbbreviation() + " distribution type: " + this.dist.getName());
 
-        JsonNode node = JsonHelper.read(ls);
         try {
-            this.userDir = determineUserDir(node);
+            this.userDir = dist.determineUserDir();
             logger.debug(g.getAbbreviation() + " user dir: " + this.userDir);
             if (!Files.exists(this.userDir)) {
                 throw new InvalidInstallationException(
                         "GAME_DATA_PATH_DOES_NOT_EXIST", g.getAbbreviation(), this.userDir.toString());
             }
 
-            this.version = determineVersion(node);
+            this.version = dist.determineVersion().map(type::getVersion)
+                    .orElse(type.determineVersionFromInstallation(this.dir))
+                    .orElse(null);
             logger.debug(g.getAbbreviation() + " version: " + this.version);
-            this.distType = determineDistType(node);
-            logger.debug(g.getAbbreviation() + " distribution type: " + this.distType.getName());
-            this.language = determineLanguage();
+            this.language = type.determineLanguage(dir, userDir).orElse(null);
             logger.debug(g.getAbbreviation() + " language: " +
                     (this.language != null ? this.language.getDisplayName() : "unknown"));
             LoggerFactory.getLogger(getClass()).debug("Finished initialization");
@@ -215,57 +181,16 @@ public abstract class GameInstallation {
         }
     }
 
-    protected Path determineUserDir(JsonNode node) throws InvalidInstallationException {
-        Game g = ALL.inverseBidiMap().get(this);
-        String value = Optional.ofNullable(node.get("gameDataPath"))
-                .orElseThrow(() -> new InvalidInstallationException("GAME_DATA_PATH_NOT_FOUND", g.getAbbreviation()))
-                .textValue();
-        return replaceVariablesInPath(value);
+    public Path getInstallDir() {
+        return dir;
     }
 
-    protected abstract GameVersion determineVersion(JsonNode node);
-
-    private GameDist determineDistType(JsonNode node) throws IOException {
-        String platform = node.required("distPlatform").textValue();
-        GameDist d;
-        if (platform.equals("steam")) {
-            // Trim the id because sometimes it contains trailing new lines!
-            var id = Files.readString(getSteamAppIdFile()).trim();
-            d = new SteamDist(Integer.parseInt(id), this);
-        } else {
-            d = new PdxLauncherDist(this);
-        }
-        return d;
-    }
-
-    protected abstract Language determineLanguage() throws Exception;
-
-    public Path getSteamAppIdFile() {
-        return getPath().resolve("steam_appid.txt");
-    }
-
-    public Path getLauncherDataPath() {
-        return getPath();
-    }
-
-    public Path getPath() {
-        return path;
-    }
-
-    public Path getModBasePath() {
-        return path;
-    }
-
-    public Path getExecutable() {
-        return executable;
-    }
-
-    public Path getUserPath() {
+    public Path getUserDir() {
         return userDir;
     }
 
-    public Path getSavegamesPath() {
-        return getUserPath().resolve("save games");
+    public Path getSavegamesDir() {
+        return getUserDir().resolve("save games");
     }
 
     public GameVersion getVersion() {

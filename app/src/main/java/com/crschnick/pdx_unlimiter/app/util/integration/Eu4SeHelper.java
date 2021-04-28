@@ -82,7 +82,7 @@ public class Eu4SeHelper {
 
         ThreadHelper.create("eu4se", true, () -> {
             // Create mod dir in case no mods are installed
-            var modDir = GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod");
+            var modDir = GameInstallation.ALL.get(Game.EU4).getUserDir().resolve("mod");
             if (!Files.exists(modDir)) {
                 try {
                     Files.createDirectory(modDir);
@@ -95,7 +95,7 @@ public class Eu4SeHelper {
             @SuppressWarnings("unchecked")
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;
             String saveFile = "save_file=" + SavegameStorage.ALL.get(Game.EU4).getSavegameFile(eu4Entry).toString();
-            String modsFolder = "mods_folder=" + GameInstallation.ALL.get(Game.EU4).getUserPath().resolve("mod").toString();
+            String modsFolder = "mods_folder=" + GameInstallation.ALL.get(Game.EU4).getUserDir().resolve("mod").toString();
             String gameFolder = "game_folder=" + GameInstallation.ALL.get(Game.EU4).getPath().toString();
             String overwrite = "override=true";
 

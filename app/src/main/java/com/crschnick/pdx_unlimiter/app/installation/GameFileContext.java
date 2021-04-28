@@ -24,7 +24,7 @@ public class GameFileContext {
         return new GameFileContext(
                 install,
                 info.getMods().stream()
-                .map(install::getModForName)
+                .map(install::getModForId)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList()));
     }

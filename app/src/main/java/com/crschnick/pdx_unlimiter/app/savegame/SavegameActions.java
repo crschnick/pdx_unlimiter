@@ -49,7 +49,7 @@ public class SavegameActions {
 
             var ins = ctx.getInstallation();
             boolean missingMods = info.getMods().stream()
-                    .map(ins::getModForName)
+                    .map(ins::getModForId)
                     .anyMatch(Optional::isEmpty);
 
             boolean missingDlc = info.getDlcs().stream()
@@ -80,8 +80,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void exportSavegame(SavegameEntry<T, I> e) {
         SavegameContext.withSavegame(e, ctx -> {
             try {
-                var path = ctx.getInstallation().getExportTarget(e);
-                ctx.getStorage().copySavegameTo(e, path);
+                FileExportTarget.createExportTarget(e).export();
             } catch (IOException ex) {
                 ErrorHandler.handleException(ex);
             }

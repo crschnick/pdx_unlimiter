@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public final class WindowsStoreDist extends GameDist {
+public final class WindowsStoreDist extends PdxLauncherDist {
 
     private static final Pattern PACKAGE_FAMILY_NAME_PATTERN = Pattern.compile("^PackageFamilyName\\s+:\\s*([^\\s]*)$");
     private static final Pattern LOCATION_PATTERN = Pattern.compile("^InstallLocation\\s+:\\s*([^\\s]*)$");

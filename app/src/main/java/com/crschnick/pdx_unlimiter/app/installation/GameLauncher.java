@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
+import com.crschnick.pdx_unlimiter.app.savegame.FileExportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
@@ -71,8 +72,8 @@ public class GameLauncher {
 
     private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T, I> e) throws Exception {
         var ctx = SavegameContext.getContext(e);
-        var path = ctx.getInstallation().getExportTarget(e);
-        ctx.getStorage().copySavegameTo(e, path);
+        var exportTarget = FileExportTarget.createExportTarget(e);
+        var path = exportTarget.export();
         ctx.getInstallation().writeLaunchConfig(ctx.getStorage().getEntryName(e), ctx.getCollection().getLastPlayed(), path);
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
@@ -82,7 +83,7 @@ public class GameLauncher {
                 .map(Optional::get)
                 .collect(Collectors.toList());
         var mods = e.getInfo().getMods().stream()
-                .map(m -> ctx.getInstallation().getModForName(m))
+                .map(m -> ctx.getInstallation().getModForId(m))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -136,11 +137,11 @@ public class GameLauncher {
     }
 
     private static void writeDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
-        var file = installation.getUserPath().resolve("dlc_load.json");
+        var file = installation.getUserDir().resolve("dlc_load.json");
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         n.putArray("enabled_mods").addAll(mods.stream()
                 .map(d -> FilenameUtils.separatorsToUnix
-                        (installation.getUserPath().relativize(d.getModFile()).toString()))
+                        (installation.getUserDir().relativize(d.getModFile()).toString()))
                 .map(JsonNodeFactory.instance::textNode)
                 .collect(Collectors.toList()));
         n.putArray("disabled_dlcs").addAll(installation.getDlcs().stream()
