@@ -178,6 +178,7 @@ public class TextFormatTokenizer {
 
         if (controlToken == CLOSE_GROUP) {
             assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
+            assert arraySizes[arraySizeStack.peek()] >= 0 : "Encountered invalid array size";
             arraySizeStack.pop();
         } else if (controlToken == EQUALS) {
             arraySizes[arraySizeStack.peek()]--;
