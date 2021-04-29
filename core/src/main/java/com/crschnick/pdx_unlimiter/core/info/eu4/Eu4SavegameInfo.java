@@ -43,15 +43,36 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private int mil;
     private List<War> wars = new ArrayList<>();
 
+    private void queryMods(Node n) {
+        // Mod data has changed in 1.31
+        if (version.compareTo(new GameVersion(1, 31, 0, 0, null)) >= 0) {
+            var list = new ArrayList<String>();
+            n.getNodeForKeyIfExistent("mods_enabled_names").ifPresent(me -> me.forEach((k,v) -> {
+                list.add(v.getNodeForKey("filename").getString());
+            }, true));
+            mods = list;
+        } else {
+            mods = n.getNodeForKeyIfExistent("mod_enabled").map(Node::getNodeArray).orElse(List.of())
+                    .stream().map(Node::getString)
+                    .collect(Collectors.toList());
+        }
+    }
+
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
         try {
             GameDate date = GameDateType.EU4.fromString(n.getNodeForKey("date").getString());
             String tag = n.getNodeForKey("player").getString();
             Eu4SavegameInfo e = new Eu4SavegameInfo();
 
-            e.mods = n.getNodeForKeyIfExistent("mod_enabled").map(Node::getNodeArray).orElse(List.of())
-                    .stream().map(Node::getString)
-                    .collect(Collectors.toList());
+            Node ver = n.getNodeForKey("savegame_version");
+            e.version = new GameVersion(
+                    ver.getNodeForKey("first").getInteger(),
+                    ver.getNodeForKey("second").getInteger(),
+                    ver.getNodeForKey("third").getInteger(),
+                    ver.getNodeForKey("forth").getInteger(),
+                    ver.getNodeForKey("name").getString());
+
+            e.queryMods(n);
 
             e.dlcs = n.getNodeForKeyIfExistent("dlc_enabled").map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
@@ -74,14 +95,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             e.releasedVassal = n.getNodeForKey("countries").getNodeForKey(tag)
                     .getNodeForKeyIfExistent("has_switched_nation").map(Node::getBoolean).orElse(false);
             e.date = date;
-
-            Node ver = n.getNodeForKey("savegame_version");
-            e.version = new GameVersion(
-                    ver.getNodeForKey("first").getInteger(),
-                    ver.getNodeForKey("second").getInteger(),
-                    ver.getNodeForKey("third").getInteger(),
-                    ver.getNodeForKey("forth").getInteger(),
-                    ver.getNodeForKey("name").getString());
 
             e.tag = Eu4Tag.getTag(e.allTags, tag);
 
