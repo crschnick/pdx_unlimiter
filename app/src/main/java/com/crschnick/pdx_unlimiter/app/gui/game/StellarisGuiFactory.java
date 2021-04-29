@@ -7,8 +7,6 @@ import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -37,7 +35,9 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
 
     @Override
     public Pane background() {
-        return GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
+        var bg = GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
+        bg.setOpacity(0.6);
+        return bg;
     }
 
     @Override
@@ -50,8 +50,5 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public void fillNodeContainer(SavegameInfo<StellarisTag> info, JFXMasonryPane grid) {
         super.fillNodeContainer(info, grid);
-        var l = new Label("What info would you like to see in this box? Share your feedback on github!");
-        l.setAlignment(Pos.CENTER);
-        grid.getChildren().add(l);
     }
 }
