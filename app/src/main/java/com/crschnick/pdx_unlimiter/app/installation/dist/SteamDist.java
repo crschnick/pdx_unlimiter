@@ -44,7 +44,6 @@ public class SteamDist extends PdxLauncherDist {
         this.appId = appId;
     }
 
-    @Override
     public boolean directLaunch() {
         if (!SteamHelper.isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
             GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
@@ -52,7 +51,7 @@ public class SteamDist extends PdxLauncherDist {
             return false;
         }
 
-        return super.directLaunch();
+        return false;
     }
 
     @Override

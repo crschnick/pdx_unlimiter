@@ -29,7 +29,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public Font font() throws IOException {
         return Font.loadFont(
-                Files.newInputStream(GameInstallation.ALL.get(Game.HOI4).getPath()
+                Files.newInputStream(GameInstallation.ALL.get(Game.HOI4).getInstallDir()
                         .resolve("launcher-assets").resolve("font.ttf")), 12);
     }
 

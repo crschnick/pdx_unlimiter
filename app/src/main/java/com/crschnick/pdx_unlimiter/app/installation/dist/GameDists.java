@@ -2,16 +2,18 @@ package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class GameDists {
 
-    private static final Map<String, BiFunction<Game, Path, Optional<GameDist>>> TYPES = new LinkedHashMap<>();
+    private static final BidiMap<String, BiFunction<Game, Path, Optional<GameDist>>> TYPES = new DualLinkedHashBidiMap<>();
 
     static {
         TYPES.put("steam", SteamDist::getDist);
@@ -22,14 +24,25 @@ public class GameDists {
     }
 
     public static Optional<GameDist> getDist(Game g, JsonNode n) {
-        // Legacy support
-        if (n.isTextual()) {
-            return getDistFromDirectory(g, Path.of(n.textValue()));
-        }
+        if (n != null) {
+            // Legacy support
+            if (n.isTextual()) {
+                return getDistFromDirectory(g, Path.of(n.textValue()));
+            }
 
-        var type = n.get("type").textValue();
-        var loc = Path.of(n.get("location").textValue());
-        return TYPES.get(type).apply(g, loc).or(() -> getDistFromDirectory(g, null));
+            var type = n.get("type").textValue();
+            var loc = Path.of(n.get("location").textValue());
+            return TYPES.get(type).apply(g, loc).or(() -> getDistFromDirectory(g, null));
+        } else {
+            return getDistFromDirectory(g, null);
+        }
+    }
+
+    public static JsonNode toNode(GameDist d) {
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("type", d.getName());
+        node.put("location", d.getInstallLocation().toString());
+        return node;
     }
 
     private static Optional<GameDist> getDistFromDirectory(Game g, Path dir) {

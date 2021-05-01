@@ -64,7 +64,7 @@ public final class GameAppManager {
 
     private static boolean isInstanceOfGame(String cmd, Game game) {
         var install = GameInstallation.ALL.get(game);
-        return install != null && cmd.contains(install.getExecutable().toString());
+        return install != null && cmd.contains(game.getInstallType().getExecutable(install.getInstallDir()).toString());
     }
 
     public static GameAppManager getInstance() {

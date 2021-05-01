@@ -133,7 +133,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public Font font() throws IOException {
         return Font.loadFont(
-                Files.newInputStream(GameInstallation.ALL.get(Game.EU4).getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+                Files.newInputStream(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("launcher-assets").resolve("font.ttf")), 12);
     }
 
     @Override

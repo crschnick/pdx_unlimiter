@@ -9,7 +9,7 @@ import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
@@ -118,7 +118,7 @@ public class SavegameActions {
                     TaskExecutor.getInstance().submitTask(() -> {
                         SavegameStorage.get(g).loadEntry(entry);
                         SavegameContext.withSavegame(entry, ctx -> {
-                            GameLauncher.continueSavegame(entry);
+                            GameDistLauncher.continueSavegame(entry);
                         });
                     }, true);
                 });
@@ -155,7 +155,7 @@ public class SavegameActions {
                                 // In case it is null, temporarily set it
                                 if (e.infoProperty().get() == null) {
                                     e.load((SavegameInfo<Object>) s.info);
-                                    GameLauncher.continueSavegame(e);
+                                    GameDistLauncher.continueSavegame(e);
                                     e.unload();
                                 }
                             });

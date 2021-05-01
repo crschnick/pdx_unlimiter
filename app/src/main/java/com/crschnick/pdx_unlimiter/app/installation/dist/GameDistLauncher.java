@@ -1,10 +1,14 @@
-package com.crschnick.pdx_unlimiter.app.installation;
+package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
+import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.installation.GameDlc;
+import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
+import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.app.savegame.FileExportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
@@ -23,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class GameLauncher {
+public class GameDistLauncher {
 
     public static void startLauncher() {
         try {
@@ -31,7 +35,7 @@ public class GameLauncher {
             if (Settings.getInstance().launchIrony.getValue()) {
                 IronyHelper.launchEntry(game, false);
             } else {
-                GameInstallation.ALL.get(game).getDistType().startLauncher();
+                GameInstallation.ALL.get(game).getDist().startLauncher();
             }
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
@@ -74,7 +78,7 @@ public class GameLauncher {
         var ctx = SavegameContext.getContext(e);
         var exportTarget = FileExportTarget.createExportTarget(e);
         var path = exportTarget.export();
-        ctx.getInstallation().writeLaunchConfig(ctx.getStorage().getEntryName(e), ctx.getCollection().getLastPlayed(), path);
+        ctx.getInstallation().getInstallDir().writeLaunchConfig(ctx.getStorage().getEntryName(e), ctx.getCollection().getLastPlayed(), path);
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
         var dlcs = e.getInfo().getDlcs().stream()
@@ -123,7 +127,7 @@ public class GameLauncher {
             IronyHelper.launchEntry(ctx.getGame(), true);
         } else {
             var install = ctx.getInstallation();
-            boolean doLaunch = install.getDistType().checkDirectLaunch();
+            boolean doLaunch = install.getDist().checkDirectLaunch();
             if (doLaunch) {
                 ctx.getInstallation().startDirectly();
             }
@@ -147,7 +151,7 @@ public class GameLauncher {
         n.putArray("disabled_dlcs").addAll(installation.getDlcs().stream()
                 .filter(d -> d.isExpansion() && !dlcs.contains(d))
                 .map(d -> FilenameUtils.separatorsToUnix(
-                        installation.getPath().relativize(d.getInfoFilePath()).toString()))
+                        installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
                 .map(JsonNodeFactory.instance::textNode)
                 .collect(Collectors.toList()));
         JsonHelper.write(n, file);

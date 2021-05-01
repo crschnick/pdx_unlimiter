@@ -143,13 +143,13 @@ public class GameImage {
     }
 
     private static Image loadCk3Icon() {
-        var installPath = GameInstallation.ALL.get(Game.CK3).getPath();
+        var installPath = GameInstallation.ALL.get(Game.CK3).getInstallDir();
         return ImageLoader.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
     }
 
     public static void loadCk3Images() {
-        var installPath = GameInstallation.ALL.get(Game.CK3).getPath();
+        var installPath = GameInstallation.ALL.get(Game.CK3).getInstallDir();
         Path p = installPath.resolve("game");
         Path i = p.resolve("gfx").resolve("interface").resolve("icons");
 
@@ -223,14 +223,14 @@ public class GameImage {
     }
 
     private static Image loadStellarisIcon() {
-        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getPath();
+        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getInstallDir();
         return ImageLoader.loadImage(
                 installPath.resolve("gfx").resolve("exe_icon.bmp"));
 
     }
 
     private static void loadStellarisImages() {
-        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getPath();
+        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
         Path f = installPath.resolve("gfx").resolve("interface").resolve("flags");
 
@@ -243,12 +243,12 @@ public class GameImage {
     }
 
     private static Image loadHoi4Icon() {
-        var installPath = GameInstallation.ALL.get(Game.HOI4).getPath();
+        var installPath = GameInstallation.ALL.get(Game.HOI4).getInstallDir();
         return ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("game-icon.png"));
     }
 
     private static void loadHoi4Images() {
-        var installPath = GameInstallation.ALL.get(Game.HOI4).getPath();
+        var installPath = GameInstallation.ALL.get(Game.HOI4).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface");
 
         HOI4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("warning_icon.dds"));
@@ -264,12 +264,12 @@ public class GameImage {
     }
 
     private static Image loadEu4Icon() {
-        var installPath = GameInstallation.ALL.get(Game.EU4).getPath();
+        var installPath = GameInstallation.ALL.get(Game.EU4).getInstallDir();
         return ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("icon.png"));
     }
 
     private static void loadEu4Images() {
-        var installPath = GameInstallation.ALL.get(Game.EU4).getPath();
+        var installPath = GameInstallation.ALL.get(Game.EU4).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface");
 
         EU4_ICON_VASSAL = ImageLoader.loadImage(i.resolve("icon_vassal.dds"));

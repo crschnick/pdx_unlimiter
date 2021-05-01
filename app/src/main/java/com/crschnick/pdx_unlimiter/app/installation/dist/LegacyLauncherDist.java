@@ -26,11 +26,6 @@ public class LegacyLauncherDist extends GameDist {
     }
 
     @Override
-    public boolean directLaunch() {
-        return super.directLaunch();
-    }
-
-    @Override
     public void startLauncher() throws IOException {
         super.startLauncher();
     }

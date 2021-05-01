@@ -29,7 +29,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     public Font font() throws IOException {
         return Font.loadFont(
                 Files.newInputStream(GameInstallation.ALL.get(Game.STELLARIS)
-                        .getPath().resolve("launcher-assets").resolve("font.ttf")), 12);
+                        .getInstallDir().resolve("launcher-assets").resolve("font.ttf")), 12);
 
     }
 

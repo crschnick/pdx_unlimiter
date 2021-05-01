@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -51,10 +50,6 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     public WindowsStoreDist(Game g, String packageFamilyName, Path installLocation) {
         super(g, "Windows Store", installLocation);
         this.packageFamilyName = packageFamilyName;
-    }
-
-    @Override
-    public void toNode(ObjectNode node) {
     }
 
     @Override

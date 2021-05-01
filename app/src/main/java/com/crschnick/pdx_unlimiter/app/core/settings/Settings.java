@@ -5,10 +5,6 @@ import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSettings;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.game.Ck3Installation;
-import com.crschnick.pdx_unlimiter.app.installation.game.Eu4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.game.Hoi4Installation;
-import com.crschnick.pdx_unlimiter.app.installation.game.StellarisInstallation;
 import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.util.integration.Eu4SeHelper;
@@ -25,20 +21,16 @@ public final class Settings extends AbstractSettings {
 
     public final SettingsEntry.GameDirectory eu4 = new SettingsEntry.GameDirectory(
             "eu4",
-            Game.EU4,
-            Eu4Installation.class);
+            Game.EU4);
     public final SettingsEntry.GameDirectory hoi4 = new SettingsEntry.GameDirectory(
             "hoi4",
-            Game.HOI4,
-            Hoi4Installation.class);
+            Game.HOI4);
     public final SettingsEntry.GameDirectory ck3 = new SettingsEntry.GameDirectory(
             "ck3",
-            Game.CK3,
-            Ck3Installation.class);
+            Game.CK3);
     public final SettingsEntry.GameDirectory stellaris = new SettingsEntry.GameDirectory(
             "stellaris",
-            Game.STELLARIS,
-            StellarisInstallation.class);
+            Game.STELLARIS);
     public final SettingsEntry.IntegerEntry fontSize = new SettingsEntry.IntegerEntry(
             "FONT_SIZE",
             "fontSize",

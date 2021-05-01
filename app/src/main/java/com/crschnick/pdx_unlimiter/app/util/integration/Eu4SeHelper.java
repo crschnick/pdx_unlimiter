@@ -96,7 +96,7 @@ public class Eu4SeHelper {
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;
             String saveFile = "save_file=" + SavegameStorage.ALL.get(Game.EU4).getSavegameFile(eu4Entry).toString();
             String modsFolder = "mods_folder=" + GameInstallation.ALL.get(Game.EU4).getUserDir().resolve("mod").toString();
-            String gameFolder = "game_folder=" + GameInstallation.ALL.get(Game.EU4).getPath().toString();
+            String gameFolder = "game_folder=" + GameInstallation.ALL.get(Game.EU4).getInstallDir().toString();
             String overwrite = "override=true";
 
             try {

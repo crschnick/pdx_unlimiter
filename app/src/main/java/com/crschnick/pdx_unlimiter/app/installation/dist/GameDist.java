@@ -2,7 +2,6 @@ package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.util.OsHelper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -21,10 +20,6 @@ public abstract class GameDist {
         this.game = game;
         this.name = name;
         this.installLocation = installLocation;
-    }
-
-    public void toNode(ObjectNode node) {
-        node.put("location", getInstallLocation().toString());
     }
 
     public Path getInstallLocation() {

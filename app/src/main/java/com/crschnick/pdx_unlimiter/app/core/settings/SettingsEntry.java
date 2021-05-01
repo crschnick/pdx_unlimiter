@@ -1,14 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.core.settings;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.InvalidInstallationException;
-import com.crschnick.pdx_unlimiter.app.util.integration.SteamHelper;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDists;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -99,7 +100,8 @@ public abstract class SettingsEntry<T> {
         INTEGER,
         STRING,
         PATH,
-        CHOICE
+        CHOICE,
+        GAME
     }
 
 
@@ -227,6 +229,70 @@ public abstract class SettingsEntry<T> {
         }
     }
 
+    public static abstract class VetoableSettingsEntry<T> extends SettingsEntry<T> {
+
+        protected boolean disabled;
+
+        public VetoableSettingsEntry(String id, String serializationName, Type type) {
+            super(id, serializationName, type);
+            this.disabled = false;
+        }
+
+        public VetoableSettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type) {
+            super(name, description, serializationName, type);
+            this.disabled = false;
+        }
+
+        @Override
+        public final void set(T newValue) {
+            if (newValue == null) {
+                this.value.set(null);
+                return;
+            }
+
+            if (newValue.equals(value.get())) {
+                return;
+            }
+
+            boolean valid = isValid(newValue);
+            if (valid) {
+                this.value.set(newValue);
+                this.disabled = false;
+            } else {
+                if (value.get() == null) {
+                    this.disabled = true;
+                }
+            }
+        }
+
+        protected abstract boolean isValid(T newValue);
+
+        @Override
+        public final void set(JsonNode node) {
+            if (node.isNull()) {
+                this.disabled = true;
+                this.value.set(null);
+            } else {
+                this.set(fromNode(node));
+            }
+        }
+
+        protected abstract T fromNode(JsonNode node);
+
+        @Override
+        public final JsonNode toNode() {
+            if (disabled) {
+                return NullNode.getInstance();
+            } else if (value.isNull().get()) {
+                return null;
+            } else {
+                return toNode(value.get());
+            }
+        }
+
+        protected abstract JsonNode toNode(T val);
+    }
+
     public static abstract class FailablePathEntry extends SettingsEntry<Path> {
 
         protected boolean disabled;
@@ -263,17 +329,15 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static class GameDirectory extends FailablePathEntry {
+    public static class GameDirectory extends VetoableSettingsEntry<GameDist> {
 
         private final Game game;
-        private final Class<? extends GameInstallation> installClass;
 
-        GameDirectory(String serializationName, Game game, Class<? extends GameInstallation> installClass) {
+        GameDirectory(String serializationName, Game game) {
             super(() -> PdxuI18n.get("GAME_DIR", game.getAbbreviation()),
                     () -> PdxuI18n.get("GAME_DIR_DESC", game.getAbbreviation()),
-                    serializationName);
+                    serializationName, Type.GAME);
             this.game = game;
-            this.installClass = installClass;
         }
 
         private void showInstallErrorMessage(String msg) {
@@ -283,31 +347,15 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public void set(Path newPath) {
-            if (newPath == null) {
-                this.value.set(null);
-                return;
-            }
-
-            if (newPath.equals(value.get())) {
-                return;
-            }
-
+        protected boolean isValid(GameDist newValue) {
             try {
-                var i = (GameInstallation) installClass.getDeclaredConstructors()[0].newInstance(newPath);
+                var i = new GameInstallation(game.getInstallType(), value.get());
                 GameInstallation.initTemporary(game, i);
-                this.value.set(newPath);
-                this.disabled = false;
+                return true;
             } catch (InvalidInstallationException e) {
-                if (value.get() == null) {
-                    this.disabled = true;
-                }
                 showInstallErrorMessage(e.getLocalisedMessage());
                 ErrorHandler.reportError(e, false, null);
             } catch (Exception e) {
-                if (value.get() == null) {
-                    this.disabled = true;
-                }
                 showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
                 ErrorHandler.reportError(e, false, null);
             }
@@ -315,9 +363,17 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void setDefault() {
-            SteamHelper.getSteamGameInstallPath(game.getFullName()).ifPresent(p -> {
-                this.set(p);
-            });
+            this.set(GameDists.getDist(game, null).orElse(null));
+        }
+
+        @Override
+        protected GameDist fromNode(JsonNode node) {
+            return GameDists.getDist(game, node).orElse(null);
+        }
+
+        @Override
+        protected JsonNode toNode(GameDist val) {
+            return GameDists.toNode(val);
         }
     }
 

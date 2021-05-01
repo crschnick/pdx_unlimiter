@@ -5,7 +5,7 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
-import com.crschnick.pdx_unlimiter.app.installation.GameLauncher;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
@@ -161,7 +161,7 @@ public class GuiStatusBar {
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add("continue-button");
             launch.setOnAction(event -> {
-                GameLauncher.continueSavegame(e);
+                GameDistLauncher.continueSavegame(e);
 
                 event.consume();
                 getStatusBar().hide();
@@ -174,7 +174,7 @@ public class GuiStatusBar {
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add("launcher-button");
             launch.setOnAction(event -> {
-                GameLauncher.startLauncherWithContinueGame(e);
+                GameDistLauncher.startLauncherWithContinueGame(e);
 
                 event.consume();
                 getStatusBar().hide();

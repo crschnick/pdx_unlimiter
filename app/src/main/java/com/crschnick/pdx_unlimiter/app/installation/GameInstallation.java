@@ -17,12 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GameInstallation {
+public final class GameInstallation {
 
     public static final BidiMap<Game, GameInstallation> ALL = new DualHashBidiMap<>();
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Path dir;
     private final GameInstallType type;
     private final GameDist dist;
 
@@ -33,8 +32,7 @@ public abstract class GameInstallation {
     private GameVersion version;
     private Language language;
 
-    public GameInstallation(Path dir, GameInstallType type, GameDist dist) {
-        this.dir = dir;
+    public GameInstallation(GameInstallType type, GameDist dist) {
         this.type = type;
         this.dist = dist;
     }
@@ -57,13 +55,13 @@ public abstract class GameInstallation {
     public static void init() {
         Settings s = Settings.getInstance();
         Optional.ofNullable(s.eu4.getValue()).ifPresent(
-                p -> ALL.put(Game.EU4, new Eu4Installation(p)));
+                p -> ALL.put(Game.EU4, new GameInstallation(Game.EU4.getInstallType(), p)));
         Optional.ofNullable(s.ck3.getValue()).ifPresent(
-                p -> ALL.put(Game.CK3, new Ck3Installation(p)));
+                p -> ALL.put(Game.CK3, new GameInstallation(Game.CK3.getInstallType(), p)));
         Optional.ofNullable(s.hoi4.getValue()).ifPresent(
-                p -> ALL.put(Game.HOI4, new Hoi4Installation(p)));
+                p -> ALL.put(Game.HOI4, new GameInstallation(Game.HOI4.getInstallType(), p)));
         Optional.ofNullable(s.stellaris.getValue()).ifPresent(
-                p -> ALL.put(Game.STELLARIS, new StellarisInstallation(p)));
+                p -> ALL.put(Game.STELLARIS, new GameInstallation(Game.STELLARIS.getInstallType(), p)));
         for (Game g : Game.values()) {
             if (!ALL.containsKey(g)) {
                 continue;
@@ -98,11 +96,11 @@ public abstract class GameInstallation {
     }
 
     private void loadDlcs() throws IOException {
-        if (!Files.isDirectory(type.getDlcPath(dir))) {
+        if (!Files.isDirectory(type.getDlcPath(getInstallDir()))) {
             return;
         }
 
-        Files.list(type.getDlcPath(dir)).forEach(f -> {
+        Files.list(type.getDlcPath(getInstallDir())).forEach(f -> {
             try {
                 GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
             } catch (Exception e) {
@@ -146,14 +144,14 @@ public abstract class GameInstallation {
         if (debug) {
             args.add(type.debugModeSwitch().get());
         }
-        dist.startDirectly(type.getExecutable(dir), args);
+        dist.startDirectly(type.getExecutable(getInstallDir()), args);
     }
 
     public void loadData() throws InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
         LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getAbbreviation() + " installation ...");
-        if (!Files.isRegularFile(type.getExecutable(dir))) {
-            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), type.getExecutable(dir).toString());
+        if (!Files.isRegularFile(type.getExecutable(getInstallDir()))) {
+            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), type.getExecutable(getInstallDir()).toString());
         }
 
         logger.debug(g.getAbbreviation() + " distribution type: " + this.dist.getName());
@@ -167,10 +165,10 @@ public abstract class GameInstallation {
             }
 
             this.version = dist.determineVersion().map(type::getVersion)
-                    .orElse(type.determineVersionFromInstallation(this.dir))
+                    .orElse(type.determineVersionFromInstallation(getInstallDir()))
                     .orElse(null);
             logger.debug(g.getAbbreviation() + " version: " + this.version);
-            this.language = type.determineLanguage(dir, userDir).orElse(null);
+            this.language = type.determineLanguage(getInstallDir(), userDir).orElse(null);
             logger.debug(g.getAbbreviation() + " language: " +
                     (this.language != null ? this.language.getDisplayName() : "unknown"));
             LoggerFactory.getLogger(getClass()).debug("Finished initialization");
@@ -182,7 +180,7 @@ public abstract class GameInstallation {
     }
 
     public Path getInstallDir() {
-        return dir;
+        return dist.getInstallLocation();
     }
 
     public Path getUserDir() {
@@ -207,5 +205,9 @@ public abstract class GameInstallation {
 
     public Language getLanguage() {
         return language;
+    }
+
+    public GameInstallType getType() {
+        return type;
     }
 }

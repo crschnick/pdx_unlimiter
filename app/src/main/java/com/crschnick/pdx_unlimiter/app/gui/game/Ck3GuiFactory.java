@@ -100,7 +100,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Font font() throws IOException {
-        return Font.loadFont(Files.newInputStream(GameInstallation.ALL.get(Game.CK3).getPath()
+        return Font.loadFont(Files.newInputStream(GameInstallation.ALL.get(Game.CK3).getInstallDir()
                 .resolve("launcher").resolve("assets").resolve("fonts").resolve("CormorantGaramond-Regular.ttf")), 12);
     }
 

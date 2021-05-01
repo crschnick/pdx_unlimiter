@@ -50,7 +50,7 @@ public class Ck3Backgrounds {
 
         var cache = CacheManager.getInstance().get(BackgroundColorCache.class);
         if (cache.colors.size() == 0) {
-            var file = GameInstallation.ALL.get(Game.CK3).getPath().resolve("game")
+            var file = GameInstallation.ALL.get(Game.CK3).getInstallDir().resolve("game")
                     .resolve("common").resolve("landed_titles").resolve("00_landed_titles.txt");
 
             try {

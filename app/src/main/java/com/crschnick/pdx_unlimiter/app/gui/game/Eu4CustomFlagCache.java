@@ -32,10 +32,10 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
         super(CacheManager.Scope.GAME_SPECIFIC);
 
         try {
-            emblems = ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getPath().resolve("gfx")
+            emblems = ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("gfx")
                     .resolve("interface").resolve("client_state_symbols_large.dds"), null);
 
-            var colorsFile = GameInstallation.ALL.get(Game.EU4).getPath().resolve("common")
+            var colorsFile = GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("common")
                     .resolve("custom_country_colors").resolve("00_custom_country_colors.txt");
             var content = TextFormatParser.textFileParser().parse(colorsFile);
             content.forEach((k, v) -> {
@@ -45,7 +45,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
             });
             content.getNodeForKey("textures").forEach((k, v) -> {
                 var tex = new Texture(
-                        ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getPath().resolve(
+                        ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve(
                                 Path.of(v.getNodeForKey("file").getString())), null),
                         v.getNodeForKey("size").getNodeForKey("x").getInteger(),
                         v.getNodeForKey("size").getNodeForKey("y").getInteger(),
