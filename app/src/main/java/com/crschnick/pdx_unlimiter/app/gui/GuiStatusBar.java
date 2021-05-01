@@ -161,7 +161,7 @@ public class GuiStatusBar {
             launch.setGraphic(new FontIcon());
             launch.getStyleClass().add("continue-button");
             launch.setOnAction(event -> {
-                GameDistLauncher.continueSavegame(e);
+                GameDistLauncher.continueSavegame(e, false);
 
                 event.consume();
                 getStatusBar().hide();

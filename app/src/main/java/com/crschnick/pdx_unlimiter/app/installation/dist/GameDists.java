@@ -14,13 +14,23 @@ import java.util.function.BiFunction;
 public class GameDists {
 
     private static final BidiMap<String, BiFunction<Game, Path, Optional<GameDist>>> TYPES = new DualLinkedHashBidiMap<>();
+    private static final BidiMap<String, Class<? extends GameDist>> IDS = new DualLinkedHashBidiMap<>();
+
 
     static {
-        TYPES.put("steam", SteamDist::getDist);
         TYPES.put("windows-store", WindowsStoreDist::getDist);
+        TYPES.put("steam", SteamDist::getDist);
         TYPES.put("pdx", PdxLauncherDist::getDist);
         TYPES.put("legacy", LegacyLauncherDist::getDist);
         TYPES.put("no-launcher", NoLauncherDist::getDist);
+    }
+
+    static {
+        IDS.put("steam", SteamDist.class);
+        IDS.put("windows-store", WindowsStoreDist.class);
+        IDS.put("pdx", PdxLauncherDist.class);
+        IDS.put("legacy", LegacyLauncherDist.class);
+        IDS.put("no-launcher", NoLauncherDist.class);
     }
 
     public static Optional<GameDist> getDist(Game g, JsonNode n) {
@@ -40,7 +50,7 @@ public class GameDists {
 
     public static JsonNode toNode(GameDist d) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("type", d.getName());
+        node.put("type", IDS.inverseBidiMap().get(d.getClass()));
         node.put("location", d.getInstallLocation().toString());
         return node;
     }

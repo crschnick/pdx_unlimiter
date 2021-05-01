@@ -29,7 +29,7 @@ public class SteamDist extends PdxLauncherDist {
                 var appIdString = Files.readString(g.getInstallType().getSteamAppIdFile(installDir));
                 // Trim the id because sometimes it contains trailing new lines!
                 var appId = Integer.parseInt(appIdString.trim());
-                return Optional.of(new SteamDist(g, dir, appId));
+                return Optional.of(new SteamDist(g, installDir, appId));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

@@ -53,7 +53,7 @@ public class GameDistLauncher {
         }
     }
 
-    public static <T, I extends SavegameInfo<T>> void continueSavegame(SavegameEntry<T, I> e) {
+    public static <T, I extends SavegameInfo<T>> void continueSavegame(SavegameEntry<T, I> e, boolean debug) {
         SavegameContext.withSavegame(e, ctx -> {
             if (!SavegameActions.isEntryCompatible(e)) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
@@ -67,7 +67,7 @@ public class GameDistLauncher {
 
             try {
                 setupContinueGame(e);
-                startGameDirectly(e);
+                startGameDirectly(e, debug);
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
@@ -78,7 +78,11 @@ public class GameDistLauncher {
         var ctx = SavegameContext.getContext(e);
         var exportTarget = FileExportTarget.createExportTarget(e);
         var path = exportTarget.export();
-        ctx.getInstallation().getInstallDir().writeLaunchConfig(ctx.getStorage().getEntryName(e), ctx.getCollection().getLastPlayed(), path);
+        ctx.getInstallation().getType().writeLaunchConfig(
+                ctx.getInstallation().getUserDir(),
+                ctx.getStorage().getEntryName(e),
+                ctx.getCollection().getLastPlayed(),
+                path);
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
         var dlcs = e.getInfo().getDlcs().stream()
@@ -103,11 +107,11 @@ public class GameDistLauncher {
         if (Settings.getInstance().launchIrony.getValue()) {
             IronyHelper.launchEntry(game, true);
         } else {
-            GameInstallation.ALL.get(game).getDistType().startLauncher();
+            GameInstallation.ALL.get(game).getDist().startLauncher();
         }
     }
 
-    private static void startGameDirectly(SavegameEntry<?, ?> e) throws Exception {
+    private static void startGameDirectly(SavegameEntry<?, ?> e, boolean debug) throws Exception {
         var ctx = SavegameContext.getContext(e);
         if (ctx.getGame().equals(Game.STELLARIS)) {
             var r = GuiIncompatibleWarning.showStellarisModWarning(
@@ -115,7 +119,7 @@ public class GameDistLauncher {
             if (r.isPresent()) {
                 var b = r.get();
                 if (b) {
-                    ctx.getInstallation().startDirectly();
+                    ctx.getInstallation().startDirectly(debug);
                 } else {
                     startLauncherDirectly();
                 }
@@ -127,10 +131,7 @@ public class GameDistLauncher {
             IronyHelper.launchEntry(ctx.getGame(), true);
         } else {
             var install = ctx.getInstallation();
-            boolean doLaunch = install.getDist().checkDirectLaunch();
-            if (doLaunch) {
-                ctx.getInstallation().startDirectly();
-            }
+            ctx.getInstallation().startDirectly(debug);
         }
     }
 

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public final class WindowsStoreDist extends PdxLauncherDist {
 
     private static final Pattern PACKAGE_FAMILY_NAME_PATTERN = Pattern.compile("^PackageFamilyName\\s+:\\s*([^\\s]*)$");
-    private static final Pattern LOCATION_PATTERN = Pattern.compile("^InstallLocation\\s+:\\s*([^\\s]*)$");
+    private static final Pattern LOCATION_PATTERN = Pattern.compile("^InstallLocation\\s+:\\s*(.+)$");
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (g.getWindowsStoreName() == null) {
@@ -54,7 +54,7 @@ public final class WindowsStoreDist extends PdxLauncherDist {
 
     @Override
     public void startLauncher() throws IOException {
-        new ProcessBuilder("start", "shell:AppsFolder\\" + packageFamilyName + "!App").start();
+        new ProcessBuilder("cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App").start();
     }
 
     @Override

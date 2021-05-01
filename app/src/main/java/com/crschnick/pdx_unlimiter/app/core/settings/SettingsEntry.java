@@ -349,7 +349,7 @@ public abstract class SettingsEntry<T> {
         @Override
         protected boolean isValid(GameDist newValue) {
             try {
-                var i = new GameInstallation(game.getInstallType(), value.get());
+                var i = new GameInstallation(game.getInstallType(), newValue);
                 GameInstallation.initTemporary(game, i);
                 return true;
             } catch (InvalidInstallationException e) {

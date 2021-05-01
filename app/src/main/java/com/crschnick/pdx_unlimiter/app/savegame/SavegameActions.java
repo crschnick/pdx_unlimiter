@@ -118,7 +118,7 @@ public class SavegameActions {
                     TaskExecutor.getInstance().submitTask(() -> {
                         SavegameStorage.get(g).loadEntry(entry);
                         SavegameContext.withSavegame(entry, ctx -> {
-                            GameDistLauncher.continueSavegame(entry);
+                            GameDistLauncher.continueSavegame(entry, false);
                         });
                     }, true);
                 });
@@ -155,7 +155,7 @@ public class SavegameActions {
                                 // In case it is null, temporarily set it
                                 if (e.infoProperty().get() == null) {
                                     e.load((SavegameInfo<Object>) s.info);
-                                    GameDistLauncher.continueSavegame(e);
+                                    GameDistLauncher.continueSavegame(e, false);
                                     e.unload();
                                 }
                             });
