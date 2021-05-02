@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
@@ -22,7 +21,6 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -66,12 +64,6 @@ public class GuiLayout {
             if (g != null) {
                 var bg = GameGuiFactory.ALL.get(g).background();
                 stack.getChildren().set(0, bg);
-                try {
-                    stack.styleProperty().set("-fx-font-family: " +
-                            GameGuiFactory.ALL.get(g).font().getName() + ";");
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
             } else {
                 stack.getChildren().set(0, new Pane());
             }

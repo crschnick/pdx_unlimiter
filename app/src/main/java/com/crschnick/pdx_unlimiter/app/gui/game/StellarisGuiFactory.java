@@ -18,6 +18,8 @@ import javafx.scene.text.Font;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.STELLARIS_BACKGROUND;
+
 public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisSavegameInfo> {
 
     @Override

@@ -155,8 +155,8 @@ public class GameImage {
 
         CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
 
-        CK3_BACKGROUND = ImageLoader.loadImage(installPath
-                .resolve("launcher").resolve("assets").resolve("app-background.png"));
+        CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.CK3)
+                .getType().chooseBackgroundImage(installPath));
         CK3_TITLE_MASK = ImageLoader.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_mask.dds"));
@@ -259,7 +259,8 @@ public class GameImage {
         HOI4_ICON_DIFF_ELITE = ImageLoader.loadImage(i.resolve("difficulty_button_elite.dds"));
         HOI4_ICON_DIFF_CIVILIAN = ImageLoader.loadImage(i.resolve("difficulty_button_civilian.dds"));
         HOI4_FLAG_OVERLAY = ImageLoader.loadImage(i.resolve("flag_overlay.dds"));
-        HOI4_BACKGROUND = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("app-background.png"));
+        HOI4_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.HOI4)
+                .getType().chooseBackgroundImage(installPath));
 
     }
 
@@ -339,7 +340,10 @@ public class GameImage {
         EU4_SMALL_SHIELD_MASK = ImageLoader.loadImage(i.resolve("small_shield_mask.tga"));
         EU4_SMALL_SHIELD_FRAME = ImageLoader.loadImage(i.resolve("small_shield_overlay.dds"));
 
-        EU4_BACKGROUND = ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("app-background.png"));
+        EU4_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.EU4)
+                .getType().chooseBackgroundImage(installPath));
+        EU4_BACKGROUND = ImageLoader.cut(EU4_BACKGROUND, new Rectangle2D(0, 0,
+                EU4_BACKGROUND.getWidth(), EU4_BACKGROUND.getHeight() - 300));
     }
 
     public static Path getEu4TagPath(String tag) {

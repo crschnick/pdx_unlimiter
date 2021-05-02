@@ -18,12 +18,19 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface GameInstallType {
 
     GameInstallType EU4 = new StandardInstallType("eu4") {
+        @Override
+        public Path chooseBackgroundImage(Path p) {
+            int i = new Random().nextInt(30) + 1;
+            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        }
+
         @Override
         public List<String> getLaunchArguments() {
             return List.of("-continuelastsave");
@@ -58,6 +65,12 @@ public interface GameInstallType {
     };
 
     GameInstallType HOI4 = new StandardInstallType("hoi4") {
+        @Override
+        public Path chooseBackgroundImage(Path p) {
+            int i = new Random().nextInt(8) + 1;
+            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        }
+
         @Override
         public List<String> getLaunchArguments() {
             return List.of("-gdpr-compliant", "--continuelastsave");
@@ -103,6 +116,12 @@ public interface GameInstallType {
 
     GameInstallType STELLARIS = new StandardInstallType("stellaris") {
         @Override
+        public Path chooseBackgroundImage(Path p) {
+            int i = new Random().nextInt(16) + 1;
+            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        }
+
+        @Override
         public List<String> getLaunchArguments() {
             return List.of("-gdpr-compliant", "--continuelastsave");
         }
@@ -135,6 +154,12 @@ public interface GameInstallType {
     };
 
     GameInstallType CK3 = new StandardInstallType("binaries/ck3") {
+        @Override
+        public Path chooseBackgroundImage(Path p) {
+            return p.resolve("game").resolve("gfx").resolve("interface").resolve("illustrations")
+                    .resolve("loading_screens").resolve("assassin.dds");
+        }
+
         @Override
         public Optional<String> debugModeSwitch() {
             return Optional.of("-debug_mode");
@@ -217,6 +242,11 @@ public interface GameInstallType {
         }
 
         @Override
+        public Path chooseBackgroundImage(Path p) {
+            return null;
+        }
+
+        @Override
         public List<String> getLaunchArguments() {
             return List.of();
         }
@@ -226,6 +256,8 @@ public interface GameInstallType {
 
         }
     };
+
+    Path chooseBackgroundImage(Path p);
 
     default Optional<GameVersion> determineVersionFromInstallation(Path p) {
         return Optional.empty();

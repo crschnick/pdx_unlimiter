@@ -13,8 +13,7 @@ import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -126,72 +125,91 @@ public class GuiStatusBar {
         BorderPane barPane = new BorderPane();
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
 
-        SavegameContext.withSavegame(e, ctx -> {
-            Label text = new Label(
-                    ctx.getStorage().getEntryName(e),
-                    ctx.getGuiFactory().createIcon());
-            barPane.setLeft(text);
-            BorderPane.setAlignment(text, Pos.CENTER);
-        });
-
-        if (!SavegameActions.isEntryCompatible(e)) {
-            barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-        }
-
         HBox buttons = new HBox();
         buttons.setSpacing(10);
         buttons.setFillHeight(true);
         buttons.setAlignment(Pos.CENTER);
         barPane.setRight(buttons);
-        {
-            Button export = new JFXButton(PdxuI18n.get("EXPORT"));
-            export.setGraphic(new FontIcon());
-            export.getStyleClass().add(CLASS_EXPORT);
-            export.setOnAction(event -> {
-                SavegameActions.exportSavegame(e);
 
-                event.consume();
-                getStatusBar().hide();
-            });
-            buttons.getChildren().add(export);
-        }
+        SavegameContext.withSavegame(e, ctx -> {
+            Label text = new Label(
+                    ctx.getStorage().getEntryName(e),
+                    ctx.getGuiFactory().createIcon());
+            text.getStyleClass().add("text");
+            barPane.setLeft(text);
+            BorderPane.setAlignment(text, Pos.CENTER);
 
-        {
-            Button launch = new JFXButton(PdxuI18n.get("CONTINUE_GAME"));
-            launch.setGraphic(new FontIcon());
-            launch.getStyleClass().add("continue-button");
-            launch.setOnAction(event -> {
-                GameDistLauncher.continueSavegame(e, false);
+            if (!SavegameActions.isEntryCompatible(e)) {
+                barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+            }
 
-                event.consume();
-                getStatusBar().hide();
-            });
-            buttons.getChildren().add(launch);
-        }
+            {
+                Button export = new Button(PdxuI18n.get("EXPORT"));
+                export.setGraphic(new FontIcon());
+                export.getStyleClass().add(CLASS_EXPORT);
+                export.setOnAction(event -> {
+                    SavegameActions.exportSavegame(e);
 
-        {
-            Button launch = new JFXButton(PdxuI18n.get("START_LAUNCHER"));
-            launch.setGraphic(new FontIcon());
-            launch.getStyleClass().add("launcher-button");
-            launch.setOnAction(event -> {
-                GameDistLauncher.startLauncherWithContinueGame(e);
+                    event.consume();
+                    getStatusBar().hide();
+                });
+                buttons.getChildren().add(export);
+            }
 
-                event.consume();
-                getStatusBar().hide();
-            });
-            buttons.getChildren().add(launch);
-        }
+            if (ctx.getInstallation().getDist().supportsLauncher()) {
+                Button launch = new Button(PdxuI18n.get("START_LAUNCHER"));
+                launch.setGraphic(new FontIcon());
+                launch.getStyleClass().add("launcher-button");
+                launch.setOnAction(event -> {
+                    GameDistLauncher.startLauncherWithContinueGame(e);
 
-        {
-            Button help = new JFXButton();
-            help.setGraphic(new FontIcon());
-            help.getStyleClass().add("help-button");
-            help.setOnAction(event -> {
-                ThreadHelper.browse(Hyperlinks.LAUNCH_GUIDE);
-                event.consume();
-            });
-            buttons.getChildren().add(help);
-        }
+                    event.consume();
+                    getStatusBar().hide();
+                });
+                buttons.getChildren().add(launch);
+            }
+
+            if (ctx.getInstallation().getDist().supportsDirectLaunch()) {
+                ButtonBase launch = null;
+                if (ctx.getInstallation().getType().debugModeSwitch().isPresent()) {
+                    var splitButton = new SplitMenuButton();
+                    splitButton.setText(PdxuI18n.get("CONTINUE_GAME"));
+
+                    var debugItem = new MenuItem("Debug mode");
+                    debugItem.setGraphic(new FontIcon());
+                    debugItem.getStyleClass().add("continue-button");
+                    debugItem.setOnAction(event -> {
+                        GameDistLauncher.continueSavegame(e, true);
+                        event.consume();
+                        getStatusBar().hide();
+                    });
+                    splitButton.getItems().add(debugItem);
+                    launch = splitButton;
+                } else {
+                    launch = new Button(PdxuI18n.get("CONTINUE_GAME"));
+                }
+
+                launch.setGraphic(new FontIcon());
+                launch.getStyleClass().add("continue-button");
+                launch.setOnAction(event -> {
+                    GameDistLauncher.continueSavegame(e, false);
+                    event.consume();
+                    getStatusBar().hide();
+                });
+                buttons.getChildren().add(launch);
+            }
+
+            {
+                Button help = new Button();
+                help.setGraphic(new FontIcon());
+                help.getStyleClass().add("help-button");
+                help.setOnAction(event -> {
+                    ThreadHelper.browse(Hyperlinks.LAUNCH_GUIDE);
+                    event.consume();
+                });
+                buttons.getChildren().add(help);
+            }
+        });
 
         return barPane;
     }
