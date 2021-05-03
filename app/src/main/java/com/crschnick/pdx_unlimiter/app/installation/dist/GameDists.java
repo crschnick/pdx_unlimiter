@@ -55,7 +55,7 @@ public class GameDists {
         return node;
     }
 
-    private static Optional<GameDist> getDistFromDirectory(Game g, Path dir) {
+    public static Optional<GameDist> getDistFromDirectory(Game g, Path dir) {
         for (var e : TYPES.values()) {
             var r = e.apply(g, dir);
             if (r.isPresent()) {

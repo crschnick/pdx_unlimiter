@@ -1,13 +1,20 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.settings.SettingsEntry;
 import com.crschnick.pdx_unlimiter.app.gui.GuiStyle;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
+import com.crschnick.pdx_unlimiter.app.installation.dist.GameDists;
+import com.crschnick.pdx_unlimiter.app.installation.dist.SteamDist;
+import com.crschnick.pdx_unlimiter.app.installation.dist.WindowsStoreDist;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXSlider;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -30,6 +37,92 @@ import java.util.Optional;
 import java.util.Set;
 
 public class GuiSettingsComponents {
+
+    private static Region distEntryNode(SettingsEntry.GameDirectory de, Set<Runnable> applyFuncs) {
+        ObjectProperty<GameDist> setDist = new SimpleObjectProperty<>();
+
+        Label typeLabel = new Label(" ");
+        typeLabel.setAlignment(Pos.CENTER);
+        typeLabel.setGraphic(new FontIcon());
+
+        TextField locationLabel = new TextField();
+        locationLabel.setEditable(false);
+        EventHandler<MouseEvent> chooseDir = (m) -> {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            if (setDist.get() != null) {
+                dirChooser.setInitialDirectory(setDist.get().getInstallLocation().toFile());
+            }
+            dirChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
+            File file = dirChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
+            if (file != null && file.exists()) {
+                setDist.set(GameDists.getDistFromDirectory(de.getGame(), file.toPath()).orElse(null));
+            }
+            m.consume();
+        };
+
+        Button browse = new Button();
+        browse.setGraphic(new FontIcon());
+        browse.getStyleClass().add(GuiStyle.CLASS_BROWSE);
+        browse.setOnMouseClicked(chooseDir);
+        GuiTooltips.install(browse, PdxuI18n.get("BROWSE_DIST_BUTTON"));
+
+        Button xbox = new Button();
+        xbox.setGraphic(new FontIcon());
+        xbox.getStyleClass().add("xbox-button");
+        GuiTooltips.install(xbox, PdxuI18n.get("XBOX_DIST_BUTTON"));
+        xbox.setOnMouseClicked(e -> {
+            var dist = WindowsStoreDist.getDist(de.getGame(), null).orElse(null);
+            if (dist == null) {
+                return;
+            }
+
+            setDist.set(dist);
+        });
+        if (de.getGame().getWindowsStoreName() == null) {
+            xbox.setDisable(true);
+            GuiTooltips.install(xbox, PdxuI18n.get("XBOX_UNAVAILABLE"));
+        }
+
+        Button del = new Button();
+        del.setGraphic(new FontIcon());
+        del.getStyleClass().add("delete-install-button");
+        del.setOnMouseClicked(e -> setDist.set(null));
+        GuiTooltips.install(del, PdxuI18n.get("CLEAR_DIST_BUTTON"));
+
+        setDist.addListener((c,o,n) -> {
+            if (n != null) {
+                locationLabel.setText(n.getInstallLocation().toString());
+                typeLabel.setVisible(true);
+
+                if (n instanceof WindowsStoreDist) {
+                    typeLabel.setGraphic(new FontIcon("mdi-xbox"));
+                    GuiTooltips.install(typeLabel, "Windows Store version");
+                } else if (n instanceof SteamDist) {
+                    typeLabel.setGraphic(new FontIcon("mdi-steam"));
+                    GuiTooltips.install(typeLabel, "Steam version");
+                } else {
+                    typeLabel.setGraphic(new FontIcon("mdi-help"));
+                    GuiTooltips.install(typeLabel, "Other version");
+                }
+            } else {
+                locationLabel.setText("");
+                typeLabel.setVisible(false);
+                typeLabel.setTooltip(null);
+            }
+        });
+        setDist.setValue(de.getValue());
+
+        locationLabel.setText(Optional.ofNullable(de.getValue()).map(v -> v.getInstallLocation().toString())
+                .orElse(""));
+        applyFuncs.add(() -> {
+            de.set(setDist.get());
+        });
+
+        HBox hbox = new HBox(typeLabel, locationLabel, browse, xbox, del);
+        hbox.setAlignment(Pos.CENTER);
+        HBox.setHgrow(locationLabel, Priority.ALWAYS);
+        return hbox;
+    }
 
     private static Region pathEntryNode(SettingsEntry<Path> de, Set<Runnable> applyFuncs) {
         TextField textArea = new TextField();
@@ -136,7 +229,9 @@ public class GuiSettingsComponents {
                 val = stringEntryNode((SettingsEntry.StringEntry) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.CHOICE)) {
                 val = choiceEntryNode((SettingsEntry.ChoiceEntry<?>) entry, applyFuncs);
-            } else {
+            } else if (entry.getType().equals(SettingsEntry.Type.GAME)) {
+                val = distEntryNode((SettingsEntry.GameDirectory) entry, applyFuncs);
+            }  else {
                 throw new IllegalArgumentException();
             }
 

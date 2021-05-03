@@ -55,3 +55,7 @@ l_english:
  THIRD_PARTY_ERROR: "$APP$ support has been disabled.\nIf you believe that the installation is valid,\nplease check whether the installation directory was correctly set."
  PLAY_SOUND_ON_BACKGROUND_IMPORT: "Play sound on background import"
  PLAY_SOUND_ON_BACKGROUND_IMPORT_DESC: "Play a beep sound when importing a savegame while a game is open and the Pdx-Unlimiter is running in the background."
+ XBOX_UNAVAILABLE: "This game does not have a Windows Store distribution."
+ XBOX_DIST_BUTTON: "Select Windows Store distribution.\nThis only works if you have a Windows Store version of the game installed."
+ CLEAR_DIST_BUTTON: "Clear the currently selected game distribution."
+ BROWSE_DIST_BUTTON: "Locate the installation directory manually."

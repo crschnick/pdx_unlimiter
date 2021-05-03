@@ -10,10 +10,6 @@
  -fx-icon-code: "mdi-filter-remove";
 }
 
-.content .ikonli-font-icon {
- -fx-icon-code: "mdi-folder-multiple-outline";
-}
-
 .help-button .ikonli-font-icon {
    -fx-icon-code: "mdi-help-circle-outline";
   }
@@ -125,7 +121,6 @@
 
 .browse-button .ikonli-font-icon {
      -fx-icon-code: "mdi-magnify";
-     -jfx-button-type: RAISED;
 }
 
 .savegame .ikonli-font-icon {
@@ -142,5 +137,13 @@
 
 .switch-game-button .ikonli-font-icon {
    -fx-icon-code: "mdi-vector-arrange-below";
+}
+
+.xbox-button .ikonli-font-icon {
+   -fx-icon-code: "mdi-xbox";
+}
+
+.delete-install-button .ikonli-font-icon {
+   -fx-icon-code: "mdi-close";
 }
 

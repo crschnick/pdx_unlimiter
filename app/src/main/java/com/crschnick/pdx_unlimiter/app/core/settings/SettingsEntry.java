@@ -375,6 +375,10 @@ public abstract class SettingsEntry<T> {
         protected JsonNode toNode(GameDist val) {
             return GameDists.toNode(val);
         }
+
+        public Game getGame() {
+            return game;
+        }
     }
 
     public static class StorageDirectory extends SettingsEntry<Path> {
