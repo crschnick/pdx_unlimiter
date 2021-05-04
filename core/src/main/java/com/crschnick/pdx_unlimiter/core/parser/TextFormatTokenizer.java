@@ -28,7 +28,7 @@ public class TextFormatTokenizer {
     private int arraySizesCounter;
     private boolean escapeChar;
 
-    public TextFormatTokenizer(byte[] bytes) {
+    public TextFormatTokenizer(byte[] bytes, int start) {
         this.bytes = bytes;
         this.nextScalarStart = 0;
         this.tokenCounter = 0;
@@ -57,17 +57,17 @@ public class TextFormatTokenizer {
 
         this.arraySizeStack = new Stack<>();
         this.arraySizesCounter = 0;
+
+        this.i = start;
+        this.nextScalarStart = start;
     }
 
     private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 
     private void checkBom() {
         if (bytes.length >= 3 && Arrays.equals(bytes, 0, 3, UTF_8_BOM, 0, 3)) {
-            this.nextScalarStart = 3;
-            this.i = 3;
-        } else {
-            this.nextScalarStart = 0;
-            this.i = 0;
+            this.nextScalarStart += 3;
+            this.i += 3;
         }
     }
 

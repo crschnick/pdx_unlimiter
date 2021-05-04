@@ -50,9 +50,9 @@ public final class TextFormatParser extends FormatParser {
         this.context = null;
     }
 
-    public final ArrayNode parse(byte[] input) throws ParseException {
+    public final ArrayNode parse(byte[] input, int start) throws ParseException {
         try {
-            this.tokenizer = new TextFormatTokenizer(input);
+            this.tokenizer = new TextFormatTokenizer(input, start);
 
             var now = Instant.now();
             this.tokenizer.tokenize();

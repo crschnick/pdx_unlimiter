@@ -61,7 +61,7 @@ public abstract class EditTarget {
                     if (Ck3SavegameParser.isCompressed(file)) {
                         toReturn[0] = new Ck3CompressedEditTarget(file);
                     } else {
-                        toReturn[0] = new FileEditTarget(file);
+                        toReturn[0] = new Ck3UncompressedEditTarget(file);
                     }
                 } catch (IOException e) {
                     ErrorHandler.handleException(e);

@@ -3,7 +3,6 @@ package com.crschnick.pdx_unlimiter.app.editor.target;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Header;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
@@ -15,14 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-public class Ck3CompressedEditTarget extends EditTarget {
+public class Ck3UncompressedEditTarget extends EditTarget {
 
-    public Ck3CompressedEditTarget(Path file) {
+    public Ck3UncompressedEditTarget(Path file) {
         super(file, TextFormatParser.ck3SavegameParser());
     }
 
@@ -33,7 +29,7 @@ public class Ck3CompressedEditTarget extends EditTarget {
         s.visit(new SavegameParser.StatusVisitor<Ck3SavegameInfo>() {
             @Override
             public void success(SavegameParser.Success<Ck3SavegameInfo> s) {
-                map.put("gamestate", s.content);
+                map.put("root", s.content);
             }
         });
 
@@ -46,7 +42,7 @@ public class Ck3CompressedEditTarget extends EditTarget {
 
     @Override
     public void write(Map<String, Node> nodeMap) throws Exception {
-        write(file, (ArrayNode) nodeMap.get("gamestate"));
+        write(file, (ArrayNode) nodeMap.get("root"));
     }
 
     private void write(Path file, ArrayNode gamestate) throws IOException {
@@ -55,16 +51,11 @@ public class Ck3CompressedEditTarget extends EditTarget {
 
         try (var out = Files.newOutputStream(file)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
-
             // Exclude trailing new line in meta length!
-            String header = new Ck3Header(true, false, metaBytes.length - 1).toString();
+            String header = new Ck3Header(false, false, metaBytes.length - 1).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
-            out.write(metaBytes);
-            try (var zout = new ZipOutputStream(out)) {
-                zout.putNextEntry(new ZipEntry("gamestate"));
-                NodeWriter.write(zout, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(metaHeaderNode, gamestate)), "\t");
-                zout.closeEntry();
-            }
+
+            NodeWriter.write(out, getParser().getCharset(), gamestate, "\t");
         }
     }
 }

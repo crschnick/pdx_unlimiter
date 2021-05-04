@@ -1,41 +1,22 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Header;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipInputStream;
 
 public class Ck3SavegameParser extends SavegameParser {
 
-    private static final int MAX_SEARCH = 150000;
-
-    private static int indexOf(byte[] array, byte[] toFind) {
-        for (int i = 0; i < MAX_SEARCH; ++i) {
-            boolean found = true;
-            for (int j = 0; j < toFind.length; ++j) {
-                if (array[i + j] != toFind[j]) {
-                    found = false;
-                    break;
-                }
-            }
-            if (found) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    private static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
-
     public static boolean isCompressed(Path file) throws IOException {
         var content = Files.readAllBytes(file);
-        int zipContentStart = indexOf(content, ZIP_HEADER);
-        return zipContentStart != -1;
+        var header = Ck3Header.fromStartOfFile(content);
+        return header.compressed();
     }
 
     @Override
@@ -44,14 +25,9 @@ public class Ck3SavegameParser extends SavegameParser {
             var content = Files.readAllBytes(input);
             String checksum = checksum(content);
 
-            var contentString = new String(content, StandardCharsets.UTF_8);
-            var first = contentString.lines().findFirst();
-            if (first.isEmpty()) {
-                return new Invalid("Empty savegame content");
-            }
-            int metaStart = first.get().length() + 1;
-            boolean binary = !contentString.startsWith("meta", metaStart);
+            var header = Ck3Header.fromStartOfFile(content);
 
+            boolean binary = header.binary();
             boolean melted = false;
             var fileToParse = input;
             if (binary) {
@@ -60,21 +36,24 @@ public class Ck3SavegameParser extends SavegameParser {
             }
 
             content = Files.readAllBytes(fileToParse);
-            byte[] savegameText;
-            int zipContentStart = indexOf(content, ZIP_HEADER);
-            boolean compressed = zipContentStart != -1;
+            int metaStart = header.toString().length() + 1;
+            header = Ck3Header.fromStartOfFile(content);
+
+            boolean compressed = header.compressed();
+            Node gamestate;
             if (compressed) {
+                int contentStart = (int) (metaStart + header.metaLength() + (binary ? 0 : 1));
                 try (var zipIn = new ZipInputStream(new ByteArrayInputStream(content,
-                        zipContentStart, content.length - zipContentStart))) {
+                        contentStart, content.length - contentStart))) {
                     zipIn.getNextEntry();
-                    savegameText = zipIn.readAllBytes();
+                    var gamestateData = zipIn.readAllBytes();
+                    gamestate = TextFormatParser.ck3SavegameParser().parse(gamestateData);
                 }
             } else {
-                savegameText = content;
+                gamestate = TextFormatParser.ck3SavegameParser().parse(content, header.toString().length() + 1);
             }
 
-            Node node = TextFormatParser.ck3SavegameParser().parse(savegameText);
-            return new Success<>(binary, checksum, node, Ck3SavegameInfo.fromSavegame(melted, node));
+            return new Success<>(binary, checksum, gamestate, Ck3SavegameInfo.fromSavegame(melted, gamestate));
         } catch (Throwable e) {
             return new Error(e);
         }

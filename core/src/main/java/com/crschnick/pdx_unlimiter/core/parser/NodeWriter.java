@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 public interface NodeWriter {
 
-    static String writeToString(ArrayNode node, int maxLines, String indent) {
+    static byte[] writeToBytes(ArrayNode node, int maxLines, String indent) {
         var out = new ByteArrayOutputStream();
         var writer = new NodeWriterImpl(out, StandardCharsets.UTF_8, maxLines, indent);
         try {
@@ -17,7 +17,11 @@ public interface NodeWriter {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return out.toString(StandardCharsets.UTF_8);
+        return out.toByteArray();
+    }
+
+    static String writeToString(ArrayNode node, int maxLines, String indent) {
+        return new String(writeToBytes(node, maxLines, indent), StandardCharsets.UTF_8);
     }
 
     static void write(OutputStream out, Charset charset, ArrayNode node, String indent) throws IOException {

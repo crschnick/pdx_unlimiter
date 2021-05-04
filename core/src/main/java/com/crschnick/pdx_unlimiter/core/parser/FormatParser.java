@@ -26,5 +26,9 @@ public abstract class FormatParser {
         return parse(Files.readAllBytes(in));
     }
 
-    public abstract ArrayNode parse(byte[] input) throws Exception;
+    public final ArrayNode parse(byte[] input) throws Exception {
+        return parse(input, 0);
+    }
+
+    public abstract ArrayNode parse(byte[] input, int start) throws Exception;
 }
