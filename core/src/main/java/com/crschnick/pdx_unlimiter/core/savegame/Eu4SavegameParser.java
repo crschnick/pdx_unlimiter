@@ -75,7 +75,7 @@ public class Eu4SavegameParser extends SavegameParser {
                     if (info.getVersion().compareTo(MIN_VERSION) < 0) {
                         return new Invalid("Savegame version " + info.getVersion() + " is not supported");
                     }
-                    return new Success<>(false, checksum, node, info);
+                    return new Success<>(checksum, node, info, content);
                 }
             } else {
                 try (var fs = FileSystems.newFileSystem(fileToParse)) {
@@ -121,7 +121,8 @@ public class Eu4SavegameParser extends SavegameParser {
                     if (info.getVersion().compareTo(MIN_VERSION) < 0) {
                         return new Invalid("Savegame version " + info.getVersion() + " is not supported");
                     }
-                    return new Success<>(true, checksum, node, info);
+                    //TODO
+                    return new Success<>(checksum, node, info, null);
                 }
             }
         } catch (Throwable e) {

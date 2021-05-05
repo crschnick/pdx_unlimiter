@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +13,10 @@ import java.security.NoSuchAlgorithmException;
 public abstract class SavegameParser {
 
     public abstract Status parse(Path input, Melter melter);
+
+    public void writeCompressedIfPossible(byte[] input, Path output) throws IOException {
+        Files.write(output, input);
+    }
 
     public String checksum(byte[] content) {
         MessageDigest d = null;
@@ -54,16 +59,16 @@ public abstract class SavegameParser {
 
     public static class Success<I extends SavegameInfo<?>> extends Status {
 
-        public boolean binary;
         public String checksum;
         public Node content;
         public I info;
+        public byte[] data;
 
-        public Success(boolean binary, String checksum, Node content, I info) {
-            this.binary = binary;
+        public Success(String checksum, Node content, I info, byte[] data) {
             this.checksum = checksum;
             this.content = content;
             this.info = info;
+            this.data = data;
         }
     }
 

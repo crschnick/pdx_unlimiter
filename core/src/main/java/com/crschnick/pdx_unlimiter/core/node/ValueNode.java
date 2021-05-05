@@ -45,6 +45,11 @@ public final class ValueNode extends Node {
     }
 
     @Override
+    public String toDebugValue() {
+        return toString();
+    }
+
+    @Override
     public Descriptor describe() {
         ValueType t;
         if (isQuoted()) {

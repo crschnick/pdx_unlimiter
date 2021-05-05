@@ -61,6 +61,11 @@ public abstract class ArrayNode extends Node {
 
     protected abstract boolean isFlat();
 
+    @Override
+    public String toDebugValue()  {
+        return NodeWriter.writeToString(this, Integer.MAX_VALUE, " ");
+    }
+
     public void writeTopLevel(NodeWriter writer) throws IOException {
         writeInternal(writer);
     }

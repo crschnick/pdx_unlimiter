@@ -15,7 +15,8 @@ public class StellarisSavegameParser extends SavegameParser {
     @Override
     public Status parse(Path input, Melter melter) {
         try {
-            String checksum = checksum(Files.readAllBytes(input));
+            byte[] data = Files.readAllBytes(input);
+            String checksum = checksum(data);
 
             var zipFile = new ZipFile(input.toFile());
             ArrayNode gamestateNode;
@@ -38,7 +39,7 @@ public class StellarisSavegameParser extends SavegameParser {
             zipFile.close();
 
             var node = new LinkedArrayNode(List.of(metaNode, gamestateNode));
-            return new Success<>(true, checksum, node, StellarisSavegameInfo.fromSavegame(node));
+            return new Success<>(checksum, node, StellarisSavegameInfo.fromSavegame(node), data);
         } catch (Throwable e) {
             return new Error(e);
         }

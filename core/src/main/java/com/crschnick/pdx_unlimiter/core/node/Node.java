@@ -9,6 +9,8 @@ import java.util.function.BiConsumer;
 
 public abstract class Node {
 
+    public abstract String toDebugValue();
+
     public abstract Descriptor describe();
 
     public final void forEach(BiConsumer<String, Node> c) {

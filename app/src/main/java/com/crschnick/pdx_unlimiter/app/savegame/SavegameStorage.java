@@ -578,7 +578,7 @@ public abstract class SavegameStorage<
                     Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
                     try {
                         FileUtils.forceMkdir(entryPath.toFile());
-                        FileUtils.copyFile(file.toFile(), entryPath.resolve(getSaveFileName()).toFile());
+                        parser.writeCompressedIfPossible(s.data, entryPath.resolve(getSaveFileName()));
                         JsonHelper.writeObject(s.info, entryPath.resolve(getInfoFileName()));
 
                         if (col == null) {

@@ -24,7 +24,8 @@ public class Hoi4SavegameParser extends SavegameParser {
     @Override
     public Status parse(Path input, Melter melter) {
         try {
-            String checksum = checksum(Files.readAllBytes(input));
+            byte[] data = Files.readAllBytes(input);
+            String checksum = checksum(data);
 
             boolean melted = false;
             var fileToParse = input;
@@ -42,7 +43,7 @@ public class Hoi4SavegameParser extends SavegameParser {
                 var content = in.readAllBytes();
                 var node = TextFormatParser.hoi4SavegameParser().parse(content);
                 var info = Hoi4SavegameInfo.fromSavegame(melted, node);
-                return new Success<>(melted, checksum, node, info);
+                return new Success<>(checksum, node, info, data);
             }
         } catch (Throwable e) {
             return new Error(e);

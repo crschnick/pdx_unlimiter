@@ -4,7 +4,6 @@ import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +37,11 @@ public final class ColorNode extends Node {
 
     public List<ValueNode> getValues() {
         return values;
+    }
+
+    @Override
+    public String toDebugValue() {
+        return toString();
     }
 
     @Override
