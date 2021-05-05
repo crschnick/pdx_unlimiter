@@ -51,8 +51,9 @@ public class GuiSavegameEntry {
             topBar.setBackground(ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
         });
 
+        var dateString = e.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
         {
-            Label l = new Label(e.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale()));
+            Label l = new Label(dateString);
             l.getStyleClass().add(CLASS_DATE);
 
             var tagImage = SavegameContext.mapSavegame(e,
@@ -72,7 +73,10 @@ public class GuiSavegameEntry {
             JFXTextField name = new JFXTextField();
             name.getStyleClass().add(CLASS_TEXT_FIELD);
             name.setAlignment(Pos.CENTER);
-            name.textProperty().bindBidirectional(e.nameProperty());
+            name.setText(e.getName().equals(dateString) ? "" : e.getName());
+            name.textProperty().addListener((c,o,n) -> {
+                e.nameProperty().set(n);
+            });
             topBar.setCenter(name);
         }
         {
