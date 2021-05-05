@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameMod;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -18,6 +19,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CascadeDirectoryHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(CascadeDirectoryHelper.class);
 
     public static void traverseDirectory(
             Path dir,
@@ -91,6 +94,7 @@ public class CascadeDirectoryHelper {
                 return r;
             }
         }
+        logger.warn("File " + file.toString() + " not found");
         return Optional.empty();
     }
 

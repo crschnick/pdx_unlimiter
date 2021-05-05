@@ -96,9 +96,11 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        var rawPatternImg = pattern(coaG, coa, info);
-        for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, info);
+        for (var sub : coa.getSubs()) {
+            var rawPatternImg = pattern(coaG, sub, info);
+            for (var emblem : sub.getEmblems()) {
+                emblem(coaImg, rawPatternImg, sub, emblem, info);
+            }
         }
 
         g.drawImage(coaImg,
@@ -153,9 +155,11 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        var rawPatternImg = pattern(coaG, coa, info);
-        for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, info);
+        for (var sub : coa.getSubs()) {
+            var rawPatternImg = pattern(coaG, sub, info);
+            for (var emblem : sub.getEmblems()) {
+                emblem(coaImg, rawPatternImg, sub, emblem, info);
+            }
         }
 
         applyMask(coaImg, GameImage.CK3_HOUSE_MASK);
@@ -200,9 +204,11 @@ public class Ck3TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        var rawPatternImg = pattern(coaG, coa, info);
-        for (var emblem : coa.getEmblems()) {
-            emblem(coaImg, rawPatternImg, emblem, info);
+        for (var sub : coa.getSubs()) {
+            var rawPatternImg = pattern(coaG, sub, info);
+            for (var emblem : sub.getEmblems()) {
+                emblem(coaImg, rawPatternImg, sub, emblem, info);
+            }
         }
 
         applyMask(coaImg, GameImage.CK3_TITLE_MASK);
@@ -278,19 +284,19 @@ public class Ck3TagRenderer {
     }
 
 
-    private static BufferedImage pattern(Graphics g, Ck3CoatOfArms coa, SavegameInfo<Ck3Tag> info) {
+    private static BufferedImage pattern(Graphics g, Ck3CoatOfArms.Sub sub, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(loadPredefinedColorsForSavegame(info));
         }
 
-        if (coa.getPatternFile() != null) {
-            int pColor1 = coa.getColors().size() > 0 ? ColorHelper.intFromColor(cache.colors
-                    .getOrDefault(coa.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
-            int pColor2 = coa.getColors().size() > 1 ? ColorHelper.intFromColor(cache.colors
-                    .getOrDefault(coa.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT)) : 0;
-            int pColor3 = coa.getColors().size() > 2 ? ColorHelper.intFromColor(cache.colors
-                    .getOrDefault(coa.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT)) : 0;
+        if (sub.getPatternFile() != null) {
+            int pColor1 = sub.getColors().size() > 0 ? ColorHelper.intFromColor(cache.colors
+                    .getOrDefault(sub.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
+            int pColor2 = sub.getColors().size() > 1 ? ColorHelper.intFromColor(cache.colors
+                    .getOrDefault(sub.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT)) : 0;
+            int pColor3 = sub.getColors().size() > 2 ? ColorHelper.intFromColor(cache.colors
+                    .getOrDefault(sub.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT)) : 0;
             Function<Integer, Integer> patternFunction = (Integer rgb) -> {
                 int alpha = rgb & 0xFF000000;
                 int color = rgb & 0x00FFFFFF;
@@ -299,10 +305,11 @@ public class Ck3TagRenderer {
                 return alpha + usedColor;
             };
             var patternFile = CascadeDirectoryHelper.openFile(
-                    Path.of("gfx", "coat_of_arms", "patterns").resolve(coa.getPatternFile()),
+                    Path.of("gfx", "coat_of_arms", "patterns").resolve(sub.getPatternFile()),
                     info);
             patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
-                g.drawImage(img, 0, 0, IMG_SIZE, IMG_SIZE, null);
+                g.drawImage(img, (int) (sub.getX() * IMG_SIZE), (int) (sub.getY() * IMG_SIZE),
+                        (int) (sub.getScaleX() * IMG_SIZE), (int) (sub.getScaleY() * IMG_SIZE), null);
             });
             return patternFile.map(p -> ImageLoader.loadAwtImage(p, null)).orElse(null);
         } else {
@@ -312,7 +319,9 @@ public class Ck3TagRenderer {
 
     private static void emblem(BufferedImage currentImage,
                                BufferedImage rawPatternImage,
-                               Ck3CoatOfArms.Emblem emblem, SavegameInfo<Ck3Tag> info) {
+                               Ck3CoatOfArms.Sub sub,
+                               Ck3CoatOfArms.Emblem emblem,
+                               SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(loadPredefinedColorsForSavegame(info));
@@ -348,12 +357,15 @@ public class Ck3TagRenderer {
                     (Graphics2D) currentImage.getGraphics();
 
             emblem.getInstances().stream().sorted(Comparator.comparingInt(i -> i.getDepth())).forEach(instance -> {
-                var scaleX = ((double) IMG_SIZE / img.getWidth()) * instance.getScaleX();
-                var scaleY = ((double) IMG_SIZE / img.getHeight()) * instance.getScaleY();
+                var scaleX = ((double) IMG_SIZE / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
+                var scaleY = ((double) IMG_SIZE / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
+
+                var x = IMG_SIZE * (sub.getX() + (sub.getScaleX() * instance.getX()));
+                var y = IMG_SIZE * (sub.getY() + (sub.getScaleY() * instance.getY()));
 
                 AffineTransform trans = new AffineTransform();
 
-                trans.translate(IMG_SIZE * instance.getX(), IMG_SIZE * instance.getY());
+                trans.translate(x, y);
                 trans.scale(scaleX, scaleY);
                 trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 

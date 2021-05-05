@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info.ck3;
 
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.node.ValueNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,23 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Ck3CoatOfArms {
+public final class Ck3CoatOfArms {
 
-    private String patternFile;
-    private List<String> colors;
-    private List<Emblem> emblems;
+    private List<Sub> subs;
 
     public Ck3CoatOfArms() {
     }
 
-    private Ck3CoatOfArms(String patternFile, List<String> colors, List<Emblem> emblems) {
-        this.patternFile = patternFile;
-        this.colors = colors;
-        this.emblems = emblems;
+    public Ck3CoatOfArms(List<Sub> subs) {
+        this.subs = subs;
     }
 
     static Ck3CoatOfArms empty() {
-        return new Ck3CoatOfArms("pattern_solid.dds", List.of("black", "black"), List.of(Emblem.empty()));
+        return new Ck3CoatOfArms(List.of(Sub.empty()));
     }
 
     public static Map<Long, Ck3CoatOfArms> createCoaMap(Node node) {
@@ -38,36 +33,127 @@ public class Ck3CoatOfArms {
     }
 
     public static Ck3CoatOfArms fromNode(Node n) {
-        var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
-
-        List<String> colors = new ArrayList<>();
-        n.getNodeForKeyIfExistent("color1").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-        n.getNodeForKeyIfExistent("color2").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-        n.getNodeForKeyIfExistent("color3").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-        n.getNodeForKeyIfExistent("color4").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-
-        List<Emblem> emblems = new ArrayList<>();
-        emblems.addAll(n.getNodesForKey("colored_emblem").stream()
-                .map(Emblem::fromColoredEmblemNode)
-                .collect(Collectors.toList()));
-
-        emblems.addAll(n.getNodesForKey("textured_emblem").stream()
-                .map(Emblem::fromTexturedEmblemNode)
-                .collect(Collectors.toList()));
-
-        return new Ck3CoatOfArms(patternFile, colors, emblems);
+        List<Sub> subs = new ArrayList<>();
+        subs.addAll(Sub.fromNode(n));
+        for (var subNode : n.getNodesForKey("sub")) {
+            subs.addAll(Sub.fromNode(subNode));
+        }
+        return new Ck3CoatOfArms(subs);
     }
 
-    public String getPatternFile() {
-        return patternFile;
+    public List<Sub> getSubs() {
+        return subs;
     }
 
-    public List<String> getColors() {
-        return colors;
-    }
+    public static final class Sub {
 
-    public List<Emblem> getEmblems() {
-        return emblems;
+        static Sub empty() {
+            return new Sub(0, 0, 1, 1, "pattern_solid.dds", List.of("black", "black"), List.of(Emblem.empty()));
+        }
+
+        private double x = 0.5;
+        private double y = 0.5;
+
+        private double scaleX = 1.0;
+        private double scaleY = 1.0;
+
+        private String patternFile;
+        private List<String> colors;
+        private List<Emblem> emblems;
+
+        public Sub() {
+        }
+
+        public Sub(double x, double y, double scaleX, double scaleY, String patternFile, List<String> colors, List<Emblem> emblems) {
+            this.x = x;
+            this.y = y;
+            this.scaleX = scaleX;
+            this.scaleY = scaleY;
+            this.patternFile = patternFile;
+            this.colors = colors;
+            this.emblems = emblems;
+        }
+
+        public static List<Sub> fromNode(Node n) {
+            List<Sub> subs = new ArrayList<>();
+            if (!n.hasKey("instance")) {
+                subs.add(subInstance(n, null));
+            } else {
+                for (var in : n.getNodesForKey("instance")) {
+                    subs.add(subInstance(n, in));
+                }
+            }
+            return subs;
+        }
+
+        public static Sub subInstance(Node n, Node instanceNode) {
+            var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
+
+            List<String> colors = new ArrayList<>();
+            n.getNodeForKeyIfExistent("color1").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color2").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color3").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color4").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+
+            List<Emblem> emblems = new ArrayList<>();
+            emblems.addAll(n.getNodesForKey("colored_emblem").stream()
+                    .map(Emblem::fromColoredEmblemNode)
+                    .collect(Collectors.toList()));
+
+            emblems.addAll(n.getNodesForKey("textured_emblem").stream()
+                    .map(Emblem::fromTexturedEmblemNode)
+                    .collect(Collectors.toList()));
+
+            double x = 0;
+            double y = 0;
+            if (instanceNode != null) {
+                var offset = instanceNode.getNodeForKeyIfExistent("offset").orElse(null);
+                if (offset != null) {
+                    x = offset.getNodeArray().get(0).getDouble();
+                    y = offset.getNodeArray().get(1).getDouble();
+                }
+            }
+
+            double sx = 1;
+            double sy = 1;
+            if (instanceNode != null) {
+                var scale = instanceNode.getNodeForKeyIfExistent("scale").orElse(null);
+                if (scale != null) {
+                    sx = scale.getNodeArray().get(0).getDouble();
+                    sy = scale.getNodeArray().get(1).getDouble();
+                }
+            }
+
+            return new Sub(x, y, sx, sy, patternFile, colors, emblems);
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public double getScaleX() {
+            return scaleX;
+        }
+
+        public double getScaleY() {
+            return scaleY;
+        }
+
+        public String getPatternFile() {
+            return patternFile;
+        }
+
+        public List<String> getColors() {
+            return colors;
+        }
+
+        public List<Emblem> getEmblems() {
+            return emblems;
+        }
     }
 
     public static final class Instance {
