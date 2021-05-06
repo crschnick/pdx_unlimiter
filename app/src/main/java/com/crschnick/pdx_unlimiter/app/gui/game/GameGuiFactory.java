@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCompatibility;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -126,15 +126,23 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
     protected Label createVersionInfo(SavegameInfo<T> info) {
-        Label version;
-        if (SavegameActions.isVersionCompatible(info)) {
-            version = new Label(info.getVersion().toString());
-            GuiTooltips.install(version, "Compatible version");
-            version.getStyleClass().add(CLASS_COMPATIBLE);
-        } else {
-            version = new Label(info.getVersion().toString());
-            GuiTooltips.install(version, "Incompatible savegame version");
-            version.getStyleClass().add(CLASS_INCOMPATIBLE);
+        Label version = null;
+        switch (SavegameCompatibility.determineForInfo(info)) {
+            case COMPATIBLE -> {
+                version = new Label(info.getVersion().toString());
+                GuiTooltips.install(version, "Compatible version");
+                version.getStyleClass().add(CLASS_COMPATIBLE);
+            }
+            case INCOMPATIBLE -> {
+                version = new Label(info.getVersion().toString());
+                GuiTooltips.install(version, "Incompatible savegame version");
+                version.getStyleClass().add(CLASS_INCOMPATIBLE);
+            }
+            case UNKNOWN -> {
+                version = new Label(info.getVersion().toString());
+                GuiTooltips.install(version, "Version compatibility unknown");
+                version.getStyleClass().add("unknown-compatible");
+            }
         }
         return version;
     }

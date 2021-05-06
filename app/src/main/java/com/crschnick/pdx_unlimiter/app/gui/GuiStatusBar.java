@@ -139,8 +139,13 @@ public class GuiStatusBar {
             barPane.setLeft(text);
             BorderPane.setAlignment(text, Pos.CENTER);
 
-            if (!SavegameActions.isEntryCompatible(e)) {
-                barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+            switch (SavegameCompatibility.determineForEntry(e)) {
+                case INCOMPATIBLE -> {
+                    barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+                }
+                case UNKNOWN -> {
+                    barPane.getStyleClass().add("status-compatible-unknown");
+                }
             }
 
             {

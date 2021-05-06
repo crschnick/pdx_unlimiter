@@ -12,6 +12,11 @@
 -fx-font-size: 1.15em;
 }
 
+.status-compatible-unknown {
+-fx-border-color: #999922AA;
+-fx-background-color: #99992299;
+}
+
 .status-incompatible {
 -fx-border-color: #994455AA;
 -fx-background-color: #99445599;

@@ -156,8 +156,9 @@ public interface GameInstallType {
     GameInstallType CK3 = new StandardInstallType("binaries/ck3") {
         @Override
         public Path chooseBackgroundImage(Path p) {
+            String[] bgs = new String[] {"assassin", "baghdad", "castle", "council", "duel"};
             return p.resolve("game").resolve("gfx").resolve("interface").resolve("illustrations")
-                    .resolve("loading_screens").resolve("assassin.dds");
+                    .resolve("loading_screens").resolve(bgs[new Random().nextInt(bgs.length)] + ".dds");
         }
 
         @Override

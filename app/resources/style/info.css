@@ -16,6 +16,10 @@
      -fx-background-color: #00ee0055;
 }
 
+.unknown-compatible {
+     -fx-background-color: #99990077;
+}
+
 .incompatible {
      -fx-background-color: #ff000055;
 }

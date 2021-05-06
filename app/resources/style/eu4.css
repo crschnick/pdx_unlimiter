@@ -8,10 +8,8 @@
 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
 
-.eu4 .ruler-info {
--fx-background-color: #777777;
--fx-padding: 0.4em;
--fx-background-radius: 0.2em;
+.eu4 .ruler {
+-fx-padding: 0;
 }
 
 .eu4 .ruler-icon {

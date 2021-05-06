@@ -8,11 +8,9 @@ import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import javafx.scene.image.Image;
@@ -38,37 +36,6 @@ public class SavegameActions {
             }
             return out;
         }));
-    }
-
-    public static boolean isEntryCompatible(SavegameEntry<?, ?> entry) {
-        return SavegameContext.mapSavegame(entry, ctx -> {
-            var info = ctx.getInfo();
-            if (info == null) {
-                return false;
-            }
-
-            var ins = ctx.getInstallation();
-            boolean missingMods = info.getMods().stream()
-                    .map(ins::getModForId)
-                    .anyMatch(Optional::isEmpty);
-
-            boolean missingDlc = info.getDlcs().stream()
-                    .map(ins::getDlcForName)
-                    .anyMatch(Optional::isEmpty);
-
-            return areCompatible(ins.getVersion(), info.getVersion()) &&
-                    !missingMods && !missingDlc;
-        });
-    }
-
-    public static boolean isVersionCompatible(SavegameInfo<?> info) {
-        return areCompatible(
-                GameInstallation.ALL.get(SavegameManagerState.get().current()).getVersion(),
-                info.getVersion());
-    }
-
-    private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
-        return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
     }
 
     public static <T, I extends SavegameInfo<T>> void openSavegame(SavegameEntry<T, I> entry) {

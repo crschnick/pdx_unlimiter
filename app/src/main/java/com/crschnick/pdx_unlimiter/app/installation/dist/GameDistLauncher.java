@@ -9,10 +9,7 @@ import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameDlc;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
-import com.crschnick.pdx_unlimiter.app.savegame.FileExportTarget;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
+import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.IronyHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -55,7 +52,7 @@ public class GameDistLauncher {
 
     public static <T, I extends SavegameInfo<T>> void continueSavegame(SavegameEntry<T, I> e, boolean debug) {
         SavegameContext.withSavegame(e, ctx -> {
-            if (!SavegameActions.isEntryCompatible(e)) {
+            if (SavegameCompatibility.determineForEntry(e) != SavegameCompatibility.Compatbility.COMPATIBLE) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
                         ctx.getInstallation(), e);
                 if (!startAnyway) {

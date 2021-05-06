@@ -1,9 +1,9 @@
 package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
-import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.installation.GameMod;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.savegame.SavegameCompatibility;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,7 +17,7 @@ public class GuiIncompatibleWarning {
 
     public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {
         StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n");
-        if (!SavegameActions.isVersionCompatible(entry.getInfo())) {
+        if (SavegameCompatibility.determineForInfo(entry.getInfo()) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
                     .append(installation.getVersion().toString()).append("\n")

@@ -43,7 +43,7 @@ public class GuiSettingsComponents {
 
         Label typeLabel = new Label(" ");
         typeLabel.setAlignment(Pos.CENTER);
-        typeLabel.setGraphic(new FontIcon());
+        typeLabel.setGraphic(new FontIcon("mdi-help"));
 
         TextField locationLabel = new TextField();
         locationLabel.setEditable(false);
