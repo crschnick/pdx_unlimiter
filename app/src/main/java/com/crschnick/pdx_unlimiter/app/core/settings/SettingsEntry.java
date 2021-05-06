@@ -59,7 +59,7 @@ public abstract class SettingsEntry<T> {
         setupLogger();
     }
 
-    private void setupLogger() {
+    protected void setupLogger() {
         this.value.addListener((c, o, n) -> {
             logger.info("Changing settings entry " + serializationName + " from " + o + " to " + n);
         });
@@ -175,8 +175,21 @@ public abstract class SettingsEntry<T> {
 
     public static class StringEntry extends SimpleEntry<String> {
 
-        public StringEntry(String id, String serializationName, String defaultValue) {
+        private final boolean secret;
+
+        public StringEntry(String id, String serializationName, String defaultValue, boolean secret) {
             super(id, serializationName, Type.STRING, defaultValue);
+            this.secret = secret;
+        }
+
+        protected void setupLogger() {
+            this.value.addListener((c, o, n) -> {
+                if (secret) {
+                    logger.info("Changing settings entry " + serializationName + " from <secret> to <secret>");
+                } else {
+                    logger.info("Changing settings entry " + serializationName + " from " + o + " to " + n);
+                }
+            });
         }
 
         @Override
@@ -187,6 +200,10 @@ public abstract class SettingsEntry<T> {
         @Override
         public JsonNode toNode() {
             return new TextNode(value.get());
+        }
+
+        public boolean isSecret() {
+            return secret;
         }
     }
 
