@@ -295,7 +295,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     public void selectEntry(SavegameEntry<T, I> e) {
         // Don't do anything if entry is not loaded yet
-        if (e != null && e.getInfo() == null) {
+        if (e != null && (e.getState() == SavegameEntry.State.LOADING || e.getState() == SavegameEntry.State.UNLOADED)) {
             return;
         }
 
