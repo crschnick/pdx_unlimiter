@@ -113,6 +113,12 @@ public class GuiMenuBar {
         });
         dev.getItems().add(error);
 
+        MenuItem terminalError = new MenuItem("Throw terminal exception");
+        terminalError.setOnAction((a) -> {
+            ErrorHandler.handleTerminalException(new RuntimeException("This is a test exception!"));
+        });
+        dev.getItems().add(terminalError);
+
         MenuItem gc = new MenuItem("Force GC");
         gc.setOnAction((a) -> {
             MemoryHelper.forceGC();

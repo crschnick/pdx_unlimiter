@@ -90,8 +90,9 @@ public class GuiErrorReporter {
                 You can notify the developers of this error automatically by clicking the 'Report automatically' button. (This will send some diagnostics data.)
                 Alternatively, you can also report it on GitHub to provide some information about the issue and get notified about the status of your reported issue.
 
-                """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter.\n" +
-                "However, if something is no longer working correctly, you should try to restart the Pdx-Unlimiter." : "") : ""));
+                """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter." :
+                "This error means that the Pdx-Unlimiter can not operate anymore without solving the underlying problem.\n" +
+                "This is done to protect the state of your savegame storage.") : ""));
 
         VBox dialogPaneContent = new VBox();
 
@@ -107,7 +108,6 @@ public class GuiErrorReporter {
 
         alert.getDialogPane().setContent(dialogPaneContent);
 
-        //TODO: better metric?
         alert.getDialogPane().setMaxWidth(800);
 
         Optional<ButtonType> r = alert.showAndWait();
