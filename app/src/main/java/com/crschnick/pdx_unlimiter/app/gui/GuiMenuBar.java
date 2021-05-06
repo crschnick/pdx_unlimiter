@@ -88,7 +88,7 @@ public class GuiMenuBar {
 
         MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
         is.setOnAction((a) -> {
-            ErrorHandler.reportIssue();
+            ErrorHandler.reportIssue(null);
         });
         help.getItems().add(is);
 

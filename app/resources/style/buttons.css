@@ -42,6 +42,10 @@
     -fx-icon-code: "mdi-tooltip-outline";
 }
 
+.report-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-alert-circle-outline";
+}
+
 .notes-button .ikonli-font-icon {
     -fx-icon-code: "mdi-tooltip";
 }

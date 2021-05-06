@@ -160,7 +160,7 @@ public class ErrorHandler {
         }
     }
 
-    public static void reportIssue() {
+    public static void reportIssue(Path attachFile) {
         Runnable run = () -> {
             var r = GuiErrorReporter.showIssueDialog();
             r.ifPresent(msg -> {
@@ -168,6 +168,9 @@ public class ErrorHandler {
                     LogManager.getInstance().getLogFile().ifPresent(l -> {
                         scope.addAttachment(new Attachment(l.toString()));
                     });
+                    if (attachFile != null) {
+                        scope.addAttachment(new Attachment(attachFile.toString()));
+                    }
 
                     var id = Sentry.captureMessage("User Issue Report");
                     Sentry.captureUserFeedback(new UserFeedback(id, null, null, msg));

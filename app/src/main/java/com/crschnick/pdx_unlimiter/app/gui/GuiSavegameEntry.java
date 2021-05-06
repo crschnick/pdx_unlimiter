@@ -1,9 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.core.CacheManager;
-import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
-import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
-import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
+import com.crschnick.pdx_unlimiter.app.core.*;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
@@ -125,6 +122,16 @@ public class GuiSavegameEntry {
     }
 
     private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {
+        {
+            Button report = new JFXButton();
+            report.setGraphic(new FontIcon());
+            report.setOnMouseClicked((m) -> {
+                ErrorHandler.reportIssue(SavegameContext.getContext(e).getStorage().getSavegameFile(e));
+            });
+            report.getStyleClass().add("report-button");
+            GuiTooltips.install(report, "Report an issue with the savegame");
+            buttonBar.getChildren().add(report);
+        }
         {
             Button copy = new JFXButton();
             copy.setGraphic(new FontIcon());
