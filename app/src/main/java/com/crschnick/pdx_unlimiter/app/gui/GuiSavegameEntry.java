@@ -77,10 +77,7 @@ public class GuiSavegameEntry {
             topBar.setCenter(name);
         }
         {
-            HBox buttonBar = new HBox();
-            buttonBar.setAlignment(Pos.CENTER);
-            createButtonBar(e, buttonBar);
-            buttonBar.getStyleClass().add(CLASS_BUTTON_BAR);
+            HBox buttonBar = createButtonBar(e);
             topBar.setRight(buttonBar);
         }
         return topBar;
@@ -121,7 +118,10 @@ public class GuiSavegameEntry {
         return entryNode;
     }
 
-    private static <T, I extends SavegameInfo<T>> void createButtonBar(SavegameEntry<T, I> e, HBox buttonBar) {
+    private static <T, I extends SavegameInfo<T>> HBox createButtonBar(SavegameEntry<T, I> e) {
+        HBox staticButtons = new HBox();
+        staticButtons.setAlignment(Pos.CENTER);
+        staticButtons.getStyleClass().add(CLASS_BUTTON_BAR);
         {
             Button report = new JFXButton();
             report.setGraphic(new FontIcon());
@@ -130,7 +130,7 @@ public class GuiSavegameEntry {
             });
             report.getStyleClass().add("report-button");
             GuiTooltips.install(report, "Report an issue with the savegame");
-            buttonBar.getChildren().add(report);
+            staticButtons.getChildren().add(report);
         }
         {
             Button copy = new JFXButton();
@@ -140,97 +140,8 @@ public class GuiSavegameEntry {
             });
             copy.getStyleClass().add(CLASS_COPY);
             GuiTooltips.install(copy, "Make a copy of the savegame");
-            buttonBar.getChildren().add(copy);
+            staticButtons.getChildren().add(copy);
         }
-
-        {
-            Button melt = new JFXButton();
-            melt.setGraphic(new FontIcon());
-            melt.setOnMouseClicked((m) -> {
-                SavegameActions.meltSavegame(e);
-            });
-            melt.getStyleClass().add(CLASS_MELT);
-            GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
-            SavegameContext.withSavegameAsync(e, ctx -> {
-                if (ctx.getInfo().isBinary()) {
-                    buttonBar.getChildren().add(0, melt);
-                }
-            });
-        }
-
-        if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(e)) {
-            SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
-            Button upload = new JFXButton();
-            upload.setGraphic(new FontIcon());
-            upload.setOnMouseClicked((m) -> {
-                RakalyWebHelper.uploadSavegame(eu4Entry);
-            });
-            upload.getStyleClass().add(CLASS_ANALYZE);
-            GuiTooltips.install(upload, "Upload and analyze with Rakaly.com");
-            buttonBar.getChildren().add(upload);
-
-
-            Button uploadSkanderbeg = new JFXButton();
-            uploadSkanderbeg.setGraphic(new FontIcon());
-            uploadSkanderbeg.setOnMouseClicked((m) -> {
-                SkanderbegHelper.uploadSavegame(eu4Entry);
-            });
-            uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
-            GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
-            buttonBar.getChildren().add(uploadSkanderbeg);
-        }
-
-        SavegameContext.withSavegameAsync(e, ctx -> {
-            if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
-                Button eu4Se = new JFXButton();
-                eu4Se.setGraphic(new FontIcon());
-                eu4Se.setOnMouseClicked((m) -> {
-                    Eu4SeHelper.open(e);
-                });
-                eu4Se.getStyleClass().add("eu4se-button");
-                GuiTooltips.install(eu4Se, "Open with Eu4SaveEditor");
-                buttonBar.getChildren().add(0, eu4Se);
-            }
-        });
-
-        if (SavegameStorage.ALL.get(Game.CK3).contains(e) && Game.EU4.isEnabled()) {
-            SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
-            Button convert = new JFXButton();
-            convert.setGraphic(new FontIcon());
-            convert.setOnMouseClicked((m) -> {
-                ConverterHelper.convertCk3ToEu4(ck3Entry);
-            });
-            convert.getStyleClass().add(CLASS_CONVERT);
-            GuiTooltips.install(convert, "Convert to EU4 savegame");
-            buttonBar.getChildren().add(convert);
-        }
-
-        if (PdxuInstallation.getInstance().isDeveloperMode()) {
-            Button open = new JFXButton();
-            open.setGraphic(new FontIcon());
-            open.getStyleClass().add("open-button");
-            GuiTooltips.install(open, "Open stored savegame location");
-            buttonBar.getChildren().add(open);
-            open.setOnMouseClicked((m) -> {
-                SavegameActions.openSavegame(e);
-            });
-        }
-
-        {
-            Button edit = new JFXButton();
-            edit.setGraphic(new FontIcon());
-            edit.setOnMouseClicked((m) -> {
-                SavegameActions.editSavegame(e);
-            });
-            edit.getStyleClass().add(CLASS_EDIT);
-            GuiTooltips.install(edit, "Edit savegame");
-            SavegameContext.withSavegameAsync(e, ctx -> {
-                if (!ctx.getInfo().isBinary()) {
-                    buttonBar.getChildren().add(0, edit);
-                }
-            });
-        }
-
         {
             Button notes = new JFXButton();
             notes.setGraphic(new FontIcon());
@@ -239,7 +150,7 @@ public class GuiSavegameEntry {
             });
             notes.getStyleClass().add("notes-button");
             GuiTooltips.install(notes, "Edit savegame notes");
-            buttonBar.getChildren().add(notes);
+            staticButtons.getChildren().add(notes);
         }
 
         {
@@ -256,8 +167,107 @@ public class GuiSavegameEntry {
             });
             del.getStyleClass().add(CLASS_DELETE);
             GuiTooltips.install(del, "Delete savegame");
-            buttonBar.getChildren().add(del);
+            staticButtons.getChildren().add(del);
         }
+
+        if (PdxuInstallation.getInstance().isDeveloperMode()) {
+            Button open = new JFXButton();
+            open.setGraphic(new FontIcon());
+            open.getStyleClass().add("open-button");
+            GuiTooltips.install(open, "Open stored savegame location");
+            staticButtons.getChildren().add(open);
+            open.setOnMouseClicked((m) -> {
+                SavegameActions.openSavegame(e);
+            });
+        }
+
+
+
+        HBox dynamicButtons = new HBox();
+        dynamicButtons.setAlignment(Pos.CENTER);
+        dynamicButtons.getStyleClass().add(CLASS_BUTTON_BAR);
+        {
+            Button melt = new JFXButton();
+            melt.setGraphic(new FontIcon());
+            melt.setOnMouseClicked((m) -> {
+                SavegameActions.meltSavegame(e);
+            });
+            melt.getStyleClass().add(CLASS_MELT);
+            GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
+            SavegameContext.withSavegameAsync(e, ctx -> {
+                if (ctx.getInfo().isBinary()) {
+                    dynamicButtons.getChildren().add(melt);
+                }
+            });
+        }
+
+        if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(e)) {
+            SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
+            Button upload = new JFXButton();
+            upload.setGraphic(new FontIcon());
+            upload.setOnMouseClicked((m) -> {
+                RakalyWebHelper.uploadSavegame(eu4Entry);
+            });
+            upload.getStyleClass().add(CLASS_ANALYZE);
+            GuiTooltips.install(upload, "Upload and analyze with Rakaly.com");
+            dynamicButtons.getChildren().add(upload);
+
+
+            Button uploadSkanderbeg = new JFXButton();
+            uploadSkanderbeg.setGraphic(new FontIcon());
+            uploadSkanderbeg.setOnMouseClicked((m) -> {
+                SkanderbegHelper.uploadSavegame(eu4Entry);
+            });
+            uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
+            GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
+            dynamicButtons.getChildren().add(uploadSkanderbeg);
+        }
+
+        SavegameContext.withSavegameAsync(e, ctx -> {
+            if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
+                Button eu4Se = new JFXButton();
+                eu4Se.setGraphic(new FontIcon());
+                eu4Se.setOnMouseClicked((m) -> {
+                    Eu4SeHelper.open(e);
+                });
+                eu4Se.getStyleClass().add("eu4se-button");
+                GuiTooltips.install(eu4Se, "Open with Eu4SaveEditor");
+                dynamicButtons.getChildren().add(0, eu4Se);
+            }
+        });
+
+        if (SavegameStorage.ALL.get(Game.CK3).contains(e) && Game.EU4.isEnabled()) {
+            SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
+            Button convert = new JFXButton();
+            convert.setGraphic(new FontIcon());
+            convert.setOnMouseClicked((m) -> {
+                ConverterHelper.convertCk3ToEu4(ck3Entry);
+            });
+            convert.getStyleClass().add(CLASS_CONVERT);
+            GuiTooltips.install(convert, "Convert to EU4 savegame");
+            dynamicButtons.getChildren().add(convert);
+        }
+
+        {
+            Button edit = new JFXButton();
+            edit.setGraphic(new FontIcon());
+            edit.setOnMouseClicked((m) -> {
+                SavegameActions.editSavegame(e);
+            });
+            edit.getStyleClass().add(CLASS_EDIT);
+            GuiTooltips.install(edit, "Edit savegame");
+            SavegameContext.withSavegameAsync(e, ctx -> {
+                if (!ctx.getInfo().isBinary()) {
+                    dynamicButtons.getChildren().add(0, edit);
+                }
+            });
+        }
+
+
+        HBox buttonBar = new HBox(dynamicButtons, staticButtons);
+        buttonBar.setSpacing(40);
+        buttonBar.setAlignment(Pos.CENTER);
+        return buttonBar;
     }
 
     private static JFXMasonryPane createEmptyContainer() {
