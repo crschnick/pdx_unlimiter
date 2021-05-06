@@ -156,10 +156,10 @@ public class GameDistLauncher {
     }
 
     private static List<GameMod> getEnabledMods(GameInstallation installation) throws Exception {
-        var file = installation.getUserPath().resolve("dlc_load.json");
+        var file = installation.getUserDir().resolve("dlc_load.json");
         var node = JsonHelper.read(file);
         return StreamSupport.stream(node.required("enabled_mods").spliterator(), false)
-                .map(n -> installation.getModForName(n.textValue()))
+                .map(n -> installation.getModForId(n.textValue()))
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList());
     }

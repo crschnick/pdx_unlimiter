@@ -237,8 +237,8 @@ public class GameImage {
         STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
         STELLARIS_FLAG_MASK = ImageLoader.loadImage(f.resolve("empire_flag_200_mask.dds"));
         STELLARIS_FLAG_FRAME = ImageLoader.loadImage(f.resolve("empire_flag_200_frame.dds"));
-        STELLARIS_BACKGROUND = ImageLoader.loadImage(
-                installPath.resolve("launcher-assets").resolve("app-background.png"));
+        STELLARIS_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.STELLARIS)
+                .getType().chooseBackgroundImage(installPath));
 
     }
 

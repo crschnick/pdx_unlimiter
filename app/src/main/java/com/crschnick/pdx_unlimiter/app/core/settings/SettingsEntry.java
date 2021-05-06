@@ -355,9 +355,11 @@ public abstract class SettingsEntry<T> {
             } catch (InvalidInstallationException e) {
                 showInstallErrorMessage(e.getLocalisedMessage());
                 ErrorHandler.reportError(e, false, null);
+                return false;
             } catch (Exception e) {
                 showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
                 ErrorHandler.reportError(e, false, null);
+                return false;
             }
         }
 

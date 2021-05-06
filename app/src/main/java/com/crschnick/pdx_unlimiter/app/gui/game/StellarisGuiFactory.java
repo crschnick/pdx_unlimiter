@@ -18,8 +18,6 @@ import javafx.scene.text.Font;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static com.crschnick.pdx_unlimiter.app.gui.game.GameImage.STELLARIS_BACKGROUND;
-
 public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisSavegameInfo> {
 
     @Override
@@ -38,7 +36,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
-        bg.setOpacity(0.6);
+        bg.setOpacity(0.3);
         return bg;
     }
 
