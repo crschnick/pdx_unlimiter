@@ -61,7 +61,8 @@ public class PdxLauncherDist extends GameDist {
     }
 
     private Path getLauncherSettings() {
-        return getGame().getInstallType().getLauncherDataPath(getInstallLocation()).resolve("launcher-settings.json");
+        return getGame().getInstallType().getWindowsStoreLauncherDataPath(
+                getInstallLocation()).resolve("launcher-settings.json");
     }
 
     private Path replaceVariablesInPath(String value) {

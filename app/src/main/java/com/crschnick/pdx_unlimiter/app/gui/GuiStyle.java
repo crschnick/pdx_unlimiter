@@ -51,7 +51,7 @@ public class GuiStyle {
     public static String CLASS_GAME_ICON = "game-icon";
     public static String CLASS_GAME_ICON_BAR = "game-icon-bar";
     public static String CLASS_SWTICH_GAME = "switch-game-button";
-    public static String CLASS_CONTENT = "content";
+    public static String CLASS_CONTENT = "needed-content";
     public static String CLASS_NO_CAMPAIGN = "no-campaign";
     public static String CLASS_LOADING = "loading";
     public static String CLASS_CONVERT = "convert-button";

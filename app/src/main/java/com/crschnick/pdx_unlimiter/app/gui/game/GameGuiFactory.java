@@ -157,7 +157,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         addNode(grid, version);
 
         if (info.getMods().size() > 0) {
-            Label mods = new Label("Mods");
+            Label mods = new Label("Mods (" + info.getMods().size() + ")");
             mods.setGraphic(new FontIcon());
             mods.getStyleClass().add(CLASS_CONTENT);
             GuiTooltips.install(mods,
@@ -178,7 +178,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         }
 
         if (info.getDlcs().size() > 0) {
-            Label dlcs = new Label("DLCs");
+            Label dlcs = new Label("DLCs (" + info.getDlcs().size() + ")");
             dlcs.setGraphic(new FontIcon());
             dlcs.getStyleClass().add(CLASS_CONTENT);
             GuiTooltips.install(dlcs,

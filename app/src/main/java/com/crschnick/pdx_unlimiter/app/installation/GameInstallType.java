@@ -116,6 +116,11 @@ public interface GameInstallType {
 
     GameInstallType STELLARIS = new StandardInstallType("stellaris") {
         @Override
+        public Path getWindowsStoreLauncherDataPath(Path p) {
+            return p.resolve("launcher");
+        }
+
+        @Override
         public Path chooseBackgroundImage(Path p) {
             int i = new Random().nextInt(16) + 1;
             return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
@@ -292,6 +297,10 @@ public interface GameInstallType {
 
     public default Path getLauncherDataPath(Path p) {
         return p;
+    }
+
+    public default Path getWindowsStoreLauncherDataPath(Path p) {
+        return getLauncherDataPath(p);
     }
 
     public default Path getModBasePath(Path p) {

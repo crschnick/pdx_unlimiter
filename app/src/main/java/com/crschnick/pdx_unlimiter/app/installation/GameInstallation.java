@@ -167,7 +167,7 @@ public final class GameInstallation {
             this.version = dist.determineVersion().map(type::getVersion)
                     .orElse(type.determineVersionFromInstallation(getInstallDir()))
                     .orElse(null);
-            logger.debug(g.getAbbreviation() + " version: " + this.version);
+            logger.debug(g.getAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
             this.language = type.determineLanguage(getInstallDir(), userDir).orElse(null);
             logger.debug(g.getAbbreviation() + " language: " +
                     (this.language != null ? this.language.getDisplayName() : "unknown"));

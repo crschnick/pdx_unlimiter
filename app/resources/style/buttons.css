@@ -38,6 +38,10 @@
     -fx-icon-code: "mdi-tooltip-outline";
 }
 
+.needed-content .ikonli-font-icon {
+ -fx-icon-code: "mdi-folder-multiple-outline";
+}
+
 .report-button .ikonli-font-icon {
     -fx-icon-code: "mdi-alert-circle-outline";
 }
