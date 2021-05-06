@@ -34,6 +34,9 @@ public abstract class GameDist {
         return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(getGame().getFullName());
     }
 
+    public boolean isGameInstance(String cmd) {
+        return cmd.contains(getGame().getInstallType().getExecutable(getInstallLocation()).toString());
+    }
     public abstract boolean supportsLauncher();
 
     public abstract boolean supportsDirectLaunch();

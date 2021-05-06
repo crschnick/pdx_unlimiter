@@ -1,13 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
-import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.slf4j.LoggerFactory;
-
-import java.awt.*;
 
 public class GameKeyListener implements NativeKeyListener {
 
@@ -25,21 +22,18 @@ public class GameKeyListener implements NativeKeyListener {
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
+                GameAppManager.getInstance().playImportSound();
                 GameAppManager.getInstance().importLatest();
-                if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
-                    Toolkit.getDefaultToolkit().beep();
-                }
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_C) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Checkpoint key pressed");
+                GameAppManager.getInstance().playImportSound();
                 GameAppManager.getInstance().loadLatestCheckpoint();
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_R) {
                 TaskExecutor.getInstance().submitTask(() -> {
                     LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");
-                    if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
-                        Toolkit.getDefaultToolkit().beep();
-                    }
+                    GameAppManager.getInstance().playImportSound();
                     handle.kill();
                     SavegameActions.importLatestAndLaunch();
                 }, true);

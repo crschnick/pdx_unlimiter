@@ -1,16 +1,15 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
-import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameAppManager;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -84,7 +83,7 @@ public class GuiStatusBar {
         l.changed(null, null, watcher.savegamesProperty().get());
         barPane.setCenter(latest);
 
-        Button importLatest = new JFXButton(PdxuI18n.get("IMPORT"));
+        Button importLatest = new Button(PdxuI18n.get("IMPORT"));
         importLatest.setGraphic(new FontIcon());
         importLatest.getStyleClass().add(CLASS_IMPORT);
         importLatest.setOnAction(event -> {
@@ -92,7 +91,7 @@ public class GuiStatusBar {
             event.consume();
         });
 
-        Button b = new JFXButton(PdxuI18n.get("KILL"));
+        Button b = new Button(PdxuI18n.get("KILL"));
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(CLASS_KILL);
         b.setOnAction(event -> {
@@ -101,10 +100,11 @@ public class GuiStatusBar {
         });
 
         HBox buttons = new HBox(importLatest);
+        buttons.setSpacing(5);
         buttons.getChildren().add(b);
 
         {
-            Button help = new JFXButton();
+            Button help = new Button();
             help.setGraphic(new FontIcon());
             help.getStyleClass().add("help-button");
             help.setOnAction(event -> {
@@ -140,12 +140,8 @@ public class GuiStatusBar {
             BorderPane.setAlignment(text, Pos.CENTER);
 
             switch (SavegameCompatibility.determineForEntry(e)) {
-                case INCOMPATIBLE -> {
-                    barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-                }
-                case UNKNOWN -> {
-                    barPane.getStyleClass().add("status-compatible-unknown");
-                }
+                case INCOMPATIBLE -> barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+                case UNKNOWN -> barPane.getStyleClass().add("status-compatible-unknown");
             }
 
             {
@@ -175,7 +171,7 @@ public class GuiStatusBar {
             }
 
             if (ctx.getInstallation().getDist().supportsDirectLaunch()) {
-                ButtonBase launch = null;
+                ButtonBase launch;
                 if (ctx.getInstallation().getType().debugModeSwitch().isPresent()) {
                     var splitButton = new SplitMenuButton();
                     splitButton.setText(PdxuI18n.get("CONTINUE_GAME"));

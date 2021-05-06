@@ -55,6 +55,12 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     }
 
     @Override
+    public boolean isGameInstance(String cmd) {
+        var execName = getGame().getInstallType().getExecutable(getInstallLocation()).getFileName().toString();
+        return cmd.contains("\\\\?\\Volume") && cmd.contains(execName);
+    }
+
+    @Override
     public void startLauncher() throws IOException {
         new ProcessBuilder("cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App").start();
     }

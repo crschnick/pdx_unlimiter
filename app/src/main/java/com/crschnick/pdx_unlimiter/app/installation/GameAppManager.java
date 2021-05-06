@@ -1,11 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
+import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.media.AudioClip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,7 @@ public final class GameAppManager {
 
     private static boolean isInstanceOfGame(String cmd, Game game) {
         var install = GameInstallation.ALL.get(game);
-        return install != null && cmd.contains(game.getInstallType().getExecutable(install.getInstallDir()).toString());
+        return install != null && install.getDist().isGameInstance(cmd);
     }
 
     public static GameAppManager getInstance() {
@@ -114,6 +116,14 @@ public final class GameAppManager {
             }
             importLatest();
             lastImport = Instant.now();
+        }
+    }
+
+    public void playImportSound() {
+        if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
+            var clip = new AudioClip(PdxuInstallation.getInstance().getResourceDir().resolve("sound")
+                    .resolve("import.wav").toUri().toString());
+            clip.play(0.2);
         }
     }
 
