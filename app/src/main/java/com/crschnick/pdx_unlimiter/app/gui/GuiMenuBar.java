@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
@@ -30,12 +31,18 @@ public class GuiMenuBar {
 
     private static MenuBar createMenuBar() {
 
-        Menu settings = new Menu(PdxuI18n.get("SETTINGS"));
+        Menu settings = new Menu("Pdx-Unlimiter");
         MenuItem c = new MenuItem(PdxuI18n.get("CHANGE_SETTINGS"));
         c.setOnAction((a) -> {
             GuiSettings.showSettings();
         });
         settings.getItems().add(c);
+
+        MenuItem rel = new MenuItem(PdxuI18n.get("RELOAD"));
+        rel.setOnAction((a) -> {
+            ComponentManager.reloadSettings(() -> {});
+        });
+        settings.getItems().add(rel);
 
 
         Menu savegames = new Menu(PdxuI18n.get("STORAGE"));

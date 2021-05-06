@@ -19,3 +19,4 @@ l_english:
   IMPORT: "Import"
   LAUNCH: "Launch"
   NO_GAME: "None"
+  RELOAD: "Reload"
