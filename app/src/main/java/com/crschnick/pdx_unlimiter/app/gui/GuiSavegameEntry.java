@@ -29,6 +29,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -83,14 +84,22 @@ public class GuiSavegameEntry {
         return topBar;
     }
 
+    private static Image FILE_ICON;
+
     private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(Region r, SavegameEntry<T, I> e) {
         r.setOnDragDetected(me -> {
+            if (FILE_ICON == null) {
+                FILE_ICON = new Image(PdxuInstallation.getInstance().getResourceDir().resolve("img")
+                        .resolve("file_icon.png").toUri().toString(), 80, 80, true, false);
+            }
+
             var out = SavegameActions.exportToTemp(e, true);
             out.ifPresent(p -> {
                 Dragboard db = r.startDragAndDrop(TransferMode.COPY);
                 var cc = new ClipboardContent();
                 cc.putFiles(List.of(p.toFile()));
                 db.setContent(cc);
+                db.setDragView(FILE_ICON, 30, 60);
             });
             me.consume();
         });

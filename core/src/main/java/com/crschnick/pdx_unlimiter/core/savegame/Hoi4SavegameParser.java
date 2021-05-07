@@ -1,6 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.FormatParser;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
@@ -23,6 +24,7 @@ public class Hoi4SavegameParser extends SavegameParser {
 
     @Override
     public Status parse(Path input, Melter melter) {
+        Node gamestate = null;
         try {
             byte[] data = Files.readAllBytes(input);
             String checksum = checksum(data);
@@ -41,12 +43,12 @@ public class Hoi4SavegameParser extends SavegameParser {
                 }
 
                 var content = in.readAllBytes();
-                var node = TextFormatParser.hoi4SavegameParser().parse(content);
-                var info = Hoi4SavegameInfo.fromSavegame(melted, node);
-                return new Success<>(checksum, node, info, data);
+                gamestate = TextFormatParser.hoi4SavegameParser().parse(content);
+                var info = Hoi4SavegameInfo.fromSavegame(melted, gamestate);
+                return new Success<>(checksum, gamestate, info, data);
             }
         } catch (Throwable e) {
-            return new Error(e);
+            return new Error(e, gamestate);
         }
     }
 }

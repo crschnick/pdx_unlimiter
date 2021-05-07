@@ -126,7 +126,7 @@ public class Eu4SavegameParser extends SavegameParser {
                 }
             }
         } catch (Throwable e) {
-            return new Error(e);
+            return new Error(e, null);
         }
     }
 }

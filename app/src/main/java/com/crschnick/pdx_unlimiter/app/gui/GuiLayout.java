@@ -12,6 +12,7 @@ import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -19,6 +20,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.util.Collection;
@@ -29,6 +31,7 @@ public class GuiLayout {
     private StackPane stack;
     private BorderPane layout;
     private Pane loadingBg;
+    private StackPane fileDropOverlay;
 
     public void setup() {
         layout = new BorderPane();
@@ -43,7 +46,12 @@ public class GuiLayout {
         loadingBg.setMinWidth(Pane.USE_COMPUTED_SIZE);
         loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
 
-        stack = new StackPane(new Pane(), layout, loadingBg);
+        fileDropOverlay = new StackPane(new FontIcon());
+        fileDropOverlay.setAlignment(Pos.CENTER);
+        fileDropOverlay.getStyleClass().add("file-drag");
+        fileDropOverlay.setVisible(false);
+
+        stack = new StackPane(new Pane(), layout, loadingBg, fileDropOverlay);
         stack.setOpacity(0);
     }
 
@@ -84,15 +92,24 @@ public class GuiLayout {
     }
 
     private void setupDragAndDrop() {
-        layout.setOnDragOver(event -> {
-            if (event.getGestureSource() == null
-                    && event.getDragboard().hasFiles()) {
+        stack.setOnDragOver(event -> {
+            if (event.getGestureSource() == null && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY);
             }
             event.consume();
         });
 
-        layout.setOnDragDropped(event -> {
+        stack.setOnDragEntered(event -> {
+            if (event.getGestureSource() == null && event.getDragboard().hasFiles()) {
+                fileDropOverlay.setVisible(true);
+            }
+        });
+
+        stack.setOnDragExited(event -> {
+            fileDropOverlay.setVisible(false);
+        });
+
+        stack.setOnDragDropped(event -> {
             // Only accept drops from outside the app window
             if (event.getGestureSource() == null && event.getDragboard().hasFiles()) {
                 event.setDropCompleted(true);

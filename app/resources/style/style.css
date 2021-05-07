@@ -20,6 +20,16 @@
 -fx-background-color: #FFFFFFcc;
 }
 
+.file-drag {
+-fx-background-color: #FFFFFFcc;
+-fx-font-size: 10em;
+}
+
+.file-drag .ikonli-font-icon {
+    -fx-opacity: 0.6;
+    -fx-icon-code: "mdi-file-import";
+}
+
 .loading > .jfx-spinner {
 -jfx-radius: 2.15em;
 }

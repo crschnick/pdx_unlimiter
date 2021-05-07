@@ -41,7 +41,7 @@ public class StellarisSavegameParser extends SavegameParser {
             var node = new LinkedArrayNode(List.of(metaNode, gamestateNode));
             return new Success<>(checksum, node, StellarisSavegameInfo.fromSavegame(node), data);
         } catch (Throwable e) {
-            return new Error(e);
+            return new Error(e, null);
         }
     }
 }

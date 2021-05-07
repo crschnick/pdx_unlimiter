@@ -130,6 +130,7 @@ public final class Ck3SavegameParser extends SavegameParser {
 
     @Override
     public Status parse(Path input, Melter melter) {
+        Node gamestate = null;
         try {
             var content = Files.readAllBytes(input);
             String checksum = checksum(content);
@@ -149,7 +150,6 @@ public final class Ck3SavegameParser extends SavegameParser {
             header = Ck3Header.fromStartOfFile(content);
 
             boolean compressed = header.compressed();
-            Node gamestate;
             if (compressed) {
                 int contentStart = (int) (metaStart + header.metaLength()) + (header.binary() ? 0 : 1);
                 try (var zipIn = new ZipInputStream(new ByteArrayInputStream(content,
@@ -168,7 +168,7 @@ public final class Ck3SavegameParser extends SavegameParser {
 
             return new Success<>(checksum, gamestate, Ck3SavegameInfo.fromSavegame(melted, gamestate), content);
         } catch (Throwable e) {
-            return new Error(e);
+            return new Error(e, gamestate);
         }
     }
 }

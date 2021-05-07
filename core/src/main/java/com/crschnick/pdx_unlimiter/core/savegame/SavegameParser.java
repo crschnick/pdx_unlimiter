@@ -75,9 +75,11 @@ public abstract class SavegameParser {
     public static class Error extends Status {
 
         public Throwable error;
+        public Node content;
 
-        public Error(Throwable error) {
+        public Error(Throwable error, Node content) {
             this.error = error;
+            this.content = content;
         }
     }
 
