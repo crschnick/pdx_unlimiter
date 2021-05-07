@@ -6,7 +6,7 @@ import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
@@ -110,7 +110,7 @@ public abstract class FileImportTarget {
         return createStandardImportsTargets(toImport);
     }
 
-    public abstract void importTarget(Consumer<SavegameParser.Status> onFinish);
+    public abstract void importTarget(Consumer<SavegameParseResult> onFinish);
 
     public abstract void delete();
 
@@ -129,7 +129,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public void importTarget(Consumer<SavegameParser.Status> onFinish) {
+        public void importTarget(Consumer<SavegameParseResult> onFinish) {
             if (GameInstallation.ALL.containsKey(Game.EU4)) {
                 return;
             }
@@ -240,7 +240,7 @@ public abstract class FileImportTarget {
             return getName().compareTo(o.getName());
         }
 
-        public void importTarget(Consumer<SavegameParser.Status> onFinish) {
+        public void importTarget(Consumer<SavegameParseResult> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
                 // File might no longer exist, since this is executed asynchronously in the task executor queue
                 if (!Files.exists(path)) {

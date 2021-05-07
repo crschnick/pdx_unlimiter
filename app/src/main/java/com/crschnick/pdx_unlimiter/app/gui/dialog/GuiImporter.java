@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -21,7 +21,7 @@ import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 
 public class GuiImporter {
 
-    public static void showResultDialog(Map<FileImportTarget, SavegameParser.Status> statusMap) {
+    public static void showResultDialog(Map<FileImportTarget, SavegameParseResult> statusMap) {
         Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.setTitle("Import results");
@@ -32,14 +32,14 @@ public class GuiImporter {
         list.setSpacing(5);
         list.getChildren().add(new Label("However, there have been some issues with the savegames listed below:"));
         for (var e : statusMap.entrySet()) {
-            e.getValue().visit(new SavegameParser.StatusVisitor<>() {
+            e.getValue().visit(new SavegameParseResult.Visitor<>() {
                 @Override
-                public void invalid(SavegameParser.Invalid iv) {
+                public void invalid(SavegameParseResult.Invalid iv) {
                     list.getChildren().add(new Label("- " + e.getKey().getName() + ": " + iv.message));
                 }
 
                 @Override
-                public void error(SavegameParser.Error er) {
+                public void error(SavegameParseResult.Error er) {
                     list.getChildren().add(new Label("- " + e.getKey().getName() + ": " +
                             er.error.getMessage() + " (error)"));
                 }

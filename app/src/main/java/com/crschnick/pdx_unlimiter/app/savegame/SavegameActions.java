@@ -12,7 +12,7 @@ import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 
@@ -76,9 +76,9 @@ public class SavegameActions {
         }
 
         SavegameStorage.get(g).getParser().parse(savegames.get(0).path, RakalyHelper::meltSavegame).visit(
-            new SavegameParser.StatusVisitor<>() {
+            new SavegameParseResult.Visitor<>() {
             @Override
-            public void success(SavegameParser.Success<SavegameInfo<?>> s) {
+            public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
                 var campaignId = s.info.getCampaignHeuristic();
                 SavegameStorage.get(g).getSavegameCollection(campaignId)
                         .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
@@ -110,10 +110,10 @@ public class SavegameActions {
         }
 
         savegames.get(0).importTarget(s -> {
-            s.visit(new SavegameParser.StatusVisitor<>() {
+            s.visit(new SavegameParseResult.Visitor<>() {
                 @Override
                 @SuppressWarnings("unchecked")
-                public void success(SavegameParser.Success<SavegameInfo<?>> s) {
+                public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
                     SavegameStorage.get(SavegameManagerState.get().current())
                             .getSavegameForChecksum(s.checksum)
                             .ifPresent(e -> {

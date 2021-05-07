@@ -18,7 +18,7 @@ public final class TextFormatParser extends FormatParser {
     private TextFormatTokenizer tokenizer;
     private NodeContext context;
 
-    private TextFormatParser(Charset charset) {
+    public TextFormatParser(Charset charset) {
         this.charset = charset;
     }
 

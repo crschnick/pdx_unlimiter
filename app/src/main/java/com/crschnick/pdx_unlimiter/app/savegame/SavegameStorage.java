@@ -16,6 +16,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -424,9 +425,9 @@ public abstract class SavegameStorage<
 
         e.startLoading();
         var status = parser.parse(file, RakalyHelper::meltSavegame);
-        status.visit(new SavegameParser.StatusVisitor<I>() {
+        status.visit(new SavegameParseResult.Visitor<I>() {
             @Override
-            public void success(SavegameParser.Success<I> s) {
+            public void success(SavegameParseResult.Success<I> s) {
                 logger.debug("Parsing was successful");
                 e.load(s.info);
                 getSavegameCollection(e).onSavegameLoad(e);
@@ -450,13 +451,13 @@ public abstract class SavegameStorage<
             }
 
             @Override
-            public void error(SavegameParser.Error er) {
+            public void error(SavegameParseResult.Error er) {
                 e.fail();
                 ErrorHandler.handleException(er.error, null, file);
             }
 
             @Override
-            public void invalid(SavegameParser.Invalid iv) {
+            public void invalid(SavegameParseResult.Invalid iv) {
                 e.fail();
                 ErrorHandler.handleException(new ParseException(iv.message), null, file);
             }
@@ -498,7 +499,7 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    protected SavegameParser.Status importSavegame(
+    protected SavegameParseResult importSavegame(
             Path file,
             String name,
             boolean checkDuplicate,
@@ -537,7 +538,7 @@ public abstract class SavegameStorage<
         loadEntry(e);
     }
 
-    private SavegameParser.Status importSavegameData(
+    private SavegameParseResult importSavegameData(
             Path file,
             String name,
             boolean checkDuplicate,
@@ -545,9 +546,9 @@ public abstract class SavegameStorage<
             SavegameCollection<T, I> col) {
         logger.debug("Parsing file " + file.toString());
         var status = parser.parse(file, RakalyHelper::meltSavegame);
-        status.visit(new SavegameParser.StatusVisitor<I>() {
+        status.visit(new SavegameParseResult.Visitor<I>() {
             @Override
-            public void success(SavegameParser.Success<I> s) {
+            public void success(SavegameParseResult.Success<I> s) {
                 logger.debug("Parsing was successful");
                 logger.debug("Checksum is " + s.checksum);
                 if (checkDuplicate) {
@@ -593,12 +594,12 @@ public abstract class SavegameStorage<
             }
 
             @Override
-            public void error(SavegameParser.Error e) {
+            public void error(SavegameParseResult.Error e) {
                 logger.error("An error occured during parsing: " + e.error.getMessage());
             }
 
             @Override
-            public void invalid(SavegameParser.Invalid iv) {
+            public void invalid(SavegameParseResult.Invalid iv) {
                 logger.error("Savegame is invalid: " + iv.message);
             }
         });

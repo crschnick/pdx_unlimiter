@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.info.ck3;
+package com.crschnick.pdx_unlimiter.core.savegame;
 
 import java.util.Random;
 
@@ -17,6 +17,8 @@ import java.util.Random;
  * Length of meta data block at the beginning of the file in bytes.
  */
 public record Ck3Header(boolean compressed, boolean binary, long randomness, long metaLength) {
+
+    public static final int LENGTH = 23;
 
     public Ck3Header(boolean compressed, boolean binary, int metaLength) {
         this(compressed, binary, (new Random().nextLong() >>> 1) % 0xFFFFFFFFL + 1, metaLength);

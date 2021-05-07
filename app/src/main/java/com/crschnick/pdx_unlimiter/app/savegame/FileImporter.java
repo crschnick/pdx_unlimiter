@@ -6,7 +6,7 @@ import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiImporter;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -71,11 +71,11 @@ public class FileImporter {
     }
 
     public static void importTargets(Collection<? extends FileImportTarget> targets) {
-        Map<FileImportTarget, SavegameParser.Status> statusMap = new HashMap<>();
+        Map<FileImportTarget, SavegameParseResult> statusMap = new HashMap<>();
         targets.forEach(t -> t.importTarget(s -> {
             // Only save non success results
             // This is done to gc the success objects and improve memory usage
-            if (!(s instanceof SavegameParser.Success)) {
+            if (!(s instanceof SavegameParseResult.Success)) {
                 statusMap.put(t, s);
             }
 
@@ -88,11 +88,11 @@ public class FileImporter {
                 () -> {
                     // Report errors
                     statusMap.entrySet().stream()
-                            .filter(e -> e.getValue() instanceof SavegameParser.Error)
+                            .filter(e -> e.getValue() instanceof SavegameParseResult.Error)
                             .findFirst()
                             .ifPresent(e -> {
                                 ErrorHandler.handleException(
-                                        ((SavegameParser.Error) e.getValue()).error,
+                                        ((SavegameParseResult.Error) e.getValue()).error,
                                         null,
                                         e.getKey().getPath());
                             });
