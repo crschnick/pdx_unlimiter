@@ -1,9 +1,15 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -68,6 +74,27 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
 
     public Ck3CompressedSavegameStructure() {
         super(null, StandardCharsets.UTF_8, Set.of(new SavegamePart("gamestate", "gamestate")));
+    }
+
+    @Override
+    public void write(Path file, Map<String, ArrayNode> nodes) throws IOException {
+        var gamestate = nodes.get("gamestate");
+        ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
+        var metaHeaderNode = ArrayNode.singleKeyNode("meta_data", meta);
+
+        try (var out = Files.newOutputStream(file)) {
+            var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
+
+            // Exclude trailing new line in meta length!
+            String header = new Ck3Header(true, false, metaBytes.length - 1).toString();
+            out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
+            out.write(metaBytes);
+            try (var zout = new ZipOutputStream(out)) {
+                zout.putNextEntry(new ZipEntry("gamestate"));
+                NodeWriter.write(zout, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(metaHeaderNode, gamestate)), "\t");
+                zout.closeEntry();
+            }
+        }
     }
 
     @Override

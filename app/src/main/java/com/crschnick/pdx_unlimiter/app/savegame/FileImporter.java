@@ -74,10 +74,9 @@ public class FileImporter {
         Map<FileImportTarget, SavegameParseResult> statusMap = new HashMap<>();
         targets.forEach(t -> t.importTarget(s -> {
             // Only save non success results
-            // This is done to gc the success objects and improve memory usage
-            if (!(s instanceof SavegameParseResult.Success)) {
-                statusMap.put(t, s);
-            }
+            s.ifPresent(result -> {
+                statusMap.put(t, result);
+            });
 
             if (Settings.getInstance().deleteOnImport.getValue()) {
                 logger.debug("Deleting import target " + t.getName());

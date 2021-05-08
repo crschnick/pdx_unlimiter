@@ -32,7 +32,7 @@ public class GuiImporter {
         list.setSpacing(5);
         list.getChildren().add(new Label("However, there have been some issues with the savegames listed below:"));
         for (var e : statusMap.entrySet()) {
-            e.getValue().visit(new SavegameParseResult.Visitor<>() {
+            e.getValue().visit(new SavegameParseResult.Visitor() {
                 @Override
                 public void invalid(SavegameParseResult.Invalid iv) {
                     list.getChildren().add(new Label("- " + e.getKey().getName() + ": " + iv.message));

@@ -1,6 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -24,9 +24,9 @@ public class EditorState {
     private final ListProperty<NavEntry> navPath;
     private final EditorFilter filter;
     private final ListProperty<EditorNode> content;
-    private final Consumer<Map<String, Node>> saveFunc;
+    private final Consumer<Map<String, ArrayNode>> saveFunc;
 
-    public EditorState(String fileName, Map<String, Node> nodes, TextFormatParser parser, Consumer<Map<String, Node>> saveFunc) {
+    public EditorState(String fileName, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;

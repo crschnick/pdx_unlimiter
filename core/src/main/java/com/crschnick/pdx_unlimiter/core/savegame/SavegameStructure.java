@@ -1,7 +1,12 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
+import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 
 public interface SavegameStructure {
@@ -61,6 +66,8 @@ public interface SavegameStructure {
             StandardCharsets.UTF_8,
             "gamestate");
 
+
+    void write(Path out, Map<String, ArrayNode> nodes) throws IOException;
 
     SavegameParseResult parse(byte[] input);
 

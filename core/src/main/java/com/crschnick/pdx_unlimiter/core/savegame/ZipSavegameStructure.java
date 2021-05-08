@@ -1,10 +1,15 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +78,25 @@ public class ZipSavegameStructure implements SavegameStructure {
             }
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);
+        }
+    }
+
+    @Override
+    public void write(Path out, Map<String, ArrayNode> nodes) throws IOException {
+        try (var fs = FileSystems.newFileSystem(out)) {
+            for (var e : nodes.entrySet()) {
+                var usedPart = parts.stream()
+                        .filter(part -> part.name().equals(e.getKey()))
+                        .findAny();
+                if (usedPart.isEmpty()) {
+                    continue;
+                }
+
+                var path = fs.getPath(usedPart.get().identifier());
+                try (var partOut = Files.newOutputStream(path)) {
+                    NodeWriter.write(partOut, charset, e.getValue(), "\t");
+                }
+            }
         }
     }
 

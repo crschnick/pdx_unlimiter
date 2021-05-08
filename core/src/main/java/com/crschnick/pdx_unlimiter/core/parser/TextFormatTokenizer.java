@@ -1,5 +1,8 @@
 package com.crschnick.pdx_unlimiter.core.parser;
 
+import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Stack;
 
@@ -27,8 +30,18 @@ public class TextFormatTokenizer {
     private int scalarCounter;
     private int arraySizesCounter;
     private boolean escapeChar;
+    private Unsafe unsafe;
+
 
     public TextFormatTokenizer(byte[] bytes, int start) {
+        try {
+            Field f = Unsafe.class.getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            unsafe = (Unsafe) f.get(null);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+
         this.bytes = bytes;
         this.nextScalarStart = 0;
         this.tokenCounter = 0;
