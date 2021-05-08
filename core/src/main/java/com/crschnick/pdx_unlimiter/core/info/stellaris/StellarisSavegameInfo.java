@@ -3,10 +3,13 @@ package com.crschnick.pdx_unlimiter.core.info.stellaris;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,7 +19,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     protected StellarisTag tag;
     protected List<StellarisTag> allTags;
 
-    public static StellarisSavegameInfo fromSavegame(Node n) throws ParseException {
+    public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameInfoException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
         try {
             i.ironman = n.getNodeForKey("galaxy").getNodeForKeyIfExistent("ironman")
@@ -75,8 +78,8 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                 throw new IllegalArgumentException("Invalid Stellaris version: " + vs);
             }
 
-        } catch (Exception e) {
-            throw new ParseException("Could not create savegame info of savegame", e);
+        } catch (Throwable e) {
+            throw new SavegameInfoException("Could not create savegame info of savegame", e);
         }
         return i;
     }

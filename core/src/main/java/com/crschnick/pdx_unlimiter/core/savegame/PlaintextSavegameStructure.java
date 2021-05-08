@@ -16,7 +16,7 @@ public record PlaintextSavegameStructure(byte[] header, Charset charset, String 
 
         try {
             var node = new TextFormatParser(charset).parse(input, header != null ? header.length + 1 : 0);
-            return new SavegameParseResult.Success(Map.of(name, node), input);
+            return new SavegameParseResult.Success(Map.of(name, node));
         } catch (ParseException e) {
             return new SavegameParseResult.Error(e);
         }

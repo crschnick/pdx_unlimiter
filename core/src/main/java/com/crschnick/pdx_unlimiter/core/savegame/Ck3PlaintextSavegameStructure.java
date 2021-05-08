@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
-import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.nio.charset.StandardCharsets;
@@ -22,7 +21,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
         try {
             var node = new TextFormatParser(StandardCharsets.UTF_8)
                     .parse(input, metaStart);
-            return new SavegameParseResult.Success(Map.of("gamestate", node), input);
+            return new SavegameParseResult.Success(Map.of("gamestate", node));
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);
         }

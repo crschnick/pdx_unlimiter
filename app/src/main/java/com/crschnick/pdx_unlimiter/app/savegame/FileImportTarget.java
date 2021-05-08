@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class FileImportTarget {
@@ -110,7 +111,7 @@ public abstract class FileImportTarget {
         return createStandardImportsTargets(toImport);
     }
 
-    public abstract void importTarget(Consumer<SavegameParseResult> onFinish);
+    public abstract void importTarget(Consumer<Optional<SavegameParseResult>> onFinish);
 
     public abstract void delete();
 
@@ -129,7 +130,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public void importTarget(Consumer<SavegameParseResult> onFinish) {
+        public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {
             if (GameInstallation.ALL.containsKey(Game.EU4)) {
                 return;
             }
@@ -240,7 +241,7 @@ public abstract class FileImportTarget {
             return getName().compareTo(o.getName());
         }
 
-        public void importTarget(Consumer<SavegameParseResult> onFinish) {
+        public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {
             TaskExecutor.getInstance().submitTask(() -> {
                 // File might no longer exist, since this is executed asynchronously in the task executor queue
                 if (!Files.exists(path)) {

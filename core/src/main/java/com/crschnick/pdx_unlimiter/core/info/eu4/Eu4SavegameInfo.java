@@ -1,11 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.info.eu4;
 
-import com.crschnick.pdx_unlimiter.core.info.GameDate;
-import com.crschnick.pdx_unlimiter.core.info.GameDateType;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.*;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,7 +54,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         }
     }
 
-    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
+    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         try {
             GameDate date = GameDateType.EU4.fromString(n.getNodeForKey("date").getString());
             String tag = n.getNodeForKey("player").getString();
@@ -202,8 +198,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             }
 
             return e;
-        } catch (Exception ex) {
-            throw new ParseException("Error while creating savegame info", ex);
+        } catch (Throwable ex) {
+            throw new SavegameInfoException("Error while creating savegame info", ex);
         }
     }
 

@@ -16,11 +16,6 @@ public class Ck3SavegameStorage extends SavegameStorage<Ck3Tag, Ck3SavegameInfo>
     }
 
     @Override
-    protected String getDefaultEntryName(Ck3SavegameInfo info) {
-        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
-    }
-
-    @Override
     protected String getDefaultCampaignName(Ck3SavegameInfo info) {
         if (info.isObserver()) {
             return "Observer";

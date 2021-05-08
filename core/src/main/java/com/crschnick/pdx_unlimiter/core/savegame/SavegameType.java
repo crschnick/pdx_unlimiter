@@ -1,10 +1,8 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
 public interface SavegameType {
@@ -35,11 +33,15 @@ public interface SavegameType {
         }
 
         @Override
-        public boolean isBinary(InputStream input) throws IOException {
-            var zipIn = new ZipInputStream(input);
-            zipIn.getNextEntry();
-            var header = zipIn.readNBytes(6);
-            return new String(header).equals("CK3bin");
+        public boolean isBinary(byte[] input) {
+            try {
+                var zipIn = new ZipInputStream(new ByteArrayInputStream(input));
+                zipIn.getNextEntry();
+                var header = zipIn.readNBytes(6);
+                return new String(header).equals("CK3bin");
+            } catch (IOException ex) {
+                return false;
+            }
         }
     };
 
@@ -61,13 +63,24 @@ public interface SavegameType {
         }
 
         @Override
-        public boolean isBinary(InputStream input) throws IOException {
-            var header = input.readNBytes(7);
+        public boolean isBinary(byte[] input) {
+            var header = Arrays.copyOfRange(input, 0, 7);
             return new String(header).equals("HOI4bin");
         }
     };
 
     SavegameType CK3 = new SavegameType() {
+
+        @Override
+        public boolean writeCompressed(byte[] input, Path output) throws IOException {
+            if (isCompressed(input)) {
+                return false;
+            }
+
+            Ck3CompressedSavegameStructure.writeCompressed(input, output);
+            return true;
+        }
+
         @Override
         public SavegameStructure determineStructure(byte[] input) {
            if (isCompressed(input)) {
@@ -89,8 +102,8 @@ public interface SavegameType {
         }
 
         @Override
-        public boolean isBinary(InputStream input) throws IOException {
-            var header = input.readNBytes(Ck3Header.LENGTH);
+        public boolean isBinary(byte[] input) {
+            var header = Arrays.copyOfRange(input, 0, Ck3Header.LENGTH);
             return Ck3Header.fromStartOfFile(header).binary();
         }
     };
@@ -114,7 +127,7 @@ public interface SavegameType {
         }
 
         @Override
-        public boolean isBinary(InputStream input) throws IOException {
+        public boolean isBinary(byte[] input) {
             return false;
         }
     };
@@ -142,7 +155,7 @@ public interface SavegameType {
         }
 
         @Override
-        public boolean isBinary(InputStream input) throws IOException {
+        public boolean isBinary(byte[] input) {
             return false;
         }
     };
@@ -165,7 +178,7 @@ public interface SavegameType {
         }
 
         @Override
-        public boolean isBinary(InputStream input) throws IOException {
+        public boolean isBinary(byte[] input) {
             return false;
         }
     };
@@ -184,11 +197,15 @@ public interface SavegameType {
         return null;
     }
 
+    default boolean writeCompressed(byte[] input, Path output) throws IOException {
+        return false;
+    }
+
     SavegameStructure determineStructure(byte[] input);
 
     boolean isCompressed(byte[] input);
 
     String getFileEnding();
 
-    boolean isBinary(InputStream input) throws IOException;
+    boolean isBinary(byte[] input);
 }

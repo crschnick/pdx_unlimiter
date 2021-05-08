@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,11 +17,13 @@ public class ZipSavegameStructure implements SavegameStructure {
     private final byte[] header;
     private final Charset charset;
     private final Set<SavegamePart> parts;
+    private final String[] ignored;
 
-    public ZipSavegameStructure(byte[] header, Charset charset, Set<SavegamePart> parts) {
+    public ZipSavegameStructure(byte[] header, Charset charset, Set<SavegamePart> parts, String... ignored) {
         this.header = header;
         this.charset = charset;
         this.parts = parts;
+        this.ignored = ignored;
     }
 
     protected SavegameParseResult parseInput(byte[] input, int offset) {
@@ -34,6 +37,12 @@ public class ZipSavegameStructure implements SavegameStructure {
                 ZipEntry entry;
                 while ((entry = zipIn.getNextEntry()) != null) {
                     ZipEntry finalEntry = entry;
+
+                    // Skip ignored entries
+                    if (Arrays.stream(ignored).anyMatch(s -> s.equals(finalEntry.getName()))) {
+                        continue;
+                    }
+
                     var part = parts.stream()
                             .filter(p -> p.identifier().equals(finalEntry.getName()))
                             .findAny().or(() -> wildcard);
@@ -60,7 +69,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                     return new SavegameParseResult.Invalid("Missing parts: " + String.join(", ", missingParts));
                 }
 
-                return new SavegameParseResult.Success(nodes, input);
+                return new SavegameParseResult.Success(nodes);
             }
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);

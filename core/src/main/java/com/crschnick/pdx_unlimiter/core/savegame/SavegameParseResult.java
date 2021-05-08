@@ -14,11 +14,9 @@ public abstract class SavegameParseResult {
     public static class Success extends SavegameParseResult {
 
         public Map<String, ArrayNode> content;
-        public byte[] data;
 
-        public Success(Map<String, ArrayNode> content, byte[] data) {
+        public Success(Map<String, ArrayNode> content) {
             this.content = content;
-            this.data = data;
         }
 
         public Node combinedNode() {

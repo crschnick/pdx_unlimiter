@@ -16,7 +16,8 @@ public interface SavegameStructure {
             StandardCharsets.ISO_8859_1,
             Set.of(new ZipSavegameStructure.SavegamePart("ai", "ai"),
                     new ZipSavegameStructure.SavegamePart("meta", "meta"),
-                    new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")));
+                    new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")),
+            "rnw.zip");
 
 
 

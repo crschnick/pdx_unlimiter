@@ -1,12 +1,14 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
+import com.crschnick.pdx_unlimiter.app.core.IntegrityManager;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.game.GameGuiFactory;
 import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.lang.GameLocalisation;
+import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Ck3SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.savegame.game.Eu4SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.game.Hoi4SavegameStorage;
 import com.crschnick.pdx_unlimiter.app.savegame.game.StellarisSavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
@@ -15,9 +17,12 @@ import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
+import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParser;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -29,12 +34,17 @@ import javafx.scene.image.Image;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.function.FailableBiFunction;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -51,24 +61,24 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Class<I> infoClass;
-    private final String fileEnding;
+    private final FailableFunction<Node, I, SavegameInfoException> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
-    private final SavegameParser parser;
+    private final SavegameType type;
     private final String infoChecksum;
     private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
+            FailableFunction<Node, I, SavegameInfoException> infoFactory,
             String name,
-            String fileEnding,
             GameDateType dateType,
-            SavegameParser parser,
+            SavegameType type,
             Class<I> infoClass,
             String infoChecksum) {
+        this.infoFactory = infoFactory;
         this.name = name;
-        this.parser = parser;
-        this.fileEnding = fileEnding;
+        this.type = type;
         this.dateType = dateType;
         this.path = Settings.getInstance().storageDirectory.getValue().resolve(name);
         this.infoClass = infoClass;
@@ -81,7 +91,18 @@ public abstract class SavegameStorage<
     }
 
     public static void init() throws Exception {
-        ALL.put(Game.EU4, new Eu4SavegameStorage());
+        ALL.put(Game.EU4, new SavegameStorage<>(
+                node -> Eu4SavegameInfo.fromSavegame(node),
+                "eu4",
+                GameDateType.EU4,
+                SavegameType.EU4,
+                Eu4SavegameInfo.class,
+                IntegrityManager.getInstance().getEu4Checksum()) {
+            @Override
+            protected String getDefaultCampaignName(Eu4SavegameInfo info) {
+                return GameLocalisation.getLocalisedValue(info.getTag().getTag(), info);
+            }
+        });
         ALL.put(Game.HOI4, new Hoi4SavegameStorage());
         ALL.put(Game.CK3, new Ck3SavegameStorage());
         ALL.put(Game.STELLARIS, new StellarisSavegameStorage());
@@ -304,7 +325,9 @@ public abstract class SavegameStorage<
         col.onSavegamesChange();
     }
 
-    protected abstract String getDefaultEntryName(I info);
+    private String getDefaultEntryName(I info) {
+        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
+    }
 
     protected abstract String getDefaultCampaignName(I info);
 
@@ -424,15 +447,31 @@ public abstract class SavegameStorage<
         }
 
         e.startLoading();
-        var status = parser.parse(file, RakalyHelper::meltSavegame);
-        status.visit(new SavegameParseResult.Visitor<I>() {
-            @Override
-            public void success(SavegameParseResult.Success<I> s) {
-                logger.debug("Parsing was successful");
-                e.load(s.info);
-                getSavegameCollection(e).onSavegameLoad(e);
 
+        SavegameParseResult result;
+        try {
+            var bytes = Files.readAllBytes(file);
+            if (type.isBinary(bytes)) {
+                bytes = RakalyHelper.meltSavegame(file);
+            }
+            var struc = type.determineStructure(bytes);
+            result = struc.parse(bytes);
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
+            e.fail();
+            return;
+        }
+
+        result.visit(new SavegameParseResult.Visitor() {
+            @Override
+            public void success(SavegameParseResult.Success s) {
                 try {
+                    logger.debug("Parsing was successful. Loading info ...");
+                    I info = infoFactory.apply(s.combinedNode());
+                    e.load(info);
+                    getSavegameCollection(e).onSavegameLoad(e);
+
+
                     // Clear old info files
                     Files.list(getSavegameDataDirectory(e)).filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
                         try {
@@ -444,9 +483,10 @@ public abstract class SavegameStorage<
                     });
 
                     logger.debug("Writing new info to file " + getSavegameInfoFile(e));
-                    JsonHelper.writeObject(s.info, getSavegameInfoFile(e));
+                    JsonHelper.writeObject(info, getSavegameInfoFile(e));
                 } catch (Exception ex) {
                     ErrorHandler.handleException(ex);
+                    e.fail();
                 }
             }
 
@@ -465,7 +505,7 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
-        return getSavegameDataDirectory(e).resolve("savegame." + fileEnding);
+        return getSavegameDataDirectory(e).resolve("savegame." + type.getFileEnding());
     }
 
     public synchronized Path getSavegameInfoFile(SavegameEntry<T, I> e) {
@@ -489,7 +529,7 @@ public abstract class SavegameStorage<
     public synchronized String getFileSystemCompatibleName(SavegameEntry<?, ?> e, boolean includeEntryName) {
         var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
         var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
-        return colName + (includeEntryName ? " (" + sgName + ")." : ".") + fileEnding;
+        return colName + (includeEntryName ? " (" + sgName + ")." : ".") + type.getFileEnding();
     }
 
     public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
@@ -499,7 +539,7 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    protected SavegameParseResult importSavegame(
+    protected Optional<SavegameParseResult> importSavegame(
             Path file,
             String name,
             boolean checkDuplicate,
@@ -511,7 +551,7 @@ public abstract class SavegameStorage<
     }
 
     private String getSaveFileName() {
-        return "savegame." + fileEnding;
+        return "savegame." + type.getFileEnding();
     }
 
     private String getInfoFileName() {
@@ -538,35 +578,77 @@ public abstract class SavegameStorage<
         loadEntry(e);
     }
 
-    private SavegameParseResult importSavegameData(
+    private String checksum(byte[] content) {
+        MessageDigest d = null;
+        try {
+            d = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("MD5 missing!");
+        }
+        d.update(content);
+        StringBuilder c = new StringBuilder();
+        ByteBuffer b = ByteBuffer.wrap(d.digest());
+        for (int i = 0; i < 16; i++) {
+            var hex = String.format("%02x", b.get());
+            c.append(hex);
+        }
+        return c.toString();
+    }
+
+    private Optional<SavegameParseResult> importSavegameData(
             Path file,
             String name,
             boolean checkDuplicate,
             String sourceFileChecksum,
             SavegameCollection<T, I> col) {
         logger.debug("Parsing file " + file.toString());
-        var status = parser.parse(file, RakalyHelper::meltSavegame);
-        status.visit(new SavegameParseResult.Visitor<I>() {
-            @Override
-            public void success(SavegameParseResult.Success<I> s) {
-                logger.debug("Parsing was successful");
-                logger.debug("Checksum is " + s.checksum);
-                if (checkDuplicate) {
-                    var exists = getSavegameForChecksum(s.checksum);
-                    if (exists.isPresent()) {
-                        logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
-                        if (sourceFileChecksum != null) {
-                            exists.get().addSourceFileChecksum(sourceFileChecksum);
-                        }
-                        return;
-                    } else {
-                        logger.debug("No entry with checksum found");
+        final SavegameParseResult[] result = new SavegameParseResult[1];
+        String checksum;
+        byte[] data;
+        try {
+            var bytes = Files.readAllBytes(file);
+            checksum = checksum(bytes);
+            logger.debug("Checksum is " + checksum);
+            if (checkDuplicate) {
+                var exists = getSavegameForChecksum(checksum);
+                if (exists.isPresent()) {
+                    logger.debug("Entry " + exists.get().getName() + " with checksum already in storage");
+                    if (sourceFileChecksum != null) {
+                        exists.get().addSourceFileChecksum(sourceFileChecksum);
                     }
+                    return Optional.empty();
+                } else {
+                    logger.debug("No entry with checksum found");
+                }
+            }
+
+            if (type.isBinary(bytes)) {
+                data = RakalyHelper.meltSavegame(file);
+            } else {
+                data = bytes;
+            }
+            var struc = type.determineStructure(bytes);
+            result[0] = struc.parse(bytes);
+        } catch (Exception ex) {
+            return Optional.of(new SavegameParseResult.Error(ex));
+        }
+
+        final SavegameParseResult[] resultToReturn = new SavegameParseResult[1];
+        result[0].visit(new SavegameParseResult.Visitor() {
+            @Override
+            public void success(SavegameParseResult.Success s) {
+                logger.debug("Parsing was successful. Loading info ...");
+                I info = null;
+                try {
+                    info = infoFactory.apply(s.combinedNode());
+                } catch (SavegameInfoException e) {
+                    resultToReturn[0] = new SavegameParseResult.Error(e);
+                    return;
                 }
 
                 UUID collectionUuid;
                 if (col == null) {
-                    collectionUuid = s.info.getCampaignHeuristic();
+                    collectionUuid = info.getCampaignHeuristic();
                     logger.debug("Campaign UUID is " + collectionUuid.toString());
                 } else {
                     collectionUuid = col.getUuid();
@@ -579,13 +661,16 @@ public abstract class SavegameStorage<
                     Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
                     try {
                         FileUtils.forceMkdir(entryPath.toFile());
-                        parser.writeCompressedIfPossible(s.data, entryPath.resolve(getSaveFileName()));
-                        JsonHelper.writeObject(s.info, entryPath.resolve(getInfoFileName()));
+                        var file = entryPath.resolve(getSaveFileName());
+                        if (!type.writeCompressed(data, file)) {
+                            Files.write(file, data);
+                        }
+                        JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 
                         if (col == null) {
-                            addNewEntryToCampaign(collectionUuid, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
+                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum);
                         } else {
-                            addNewEntryToCollection(col, saveUuid, s.checksum, s.info, name, sourceFileChecksum);
+                            addNewEntryToCollection(col, saveUuid, checksum, info, name, sourceFileChecksum);
                         }
                     } catch (Exception e) {
                         ErrorHandler.handleException(e);
@@ -596,14 +681,16 @@ public abstract class SavegameStorage<
             @Override
             public void error(SavegameParseResult.Error e) {
                 logger.error("An error occured during parsing: " + e.error.getMessage());
+                resultToReturn[0] = e;
             }
 
             @Override
             public void invalid(SavegameParseResult.Invalid iv) {
                 logger.error("Savegame is invalid: " + iv.message);
+                resultToReturn[0] = iv;
             }
         });
-        return status;
+        return Optional.ofNullable(resultToReturn[0]);
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {
@@ -637,9 +724,5 @@ public abstract class SavegameStorage<
 
     public String getName() {
         return name;
-    }
-
-    public SavegameParser getParser() {
-        return parser;
     }
 }

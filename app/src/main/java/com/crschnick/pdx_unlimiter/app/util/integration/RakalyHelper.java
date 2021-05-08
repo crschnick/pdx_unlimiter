@@ -3,8 +3,6 @@ package com.crschnick.pdx_unlimiter.app.util.integration;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import javafx.scene.control.Alert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,7 +21,7 @@ public class RakalyHelper {
         });
     }
 
-    public static Path meltSavegame(Path file) throws Exception {
+    public static byte[] meltSavegame(Path file) throws Exception {
         if (!Files.exists(PdxuInstallation.getInstance().getRakalyExecutable())) {
             showError();
             throw new IOException("Rakaly melter missing");
@@ -45,10 +43,6 @@ public class RakalyHelper {
             throw new IOException("Rakaly melter failed with exit code " + returnCode);
         }
 
-        Path temp = FileUtils.getTempDirectory().toPath()
-                .resolve("pdxu").resolve("melted." + FilenameUtils.getExtension(file.toString()));
-        FileUtils.forceMkdirParent(temp.toFile());
-        Files.write(temp, b);
-        return temp;
+        return b;
     }
 }

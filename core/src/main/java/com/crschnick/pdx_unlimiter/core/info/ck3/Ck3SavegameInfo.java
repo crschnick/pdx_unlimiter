@@ -1,13 +1,12 @@
 package com.crschnick.pdx_unlimiter.core.info.ck3;
 
-import com.crschnick.pdx_unlimiter.core.info.GameDateType;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.War;
+import com.crschnick.pdx_unlimiter.core.info.*;
 import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,7 +20,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     private List<War<Ck3Tag>> wars = new ArrayList<>();
     private List<Ck3Tag> allies = new ArrayList<>();
 
-    public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws ParseException {
+    public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
             i.ironman = n.getNodeForKey("meta_data").getNodeForKey("ironman").getBoolean();
@@ -48,8 +47,8 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
             i.initVersion(n);
             i.initPlayerData(n);
-        } catch (Exception e) {
-            throw new ParseException("Could not create savegame info of savegame", e);
+        } catch (Throwable t) {
+            throw new SavegameInfoException("Could not create savegame info of savegame", t);
         }
         return i;
     }
