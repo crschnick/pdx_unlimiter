@@ -1,7 +1,6 @@
-package com.crschnick.pdx_unlimiter.core.parser;
+package com.crschnick.pdx_unlimiter.core.writer;
 
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;
-import com.crschnick.pdx_unlimiter.core.node.StringValues;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
@@ -32,5 +32,10 @@ public record PlaintextSavegameStructure(byte[] header, Charset charset, String 
         } catch (ParseException e) {
             return new SavegameParseResult.Error(e);
         }
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset();
     }
 }

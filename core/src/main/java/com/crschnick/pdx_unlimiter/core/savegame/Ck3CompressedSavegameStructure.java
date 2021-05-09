@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.LinkedArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

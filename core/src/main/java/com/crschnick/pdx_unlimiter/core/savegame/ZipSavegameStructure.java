@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
@@ -103,6 +103,11 @@ public class ZipSavegameStructure implements SavegameStructure {
     @Override
     public SavegameParseResult parse(byte[] input) {
         return parseInput(input, 0);
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset;
     }
 
     public record SavegamePart(String name, String identifier) {}

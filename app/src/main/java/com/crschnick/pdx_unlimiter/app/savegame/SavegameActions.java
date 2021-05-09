@@ -8,11 +8,8 @@ import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 
@@ -75,22 +72,22 @@ public class SavegameActions {
             return;
         }
 
-        SavegameStorage.get(g).getParser().parse(savegames.get(0).path, RakalyHelper::meltSavegame).visit(
-            new SavegameParseResult.Visitor<>() {
-            @Override
-            public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
-                var campaignId = s.info.getCampaignHeuristic();
-                SavegameStorage.get(g).getSavegameCollection(campaignId)
-                        .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
-                    TaskExecutor.getInstance().submitTask(() -> {
-                        SavegameStorage.get(g).loadEntry(entry);
-                        SavegameContext.withSavegame(entry, ctx -> {
-                            GameDistLauncher.continueSavegame(entry, false);
-                        });
-                    }, true);
-                });
-            }
-        });
+//        SavegameStorage.get(g).getParser().parse(savegames.get(0).path, RakalyHelper::meltSavegame).visit(
+//            new SavegameParseResult.Visitor<>() {
+//            @Override
+//            public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
+//                var campaignId = s.info.getCampaignHeuristic();
+//                SavegameStorage.get(g).getSavegameCollection(campaignId)
+//                        .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
+//                    TaskExecutor.getInstance().submitTask(() -> {
+//                        SavegameStorage.get(g).loadEntry(entry);
+//                        SavegameContext.withSavegame(entry, ctx -> {
+//                            GameDistLauncher.continueSavegame(entry, false);
+//                        });
+//                    }, true);
+//                });
+//            }
+//        });
     }
 
     public static void importLatestSavegame(Game g) {
@@ -109,26 +106,26 @@ public class SavegameActions {
             return;
         }
 
-        savegames.get(0).importTarget(s -> {
-            s.visit(new SavegameParseResult.Visitor<>() {
-                @Override
-                @SuppressWarnings("unchecked")
-                public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
-                    SavegameStorage.get(SavegameManagerState.get().current())
-                            .getSavegameForChecksum(s.checksum)
-                            .ifPresent(e -> {
-                                // The info is loaded asynchronously when the savegame is opened in the gui.
-                                // This means that at this point, the info can either be null or not null
-                                // In case it is null, temporarily set it
-                                if (e.infoProperty().get() == null) {
-                                    e.load((SavegameInfo<Object>) s.info);
-                                    GameDistLauncher.continueSavegame(e, false);
-                                    e.unload();
-                                }
-                            });
-                }
-            });
-        });
+//        savegames.get(0).importTarget(s -> {
+//            s.visit(new SavegameParseResult.Visitor<>() {
+//                @Override
+//                @SuppressWarnings("unchecked")
+//                public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
+//                    SavegameStorage.get(SavegameManagerState.get().current())
+//                            .getSavegameForChecksum(s.checksum)
+//                            .ifPresent(e -> {
+//                                // The info is loaded asynchronously when the savegame is opened in the gui.
+//                                // This means that at this point, the info can either be null or not null
+//                                // In case it is null, temporarily set it
+//                                if (e.infoProperty().get() == null) {
+//                                    e.load((SavegameInfo<Object>) s.info);
+//                                    GameDistLauncher.continueSavegame(e, false);
+//                                    e.unload();
+//                                }
+//                            });
+//                }
+//            });
+//        });
     }
 
     public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
@@ -136,21 +133,21 @@ public class SavegameActions {
             return;
         }
 
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegame(e, ctx -> {
-                Path meltedFile;
-                try {
-                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                    return;
-                }
-                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
-                folder.ifPresent(f -> {
-                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
-                });
-            });
-        }, true);
+//        TaskExecutor.getInstance().submitTask(() -> {
+//            SavegameContext.withSavegame(e, ctx -> {
+//                Path meltedFile;
+//                try {
+//                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
+//                } catch (Exception ex) {
+//                    ErrorHandler.handleException(ex);
+//                    return;
+//                }
+//                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
+//                folder.ifPresent(f -> {
+//                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
+//                });
+//            });
+//        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {

@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.editor.target.EditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.editor.GuiEditor;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
+import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
@@ -23,7 +23,7 @@ public class Editor {
             ErrorHandler.handleException(e, null, target.getFile());
             return;
         }
-        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {
+        EditorState state = new EditorState(target.getName(), nodes, new TextFormatParser(target.getCharset()), n -> {
             try {
                 target.write(n);
             } catch (Exception e) {

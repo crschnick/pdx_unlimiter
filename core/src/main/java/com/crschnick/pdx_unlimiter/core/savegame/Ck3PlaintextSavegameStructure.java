@@ -1,10 +1,11 @@
 package com.crschnick.pdx_unlimiter.core.savegame;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,5 +47,10 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);
         }
+    }
+
+    @Override
+    public Charset getCharset() {
+        return StandardCharsets.UTF_8;
     }
 }

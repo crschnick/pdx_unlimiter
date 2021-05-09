@@ -5,6 +5,7 @@ import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameStructure;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameType;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -42,5 +43,10 @@ public class SavegameEditTarget extends EditTarget {
     @Override
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
         structure.write(file, nodeMap);
+    }
+
+    @Override
+    public Charset getCharset() {
+        return structure.getCharset();
     }
 }

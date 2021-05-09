@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.node;
 
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.parser.NodeWriter;
+import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
 
 import java.io.IOException;
 import java.util.Collections;

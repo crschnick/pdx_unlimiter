@@ -1,4 +1,4 @@
-package com.crschnick.pdx_unlimiter.core.parser;
+package com.crschnick.pdx_unlimiter.core.writer;
 
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 import com.crschnick.pdx_unlimiter.core.node.NodeContext;

@@ -8,9 +8,6 @@ import com.crschnick.pdx_unlimiter.app.gui.game.ImageLoader;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.lang.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
-import com.crschnick.pdx_unlimiter.app.savegame.game.Ck3SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.savegame.game.Hoi4SavegameStorage;
-import com.crschnick.pdx_unlimiter.app.savegame.game.StellarisSavegameStorage;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
@@ -18,7 +15,10 @@ import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
+import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
@@ -35,7 +35,6 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
-import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +60,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Class<I> infoClass;
-    private final FailableFunction<Node, I, SavegameInfoException> infoFactory;
+    private final FailableBiFunction<Node, Boolean, I, SavegameInfoException> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -70,7 +69,7 @@ public abstract class SavegameStorage<
     private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
-            FailableFunction<Node, I, SavegameInfoException> infoFactory,
+            FailableBiFunction<Node, Boolean, I, SavegameInfoException> infoFactory,
             String name,
             GameDateType dateType,
             SavegameType type,
@@ -92,7 +91,7 @@ public abstract class SavegameStorage<
 
     public static void init() throws Exception {
         ALL.put(Game.EU4, new SavegameStorage<>(
-                node -> Eu4SavegameInfo.fromSavegame(node),
+                (node, melted) -> Eu4SavegameInfo.fromSavegame(melted, node),
                 "eu4",
                 GameDateType.EU4,
                 SavegameType.EU4,
@@ -103,9 +102,53 @@ public abstract class SavegameStorage<
                 return GameLocalisation.getLocalisedValue(info.getTag().getTag(), info);
             }
         });
-        ALL.put(Game.HOI4, new Hoi4SavegameStorage());
-        ALL.put(Game.CK3, new Ck3SavegameStorage());
-        ALL.put(Game.STELLARIS, new StellarisSavegameStorage());
+        ALL.put(Game.HOI4, new SavegameStorage<>(
+                (node, melted) -> Hoi4SavegameInfo.fromSavegame(melted, node),
+                "hoi4",
+                GameDateType.HOI4,
+                SavegameType.HOI4,
+                Hoi4SavegameInfo.class,
+                IntegrityManager.getInstance().getHoi4Checksum()
+        ) {
+            @Override
+            protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
+                return "Unknown";
+            }
+        });
+        ALL.put(Game.CK3, new SavegameStorage<>(
+                (node, melted) -> Ck3SavegameInfo.fromSavegame(melted, node),
+                "ck3",
+                GameDateType.CK3,
+                SavegameType.CK3,
+                Ck3SavegameInfo.class,
+                IntegrityManager.getInstance().getCk3Checksum()
+        ) {
+            @Override
+            protected String getDefaultCampaignName(Ck3SavegameInfo info) {
+                if (info.isObserver()) {
+                    return "Observer";
+                }
+
+                if (!info.hasOnePlayerTag()) {
+                    return "Unknown";
+                }
+
+                return info.getTag().getName();
+            }
+        });
+        ALL.put(Game.STELLARIS, new SavegameStorage<>(
+                (node, melted) -> StellarisSavegameInfo.fromSavegame(node),
+                "stellaris",
+                GameDateType.STELLARIS,
+                SavegameType.STELLARIS,
+                StellarisSavegameInfo.class,
+                IntegrityManager.getInstance().getStellarisChecksum()
+        ) {
+            @Override
+            protected String getDefaultCampaignName(StellarisSavegameInfo info) {
+                return info.getTag().getName();
+            }
+        });
         for (SavegameStorage<?, ?> s : ALL.values()) {
             s.loadData();
         }
@@ -449,10 +492,14 @@ public abstract class SavegameStorage<
         e.startLoading();
 
         SavegameParseResult result;
+        boolean melted;
         try {
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
                 bytes = RakalyHelper.meltSavegame(file);
+                melted = true;
+            } else {
+                melted = false;
             }
             var struc = type.determineStructure(bytes);
             result = struc.parse(bytes);
@@ -467,7 +514,7 @@ public abstract class SavegameStorage<
             public void success(SavegameParseResult.Success s) {
                 try {
                     logger.debug("Parsing was successful. Loading info ...");
-                    I info = infoFactory.apply(s.combinedNode());
+                    I info = infoFactory.apply(s.combinedNode(), melted);
                     e.load(info);
                     getSavegameCollection(e).onSavegameLoad(e);
 
@@ -605,6 +652,7 @@ public abstract class SavegameStorage<
         final SavegameParseResult[] result = new SavegameParseResult[1];
         String checksum;
         byte[] data;
+        boolean melted;
         try {
             var bytes = Files.readAllBytes(file);
             checksum = checksum(bytes);
@@ -624,8 +672,10 @@ public abstract class SavegameStorage<
 
             if (type.isBinary(bytes)) {
                 data = RakalyHelper.meltSavegame(file);
+                melted = true;
             } else {
                 data = bytes;
+                melted = false;
             }
             var struc = type.determineStructure(bytes);
             result[0] = struc.parse(bytes);
@@ -640,7 +690,7 @@ public abstract class SavegameStorage<
                 logger.debug("Parsing was successful. Loading info ...");
                 I info = null;
                 try {
-                    info = infoFactory.apply(s.combinedNode());
+                    info = infoFactory.apply(s.combinedNode(), melted);
                 } catch (SavegameInfoException e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;

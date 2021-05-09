@@ -38,7 +38,7 @@ public interface SavegameType {
                 var zipIn = new ZipInputStream(new ByteArrayInputStream(input));
                 zipIn.getNextEntry();
                 var header = zipIn.readNBytes(6);
-                return new String(header).equals("CK3bin");
+                return new String(header).equals("EU4bin");
             } catch (IOException ex) {
                 return false;
             }

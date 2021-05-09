@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.core.savegame;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -71,6 +72,8 @@ public interface SavegameStructure {
 
     SavegameParseResult parse(byte[] input);
 
+    Charset getCharset();
+
     static boolean validateHeader(byte[] header, byte[] content) {
         if (content.length < header.length) {
             return false;
@@ -80,4 +83,6 @@ public interface SavegameStructure {
         System.arraycopy(content, 0, first, 0, header.length);
         return Arrays.equals(first, header);
     }
+
+
 }

@@ -6,6 +6,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
@@ -28,5 +29,10 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
         target.write(nodeMap);
         SavegameActions.reloadSavegame(entry);
+    }
+
+    @Override
+    public Charset getCharset() {
+        return target.getCharset();
     }
 }

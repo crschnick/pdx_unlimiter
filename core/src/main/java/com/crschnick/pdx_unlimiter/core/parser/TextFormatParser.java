@@ -3,13 +3,16 @@ package com.crschnick.pdx_unlimiter.core.parser;
 import com.crschnick.pdx_unlimiter.core.info.GameColor;
 import com.crschnick.pdx_unlimiter.core.node.*;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class TextFormatParser extends FormatParser {
+public final class TextFormatParser {
 
     private final Charset charset;
     private int index;
@@ -48,6 +51,14 @@ public final class TextFormatParser extends FormatParser {
         this.arrayIndex = 0;
         this.tokenizer = null;
         this.context = null;
+    }
+
+    public final ArrayNode parse(Path file) throws IOException, ParseException {
+        return parse(Files.readAllBytes(file), 0);
+    }
+
+    public final ArrayNode parse(byte[] input) throws ParseException {
+        return parse(input, 0);
     }
 
     public final ArrayNode parse(byte[] input, int start) throws ParseException {
