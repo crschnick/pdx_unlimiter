@@ -1,13 +1,18 @@
 package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
+import org.apache.commons.lang3.SystemUtils;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -15,7 +20,17 @@ public class GameDists {
 
     private static final BidiMap<String, BiFunction<Game, Path, Optional<GameDist>>> TYPES = new DualLinkedHashBidiMap<>();
     private static final BidiMap<String, Class<? extends GameDist>> IDS = new DualLinkedHashBidiMap<>();
+    private static final List<Path> installDirSearchPaths = new ArrayList<>();
 
+    static {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            for (var root : FileSystems.getDefault().getRootDirectories()) {
+                installDirSearchPaths.add(root.resolve("Program Files (x86)"));
+            }
+        } else {
+            installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"));
+        }
+    }
 
     static {
         TYPES.put("windows-store", WindowsStoreDist::getDist);
@@ -63,5 +78,9 @@ public class GameDists {
             }
         }
         return Optional.empty();
+    }
+
+    public static List<Path> getInstallDirSearchPaths() {
+        return installDirSearchPaths;
     }
 }

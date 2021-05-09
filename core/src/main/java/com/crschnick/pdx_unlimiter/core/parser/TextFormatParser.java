@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public final class TextFormatParser {
 
             var now = Instant.now();
             this.tokenizer.tokenize();
-            // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+            System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
             this.context = new NodeContext(input, charset,
                     tokenizer.getScalarsStart(),
@@ -76,7 +77,7 @@ public final class TextFormatParser {
 
             now = Instant.now();
             ArrayNode r = parseArray();
-            // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
+            System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
             return r;
         } catch (Throwable t) {

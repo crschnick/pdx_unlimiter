@@ -89,6 +89,14 @@ public abstract class SavegameStorage<
         return (SavegameStorage<T, I>) ALL.get(g);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T, I extends SavegameInfo<T>> SavegameStorage<T, I> get(SavegameType type) {
+        var found = ALL.entrySet().stream()
+                .filter(entry -> entry.getValue().type.equals(type))
+                .findAny();
+        return (SavegameStorage<T, I>) found.map(e -> e.getValue()).orElse(null);
+    }
+
     public static void init() throws Exception {
         ALL.put(Game.EU4, new SavegameStorage<>(
                 (node, melted) -> Eu4SavegameInfo.fromSavegame(melted, node),
@@ -775,4 +783,6 @@ public abstract class SavegameStorage<
     public String getName() {
         return name;
     }
+
+
 }

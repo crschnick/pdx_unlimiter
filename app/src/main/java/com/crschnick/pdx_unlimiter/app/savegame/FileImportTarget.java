@@ -5,8 +5,8 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.core.savegame.RawSavegameVisitor;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
+import com.crschnick.pdx_unlimiter.core.savegame.SavegameType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
@@ -40,60 +40,38 @@ public abstract class FileImportTarget {
             return List.of();
         }
 
+        if (Files.isDirectory(p)) {
+            List<StandardImportTarget> targets = new ArrayList<>();
+            try {
+                Files.list(p).forEach(f -> targets.addAll(
+                        FileImportTarget.createStandardImportsTargets(f.toString())));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+                return targets;
+            }
+        }
+
         List<StandardImportTarget> targets = new ArrayList<>();
-        RawSavegameVisitor.vist(p, new RawSavegameVisitor() {
-            @Override
-            public void visitEu4(Path file) {
-                if (!Game.EU4.isEnabled()) {
-                    return;
-                }
+        var type = SavegameType.getTypeForFile(p);
+        if (type == null) {
+            return List.of();
+        }
 
-                targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.EU4), file));
-            }
-
-            @Override
-            public void visitHoi4(Path file) {
-                if (!Game.HOI4.isEnabled()) {
-                    return;
-                }
-
-                targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.HOI4), file));
-            }
-
-            @Override
-            public void visitStellaris(Path file) {
-                if (!Game.STELLARIS.isEnabled()) {
-                    return;
-                }
-
-                if (file.getFileName().toString().equals("ironman.sav")) {
-                    targets.add(new StellarisIronmanImportTarget(file));
+        var storage = SavegameStorage.get(type);
+        if (storage.equals(SavegameStorage.get(Game.STELLARIS))) {
+            if (Game.STELLARIS.isEnabled()) {
+                if (p.getFileName().toString().equals("ironman.sav")) {
+                    targets.add(new StellarisIronmanImportTarget(p));
                 } else {
-                    targets.add(new StellarisNormalImportTarget(file));
+                    targets.add(new StellarisNormalImportTarget(p));
                 }
             }
-
-            @Override
-            public void visitCk3(Path file) {
-                if (!Game.CK3.isEnabled()) {
-                    return;
-                }
-
-                targets.add(new StandardImportTarget(SavegameStorage.ALL.get(Game.CK3), file));
+        } else {
+            var game = SavegameStorage.ALL.inverseBidiMap().get(storage);
+            if (game.isEnabled()) {
+                targets.add(new StandardImportTarget(storage, p));
             }
-
-            @Override
-            public void visitOther(Path file) {
-                if (Files.isDirectory(file)) {
-                    try {
-                        Files.list(file).forEach(f -> targets.addAll(
-                                FileImportTarget.createStandardImportsTargets(f.toString())));
-                    } catch (IOException e) {
-                        ErrorHandler.handleException(e);
-                    }
-                }
-            }
-        });
+        }
         return targets;
     }
 

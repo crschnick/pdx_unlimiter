@@ -30,10 +30,10 @@ public class TextFormatTokenizer {
     private int scalarCounter;
     private int arraySizesCounter;
     private boolean escapeChar;
-    private Unsafe unsafe;
 
+    private static final Unsafe unsafe;
 
-    public TextFormatTokenizer(byte[] bytes, int start) {
+    static {
         try {
             Field f = Unsafe.class.getDeclaredField("theUnsafe");
             f.setAccessible(true);
@@ -41,7 +41,9 @@ public class TextFormatTokenizer {
         } catch (Exception e) {
             throw new AssertionError(e);
         }
+    }
 
+    public TextFormatTokenizer(byte[] bytes, int start) {
         this.bytes = bytes;
         this.nextScalarStart = 0;
         this.tokenCounter = 0;

@@ -23,12 +23,10 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -106,8 +104,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     }
 
     public abstract Image tagImage(SavegameInfo<T> info, T tag);
-
-    public abstract Font font() throws IOException;
 
     public abstract Pane background();
 

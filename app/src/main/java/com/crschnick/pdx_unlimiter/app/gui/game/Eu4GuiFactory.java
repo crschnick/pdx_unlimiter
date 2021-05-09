@@ -1,10 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.lang.GameLocalisation;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
@@ -15,10 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
@@ -131,15 +126,9 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     }
 
     @Override
-    public Font font() throws IOException {
-        return Font.loadFont(
-                Files.newInputStream(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("launcher-assets").resolve("font.ttf")), 12);
-    }
-
-    @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(EU4_BACKGROUND);
-        bg.setOpacity(0.2);
+        bg.setOpacity(0.9);
         return bg;
     }
 

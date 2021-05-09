@@ -1,7 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
@@ -18,20 +16,10 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
-
-    @Override
-    public Font font() throws IOException {
-        return Font.loadFont(
-                Files.newInputStream(GameInstallation.ALL.get(Game.HOI4).getInstallDir()
-                        .resolve("launcher-assets").resolve("font.ttf")), 12);
-    }
 
     @Override
     public Pane background() {

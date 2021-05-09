@@ -342,8 +342,6 @@ public class GameImage {
 
         EU4_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.EU4)
                 .getType().chooseBackgroundImage(installPath));
-        EU4_BACKGROUND = ImageLoader.cut(EU4_BACKGROUND, new Rectangle2D(0, 0,
-                EU4_BACKGROUND.getWidth(), EU4_BACKGROUND.getHeight() - 300));
     }
 
     public static Path getEu4TagPath(String tag) {

@@ -17,10 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,12 +96,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         }
 
         return Ck3TagRenderer.realmImage(info, tag);
-    }
-
-    @Override
-    public Font font() throws IOException {
-        return Font.loadFont(Files.newInputStream(GameInstallation.ALL.get(Game.CK3).getInstallDir()
-                .resolve("launcher").resolve("assets").resolve("fonts").resolve("CormorantGaramond-Regular.ttf")), 12);
     }
 
     @Override

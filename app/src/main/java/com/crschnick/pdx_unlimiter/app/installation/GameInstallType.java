@@ -27,8 +27,13 @@ public interface GameInstallType {
     GameInstallType EU4 = new StandardInstallType("eu4") {
         @Override
         public Path chooseBackgroundImage(Path p) {
-            int i = new Random().nextInt(30) + 1;
-            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+            // Prefer launcher image!
+            var launcherBg = p.resolve("launcher-assets").resolve("app-background.png");
+            if (Files.exists(launcherBg)) {
+                return launcherBg;
+            }
+
+            return null;
         }
 
         @Override
@@ -249,12 +254,13 @@ public interface GameInstallType {
 
         @Override
         public Path chooseBackgroundImage(Path p) {
-            return null;
+            int i = new Random().nextInt(20) + 1;
+            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
         }
 
         @Override
         public List<String> getLaunchArguments() {
-            return List.of();
+            return List.of("-skiplauncher");
         }
 
         @Override
