@@ -44,7 +44,7 @@ public final class GameAppManager {
             while (active) {
                 try {
                     update();
-                    ThreadHelper.sleep(20);
+                    ThreadHelper.sleep(1000);
                 } catch (Exception ex) {
                     // Catch all exceptions to not terminate this thread if an error occurs!
                     ErrorHandler.handleException(ex);
