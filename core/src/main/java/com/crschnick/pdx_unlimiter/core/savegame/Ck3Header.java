@@ -25,11 +25,11 @@ public record Ck3Header(boolean compressed, boolean binary, long randomness, lon
     }
 
     public static Ck3Header fromStartOfFile(byte[] data) {
-        if (data.length < 24) {
+        if (data.length < LENGTH) {
             throw new IllegalArgumentException();
         }
 
-        return fromString(new String(data, 0, 24));
+        return fromString(new String(data, 0, LENGTH));
     }
 
 

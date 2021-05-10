@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class GameImage {
 
@@ -108,6 +107,12 @@ public class GameImage {
     public static Image EU4_SMALL_SHIELD_MASK;
     public static Image EU4_SMALL_SHIELD_FRAME;
 
+
+    public static Image CK2_BACKGROUND;
+
+
+    public static Image VIC2_BACKGROUND;
+
     private static void resetImages() {
         for (var field : GameImage.class.getFields()) {
             if (field.getType().equals(Image.class)) {
@@ -126,7 +131,9 @@ public class GameImage {
                 Game.EU4, GameImage::loadEu4Images,
                 Game.CK3, GameImage::loadCk3Images,
                 Game.HOI4, GameImage::loadHoi4Images,
-                Game.STELLARIS, GameImage::loadStellarisImages);
+                Game.STELLARIS, GameImage::loadStellarisImages,
+                Game.CK2, GameImage::loadCk2Images,
+                Game.VIC2, GameImage::loadVic2Images);
 
         if (g != null) {
             loadFuncs.get(g).run();
@@ -134,18 +141,7 @@ public class GameImage {
     }
 
     public static Image getGameIcon(Game g) {
-        Map<Game, Supplier<Image>> loadFuncs = Map.of(
-                Game.EU4, GameImage::loadEu4Icon,
-                Game.CK3, GameImage::loadCk3Icon,
-                Game.HOI4, GameImage::loadHoi4Icon,
-                Game.STELLARIS, GameImage::loadStellarisIcon);
-        return loadFuncs.get(g).get();
-    }
-
-    private static Image loadCk3Icon() {
-        var installPath = GameInstallation.ALL.get(Game.CK3).getInstallDir();
-        return ImageLoader.loadImage(
-                installPath.resolve("game").resolve("gfx").resolve("exe_icon.bmp"));
+        return ImageLoader.loadImage(GameInstallation.ALL.get(g).getDist().getIcon());
     }
 
     public static void loadCk3Images() {
@@ -222,13 +218,6 @@ public class GameImage {
         CK3_ICON_HEALTH = ImageLoader.loadImage(i.resolve("traits").resolve("_frame_health.dds"));
     }
 
-    private static Image loadStellarisIcon() {
-        var installPath = GameInstallation.ALL.get(Game.STELLARIS).getInstallDir();
-        return ImageLoader.loadImage(
-                installPath.resolve("gfx").resolve("exe_icon.bmp"));
-
-    }
-
     private static void loadStellarisImages() {
         var installPath = GameInstallation.ALL.get(Game.STELLARIS).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
@@ -242,9 +231,18 @@ public class GameImage {
 
     }
 
-    private static Image loadHoi4Icon() {
-        var installPath = GameInstallation.ALL.get(Game.HOI4).getInstallDir();
-        return ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("game-icon.png"));
+    private static void loadCk2Images() {
+        var installPath = GameInstallation.ALL.get(Game.CK2).getInstallDir();
+        CK2_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.CK2)
+                .getType().chooseBackgroundImage(installPath));
+    }
+
+    private static void loadVic2Images() {
+        var installPath = GameInstallation.ALL.get(Game.VIC2).getInstallDir();
+        VIC2_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.VIC2)
+                .getType().chooseBackgroundImage(installPath));
+        VIC2_BACKGROUND = ImageLoader.cut(VIC2_BACKGROUND, new Rectangle2D(100, 100,
+                VIC2_BACKGROUND.getWidth() - 200, VIC2_BACKGROUND.getHeight() - 200));
     }
 
     private static void loadHoi4Images() {
@@ -262,11 +260,6 @@ public class GameImage {
         HOI4_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.HOI4)
                 .getType().chooseBackgroundImage(installPath));
 
-    }
-
-    private static Image loadEu4Icon() {
-        var installPath = GameInstallation.ALL.get(Game.EU4).getInstallDir();
-        return ImageLoader.loadImage(installPath.resolve("launcher-assets").resolve("icon.png"));
     }
 
     private static void loadEu4Images() {

@@ -20,6 +20,7 @@ import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdx_unlimiter.core.info.vic2.Vic2SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 import com.crschnick.pdx_unlimiter.core.parser.ParseException;
 import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
@@ -160,6 +161,18 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(Ck2SavegameInfo info) {
+                return "Unknown";
+            }
+        });
+        ALL.put(Game.VIC2, new SavegameStorage<>(
+                (node, melted) -> new Vic2SavegameInfo(node),
+                "vic2",
+                GameDateType.EU4,
+                SavegameType.VIC2,
+                Vic2SavegameInfo.class
+        ) {
+            @Override
+            protected String getDefaultCampaignName(Vic2SavegameInfo info) {
                 return "Unknown";
             }
         });

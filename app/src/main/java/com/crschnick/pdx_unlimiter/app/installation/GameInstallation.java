@@ -62,6 +62,10 @@ public final class GameInstallation {
                 p -> ALL.put(Game.HOI4, new GameInstallation(Game.HOI4.getInstallType(), p)));
         Optional.ofNullable(s.stellaris.getValue()).ifPresent(
                 p -> ALL.put(Game.STELLARIS, new GameInstallation(Game.STELLARIS.getInstallType(), p)));
+        Optional.ofNullable(s.ck2.getValue()).ifPresent(
+                p -> ALL.put(Game.CK2, new GameInstallation(Game.CK2.getInstallType(), p)));
+        Optional.ofNullable(s.vic2.getValue()).ifPresent(
+                p -> ALL.put(Game.VIC2, new GameInstallation(Game.VIC2.getInstallType(), p)));
         for (Game g : Game.values()) {
             if (!ALL.containsKey(g)) {
                 continue;

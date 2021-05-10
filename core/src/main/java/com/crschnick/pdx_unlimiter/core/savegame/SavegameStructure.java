@@ -51,12 +51,12 @@ public interface SavegameStructure {
 
     SavegameStructure CK2_PLAINTEXT = new PlaintextSavegameStructure(
             "CK2txt".getBytes(),
-            StandardCharsets.UTF_8,
+            StandardCharsets.ISO_8859_1,
             "gamestate");
 
     SavegameStructure CK2_COMPRESSED = new ZipSavegameStructure(
             "CK2txt".getBytes(),
-            StandardCharsets.UTF_8,
+            StandardCharsets.ISO_8859_1,
             Set.of(new ZipSavegameStructure.SavegamePart("meta", "meta"),
                     new ZipSavegameStructure.SavegamePart("gamestate", "*")));
 

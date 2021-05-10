@@ -192,7 +192,12 @@ public class TextFormatTokenizer {
         moveScalarStartToNext();
 
         if (controlToken == CLOSE_GROUP) {
-            assert arraySizeStack.size() > 0 : "Encountered an additional close group token at " + i;
+            // Special case for additional close group token on top level
+            // Happens in CK2 and VIC2
+            if (arraySizeStack.size() == 1) {
+                return;
+            }
+
             assert arraySizes[arraySizeStack.peek()] >= 0 : "Encountered invalid array size";
             arraySizeStack.pop();
         } else if (controlToken == EQUALS) {

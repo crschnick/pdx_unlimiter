@@ -18,6 +18,9 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
     private Ck2Tag tag;
     private List<Ck2Tag> allTags;
 
+    public Ck2SavegameInfo() {
+    }
+
     public Ck2SavegameInfo(Node n) throws SavegameInfoException {
         try {
             ironman = false;
