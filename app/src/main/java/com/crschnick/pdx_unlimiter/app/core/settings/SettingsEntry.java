@@ -352,7 +352,7 @@ public abstract class SettingsEntry<T> {
 
         GameDirectory(String serializationName, Game game) {
             super(() -> PdxuI18n.get("GAME_DIR", game.getAbbreviation()),
-                    () -> PdxuI18n.get("GAME_DIR_DESC", game.getAbbreviation()),
+                    () -> PdxuI18n.get("GAME_DIR_DESC", game.getFullName()),
                     serializationName, Type.GAME);
             this.game = game;
         }

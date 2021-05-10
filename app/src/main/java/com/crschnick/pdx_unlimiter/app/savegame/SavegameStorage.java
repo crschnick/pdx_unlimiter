@@ -15,6 +15,7 @@ import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
+import com.crschnick.pdx_unlimiter.core.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
@@ -65,7 +66,6 @@ public abstract class SavegameStorage<
     private final GameDateType dateType;
     private final Path path;
     private final SavegameType type;
-    private final String infoChecksum;
     private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
@@ -73,15 +73,13 @@ public abstract class SavegameStorage<
             String name,
             GameDateType dateType,
             SavegameType type,
-            Class<I> infoClass,
-            String infoChecksum) {
+            Class<I> infoClass) {
         this.infoFactory = infoFactory;
         this.name = name;
         this.type = type;
         this.dateType = dateType;
         this.path = Settings.getInstance().storageDirectory.getValue().resolve(name);
         this.infoClass = infoClass;
-        this.infoChecksum = infoChecksum;
     }
 
     @SuppressWarnings("unchecked")
@@ -103,8 +101,7 @@ public abstract class SavegameStorage<
                 "eu4",
                 GameDateType.EU4,
                 SavegameType.EU4,
-                Eu4SavegameInfo.class,
-                IntegrityManager.getInstance().getEu4Checksum()) {
+                Eu4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Eu4SavegameInfo info) {
                 return GameLocalisation.getLocalisedValue(info.getTag().getTag(), info);
@@ -115,8 +112,7 @@ public abstract class SavegameStorage<
                 "hoi4",
                 GameDateType.HOI4,
                 SavegameType.HOI4,
-                Hoi4SavegameInfo.class,
-                IntegrityManager.getInstance().getHoi4Checksum()
+                Hoi4SavegameInfo.class
         ) {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
@@ -128,8 +124,7 @@ public abstract class SavegameStorage<
                 "ck3",
                 GameDateType.CK3,
                 SavegameType.CK3,
-                Ck3SavegameInfo.class,
-                IntegrityManager.getInstance().getCk3Checksum()
+                Ck3SavegameInfo.class
         ) {
             @Override
             protected String getDefaultCampaignName(Ck3SavegameInfo info) {
@@ -149,12 +144,23 @@ public abstract class SavegameStorage<
                 "stellaris",
                 GameDateType.STELLARIS,
                 SavegameType.STELLARIS,
-                StellarisSavegameInfo.class,
-                IntegrityManager.getInstance().getStellarisChecksum()
+                StellarisSavegameInfo.class
         ) {
             @Override
             protected String getDefaultCampaignName(StellarisSavegameInfo info) {
                 return info.getTag().getName();
+            }
+        });
+        ALL.put(Game.CK2, new SavegameStorage<>(
+                (node, melted) -> new Ck2SavegameInfo(node),
+                "ck2",
+                GameDateType.CK3,
+                SavegameType.CK2,
+                Ck2SavegameInfo.class
+        ) {
+            @Override
+            protected String getDefaultCampaignName(Ck2SavegameInfo info) {
+                return "Unknown";
             }
         });
         for (SavegameStorage<?, ?> s : ALL.values()) {
@@ -610,7 +616,8 @@ public abstract class SavegameStorage<
     }
 
     private String getInfoFileName() {
-        return "info_" + infoChecksum + ".json";
+        String cs = IntegrityManager.getInstance().getChecksum(ALL.inverseBidiMap().get(this));
+        return "info_" + cs + ".json";
     }
 
     public synchronized void invalidateSavegameInfo(SavegameEntry<T, I> e) {

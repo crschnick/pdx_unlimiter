@@ -2,6 +2,7 @@ package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -9,6 +10,10 @@ public class NoLauncherDist extends GameDist {
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
+            return Optional.empty();
+        }
+
+        if (!Files.exists(g.getInstallType().getExecutable(dir))) {
             return Optional.empty();
         }
 

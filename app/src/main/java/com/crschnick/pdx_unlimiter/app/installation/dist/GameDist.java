@@ -1,7 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.installation.dist;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -22,6 +21,11 @@ public abstract class GameDist {
         this.installLocation = installLocation;
     }
 
+    @Override
+    public String toString() {
+        return game.getFullName() + " (" + name + ") at " + installLocation.toString();
+    }
+
     public Path getInstallLocation() {
         return installLocation;
     }
@@ -31,12 +35,17 @@ public abstract class GameDist {
     }
 
     public Path determineUserDir() throws IOException {
-        return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(getGame().getFullName());
+        return getGame().getInstallType().determineUserDir(getInstallLocation(), getGame().getFullName());
     }
 
     public boolean isGameInstance(String cmd) {
         return cmd.contains(getGame().getInstallType().getExecutable(getInstallLocation()).toString());
     }
+
+    public Path getIcon() {
+        return getGame().getInstallType().getIcon(getInstallLocation());
+    }
+
     public abstract boolean supportsLauncher();
 
     public abstract boolean supportsDirectLaunch();

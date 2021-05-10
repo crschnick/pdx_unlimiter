@@ -55,6 +55,11 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     }
 
     @Override
+    public Path getIcon() {
+        return getGame().getInstallType().getWindowsStoreIcon(getInstallLocation());
+    }
+
+    @Override
     public boolean isGameInstance(String cmd) {
         var execName = getGame().getInstallType().getExecutable(getInstallLocation()).getFileName().toString();
         return cmd.contains("\\\\?\\Volume") && cmd.contains(execName);

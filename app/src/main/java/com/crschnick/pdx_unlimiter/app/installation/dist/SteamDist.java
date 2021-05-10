@@ -1,6 +1,5 @@
 package com.crschnick.pdx_unlimiter.app.installation.dist;
 
-import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SteamDist extends PdxLauncherDist {
+public class SteamDist extends GameDist {
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         var installDir = dir;
@@ -25,23 +24,27 @@ public class SteamDist extends PdxLauncherDist {
                     .orElse(null);
         }
         if (installDir != null) {
-            try {
-                var appIdString = Files.readString(g.getInstallType().getSteamAppIdFile(installDir));
-                // Trim the id because sometimes it contains trailing new lines!
-                var appId = Integer.parseInt(appIdString.trim());
-                return Optional.of(new SteamDist(g, installDir, appId));
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
+            var steamFile = g.getInstallType().getSteamSpecificFile(installDir);
+            if (Files.exists(steamFile)) {
+                var basicDist = GameDists.getBasicDistFromDirectory(g, installDir);
+                if (basicDist.isPresent()) {
+                    return Optional.of(new SteamDist(g, installDir, basicDist.get()));
+                }
             }
         }
         return Optional.empty();
     }
 
-    private final int appId;
+    private final GameDist dist;
 
-    public SteamDist(Game g, Path installLocation, int appId) {
+    public SteamDist(Game g, Path installLocation, GameDist dist) {
         super(g, "Steam", installLocation);
-        this.appId = appId;
+        this.dist = dist;
+    }
+
+    @Override
+    public String getName() {
+        return "Steam + " + dist.getName();
     }
 
     public boolean directLaunch() {
@@ -55,9 +58,19 @@ public class SteamDist extends PdxLauncherDist {
     }
 
     @Override
+    public boolean supportsLauncher() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsDirectLaunch() {
+        return dist.supportsDirectLaunch();
+    }
+
+    @Override
     public void startLauncher() throws IOException {
         if (Settings.getInstance().startSteam.getValue()) {
-            SteamHelper.openSteamURI("steam://run/" + appId + "//");
+            SteamHelper.openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
         } else {
             super.startLauncher();
         }
@@ -65,7 +78,7 @@ public class SteamDist extends PdxLauncherDist {
 
     @Override
     public List<Path> getAdditionalSavegamePaths() {
-        return SteamHelper.getRemoteDataPaths(appId).stream()
+        return SteamHelper.getRemoteDataPaths(getGame().getSteamAppId()).stream()
                 .map(d -> d.resolve("save games"))
                 .collect(Collectors.toList());
     }

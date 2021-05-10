@@ -77,7 +77,6 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             } else {
                 throw new IllegalArgumentException("Invalid Stellaris version: " + vs);
             }
-
         } catch (Throwable e) {
             throw new SavegameInfoException("Could not create savegame info of savegame", e);
         }

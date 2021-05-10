@@ -16,6 +16,11 @@ public class Language {
         this.displayName = displayName;
     }
 
+    @Override
+    public String toString() {
+        return displayName;
+    }
+
     public Locale getLocale() {
         return locale;
     }

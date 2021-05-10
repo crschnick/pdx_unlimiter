@@ -31,6 +31,12 @@ public final class Settings extends AbstractSettings {
     public final SettingsEntry.GameDirectory stellaris = new SettingsEntry.GameDirectory(
             "stellaris",
             Game.STELLARIS);
+    public final SettingsEntry.GameDirectory ck2 = new SettingsEntry.GameDirectory(
+            "ck2",
+            Game.CK2);
+    public final SettingsEntry.GameDirectory vic2 = new SettingsEntry.GameDirectory(
+            "vic2",
+            Game.VIC2);
     public final SettingsEntry.IntegerEntry fontSize = new SettingsEntry.IntegerEntry(
             "FONT_SIZE",
             "fontSize",

@@ -11,14 +11,13 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 
 public class GameDists {
 
-    private static final BidiMap<String, BiFunction<Game, Path, Optional<GameDist>>> TYPES = new DualLinkedHashBidiMap<>();
+    private static final BidiMap<String, BiFunction<Game, Path, Optional<GameDist>>> COMPOUND_TYPES = new DualLinkedHashBidiMap<>();
+    private static final BidiMap<String, BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = new DualLinkedHashBidiMap<>();
     private static final BidiMap<String, Class<? extends GameDist>> IDS = new DualLinkedHashBidiMap<>();
     private static final List<Path> installDirSearchPaths = new ArrayList<>();
 
@@ -33,11 +32,12 @@ public class GameDists {
     }
 
     static {
-        TYPES.put("windows-store", WindowsStoreDist::getDist);
-        TYPES.put("steam", SteamDist::getDist);
-        TYPES.put("pdx", PdxLauncherDist::getDist);
-        TYPES.put("legacy", LegacyLauncherDist::getDist);
-        TYPES.put("no-launcher", NoLauncherDist::getDist);
+        COMPOUND_TYPES.put("windows-store", WindowsStoreDist::getDist);
+        COMPOUND_TYPES.put("steam", SteamDist::getDist);
+
+        BASIC_DISTS.put("pdx", PdxLauncherDist::getDist);
+        BASIC_DISTS.put("legacy", LegacyLauncherDist::getDist);
+        BASIC_DISTS.put("no-launcher", NoLauncherDist::getDist);
     }
 
     static {
@@ -48,18 +48,46 @@ public class GameDists {
         IDS.put("no-launcher", NoLauncherDist.class);
     }
 
+    public static Optional<GameDist> detectDist(Game g, Path dir) {
+        return getCompoundDistFromDirectory(g, dir)
+                .or(() -> GameDists.getBasicDistFromDirectory(g, dir));
+    }
+
+    public static Optional<GameDist> getBasicDistFromDirectory(Game g, Path dir) {
+        for (var e : BASIC_DISTS.values()) {
+            var r = e.apply(g, dir);
+            if (r.isPresent()) {
+                return r;
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<GameDist> getCompoundDistFromDirectory(Game g, Path dir) {
+        for (var e : COMPOUND_TYPES.values()) {
+            var r = e.apply(g, dir);
+            if (r.isPresent()) {
+                return r;
+            }
+        }
+        return Optional.empty();
+    }
+
     public static Optional<GameDist> getDist(Game g, JsonNode n) {
         if (n != null) {
             // Legacy support
             if (n.isTextual()) {
-                return getDistFromDirectory(g, Path.of(n.textValue()));
+                return detectDist(g, Path.of(n.textValue()));
             }
 
             var type = n.get("type").textValue();
             var loc = Path.of(n.get("location").textValue());
-            return TYPES.get(type).apply(g, loc).or(() -> getDistFromDirectory(g, null));
+
+            var exTypes = new HashMap<>(COMPOUND_TYPES);
+            exTypes.putAll(BASIC_DISTS);
+            return exTypes.get(type).apply(g, loc).or(() -> detectDist(g, null));
         } else {
-            return getDistFromDirectory(g, null);
+            return detectDist(g, null);
         }
     }
 
@@ -68,16 +96,6 @@ public class GameDists {
         node.put("type", IDS.inverseBidiMap().get(d.getClass()));
         node.put("location", d.getInstallLocation().toString());
         return node;
-    }
-
-    public static Optional<GameDist> getDistFromDirectory(Game g, Path dir) {
-        for (var e : TYPES.values()) {
-            var r = e.apply(g, dir);
-            if (r.isPresent()) {
-                return r;
-            }
-        }
-        return Optional.empty();
     }
 
     public static List<Path> getInstallDirSearchPaths() {

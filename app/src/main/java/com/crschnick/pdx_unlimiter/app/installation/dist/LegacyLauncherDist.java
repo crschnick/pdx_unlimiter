@@ -14,7 +14,8 @@ public class LegacyLauncherDist extends GameDist {
             return Optional.empty();
         }
 
-        if (!Files.exists(g.getInstallType().getLauncherDataPath(dir))) {
+        var legacyLauncher = g.getInstallType().getLegacyLauncherExecutable(dir);
+        if (legacyLauncher.isEmpty() || !Files.exists(legacyLauncher.get())) {
             return Optional.empty();
         }
 

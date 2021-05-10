@@ -13,6 +13,8 @@ module com.crschnick.pdx_unlimiter.core {
     exports com.crschnick.pdx_unlimiter.core.info.hoi4;
     exports com.crschnick.pdx_unlimiter.core.info.stellaris;
     exports com.crschnick.pdx_unlimiter.core.writer;
+    exports com.crschnick.pdx_unlimiter.core.info.ck2;
+    exports com.crschnick.pdx_unlimiter.core.info.vic2;
 
     requires jdk.unsupported;
 }

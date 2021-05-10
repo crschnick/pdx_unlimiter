@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
+import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.Map;
 
 public class IntegrityManager {
@@ -18,10 +20,7 @@ public class IntegrityManager {
     private static final Logger logger = LoggerFactory.getLogger(IntegrityManager.class);
     private static IntegrityManager INSTANCE;
 
-    private String eu4Checksum;
-    private String ck3Checksum;
-    private String hoi4Checksum;
-    private String stellarisChecksum;
+    private final Map<Game,String> checksums = new HashMap<>();
 
     public static void init() throws Exception {
         INSTANCE = new IntegrityManager();
@@ -39,10 +38,9 @@ public class IntegrityManager {
                     .getPath("/com/crschnick/pdx_unlimiter/core");
         }
 
-        INSTANCE.eu4Checksum = calc(infoPackage, "eu4");
-        INSTANCE.ck3Checksum = calc(infoPackage, "ck3");
-        INSTANCE.hoi4Checksum = calc(infoPackage, "hoi4");
-        INSTANCE.stellarisChecksum = calc(infoPackage, "stellaris");
+        for (Game g : Game.values()) {
+            INSTANCE.checksums.put(g, calc(infoPackage, g.getId()));
+        }
     }
 
     private static String calc(Path pack, String game) throws Exception {
@@ -87,19 +85,7 @@ public class IntegrityManager {
         return INSTANCE;
     }
 
-    public String getEu4Checksum() {
-        return eu4Checksum;
-    }
-
-    public String getCk3Checksum() {
-        return ck3Checksum;
-    }
-
-    public String getHoi4Checksum() {
-        return hoi4Checksum;
-    }
-
-    public String getStellarisChecksum() {
-        return stellarisChecksum;
+    public String getChecksum(Game g) {
+        return checksums.get(g);
     }
 }

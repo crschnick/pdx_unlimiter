@@ -3,6 +3,7 @@ package com.crschnick.pdx_unlimiter.app.installation;
 import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -67,6 +68,11 @@ public interface GameInstallType {
                     .put("filename", sgPath);
             JsonHelper.write(n, userDir.resolve("continue_game.json"));
         }
+
+        @Override
+        public Path getIcon(Path p) {
+            return p.resolve("launcher-assets").resolve("icon.png");
+        }
     };
 
     GameInstallType HOI4 = new StandardInstallType("hoi4") {
@@ -114,6 +120,11 @@ public interface GameInstallType {
         }
 
         @Override
+        public Path getIcon(Path p) {
+            return p.resolve("launcher-assets").resolve("game-icon.png");
+        }
+
+        @Override
         public String getModId(Path userDir, GameMod mod) {
             return mod.getName();
         }
@@ -123,6 +134,11 @@ public interface GameInstallType {
         @Override
         public Path getWindowsStoreLauncherDataPath(Path p) {
             return p.resolve("launcher");
+        }
+
+        @Override
+        public Path getIcon(Path p) {
+            return p.resolve("gfx").resolve("exe_icon.bmp");
         }
 
         @Override
@@ -214,12 +230,17 @@ public interface GameInstallType {
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }
 
-        public Path getSteamAppIdFile(Path p) {
+        public Path getSteamSpecificFile(Path p) {
             return p.resolve("binaries").resolve("steam_appid.txt");
         }
 
         public Path getLauncherDataPath(Path p) {
             return p.resolve("launcher");
+        }
+
+        @Override
+        public Path getIcon(Path p) {
+            return p.resolve("game").resolve("gfx").resolve("exe_icon.bmp");
         }
 
         public Path getModBasePath(Path p) {
@@ -243,7 +264,7 @@ public interface GameInstallType {
     GameInstallType CK2 = new StandardInstallType("CK2game") {
 
         @Override
-        public Optional<Path> getLauncherExecutable(Path p) {
+        public Optional<Path> getLegacyLauncherExecutable(Path p) {
             return Optional.of(getExecutable(p));
         }
 
@@ -267,7 +288,90 @@ public interface GameInstallType {
         public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
 
         }
+
+        @Override
+        public Path getIcon(Path p) {
+            return p.resolve("gfx").resolve("CK2_icon.bmp");
+        }
+
+        @Override
+        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+            var sf = userDir.resolve("settings.txt");
+            if (!Files.exists(sf)) {
+                return Optional.empty();
+            }
+
+            var node = TextFormatParser.textFileParser().parse(sf);
+            var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
+            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+        }
     };
+
+    GameInstallType VIC2 = new StandardInstallType("v2game") {
+
+        @Override
+        public Optional<Path> getLegacyLauncherExecutable(Path p) {
+            return Optional.of(p.resolve("victoria2.exe"));
+        }
+
+        @Override
+        public Optional<String> debugModeSwitch() {
+            return Optional.of("-debug_mode");
+        }
+
+        @Override
+        public Path chooseBackgroundImage(Path p) {
+            int i = new Random().nextInt(7) + 1;
+            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        }
+
+        @Override
+        public Path getSteamSpecificFile(Path p) {
+            return p.resolve("42960_install.vdf");
+        }
+
+        @Override
+        public List<String> getLaunchArguments() {
+            return List.of();
+        }
+
+        @Override
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+
+        }
+
+        @Override
+        public Path determineUserDir(Path p, String name) throws IOException {
+            var userDirFile = p.resolve("userdir.txt");
+            if (Files.exists(userDirFile)) {
+                var s = Files.readString(userDirFile).trim();
+                if (!s.isEmpty()) {
+                    return Path.of(Files.readString(userDirFile));
+                }
+            }
+
+            return p;
+        }
+
+        @Override
+        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+            var sf = userDir.resolve("settings.txt");
+            if (!Files.exists(sf)) {
+                return Optional.empty();
+            }
+
+            var node = TextFormatParser.textFileParser().parse(sf);
+            var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
+            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+        }
+
+        @Override
+        public Path getIcon(Path p) {
+            return null;
+        }
+    };
+
+
 
     Path chooseBackgroundImage(Path p);
 
@@ -297,7 +401,7 @@ public interface GameInstallType {
 
     public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;
 
-    public default Path getSteamAppIdFile(Path p) {
+    public default Path getSteamSpecificFile(Path p) {
         return p.resolve("steam_appid.txt");
     }
 
@@ -309,16 +413,34 @@ public interface GameInstallType {
         return getLauncherDataPath(p);
     }
 
+    Path getIcon(Path p);
+
+    public default Path getWindowsStoreIcon(Path p) {
+        return p.resolve("Square150x150Logo.scale-100.png");
+    }
+
     public default Path getModBasePath(Path p) {
         return p;
     }
 
-    default Optional<Path> getLauncherExecutable(Path p) {
+    default Optional<Path> getLegacyLauncherExecutable(Path p) {
         return Optional.empty();
     }
 
     public default Optional<String> debugModeSwitch() {
         return Optional.empty();
+    }
+
+    public default Path determineUserDir(Path p, String name) throws IOException {
+        var userDirFile = p.resolve("userdir.txt");
+        if (Files.exists(userDirFile)) {
+            var s = Files.readString(userDirFile).trim();
+            if (!s.isEmpty()) {
+                return Path.of(Files.readString(userDirFile));
+            }
+        }
+
+        return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name);
     }
 
     public static abstract class StandardInstallType implements GameInstallType {

@@ -24,7 +24,7 @@ public class GuiSettings {
         Settings s = Settings.getInstance();
         Set<Runnable> applyFuncs = new HashSet<>();
         VBox vbox = new VBox(
-                GuiSettingsComponents.section("GAME_DIRS", applyFuncs, s.eu4, s.ck3, s.hoi4, s.stellaris),
+                GuiSettingsComponents.section("GAME_DIRS", applyFuncs, s.eu4, s.ck3, s.hoi4, s.stellaris, s.ck2, s.vic2),
                 new Separator(),
                 GuiSettingsComponents.section("GENERAL", applyFuncs, s.enableAutoUpdate, s.storageDirectory, s.startSteam),
                 new Separator(),
