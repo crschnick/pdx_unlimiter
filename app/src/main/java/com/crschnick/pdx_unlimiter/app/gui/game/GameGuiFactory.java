@@ -109,7 +109,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public abstract Pane background();
 
-    public final Pane createIcon() {
+    public Pane createIcon() {
         return GameImage.imageNode(GameImage.getGameIcon(ALL.inverseBidiMap().get(this)), CLASS_IMAGE_ICON);
     }
 
@@ -150,9 +150,11 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         var styleClass = ALL.inverseBidiMap().get(this).getId();
         grid.getStyleClass().add(styleClass);
 
-        Label version = createVersionInfo(info);
-        version.setAlignment(Pos.CENTER);
-        addNode(grid, version);
+        if (info.getVersion() != null) {
+            Label version = createVersionInfo(info);
+            version.setAlignment(Pos.CENTER);
+            addNode(grid, version);
+        }
 
         if (info.getMods().size() > 0) {
             Label mods = new Label("Mods (" + info.getMods().size() + ")");

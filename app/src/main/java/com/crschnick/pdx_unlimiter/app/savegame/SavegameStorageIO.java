@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,9 +31,11 @@ public class SavegameStorageIO {
         for (SavegameCollection<T, I> c : cache.getCollections()) {
             for (SavegameEntry<T, I> e : c.getSavegames()) {
                 Path fileOut = out.resolve(cache.getFileSystemCompatibleName(e, true));
-                int counter = 2;
+                int counter = 0;
                 while (Files.exists(fileOut)) {
-                    fileOut = fileOut.resolveSibling("(" + counter + ") " + cache.getFileSystemCompatibleName(e, true));
+                    var name = cache.getFileSystemCompatibleName(e, true);
+                    fileOut = fileOut.resolveSibling(FilenameUtils.getBaseName(name) +
+                            (counter != 0 ? "(" + counter + ") " : "") + "." + FilenameUtils.getExtension(name));
                     counter++;
                 }
                 cache.copySavegameTo(e, fileOut);

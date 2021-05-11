@@ -46,8 +46,7 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
                         Integer.parseInt(m.group(1)),
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
-                        Integer.parseInt(m.group(4)),
-                        null);
+                        Integer.parseInt(m.group(4)));
             } else {
                 throw new IllegalArgumentException("Invalid CK2 version: " + vs);
             }

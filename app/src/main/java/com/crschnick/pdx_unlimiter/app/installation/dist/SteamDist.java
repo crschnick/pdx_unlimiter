@@ -43,6 +43,16 @@ public class SteamDist extends GameDist {
     }
 
     @Override
+    public Path determineUserDir() throws IOException {
+        return dist.determineUserDir();
+    }
+
+    @Override
+    public Optional<String> determineVersion() throws IOException {
+        return dist.determineVersion();
+    }
+
+    @Override
     public String getName() {
         return "Steam + " + dist.getName();
     }

@@ -155,7 +155,7 @@ public abstract class SavegameStorage<
         ALL.put(Game.CK2, new SavegameStorage<>(
                 (node, melted) -> new Ck2SavegameInfo(node),
                 "ck2",
-                GameDateType.CK3,
+                GameDateType.CK2,
                 SavegameType.CK2,
                 Ck2SavegameInfo.class
         ) {
@@ -167,7 +167,7 @@ public abstract class SavegameStorage<
         ALL.put(Game.VIC2, new SavegameStorage<>(
                 (node, melted) -> new Vic2SavegameInfo(node),
                 "vic2",
-                GameDateType.EU4,
+                GameDateType.VIC2,
                 SavegameType.VIC2,
                 Vic2SavegameInfo.class
         ) {

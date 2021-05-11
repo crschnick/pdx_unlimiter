@@ -1,9 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.app.savegame.SavegameCompatibility;
 import com.crschnick.pdx_unlimiter.core.info.GameDate;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.War;
@@ -75,18 +72,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             skills.getChildren().add(box);
         }
         return skills;
-    }
-
-    @Override
-    protected Label createVersionInfo(SavegameInfo<Ck3Tag> info) {
-        var l = super.createVersionInfo(info);
-        var ver = GameInstallation.ALL.get(Game.CK3).getVersion();
-        if (ver != null && SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.COMPATIBLE) {
-            l.setText(l.getText() + " " + GameInstallation.ALL.get(Game.CK3).getVersion().getName());
-        } else {
-            l.setText(l.getText() + " (?)");
-        }
-        return l;
     }
 
     @Override

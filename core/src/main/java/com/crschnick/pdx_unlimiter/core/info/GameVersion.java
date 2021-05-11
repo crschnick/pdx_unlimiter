@@ -7,22 +7,20 @@ public class GameVersion implements Comparable<GameVersion> {
     private int second;
     private int third;
     private int fourth;
-    private String name;
 
     public GameVersion() {
     }
 
-    public GameVersion(int first, int second, int third, int fourth, String name) {
+    public GameVersion(int first, int second, int third, int fourth) {
         this.first = first;
         this.second = second;
         this.third = third;
         this.fourth = fourth;
-        this.name = name;
     }
 
     @Override
     public String toString() {
-        return first + "." + second + "." + third + (fourth != 0 ? "." + fourth : "") + (name != null ? " " + name : "");
+        return first + "." + second + "." + third + (fourth != 0 ? "." + fourth : "");
     }
 
     public int getFirst() {
@@ -39,10 +37,6 @@ public class GameVersion implements Comparable<GameVersion> {
 
     public int getFourth() {
         return fourth;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override

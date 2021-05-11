@@ -1,3 +1,4 @@
 rootProject.name = 'pdx_unlimiter'
 include 'core'
 include 'app'
+include 'pdxu-info'

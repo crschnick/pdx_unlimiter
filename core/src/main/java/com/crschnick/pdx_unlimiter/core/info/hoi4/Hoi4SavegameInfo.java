@@ -1,9 +1,6 @@
 package com.crschnick.pdx_unlimiter.core.info.hoi4;
 
-import com.crschnick.pdx_unlimiter.core.info.GameDateType;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
+import com.crschnick.pdx_unlimiter.core.info.*;
 import com.crschnick.pdx_unlimiter.core.node.Node;
 
 import java.util.List;
@@ -36,7 +33,8 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
             Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)\\s+.*");
             Matcher m = p.matcher(n.getNodeForKey("version").getString());
             m.matches();
-            i.version = new GameVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)), 0, m.group(1));
+            i.version = new GameNamedVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)),
+                    Integer.parseInt(m.group(4)), 0, m.group(1));
 
         } catch (Throwable e) {
             throw new SavegameInfoException("Could not create savegame info of savegame", e);

@@ -143,6 +143,7 @@ public final class GameInstallation {
     public Optional<GameMod> getModForId(String id) {
         return getMods().stream().filter(m -> type.getModId(userDir, m).equals(id)).findAny();
     }
+
     public void startDirectly(boolean debug) throws IOException {
         var args = new ArrayList<>(type.getLaunchArguments());
         if (debug) {

@@ -41,7 +41,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     private void queryMods(Node n) {
         // Mod data has changed in 1.31
-        if (version.compareTo(new GameVersion(1, 31, 0, 0, null)) >= 0) {
+        if (version.compareTo(new GameVersion(1, 31, 0, 0)) >= 0) {
             var list = new ArrayList<String>();
             n.getNodeForKeyIfExistent("mods_enabled_names").ifPresent(me -> me.forEach((k,v) -> {
                 list.add(v.getNodeForKey("filename").getString());
@@ -61,7 +61,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             Eu4SavegameInfo e = new Eu4SavegameInfo();
 
             Node ver = n.getNodeForKey("savegame_version");
-            e.version = new GameVersion(
+            e.version = new GameNamedVersion(
                     ver.getNodeForKey("first").getInteger(),
                     ver.getNodeForKey("second").getInteger(),
                     ver.getNodeForKey("third").getInteger(),

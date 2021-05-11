@@ -61,8 +61,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
                 Integer.parseInt(m.group(1)),
                 Integer.parseInt(m.group(2)),
                 Integer.parseInt(m.group(3)),
-                0,
-                null);
+                0);
     }
 
     private void initPlayerData(Node n) {

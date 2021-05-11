@@ -127,7 +127,6 @@ public class GameDistLauncher {
         if (Settings.getInstance().launchIrony.getValue()) {
             IronyHelper.launchEntry(ctx.getGame(), true);
         } else {
-            var install = ctx.getInstallation();
             ctx.getInstallation().startDirectly(debug);
         }
     }

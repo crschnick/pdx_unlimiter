@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.core.info.stellaris;
 
 import com.crschnick.pdx_unlimiter.core.info.GameDateType;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdx_unlimiter.core.info.GameNamedVersion;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
 import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
 import com.crschnick.pdx_unlimiter.core.node.Node;
@@ -70,7 +70,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             var vs = n.getNodesForKey("version").get(0).getString();
             Matcher m = p.matcher(vs);
             if (m.matches()) {
-                i.version = new GameVersion(
+                i.version = new GameNamedVersion(
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0, 0, m.group(1).trim());

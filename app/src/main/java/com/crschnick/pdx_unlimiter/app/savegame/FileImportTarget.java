@@ -47,8 +47,8 @@ public abstract class FileImportTarget {
                         FileImportTarget.createStandardImportsTargets(f.toString())));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
-                return targets;
             }
+            return targets;
         }
 
         List<StandardImportTarget> targets = new ArrayList<>();

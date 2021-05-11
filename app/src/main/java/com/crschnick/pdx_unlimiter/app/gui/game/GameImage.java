@@ -141,7 +141,8 @@ public class GameImage {
     }
 
     public static Image getGameIcon(Game g) {
-        return ImageLoader.loadImage(GameInstallation.ALL.get(g).getDist().getIcon());
+        var iconFile = GameInstallation.ALL.get(g).getDist().getIcon();
+        return ImageLoader.loadImage(iconFile);
     }
 
     public static void loadCk3Images() {

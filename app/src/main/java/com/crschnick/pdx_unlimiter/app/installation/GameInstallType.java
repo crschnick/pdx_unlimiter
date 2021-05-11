@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.OsHelper;
+import com.crschnick.pdx_unlimiter.core.info.GameNamedVersion;
 import com.crschnick.pdx_unlimiter.core.info.GameVersion;
 import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -47,7 +48,7 @@ public interface GameInstallType {
             Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)\\.\\w+\\s.+")
                     .matcher(versionString);
             if (m.find()) {
-                return Optional.of(new GameVersion(
+                return Optional.of(new GameNamedVersion(
                         Integer.parseInt(m.group(1)),
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
@@ -91,7 +92,7 @@ public interface GameInstallType {
         public Optional<GameVersion> getVersion(String versionString) {
             Matcher m = Pattern.compile("(\\w+)\\s+v(\\d)\\.(\\d+)\\.(\\d+)").matcher(versionString);
             if (m.find()) {
-                return Optional.of(new GameVersion(
+                return Optional.of(new GameNamedVersion(
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         Integer.parseInt(m.group(4)),
@@ -156,7 +157,7 @@ public interface GameInstallType {
         public Optional<GameVersion> getVersion(String versionString) {
             Matcher m = Pattern.compile("(\\w)+\\s+v?(\\d)\\.(\\d+)\\.(\\d+).+").matcher(versionString);
             if (m.find()) {
-                return Optional.of(new GameVersion(
+                return Optional.of(new GameNamedVersion(
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         Integer.parseInt(m.group(4)),
@@ -201,7 +202,7 @@ public interface GameInstallType {
         public Optional<GameVersion> getVersion(String versionString) {
             Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)\\s+\\((\\w+)\\)").matcher(versionString);
             if (m.find()) {
-                return Optional.of(new GameVersion(
+                return Optional.of(new GameNamedVersion(
                         Integer.parseInt(m.group(1)),
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
@@ -305,6 +306,11 @@ public interface GameInstallType {
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }
+
+        @Override
+        public Optional<GameVersion> determineVersionFromInstallation(Path p) {
+            return Optional.of(new GameVersion(3,3,3,0));
+        }
     };
 
     GameInstallType VIC2 = new StandardInstallType("v2game") {
@@ -316,7 +322,7 @@ public interface GameInstallType {
 
         @Override
         public Optional<String> debugModeSwitch() {
-            return Optional.of("-debug_mode");
+            return Optional.empty();
         }
 
         @Override
@@ -367,7 +373,12 @@ public interface GameInstallType {
 
         @Override
         public Path getIcon(Path p) {
-            return null;
+            return p.resolve("load_bg.jpg");
+        }
+
+        @Override
+        public Optional<GameVersion> determineVersionFromInstallation(Path p) {
+            return Optional.of(new GameVersion(3, 4, 0, 0));
         }
     };
 

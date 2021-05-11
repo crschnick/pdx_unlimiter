@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * CK3 header format:
  *
- * SAV010 <type> <8 bytes of randomness> <8 bytes of meta data size>
+ * SAV010 <type> <8 hex digits of randomness> <8 hex digits of meta data size>
  *
  * type:
  * 3: Compressed + Binary
