@@ -45,6 +45,11 @@ public final class WindowsStoreDist extends PdxLauncherDist {
                 return m.matches() ? Optional.of(m.group(1)) : Optional.<String>empty();
             }).flatMap(Optional::stream).findAny();
             if (loc.isPresent() && pkgFamName.isPresent()) {
+                // Check whether the already set install location is a windows store dist
+                if (dir != null && !dir.equals(loc.get())) {
+                    return Optional.empty();
+                }
+
                 return Optional.of(new WindowsStoreDist(g, pkgFamName.get(), loc.get()));
             }
         } catch (Exception e) {

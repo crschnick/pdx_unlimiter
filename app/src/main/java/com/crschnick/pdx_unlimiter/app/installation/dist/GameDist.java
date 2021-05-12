@@ -53,6 +53,7 @@ public abstract class GameDist {
     public final void startDirectly(Path executable, List<String> args) throws IOException {
         if (supportsDirectLaunch()) {
             var input = new ArrayList<String>();
+            // Make UAC popup if needed
             if (SystemUtils.IS_OS_WINDOWS) {
                 input.add("cmd");
                 input.add("/C");

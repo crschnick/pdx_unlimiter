@@ -32,7 +32,16 @@ public enum Game {
                 return g;
             }
         }
-        return null;
+        throw new AssertionError("Invalid id");
+    }
+
+    public static Game byType(GameInstallType type) {
+        for (Game g : values()) {
+            if (g.getInstallType().equals(type)) {
+                return g;
+            }
+        }
+        throw new AssertionError("Invalid type");
     }
 
     public boolean isEnabled() {

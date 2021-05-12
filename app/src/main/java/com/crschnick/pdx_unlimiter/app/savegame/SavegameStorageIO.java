@@ -18,7 +18,7 @@ public class SavegameStorageIO {
                 FileUtils.forceMkdir(out.toFile());
                 for (SavegameStorage<?, ?> cache : SavegameStorage.ALL.values()) {
                     Path cacheDir = out.resolve(cache.getName());
-                    Files.createDirectory(cacheDir);
+                    FileUtils.forceMkdir(cacheDir.toFile());
                     exportSavegameDirectory(cache, cacheDir);
                 }
             } catch (Exception e) {

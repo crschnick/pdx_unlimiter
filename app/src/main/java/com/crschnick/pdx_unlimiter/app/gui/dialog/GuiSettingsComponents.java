@@ -52,7 +52,7 @@ public class GuiSettingsComponents {
             dirChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
             File file = dirChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
-                setDist.set(GameDists.detectDist(de.getGame(), file.toPath()).orElse(null));
+                setDist.set(GameDists.detectDist(de.getGame(), file.toPath()));
             }
             m.consume();
         };

@@ -10,6 +10,7 @@ import com.crschnick.pdx_unlimiter.app.installation.InvalidInstallationException
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDists;
 import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -358,7 +359,7 @@ public abstract class SettingsEntry<T> {
         }
 
         private void showInstallErrorMessage(String msg) {
-            String fullMsg = PdxuI18n.get("GAME_DIR_ERROR", game.getFullName()) + ":\n" +
+            String fullMsg = PdxuI18n.get("GAME_DIR_ERROR", game.getFullName()) + ":\n\n" +
                     msg + "\n\n" + PdxuI18n.get("GAME_DIR_ERROR_MSG", game.getFullName());
             GuiErrorReporter.showSimpleErrorMessage(fullMsg);
         }
@@ -382,12 +383,12 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void setDefault() {
-            this.set(GameDists.getDist(game, null).orElse(null));
+            this.set(GameDists.detectDist(game, (JsonNode) null));
         }
 
         @Override
         protected GameDist fromNode(JsonNode node) {
-            return GameDists.getDist(game, node).orElse(null);
+            return GameDists.detectDist(game, node);
         }
 
         @Override
@@ -414,6 +415,14 @@ public abstract class SettingsEntry<T> {
             }).map(t -> t.getButtonData().isDefaultButton()).orElse(false);
         }
 
+        private void showSavegameDirDialog() {
+            GuiDialogHelper.showBlockingAlert(a -> {
+                a.setAlertType(Alert.AlertType.WARNING);
+                a.setTitle(PdxuI18n.get("STORAGE_DIR_SAVEGAME_WARNING_TITLE"));
+                a.setHeaderText(PdxuI18n.get("STORAGE_DIR_SAVEGAME_WARNING_TEXT"));
+            });
+        }
+
         @Override
         public void set(JsonNode node) {
             this.value.set(Path.of(node.textValue()));
@@ -429,6 +438,11 @@ public abstract class SettingsEntry<T> {
             Objects.requireNonNull(newPath);
 
             if (newPath.equals(value.get())) {
+                return;
+            }
+
+            if (newPath.startsWith(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive")))  {
+                showSavegameDirDialog();
                 return;
             }
 

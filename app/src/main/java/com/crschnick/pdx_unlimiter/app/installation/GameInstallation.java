@@ -4,6 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
 import com.crschnick.pdx_unlimiter.app.lang.Language;
+import com.crschnick.pdx_unlimiter.app.util.OsHelper;
 import com.crschnick.pdxu.model.GameVersion;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -155,6 +156,11 @@ public final class GameInstallation {
     public void loadData() throws InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
         LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getAbbreviation() + " installation ...");
+
+        if (getInstallDir().startsWith(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
+            throw new InvalidInstallationException("INSTALL_DIR_IS_USER_DIR", g.getFullName(), g.getFullName());
+        }
+
         if (!Files.isRegularFile(type.getExecutable(getInstallDir()))) {
             throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), type.getExecutable(getInstallDir()).toString());
         }

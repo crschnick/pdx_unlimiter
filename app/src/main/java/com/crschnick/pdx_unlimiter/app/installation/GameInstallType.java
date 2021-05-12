@@ -382,7 +382,6 @@ public interface GameInstallType {
         }
     };
 
-
     Path chooseBackgroundImage(Path p);
 
     default Optional<GameVersion> determineVersionFromInstallation(Path p) {
