@@ -1,7 +1,7 @@
 l_english:
   EXPORT: "Export"
   CONTINUE_GAME: "Continue Game"
-  START_LAUNCHER: "Start Launcher"
+  START_LAUNCHER: "Start in Launcher"
   RUNNING: "Running"
   LATEST: "Latest"
   NONE: "NONE"

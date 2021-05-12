@@ -150,6 +150,7 @@ public class GuiStatusBar {
                 export.getStyleClass().add(CLASS_EXPORT);
                 export.setOnAction(event -> {
                     SavegameActions.exportSavegame(e);
+                    SavegameManagerState.<T, I>get().selectEntry(null);
 
                     event.consume();
                     getStatusBar().hide();
@@ -163,6 +164,7 @@ public class GuiStatusBar {
                 launch.getStyleClass().add("launcher-button");
                 launch.setOnAction(event -> {
                     GameDistLauncher.startLauncherWithContinueGame(e);
+                    SavegameManagerState.<T, I>get().selectEntry(null);
 
                     event.consume();
                     getStatusBar().hide();
@@ -175,6 +177,7 @@ public class GuiStatusBar {
                 if (ctx.getInstallation().getType().debugModeSwitch().isPresent()) {
                     var splitButton = new SplitMenuButton();
                     splitButton.setText(PdxuI18n.get("CONTINUE_GAME"));
+                    SavegameManagerState.<T, I>get().selectEntry(null);
 
                     var debugItem = new MenuItem("Debug mode");
                     debugItem.setGraphic(new FontIcon());

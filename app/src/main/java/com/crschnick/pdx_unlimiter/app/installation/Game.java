@@ -2,8 +2,9 @@ package com.crschnick.pdx_unlimiter.app.installation;
 
 public enum Game {
 
-    EU4("eu4", "EU4", "Europa Universalis IV", "abc", 236850, GameInstallType.EU4),
-    HOI4("hoi4", "HOI4", "Hearts of Iron IV", null, 394360, GameInstallType.HOI4),
+    EU4("eu4", "EU4", "Europa Universalis IV", "ParadoxInteractive.EuropaUniversalisIV-MicrosoftSt", 236850, GameInstallType.EU4),
+    HOI4("hoi4", "HOI4", "Hearts of Iron IV",
+            "ParadoxInteractive.HeartsofIronIV-MicrosoftStoreEd", 394360, GameInstallType.HOI4),
     CK3("ck3", "CK3", "Crusader Kings III", "ParadoxInteractive.ProjectTitus", 1158310, GameInstallType.CK3),
     STELLARIS("stellaris", "Stellaris", "Stellaris",
             "ParadoxInteractive.Stellaris-MicrosoftStoreEdition", 281990, GameInstallType.STELLARIS),

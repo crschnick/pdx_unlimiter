@@ -243,28 +243,12 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         return guarantees;
     }
 
-    public Optional<Eu4Tag> getOverlord() {
-        return Optional.ofNullable(overlord);
-    }
-
     public List<Eu4Tag> getJuniorPartners() {
         return juniorPartners;
     }
 
-    public Optional<Eu4Tag> getSeniorPartner() {
-        return Optional.ofNullable(seniorPartner);
-    }
-
     public List<Eu4Tag> getTributaryJuniors() {
         return tributaryJuniors;
-    }
-
-    public Optional<Eu4Tag> getTributarySenior() {
-        return Optional.ofNullable(tributarySenior);
-    }
-
-    public Map<Eu4Tag, GameDate> getTruces() {
-        return Map.of();
     }
 
     public List<War> getWars() {

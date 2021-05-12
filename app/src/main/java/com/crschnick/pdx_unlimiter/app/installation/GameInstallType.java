@@ -28,11 +28,21 @@ public interface GameInstallType {
 
     GameInstallType EU4 = new StandardInstallType("eu4") {
         @Override
+        public Path getWindowsStoreLauncherDataPath(Path p) {
+            return p.resolve("launcher");
+        }
+
+        @Override
         public Path chooseBackgroundImage(Path p) {
             // Prefer launcher image!
-            var launcherBg = p.resolve("launcher-assets").resolve("app-background.png");
+            var launcherBg = getLauncherDataPath(p).resolve("launcher-assets").resolve("app-background.png");
             if (Files.exists(launcherBg)) {
                 return launcherBg;
+            }
+
+            var launcherWindowsBg = getWindowsStoreLauncherDataPath(p).resolve("launcher-assets").resolve("app-background.png");
+            if (Files.exists(launcherWindowsBg)) {
+                return launcherWindowsBg;
             }
 
             return null;
@@ -77,6 +87,11 @@ public interface GameInstallType {
     };
 
     GameInstallType HOI4 = new StandardInstallType("hoi4") {
+        @Override
+        public Path getWindowsStoreLauncherDataPath(Path p) {
+            return p.resolve("launcher");
+        }
+
         @Override
         public Path chooseBackgroundImage(Path p) {
             int i = new Random().nextInt(8) + 1;

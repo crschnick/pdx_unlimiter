@@ -59,6 +59,12 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     }
 
     @Override
+    protected Path getLauncherSettings() {
+        return getGame().getInstallType().getWindowsStoreLauncherDataPath(
+                getInstallLocation()).resolve("launcher-settings.json");
+    }
+
+    @Override
     public Path getIcon() {
         return getGame().getInstallType().getWindowsStoreIcon(getInstallLocation());
     }
