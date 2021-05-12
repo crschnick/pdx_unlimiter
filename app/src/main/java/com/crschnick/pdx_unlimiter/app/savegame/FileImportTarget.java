@@ -5,8 +5,8 @@ import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.core.TaskExecutor;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameType;
+import com.crschnick.pdxu.io.savegame.SavegameParseResult;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
@@ -135,7 +135,7 @@ public abstract class FileImportTarget {
                     Files.write(downloadedFile, data);
 
                     onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, null, true,null, null));
+                            .importSavegame(downloadedFile, null, true, null, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }

@@ -9,7 +9,7 @@ import com.crschnick.pdx_unlimiter.app.editor.target.StorageEditTarget;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 

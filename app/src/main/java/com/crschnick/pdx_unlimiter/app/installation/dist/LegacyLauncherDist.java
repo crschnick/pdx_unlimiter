@@ -9,6 +9,10 @@ import java.util.Optional;
 
 public class LegacyLauncherDist extends GameDist {
 
+    public LegacyLauncherDist(Game game, Path installLocation) {
+        super(game, "Legacy", installLocation);
+    }
+
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
             return Optional.empty();
@@ -20,10 +24,6 @@ public class LegacyLauncherDist extends GameDist {
         }
 
         return Optional.of(new LegacyLauncherDist(g, dir));
-    }
-
-    public LegacyLauncherDist(Game game, Path installLocation) {
-        super(game, "Legacy", installLocation);
     }
 
     @Override

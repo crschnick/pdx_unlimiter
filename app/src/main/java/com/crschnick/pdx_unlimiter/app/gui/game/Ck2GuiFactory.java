@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck2.Ck2SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck2.Ck2Tag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
+import com.crschnick.pdxu.model.ck2.Ck2Tag;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;

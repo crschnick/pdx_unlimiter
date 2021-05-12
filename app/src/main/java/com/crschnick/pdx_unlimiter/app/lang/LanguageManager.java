@@ -15,6 +15,7 @@ public class LanguageManager {
     public static final Language DEFAULT = Language.ENGLISH;
 
     private static LanguageManager INSTANCE;
+    private final BidiMap<String, Language> languages = new DualHashBidiMap<>();
 
     public static void init() {
         INSTANCE = new LanguageManager();
@@ -24,8 +25,6 @@ public class LanguageManager {
     public static LanguageManager getInstance() {
         return INSTANCE;
     }
-
-    private final BidiMap<String,Language> languages = new DualHashBidiMap<>();
 
     private void load() {
         try {

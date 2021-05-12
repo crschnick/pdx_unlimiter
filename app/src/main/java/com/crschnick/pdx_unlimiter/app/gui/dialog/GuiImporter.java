@@ -2,7 +2,7 @@ package com.crschnick.pdx_unlimiter.app.gui.dialog;
 
 import com.crschnick.pdx_unlimiter.app.savegame.FileImportTarget;
 import com.crschnick.pdx_unlimiter.app.savegame.FileImporter;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
+import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.geometry.Pos;

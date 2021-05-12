@@ -9,7 +9,7 @@ import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.savegame.*;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;

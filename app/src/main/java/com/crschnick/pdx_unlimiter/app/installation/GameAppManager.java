@@ -38,6 +38,15 @@ public final class GameAppManager {
         INSTANCE.stop();
     }
 
+    private static boolean isInstanceOfGame(String cmd, Game game) {
+        var install = GameInstallation.ALL.get(game);
+        return install != null && install.getDist().isGameInstance(cmd);
+    }
+
+    public static GameAppManager getInstance() {
+        return INSTANCE;
+    }
+
     private void start() {
         active = true;
         thread = ThreadHelper.create("game watcher", true, () -> {
@@ -62,15 +71,6 @@ public final class GameAppManager {
         }
         thread = null;
         activeGame.set(null);
-    }
-
-    private static boolean isInstanceOfGame(String cmd, Game game) {
-        var install = GameInstallation.ALL.get(game);
-        return install != null && install.getDist().isGameInstance(cmd);
-    }
-
-    public static GameAppManager getInstance() {
-        return INSTANCE;
     }
 
     private void update() {

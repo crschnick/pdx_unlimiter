@@ -2,9 +2,9 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.vic2.Vic2SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.vic2.Vic2Tag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
+import com.crschnick.pdxu.model.vic2.Vic2Tag;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;

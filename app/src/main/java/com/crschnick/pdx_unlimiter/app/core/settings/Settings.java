@@ -187,13 +187,13 @@ public final class Settings extends AbstractSettings {
                         hoi4.getValue() == null && stellaris.getValue() == null;
         if (hasNoValidInstallation) {
             GuiErrorReporter.showSimpleErrorMessage("""
-                            Welcome to the Pdx-Unlimiter!
-                                                    
-                            The automatic game detection did not detect any supported Paradox game.
-                            To get started, you can set the installation directories of games manually in the settings menu.
+                    Welcome to the Pdx-Unlimiter!
+                                            
+                    The automatic game detection did not detect any supported Paradox game.
+                    To get started, you can set the installation directories of games manually in the settings menu.
 
-                            Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
-                                                """);
+                    Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
+                                        """);
             Platform.runLater(GuiSettings::showSettings);
         }
     }

@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
-import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.node.NodeMatcher;
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodeMatcher;
 
 import java.util.ArrayList;
 import java.util.List;

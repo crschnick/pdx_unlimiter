@@ -14,6 +14,10 @@ import java.util.Optional;
 
 public class PdxLauncherDist extends GameDist {
 
+    public PdxLauncherDist(Game g, String name, Path installLocation) {
+        super(g, name, installLocation);
+    }
+
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
             return Optional.empty();
@@ -54,10 +58,6 @@ public class PdxLauncherDist extends GameDist {
                         "--pdxlGameDir", launcherPath.toString(),
                         "--gameDir", launcherPath.toString())
                 .start();
-    }
-
-    public PdxLauncherDist(Game g, String name, Path installLocation) {
-        super(g, name, installLocation);
     }
 
     private Path getLauncherSettings() {

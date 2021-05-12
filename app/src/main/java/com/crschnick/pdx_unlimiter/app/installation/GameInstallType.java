@@ -4,9 +4,9 @@ import com.crschnick.pdx_unlimiter.app.lang.Language;
 import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.OsHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameNamedVersion;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.model.GameNamedVersion;
+import com.crschnick.pdxu.model.GameVersion;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
@@ -183,7 +183,7 @@ public interface GameInstallType {
     GameInstallType CK3 = new StandardInstallType("binaries/ck3") {
         @Override
         public Path chooseBackgroundImage(Path p) {
-            String[] bgs = new String[] {"assassin", "baghdad", "castle", "council", "duel"};
+            String[] bgs = new String[]{"assassin", "baghdad", "castle", "council", "duel"};
             return p.resolve("game").resolve("gfx").resolve("interface").resolve("illustrations")
                     .resolve("loading_screens").resolve(bgs[new Random().nextInt(bgs.length)] + ".dds");
         }
@@ -309,7 +309,7 @@ public interface GameInstallType {
 
         @Override
         public Optional<GameVersion> determineVersionFromInstallation(Path p) {
-            return Optional.of(new GameVersion(3,3,3,0));
+            return Optional.of(new GameVersion(3, 3, 3, 0));
         }
     };
 
@@ -383,7 +383,6 @@ public interface GameInstallType {
     };
 
 
-
     Path chooseBackgroundImage(Path p);
 
     default Optional<GameVersion> determineVersionFromInstallation(Path p) {
@@ -410,27 +409,27 @@ public interface GameInstallType {
         return userDir.relativize(mod.getModFile()).toString();
     }
 
-    public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;
+    void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;
 
-    public default Path getSteamSpecificFile(Path p) {
+    default Path getSteamSpecificFile(Path p) {
         return p.resolve("steam_appid.txt");
     }
 
-    public default Path getLauncherDataPath(Path p) {
+    default Path getLauncherDataPath(Path p) {
         return p;
     }
 
-    public default Path getWindowsStoreLauncherDataPath(Path p) {
+    default Path getWindowsStoreLauncherDataPath(Path p) {
         return getLauncherDataPath(p);
     }
 
     Path getIcon(Path p);
 
-    public default Path getWindowsStoreIcon(Path p) {
+    default Path getWindowsStoreIcon(Path p) {
         return p.resolve("Square150x150Logo.scale-100.png");
     }
 
-    public default Path getModBasePath(Path p) {
+    default Path getModBasePath(Path p) {
         return p;
     }
 
@@ -438,11 +437,11 @@ public interface GameInstallType {
         return Optional.empty();
     }
 
-    public default Optional<String> debugModeSwitch() {
+    default Optional<String> debugModeSwitch() {
         return Optional.empty();
     }
 
-    public default Path determineUserDir(Path p, String name) throws IOException {
+    default Path determineUserDir(Path p, String name) throws IOException {
         var userDirFile = p.resolve("userdir.txt");
         if (Files.exists(userDirFile)) {
             var s = Files.readString(userDirFile).trim();
@@ -454,7 +453,7 @@ public interface GameInstallType {
         return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name);
     }
 
-    public static abstract class StandardInstallType implements GameInstallType {
+    abstract class StandardInstallType implements GameInstallType {
 
         private final String executableName;
 

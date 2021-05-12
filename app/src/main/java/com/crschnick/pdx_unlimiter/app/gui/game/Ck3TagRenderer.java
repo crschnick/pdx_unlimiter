@@ -4,15 +4,15 @@ import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3CoatOfArms;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3House;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.TaggedNode;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.model.GameColor;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
+import com.crschnick.pdxu.model.ck3.Ck3House;
+import com.crschnick.pdxu.model.ck3.Ck3Tag;
+import com.crschnick.pdxu.model.ck3.Ck3Title;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -40,24 +40,11 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-
-    public static class CoatOfArmsCache extends CacheManager.Cache {
-
-        private final Map<Ck3Tag, Image> realms = new ConcurrentHashMap<>();
-        private final Map<Ck3Title, Image> titles = new ConcurrentHashMap<>();
-        private final Map<Ck3House, Image> houses = new ConcurrentHashMap<>();
-        private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
-
-        public CoatOfArmsCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
-        }
-    }
-
     private static Map<String, javafx.scene.paint.Color> loadPredefinedColors(Node node) {
         Map<String, javafx.scene.paint.Color> map = new HashMap<>();
         node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
             n.forEach((k, v) -> {
-                ColorNode colorData = (ColorNode) v;
+                TaggedNode colorData = (TaggedNode) v;
                 map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
             });
         });
@@ -283,7 +270,6 @@ public class Ck3TagRenderer {
         }
     }
 
-
     private static BufferedImage pattern(Graphics g, Ck3CoatOfArms.Sub sub, SavegameInfo<Ck3Tag> info) {
         var cache = CacheManager.getInstance().get(CoatOfArmsCache.class);
         if (cache.colors.size() == 0) {
@@ -380,8 +366,20 @@ public class Ck3TagRenderer {
 
             if (hasMask) {
                 applyCullingMask(emblemToCullImage, rawPatternImage, emblem.getMask());
-                currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new Color(0,0,0,0), null);
+                currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new Color(0, 0, 0, 0), null);
             }
         });
+    }
+
+    public static class CoatOfArmsCache extends CacheManager.Cache {
+
+        private final Map<Ck3Tag, Image> realms = new ConcurrentHashMap<>();
+        private final Map<Ck3Title, Image> titles = new ConcurrentHashMap<>();
+        private final Map<Ck3House, Image> houses = new ConcurrentHashMap<>();
+        private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
+
+        public CoatOfArmsCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        }
     }
 }

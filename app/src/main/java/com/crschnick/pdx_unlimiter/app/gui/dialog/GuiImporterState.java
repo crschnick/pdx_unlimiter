@@ -19,6 +19,7 @@ public class GuiImporterState {
     private final StringProperty filter;
     private final List<ImportEntry> allTargets;
     private final ListProperty<ImportEntry> shownTargets;
+
     public GuiImporterState() {
         selectAll = new SimpleBooleanProperty();
         filter = new SimpleStringProperty("");

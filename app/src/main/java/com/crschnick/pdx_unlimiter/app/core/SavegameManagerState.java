@@ -7,7 +7,7 @@ import com.crschnick.pdx_unlimiter.app.savegame.SavegameCollection;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameContext;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
@@ -39,33 +39,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         addShownContentChangeListeners();
     }
 
-    private void addShownContentChangeListeners() {
-        var colListener = (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
-            updateShownCollections();
-        };
-        current.addListener((c,o,n) -> {
-            if (o != null) {
-                SavegameStorage.get(o).getCollections().removeListener(colListener);
-            }
-            if (n != null) {
-                SavegameStorage.get(n).getCollections().addListener(colListener);
-            }
-        });
-
-
-        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
-        globalSelectedCollection.addListener((c, o, n) -> {
-            if (o != null) {
-                o.getSavegames().removeListener(cl);
-                unloadCollectionAsync(o);
-            }
-
-            if (n != null) {
-                n.getSavegames().addListener(cl);
-            }
-        });
-    }
-
     @SuppressWarnings("unchecked")
     public static <T, I extends SavegameInfo<T>> SavegameManagerState<T, I> get() {
         return (SavegameManagerState<T, I>) INSTANCE;
@@ -94,6 +67,33 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         if (INSTANCE.current() != null) {
             INSTANCE.selectGame(null);
         }
+    }
+
+    private void addShownContentChangeListeners() {
+        var colListener = (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
+            updateShownCollections();
+        };
+        current.addListener((c, o, n) -> {
+            if (o != null) {
+                SavegameStorage.get(o).getCollections().removeListener(colListener);
+            }
+            if (n != null) {
+                SavegameStorage.get(n).getCollections().addListener(colListener);
+            }
+        });
+
+
+        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
+        globalSelectedCollection.addListener((c, o, n) -> {
+            if (o != null) {
+                o.getSavegames().removeListener(cl);
+                unloadCollectionAsync(o);
+            }
+
+            if (n != null) {
+                n.getSavegames().addListener(cl);
+            }
+        });
     }
 
     public void onGameChange(Consumer<Game> change) {

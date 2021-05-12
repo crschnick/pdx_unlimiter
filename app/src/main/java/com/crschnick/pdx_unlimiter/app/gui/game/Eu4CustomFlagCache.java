@@ -5,8 +5,8 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.model.GameColor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -28,6 +28,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
     private final List<GameColor> flagColors = new ArrayList<>();
     private final List<Texture> textures = new ArrayList<>();
     private BufferedImage emblems;
+
     public Eu4CustomFlagCache() {
         super(CacheManager.Scope.GAME_SPECIFIC);
 

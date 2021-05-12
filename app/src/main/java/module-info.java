@@ -1,5 +1,4 @@
 module com.crschnick.pdx_unlimiter.app {
-    requires com.crschnick.pdx_unlimiter.core;
     requires com.realityinteractive.imageio.tga;
     requires org.apache.commons.lang;
     requires org.apache.commons.io;
@@ -21,6 +20,8 @@ module com.crschnick.pdx_unlimiter.app {
     requires org.apache.commons.collections4;
     requires java.desktop;
     requires java.net.http;
+    requires com.crschnick.pdxu.model;
+    requires com.crschnick.pdxu.io;
 
     exports com.crschnick.pdx_unlimiter.app to javafx.graphics;
 }

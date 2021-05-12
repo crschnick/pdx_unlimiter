@@ -1,5 +1,6 @@
 package com.crschnick.pdx_unlimiter.app.gui;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -25,13 +26,17 @@ public class GuiTooltips {
     }
 
     public static void install(Node node, String text) {
-        var tt = GuiTooltips.createTooltip(text);
-        tt.setShowDelay(Duration.millis(350));
-        tt.setShowDuration(Duration.INDEFINITE);
-        Tooltip.install(node, tt);
+        // TODO
+        // Attempt to fix weird tooltip errors by forcing the platform thread to do the installation
+        Platform.runLater(() -> {
+            var tt = GuiTooltips.createTooltip(text);
+            tt.setShowDelay(Duration.millis(350));
+            tt.setShowDuration(Duration.INDEFINITE);
+            Tooltip.install(node, tt);
+        });
     }
 
-    public static class FocusTooltip extends Tooltip {
+    private static class FocusTooltip extends Tooltip {
 
         public FocusTooltip(String string) {
             super(string);

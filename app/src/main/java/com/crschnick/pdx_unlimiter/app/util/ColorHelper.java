@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.util;
 
-import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.ValueNode;
+import com.crschnick.pdxu.io.node.TaggedNode;
+import com.crschnick.pdxu.io.node.ValueNode;
+import com.crschnick.pdxu.model.GameColor;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -54,8 +54,8 @@ public class ColorHelper {
         return (0xFF << 24) + ((int) (c.getRed() * 0xFF) << 16) + ((int) (c.getGreen() * 0xFF) << 8) + ((int) (c.getBlue() * 0xFF));
     }
 
-    public static ColorNode toColorNode(Color c) {
-        return new ColorNode(GameColor.Type.RGB, List.of(
+    public static TaggedNode toColorNode(Color c) {
+        return new TaggedNode(TaggedNode.TagType.RGB, List.of(
                 new ValueNode(String.valueOf((int) (c.getRed() * 255)), false),
                 new ValueNode(String.valueOf((int) (c.getGreen() * 255)), false),
                 new ValueNode(String.valueOf((int) (c.getBlue() * 255)), false)));
@@ -77,6 +77,7 @@ public class ColorHelper {
                     Double.parseDouble(c.get(1)) / 255.0,
                     Double.parseDouble(c.get(2)) / 255.0);
             case HEX -> Color.valueOf("#" + color.getValues().get(0));
+            default -> throw new IllegalStateException("Unexpected value: " + color.getType());
         };
     }
 }

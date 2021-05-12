@@ -4,12 +4,12 @@ import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
-import com.crschnick.pdx_unlimiter.core.node.ColorNode;
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.TaggedNode;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.model.GameColor;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
@@ -29,22 +29,11 @@ public class StellarisTagRenderer {
     private static final int PATTERN_COLOR_1 = 0xFFFF0000;
     private static final int PATTERN_COLOR_2 = 0xFF00FF00;
 
-    public static class StellarisTagImageCache extends CacheManager.Cache {
-
-        private final Map<Path, BufferedImage> backgrounds = new ConcurrentHashMap<>();
-        private final Map<Path, BufferedImage> icons = new ConcurrentHashMap<>();
-        private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
-
-        public StellarisTagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
-        }
-    }
-
     private static Map<String, javafx.scene.paint.Color> loadPredefinedStellarisColors(Node node) {
         Map<String, javafx.scene.paint.Color> map = new HashMap<>();
         node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
             n.forEach((k, v) -> {
-                ColorNode colorData = (ColorNode) v.getNodeForKey("flag");
+                TaggedNode colorData = (TaggedNode) v.getNodeForKey("flag");
                 map.put(k, fromGameColor(GameColor.fromColorNode(colorData)));
             });
         });
@@ -94,7 +83,6 @@ public class StellarisTagRenderer {
         return result;
     }
 
-
     private static BufferedImage icon(SavegameInfo<StellarisTag> info, StellarisTag tag) {
         var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
 
@@ -138,5 +126,16 @@ public class StellarisTagRenderer {
         var img = ImageLoader.loadAwtImage(in.get(), customFilter);
         cache.backgrounds.put(path, img);
         return img;
+    }
+
+    public static class StellarisTagImageCache extends CacheManager.Cache {
+
+        private final Map<Path, BufferedImage> backgrounds = new ConcurrentHashMap<>();
+        private final Map<Path, BufferedImage> icons = new ConcurrentHashMap<>();
+        private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
+
+        public StellarisTagImageCache() {
+            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        }
     }
 }

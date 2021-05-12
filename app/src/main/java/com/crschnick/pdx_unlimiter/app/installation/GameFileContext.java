@@ -1,10 +1,10 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -18,23 +18,22 @@ public class GameFileContext {
             Ck3SavegameInfo.class, Game.CK3,
             Hoi4SavegameInfo.class, Game.HOI4,
             StellarisSavegameInfo.class, Game.STELLARIS);
-
-    public static GameFileContext fromInfo(SavegameInfo<?> info) {
-        var install = GameInstallation.ALL.get(INFO_MAP.get(info.getClass()));
-        return new GameFileContext(
-                install,
-                info.getMods().stream()
-                .map(install::getModForId)
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList()));
-    }
-
     private final GameInstallation install;
     private final List<GameMod> mods;
 
     public GameFileContext(GameInstallation install, List<GameMod> mods) {
         this.install = install;
         this.mods = mods;
+    }
+
+    public static GameFileContext fromInfo(SavegameInfo<?> info) {
+        var install = GameInstallation.ALL.get(INFO_MAP.get(info.getClass()));
+        return new GameFileContext(
+                install,
+                info.getMods().stream()
+                        .map(install::getModForId)
+                        .flatMap(Optional::stream)
+                        .collect(Collectors.toList()));
     }
 
     public GameInstallation getInstall() {

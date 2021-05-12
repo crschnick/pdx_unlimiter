@@ -2,9 +2,9 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;

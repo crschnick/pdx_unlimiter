@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.editor;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.FileWatchManager;
 import com.crschnick.pdx_unlimiter.app.util.ThreadHelper;
-import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.NodeWriter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +23,8 @@ public class EditorExternalState {
 
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
-    private final Set<Entry> openEntries = new CopyOnWriteArraySet<>();
-
     private static final Logger logger = LoggerFactory.getLogger(EditorExternalState.class);
+    private final Set<Entry> openEntries = new CopyOnWriteArraySet<>();
 
     public static void init() {
         try {
@@ -34,7 +33,8 @@ public class EditorExternalState {
             try {
                 // Remove old editor files in dir
                 FileUtils.cleanDirectory(TEMP.toFile());
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
 
             FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
                 if (!Files.exists(changed)) {

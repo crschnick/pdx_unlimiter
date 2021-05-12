@@ -14,6 +14,13 @@ import java.util.stream.Collectors;
 
 public class SteamDist extends GameDist {
 
+    private final GameDist dist;
+
+    public SteamDist(Game g, Path installLocation, GameDist dist) {
+        super(g, "Steam", installLocation);
+        this.dist = dist;
+    }
+
     public static Optional<GameDist> getDist(Game g, Path dir) {
         var installDir = dir;
         if (dir == null) {
@@ -33,13 +40,6 @@ public class SteamDist extends GameDist {
             }
         }
         return Optional.empty();
-    }
-
-    private final GameDist dist;
-
-    public SteamDist(Game g, Path installLocation, GameDist dist) {
-        super(g, "Steam", installLocation);
-        this.dist = dist;
     }
 
     @Override

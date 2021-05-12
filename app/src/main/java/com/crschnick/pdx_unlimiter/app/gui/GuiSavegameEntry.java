@@ -13,11 +13,11 @@ import com.crschnick.pdx_unlimiter.app.util.integration.ConverterHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.RakalyWebHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.SkanderbegHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3Tag;
+import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
 import com.jfoenix.controls.JFXSpinner;
@@ -41,6 +41,8 @@ import java.util.List;
 import static com.crschnick.pdx_unlimiter.app.gui.GuiStyle.*;
 
 public class GuiSavegameEntry {
+
+    private static Image FILE_ICON;
 
     private static <T, I extends SavegameInfo<T>> Region setupTopBar(SavegameEntry<T, I> e) {
         BorderPane topBar = new BorderPane();
@@ -72,7 +74,7 @@ public class GuiSavegameEntry {
             name.getStyleClass().add(CLASS_TEXT_FIELD);
             name.setAlignment(Pos.CENTER);
             name.setText(e.getName().equals(dateString) ? "" : e.getName());
-            name.textProperty().addListener((c,o,n) -> {
+            name.textProperty().addListener((c, o, n) -> {
                 e.nameProperty().set(n);
             });
             topBar.setCenter(name);
@@ -83,8 +85,6 @@ public class GuiSavegameEntry {
         }
         return topBar;
     }
-
-    private static Image FILE_ICON;
 
     private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(Region r, SavegameEntry<T, I> e) {
         r.setOnDragDetected(me -> {
@@ -189,7 +189,6 @@ public class GuiSavegameEntry {
                 SavegameActions.openSavegame(e);
             });
         }
-
 
 
         HBox dynamicButtons = new HBox();
@@ -348,7 +347,7 @@ public class GuiSavegameEntry {
             }
         });
 
-        entry.infoProperty().addListener((c,o,n) -> {
+        entry.infoProperty().addListener((c, o, n) -> {
             if (n != null) {
                 loadEntry.run();
             } else {

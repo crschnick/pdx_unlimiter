@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.core.settings.Settings;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDist;
 import com.crschnick.pdx_unlimiter.app.lang.Language;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
+import com.crschnick.pdxu.model.GameVersion;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.slf4j.Logger;

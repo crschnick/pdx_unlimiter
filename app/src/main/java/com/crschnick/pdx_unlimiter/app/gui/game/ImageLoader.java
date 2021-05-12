@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.util.function.Function;
 
 import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.*;
-import static com.crschnick.pdx_unlimiter.app.util.ColorHelper.getBlue;
 
 public class ImageLoader {
 

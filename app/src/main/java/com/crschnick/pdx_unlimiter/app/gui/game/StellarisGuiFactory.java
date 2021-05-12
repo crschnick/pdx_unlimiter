@@ -1,8 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;

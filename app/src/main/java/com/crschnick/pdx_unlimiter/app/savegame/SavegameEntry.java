@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
-import com.crschnick.pdx_unlimiter.core.info.GameDate;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.GameDate;
+import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.*;
 
 import java.util.ArrayList;
@@ -9,13 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Comparable<SavegameEntry<T, I>> {
-
-    public static enum State {
-        UNLOADED,
-        LOADING,
-        LOADED,
-        LOAD_FAILED
-    }
 
     private final ObjectProperty<State> state;
     private final StringProperty name;
@@ -112,5 +105,12 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
 
     public ReadOnlyObjectProperty<State> stateProperty() {
         return state;
+    }
+
+    public enum State {
+        UNLOADED,
+        LOADING,
+        LOADED,
+        LOAD_FAILED
     }
 }

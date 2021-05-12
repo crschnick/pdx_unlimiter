@@ -4,9 +4,9 @@ import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.lang.GameLocalisation;
 import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -97,7 +97,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     private void addDucatsEntry(
             JFXMasonryPane pane,
             int value, int loans) {
-        var label = new Label(value + (loans != 0 ?  " / -" + loans : ""),
+        var label = new Label(value + (loans != 0 ? " / -" + loans : ""),
                 GameImage.imageNode(EU4_ICON_DUCATS, CLASS_IMAGE_ICON));
         label.setMinWidth(Region.USE_PREF_SIZE);
         label.setEllipsisString("");

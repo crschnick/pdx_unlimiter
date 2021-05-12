@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.editor.target;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameActions;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.nio.charset.Charset;
 import java.util.Map;

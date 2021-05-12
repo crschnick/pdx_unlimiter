@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor.target;
 
-import com.crschnick.pdx_unlimiter.core.node.ArrayNode;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameType;
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;

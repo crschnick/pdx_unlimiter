@@ -1,0 +1,56 @@
+package com.crschnick.pdxu.model;
+
+import java.util.List;
+import java.util.UUID;
+
+public abstract class SavegameInfo<T> {
+
+    protected UUID campaignHeuristic;
+    protected List<String> mods;
+    protected List<String> dlcs;
+    protected GameVersion version;
+    protected boolean ironman;
+    protected GameDate date;
+    protected boolean binary;
+    protected boolean observer;
+
+    public List<String> getMods() {
+        return mods;
+    }
+
+    public List<String> getDlcs() {
+        return dlcs;
+    }
+
+    public abstract T getTag();
+
+    public boolean isIronman() {
+        return ironman;
+    }
+
+    public GameDate getDate() {
+        return date;
+    }
+
+    public GameVersion getVersion() {
+        return version;
+    }
+
+    public abstract List<T> getAllTags();
+
+    public boolean isBinary() {
+        return binary;
+    }
+
+    public UUID getCampaignHeuristic() {
+        return campaignHeuristic;
+    }
+
+    public boolean hasOnePlayerTag() {
+        return getTag() != null;
+    }
+
+    public boolean isObserver() {
+        return observer;
+    }
+}

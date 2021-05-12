@@ -28,13 +28,13 @@ List<String> runArgs = [
         "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
         "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.eu4=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.ck3=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.hoi4=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.stellaris=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.ck2=com.fasterxml.jackson.databind",
-        "--add-opens", "com.crschnick.pdx_unlimiter.core/com.crschnick.pdx_unlimiter.core.info.vic2=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.eu4=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.ck3=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.hoi4=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.stellaris=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.ck2=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.vic2=com.fasterxml.jackson.databind",
         "-Xmx4g",
         "-XX:+ExitOnOutOfMemoryError"]
 
@@ -87,7 +87,8 @@ dependencies {
     implementation files("$buildDir/generated-modules/sentry-4.3.0.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.0.2.jar")
 
-    implementation project(':core')
+    implementation project(':pdxu-io')
+    implementation project(':pdxu-model')
 }
 
 addDependenciesModuleInfo {

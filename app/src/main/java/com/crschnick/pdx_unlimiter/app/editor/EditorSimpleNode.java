@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.editor;
 
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.node.*;
+import com.crschnick.pdxu.io.node.*;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public final class EditorSimpleNode extends EditorNode {
     }
 
     public void updateColor(Color c) {
-        ColorNode cn = (ColorNode) backingNode;
+        TaggedNode cn = (TaggedNode) backingNode;
         var newColorNode = ColorHelper.toColorNode(c);
         cn.set(newColorNode);
     }
@@ -115,8 +115,8 @@ public final class EditorSimpleNode extends EditorNode {
             }
 
             var nodeToUse = newNode.getNodeArray().get(0);
-            if (nodeToUse.isColor()) {
-                ((ColorNode) backingNode).set((ColorNode) nodeToUse);
+            if (nodeToUse.isTagged()) {
+                ((TaggedNode) backingNode).set((TaggedNode) nodeToUse);
             } else if (nodeToUse.isValue()) {
                 ((ValueNode) backingNode).set((ValueNode) nodeToUse);
             } else {

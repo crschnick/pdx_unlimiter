@@ -6,8 +6,9 @@ import com.crschnick.pdx_unlimiter.app.editor.EditorSimpleNode;
 import com.crschnick.pdx_unlimiter.app.editor.EditorState;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameColor;
-import com.crschnick.pdx_unlimiter.core.writer.NodeWriter;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodeWriter;
+import com.crschnick.pdxu.model.GameColor;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import javafx.geometry.Pos;
@@ -30,7 +31,8 @@ public class GuiEditorNode {
                 state.onTextChanged();
             });
             return tf;
-        } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isColor()) {
+        } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isTagged() &&
+                ((EditorSimpleNode) n).getBackingNode().describe().getValueType().equals(Node.ValueType.COLOR)) {
             var picker = new JFXColorPicker(ColorHelper.fromGameColor(GameColor.fromColorNode(
                     ((EditorSimpleNode) n).getBackingNode())));
             picker.valueProperty().addListener((c, o, ne) -> {

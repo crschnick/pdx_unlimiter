@@ -1,7 +1,7 @@
 package com.crschnick.pdx_unlimiter.app.installation;
 
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.TextFormatParser;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

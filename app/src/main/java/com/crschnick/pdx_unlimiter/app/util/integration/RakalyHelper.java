@@ -15,9 +15,9 @@ public class RakalyHelper {
             alert.setAlertType(Alert.AlertType.ERROR);
             alert.setTitle("Rakaly error");
             alert.setHeaderText("It seems like a core component, the Rakaly Ironman converter, is missing.\n" +
-                   "This is usually caused by a not fully completed update.\n" +
-                   "Please try restarting the Pdx-Unlimiter while you are connected to the internet to fix this.\n\n" +
-                   "If this doesn't help, please report this error to the developers.");
+                    "This is usually caused by a not fully completed update.\n" +
+                    "Please try restarting the Pdx-Unlimiter while you are connected to the internet to fix this.\n\n" +
+                    "If this doesn't help, please report this error to the developers.");
         });
     }
 

@@ -93,7 +93,7 @@ public class GuiErrorReporter {
                 """ + (!terminal ? "Note that this error is not terminal and you can continue using the Pdx-Unlimiter.\n" +
                 "However, if something is no longer working correctly, you should try to restart the Pdx-Unlimiter." :
                 "This error means that the Pdx-Unlimiter can not operate anymore without solving the underlying problem.\n" +
-                "This is done to protect the state of your savegame storage.") : ""));
+                        "This is done to protect the state of your savegame storage.") : ""));
 
         VBox dialogPaneContent = new VBox();
 

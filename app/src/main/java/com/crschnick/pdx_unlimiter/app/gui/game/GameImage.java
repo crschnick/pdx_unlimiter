@@ -4,7 +4,7 @@ import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
 import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4Tag;
+import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -195,13 +195,13 @@ public class GameImage {
 
         CK3_REALM_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("_default.dds"));
         CK3_REALM_CLAN_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("clan_government.dds"));
-        CK3_REALM_REPUBLIC_MASK= ImageLoader.loadImage(i.resolve("realm_masks").resolve("republic_government.dds"));
+        CK3_REALM_REPUBLIC_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("republic_government.dds"));
         CK3_REALM_THEOCRACY_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("theocracy_government.dds"));
         CK3_REALM_TRIBAL_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("tribal_government.dds"));
 
         CK3_REALM_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("_default_115.dds"));
         CK3_REALM_CLAN_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("clan_government_115.dds"));
-        CK3_REALM_REPUBLIC_FRAME= ImageLoader.loadImage(i.resolve("realm_frames").resolve("republic_government_115.dds"));
+        CK3_REALM_REPUBLIC_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("republic_government_115.dds"));
         CK3_REALM_THEOCRACY_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("theocracy_government_115.dds"));
         CK3_REALM_TRIBAL_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("tribal_government_115.dds"));
 

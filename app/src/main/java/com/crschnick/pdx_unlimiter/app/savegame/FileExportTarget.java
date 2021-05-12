@@ -1,18 +1,18 @@
 package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisTag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisTag;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public abstract class FileExportTarget<T,I extends SavegameInfo<T>> {
+public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
     protected Path savegameDir;
-    protected SavegameStorage<T,I> storage;
-    protected SavegameEntry<T,I> entry;
+    protected SavegameStorage<T, I> storage;
+    protected SavegameEntry<T, I> entry;
 
     FileExportTarget(Path savegameDir, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
         this.savegameDir = savegameDir;
@@ -21,7 +21,7 @@ public abstract class FileExportTarget<T,I extends SavegameInfo<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T,I extends SavegameInfo<T>> FileExportTarget<T,I> createExportTarget(SavegameEntry<T,I> entry) {
+    public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             if (SavegameStorage.get(Game.STELLARIS).equals(ctx.getStorage())) {
                 return (FileExportTarget<T, I>) new StellarisExportTarget(
@@ -36,7 +36,7 @@ public abstract class FileExportTarget<T,I extends SavegameInfo<T>> {
 
     public abstract Path export() throws IOException;
 
-    public static class StandardExportTarget<T,I extends SavegameInfo<T>> extends FileExportTarget<T,I> {
+    public static class StandardExportTarget<T, I extends SavegameInfo<T>> extends FileExportTarget<T, I> {
 
         public StandardExportTarget(Path savegameDir, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
             super(savegameDir, storage, entry);

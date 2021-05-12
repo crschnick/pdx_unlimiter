@@ -2,11 +2,11 @@ package com.crschnick.pdx_unlimiter.app.gui;
 
 import com.crschnick.pdx_unlimiter.app.core.ComponentManager;
 import com.crschnick.pdx_unlimiter.app.core.ErrorHandler;
-import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.core.PdxuInstallation;
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.gui.dialog.*;
 import com.crschnick.pdx_unlimiter.app.installation.dist.GameDistLauncher;
+import com.crschnick.pdx_unlimiter.app.lang.PdxuI18n;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorageIO;
 import com.crschnick.pdx_unlimiter.app.util.Hyperlinks;
 import com.crschnick.pdx_unlimiter.app.util.MemoryHelper;
@@ -40,7 +40,8 @@ public class GuiMenuBar {
 
         MenuItem rel = new MenuItem(PdxuI18n.get("RELOAD"));
         rel.setOnAction((a) -> {
-            ComponentManager.reloadSettings(() -> {});
+            ComponentManager.reloadSettings(() -> {
+            });
         });
         settings.getItems().add(rel);
 

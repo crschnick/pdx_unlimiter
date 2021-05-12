@@ -2,18 +2,12 @@ package com.crschnick.pdx_unlimiter.app.savegame;
 
 import com.crschnick.pdx_unlimiter.app.core.SavegameManagerState;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
-import com.crschnick.pdx_unlimiter.core.info.GameVersion;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.GameVersion;
+import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.util.Optional;
 
 public class SavegameCompatibility {
-
-    public static enum Compatbility {
-        COMPATIBLE,
-        INCOMPATIBLE,
-        UNKNOWN
-    }
 
     public static Compatbility determineForEntry(SavegameEntry<?, ?> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
@@ -56,5 +50,11 @@ public class SavegameCompatibility {
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
         return gameVersion.getFirst() == saveVersion.getFirst() && gameVersion.getSecond() == saveVersion.getSecond();
+    }
+
+    public enum Compatbility {
+        COMPATIBLE,
+        INCOMPATIBLE,
+        UNKNOWN
     }
 }

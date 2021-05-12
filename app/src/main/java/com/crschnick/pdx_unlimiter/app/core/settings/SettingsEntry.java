@@ -209,10 +209,10 @@ public abstract class SettingsEntry<T> {
 
     public static class ChoiceEntry<T> extends SimpleEntry<T> {
 
-        private final Function<T,String> displayNameFunc;
-        private final BidiMap<T,String> mapping;
+        private final Function<T, String> displayNameFunc;
+        private final BidiMap<T, String> mapping;
 
-        public ChoiceEntry(String id, String serializationName, T defaultValue, BidiMap<T,String> mapping, Function<T,String> displayNameFunc) {
+        public ChoiceEntry(String id, String serializationName, T defaultValue, BidiMap<T, String> mapping, Function<T, String> displayNameFunc) {
             super(id, serializationName, Type.CHOICE, defaultValue);
             this.mapping = mapping;
             this.displayNameFunc = displayNameFunc;

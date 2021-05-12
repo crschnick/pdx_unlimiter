@@ -3,8 +3,8 @@ package com.crschnick.pdx_unlimiter.app.gui.game;
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdx_unlimiter.app.util.ColorHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4Tag;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import javafx.scene.image.Image;
 
 import java.awt.*;

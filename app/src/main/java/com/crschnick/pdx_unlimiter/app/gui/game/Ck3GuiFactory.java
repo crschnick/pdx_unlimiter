@@ -1,13 +1,13 @@
 package com.crschnick.pdx_unlimiter.app.gui.game;
 
 import com.crschnick.pdx_unlimiter.app.gui.GuiTooltips;
-import com.crschnick.pdx_unlimiter.core.info.GameDate;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.War;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Person;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Title;
+import com.crschnick.pdxu.model.GameDate;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.War;
+import com.crschnick.pdxu.model.ck3.Ck3Person;
+import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3Tag;
+import com.crschnick.pdxu.model.ck3.Ck3Title;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

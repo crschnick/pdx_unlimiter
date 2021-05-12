@@ -3,13 +3,24 @@ package com.crschnick.pdx_unlimiter.app.lang;
 import com.crschnick.pdx_unlimiter.app.core.CacheManager;
 import com.crschnick.pdx_unlimiter.app.installation.GameFileContext;
 import com.crschnick.pdx_unlimiter.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameLocalisation {
+
+    public static String getLocalisedValue(String key, SavegameInfo<?> info) {
+        var cache = CacheManager.getInstance().get(LocalisationCache.class);
+        if (!cache.isLoaded()) {
+            cache.loadLocalisations(
+                    LanguageManager.getInstance().getActiveLanguage(),
+                    GameFileContext.fromInfo(info));
+        }
+
+        return cache.strings.getOrDefault(key, "Unknown");
+    }
 
     public static class LocalisationCache extends CacheManager.Cache {
 
@@ -36,16 +47,5 @@ public class GameLocalisation {
         public boolean isLoaded() {
             return strings.size() > 0;
         }
-    }
-
-    public static String getLocalisedValue(String key, SavegameInfo<?> info) {
-        var cache = CacheManager.getInstance().get(LocalisationCache.class);
-        if (!cache.isLoaded()) {
-            cache.loadLocalisations(
-                    LanguageManager.getInstance().getActiveLanguage(),
-                    GameFileContext.fromInfo(info));
-        }
-
-        return cache.strings.getOrDefault(key, "Unknown");
     }
 }

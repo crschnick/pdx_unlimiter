@@ -11,20 +11,20 @@ import com.crschnick.pdx_unlimiter.app.lang.LanguageManager;
 import com.crschnick.pdx_unlimiter.app.util.ConfigHelper;
 import com.crschnick.pdx_unlimiter.app.util.JsonHelper;
 import com.crschnick.pdx_unlimiter.app.util.integration.RakalyHelper;
-import com.crschnick.pdx_unlimiter.core.info.GameDate;
-import com.crschnick.pdx_unlimiter.core.info.GameDateType;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfoException;
-import com.crschnick.pdx_unlimiter.core.info.ck2.Ck2SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.eu4.Eu4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.vic2.Vic2SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.node.Node;
-import com.crschnick.pdx_unlimiter.core.parser.ParseException;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameParseResult;
-import com.crschnick.pdx_unlimiter.core.savegame.SavegameType;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.parser.ParseException;
+import com.crschnick.pdxu.io.savegame.SavegameParseResult;
+import com.crschnick.pdxu.io.savegame.SavegameType;
+import com.crschnick.pdxu.model.GameDate;
+import com.crschnick.pdxu.model.GameDateType;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfoException;
+import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -244,10 +244,10 @@ public abstract class SavegameStorage<
                 SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
                 List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
                         .map(n -> StreamSupport.stream(n.spliterator(), false)
-                                    .map(sfc -> sfc.textValue())
-                                    .collect(Collectors.toList()))
+                                .map(sfc -> sfc.textValue())
+                                .collect(Collectors.toList()))
                         .orElse(List.of());
-                collection.add(new SavegameEntry<>(name, eId,  checksum, date, notes, sourceFileChecksums));
+                collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
             });
         }
     }
@@ -480,7 +480,7 @@ public abstract class SavegameStorage<
         } catch (IOException ex) {
             // Don't show the user this error. It sometimes happens when the file is
             // used by another process or even an antivirus program
-            logger.error("Could not delete entry " + e.getName() , ex);
+            logger.error("Could not delete entry " + e.getName(), ex);
         }
 
         c.getSavegames().remove(e);

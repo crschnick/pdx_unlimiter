@@ -1,7 +1,8 @@
 package com.crschnick.pdx_unlimiter.app.core;
 
 import com.crschnick.pdx_unlimiter.app.installation.Game;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.io.savegame.SavegameType;
+import com.crschnick.pdxu.model.SavegameInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,34 +21,49 @@ public class IntegrityManager {
     private static final Logger logger = LoggerFactory.getLogger(IntegrityManager.class);
     private static IntegrityManager INSTANCE;
 
-    private final Map<Game,String> checksums = new HashMap<>();
+    private final Map<Game, String> checksums = new HashMap<>();
 
     public static void init() throws Exception {
         INSTANCE = new IntegrityManager();
 
-        Path infoPackage;
+        Path modelPackage;
+        Path ioPackage;
         if (PdxuInstallation.getInstance().isImage()) {
-            infoPackage = FileSystems.getFileSystem(URI.create("jrt:/")).getPath(
+            modelPackage = FileSystems.getFileSystem(URI.create("jrt:/")).getPath(
                     "modules",
-                    "com.crschnick.pdx_unlimiter.core",
-                    "com/crschnick/pdx_unlimiter/core");
+                    "com.crschnick.pdxu.model",
+                    "com/crschnick/pdxu/model");
+            ioPackage = FileSystems.getFileSystem(URI.create("jrt:/")).getPath(
+                    "modules",
+                    "com.crschnick.pdxu.io",
+                    "com/crschnick/pdxu/io");
+            for (Game g : Game.values()) {
+                INSTANCE.checksums.put(g, calc(ioPackage, modelPackage, g.getId()));
+            }
         } else {
-            var uri = new URI("jar:" + SavegameInfo.class.getProtectionDomain().getCodeSource()
+            var modelUri = new URI("jar:" + SavegameInfo.class.getProtectionDomain().getCodeSource()
                     .getLocation().toURI().toString());
-            infoPackage = FileSystems.newFileSystem(uri, Map.of())
-                    .getPath("/com/crschnick/pdx_unlimiter/core");
-        }
+            var ioUri = new URI("jar:" + SavegameType.class.getProtectionDomain().getCodeSource()
+                    .getLocation().toURI().toString());
+            try (var fs = FileSystems.newFileSystem(modelUri, Map.of());
+                 var ioFs = FileSystems.newFileSystem(ioUri, Map.of())) {
+                modelPackage = fs.getPath("/com/crschnick/pdxu/model");
+                ioPackage = ioFs.getPath("/com/crschnick/pdxu/io");
 
-        for (Game g : Game.values()) {
-            INSTANCE.checksums.put(g, calc(infoPackage, g.getId()));
+                for (Game g : Game.values()) {
+                    INSTANCE.checksums.put(g, calc(ioPackage, modelPackage, g.getId()));
+                }
+            }
         }
     }
 
-    private static String calc(Path pack, String game) throws Exception {
+    private static String calc(Path ioPackage, Path modelPackage, String game) throws Exception {
         MessageDigest d = MessageDigest.getInstance("MD5");
-        update(d, pack.resolve("parser"));
-        update(d, pack.resolve("info"));
-        update(d, pack.resolve("info").resolve(game));
+        update(d, ioPackage.resolve("parser"));
+        update(d, ioPackage.resolve("savegame"));
+        update(d, ioPackage.resolve("node"));
+        update(d, modelPackage);
+        update(d, modelPackage.resolve(game));
 
         // Rebuild caches if ironman converter changes
         try {

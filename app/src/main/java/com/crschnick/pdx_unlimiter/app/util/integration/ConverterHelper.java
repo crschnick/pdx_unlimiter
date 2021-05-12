@@ -8,8 +8,8 @@ import com.crschnick.pdx_unlimiter.app.installation.Game;
 import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameStorage;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3SavegameInfo;
-import com.crschnick.pdx_unlimiter.core.info.ck3.Ck3Tag;
+import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -121,7 +121,7 @@ public class ConverterHelper {
 
                 try {
                     int returnCode = handle.waitFor();
-                    
+
                     Platform.runLater(() -> {
                         if (returnCode == 0) {
                             GuiConverterConfig.showConversionSuccessDialog();

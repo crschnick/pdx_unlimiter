@@ -6,7 +6,7 @@ import com.crschnick.pdx_unlimiter.app.installation.GameInstallation;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCampaign;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameCompatibility;
 import com.crschnick.pdx_unlimiter.app.savegame.SavegameEntry;
-import com.crschnick.pdx_unlimiter.core.info.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -68,7 +68,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
 
     protected void addIntegerEntry(JFXMasonryPane pane,
-            Image icon, int value, String tooltip, boolean showPlus) {
+                                   Image icon, int value, String tooltip, boolean showPlus) {
         var text = (showPlus && value > 0 ? "+" + value : String.valueOf(value));
         var ironman = new StackPane(new Label(text, GameImage.imageNode(icon, CLASS_IMAGE_ICON)));
         ironman.setAlignment(Pos.CENTER);

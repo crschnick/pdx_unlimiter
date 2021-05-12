@@ -86,7 +86,7 @@ public class GuiSettingsComponents {
         del.setOnMouseClicked(e -> setDist.set(null));
         GuiTooltips.install(del, PdxuI18n.get("CLEAR_DIST_BUTTON"));
 
-        setDist.addListener((c,o,n) -> {
+        setDist.addListener((c, o, n) -> {
             if (n != null) {
                 locationLabel.setText(n.getInstallLocation().toString());
                 typeLabel.setVisible(true);
@@ -228,7 +228,7 @@ public class GuiSettingsComponents {
                 val = choiceEntryNode((SettingsEntry.ChoiceEntry<?>) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.GAME)) {
                 val = distEntryNode((SettingsEntry.GameDirectory) entry, applyFuncs);
-            }  else {
+            } else {
                 throw new IllegalArgumentException();
             }
 

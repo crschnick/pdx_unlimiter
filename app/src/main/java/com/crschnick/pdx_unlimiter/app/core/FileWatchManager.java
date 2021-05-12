@@ -39,7 +39,7 @@ public class FileWatchManager {
 
     public void startWatchersInDirectories(
             List<Path> dirs,
-            BiConsumer<Path,WatchEvent.Kind<Path>> listener) {
+            BiConsumer<Path, WatchEvent.Kind<Path>> listener) {
         dirs.forEach(d -> watchedDirectories.add(new WatchedDirectory(d, listener)));
     }
 
