@@ -2,9 +2,9 @@ package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.util.OsHelper;
 import com.crschnick.pdxu.model.SavegameInfo;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,10 +16,10 @@ public class SavegameStorageIO {
         TaskExecutor.getInstance().submitTask(() -> {
             try {
                 FileUtils.forceMkdir(out.toFile());
-                for (SavegameStorage<?, ?> cache : SavegameStorage.ALL.values()) {
-                    Path cacheDir = out.resolve(cache.getName());
-                    FileUtils.forceMkdir(cacheDir.toFile());
-                    exportSavegameDirectory(cache, cacheDir);
+                for (SavegameStorage<?, ?> storage : SavegameStorage.ALL.values()) {
+                    Path storageDir = out.resolve(storage.getName());
+                    FileUtils.forceMkdir(storageDir.toFile());
+                    exportSavegameDirectory(storage, storageDir);
                 }
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
@@ -27,18 +27,18 @@ public class SavegameStorageIO {
         }, true);
     }
 
-    private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> cache, Path out) throws IOException {
-        for (SavegameCollection<T, I> c : cache.getCollections()) {
+    private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> storage, Path out) throws IOException {
+        for (SavegameCollection<T, I> c : storage.getCollections()) {
+            Path colDir = out.resolve(OsHelper.getFileSystemCompatibleName(c.getName() +
+                    " (" + c.getUuid().toString().substring(0, 8) + ")"));
+            FileUtils.forceMkdir(colDir.toFile());
             for (SavegameEntry<T, I> e : c.getSavegames()) {
-                Path fileOut = out.resolve(cache.getFileSystemCompatibleName(e, true));
-                int counter = 0;
-                while (Files.exists(fileOut)) {
-                    var name = cache.getFileSystemCompatibleName(e, true);
-                    fileOut = fileOut.resolveSibling(FilenameUtils.getBaseName(name) +
-                            (counter != 0 ? "(" + counter + ") " : "") + "." + FilenameUtils.getExtension(name));
-                    counter++;
+                var name = e.getName() + " (" + e.getUuid().toString().substring(0, 8) + ")." +
+                        storage.getType().getFileEnding();
+                Path fileOut = colDir.resolve(OsHelper.getFileSystemCompatibleName(name));
+                if (!Files.exists(fileOut)) {
+                    storage.copySavegameTo(e, fileOut);
                 }
-                cache.copySavegameTo(e, fileOut);
             }
         }
     }

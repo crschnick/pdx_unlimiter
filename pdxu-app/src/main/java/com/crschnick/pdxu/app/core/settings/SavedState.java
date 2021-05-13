@@ -21,6 +21,7 @@ public class SavedState {
     private int windowWidth;
     private int windowHeight;
     private Game activeGame;
+    private Path previousExportLocation;
 
     public static void init() {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("state.json");
@@ -46,6 +47,11 @@ public class SavedState {
         s.windowY = Optional.ofNullable(sNode.get("windowY")).map(JsonNode::intValue).orElse(INVALID);
         s.windowWidth = Optional.ofNullable(sNode.get("windowWidth")).map(JsonNode::intValue).orElse(INVALID);
         s.windowHeight = Optional.ofNullable(sNode.get("windowHeight")).map(JsonNode::intValue).orElse(INVALID);
+        s.previousExportLocation = Optional.ofNullable(sNode.get("previousExportLocation"))
+                .map(JsonNode::textValue)
+                .map(Path::of)
+                .filter(Files::exists)
+                .orElse(null);
 
         var active = Optional.ofNullable(sNode.get("activeGame"));
         active.map(JsonNode::textValue).ifPresent(n -> {
@@ -69,6 +75,7 @@ public class SavedState {
         i.put("windowY", s.windowY);
         i.put("windowWidth", s.windowWidth);
         i.put("windowHeight", s.windowHeight);
+        i.put("previousExportLocation", s.previousExportLocation.toString());
 
         ConfigHelper.writeConfig(file, n);
     }
@@ -119,5 +126,13 @@ public class SavedState {
 
     public void setActiveGame(Game activeGame) {
         this.activeGame = activeGame;
+    }
+
+    public Path getPreviousExportLocation() {
+        return previousExportLocation;
+    }
+
+    public void setPreviousExportLocation(Path previousExportLocation) {
+        this.previousExportLocation = previousExportLocation;
     }
 }

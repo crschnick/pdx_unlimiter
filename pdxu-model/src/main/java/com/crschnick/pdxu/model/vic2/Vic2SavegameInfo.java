@@ -3,10 +3,7 @@ package com.crschnick.pdxu.model.vic2;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodeWriter;
-import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.GameVersion;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.SavegameInfoException;
+import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +13,7 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
 
     private Vic2Tag tag;
     private List<Vic2Tag> allTags;
+    private GameVersion version;
 
     public Vic2SavegameInfo() {
     }
@@ -61,6 +59,11 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
     @Override
     public Vic2Tag getTag() {
         return tag;
+    }
+
+    @Override
+    public GameVersion getVersion() {
+        return version;
     }
 
     @Override

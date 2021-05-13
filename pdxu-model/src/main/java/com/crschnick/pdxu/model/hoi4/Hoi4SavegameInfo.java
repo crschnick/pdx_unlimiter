@@ -1,10 +1,7 @@
 package com.crschnick.pdxu.model.hoi4;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.GameNamedVersion;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.SavegameInfoException;
+import com.crschnick.pdxu.model.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +13,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
 
     protected Hoi4Tag tag;
     protected List<Hoi4Tag> allTags;
+    private GameNamedVersion version;
 
     public static Hoi4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
@@ -48,6 +46,11 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     @Override
     public Hoi4Tag getTag() {
         return tag;
+    }
+
+    @Override
+    public GameVersion getVersion() {
+        return version;
     }
 
     @Override

@@ -144,6 +144,19 @@ public interface GameInstallType {
         public String getModId(Path userDir, GameMod mod) {
             return mod.getName();
         }
+
+        @Override
+        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+            var sf = userDir.resolve("pdx_settings.txt");
+            if (!Files.exists(sf)) {
+                return Optional.empty();
+            }
+
+            var node = TextFormatParser.textFileParser().parse(sf);
+            var langId = node.getNodeForKey("\"System\"")
+                    .getNodeForKey("\"language\"").getNodeForKey("value").getString();
+            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+        }
     };
 
     GameInstallType STELLARIS = new StandardInstallType("stellaris") {
@@ -282,11 +295,6 @@ public interface GameInstallType {
         @Override
         public Optional<Path> getLegacyLauncherExecutable(Path p) {
             return Optional.of(getExecutable(p));
-        }
-
-        @Override
-        public Optional<String> debugModeSwitch() {
-            return Optional.of("-debug_mode");
         }
 
         @Override

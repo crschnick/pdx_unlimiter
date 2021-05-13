@@ -38,6 +38,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private int dip;
     private int mil;
     private List<War> wars = new ArrayList<>();
+    private GameNamedVersion version;
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         try {
@@ -257,6 +258,11 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public Eu4Tag getTag() {
         return tag;
+    }
+
+    @Override
+    public GameVersion getVersion() {
+        return version;
     }
 
     public List<Eu4Tag> getAllTags() {

@@ -804,5 +804,7 @@ public abstract class SavegameStorage<
         return name;
     }
 
-
+    public SavegameType getType() {
+        return type;
+    }
 }

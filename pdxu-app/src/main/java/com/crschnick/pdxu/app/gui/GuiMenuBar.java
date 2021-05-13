@@ -21,7 +21,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
@@ -52,11 +51,6 @@ public class GuiMenuBar {
         export.setOnAction((a) -> {
             Optional<Path> path = GuiSavegameIO.showExportDialog();
             path.ifPresent(p -> {
-                if (FileUtils.listFiles(p.toFile(), null, false).size() > 0) {
-                    GuiErrorReporter.showSimpleErrorMessage("Selected directory is not empty!" +
-                            " You can only export the storage into an empty directory");
-                    return;
-                }
                 SavegameStorageIO.exportSavegameStorage(p);
             });
         });

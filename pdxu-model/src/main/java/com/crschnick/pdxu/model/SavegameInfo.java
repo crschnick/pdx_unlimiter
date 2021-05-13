@@ -8,7 +8,6 @@ public abstract class SavegameInfo<T> {
     protected UUID campaignHeuristic;
     protected List<String> mods;
     protected List<String> dlcs;
-    protected GameVersion version;
     protected boolean ironman;
     protected GameDate date;
     protected boolean binary;
@@ -32,9 +31,7 @@ public abstract class SavegameInfo<T> {
         return date;
     }
 
-    public GameVersion getVersion() {
-        return version;
-    }
+    public abstract GameVersion getVersion();
 
     public abstract List<T> getAllTags();
 

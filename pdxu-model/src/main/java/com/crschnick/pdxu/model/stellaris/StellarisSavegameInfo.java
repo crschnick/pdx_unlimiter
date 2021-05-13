@@ -1,10 +1,7 @@
 package com.crschnick.pdxu.model.stellaris;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.GameNamedVersion;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.SavegameInfoException;
+import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
     protected StellarisTag tag;
     protected List<StellarisTag> allTags;
+    private GameNamedVersion version;
 
     public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameInfoException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
@@ -86,6 +84,11 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     @Override
     public StellarisTag getTag() {
         return tag;
+    }
+
+    @Override
+    public GameVersion getVersion() {
+        return version;
     }
 
     public List<StellarisTag> getAllTags() {

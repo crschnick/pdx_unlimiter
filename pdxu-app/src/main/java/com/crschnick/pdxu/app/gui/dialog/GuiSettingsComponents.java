@@ -128,7 +128,9 @@ public class GuiSettingsComponents {
             DirectoryChooser dirChooser = new DirectoryChooser();
             if (!textArea.getText().isEmpty()) {
                 Path p = Path.of(textArea.getText());
-                dirChooser.setInitialDirectory(p.toFile());
+                if (Files.exists(p)) {
+                    dirChooser.setInitialDirectory(p.toFile());
+                }
             }
             dirChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
             File file = dirChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());

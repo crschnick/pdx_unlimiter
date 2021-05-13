@@ -19,10 +19,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -110,7 +108,18 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     public abstract Pane background();
 
     public Pane createIcon() {
-        return GameImage.imageNode(GameImage.getGameIcon(ALL.inverseBidiMap().get(this)), CLASS_IMAGE_ICON);
+        var img = GameImage.getGameIcon(ALL.inverseBidiMap().get(this));
+        if (img.equals(ImageLoader.DEFAULT_IMAGE)) {
+            var label = new Label("(" + ALL.inverseBidiMap().get(this).getAbbreviation() + ")");
+            label.setAlignment(Pos.CENTER);
+            var pane = new StackPane(label);
+            pane.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+            pane.setAlignment(Pos.CENTER);
+            pane.getStyleClass().add(CLASS_IMAGE_ICON);
+            return pane;
+        } else {
+            return GameImage.imageNode(img, CLASS_IMAGE_ICON);
+        }
     }
 
     public abstract Background createEntryInfoBackground(SavegameInfo<T> info);

@@ -1,10 +1,7 @@
 package com.crschnick.pdxu.model.ck2;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.GameVersion;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.SavegameInfoException;
+import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +14,7 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
 
     private Ck2Tag tag;
     private List<Ck2Tag> allTags;
+    private GameVersion version;
 
     public Ck2SavegameInfo() {
     }
@@ -58,6 +56,11 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
     @Override
     public Ck2Tag getTag() {
         return tag;
+    }
+
+    @Override
+    public GameVersion getVersion() {
+        return version;
     }
 
     @Override

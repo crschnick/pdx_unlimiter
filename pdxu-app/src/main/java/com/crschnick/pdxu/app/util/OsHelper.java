@@ -8,6 +8,10 @@ import java.nio.file.Paths;
 
 public class OsHelper {
 
+    public static String getFileSystemCompatibleName(String name) {
+        return name.replaceAll("[\\\\/:*?\"<>|]", "_");
+    }
+
     public static Path getUserDocumentsPath() {
         if (SystemUtils.IS_OS_WINDOWS) {
             return Path.of(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());

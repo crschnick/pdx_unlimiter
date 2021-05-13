@@ -19,6 +19,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     private String houseName;
     private List<War<Ck3Tag>> wars = new ArrayList<>();
     private List<Ck3Tag> allies = new ArrayList<>();
+    private GameVersion version;
 
     public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
@@ -121,6 +122,11 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     @Override
     public Ck3Tag getTag() {
         return tag;
+    }
+
+    @Override
+    public GameVersion getVersion() {
+        return version;
     }
 
     @Override

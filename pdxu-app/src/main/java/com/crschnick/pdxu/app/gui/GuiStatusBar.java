@@ -177,13 +177,13 @@ public class GuiStatusBar {
                 if (ctx.getInstallation().getType().debugModeSwitch().isPresent()) {
                     var splitButton = new SplitMenuButton();
                     splitButton.setText(PdxuI18n.get("CONTINUE_GAME"));
-                    SavegameManagerState.<T, I>get().selectEntry(null);
 
                     var debugItem = new MenuItem("Debug mode");
                     debugItem.setGraphic(new FontIcon());
                     debugItem.getStyleClass().add("continue-button");
                     debugItem.setOnAction(event -> {
                         GameDistLauncher.continueSavegame(e, true);
+                        SavegameManagerState.<T, I>get().selectEntry(null);
                         event.consume();
                         getStatusBar().hide();
                     });
@@ -197,6 +197,7 @@ public class GuiStatusBar {
                 launch.getStyleClass().add("continue-button");
                 launch.setOnAction(event -> {
                     GameDistLauncher.continueSavegame(e, false);
+                    SavegameManagerState.<T, I>get().selectEntry(null);
                     event.consume();
                     getStatusBar().hide();
                 });
