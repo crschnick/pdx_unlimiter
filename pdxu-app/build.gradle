@@ -1,0 +1,250 @@
+import org.beryx.jlink.JlinkTask
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+plugins {
+    id 'application'
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
+    id 'org.beryx.jlink' version '2.23.3'
+}
+
+setVersion '2.6.18'
+
+if (!file("${projectDir}/pdxu.properties").exists()) {
+    file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
+}
+
+java {
+    modularity.inferModulePath = true
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+List<String> runArgs = [
+        "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
+        "--add-exports", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
+        "--add-exports", "javafx.base/com.sun.javafx.binding=com.jfoenix",
+        "--add-exports", "javafx.base/com.sun.javafx.event=com.jfoenix",
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control=com.jfoenix",
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
+        "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
+        "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.eu4=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.ck3=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.hoi4=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.stellaris=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.ck2=com.fasterxml.jackson.databind",
+        "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.vic2=com.fasterxml.jackson.databind",
+        "-Xmx4g",
+        "-XX:+ExitOnOutOfMemoryError"]
+
+application {
+    mainModule = 'com.crschnick.pdxu.app'
+    mainClass = 'com.crschnick.pdxu.app.Main'
+    applicationDefaultJvmArgs = runArgs + ["-ea"]
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    maven {
+        url = 'https://maven.nikr.net/'
+    }
+    maven { url "https://jitpack.io" }
+}
+
+def currentOS = DefaultNativePlatform.currentOperatingSystem;
+def platform
+if (currentOS.isWindows()) {
+    platform = 'win'
+} else if (currentOS.isLinux()) {
+    platform = 'linux'
+} else if (currentOS.isMacOsX()) {
+    platform = 'mac'
+}
+
+dependencies {
+    implementation "org.openjfx:javafx-base:16:${platform}"
+    implementation "org.openjfx:javafx-controls:16:${platform}"
+    implementation "org.openjfx:javafx-graphics:16:${platform}"
+    implementation "org.openjfx:javafx-media:16:${platform}"
+    implementation 'com.jfoenix:jfoenix:9.0.10'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
+    implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
+
+    implementation files("$buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
+    implementation files("$buildDir/generated-modules/dds-1.0.0.jar")
+    implementation files("$buildDir/generated-modules/commons-lang3-3.12.0.jar")
+    implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
+    implementation files("$buildDir/generated-modules/commons-collections4-4.4.jar")
+    implementation files("$buildDir/generated-modules/sentry-4.3.0.jar")
+    implementation files("$buildDir/generated-modules/jnativehook-2.0.2.jar")
+
+    implementation project(':pdxu-io')
+    implementation project(':pdxu-model')
+}
+
+addDependenciesModuleInfo {
+    overwriteExistingFiles = true
+    jdepsExtraArgs = ['-q']
+    outputDirectory = file("$buildDir/generated-modules")
+    modules {
+        module {
+            artifact 'com.1stleg:jnativehook:2.0.2'
+            moduleInfoSource = '''
+                module org.jnativehook {
+                    exports org.jnativehook;
+                    exports org.jnativehook.keyboard;
+                    requires java.logging;
+                    requires java.desktop;
+                }
+            '''
+        }
+        module {
+            artifact 'io.sentry:sentry:4.3.0'
+            moduleInfoSource = '''
+                module io.sentry {
+                    exports io.sentry;
+                    opens io.sentry to com.google.gson;
+                    
+                    exports io.sentry.protocol;
+                    opens io.sentry.protocol to com.google.gson;
+                    
+                    exports io.sentry.adapters;
+                    opens io.sentry.adapters to com.google.gson;
+                    
+                    exports io.sentry.config;
+                    opens io.sentry.config to com.google.gson;
+                    
+                    exports io.sentry.transport;
+                    opens io.sentry.transport to com.google.gson;
+                    
+                    exports io.sentry.util;
+                    opens io.sentry.util to com.google.gson;
+                    
+                    requires com.google.gson;
+                }
+            '''
+        }
+        module {
+            artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
+            moduleInfoSource = '''
+                module com.realityinteractive.imageio.tga {
+                    requires java.desktop;
+                    exports com.realityinteractive.imageio.tga;
+                }
+            '''
+        }
+        module {
+            artifact 'net.nikr:dds:1.0.0'
+            moduleInfoSource = '''
+                module net.nikr.dds {
+                    requires java.desktop;
+                    exports net.nikr.dds;
+                }
+            '''
+        }
+        module {
+            artifact 'org.apache.commons:commons-lang3:3.12.0'
+            moduleInfoSource = '''
+                module org.apache.commons.lang {
+                    exports org.apache.commons.lang3;
+                    exports org.apache.commons.lang3.function;
+                    exports org.apache.commons.lang3.arch;
+                    exports org.apache.commons.lang3.reflect;
+                }
+            '''
+        }
+        module {
+            artifact 'org.apache.commons:commons-collections4:4.4'
+            moduleInfoSource = '''
+                module org.apache.commons.collections4 {
+                    exports org.apache.commons.collections4;
+                    exports org.apache.commons.collections4.bidimap;
+                }
+            '''
+        }
+        module {
+            artifact 'commons-io:commons-io:2.8.0'
+            moduleInfoSource = '''
+                module org.apache.commons.io {
+                    exports org.apache.commons.io;
+                    exports org.apache.commons.io.file;
+                    exports org.apache.commons.io.input;
+                    exports org.apache.commons.io.filefilter;
+                }
+            '''
+        }
+    }
+}
+
+task copyModules(type: Copy) {
+    into "${buildDir}/modules"
+    from configurations.runtimeClasspath
+}
+
+task copyOutput(type: Copy) {
+    into "${buildDir}/modules"
+    from "${buildDir}/libs"
+}
+
+jlink {
+    imageDir = file("$buildDir/image")
+    options = [
+            // '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages']
+    launcher {
+        name = 'pdxu'
+        jvmArgs = runArgs
+    }
+
+    customImage {
+        appModules = [
+                'com.crschnick.pdxu.app',
+                'org.slf4j',
+                'org.slf4j.simple',
+                'jdk.crypto.ec',
+                'org.kordamp.ikonli.materialdesign',
+                'jdk.zipfs'
+        ]
+    }
+}
+
+task createImage(type: JlinkTask, dependsOn: [copyModules, copyOutput]) {
+}
+
+task writeVersion(type: DefaultTask) {
+    doLast {
+        mkdir "${buildDir}/image/"
+        file("${buildDir}/image/version").write(String.valueOf(version))
+    }
+}
+
+task copyResources(type: Copy) {
+    into "${buildDir}/image/resources"
+    from "${projectDir}/resources"
+}
+
+task copyLang(type: Copy) {
+    into "${buildDir}/image/lang"
+    from "${projectDir}/lang"
+}
+
+createImage.finalizedBy(writeVersion, copyResources, copyLang)
+
+task createDist(type: Zip, dependsOn: createImage) {
+    destinationDirectory = buildDir
+    archivesBaseName = "pdx_unlimiter"
+    archiveAppendix = currentOS.windows ? "windows" : "linux"
+    archiveVersion = ""
+    from "${buildDir}/image"
+}

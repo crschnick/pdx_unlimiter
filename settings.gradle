@@ -1,4 +1,4 @@
 rootProject.name = 'pdx_unlimiter'
-include 'app'
+include 'pdxu-app'
 include 'pdxu-model'
 include 'pdxu-io'
