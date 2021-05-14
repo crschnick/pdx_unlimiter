@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.core.TaskExecutor;
-import com.crschnick.pdxu.app.savegame.SavegameActions;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,7 @@ public class GameKeyListener implements NativeKeyListener {
                 TaskExecutor.getInstance().submitTask(() -> {
                     LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");
                     GameAppManager.getInstance().playImportSound();
-                    handle.kill();
-                    SavegameActions.importLatestAndLaunch();
+                    GameAppManager.getInstance().importLatestAndLaunch();
                 }, true);
             }
         }

@@ -135,6 +135,15 @@ public final class GameAppManager {
         }
     }
 
+    public void importLatestAndLaunch() {
+        var g = getActiveGame();
+        if (g != null && g.getGame().isEnabled()) {
+            logger.info("Import latest savegame and launch");
+            g.kill();
+            SavegameActions.importLatestAndLaunch(g.getGame());
+        }
+    }
+
     public void loadLatestCheckpoint() {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {

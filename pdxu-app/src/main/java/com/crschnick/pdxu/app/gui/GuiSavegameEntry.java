@@ -127,6 +127,7 @@ public class GuiSavegameEntry {
         return entryNode;
     }
 
+    @SuppressWarnings("unchecked")
     private static <T, I extends SavegameInfo<T>> HBox createButtonBar(SavegameEntry<T, I> e) {
         HBox staticButtons = new HBox();
         staticButtons.setAlignment(Pos.CENTER);

@@ -783,6 +783,12 @@ public abstract class SavegameStorage<
         return cn + " (" + en + ")";
     }
 
+    public Optional<SavegameEntry<T,I>> getEntryForSourceFile(String sourceFileChecksum) {
+        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+                .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
+                .findAny();
+    }
+
     public boolean hasImportedSourceFile(String sourceFileChecksum) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
                 .anyMatch(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum));
@@ -806,5 +812,9 @@ public abstract class SavegameStorage<
 
     public SavegameType getType() {
         return type;
+    }
+
+    public FailableBiFunction<Node, Boolean, I, SavegameInfoException> getInfoFactory() {
+        return infoFactory;
     }
 }

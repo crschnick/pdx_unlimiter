@@ -1,19 +1,22 @@
 package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.editor.Editor;
 import com.crschnick.pdxu.app.editor.target.EditTarget;
 import com.crschnick.pdxu.app.editor.target.StorageEditTarget;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.util.ThreadHelper;
+import com.crschnick.pdxu.app.util.integration.RakalyHelper;
+import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -72,22 +75,43 @@ public class SavegameActions {
             return;
         }
 
-//        SavegameStorage.get(g).getParser().parse(savegames.get(0).path, RakalyHelper::meltSavegame).visit(
-//            new SavegameParseResult.Visitor<>() {
-//            @Override
-//            public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
-//                var campaignId = s.info.getCampaignHeuristic();
-//                SavegameStorage.get(g).getSavegameCollection(campaignId)
-//                        .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
-//                    TaskExecutor.getInstance().submitTask(() -> {
-//                        SavegameStorage.get(g).loadEntry(entry);
-//                        SavegameContext.withSavegame(entry, ctx -> {
-//                            GameDistLauncher.continueSavegame(entry, false);
-//                        });
-//                    }, true);
-//                });
-//            }
-//        });
+        SavegameParseResult r = null;
+        try {
+            var type = SavegameStorage.get(g).getType();
+            var file = savegames.get(0).path;
+            var bytes = Files.readAllBytes(file);
+            if (type.isBinary(bytes)) {
+                bytes = RakalyHelper.meltSavegame(file);
+            }
+            var struc = type.determineStructure(bytes);
+            r = struc.parse(bytes);
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+
+        if (r == null) {
+            return;
+        }
+        r.visit(new SavegameParseResult.Visitor() {
+            @Override
+            public void success(SavegameParseResult.Success s) {
+                try {
+                    var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode(), false);
+                    var campaignId = info.getCampaignHeuristic();
+                    SavegameStorage.get(g).getSavegameCollection(campaignId)
+                            .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
+                        TaskExecutor.getInstance().submitTask(() -> {
+                            SavegameStorage.get(g).loadEntry(entry);
+                            SavegameContext.withSavegame(entry, ctx -> {
+                                GameDistLauncher.continueSavegame(entry, false);
+                            });
+                        }, true);
+                    });
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            }
+        });
     }
 
     public static void importLatestSavegame(Game g) {
@@ -99,33 +123,28 @@ public class SavegameActions {
         FileImporter.importTargets(Set.of(savegames.get(0)));
     }
 
-    public static void importLatestAndLaunch() {
-        var savegames = SavegameWatcher.ALL.get(
-                SavegameManagerState.get().current()).getSavegames();
+    public static void importLatestAndLaunch(Game g) {
+        var savegames = SavegameWatcher.ALL.get(g).getSavegames();
         if (savegames.size() == 0) {
             return;
         }
 
-//        savegames.get(0).importTarget(s -> {
-//            s.visit(new SavegameParseResult.Visitor<>() {
-//                @Override
-//                @SuppressWarnings("unchecked")
-//                public void success(SavegameParseResult.Success<SavegameInfo<?>> s) {
-//                    SavegameStorage.get(SavegameManagerState.get().current())
-//                            .getSavegameForChecksum(s.checksum)
-//                            .ifPresent(e -> {
-//                                // The info is loaded asynchronously when the savegame is opened in the gui.
-//                                // This means that at this point, the info can either be null or not null
-//                                // In case it is null, temporarily set it
-//                                if (e.infoProperty().get() == null) {
-//                                    e.load((SavegameInfo<Object>) s.info);
-//                                    GameDistLauncher.continueSavegame(e, false);
-//                                    e.unload();
-//                                }
-//                            });
-//                }
-//            });
-//        });
+        var target = savegames.get(0);
+        var checksum = target.getSourceFileChecksum();
+        savegames.get(0).importTarget(s -> {
+            if (s.isEmpty()) {
+                SavegameStorage.get(g).getEntryForSourceFile(checksum).ifPresent(e -> {
+                    // The info is loaded asynchronously only when the savegame is opened in the gui.
+                    // This means that at this point, the info can either be null or not null
+                    // In case it is null, temporarily set it
+                    if (e.infoProperty().get() == null) {
+                        SavegameStorage.get(g).loadEntry(e);
+                        GameDistLauncher.continueSavegame(e, false);
+                        e.unload();
+                    }
+                });
+            }
+        });
     }
 
     public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {

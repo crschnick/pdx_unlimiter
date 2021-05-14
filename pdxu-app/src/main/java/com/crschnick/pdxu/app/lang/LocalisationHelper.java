@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class LocalisationHelper {
 
-    private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\w+\\$");
+    private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\w+?\\$");
 
     public static Map<String, String> loadTranslations(Path file, Language lang) {
         Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.getId() +
@@ -50,7 +51,7 @@ public class LocalisationHelper {
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(bin, charsetName))) {
                 // Skip lang ID
-                var lang = br.readLine();
+                br.readLine();
 
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -76,7 +77,12 @@ public class LocalisationHelper {
         for (var v : vars) {
             v = v != null ? v : "null";
             var matcher = VAR_PATTERN.matcher(s);
-            s = matcher.replaceFirst(Matcher.quoteReplacement(v));
+            if (matcher.find()) {
+                var group = matcher.group();
+                s = s.replace(group, Matcher.quoteReplacement(v));
+            } else {
+                LoggerFactory.getLogger(LocalisationHelper.class).warn("No match found for value " + v + " in string " + s);
+            }
         }
         return s;
     }
