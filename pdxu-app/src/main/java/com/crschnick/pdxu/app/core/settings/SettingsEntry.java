@@ -383,12 +383,12 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void setDefault() {
-            this.set(GameDists.detectDist(game, (JsonNode) null));
+            this.set(GameDists.detectDist(game).orElse(null));
         }
 
         @Override
         protected GameDist fromNode(JsonNode node) {
-            return GameDists.detectDist(game, node);
+            return GameDists.detectDistFromDirectory(game, Path.of(node.textValue()));
         }
 
         @Override

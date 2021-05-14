@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.*;
+import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorageIO;
@@ -30,22 +31,19 @@ public class GuiMenuBar {
 
     private static MenuBar createMenuBar() {
 
-        Menu settings = new Menu("Pdx-Unlimiter");
+        Menu pdxu = new Menu("Pdx-Unlimiter");
         MenuItem c = new MenuItem(PdxuI18n.get("CHANGE_SETTINGS"));
         c.setOnAction((a) -> {
             GuiSettings.showSettings();
         });
-        settings.getItems().add(c);
+        pdxu.getItems().add(c);
 
         MenuItem rel = new MenuItem(PdxuI18n.get("RELOAD"));
         rel.setOnAction((a) -> {
             ComponentManager.reloadSettings(() -> {
             });
         });
-        settings.getItems().add(rel);
-
-
-        Menu savegames = new Menu(PdxuI18n.get("STORAGE"));
+        pdxu.getItems().add(rel);
 
         MenuItem export = new MenuItem(PdxuI18n.get("EXPORT_STORAGE"));
         export.setOnAction((a) -> {
@@ -54,7 +52,7 @@ public class GuiMenuBar {
                 SavegameStorageIO.exportSavegameStorage(p);
             });
         });
-        savegames.getItems().add(export);
+        pdxu.getItems().add(export);
 
 
         Menu about = new Menu(PdxuI18n.get("ABOUT"));
@@ -138,8 +136,7 @@ public class GuiMenuBar {
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
-        menuBar.getMenus().add(settings);
-        menuBar.getMenus().add(savegames);
+        menuBar.getMenus().add(pdxu);
         menuBar.getMenus().add(about);
         menuBar.getMenus().add(help);
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
@@ -180,7 +177,10 @@ public class GuiMenuBar {
         launch.getStyleClass().add(GuiStyle.CLASS_LAUNCH);
         launch.setDisable(SavegameManagerState.get().current() == null);
         SavegameManagerState.get().onGameChange(n -> {
-            Platform.runLater(() -> launch.setDisable(n == null));
+            Platform.runLater(() -> {
+                boolean disable = n == null || !GameInstallation.ALL.get(n).getDist().supportsLauncher();
+                launch.setDisable(disable);
+            });
         });
 
         var box = new HBox(m, importB, launch);

@@ -143,7 +143,7 @@ public class ComponentManager {
             PdxuI18n.reset();
             CacheManager.reset();
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            ErrorHandler.handleTerminalException(e);
         }
         logger.debug("Reset completed");
     }

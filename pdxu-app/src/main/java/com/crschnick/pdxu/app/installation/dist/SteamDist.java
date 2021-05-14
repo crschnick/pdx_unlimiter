@@ -1,9 +1,14 @@
 package com.crschnick.pdxu.app.installation.dist;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.util.integration.SteamHelper;
+import com.crschnick.pdxu.app.util.ThreadHelper;
+import com.crschnick.pdxu.app.util.WindowsRegistry;
+import org.apache.commons.lang3.ArchUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,10 +26,26 @@ public class SteamDist extends GameDist {
         this.dist = dist;
     }
 
+    private static Optional<Path> getSteamPath() {
+        Optional<String> steamDir = Optional.empty();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (ArchUtils.getProcessor().is64Bit()) {
+                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+            } else {
+                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
+            }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toString();
+            steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+        }
+
+        return steamDir.map(Path::of);
+    }
+
     public static Optional<GameDist> getDist(Game g, Path dir) {
         var installDir = dir;
         if (dir == null) {
-            Optional<Path> steamDir = SteamHelper.getSteamPath();
+            Optional<Path> steamDir = getSteamPath();
             installDir = steamDir.map(d -> d.resolve("steamapps")
                     .resolve("common").resolve(g.getFullName()))
                     .filter(Files::exists)
@@ -57,14 +78,43 @@ public class SteamDist extends GameDist {
         return "Steam + " + dist.getName();
     }
 
-    public boolean directLaunch() {
-        if (!SteamHelper.isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
+    private boolean isSteamRunning() {
+        return ProcessHandle.allProcesses()
+                .map(p -> p.info().command())
+                .flatMap(Optional::stream)
+                .anyMatch(c -> c.contains("steam") && c.contains("Steam"));
+    }
+
+
+    private void openSteamURI(String uri) {
+        if (SystemUtils.IS_OS_LINUX) {
+            if (!isSteamRunning()) {
+                GuiErrorReporter.showSimpleErrorMessage("Steam is not started. " +
+                        "Please start Steam first before launching the game");
+            } else {
+                TaskExecutor.getInstance().submitTask(() -> {
+                    try {
+                        var p = new ProcessBuilder("steam", uri).start();
+                        p.getInputStream().readAllBytes();
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e);
+                    }
+                }, true);
+            }
+        } else {
+            ThreadHelper.browse(uri);
+        }
+    }
+
+    @Override
+    public void startDirectly(Path executable, List<String> args) throws IOException {
+        if (!isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
             GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
                     "Please start Steam first before launching the game");
-            return false;
+            return;
         }
 
-        return false;
+        dist.startDirectly(executable, args);
     }
 
     @Override
@@ -80,15 +130,32 @@ public class SteamDist extends GameDist {
     @Override
     public void startLauncher() throws IOException {
         if (Settings.getInstance().startSteam.getValue()) {
-            SteamHelper.openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
+            openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
         } else {
             super.startLauncher();
         }
     }
 
+    public List<Path> getRemoteDataPaths(int appId) {
+        var p = getSteamPath();
+        if (p.isEmpty()) {
+            return List.of();
+        }
+
+        Path userData = p.get().resolve("userdata");
+        try {
+            return Files.list(userData)
+                    .map(d -> d.resolve(String.valueOf(appId)).resolve("remote"))
+                    .filter(Files::exists)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            return List.of();
+        }
+    }
+
     @Override
     public List<Path> getAdditionalSavegamePaths() {
-        return SteamHelper.getRemoteDataPaths(getGame().getSteamAppId()).stream()
+        return getRemoteDataPaths(getGame().getSteamAppId()).stream()
                 .map(d -> d.resolve("save games"))
                 .collect(Collectors.toList());
     }

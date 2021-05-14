@@ -1,7 +1,7 @@
-package com.crschnick.pdxu.app.gui;
+package com.crschnick.pdxu.app.gui.dialog;
 
 import com.crschnick.pdxu.app.core.settings.SavedState;
-import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

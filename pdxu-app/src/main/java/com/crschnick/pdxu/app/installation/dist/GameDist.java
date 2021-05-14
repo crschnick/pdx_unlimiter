@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class GameDist {
@@ -16,9 +17,9 @@ public abstract class GameDist {
     private final Path installLocation;
 
     public GameDist(Game game, String name, Path installLocation) {
-        this.game = game;
-        this.name = name;
-        this.installLocation = installLocation;
+        this.game = Objects.requireNonNull(game);
+        this.name = Objects.requireNonNull(name);
+        this.installLocation = Objects.requireNonNull(installLocation);
     }
 
     @Override
@@ -50,7 +51,7 @@ public abstract class GameDist {
 
     public abstract boolean supportsDirectLaunch();
 
-    public final void startDirectly(Path executable, List<String> args) throws IOException {
+    public void startDirectly(Path executable, List<String> args) throws IOException {
         if (supportsDirectLaunch()) {
             var input = new ArrayList<String>();
             // Make UAC popup if needed

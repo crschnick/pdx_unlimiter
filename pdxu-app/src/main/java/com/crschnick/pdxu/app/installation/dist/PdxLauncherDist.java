@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.installation.dist;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.util.WindowsRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -27,34 +28,40 @@ public class PdxLauncherDist extends GameDist {
             return Optional.empty();
         }
 
-        if (!Files.exists(getBootstrapper())) {
+        if (getBootstrapper().isEmpty()) {
             return Optional.empty();
         }
 
         return Optional.of(new PdxLauncherDist(g, "Paradox Launcher", dir));
     }
 
-    private static Path getBootstrapper() {
-        Path bootstrapper;
+    private static Optional<Path> getParadoxLauncherPath() {
+        Optional<String> launcherDir = Optional.empty();
         if (SystemUtils.IS_OS_WINDOWS) {
-            bootstrapper = Path.of(System.getenv("LOCALAPPDATA"))
-                    .resolve("Programs")
-                    .resolve("Paradox Interactive")
-                    .resolve("bootstrapper-v2.exe");
-        } else {
-            bootstrapper = Path.of(System.getProperty("user.home"))
-                    .resolve(".paradoxlauncher")
-                    .resolve("bootstrapper-v2");
+            launcherDir = WindowsRegistry.readRegistry("HKEY_CURRENT_USER\\SOFTWARE\\Paradox Interactive\\Paradox Launcher v2", "LauncherInstallation");
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String s = Path.of(System.getProperty("user.home")).resolve(".paradoxlauncher").toString();
+            launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
         }
-        return bootstrapper;
+
+        return launcherDir.map(Path::of);
+    }
+
+    private static Optional<Path> getBootstrapper() {
+        var dir = getParadoxLauncherPath();
+        return dir.map(p -> p.resolve("bootstrapper-v2" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "")))
+                .filter(Files::exists);
     }
 
     private static void startParadoxLauncher(Path launcherPath) throws IOException {
-        Path bootstrapper = getBootstrapper();
+        var bootstrapper = getBootstrapper();
+        if (bootstrapper.isEmpty()) {
+            return;
+        }
 
         new ProcessBuilder()
                 .directory(launcherPath.toFile())
-                .command(bootstrapper.toString(),
+                .command(bootstrapper.get().toString(),
                         "--pdxlGameDir", launcherPath.toString(),
                         "--gameDir", launcherPath.toString())
                 .start();

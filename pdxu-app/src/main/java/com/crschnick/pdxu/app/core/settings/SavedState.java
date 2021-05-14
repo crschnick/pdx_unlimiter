@@ -75,7 +75,9 @@ public class SavedState {
         i.put("windowY", s.windowY);
         i.put("windowWidth", s.windowWidth);
         i.put("windowHeight", s.windowHeight);
-        i.put("previousExportLocation", s.previousExportLocation.toString());
+        if (s.previousExportLocation != null) {
+            i.put("previousExportLocation", s.previousExportLocation.toString());
+        }
 
         ConfigHelper.writeConfig(file, n);
     }

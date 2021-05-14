@@ -24,10 +24,16 @@ public final class WindowsStoreDist extends PdxLauncherDist {
             return Optional.empty();
         }
 
+        // Prevent querying for appx-package if we can rule out that the given dir is a windows store dist
+        if (dir != null && !dir.toString().contains("WindowsApps")) {
+            return Optional.empty();
+        }
+
         try {
+            // This is somehow very slow. Why?
             // Important: Use out-string to increase output width. Otherwise long file paths can be wrapped!
             var proc = new ProcessBuilder("powershell.exe", "Get-AppxPackage",
-                    g.getWindowsStoreName(), "|", "out-string", "-width", "1000")
+                    g.getWindowsStoreName(), "|", "out-string", "-width", "300")
                     .start();
             var in = new String(proc.getInputStream().readAllBytes());
             proc.waitFor();

@@ -53,7 +53,7 @@ public class GuiSettingsComponents {
             dirChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
             File file = dirChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
-                setDist.set(GameDists.detectDist(de.getGame(), file.toPath()));
+                setDist.set(GameDists.detectDistFromDirectory(de.getGame(), file.toPath()));
             }
             m.consume();
         };
@@ -182,7 +182,7 @@ public class GuiSettingsComponents {
         applyFuncs.add(() -> {
             ce.set(cb.getValue());
         });
-        cb.setConverter(new StringConverter<T>() {
+        cb.setConverter(new StringConverter<>() {
             @Override
             public String toString(T object) {
                 return ce.getDisplayNameFunc().apply(object);
@@ -205,6 +205,7 @@ public class GuiSettingsComponents {
         return tf;
     }
 
+    @SuppressWarnings("unchecked")
     public static Node section(String id, Set<Runnable> applyFuncs, SettingsEntry<?>... entries) {
         GridPane grid = new GridPane();
 

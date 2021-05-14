@@ -10,6 +10,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -25,33 +26,31 @@ public class GameDists {
             NoLauncherDist::getDist
     );
 
-    private static final List<Path> installDirSearchPaths = new ArrayList<>();
-
-    static {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            for (var root : FileSystems.getDefault().getRootDirectories()) {
-                installDirSearchPaths.add(root.resolve("Program Files (x86)"));
-            }
-        } else {
-            installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"));
-        }
+    public static Optional<GameDist> detectDist(Game g) {
+        return getCompoundDistFromDirectory(g, null)
+                .or(() -> {
+                        for (var p : getInstallDirSearchPaths(g)) {
+                            var dist = GameDists.getBasicDistFromDirectory(g, p);
+                            if (dist.isPresent()) {
+                                return dist;
+                            }
+                        }
+                        return Optional.empty();
+                });
     }
 
-    public static GameDist detectDist(Game g, Path dir) {
+    public static GameDist detectDistFromDirectory(Game g, Path dir) {
+        Objects.requireNonNull(dir);
+
         return getCompoundDistFromDirectory(g, dir)
                 .or(() -> GameDists.getBasicDistFromDirectory(g, dir))
                 .orElse(new CatchAllDist(g, dir));
     }
 
-    public static GameDist detectDist(Game g, JsonNode n) {
-        if (n != null) {
-            return detectDist(g, Path.of(n.textValue()));
-        } else {
-            return detectDist(g, (Path) null);
-        }
-    }
-
     static Optional<GameDist> getBasicDistFromDirectory(Game g, Path dir) {
+        // Basic dists do require a directory
+        Objects.requireNonNull(dir);
+
         for (var e : BASIC_DISTS) {
             var r = e.apply(g, dir);
             if (r.isPresent()) {
@@ -75,7 +74,18 @@ public class GameDists {
         return new TextNode(d.getInstallLocation().toString());
     }
 
-    public static List<Path> getInstallDirSearchPaths() {
+    private static List<Path> getInstallDirSearchPaths(Game g) {
+        var installDirSearchPaths = new ArrayList<Path>();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            for (var root : FileSystems.getDefault().getRootDirectories()) {
+                installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve(g.getFullName()));
+
+                // Paradox Games Launcher path
+                installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive").resolve("games").resolve(g.getId()));
+            }
+        } else {
+            installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"));
+        }
         return installDirSearchPaths;
     }
 }
