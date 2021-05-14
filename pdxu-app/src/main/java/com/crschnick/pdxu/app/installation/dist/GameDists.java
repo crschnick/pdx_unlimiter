@@ -78,13 +78,20 @@ public class GameDists {
         var installDirSearchPaths = new ArrayList<Path>();
         if (SystemUtils.IS_OS_WINDOWS) {
             for (var root : FileSystems.getDefault().getRootDirectories()) {
-                installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve(g.getFullName()));
+                for (var name : g.getCommonInstallDirNames()) {
+                    installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve(name));
+                }
 
                 // Paradox Games Launcher path
-                installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive").resolve("games").resolve(g.getId()));
+                if (g.getParadoxGamesLauncherName() != null) {
+                    installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive")
+                            .resolve("games").resolve(g.getParadoxGamesLauncherName()));
+                }
             }
         } else {
-            installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"));
+            for (var name : g.getCommonInstallDirNames()) {
+                installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name));
+            }
         }
         return installDirSearchPaths;
     }

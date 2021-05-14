@@ -153,10 +153,14 @@ public class ErrorHandler {
                 if (attachFile != null) {
                     scope.addAttachment(new Attachment(attachFile.toString()));
                 }
+                scope.setTag("diagnoticsData", "true");
                 Sentry.captureException(t);
             });
         } else {
-            Sentry.captureException(t);
+            Sentry.withScope(scope -> {
+                scope.setTag("diagnoticsData", "false");
+                Sentry.captureException(t);
+            });
         }
     }
 
