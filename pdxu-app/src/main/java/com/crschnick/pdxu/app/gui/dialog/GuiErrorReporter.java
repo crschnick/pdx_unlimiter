@@ -65,22 +65,25 @@ public class GuiErrorReporter {
         if (PdxuApp.getApp() != null && PdxuApp.getApp().getIcon() != null) {
             GuiDialogHelper.setIcon(alert);
         }
+
         alert.getButtonTypes().clear();
-
-        ButtonType bar = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().add(bar);
-
         if (reportable) {
-            ButtonType foo = new ButtonType("Report automatically", ButtonBar.ButtonData.OK_DONE);
-            ButtonType report = new ButtonType("Report on github", ButtonBar.ButtonData.APPLY);
-            alert.getButtonTypes().addAll(report, foo);
+            ButtonType autoReport = new ButtonType("Report automatically", ButtonBar.ButtonData.OK_DONE);
+            ButtonType reportOnGithub = new ButtonType("Report on github", ButtonBar.ButtonData.APPLY);
+            ButtonType reportOnDiscord = new ButtonType("Get help on Discord", ButtonBar.ButtonData.APPLY);
+            alert.getButtonTypes().addAll(reportOnDiscord, reportOnGithub, autoReport);
 
-            Button reportButton = (Button) alert.getDialogPane().lookupButton(report);
-            reportButton.addEventFilter(ActionEvent.ACTION, event -> {
+            alert.getDialogPane().lookupButton(reportOnGithub).addEventFilter(ActionEvent.ACTION, event -> {
                 Hyperlinks.open(Hyperlinks.NEW_ISSUE);
                 event.consume();
             });
+            alert.getDialogPane().lookupButton(reportOnDiscord).addEventFilter(ActionEvent.ACTION, event -> {
+                Hyperlinks.open(Hyperlinks.DISCORD);
+                event.consume();
+            });
         }
+        ButtonType ok = new ButtonType("Ok", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().add(ok);
 
         alert.setAlertType(Alert.AlertType.ERROR);
         alert.setTitle("Pdx-Unlimiter");

@@ -7,14 +7,8 @@ import java.util.Optional;
 
 public class WindowsRegistry {
 
-    /**
-     * @param location path in the registry
-     * @param key      registry key
-     * @return registry value or null if not found
-     */
-    public static final Optional<String> readRegistry(String location, String key) {
+    public static Optional<String> readRegistry(String location, String key) {
         try {
-            // Run reg query, then read output with StreamReader (internal class)
             Process process = Runtime.getRuntime().exec("reg query " +
                     '"' + location + "\" /v " + key);
 

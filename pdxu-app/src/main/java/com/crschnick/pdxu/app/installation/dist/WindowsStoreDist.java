@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.installation.Game;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,6 +22,10 @@ public final class WindowsStoreDist extends PdxLauncherDist {
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (g.getWindowsStoreName() == null) {
+            return Optional.empty();
+        }
+
+        if (!SystemUtils.IS_OS_WINDOWS) {
             return Optional.empty();
         }
 

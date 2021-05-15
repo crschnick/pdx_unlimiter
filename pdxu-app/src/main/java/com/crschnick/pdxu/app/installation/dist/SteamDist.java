@@ -13,8 +13,10 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SteamDist extends GameDist {
@@ -42,21 +44,46 @@ public class SteamDist extends GameDist {
         return steamDir.map(Path::of);
     }
 
-    public static Optional<GameDist> getDist(Game g, Path dir) {
-        var installDir = dir;
-        if (dir == null) {
-            Optional<Path> steamDir = getSteamPath();
-            installDir = steamDir.map(d -> d.resolve("steamapps")
-                    .resolve("common").resolve(g.getFullName()))
-                    .filter(Files::exists)
-                    .orElse(null);
+    private static List<Path> getSteamLibraryPaths() {
+        var p = getSteamPath();
+        if (p.isEmpty()) {
+            return List.of();
         }
-        if (installDir != null) {
-            var steamFile = g.getInstallType().getSteamSpecificFile(installDir);
+
+        var list = new ArrayList<Path>();
+        list.add(p.get().resolve("steamapps").resolve("common"));
+
+        try {
+            var libraryFoldersFile = Files.readString(p.get().resolve("steamapps").resolve("libraryfolders.vdf"));
+            Pattern pattern = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
+            libraryFoldersFile.lines().forEach(line -> {
+                var m = pattern.matcher(line);
+                if (m.find()) {
+                    list.add(Path.of(m.group(1)).resolve("steamapps").resolve("common"));
+                }
+            });
+        } catch (Exception e) {
+            return list;
+        }
+
+        return list;
+    }
+
+    public static Optional<GameDist> getDist(Game g, Path dir) {
+        if (dir == null) {
+            for (var path : getSteamLibraryPaths()) {
+                var installDir = path.resolve(g.getFullName());
+                var found = getDist(g, installDir);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        } else {
+            var steamFile = g.getInstallType().getSteamSpecificFile(dir);
             if (Files.exists(steamFile)) {
-                var basicDist = GameDists.getBasicDistFromDirectory(g, installDir);
+                var basicDist = GameDists.getBasicDistFromDirectory(g, dir);
                 if (basicDist.isPresent()) {
-                    return Optional.of(new SteamDist(g, installDir, basicDist.get()));
+                    return Optional.of(new SteamDist(g, dir, basicDist.get()));
                 }
             }
         }
@@ -136,7 +163,7 @@ public class SteamDist extends GameDist {
         }
     }
 
-    public List<Path> getRemoteDataPaths(int appId) {
+    private List<Path> getRemoteDataPaths(int appId) {
         var p = getSteamPath();
         if (p.isEmpty()) {
             return List.of();

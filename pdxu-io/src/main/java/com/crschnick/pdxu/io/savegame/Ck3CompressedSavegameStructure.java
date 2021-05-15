@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,25 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
 
     public Ck3CompressedSavegameStructure() {
         super(null, StandardCharsets.UTF_8, TaggedNode.COLORS, Set.of(new SavegamePart("gamestate", "gamestate")));
+    }
+
+    private static final int MAX_SEARCH = 150000;
+    private static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
+
+    private static int indexOf(byte[] array, byte[] toFind) {
+        for (int i = 0; i < MAX_SEARCH; ++i) {
+            boolean found = true;
+            for (int j = 0; j < toFind.length; ++j) {
+                if (array[i + j] != toFind[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static void writeCompressed(byte[] input, Path output) throws IOException {
@@ -39,39 +59,6 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
             try (var zout = new ZipOutputStream(out)) {
                 zout.putNextEntry(new ZipEntry("gamestate"));
                 zout.write(input, metaStart, input.length - metaStart);
-                zout.closeEntry();
-            }
-        }
-    }
-
-    public static void writeCompressedWithDisabledIronman(byte[] input, Path output) throws IOException {
-        var header = Ck3Header.fromStartOfFile(input);
-        if (header.compressed()) {
-            throw new IllegalArgumentException("Savegame is already compressed");
-        }
-        if (header.binary()) {
-            throw new IllegalArgumentException("Savegame is not in plaintext format");
-        }
-
-        int metaStart = header.toString().length() + 1;
-        String metaData = new String(input, metaStart, (int) header.metaLength());
-        metaData = metaData.replace("can_get_achievements=yes", "can_get_achievements=no");
-        metaData = metaData.replace("ironman=yes", "ironman=no");
-        var newMetaBytes = metaData.getBytes(StandardCharsets.UTF_8);
-        var newHeader = new Ck3Header(true, false, newMetaBytes.length);
-
-        int contentStart = (int) (metaStart + header.metaLength() + 1);
-        String ironmanManager = new String(input, contentStart, 1000);
-        ironmanManager = ironmanManager.replace("ironman=yes", "ironman=no");
-
-        try (var out = Files.newOutputStream(output)) {
-            out.write((newHeader + "\n").getBytes(StandardCharsets.UTF_8));
-            out.write(input, metaStart, (int) newHeader.metaLength());
-            out.write("\n".getBytes(StandardCharsets.UTF_8));
-            try (var zout = new ZipOutputStream(out)) {
-                zout.putNextEntry(new ZipEntry("gamestate"));
-                zout.write(ironmanManager.getBytes(StandardCharsets.UTF_8));
-                zout.write(input, contentStart, input.length - (contentStart + 1000));
                 zout.closeEntry();
             }
         }
@@ -110,6 +97,12 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
 
         int metaStart = header.toString().length() + 1;
         int contentStart = (int) (metaStart + header.metaLength()) + 1;
+
+        // Check if the header meta length is actually right. If not, manually search for the zip header start
+        if (!Arrays.equals(input, contentStart, contentStart + 4, ZIP_HEADER, 0, 4)) {
+            contentStart = indexOf(input, ZIP_HEADER);
+        }
+
         return parseInput(input, contentStart);
     }
 }

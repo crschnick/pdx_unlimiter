@@ -40,7 +40,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                 .findAny();
 
         try {
-            try (var zipIn = new ZipInputStream(new ByteArrayInputStream(input, offset, Integer.MAX_VALUE))) {
+            try (var zipIn = new ZipInputStream(new ByteArrayInputStream(input, offset, input.length - offset))) {
                 Map<String, ArrayNode> nodes = new HashMap<>();
                 ZipEntry entry;
                 while ((entry = zipIn.getNextEntry()) != null) {

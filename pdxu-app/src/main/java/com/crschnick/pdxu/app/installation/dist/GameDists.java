@@ -17,8 +17,8 @@ import java.util.function.BiFunction;
 public class GameDists {
 
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> COMPOUND_TYPES = List.of(
-            WindowsStoreDist::getDist,
-            SteamDist::getDist);
+            SteamDist::getDist,
+            WindowsStoreDist::getDist);
 
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = List.of(
             PdxLauncherDist::getDist,
