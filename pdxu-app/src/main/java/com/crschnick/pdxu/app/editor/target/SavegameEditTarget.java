@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.editor.target;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameStructure;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
@@ -25,19 +24,12 @@ public class SavegameEditTarget extends EditTarget {
         var bytes = Files.readAllBytes(file);
         structure = type.determineStructure(bytes);
 
-        final Map<String, ArrayNode>[] map = new Map[]{null};
-        structure.parse(bytes).visit(new SavegameParseResult.Visitor() {
-            @Override
-            public void success(SavegameParseResult.Success s) {
-                map[0] = s.content;
-            }
-        });
-
-        if (map[0] == null) {
+        var succ = structure.parse(bytes).success();
+        if (succ.isPresent()) {
+            return succ.get().content;
+        } else {
             throw new IllegalArgumentException();
         }
-
-        return map[0];
     }
 
     @Override

@@ -81,7 +81,7 @@ public class SavegameActions {
             var file = savegames.get(0).path;
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.meltSavegame(file);
+                bytes = RakalyHelper.toPlaintext(file);
             }
             var struc = type.determineStructure(bytes);
             r = struc.parse(bytes);
@@ -152,21 +152,21 @@ public class SavegameActions {
             return;
         }
 
-//        TaskExecutor.getInstance().submitTask(() -> {
-//            SavegameContext.withSavegame(e, ctx -> {
-//                Path meltedFile;
-//                try {
-//                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
-//                } catch (Exception ex) {
-//                    ErrorHandler.handleException(ex);
-//                    return;
-//                }
-//                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
-//                folder.ifPresent(f -> {
-//                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
-//                });
-//            });
-//        }, true);
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameContext.withSavegame(e, ctx -> {
+                Path meltedFile;
+                try {
+                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                    return;
+                }
+                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
+                folder.ifPresent(f -> {
+                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
+                });
+            });
+        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {

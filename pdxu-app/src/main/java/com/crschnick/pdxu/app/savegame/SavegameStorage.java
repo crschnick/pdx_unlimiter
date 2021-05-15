@@ -523,7 +523,7 @@ public abstract class SavegameStorage<
         try {
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.meltSavegame(file);
+                bytes = RakalyHelper.toPlaintext(file);
                 melted = true;
             } else {
                 melted = false;
@@ -679,10 +679,10 @@ public abstract class SavegameStorage<
         logger.debug("Parsing file " + file.toString());
         final SavegameParseResult[] result = new SavegameParseResult[1];
         String checksum;
-        byte[] data;
+        byte[] bytes;
         boolean melted;
         try {
-            var bytes = Files.readAllBytes(file);
+            bytes = Files.readAllBytes(file);
             checksum = checksum(bytes);
             logger.debug("Checksum is " + checksum);
             if (checkDuplicate) {
@@ -698,15 +698,16 @@ public abstract class SavegameStorage<
                 }
             }
 
+            byte[] data;
             if (type.isBinary(bytes)) {
-                data = RakalyHelper.meltSavegame(file);
+                data = RakalyHelper.toPlaintext(file);
                 melted = true;
             } else {
                 data = bytes;
                 melted = false;
             }
-            var struc = type.determineStructure(bytes);
-            result[0] = struc.parse(bytes);
+            var struc = type.determineStructure(data);
+            result[0] = struc.parse(data);
         } catch (Exception ex) {
             return Optional.of(new SavegameParseResult.Error(ex));
         }
@@ -740,8 +741,8 @@ public abstract class SavegameStorage<
                     try {
                         FileUtils.forceMkdir(entryPath.toFile());
                         var file = entryPath.resolve(getSaveFileName());
-                        if (!type.writeCompressed(data, file)) {
-                            Files.write(file, data);
+                        if (!type.writeCompressed(bytes, file)) {
+                            Files.write(file, bytes);
                         }
                         JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 

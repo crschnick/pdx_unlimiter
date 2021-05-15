@@ -5,11 +5,15 @@ import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class SavegameParseResult {
 
-    @SuppressWarnings("unchecked")
     public abstract void visit(Visitor visitor);
+
+    public Optional<Success> success() {
+        return Optional.empty();
+    }
 
     public static class Success extends SavegameParseResult {
 
@@ -26,6 +30,11 @@ public abstract class SavegameParseResult {
         @Override
         public void visit(Visitor visitor) {
             visitor.success(this);
+        }
+
+        @Override
+        public Optional<Success> success() {
+            return Optional.of(this);
         }
     }
 

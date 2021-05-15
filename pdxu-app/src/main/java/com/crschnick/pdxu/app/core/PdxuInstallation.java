@@ -18,7 +18,6 @@ public class PdxuInstallation {
     private Path dataDir;
     private String version;
     private boolean production;
-    private Path rakalyDir;
     private boolean developerMode;
     private boolean nativeHookEnabled;
     private boolean image;
@@ -60,7 +59,6 @@ public class PdxuInstallation {
         } else {
             appInstallPath = i.dataDir;
         }
-        i.rakalyDir = appInstallPath.resolve("rakaly");
 
         i.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
         if (!Files.exists(i.eu4SeDir)) {
@@ -110,11 +108,6 @@ public class PdxuInstallation {
             i.production = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
-
-            Optional.ofNullable(props.get("rakalyDir"))
-                    .map(val -> Path.of(val.toString()))
-                    .filter(val -> val.isAbsolute() && Files.exists(val))
-                    .ifPresent(path -> i.rakalyDir = path);
         }
 
         i.developerMode = Optional.ofNullable(props.get("developerMode"))
@@ -146,10 +139,6 @@ public class PdxuInstallation {
     }
 
     public Path getImportQueueLocation() {
-        return dataDir.resolve("import");
-    }
-
-    public Path getLazyImportStorageLocation() {
         return dataDir.resolve("import");
     }
 
@@ -187,7 +176,7 @@ public class PdxuInstallation {
     }
 
     public Path getRakalyExecutable() {
-        Path dir = rakalyDir;
+        Path dir = getResourceDir();
         if (SystemUtils.IS_OS_WINDOWS) {
             return dir.resolve("bin").resolve("rakaly_windows.exe");
         } else if (SystemUtils.IS_OS_LINUX) {

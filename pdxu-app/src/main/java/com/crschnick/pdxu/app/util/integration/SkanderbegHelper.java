@@ -32,7 +32,7 @@ public class SkanderbegHelper {
             try {
                 byte[] body = Files.readAllBytes(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
                 if (entry.getInfo().isIronman()) {
-                    body = RakalyHelper.meltSavegame(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
+                    body = RakalyHelper.toPlaintext(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
                 }
 
                 String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4)
