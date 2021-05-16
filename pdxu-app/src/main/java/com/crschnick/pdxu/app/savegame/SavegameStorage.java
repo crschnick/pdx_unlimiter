@@ -60,7 +60,7 @@ public abstract class SavegameStorage<
 
 
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger;
     private final Class<I> infoClass;
     private final FailableBiFunction<Node, Boolean, I, SavegameInfoException> infoFactory;
     private final String name;
@@ -81,6 +81,7 @@ public abstract class SavegameStorage<
         this.dateType = dateType;
         this.path = Settings.getInstance().storageDirectory.getValue().resolve(name);
         this.infoClass = infoClass;
+        this.logger = LoggerFactory.getLogger("SavegameStorage (" + getName() + ")");
     }
 
     @SuppressWarnings("unchecked")

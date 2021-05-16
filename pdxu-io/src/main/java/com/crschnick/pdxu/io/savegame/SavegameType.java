@@ -79,8 +79,12 @@ public interface SavegameType {
                 return false;
             }
 
-            Ck3CompressedSavegameStructure.writeCompressed(input, output);
-            return true;
+            return false;
+            
+            // TODO: enable
+            // Temp disabled, since rakaly doesn't write headers yet
+            // Ck3CompressedSavegameStructure.writeCompressed(input, output);
+            // return true;
         }
 
         @Override

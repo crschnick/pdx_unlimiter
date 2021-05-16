@@ -11,7 +11,6 @@ import javafx.scene.media.AudioClip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -111,9 +110,7 @@ public final class GameAppManager {
         if (Duration.between(lastImport, Instant.now()).compareTo(
                 Duration.of(Settings.getInstance().timedImportsInterval.getValue(), ChronoUnit.MINUTES)) > 0) {
             logger.info("Importing latest savegame because timed imports is enabled");
-            if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
-                Toolkit.getDefaultToolkit().beep();
-            }
+            playImportSound();
             importLatest();
             lastImport = Instant.now();
         }
@@ -123,7 +120,7 @@ public final class GameAppManager {
         if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
             var clip = new AudioClip(PdxuInstallation.getInstance().getResourceDir().resolve("sound")
                     .resolve("import.wav").toUri().toString());
-            clip.play(0.2);
+            clip.play(0.1);
         }
     }
 
