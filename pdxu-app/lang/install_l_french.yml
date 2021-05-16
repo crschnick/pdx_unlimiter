@@ -1,0 +1,6 @@
+l_french:
+  ERROR_OCCURED: "Une erreur inattendue s'est produite: $CAUSE$"
+  GAME_DATA_PATH_NOT_FOUND: "Impossible de trouver le chemin vers le fichiers du jeu dans le fichier de configuration du lanceur de $GAME$."
+  GAME_DATA_PATH_DOES_NOT_EXIST: "Le répertoire de données utilisateur $DIR$ de $GAME$ n'existe pas. Pour résoudre ce problème, veuillez démarrer le jeu une fois pour le générer"
+  EXECUTABLE_NOT_FOUND: "Impossible de trouver l'exécutable $FILE$ de $GAME$"
+  LAUNCHER_SETTINGS_NOT_FOUND: "Paramètres du lanceur Paradox manquants. Seules les installations utilisant le lanceur Paradox de $GAME$ sont prises en charge."

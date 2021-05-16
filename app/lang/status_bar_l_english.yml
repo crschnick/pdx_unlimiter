@@ -1,9 +1,0 @@
-l_english:
-  EXPORT: "Export"
-  CONTINUE_GAME: "Continue Game"
-  START_LAUNCHER: "Start Launcher"
-  RUNNING: "Running"
-  LATEST: "Latest"
-  NONE: "NONE"
-  IMPORT: "Import"
-  KILL: "Kill"

@@ -1,0 +1,41 @@
+
+
+.eu4 .tag-icon {
+-fx-min-width: 2em;
+-fx-max-width: 2em;
+-fx-min-height: 2em;
+-fx-max-height: 2em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.eu4 .ruler {
+-fx-padding: 0;
+}
+
+.eu4 .ruler-icon {
+-fx-min-width: 1.5em;
+-fx-min-height: 1.5em;
+-fx-max-width: 1.5em;
+-fx-max-height: 1.5em;
+}
+
+.eu4 .power-icon {
+-fx-pref-width: 1em;
+-fx-pref-height: 1em;
+}
+
+.eu4 .guarantee {
+      -fx-background-color: #631aa999;
+}
+
+.eu4 .marriage {
+      -fx-background-color: #631aa999;
+}
+
+.eu4 .number {
+    -fx-background-color: #dddddd11;
+}
+
+.eu4 .subject {
+    -fx-background-color: #2daba3AA;
+}

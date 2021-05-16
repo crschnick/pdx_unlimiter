@@ -1,0 +1,57 @@
+.editor-grid {
+  -fx-padding: 0;
+  -fx-alignment: center;
+  -fx-font-size: 12pt;
+}
+
+.editor-grid .pane {
+  -fx-padding: 0.35em 0.25em 0.35em 0.6em;
+}
+
+.editor-grid .odd {
+  -fx-background-color: #EAEAEAFF;
+}
+
+.editor-grid .preview {
+  -fx-font-family: "monospaced";
+}
+
+.editor-filter-bar {
+  -fx-padding: 0.5em;
+  -fx-background-color: white;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0.15em 0 0 0;
+}
+
+.editor .menu {
+  -fx-font-size: 10pt;
+}
+
+.editor-nav-bar-container {
+  -fx-padding: 0.7em;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0 0 0.1em 0;
+}
+
+.editor-nav-bar {
+  -fx-font-size: 11pt;
+  -fx-background-color: #EEEEEEFF;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0.1em;
+}
+
+.editor-grid .jfx-button {
+-fx-padding: 0.1 0.2em 0.05em 0.2em;
+  -fx-font-family: "monospaced";
+}
+
+.editor-grid .text-field {
+-fx-padding: 0.25em 0.2em 0.25em 0.2em;
+-fx-border-width: 0 1em 0 1em;
+  -fx-font-family: "monospaced";
+}
+
+.jfx-color-picker .color-label {
+-fx-padding: 0;
+-fx-alignment: center;
+}

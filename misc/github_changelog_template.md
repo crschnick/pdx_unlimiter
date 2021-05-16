@@ -1,5 +1,3 @@
-- changes
-
 If you have already installed the Pdx-Unlimiter,
 this update will be automatically installed when launching it the next time.
 
@@ -14,3 +12,19 @@ Note that there might be some issues with Windows SmartScreen blocking the insta
 If you are facing these issues, click on "More info" and then "Run anyway".
 
 ### [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
+
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;
+&emsp;

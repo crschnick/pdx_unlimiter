@@ -1,0 +1,10 @@
+.game-icon {
+-fx-min-width: 8em;
+-fx-max-width: 8em;
+-fx-min-height: 8em;
+-fx-max-height: 8em;
+}
+.game-icon-bar {
+  -fx-spacing: 3em;
+-fx-padding: 2em;
+}
