@@ -17,7 +17,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 public class SkanderbegHelper {
 
@@ -30,9 +29,9 @@ public class SkanderbegHelper {
 
         TaskExecutor.getInstance().submitTask(() -> {
             try {
-                byte[] body = Files.readAllBytes(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
+                byte[] body = SavegameStorage.<T,I>get(Game.EU4).getSavegameData(entry);
                 if (entry.getInfo().isIronman()) {
-                    body = RakalyHelper.toPlaintext(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
+                    body = RakalyHelper.toPlaintext(body);
                 }
 
                 String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4)

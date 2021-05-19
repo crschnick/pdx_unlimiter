@@ -36,21 +36,20 @@ import javafx.scene.image.Image;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -498,9 +497,7 @@ public abstract class SavegameStorage<
             return;
         }
 
-
-        var file = getSavegameFile(e);
-        if (!Files.exists(file)) {
+        if (!Files.exists(getSavegameFile(e, false)) && !Files.exists(getSavegameFile(e, true))) {
             e.fail();
             return;
         }
@@ -522,9 +519,9 @@ public abstract class SavegameStorage<
         SavegameParseResult result;
         boolean melted;
         try {
-            var bytes = Files.readAllBytes(file);
+            var bytes = getSavegameData(e);
             if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.toPlaintext(file);
+                bytes = RakalyHelper.toPlaintext(bytes);
                 melted = true;
             } else {
                 melted = false;
@@ -548,7 +545,10 @@ public abstract class SavegameStorage<
 
 
                     // Clear old info files
-                    Files.list(getSavegameDataDirectory(e)).filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
+                    Files.list(getSavegameDataDirectory(e))
+                            .filter(p -> !p.equals(getSavegameFile(e, false)) &&
+                                    !p.equals(getSavegameFile(e, true)))
+                            .forEach(p -> {
                         try {
                             logger.debug("Deleting old info file " + p.toString());
                             Files.delete(p);
@@ -579,8 +579,40 @@ public abstract class SavegameStorage<
         });
     }
 
-    public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
-        return getSavegameDataDirectory(e).resolve("savegame." + type.getFileEnding());
+    public Path getRawSavegameFile(SavegameEntry<?, ?> e) throws IOException {
+        boolean compressed = Files.exists(getSavegameFile(e, true));
+        if (compressed) {
+            try (var fs = FileSystems.newFileSystem(getSavegameFile(e, true))) {
+                var tempOut = Files.createTempFile("pdxu", "." + getType().getFileEnding());
+                Files.write(tempOut, Files.readAllBytes(fs.getPath(getSaveFileName())));
+                return tempOut;
+            }
+        } else {
+            return getSavegameFile(e, false);
+        }
+    }
+
+    private synchronized Path getSavegameFile(SavegameEntry<?, ?> e, boolean compressed) {
+        return getSavegameDataDirectory(e).resolve("savegame." + type.getFileEnding() + (compressed ? ".zip" : ""));
+    }
+
+    public synchronized byte[] getSavegameData(SavegameEntry<T, I> e) {
+        byte[] data = null;
+        boolean compressed = Files.exists(getSavegameFile(e, true));
+        if (compressed) {
+            try (var fs = FileSystems.newFileSystem(getSavegameFile(e, true))) {
+                data = Files.readAllBytes(fs.getPath(getSaveFileName()));
+            } catch (IOException ioException) {
+                ErrorHandler.handleException(ioException);
+            }
+        } else {
+            try {
+                data = Files.readAllBytes(getSavegameFile(e, false));
+            } catch (IOException ioException) {
+                ErrorHandler.handleException(ioException);
+            }
+        }
+        return data;
     }
 
     public synchronized Path getSavegameInfoFile(SavegameEntry<T, I> e) {
@@ -608,9 +640,8 @@ public abstract class SavegameStorage<
     }
 
     public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
-        Path srcPath = getSavegameFile(e);
         FileUtils.forceMkdirParent(destPath.toFile());
-        FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
+        Files.write(destPath, getSavegameData(e));
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
@@ -671,9 +702,51 @@ public abstract class SavegameStorage<
         return c.toString();
     }
 
+    private synchronized void moveFileIntoStorage(
+            SavegameCollection<T, I> colTarget,
+            String entryName,
+            byte[] bytes,
+            String checksum,
+            String sourceFileChecksum,
+            I info) {
+        UUID collectionUuid;
+        if (colTarget == null) {
+            collectionUuid = info.getCampaignHeuristic();
+        } else {
+            collectionUuid = colTarget.getUuid();
+        }
+        logger.debug("Collection UUID is " + collectionUuid.toString());
+        UUID saveUuid = UUID.randomUUID();
+        logger.debug("Generated savegame UUID " + saveUuid.toString());
+
+        Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
+        try {
+            FileUtils.forceMkdir(entryPath.toFile());
+            if (!type.isCompressed(bytes)) {
+                try (var fs = FileSystems.newFileSystem(
+                        entryPath.resolve(getSaveFileName() + ".zip"), Map.of("create", "true"))) {
+                    Files.write(fs.getPath(getSaveFileName()), bytes);
+                }
+            } else {
+                var file = entryPath.resolve(getSaveFileName());
+                Files.write(file, bytes);
+            }
+
+            JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
+
+            if (colTarget == null) {
+                addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, entryName, sourceFileChecksum);
+            } else {
+                addNewEntryToCollection(colTarget, saveUuid, checksum, info, entryName, sourceFileChecksum);
+            }
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+    }
+
     private Optional<SavegameParseResult> importSavegameData(
             Path file,
-            String name,
+            String entryName,
             boolean checkDuplicate,
             String sourceFileChecksum,
             SavegameCollection<T, I> col) {
@@ -718,7 +791,7 @@ public abstract class SavegameStorage<
             @Override
             public void success(SavegameParseResult.Success s) {
                 logger.debug("Parsing was successful. Loading info ...");
-                I info = null;
+                I info;
                 try {
                     info = infoFactory.apply(s.combinedNode(), melted);
                 } catch (SavegameInfoException e) {
@@ -726,36 +799,7 @@ public abstract class SavegameStorage<
                     return;
                 }
 
-                UUID collectionUuid;
-                if (col == null) {
-                    collectionUuid = info.getCampaignHeuristic();
-                    logger.debug("Campaign UUID is " + collectionUuid.toString());
-                } else {
-                    collectionUuid = col.getUuid();
-                    logger.debug("Folder UUID is " + collectionUuid.toString());
-                }
-                UUID saveUuid = UUID.randomUUID();
-                logger.debug("Generated savegame UUID " + saveUuid.toString());
-
-                synchronized (this) {
-                    Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
-                    try {
-                        FileUtils.forceMkdir(entryPath.toFile());
-                        var file = entryPath.resolve(getSaveFileName());
-                        if (!type.writeCompressed(bytes, file)) {
-                            Files.write(file, bytes);
-                        }
-                        JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
-
-                        if (col == null) {
-                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum);
-                        } else {
-                            addNewEntryToCollection(col, saveUuid, checksum, info, name, sourceFileChecksum);
-                        }
-                    } catch (Exception e) {
-                        ErrorHandler.handleException(e);
-                    }
-                }
+                moveFileIntoStorage(col, entryName, bytes, checksum, sourceFileChecksum, info);
             }
 
             @Override
@@ -785,7 +829,7 @@ public abstract class SavegameStorage<
         return cn + " (" + en + ")";
     }
 
-    public Optional<SavegameEntry<T,I>> getEntryForSourceFile(String sourceFileChecksum) {
+    public Optional<SavegameEntry<T, I>> getEntryForSourceFile(String sourceFileChecksum) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
                 .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
                 .findAny();

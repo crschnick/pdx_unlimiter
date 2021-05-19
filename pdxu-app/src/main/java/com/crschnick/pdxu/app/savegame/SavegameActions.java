@@ -81,7 +81,7 @@ public class SavegameActions {
             var file = savegames.get(0).path;
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.toPlaintext(file);
+                bytes = RakalyHelper.toPlaintext(bytes);
             }
             var struc = type.determineStructure(bytes);
             r = struc.parse(bytes);
@@ -210,7 +210,7 @@ public class SavegameActions {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegame(e, ctx -> {
                 var sgs = ctx.getStorage();
-                var in = sgs.getSavegameFile(e);
+                var in = sgs.getRawSavegameFile(e);
                 sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
                         sgs.getSavegameCollection(e));
             });

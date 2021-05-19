@@ -82,7 +82,7 @@ public class ConverterHelper {
             writeLine(writer, "CK3directory", GameInstallation.ALL.get(Game.CK3).getInstallDir().toString());
             writeLine(writer, "EU4directory", GameInstallation.ALL.get(Game.EU4).getInstallDir().toString());
             writeLine(writer, "targetGameModPath", getEu4ModDir());
-            writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getSavegameFile(entry).toString());
+            writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getRawSavegameFile(entry).toString());
             writeLine(writer, "output_name", getOutputName(entry));
             for (var e : values.entrySet()) {
                 writeLine(writer, e.getKey(), e.getValue());

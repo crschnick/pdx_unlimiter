@@ -74,20 +74,6 @@ public interface SavegameType {
     SavegameType CK3 = new SavegameType() {
 
         @Override
-        public boolean writeCompressed(byte[] input, Path output) throws IOException {
-            if (isCompressed(input)) {
-                return false;
-            }
-
-            return false;
-            
-            // TODO: enable
-            // Temp disabled, since rakaly doesn't write headers yet
-            // Ck3CompressedSavegameStructure.writeCompressed(input, output);
-            // return true;
-        }
-
-        @Override
         public SavegameStructure determineStructure(byte[] input) {
             if (isCompressed(input)) {
                 return SavegameStructure.CK3_COMPRESSED;
@@ -201,10 +187,6 @@ public interface SavegameType {
             }
         }
         return null;
-    }
-
-    default boolean writeCompressed(byte[] input, Path output) throws IOException {
-        return false;
     }
 
     SavegameStructure determineStructure(byte[] input);

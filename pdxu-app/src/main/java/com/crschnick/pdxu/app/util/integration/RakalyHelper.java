@@ -34,7 +34,7 @@ public class RakalyHelper {
         return temp;
     }
 
-    public static byte[] toPlaintext(Path file) throws Exception {
+    public static byte[] toPlaintext(byte[] input) throws Exception {
         var proc = new ProcessBuilder(
                 PdxuInstallation.getInstance().getRakalyExecutable().toString(),
                 "melt",
