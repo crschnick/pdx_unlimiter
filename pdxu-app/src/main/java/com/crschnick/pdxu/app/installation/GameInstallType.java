@@ -451,7 +451,8 @@ public interface GameInstallType {
     }
 
     default String getModId(Path userDir, GameMod mod) {
-        return userDir.relativize(mod.getModFile()).toString();
+        var rel = userDir.relativize(mod.getModFile());
+        return FilenameUtils.separatorsToUnix(rel.toString());
     }
 
     void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;

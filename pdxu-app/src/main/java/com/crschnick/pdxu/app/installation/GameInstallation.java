@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public final class GameInstallation {
 
@@ -149,10 +148,15 @@ public final class GameInstallation {
     }
 
     private void loadEnabledMods() throws Exception {
-        this.enabledMods.addAll(type.getEnabledMods(getInstallDir(), userDir).stream()
-                .map(s -> getModForId(s))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList()));
+        type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
+            var mod = getModForId(s);
+            mod.ifPresentOrElse(m -> {
+                enabledMods.add(m);
+                logger.debug("Detected enabled mod " + m.getName());
+            }, () -> {
+                logger.warn("Detected enabled but unrecognized mod " + s);
+            });
+        });
     }
 
     public void startDirectly(boolean debug) throws IOException {

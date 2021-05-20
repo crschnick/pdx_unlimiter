@@ -95,7 +95,7 @@ public class LogManager {
 
     private void setLogLevels(boolean debug) {
         if (true) { //if (debug) {
-            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         }
 
         // Debug output for platform

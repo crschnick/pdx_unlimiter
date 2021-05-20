@@ -75,7 +75,7 @@ public class StellarisTagRenderer {
         BufferedImage result = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         var g = result.getGraphics();
         g.drawImage(bg, 0, 0, IMG_SIZE, IMG_SIZE, null);
-        g.drawImage(icon, 38, 38, IMG_SIZE - 76, IMG_SIZE - 76, null);
+        g.drawImage(icon, 40, 40, IMG_SIZE - 80, IMG_SIZE - 80, null);
 
         return result;
     }

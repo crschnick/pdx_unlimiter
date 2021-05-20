@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -62,7 +63,8 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         @Override
         public Path export() throws IOException {
             Path file;
-            Path dir = savegameDir.resolve(storage.getFileSystemCompatibleName(entry, false));
+            Path dir = savegameDir.resolve(FilenameUtils.getBaseName(
+                    storage.getFileSystemCompatibleName(entry, false)));
             if (entry.getInfo().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {
