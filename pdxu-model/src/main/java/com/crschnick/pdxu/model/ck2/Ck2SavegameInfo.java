@@ -32,7 +32,7 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
 
             allTags = new ArrayList<>();
 
-            mods = List.of();
+            mods = null;
 
             dlcs = List.of();
 

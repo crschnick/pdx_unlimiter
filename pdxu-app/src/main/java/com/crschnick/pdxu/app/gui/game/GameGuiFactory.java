@@ -165,7 +165,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             addNode(grid, version);
         }
 
-        if (info.getMods().size() > 0) {
+        if (info.getMods() != null && info.getMods().size() > 0) {
             Label mods = new Label("Mods (" + info.getMods().size() + ")");
             mods.setGraphic(new FontIcon());
             mods.getStyleClass().add(CLASS_CONTENT);

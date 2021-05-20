@@ -1,9 +1,9 @@
 package com.crschnick.pdxu.app.editor.target;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +29,7 @@ public abstract class EditTarget {
 
     public abstract void write(Map<String, ArrayNode> nodeMap) throws Exception;
 
-    public abstract Charset getCharset();
+    public abstract TextFormatParser getParser();
 
     public String getName() {
         return file.getFileName().toString();

@@ -37,7 +37,7 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
                     .findAny()
                     .orElseThrow(() -> new SavegameInfoException("No player tag found"));
 
-            mods = List.of();
+            mods = null;
             dlcs = List.of();
 
             // Hardcode version

@@ -22,7 +22,7 @@ public class GameMod {
 
         Node node;
         try {
-            node = TextFormatParser.textFileParser().parse(p);
+            node = TextFormatParser.TEXT.parse(p);
         } catch (ParseException ex) {
             throw new ParseException("Could not parse malformed mod file " + p.toString(), ex);
         }

@@ -30,10 +30,11 @@ public class GameFileContext {
         var install = GameInstallation.ALL.get(INFO_MAP.get(info.getClass()));
         return new GameFileContext(
                 install,
-                info.getMods().stream()
+                info.getMods() != null ?
+                        info.getMods().stream()
                         .map(install::getModForId)
                         .flatMap(Optional::stream)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()) : null);
     }
 
     public GameInstallation getInstall() {

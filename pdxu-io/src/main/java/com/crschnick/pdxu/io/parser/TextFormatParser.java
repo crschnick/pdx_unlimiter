@@ -9,24 +9,56 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class TextFormatParser {
 
+    public static final TextFormatParser TEXT = new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.ALL, s -> true);
+
+    public static final TextFormatParser EU4 = new TextFormatParser(
+            StandardCharsets.ISO_8859_1,
+            TaggedNode.NO_TAGS,
+            s -> s.equals("map_area_data"));
+
+    public static final TextFormatParser CK3 = new TextFormatParser(
+            StandardCharsets.UTF_8,
+            TaggedNode.COLORS,
+            s -> false);
+
+    public static final TextFormatParser HOI4 = new TextFormatParser(
+            StandardCharsets.UTF_8,
+            TaggedNode.COLORS,
+            s -> false);
+
+    public static final TextFormatParser STELLARIS = new TextFormatParser(
+            StandardCharsets.UTF_8,
+            TaggedNode.COLORS,
+            s -> false);
+
+    public static final TextFormatParser CK2 = new TextFormatParser(
+            StandardCharsets.ISO_8859_1,
+            TaggedNode.NO_TAGS,
+            s -> false);
+
+    public static final TextFormatParser VIC2 = new TextFormatParser(
+            StandardCharsets.ISO_8859_1,
+            TaggedNode.NO_TAGS,
+            s -> false);
+
     private final Charset charset;
     private final TaggedNode.TagType[] possibleTags;
+    private final Predicate<String> keyWithoutEquals;
+
     private int index;
     private int slIndex;
     private int arrayIndex;
     private TextFormatTokenizer tokenizer;
     private NodeContext context;
 
-    public TextFormatParser(Charset charset, TaggedNode.TagType[] possibleTags) {
+    public TextFormatParser(Charset charset, TaggedNode.TagType[] possibleTags, Predicate<String> keyWithoutEquals) {
         this.charset = charset;
         this.possibleTags = possibleTags;
-    }
-
-    public static TextFormatParser textFileParser() {
-        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.ALL);
+        this.keyWithoutEquals = keyWithoutEquals;
     }
 
     private void reset() {
@@ -37,15 +69,15 @@ public final class TextFormatParser {
         this.context = null;
     }
 
-    public final ArrayNode parse(Path file) throws IOException, ParseException {
+    public final synchronized ArrayNode parse(Path file) throws IOException, ParseException {
         return parse(Files.readAllBytes(file), 0);
     }
 
-    public final ArrayNode parse(byte[] input) throws ParseException {
+    public final synchronized ArrayNode parse(byte[] input) throws ParseException {
         return parse(input, 0);
     }
 
-    public final ArrayNode parse(byte[] input, int start) throws ParseException {
+    public final synchronized ArrayNode parse(byte[] input, int start) throws ParseException {
         try {
             this.tokenizer = new TextFormatTokenizer(input, start);
 
@@ -162,7 +194,7 @@ public final class TextFormatParser {
 
             boolean isKeyValueWithoutEquals = tt[index] == TextFormatTokenizer.STRING_UNQUOTED &&
                     tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
-            if (isKeyValueWithoutEquals) {
+            if (isKeyValueWithoutEquals && keyWithoutEquals.test(context.evaluate(slIndex))) {
                 int keyIndex = slIndex;
                 slIndex++;
                 index++;

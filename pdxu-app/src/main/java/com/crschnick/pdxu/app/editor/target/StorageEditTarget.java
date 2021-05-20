@@ -4,9 +4,9 @@ import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.SavegameInfo;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
@@ -32,7 +32,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     }
 
     @Override
-    public Charset getCharset() {
-        return target.getCharset();
+    public TextFormatParser getParser() {
+        return target.getParser();
     }
 }

@@ -154,7 +154,7 @@ public class GuiConverterConfig {
         Node configNode;
         Map<String, String> translations;
         try {
-            configNode = TextFormatParser.textFileParser().parse(Files.readAllBytes(
+            configNode = TextFormatParser.TEXT.parse(Files.readAllBytes(
                     Settings.getInstance().ck3toeu4Dir.getValue()
                             .resolve("Configuration").resolve("fronter-options.txt")));
             translations = LocalisationHelper.loadTranslations(Settings.getInstance().ck3toeu4Dir.getValue()

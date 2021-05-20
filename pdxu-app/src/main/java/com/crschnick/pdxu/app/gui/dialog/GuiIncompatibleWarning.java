@@ -5,8 +5,10 @@ import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +27,7 @@ public class GuiIncompatibleWarning {
                     .append(entry.getInfo().getVersion().toString());
         }
 
-        boolean missingMods = entry.getInfo().getMods().stream()
+        boolean missingMods = entry.getInfo().getMods() != null && entry.getInfo().getMods().stream()
                 .map(m -> installation.getModForId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingMods) {
@@ -73,14 +75,21 @@ public class GuiIncompatibleWarning {
             alert.getButtonTypes().add(launchButton);
             alert.getButtonTypes().add(changeModsButton);
             alert.setTitle(PdxuI18n.get("STELLARIS_INFO_TITLE"));
+            alert.setHeaderText(PdxuI18n.get("STELLARIS_INFO"));
 
-            String builder = PdxuI18n.get("STELLARIS_INFO") + enabledMods.stream()
+            String builder = enabledMods.stream()
                     .map(m -> "- " + m.getName())
                     .collect(Collectors.joining("\n"));
             if (enabledMods.size() == 0) {
                 builder = builder + "<None>";
             }
-            alert.setHeaderText(builder);
+            var text = new TextArea(builder);
+            text.setPrefHeight(200);
+            text.setEditable(false);
+
+            alert.getDialogPane().setContent(text);
+            alert.getDialogPane().setPadding(Insets.EMPTY);
+            alert.getDialogPane().minHeightProperty().bind(text.prefHeightProperty());
         });
 
         if (r.isPresent()) {

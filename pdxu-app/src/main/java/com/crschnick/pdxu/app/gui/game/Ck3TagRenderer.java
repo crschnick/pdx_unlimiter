@@ -57,7 +57,7 @@ public class Ck3TagRenderer {
                 info);
         if (file.isPresent()) {
             try {
-                Node node = TextFormatParser.textFileParser().parse(file.get());
+                Node node = TextFormatParser.TEXT.parse(file.get());
                 return loadPredefinedColors(node);
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);

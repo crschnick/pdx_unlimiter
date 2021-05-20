@@ -2,12 +2,10 @@ package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
-import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,15 +19,13 @@ import java.util.zip.ZipInputStream;
 public class ZipSavegameStructure implements SavegameStructure {
 
     private final byte[] header;
-    private final Charset charset;
-    private final TaggedNode.TagType[] tagTypes;
+    private final TextFormatParser parser;
     private final Set<SavegamePart> parts;
     private final String[] ignored;
 
-    public ZipSavegameStructure(byte[] header, Charset charset, TaggedNode.TagType[] tagTypes, Set<SavegamePart> parts, String... ignored) {
+    public ZipSavegameStructure(byte[] header, TextFormatParser parser, Set<SavegamePart> parts, String... ignored) {
         this.header = header;
-        this.charset = charset;
-        this.tagTypes = tagTypes;
+        this.parser = parser;
         this.parts = parts;
         this.ignored = ignored;
     }
@@ -65,7 +61,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                         return new SavegameParseResult.Invalid("File " + part.get().identifier() + " has an invalid header");
                     }
 
-                    var node = new TextFormatParser(charset, tagTypes).parse(bytes, header != null ? header.length + 1 : 0);
+                    var node = parser.parse(bytes, header != null ? header.length + 1 : 0);
                     nodes.put(part.get().name(), node);
                 }
 
@@ -97,7 +93,7 @@ public class ZipSavegameStructure implements SavegameStructure {
 
                 var path = fs.getPath(usedPart.get().identifier());
                 try (var partOut = Files.newOutputStream(path)) {
-                    NodeWriter.write(partOut, charset, e.getValue(), "\t");
+                    NodeWriter.write(partOut, parser.getCharset(), e.getValue(), "\t");
                 }
             }
         }
@@ -109,12 +105,10 @@ public class ZipSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public Charset getCharset() {
-        return charset;
+    public TextFormatParser getParser() {
+        return parser;
     }
 
     public record SavegamePart(String name, String identifier) {
     }
-
-
 }

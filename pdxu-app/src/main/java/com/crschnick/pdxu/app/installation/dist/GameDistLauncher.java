@@ -25,7 +25,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class GameDistLauncher {
 
@@ -90,11 +89,11 @@ public class GameDistLauncher {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-        var mods = e.getInfo().getMods().stream()
+        var mods = e.getInfo().getMods() != null ?e.getInfo().getMods().stream()
                 .map(m -> ctx.getInstallation().getModForId(m))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : List.<GameMod>of();
         if (ctx.getGame().equals(Game.STELLARIS)) {
             writeStellarisDlcLoadFile(GameInstallation.ALL.get(Game.STELLARIS), dlcs);
         } else {
@@ -115,7 +114,7 @@ public class GameDistLauncher {
         var ctx = SavegameContext.getContext(e);
         if (ctx.getGame().equals(Game.STELLARIS)) {
             var r = GuiIncompatibleWarning.showStellarisModWarning(
-                    getEnabledMods(GameInstallation.ALL.get(Game.STELLARIS)));
+                    GameInstallation.ALL.get(Game.STELLARIS).getEnabledMods());
             if (r.isPresent()) {
                 var b = r.get();
                 if (b) {
@@ -136,7 +135,7 @@ public class GameDistLauncher {
 
     private static void writeStellarisDlcLoadFile(
             GameInstallation installation, List<GameDlc> dlcs) throws Exception {
-        var existingMods = getEnabledMods(installation);
+        var existingMods = installation.getEnabledMods();
         writeDlcLoadFile(installation, existingMods, dlcs);
     }
 
@@ -155,14 +154,5 @@ public class GameDistLauncher {
                 .map(JsonNodeFactory.instance::textNode)
                 .collect(Collectors.toList()));
         JsonHelper.write(n, file);
-    }
-
-    private static List<GameMod> getEnabledMods(GameInstallation installation) throws Exception {
-        var file = installation.getUserDir().resolve("dlc_load.json");
-        var node = JsonHelper.read(file);
-        return StreamSupport.stream(node.required("enabled_mods").spliterator(), false)
-                .map(n -> installation.getModForId(n.textValue()))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList());
     }
 }

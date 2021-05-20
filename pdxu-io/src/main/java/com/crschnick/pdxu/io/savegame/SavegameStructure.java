@@ -1,11 +1,9 @@
 package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.TaggedNode;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
@@ -15,14 +13,12 @@ public interface SavegameStructure {
 
     SavegameStructure EU4_PLAINTEXT = new PlaintextSavegameStructure(
             "EU4txt".getBytes(),
-            StandardCharsets.ISO_8859_1,
             "gamestate",
-            TaggedNode.NO_TAGS);
+            TextFormatParser.EU4);
 
     SavegameStructure EU4_COMPRESSED = new ZipSavegameStructure(
             "EU4txt".getBytes(),
-            StandardCharsets.ISO_8859_1,
-            TaggedNode.NO_TAGS,
+            TextFormatParser.EU4,
             Set.of(new ZipSavegameStructure.SavegamePart("ai", "ai"),
                     new ZipSavegameStructure.SavegamePart("meta", "meta"),
                     new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")),
@@ -36,38 +32,33 @@ public interface SavegameStructure {
 
     SavegameStructure HOI4 = new PlaintextSavegameStructure(
             "HOI4txt".getBytes(),
-            StandardCharsets.UTF_8,
             "gamestate",
-            TaggedNode.COLORS);
+            TextFormatParser.HOI4);
 
 
     SavegameStructure STELLARIS = new ZipSavegameStructure(
             null,
-            StandardCharsets.UTF_8,
-            TaggedNode.COLORS,
+            TextFormatParser.STELLARIS,
             Set.of(new ZipSavegameStructure.SavegamePart("meta", "meta"),
                     new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")));
 
 
     SavegameStructure CK2_PLAINTEXT = new PlaintextSavegameStructure(
             "CK2txt".getBytes(),
-            StandardCharsets.ISO_8859_1,
             "gamestate",
-            TaggedNode.NO_TAGS);
+            TextFormatParser.CK2);
 
     SavegameStructure CK2_COMPRESSED = new ZipSavegameStructure(
             "CK2txt".getBytes(),
-            StandardCharsets.ISO_8859_1,
-            TaggedNode.NO_TAGS,
+            TextFormatParser.CK2,
             Set.of(new ZipSavegameStructure.SavegamePart("meta", "meta"),
                     new ZipSavegameStructure.SavegamePart("gamestate", "*")));
 
 
     SavegameStructure VIC2 = new PlaintextSavegameStructure(
             null,
-            StandardCharsets.UTF_8,
             "gamestate",
-            TaggedNode.NO_TAGS);
+            TextFormatParser.VIC2);
 
     static boolean validateHeader(byte[] header, byte[] content) {
         if (content.length < header.length) {
@@ -83,7 +74,5 @@ public interface SavegameStructure {
 
     SavegameParseResult parse(byte[] input);
 
-    Charset getCharset();
-
-
+    TextFormatParser getParser();
 }

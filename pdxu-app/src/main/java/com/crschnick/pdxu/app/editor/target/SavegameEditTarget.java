@@ -1,10 +1,10 @@
 package com.crschnick.pdxu.app.editor.target;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameStructure;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class SavegameEditTarget extends EditTarget {
     }
 
     @Override
-    public Charset getCharset() {
-        return structure.getCharset();
+    public TextFormatParser getParser() {
+        return structure.getParser();
     }
 }

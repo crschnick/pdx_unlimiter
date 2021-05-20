@@ -2,11 +2,9 @@ package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
-import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,8 +40,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
 
         int metaStart = header.toString().length() + 1;
         try {
-            var node = new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.COLORS)
-                    .parse(input, metaStart);
+            var node = getParser().parse(input, metaStart);
             return new SavegameParseResult.Success(Map.of("gamestate", node));
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);
@@ -51,7 +48,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public Charset getCharset() {
-        return StandardCharsets.UTF_8;
+    public TextFormatParser getParser() {
+        return TextFormatParser.CK3;
     }
 }

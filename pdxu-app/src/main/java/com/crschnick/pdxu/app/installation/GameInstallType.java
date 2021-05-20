@@ -23,6 +23,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public interface GameInstallType {
 
@@ -152,7 +154,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.textFileParser().parse(sf);
+            var node = TextFormatParser.TEXT.parse(sf);
             var langId = node.getNodeForKey("\"System\"")
                     .getNodeForKey("\"language\"").getNodeForKey("value").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
@@ -253,7 +255,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.textFileParser().parse(sf);
+            var node = TextFormatParser.TEXT.parse(sf);
             var langId = node.getNodeForKey("\"System\"")
                     .getNodeForKey("\"language\"").getNodeForKey("value").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
@@ -325,7 +327,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.textFileParser().parse(sf);
+            var node = TextFormatParser.TEXT.parse(sf);
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }
@@ -333,6 +335,22 @@ public interface GameInstallType {
         @Override
         public Optional<GameVersion> determineVersionFromInstallation(Path p) {
             return Optional.of(new GameVersion(3, 3, 3, 0));
+        }
+
+        @Override
+        public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
+            var sf = userDir.resolve("settings.txt");
+            if (!Files.exists(sf)) {
+                return List.of();
+            }
+
+            var node = TextFormatParser.TEXT.parse(sf);
+            var mods = node.getNodeForKeyIfExistent("last_mods");
+            if (mods.isEmpty()) {
+                return List.of();
+            }
+
+            return mods.get().getNodeArray().stream().map(n -> n.getString()).collect(Collectors.toList());
         }
     };
 
@@ -389,7 +407,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.textFileParser().parse(sf);
+            var node = TextFormatParser.TEXT.parse(sf);
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }
@@ -402,6 +420,11 @@ public interface GameInstallType {
         @Override
         public Optional<GameVersion> determineVersionFromInstallation(Path p) {
             return Optional.of(new GameVersion(3, 4, 0, 0));
+        }
+
+        @Override
+        public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
+            return List.of();
         }
     };
 
@@ -463,6 +486,8 @@ public interface GameInstallType {
         return Optional.empty();
     }
 
+    public List<String> getEnabledMods(Path dir, Path userDir) throws Exception;
+
     default Path determineUserDir(Path p, String name) throws IOException {
         var userDirFile = p.resolve("userdir.txt");
         if (Files.exists(userDirFile)) {
@@ -495,9 +520,17 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.textFileParser().parse(sf);
+            var node = TextFormatParser.TEXT.parse(sf);
             var langId = node.getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+        }
+
+        public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
+            var file = userDir.resolve("dlc_load.json");
+            var node = JsonHelper.read(file);
+            return StreamSupport.stream(node.required("enabled_mods").spliterator(), false)
+                    .map(n -> n.textValue())
+                    .collect(Collectors.toList());
         }
     }
 }

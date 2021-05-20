@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -43,17 +42,10 @@ public class CascadeDirectoryHelper {
 
     private static List<Path> getCascadingDirectories(
             GameFileContext ctx) {
-        List<Path> dirs = new ArrayList<>();
-        dirs.addAll(ctx.getMods().stream()
+        var mods = ctx.getMods() == null ? ctx.getInstall().getEnabledMods() : ctx.getMods();
+        List<Path> dirs = mods.stream()
                 .map(GameMod::getPath)
-                .collect(Collectors.toList()));
-
-//        dirs.addAll(info.getDlcs().stream()
-//                .map(install::getDlcForName)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .map(GameDlc::getDataPath)
-//                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
 
         dirs.add(ctx.getInstall().getType().getModBasePath(ctx.getInstall().getInstallDir()));
         return dirs;

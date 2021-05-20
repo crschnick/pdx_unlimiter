@@ -58,7 +58,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                 i.allTags.add(tag);
             });
 
-            i.mods = List.of();
+            i.mods = null;
 
             i.dlcs = n.getNodeForKeyIfExistent("required_dlcs").map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)

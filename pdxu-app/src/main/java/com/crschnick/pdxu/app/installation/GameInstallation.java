@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class GameInstallation {
 
@@ -28,6 +29,7 @@ public final class GameInstallation {
 
     private final List<GameDlc> dlcs = new ArrayList<>();
     private final List<GameMod> mods = new ArrayList<>();
+    private final List<GameMod> enabledMods = new ArrayList<>();
 
     private Path userDir;
     private GameVersion version;
@@ -97,6 +99,7 @@ public final class GameInstallation {
         LoggerFactory.getLogger(getClass()).debug("Initializing optional data ...");
         loadDlcs();
         loadMods();
+        loadEnabledMods();
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
@@ -143,6 +146,13 @@ public final class GameInstallation {
 
     public Optional<GameMod> getModForId(String id) {
         return getMods().stream().filter(m -> type.getModId(userDir, m).equals(id)).findAny();
+    }
+
+    private void loadEnabledMods() throws Exception {
+        this.enabledMods.addAll(type.getEnabledMods(getInstallDir(), userDir).stream()
+                .map(s -> getModForId(s))
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()));
     }
 
     public void startDirectly(boolean debug) throws IOException {
@@ -220,5 +230,9 @@ public final class GameInstallation {
 
     public GameInstallType getType() {
         return type;
+    }
+
+    public List<GameMod> getEnabledMods() {
+        return enabledMods;
     }
 }
