@@ -28,12 +28,12 @@ public class GuiIncompatibleWarning {
         }
 
         boolean missingMods = entry.getInfo().getMods() != null && entry.getInfo().getMods().stream()
-                .map(m -> installation.getModForId(m))
+                .map(m -> installation.getModForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingMods) {
             builder.append("\nThe following Mods are missing:\n").append(entry.getInfo().getMods().stream()
                     .map(s -> {
-                        var m = installation.getModForId(s);
+                        var m = installation.getModForSavegameId(s);
                         return (m.isPresent() ? null : "- " + s);
                     })
                     .filter(Objects::nonNull)

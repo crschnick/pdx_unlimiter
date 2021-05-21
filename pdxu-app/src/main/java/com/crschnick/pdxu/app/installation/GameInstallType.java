@@ -143,7 +143,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public String getModId(Path userDir, GameMod mod) {
+        public String getModSavegameId(Path userDir, GameMod mod) {
             return mod.getName();
         }
 
@@ -450,9 +450,13 @@ public interface GameInstallType {
         return p.resolve("dlc");
     }
 
-    default String getModId(Path userDir, GameMod mod) {
+    default String getModFileName(Path userDir, GameMod mod) {
         var rel = userDir.relativize(mod.getModFile());
         return FilenameUtils.separatorsToUnix(rel.toString());
+    }
+
+    default String getModSavegameId(Path userDir, GameMod mod) {
+        return getModFileName(userDir, mod);
     }
 
     void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;

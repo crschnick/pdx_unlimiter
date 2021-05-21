@@ -124,9 +124,12 @@ public final class GameInstallation {
         Files.list(getUserDir().resolve("mod")).forEach(f -> {
             try {
                 GameMod.fromFile(f).ifPresent(m -> {
-                    if (Files.exists(m.getPath())) mods.add(m);
-                    LoggerFactory.getLogger(getClass()).debug("Found mod " + m.getName() +
-                            " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(m.getPath()) +
+                    var path = m.getPath().isAbsolute() ? m.getPath() : getUserDir().resolve(m.getPath());
+                    if (Files.exists(path)) {
+                        mods.add(m);
+                    }
+                    logger.debug("Found mod " + m.getName() +
+                            " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(path) +
                             ". Legacy: " + m.isLegacyArchive());
                 });
             } catch (Exception e) {
@@ -143,13 +146,17 @@ public final class GameInstallation {
         return dist;
     }
 
-    public Optional<GameMod> getModForId(String id) {
-        return getMods().stream().filter(m -> type.getModId(userDir, m).equals(id)).findAny();
+    public Optional<GameMod> getModForFileName(String fn) {
+        return getMods().stream().filter(m -> type.getModFileName(userDir, m).equals(fn)).findAny();
+    }
+
+    public Optional<GameMod> getModForSavegameId(String id) {
+        return getMods().stream().filter(m -> type.getModSavegameId(userDir, m).equals(id)).findAny();
     }
 
     private void loadEnabledMods() throws Exception {
         type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
-            var mod = getModForId(s);
+            var mod = getModForFileName(s);
             mod.ifPresentOrElse(m -> {
                 enabledMods.add(m);
                 logger.debug("Detected enabled mod " + m.getName());

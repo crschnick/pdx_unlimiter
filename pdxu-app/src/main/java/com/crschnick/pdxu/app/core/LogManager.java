@@ -51,7 +51,7 @@ public class LogManager {
         System.setProperty("org.slf4j.simpleLogger.showShortLogName", "true");
 
         INSTANCE = new LogManager(logFile, true);
-        INSTANCE.setLogLevels(i.isDeveloperMode());
+        INSTANCE.setLogLevels();
 
         Logger l = LoggerFactory.getLogger(LogManager.class);
         l.info("Initializing LogManager");
@@ -93,10 +93,8 @@ public class LogManager {
         return INSTANCE;
     }
 
-    private void setLogLevels(boolean debug) {
-        if (true) { //if (debug) {
-            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-        }
+    private void setLogLevels() {
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", PdxuInstallation.getInstance().getLogLevel());
 
         // Debug output for platform
         // System.setProperty("prism.verbose", "true");

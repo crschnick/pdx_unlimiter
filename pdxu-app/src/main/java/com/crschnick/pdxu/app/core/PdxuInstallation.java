@@ -26,6 +26,7 @@ public class PdxuInstallation {
     private Path resourceDir;
     private boolean preRelease;
     private String latestVersion;
+    private String logLevel = "debug";
 
     public static void init() {
         var i = new PdxuInstallation();
@@ -109,6 +110,10 @@ public class PdxuInstallation {
                     .map(val -> Boolean.parseBoolean(val.toString()))
                     .orElse(false);
         }
+
+        i.logLevel = Optional.ofNullable(props.get("logLevel"))
+                .map(val -> val.toString())
+                .orElse("debug");
 
         i.developerMode = Optional.ofNullable(props.get("developerMode"))
                 .map(val -> Boolean.parseBoolean(val.toString()))
@@ -228,5 +233,9 @@ public class PdxuInstallation {
 
     public String getLatestVersion() {
         return latestVersion;
+    }
+
+    public String getLogLevel() {
+        return logLevel;
     }
 }

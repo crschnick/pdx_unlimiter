@@ -32,7 +32,7 @@ public class GameFileContext {
                 install,
                 info.getMods() != null ?
                         info.getMods().stream()
-                        .map(install::getModForId)
+                        .map(install::getModForSavegameId)
                         .flatMap(Optional::stream)
                         .collect(Collectors.toList()) : null);
     }

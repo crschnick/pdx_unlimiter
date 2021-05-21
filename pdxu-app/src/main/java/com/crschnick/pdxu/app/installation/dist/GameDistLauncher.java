@@ -90,7 +90,7 @@ public class GameDistLauncher {
                 .map(Optional::get)
                 .collect(Collectors.toList());
         var mods = e.getInfo().getMods() != null ?e.getInfo().getMods().stream()
-                .map(m -> ctx.getInstallation().getModForId(m))
+                .map(m -> ctx.getInstallation().getModForSavegameId(m))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()) : List.<GameMod>of();

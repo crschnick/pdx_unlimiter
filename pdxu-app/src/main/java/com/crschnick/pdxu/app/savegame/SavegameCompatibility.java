@@ -18,7 +18,7 @@ public class SavegameCompatibility {
 
             var ins = ctx.getInstallation();
             boolean missingMods = info.getMods() != null && info.getMods().stream()
-                    .map(ins::getModForId)
+                    .map(ins::getModForSavegameId)
                     .anyMatch(Optional::isEmpty);
 
             boolean missingDlc = info.getDlcs().stream()
