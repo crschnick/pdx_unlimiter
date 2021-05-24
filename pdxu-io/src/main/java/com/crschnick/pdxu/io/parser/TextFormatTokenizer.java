@@ -144,6 +144,7 @@ public class TextFormatTokenizer {
             escapeChar = c == '\\';
             if (c == '"') {
                 isInQuotes = false;
+                finishCurrentToken(i + 1);
             }
         }
 
@@ -151,22 +152,26 @@ public class TextFormatTokenizer {
     }
 
     private void finishCurrentToken() {
-        boolean isCurrentToken = nextScalarStart < i;
+        finishCurrentToken(i);
+    }
+
+    private void finishCurrentToken(int endExclusive) {
+        boolean isCurrentToken = nextScalarStart < endExclusive;
         if (!isCurrentToken) {
             return;
         }
 
-        short length = (short) ((i - 1) - nextScalarStart + 1);
+        short length = (short) ((endExclusive - 1) - nextScalarStart + 1);
 
         // Check for length overflow
         if (length < 0) {
             throw new IndexOutOfBoundsException(
-                    "Encountered scalar with length " + ((i - 1) - nextScalarStart + 1) + ", which is too big");
+                    "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) + ", which is too big");
         }
 
         assert length > 0 : "Scalar must be of length at least 1";
 
-        if (bytes[nextScalarStart] == DOUBLE_QUOTE_CHAR && bytes[i - 1] == DOUBLE_QUOTE_CHAR) {
+        if (bytes[nextScalarStart] == DOUBLE_QUOTE_CHAR && bytes[endExclusive - 1] == DOUBLE_QUOTE_CHAR) {
             tokenTypes[tokenCounter++] = STRING_QUOTED;
         } else {
             tokenTypes[tokenCounter++] = STRING_UNQUOTED;
@@ -178,7 +183,7 @@ public class TextFormatTokenizer {
         assert arraySizeStack.size() > 0 : "Encountered unexpectedly large array at index " + i;
         arraySizes[arraySizeStack.peek()]++;
 
-        nextScalarStart = i;
+        nextScalarStart = endExclusive;
     }
 
     private void checkForNewControlToken(byte controlToken) {

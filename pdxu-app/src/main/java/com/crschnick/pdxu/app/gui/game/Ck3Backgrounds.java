@@ -32,7 +32,7 @@ public class Ck3Backgrounds {
                 ArrayNode node = TextFormatParser.TEXT.parse(file);
                 cache.addColors(node);
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                ErrorHandler.handleException(e, "Couldn't parse title data", file);
             }
         }
 
