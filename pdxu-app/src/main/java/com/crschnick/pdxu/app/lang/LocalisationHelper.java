@@ -79,7 +79,7 @@ public class LocalisationHelper {
             var matcher = VAR_PATTERN.matcher(s);
             if (matcher.find()) {
                 var group = matcher.group();
-                s = s.replace(group, Matcher.quoteReplacement(v));
+                s = s.replace(group, v);
             } else {
                 LoggerFactory.getLogger(LocalisationHelper.class).warn("No match found for value " + v + " in string " + s);
             }

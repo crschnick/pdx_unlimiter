@@ -184,7 +184,8 @@ public final class GameInstallation {
         }
 
         if (!Files.isRegularFile(type.getExecutable(getInstallDir()))) {
-            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), type.getExecutable(getInstallDir()).toString());
+            var exec = getInstallDir().relativize(type.getExecutable(getInstallDir()));
+            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getAbbreviation(), exec.toString(), getInstallDir().toString());
         }
 
         logger.debug(g.getAbbreviation() + " distribution type: " + this.dist.getName());
