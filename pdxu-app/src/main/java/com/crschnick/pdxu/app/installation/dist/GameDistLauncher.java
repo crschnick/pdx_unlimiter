@@ -23,6 +23,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class GameDistLauncher {
             if (Settings.getInstance().launchIrony.getValue()) {
                 IronyHelper.launchEntry(game, false);
             } else {
-                GameInstallation.ALL.get(game).getDist().startLauncher();
+                GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
             }
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
@@ -106,7 +107,7 @@ public class GameDistLauncher {
         if (Settings.getInstance().launchIrony.getValue()) {
             IronyHelper.launchEntry(game, true);
         } else {
-            GameInstallation.ALL.get(game).getDist().startLauncher();
+            GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
         }
     }
 

@@ -180,7 +180,7 @@ public class TextFormatTokenizer {
         scalarsLength[scalarCounter] = length;
         scalarCounter++;
 
-        assert arraySizeStack.size() > 0 : "Encountered unexpectedly large array at index " + i;
+        assert arraySizeStack.size() > 0 : "Encountered unexpectedly large array at index " + endExclusive;
         arraySizes[arraySizeStack.peek()]++;
 
         nextScalarStart = endExclusive;

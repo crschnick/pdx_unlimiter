@@ -13,9 +13,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -134,14 +132,14 @@ public class SteamDist extends GameDist {
     }
 
     @Override
-    public void startDirectly(Path executable, List<String> args) throws IOException {
+    public void startDirectly(Path executable, List<String> args, Map<String,String> env) throws IOException {
         if (!isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
             GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
                     "Please start Steam first before launching the game");
             return;
         }
 
-        dist.startDirectly(executable, args);
+        dist.startDirectly(executable, args, createSteamEnv());
     }
 
     @Override
@@ -154,12 +152,22 @@ public class SteamDist extends GameDist {
         return dist.supportsDirectLaunch();
     }
 
+    private Map<String,String> createSteamEnv() {
+        return Map.of(
+                "SteamAppId", String.valueOf(getGame().getSteamAppId()),
+                "SteamGameId", String.valueOf(getGame().getSteamAppId()),
+                    "SteamOverlayGameId", String.valueOf(getGame().getSteamAppId()));
+    }
+
     @Override
-    public void startLauncher() throws IOException {
+    public void startLauncher(Map<String,String> env) throws IOException {
         if (Settings.getInstance().startSteam.getValue()) {
             openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
         } else {
-            super.startLauncher();
+            var completeEnv = new HashMap<String,String>();
+            completeEnv.putAll(env);
+            completeEnv.putAll(createSteamEnv());
+            dist.startLauncher(completeEnv);
         }
     }
 

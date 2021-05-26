@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public final class GameInstallation {
@@ -171,7 +172,7 @@ public final class GameInstallation {
         if (debug) {
             args.add(type.debugModeSwitch().get());
         }
-        dist.startDirectly(type.getExecutable(getInstallDir()), args);
+        dist.startDirectly(type.getExecutable(getInstallDir()), args, Map.of());
     }
 
     public void loadData() throws InvalidInstallationException {

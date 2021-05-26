@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PdxLauncherDist extends GameDist {
@@ -53,18 +54,19 @@ public class PdxLauncherDist extends GameDist {
                 .filter(Files::exists);
     }
 
-    private static void startParadoxLauncher(Path launcherPath) throws IOException {
+    private static void startParadoxLauncher(Path launcherPath, Map<String,String> env) throws IOException {
         var bootstrapper = getBootstrapper();
         if (bootstrapper.isEmpty()) {
             return;
         }
 
-        new ProcessBuilder()
+        var pb = new ProcessBuilder()
                 .directory(launcherPath.toFile())
                 .command(bootstrapper.get().toString(),
                         "--pdxlGameDir", launcherPath.toString(),
-                        "--gameDir", launcherPath.toString())
-                .start();
+                        "--gameDir", launcherPath.toString());
+        pb.environment().putAll(env);
+        pb.start();
     }
 
     protected Path getLauncherSettings() {
@@ -109,8 +111,8 @@ public class PdxLauncherDist extends GameDist {
     }
 
     @Override
-    public void startLauncher() throws IOException {
-        startParadoxLauncher(getGame().getInstallType().getLauncherDataPath(getInstallLocation()));
+    public void startLauncher(Map<String,String> env) throws IOException {
+        startParadoxLauncher(getGame().getInstallType().getLauncherDataPath(getInstallLocation()), env);
     }
 
     @Override

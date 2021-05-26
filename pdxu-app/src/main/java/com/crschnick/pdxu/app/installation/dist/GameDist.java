@@ -5,10 +5,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class GameDist {
 
@@ -51,7 +48,7 @@ public abstract class GameDist {
 
     public abstract boolean supportsDirectLaunch();
 
-    public void startDirectly(Path executable, List<String> args) throws IOException {
+    public void startDirectly(Path executable, List<String> args, Map<String,String> env) throws IOException {
         if (supportsDirectLaunch()) {
             var input = new ArrayList<String>();
             // Make UAC popup if needed
@@ -61,13 +58,15 @@ public abstract class GameDist {
             }
             input.add(executable.toString());
             input.addAll(args);
-            new ProcessBuilder().command(input).start();
+            var pb = new ProcessBuilder().command(input);
+            pb.environment().putAll(env);
+            pb.start();
         } else {
             throw new UnsupportedOperationException();
         }
     }
 
-    public void startLauncher() throws IOException {
+    public void startLauncher(Map<String,String> env) throws IOException {
         throw new UnsupportedOperationException();
     }
 

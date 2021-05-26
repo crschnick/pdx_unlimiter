@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 public class LegacyLauncherDist extends GameDist {
@@ -27,8 +28,11 @@ public class LegacyLauncherDist extends GameDist {
     }
 
     @Override
-    public void startLauncher() throws IOException {
-        super.startLauncher();
+    public void startLauncher(Map<String,String> env) throws IOException {
+        var exec = getGame().getInstallType().getLegacyLauncherExecutable(getInstallLocation()).orElseThrow();
+        var pb = new ProcessBuilder(exec.toString());
+        pb.environment().putAll(env);
+        pb.start();
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -87,8 +88,11 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     }
 
     @Override
-    public void startLauncher() throws IOException {
-        new ProcessBuilder("cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App").start();
+    public void startLauncher(Map<String,String> env) throws IOException {
+        var pb = new ProcessBuilder(
+                "cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App");
+        pb.environment().putAll(env);
+        pb.start();
     }
 
     @Override
