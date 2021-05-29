@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
@@ -64,7 +65,7 @@ public class GuiIncompatibleWarning {
         }).orElse(ButtonType.CLOSE).equals(launch);
     }
 
-    public static Optional<Boolean> showStellarisModWarning(List<GameMod> enabledMods) {
+    public static Optional<Boolean> showNoSavedModsWarning(Game game, List<GameMod> enabledMods) {
         var launchButton = new ButtonType(PdxuI18n.get("LAUNCH"));
         var changeModsButton = new ButtonType(PdxuI18n.get("CHANGE_MODS"));
 
@@ -74,8 +75,8 @@ public class GuiIncompatibleWarning {
             alert.getButtonTypes().add(ButtonType.CLOSE);
             alert.getButtonTypes().add(launchButton);
             alert.getButtonTypes().add(changeModsButton);
-            alert.setTitle(PdxuI18n.get("STELLARIS_INFO_TITLE"));
-            alert.setHeaderText(PdxuI18n.get("STELLARIS_INFO"));
+            alert.setTitle(PdxuI18n.get("MOD_INFO_TITLE", game.getFullName()));
+            alert.setHeaderText(PdxuI18n.get("MOD_INFO", game.getFullName()));
 
             String builder = enabledMods.stream()
                     .map(m -> "- " + m.getName())

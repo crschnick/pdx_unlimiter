@@ -5,5 +5,5 @@ l_english:
   INCOMPATIBLE_VERSION: "Incompatible versions"
   GAME_VERSION: "Game version"
   SAVEGAME_VERSION: "Savegame version"
-  STELLARIS_INFO_TITLE: "Stellaris mod information"
-  STELLARIS_INFO: "Stellaris savegames do not store which mods they require.\nTherefore, you have to verify manually, that you are using the correct ones.\n\nThe following Mods are enabled:\n"
+  MOD_INFO_TITLE: "$GAME$ mod information"
+  MOD_INFO: "$GAME$ savegames do not store which mods they require.\nTherefore, you have to verify manually, that you are using the correct ones.\n\nThe following Mods are enabled:\n"

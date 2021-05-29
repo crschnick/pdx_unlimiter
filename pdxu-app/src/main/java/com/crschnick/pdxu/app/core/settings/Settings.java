@@ -132,12 +132,14 @@ public final class Settings extends AbstractSettings {
     public final SettingsEntry.ThirdPartyDirectory ck3toeu4Dir = new SettingsEntry.ThirdPartyDirectory(
             "CK3_TO_EU4_DIR",
             "ck3toeu4Dir",
+            "CK3 to EU4 converter",
             Path.of("Ck3ToEu4", "CK3ToEU4Converter.exe"),
             () -> null
     );
     public final SettingsEntry.ThirdPartyDirectory ironyDir = new SettingsEntry.ThirdPartyDirectory(
             "IRONY_DIR",
             "ironyDir",
+            "Irony Mod Manager",
             Path.of("IronyModManager.exe"),
             () -> IronyHelper.getIronyDefaultInstallPath().orElse(null)
     );
@@ -163,7 +165,7 @@ public final class Settings extends AbstractSettings {
     public final SettingsEntry.BooleanEntry useGameLanguage = new SettingsEntry.BooleanEntry(
             "USE_GAME_LANGUAGE",
             "useGameLanguage",
-            true
+            false
     );
 
     public static void init() {
@@ -195,6 +197,11 @@ public final class Settings extends AbstractSettings {
                     Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
                                         """);
             Platform.runLater(GuiSettings::showSettings);
+        }
+
+        // Disable irony if needed
+        if (ironyDir.getValue() == null) {
+            launchIrony.set(false);
         }
     }
 }

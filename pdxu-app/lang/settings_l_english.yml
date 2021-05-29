@@ -5,7 +5,7 @@ l_english:
  IMPORTS: "Imports"
  IRONY: "Irony mod manager"
  USE_GAME_LANGUAGE: "Use game language"
- USE_GAME_LANGUAGE_DESC: "Always use the language that the currently selected game is in.\nIf this is enabled, the custom language setting below is not used."
+ USE_GAME_LANGUAGE_DESC: "Always use the language that the currently selected game is in.\nIf this is enabled, the custom language setting below is not used. Note that the translations are incomplete!"
  LANGUAGE: "Language"
  LANGUAGE_DESC: "The custom interface language to use.\nOnly is applied, if the 'Use game language' setting is false."
  SELECT_DIR: "Select $DIR$ directory"

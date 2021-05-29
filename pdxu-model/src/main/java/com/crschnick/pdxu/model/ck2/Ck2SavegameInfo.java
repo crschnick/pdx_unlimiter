@@ -25,6 +25,8 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
             date = GameDateType.CK3.fromString(n.getNodesForKey("date").get(0).getString());
             binary = false;
 
+            tag = new Ck2Tag(n.getNodeForKey("player_realm").getString(), n.getNodeForKey("player_name").getString());
+
             long seed = n.getNodeForKey("playthrough_id").getLong();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);

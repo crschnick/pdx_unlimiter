@@ -133,6 +133,17 @@ public class GuiSavegameEntry {
         staticButtons.setAlignment(Pos.CENTER);
         staticButtons.getStyleClass().add(CLASS_BUTTON_BAR);
         {
+            Button export = new JFXButton();
+            export.setGraphic(new FontIcon());
+            export.setOnMouseClicked((m) -> {
+                SavegameActions.exportSavegame(e);
+                SavegameManagerState.<T, I>get().selectEntry(null);
+            });
+            export.getStyleClass().add(CLASS_EXPORT);
+            GuiTooltips.install(export, "Export to " + SavegameContext.getContext(e).getGame().getFullName() + " save games directory");
+            staticButtons.getChildren().add(export);
+        }
+        {
             Button report = new JFXButton();
             report.setGraphic(new FontIcon());
             report.setOnMouseClicked((m) -> {

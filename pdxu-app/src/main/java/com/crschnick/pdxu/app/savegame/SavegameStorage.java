@@ -162,7 +162,7 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(Ck2SavegameInfo info) {
-                return "Unknown";
+                return info.getTag().getRulerName();
             }
         });
         ALL.put(Game.VIC2, new SavegameStorage<>(

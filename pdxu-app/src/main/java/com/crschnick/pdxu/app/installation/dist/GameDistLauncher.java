@@ -5,10 +5,7 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
-import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.installation.GameDlc;
-import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.installation.GameMod;
+import com.crschnick.pdxu.app.installation.*;
 import com.crschnick.pdxu.app.savegame.FileExportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
@@ -95,8 +92,9 @@ public class GameDistLauncher {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()) : List.<GameMod>of();
-        if (ctx.getGame().equals(Game.STELLARIS)) {
-            writeStellarisDlcLoadFile(GameInstallation.ALL.get(Game.STELLARIS), dlcs);
+        if (ctx.getGame().getInstallType().getModInfoStorageType() ==
+                GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
+            writeDlcLoadFileWithEnabledMods(ctx.getInstallation(), dlcs);
         } else {
             writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
         }
@@ -113,9 +111,10 @@ public class GameDistLauncher {
 
     private static void startGameDirectly(SavegameEntry<?, ?> e, boolean debug) throws Exception {
         var ctx = SavegameContext.getContext(e);
-        if (ctx.getGame().equals(Game.STELLARIS)) {
-            var r = GuiIncompatibleWarning.showStellarisModWarning(
-                    GameInstallation.ALL.get(Game.STELLARIS).getEnabledMods());
+        if (ctx.getGame().getInstallType().getModInfoStorageType() ==
+                GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
+            var r = GuiIncompatibleWarning.showNoSavedModsWarning(
+                    ctx.getGame(), ctx.getInstallation().getEnabledMods());
             if (r.isPresent()) {
                 var b = r.get();
                 if (b) {
@@ -134,7 +133,7 @@ public class GameDistLauncher {
         }
     }
 
-    private static void writeStellarisDlcLoadFile(
+    private static void writeDlcLoadFileWithEnabledMods(
             GameInstallation installation, List<GameDlc> dlcs) throws Exception {
         var existingMods = installation.getEnabledMods();
         writeDlcLoadFile(installation, existingMods, dlcs);

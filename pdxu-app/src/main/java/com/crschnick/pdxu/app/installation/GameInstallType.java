@@ -28,6 +28,12 @@ import java.util.stream.StreamSupport;
 
 public interface GameInstallType {
 
+    public static enum ModInfoStorageType {
+        STORES_INFO,
+        SAVEGAME_DOESNT_STORE_INFO,
+        SAVEGAMES_AND_GAME_DONT_STORE_INFO
+    }
+
     GameInstallType EU4 = new StandardInstallType("eu4") {
         @Override
         public Path getWindowsStoreLauncherDataPath(Path p) {
@@ -162,6 +168,12 @@ public interface GameInstallType {
     };
 
     GameInstallType STELLARIS = new StandardInstallType("stellaris") {
+
+        @Override
+        public ModInfoStorageType getModInfoStorageType() {
+            return ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO;
+        }
+
         @Override
         public Path getWindowsStoreLauncherDataPath(Path p) {
             return p.resolve("launcher");
@@ -185,14 +197,13 @@ public interface GameInstallType {
 
         @Override
         public Optional<GameVersion> getVersion(String versionString) {
-            Matcher m = Pattern.compile("(\\w)+\\s+v?(\\d)\\.(\\d+)\\.(\\d+).+").matcher(versionString);
+            Matcher m = Pattern.compile("(\\w*\\s*)v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?").matcher(versionString);
             if (m.find()) {
                 return Optional.of(new GameNamedVersion(
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
-                        Integer.parseInt(m.group(4)),
-                        0,
-                        m.group(1)));
+                        m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0,
+                        0, m.group(1).trim()));
             } else {
                 return Optional.empty();
             }
@@ -295,6 +306,11 @@ public interface GameInstallType {
     GameInstallType CK2 = new StandardInstallType("CK2game") {
 
         @Override
+        public ModInfoStorageType getModInfoStorageType() {
+            return ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO;
+        }
+
+        @Override
         public Optional<Path> getLegacyLauncherExecutable(Path p) {
             return Optional.of(getExecutable(p));
         }
@@ -355,6 +371,11 @@ public interface GameInstallType {
     };
 
     GameInstallType VIC2 = new StandardInstallType("v2game") {
+
+        @Override
+        public ModInfoStorageType getModInfoStorageType() {
+            return ModInfoStorageType.SAVEGAMES_AND_GAME_DONT_STORE_INFO;
+        }
 
         @Override
         public Optional<Path> getLegacyLauncherExecutable(Path p) {
@@ -461,6 +482,10 @@ public interface GameInstallType {
 
     void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;
 
+    default ModInfoStorageType getModInfoStorageType() {
+        return ModInfoStorageType.STORES_INFO;
+    }
+
     default Path getSteamSpecificFile(Path p) {
         return p.resolve("steam_appid.txt");
     }
@@ -537,5 +562,6 @@ public interface GameInstallType {
                     .map(n -> n.textValue())
                     .collect(Collectors.toList());
         }
+
     }
 }

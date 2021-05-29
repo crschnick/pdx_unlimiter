@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.model.ck2.Ck2Tag;
@@ -15,7 +17,8 @@ public class Ck2GuiFactory extends GameGuiFactory<Ck2Tag, Ck2SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Ck2Tag> info, Ck2Tag tag) {
-        return ImageLoader.DEFAULT_IMAGE;
+        return ImageLoader.loadImage(GameInstallation.ALL.get(Game.CK2).getInstallDir()
+                .resolve("gfx").resolve("flags").resolve(tag.getPrimaryTitle() + ".tga"));
     }
 
     @Override

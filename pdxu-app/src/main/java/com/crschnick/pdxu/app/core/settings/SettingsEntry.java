@@ -471,11 +471,13 @@ public abstract class SettingsEntry<T> {
 
     public static class ThirdPartyDirectory extends FailablePathEntry {
 
+        private final String name;
         private final Path checkFile;
         private final Supplier<Path> defaultValue;
 
-        public ThirdPartyDirectory(String id, String serializationName, Path checkFile, Supplier<Path> defaultValue) {
+        public ThirdPartyDirectory(String id, String serializationName, String name, Path checkFile, Supplier<Path> defaultValue) {
             super(id, serializationName);
+            this.name = name;
             this.checkFile = checkFile;
             this.defaultValue = defaultValue;
         }
@@ -520,7 +522,7 @@ public abstract class SettingsEntry<T> {
         }
 
         private void showErrorMessage() {
-            GuiErrorReporter.showSimpleErrorMessage(PdxuI18n.get("THIRD_PARTY_ERROR"));
+            GuiErrorReporter.showSimpleErrorMessage(PdxuI18n.get("THIRD_PARTY_ERROR", name));
         }
     }
 }
