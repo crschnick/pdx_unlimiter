@@ -24,7 +24,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
             String header = new Ck3Header(false, false, metaBytes.length - 1).toString();
             gsOut.write((header + "\n").getBytes(StandardCharsets.UTF_8));
 
-            NodeWriter.write(gsOut, StandardCharsets.UTF_8, gamestate, "\t");
+            NodeWriter.write(gsOut, StandardCharsets.UTF_8, gamestate, "\t", 0);
         }
     }
 

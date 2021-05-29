@@ -15,6 +15,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -305,6 +306,11 @@ public interface GameInstallType {
 
     GameInstallType CK2 = new StandardInstallType("CK2game") {
 
+        public String getCompatibleSavegameName(String name) {
+            return Normalizer.normalize(super.getCompatibleSavegameName(name), Normalizer.Form.NFC)
+                    .replaceAll("[^\\p{ASCII}]", "");
+        }
+
         @Override
         public ModInfoStorageType getModInfoStorageType() {
             return ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO;
@@ -370,7 +376,18 @@ public interface GameInstallType {
         }
     };
 
+    static enum Vic2InstallType {
+        BASE_GAME,
+        A_HOUSE_DIVIDED,
+        HEART_OF_DARKNESS
+    }
+
     GameInstallType VIC2 = new StandardInstallType("v2game") {
+
+        public String getCompatibleSavegameName(String name) {
+            return Normalizer.normalize(super.getCompatibleSavegameName(name), Normalizer.Form.NFC)
+                    .replaceAll("[^\\p{ASCII}]", "");
+        }
 
         @Override
         public ModInfoStorageType getModInfoStorageType() {
@@ -514,6 +531,10 @@ public interface GameInstallType {
 
     default Optional<String> debugModeSwitch() {
         return Optional.empty();
+    }
+
+    default String getCompatibleSavegameName(String name) {
+        return OsHelper.getFileSystemCompatibleName(name);
     }
 
     public List<String> getEnabledMods(Path dir, Path userDir) throws Exception;

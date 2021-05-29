@@ -27,7 +27,7 @@ public class SavegameActions {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var sc = ctx.getStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(
-                    sc.getFileSystemCompatibleName(entry, includeEntryName));
+                    sc.getCompatibleName(entry, includeEntryName));
             try {
                 sc.copySavegameTo(entry, out);
             } catch (IOException ioException) {
@@ -141,6 +141,8 @@ public class SavegameActions {
                         SavegameStorage.get(g).loadEntry(e);
                         GameDistLauncher.continueSavegame(e, false);
                         e.unload();
+                    } else {
+                        GameDistLauncher.continueSavegame(e, false);
                     }
                 });
             }

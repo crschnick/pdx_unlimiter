@@ -102,7 +102,7 @@ public class EditorExternalState {
 
         Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
         try (var out = Files.newOutputStream(file)) {
-            NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ");
+            NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ", 0);
             var entry = new Entry(file, node, state);
             entry.registerChange();
             openEntries.add(entry);

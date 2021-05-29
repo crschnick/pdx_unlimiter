@@ -74,20 +74,6 @@ public interface SavegameType {
     SavegameType CK3 = new SavegameType() {
 
         @Override
-        public boolean writeCompressed(byte[] input, Path output) throws IOException {
-            if (isCompressed(input)) {
-                return false;
-            }
-
-            return false;
-            
-            // TODO: enable
-            // Temp disabled, since rakaly doesn't write headers yet
-            // Ck3CompressedSavegameStructure.writeCompressed(input, output);
-            // return true;
-        }
-
-        @Override
         public SavegameStructure determineStructure(byte[] input) {
             if (isCompressed(input)) {
                 return SavegameStructure.CK3_COMPRESSED;
@@ -110,7 +96,13 @@ public interface SavegameType {
         @Override
         public boolean isBinary(byte[] input) {
             var header = Arrays.copyOfRange(input, 0, Ck3Header.LENGTH);
-            return Ck3Header.fromStartOfFile(header).binary();
+            if (Ck3Header.fromStartOfFile(header).binary()) {
+                return true;
+            }
+
+            // Fix for invalid headers created by rakaly
+            var first = Arrays.copyOfRange(input, Ck3Header.LENGTH + 1, Ck3Header.LENGTH + 5);
+            return !new String(first).equals("meta");
         }
     };
 
@@ -201,10 +193,6 @@ public interface SavegameType {
             }
         }
         return null;
-    }
-
-    default boolean writeCompressed(byte[] input, Path output) throws IOException {
-        return false;
     }
 
     SavegameStructure determineStructure(byte[] input);

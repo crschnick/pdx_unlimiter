@@ -79,7 +79,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
                 zout.putNextEntry(new ZipEntry("gamestate"));
-                NodeWriter.write(zout, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(metaHeaderNode, gamestate)), "\t");
+                NodeWriter.write(zout, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(metaHeaderNode, gamestate)), "\t", 0);
                 zout.closeEntry();
             }
         }

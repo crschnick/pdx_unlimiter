@@ -170,7 +170,8 @@ public abstract class ArrayNode extends Node {
 
         private void checkFull() {
             if (isFull()) {
-                throw new IndexOutOfBoundsException("Node " + build().toString() + " is already full");
+                var string = build().toString();
+                throw new IndexOutOfBoundsException("Node " + string + " is already full");
             }
         }
 

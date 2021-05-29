@@ -601,14 +601,15 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized String getFileSystemCompatibleName(SavegameEntry<?, ?> e, boolean includeEntryName) {
-        var colName = getSavegameCollection(e).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
-        var sgName = e.getName().replaceAll("[\\\\/:*?\"<>|]", "_");
-        return colName + (includeEntryName ? " (" + sgName + ")." : ".") + type.getFileEnding();
+    public synchronized String getCompatibleName(SavegameEntry<?, ?> e, boolean includeEntryName) {
+        var name = getSavegameCollection(e).getName() + (includeEntryName ?
+                " (" + e.getName() + ")." : ".") + type.getFileEnding();
+        return SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name);
     }
 
     public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
         Path srcPath = getSavegameFile(e);
+
         FileUtils.forceMkdirParent(destPath.toFile());
         FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
@@ -742,9 +743,7 @@ public abstract class SavegameStorage<
                     try {
                         FileUtils.forceMkdir(entryPath.toFile());
                         var file = entryPath.resolve(getSaveFileName());
-                        if (!type.writeCompressed(bytes, file)) {
-                            Files.write(file, bytes);
-                        }
+                        Files.write(file, bytes);
                         JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 
                         if (col == null) {

@@ -45,7 +45,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
         @Override
         public Path export() throws IOException {
-            var out = savegameDir.resolve(storage.getFileSystemCompatibleName(entry, false));
+            var out = savegameDir.resolve(storage.getCompatibleName(entry, false));
             storage.copySavegameTo(entry, out);
             return out;
         }
@@ -64,7 +64,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         public Path export() throws IOException {
             Path file;
             Path dir = savegameDir.resolve(FilenameUtils.getBaseName(
-                    storage.getFileSystemCompatibleName(entry, false)));
+                    storage.getCompatibleName(entry, false)));
             if (entry.getInfo().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {

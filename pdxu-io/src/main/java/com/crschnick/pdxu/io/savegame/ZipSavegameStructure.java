@@ -93,7 +93,11 @@ public class ZipSavegameStructure implements SavegameStructure {
 
                 var path = fs.getPath(usedPart.get().identifier());
                 try (var partOut = Files.newOutputStream(path)) {
-                    NodeWriter.write(partOut, parser.getCharset(), e.getValue(), "\t");
+                    if (header != null) {
+                        partOut.write(header);
+                        partOut.write("\n".getBytes());
+                    }
+                    NodeWriter.write(partOut, parser.getCharset(), e.getValue(), "\t", 0);
                 }
             }
         }
