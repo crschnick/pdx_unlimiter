@@ -156,6 +156,8 @@ public final class GameInstallation {
     }
 
     private void loadEnabledMods() throws Exception {
+        logger.debug("Loading enabled mods ...");
+        enabledMods.clear();
         type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
             var mod = getModForFileName(s);
             mod.ifPresentOrElse(m -> {
@@ -245,7 +247,12 @@ public final class GameInstallation {
         return type;
     }
 
-    public List<GameMod> getEnabledMods() {
+    public List<GameMod> queryEnabledMods() {
+        try {
+            loadEnabledMods();
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
         return enabledMods;
     }
 }

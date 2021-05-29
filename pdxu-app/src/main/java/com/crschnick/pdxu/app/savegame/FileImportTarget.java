@@ -295,7 +295,8 @@ public abstract class FileImportTarget {
 
         @Override
         public String getName() {
-            return path.getParent().getFileName().toString().split("_")[0] + " " + path.getFileName().toString();
+            return path.getParent().getFileName().toString().split("_")[0] + " " + FilenameUtils.getBaseName(
+                    path.getFileName().toString());
         }
     }
 

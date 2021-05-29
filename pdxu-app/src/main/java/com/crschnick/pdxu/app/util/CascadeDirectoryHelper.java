@@ -42,7 +42,7 @@ public class CascadeDirectoryHelper {
 
     private static List<Path> getCascadingDirectories(
             GameFileContext ctx) {
-        var mods = ctx.getMods() == null ? ctx.getInstall().getEnabledMods() : ctx.getMods();
+        var mods = ctx.getMods() == null ? ctx.getInstall().queryEnabledMods() : ctx.getMods();
         List<Path> dirs = mods.stream()
                 .map(GameMod::getPath)
                 .collect(Collectors.toList());

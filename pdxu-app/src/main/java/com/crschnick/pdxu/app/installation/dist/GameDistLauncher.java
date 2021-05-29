@@ -114,7 +114,7 @@ public class GameDistLauncher {
         if (ctx.getGame().getInstallType().getModInfoStorageType() ==
                 GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
             var r = GuiIncompatibleWarning.showNoSavedModsWarning(
-                    ctx.getGame(), ctx.getInstallation().getEnabledMods());
+                    ctx.getGame(), ctx.getInstallation().queryEnabledMods());
             if (r.isPresent()) {
                 var b = r.get();
                 if (b) {
@@ -135,7 +135,7 @@ public class GameDistLauncher {
 
     private static void writeDlcLoadFileWithEnabledMods(
             GameInstallation installation, List<GameDlc> dlcs) throws Exception {
-        var existingMods = installation.getEnabledMods();
+        var existingMods = installation.queryEnabledMods();
         writeDlcLoadFile(installation, existingMods, dlcs);
     }
 
