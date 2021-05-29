@@ -16,7 +16,10 @@ import java.util.function.BiFunction;
 
 public class GameDists {
 
-    private static final List<BiFunction<Game, Path, Optional<GameDist>>> COMPOUND_TYPES = List.of(
+    private static final List<BiFunction<Game, Path, Optional<GameDist>>> FAST_COMPOUND_TYPES = List.of(
+            SteamDist::getDist);
+
+    private static final List<BiFunction<Game, Path, Optional<GameDist>>> ALL_COMPOUND_TYPES = List.of(
             SteamDist::getDist,
             WindowsStoreDist::getDist);
 
@@ -26,8 +29,8 @@ public class GameDists {
             NoLauncherDist::getDist
     );
 
-    public static Optional<GameDist> detectDist(Game g) {
-        return getCompoundDistFromDirectory(g, null)
+    public static Optional<GameDist> detectDist(Game g, boolean checkXbox) {
+        return getCompoundDistFromDirectory(g, null, checkXbox)
                 .or(() -> {
                         for (var p : getInstallDirSearchPaths(g)) {
                             var dist = GameDists.getBasicDistFromDirectory(g, p);
@@ -42,7 +45,7 @@ public class GameDists {
     public static GameDist detectDistFromDirectory(Game g, Path dir) {
         Objects.requireNonNull(dir);
 
-        return getCompoundDistFromDirectory(g, dir)
+        return getCompoundDistFromDirectory(g, dir, true)
                 .or(() -> GameDists.getBasicDistFromDirectory(g, dir))
                 .orElse(new CatchAllDist(g, dir));
     }
@@ -60,8 +63,8 @@ public class GameDists {
         return Optional.empty();
     }
 
-    private static Optional<GameDist> getCompoundDistFromDirectory(Game g, Path dir) {
-        for (var e : COMPOUND_TYPES) {
+    private static Optional<GameDist> getCompoundDistFromDirectory(Game g, Path dir, boolean checkXbox) {
+        for (var e : checkXbox ? ALL_COMPOUND_TYPES : FAST_COMPOUND_TYPES) {
             var r = e.apply(g, dir);
             if (r.isPresent()) {
                 return r;

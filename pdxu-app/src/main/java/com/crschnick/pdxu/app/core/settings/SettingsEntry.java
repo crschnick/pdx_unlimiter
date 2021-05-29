@@ -74,7 +74,7 @@ public abstract class SettingsEntry<T> {
         value.set(newValue);
     }
 
-    public abstract void setDefault();
+    public abstract void setDefault(boolean settingsExist);
 
     public String getName() {
         return name.get();
@@ -116,7 +116,7 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public final void setDefault() {
+        public final void setDefault(boolean settingsExist) {
             this.value.set(defaultValue);
         }
     }
@@ -382,8 +382,8 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public void setDefault() {
-            this.set(GameDists.detectDist(game).orElse(null));
+        public void setDefault(boolean settingsExist) {
+            this.set(GameDists.detectDist(game, !settingsExist).orElse(null));
         }
 
         @Override
@@ -464,7 +464,7 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public void setDefault() {
+        public void setDefault(boolean settingsExist) {
             this.value.set(PdxuInstallation.getInstance().getDefaultSavegamesLocation());
         }
     }
@@ -506,7 +506,7 @@ public abstract class SettingsEntry<T> {
         }
 
         @Override
-        public void setDefault() {
+        public void setDefault(boolean settingsExist) {
             var df = defaultValue.get();
             if (df == null) {
                 this.value.set(null);

@@ -24,7 +24,8 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
-            i.ironman = n.getNodeForKey("meta_data").getNodeForKey("ironman").getBoolean();
+            var meta = n.getNodeForKey("meta_data");
+            i.ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
             i.binary = melted;
             i.date = GameDateType.CK3.fromString(n.getNodeForKey("date").getString());
 

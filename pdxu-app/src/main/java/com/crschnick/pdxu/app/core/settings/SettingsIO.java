@@ -18,11 +18,14 @@ public class SettingsIO {
     public static void load(AbstractSettings s) {
         Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve(s.getName() + ".json");
         JsonNode sNode;
+        boolean exists;
         if (Files.exists(file)) {
             JsonNode node = ConfigHelper.readConfig(file);
             sNode = Optional.ofNullable(node.get("settings")).orElse(JsonNodeFactory.instance.objectNode());
+            exists = true;
         } else {
             sNode = JsonNodeFactory.instance.objectNode();
+            exists = false;
         }
 
         for (var field : s.getClass().getFields()) {
@@ -36,7 +39,7 @@ public class SettingsIO {
                 if (node != null) {
                     e.set(node);
                 } else {
-                    e.setDefault();
+                    e.setDefault(exists);
                 }
             } catch (Exception e) {
                 ErrorHandler.handleException(e);

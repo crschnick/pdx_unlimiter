@@ -39,6 +39,7 @@ public class RakalyHelper {
                 PdxuInstallation.getInstance().getRakalyExecutable().toString(),
                 "melt",
                 "--unknown-key", "stringify",
+                "--retain",
                 "--to-stdout",
                 file.toString())
                 .redirectError(ProcessBuilder.Redirect.DISCARD)
