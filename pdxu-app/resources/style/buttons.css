@@ -26,6 +26,10 @@
     -fx-icon-code: "mdi-delete";
 }
 
+.branch-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-source-branch";
+}
+
 .key-button .ikonli-font-icon {
     -fx-icon-code: "mdi-key";
 }

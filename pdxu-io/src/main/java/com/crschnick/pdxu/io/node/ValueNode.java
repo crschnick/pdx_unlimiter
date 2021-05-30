@@ -126,4 +126,9 @@ public final class ValueNode extends Node {
     public boolean matches(NodeMatcher matcher) {
         return matcher.matchesScalar(context, scalarIndex);
     }
+
+    @Override
+    public ValueNode getValueNode() {
+        return this;
+    }
 }

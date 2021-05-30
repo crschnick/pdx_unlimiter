@@ -13,6 +13,7 @@ import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.ParseException;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
@@ -212,7 +213,7 @@ public abstract class SavegameStorage<
                 Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
                 Image image = ImageLoader.loadImage(
                         getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
-                collections.add(new SavegameCampaign<>(lastDate, name, id, date, image));
+                collections.add(new SavegameCampaign<>(lastDate, name, id, branch, date, image));
             }
         }
 
@@ -344,6 +345,65 @@ public abstract class SavegameStorage<
         return Optional.of(col);
     }
 
+    private synchronized void addNewCampaign(
+            UUID campainUuid,
+            I info,
+            boolean branch) {
+        logger.debug("Adding new campaign " + getDefaultCampaignName(info));
+        var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
+                .tagImage(info, info.getTag());
+        SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
+                Instant.now(),
+                getDefaultCampaignName(info),
+                campainUuid,
+                branch,
+                info.getDate(),
+                img);
+        this.collections.add(newCampaign);
+    }
+
+    public synchronized void createNewBranch(SavegameEntry<T,I> e) {
+        byte[] bytes;
+        try {
+            bytes = Files.readAllBytes(getSavegameFile(e));
+        } catch (IOException ioException) {
+            ErrorHandler.handleException(
+                    ioException, "Couldn't parse savegame " + getSavegameFile(e), getSavegameFile(e));
+            return;
+        }
+
+        var binary = type.isBinary(bytes);
+        var struc = type.determineStructure(bytes);
+        var r = struc.parse(bytes);
+        r.visit(new SavegameParseResult.Visitor() {
+            @Override
+            public void success(SavegameParseResult.Success s) {
+                try {
+                    var c = s.content;
+                    UUID uuid;
+                    if (!binary) {
+                        struc.generateNewCampaignIdHeuristic(c);
+                        uuid = struc.getCampaignIdHeuristic(c);
+                    } else {
+                        uuid = UUID.randomUUID();
+                    }
+                    
+                    I info = infoFactory.apply(s.combinedNode(), false);
+                    addNewCampaign(uuid, info, true);
+                    var entryUuid = UUID.randomUUID();
+                    Path entryPath = getSavegameDataDirectory().resolve(uuid.toString()).resolve(entryUuid.toString());
+                    FileUtils.forceMkdir(entryPath.toFile());
+                    var file = entryPath.resolve(getSaveFileName());
+                    struc.write(file, c);
+                    JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
+                    addNewEntryToCampaign(uuid, UUID.randomUUID(), checksum(bytes), info, null, null);
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex, "Couldn't create campaign branch", getSavegameFile(e));
+                }
+            }
+        });
+    }
+
     public synchronized void addNewEntryToCampaign(
             UUID campainUuid,
             UUID entryUuid,
@@ -366,7 +426,7 @@ public abstract class SavegameStorage<
                     Instant.now(),
                     getDefaultCampaignName(info),
                     campainUuid,
-                    e.getDate(),
+                    branch, e.getDate(),
                     img);
             this.collections.add(newCampaign);
         }

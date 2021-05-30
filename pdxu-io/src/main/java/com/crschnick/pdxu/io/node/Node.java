@@ -21,6 +21,10 @@ public abstract class Node {
 
     public abstract void write(NodeWriter writer) throws IOException;
 
+    public ValueNode getValueNode() {
+        throw new UnsupportedOperationException();
+    }
+
     public TaggedNode getTaggedNode() {
         throw new UnsupportedOperationException();
     }

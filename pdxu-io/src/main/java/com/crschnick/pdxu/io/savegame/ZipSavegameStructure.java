@@ -9,10 +9,9 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -22,12 +21,26 @@ public class ZipSavegameStructure implements SavegameStructure {
     private final TextFormatParser parser;
     private final Set<SavegamePart> parts;
     private final String[] ignored;
+    private final Function<SavegameContent, UUID> idExtractor;
+    private final Consumer<SavegameContent> idGenerator;
 
-    public ZipSavegameStructure(byte[] header, TextFormatParser parser, Set<SavegamePart> parts, String... ignored) {
+    public ZipSavegameStructure(byte[] header, TextFormatParser parser, Set<SavegamePart> parts, Function<SavegameContent, UUID> idExtractor, Consumer<SavegameContent> idGenerator, String... ignored) {
         this.header = header;
         this.parser = parser;
         this.parts = parts;
+        this.idExtractor = idExtractor;
+        this.idGenerator = idGenerator;
         this.ignored = ignored;
+    }
+
+    @Override
+    public UUID getCampaignIdHeuristic(SavegameContent c) {
+        return idExtractor.apply(c);
+    }
+
+    @Override
+    public void generateNewCampaignIdHeuristic(SavegameContent c) {
+        idGenerator.accept(c);
     }
 
     protected SavegameParseResult parseInput(byte[] input, int offset) {
@@ -81,9 +94,9 @@ public class ZipSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public void write(Path out, Map<String, ArrayNode> nodes) throws IOException {
+    public void write(Path out, SavegameContent c) throws IOException {
         try (var fs = FileSystems.newFileSystem(out)) {
-            for (var e : nodes.entrySet()) {
+            for (var e : c.entrySet()) {
                 var usedPart = parts.stream()
                         .filter(part -> part.name().equals(e.getKey()))
                         .findAny();

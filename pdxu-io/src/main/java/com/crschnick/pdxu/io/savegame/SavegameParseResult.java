@@ -1,10 +1,7 @@
 package com.crschnick.pdxu.io.savegame;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 
-import java.util.Map;
 import java.util.Optional;
 
 public abstract class SavegameParseResult {
@@ -17,14 +14,14 @@ public abstract class SavegameParseResult {
 
     public static class Success extends SavegameParseResult {
 
-        public Map<String, ArrayNode> content;
+        public SavegameContent content;
 
-        public Success(Map<String, ArrayNode> content) {
+        public Success(SavegameContent content) {
             this.content = content;
         }
 
         public Node combinedNode() {
-            return new LinkedArrayNode(content.values().stream().toList());
+            return content.combinedNode();
         }
 
         @Override

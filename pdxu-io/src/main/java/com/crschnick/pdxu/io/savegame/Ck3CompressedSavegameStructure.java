@@ -3,23 +3,32 @@ package com.crschnick.pdxu.io.savegame;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
+import com.crschnick.pdxu.io.node.ValueNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
 
     public Ck3CompressedSavegameStructure() {
-        super(null, TextFormatParser.CK3, Set.of(new SavegamePart("gamestate", "gamestate")));
+        super(null, TextFormatParser.CK3, Set.of(new SavegamePart("gamestate", "gamestate")),
+                c -> {
+                    long seed = c.get("gamestate").getNodeForKey("random_seed").getLong();
+                    byte[] b = new byte[20];
+                    new Random(seed).nextBytes(b);
+                    return UUID.nameUUIDFromBytes(b);
+                },
+                c -> {
+                    int rand = new Random().nextInt(Integer.MAX_VALUE);
+                    c.get("gamestate").getNodeForKey("random_seed").getValueNode().set(
+                            new ValueNode(String.valueOf(rand), false));
+                });
     }
 
     private static final int MAX_SEARCH = 150000;
@@ -65,8 +74,8 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
     }
 
     @Override
-    public void write(Path file, Map<String, ArrayNode> nodes) throws IOException {
-        var gamestate = nodes.get("gamestate");
+    public void write(Path file, SavegameContent c) throws IOException {
+        var gamestate = c.get("gamestate");
         ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
         var metaHeaderNode = ArrayNode.singleKeyNode("meta_data", meta);
 

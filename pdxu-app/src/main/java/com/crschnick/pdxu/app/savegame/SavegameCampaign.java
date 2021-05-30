@@ -15,11 +15,13 @@ import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
+    private final boolean branch;
     private final ObjectProperty<GameDate> date;
     private final ObjectProperty<Image> image;
 
-    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, Image image) {
+    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, boolean branch, GameDate date, Image image) {
         super(lastPlayed, name, campaignId);
+        this.branch = branch;
         this.date = new SimpleObjectProperty<>(date);
         this.image = new SimpleObjectProperty<>(image);
     }
@@ -70,5 +72,9 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
 
     public ObjectProperty<GameDate> dateProperty() {
         return date;
+    }
+
+    public boolean isBranch() {
+        return branch;
     }
 }
