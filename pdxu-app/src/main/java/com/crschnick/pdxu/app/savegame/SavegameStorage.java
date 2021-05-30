@@ -13,7 +13,6 @@ import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.ParseException;
-import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
@@ -55,9 +54,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public abstract class SavegameStorage<
-        T,
-        I extends SavegameInfo<T>> {
+public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
 
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
@@ -213,6 +210,7 @@ public abstract class SavegameStorage<
                 Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
                 Image image = ImageLoader.loadImage(
                         getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
+                boolean branch = Optional.ofNullable(c.get("branch")).map(JsonNode::asBoolean).orElse(false);
                 collections.add(new SavegameCampaign<>(lastDate, name, id, branch, date, image));
             }
         }
@@ -387,16 +385,15 @@ public abstract class SavegameStorage<
                     } else {
                         uuid = UUID.randomUUID();
                     }
-                    
+
                     I info = infoFactory.apply(s.combinedNode(), false);
-                    addNewCampaign(uuid, info, true);
                     var entryUuid = UUID.randomUUID();
                     Path entryPath = getSavegameDataDirectory().resolve(uuid.toString()).resolve(entryUuid.toString());
                     FileUtils.forceMkdir(entryPath.toFile());
                     var file = entryPath.resolve(getSaveFileName());
                     struc.write(file, c);
                     JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
-                    addNewEntryToCampaign(uuid, UUID.randomUUID(), checksum(bytes), info, null, null);
+                    addNewEntryToCampaign(uuid, UUID.randomUUID(), checksum(bytes), info, null, null, true);
                 } catch (Exception ex) {
                     ErrorHandler.handleException(ex, "Couldn't create campaign branch", getSavegameFile(e));
                 }
@@ -410,7 +407,8 @@ public abstract class SavegameStorage<
             String checksum,
             I info,
             String name,
-            String sourceFileChecksum) {
+            String sourceFileChecksum,
+            boolean branch) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
@@ -419,16 +417,7 @@ public abstract class SavegameStorage<
                 SavegameNotes.empty(),
                 sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
-            logger.debug("Adding new campaign " + getDefaultCampaignName(info));
-            var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
-                    .tagImage(info, info.getTag());
-            SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
-                    Instant.now(),
-                    getDefaultCampaignName(info),
-                    campainUuid,
-                    branch, e.getDate(),
-                    img);
-            this.collections.add(newCampaign);
+            addNewCampaign(campainUuid, info, false);
         }
 
         SavegameCollection<T, I> c = this.getSavegameCollection(campainUuid).get();
@@ -807,7 +796,7 @@ public abstract class SavegameStorage<
                         JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 
                         if (col == null) {
-                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum);
+                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum, false);
                         } else {
                             addNewEntryToCollection(col, saveUuid, checksum, info, name, sourceFileChecksum);
                         }
