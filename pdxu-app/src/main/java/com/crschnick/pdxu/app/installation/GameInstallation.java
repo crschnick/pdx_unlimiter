@@ -99,7 +99,6 @@ public final class GameInstallation {
         LoggerFactory.getLogger(getClass()).debug("Initializing optional data ...");
         loadDlcs();
         loadMods();
-        loadEnabledMods();
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 

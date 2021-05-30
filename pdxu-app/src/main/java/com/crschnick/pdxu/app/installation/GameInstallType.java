@@ -578,7 +578,15 @@ public interface GameInstallType {
 
         public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
             var file = userDir.resolve("dlc_load.json");
+            if (!Files.exists(file)) {
+                return List.of();
+            }
+
             var node = JsonHelper.read(file);
+            if (node.get("enabled_mods") == null) {
+                return List.of();
+            }
+
             return StreamSupport.stream(node.required("enabled_mods").spliterator(), false)
                     .map(n -> n.textValue())
                     .collect(Collectors.toList());
