@@ -11,10 +11,13 @@ public class StringValues {
     public static String unescapeScalarValue(NodeContext context, int index) {
         var b = context.getLiteralsBegin()[index];
         var l = context.getLiteralsLength()[index];
+        var s = new String(context.getData(), b, l, context.getCharset());
+        if (l <= 2) {
+            return s;
+        }
+
         boolean quoted = context.getData()[b] == DOUBLE_QUOTE_CHAR &&
                 context.getData()[b + l - 1] == DOUBLE_QUOTE_CHAR;
-
-        var s = new String(context.getData(), b, l, context.getCharset());
         var matcher = UNESCAPE_PATTERN.matcher(s);
         if (quoted) {
             matcher.region(1, s.length() - 1);

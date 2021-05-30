@@ -53,7 +53,12 @@ public class GuiSettingsComponents {
             dirChooser.setTitle(PdxuI18n.get("SELECT_DIR", de.getName()));
             File file = dirChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
-                setDist.set(GameDists.detectDistFromDirectory(de.getGame(), file.toPath()));
+                var path = file.toPath();
+                // Ugly hack for CK3 installations
+                if (path.endsWith("binaries")) {
+                    path = path.getParent();
+                }
+                setDist.set(GameDists.detectDistFromDirectory(de.getGame(), path));
             }
             m.consume();
         };
