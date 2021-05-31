@@ -39,6 +39,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private int mil;
     private List<War> wars = new ArrayList<>();
     private GameNamedVersion version;
+    private boolean achievementOk;
 
     public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
         try {
@@ -74,7 +75,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             e.randomNewWorld = n.getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
             e.ironman = melted;
             e.binary = e.ironman;
-            e.releasedVassal = n.getNodeForKey("countries").getNodeForKey(tag)
+            e.achievementOk = n.getNodeForKeyIfExistent("achievement_ok").map(Node::getBoolean).orElse(false);
+                    e.releasedVassal = n.getNodeForKey("countries").getNodeForKey(tag)
                     .getNodeForKeyIfExistent("has_switched_nation").map(Node::getBoolean).orElse(false);
             e.date = date;
 
@@ -460,5 +462,9 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
         public List<Eu4Tag> getEnemies() {
             return enemies;
         }
+    }
+
+    public boolean isAchievementOk() {
+        return achievementOk;
     }
 }

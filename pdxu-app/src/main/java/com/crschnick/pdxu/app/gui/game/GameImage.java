@@ -101,6 +101,7 @@ public class GameImage {
     public static Image EU4_ICON_MANPOWER;
     public static Image EU4_ICON_PRESTIGE;
     public static Image EU4_ICON_STABILITY;
+    public static Image EU4_ICON_ACHIEVEMENT;
     public static Image EU4_BACKGROUND;
     public static Image EU4_SHIELD_MASK;
     public static Image EU4_SHIELD_FRAME;
@@ -293,6 +294,7 @@ public class GameImage {
         EU4_ICON_DUCATS = ImageLoader.loadImage(i.resolve("icon_gold.dds"));
         EU4_ICON_PRESTIGE = ImageLoader.loadImage(i.resolve("icon_prestige.dds"));
         EU4_ICON_STABILITY = ImageLoader.loadImage(i.resolve("icon_stability.dds"));
+        EU4_ICON_ACHIEVEMENT = ImageLoader.loadImage(i.resolve("button_achievements.dds"));
 
         Function<Integer, Integer> rnwFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;

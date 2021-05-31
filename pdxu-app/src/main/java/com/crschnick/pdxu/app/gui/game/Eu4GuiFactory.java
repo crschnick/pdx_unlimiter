@@ -11,6 +11,7 @@ import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 
@@ -158,6 +159,20 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
             ironman.setAlignment(Pos.CENTER);
             GuiTooltips.install(ironman, PdxuI18n.get("IRONMAN"));
             addNode(grid, ironman);
+        }
+
+        if (info.isIronman()) {
+            var achievementOk = new StackPane(imageNode(EU4_ICON_ACHIEVEMENT, CLASS_IMAGE_ICON, null));
+            achievementOk.setAlignment(Pos.CENTER);
+            if (info.isAchievementOk()) {
+                GuiTooltips.install(achievementOk, PdxuI18n.get("ACHIEVEMENT_ELIGIBLE"));
+            } else {
+                GuiTooltips.install(achievementOk, PdxuI18n.get("ACHIEVEMENT_INELIGIBLE"));
+                ColorAdjust desaturate = new ColorAdjust();
+                desaturate.setSaturation(-1);
+                achievementOk.setEffect(desaturate);
+            }
+            addNode(grid, achievementOk);
         }
 
         if (info.isRandomNewWorld()) {
