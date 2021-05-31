@@ -21,7 +21,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
         try (var gsOut = Files.newOutputStream(out)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
             // Exclude trailing new line in meta length!
-            String header = new Ck3Header(false, false, metaBytes.length - 1).toString();
+            String header = new Ck3Header(true, false, false, metaBytes.length - 1).toString();
             gsOut.write((header + "\n").getBytes(StandardCharsets.UTF_8));
 
             NodeWriter.write(gsOut, StandardCharsets.UTF_8, gamestate, "\t", 0);

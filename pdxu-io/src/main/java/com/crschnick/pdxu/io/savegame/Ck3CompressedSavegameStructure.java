@@ -41,29 +41,6 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
         return -1;
     }
 
-    public static void writeCompressed(byte[] input, Path output) throws IOException {
-        var inputHeader = Ck3Header.fromStartOfFile(input);
-        if (inputHeader.compressed()) {
-            throw new IllegalArgumentException("Savegame is already compressed");
-        }
-
-        var header = new Ck3Header(true, inputHeader.binary(),
-                inputHeader.randomness(), inputHeader.metaLength());
-        int metaStart = header.toString().length() + 1;
-        try (var out = Files.newOutputStream(output)) {
-            out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
-            out.write(input, metaStart, (int) header.metaLength());
-            if (!header.binary()) {
-                out.write("\n".getBytes(StandardCharsets.UTF_8));
-            }
-            try (var zout = new ZipOutputStream(out)) {
-                zout.putNextEntry(new ZipEntry("gamestate"));
-                zout.write(input, metaStart, input.length - metaStart);
-                zout.closeEntry();
-            }
-        }
-    }
-
     @Override
     public void write(Path file, Map<String, ArrayNode> nodes) throws IOException {
         var gamestate = nodes.get("gamestate");
@@ -74,7 +51,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
 
             // Exclude trailing new line in meta length!
-            String header = new Ck3Header(true, false, metaBytes.length - 1).toString();
+            String header = new Ck3Header(true, true, false, metaBytes.length - 1).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
