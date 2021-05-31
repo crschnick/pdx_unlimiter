@@ -27,8 +27,11 @@ public class GuiEditorNode {
             var tf = new TextField(((EditorSimpleNode) n).getBackingNode().getString());
             tf.setAlignment(Pos.CENTER);
             tf.textProperty().addListener((c, o, ne) -> {
-                ((EditorSimpleNode) n).updateText(ne);
-                state.onTextChanged();
+                var result = ((EditorSimpleNode) n).updateText(ne);
+                tf.setText(result);
+                if (!result.equals(ne)) {
+                    state.onTextChanged();
+                }
             });
             return tf;
         } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isTagged() &&

@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.io.node;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public final class ValueNode extends Node {
@@ -13,6 +14,11 @@ public final class ValueNode extends Node {
     private int scalarIndex;
 
     public ValueNode(String value, boolean quoted) {
+        Objects.requireNonNull(value);
+        if (!quoted && value.length() == 0) {
+            throw new IllegalArgumentException("Unquoted value has to have a length of at least 1");
+        }
+
         this.context = new NodeContext(value, quoted);
         this.scalarIndex = 0;
     }

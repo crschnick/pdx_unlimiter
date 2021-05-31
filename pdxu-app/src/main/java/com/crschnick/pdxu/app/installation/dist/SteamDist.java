@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
-import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.ThreadHelper;
@@ -133,13 +132,16 @@ public class SteamDist extends GameDist {
 
     @Override
     public void startDirectly(Path executable, List<String> args, Map<String,String> env) throws IOException {
-        if (!isSteamRunning() && Settings.getInstance().startSteam.getValue()) {
+        if (!isSteamRunning()) {
             GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
                     "Please start Steam first before launching the game");
             return;
         }
 
-        dist.startDirectly(executable, args, createSteamEnv());
+        var completeEnv = new HashMap<String,String>();
+        completeEnv.putAll(env);
+        completeEnv.putAll(createSteamEnv());
+        dist.startDirectly(executable, args, completeEnv);
     }
 
     @Override
@@ -161,14 +163,7 @@ public class SteamDist extends GameDist {
 
     @Override
     public void startLauncher(Map<String,String> env) throws IOException {
-        if (Settings.getInstance().startSteam.getValue()) {
-            openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
-        } else {
-            var completeEnv = new HashMap<String,String>();
-            completeEnv.putAll(env);
-            completeEnv.putAll(createSteamEnv());
-            dist.startLauncher(completeEnv);
-        }
+        openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
     }
 
     private List<Path> getRemoteDataPaths(int appId) {

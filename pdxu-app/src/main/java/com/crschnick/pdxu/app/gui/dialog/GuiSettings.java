@@ -26,7 +26,7 @@ public class GuiSettings {
         VBox vbox = new VBox(
                 GuiSettingsComponents.section("GAME_DIRS", applyFuncs, s.eu4, s.ck3, s.hoi4, s.stellaris, s.ck2, s.vic2),
                 new Separator(),
-                GuiSettingsComponents.section("GENERAL", applyFuncs, s.enableAutoUpdate, s.storageDirectory, s.startSteam),
+                GuiSettingsComponents.section("GENERAL", applyFuncs, s.enableAutoUpdate, s.storageDirectory),
                 new Separator(),
                 GuiSettingsComponents.section("IMPORTS", applyFuncs,
                         s.deleteOnImport,

@@ -43,24 +43,6 @@ public class GuiDialogHelper {
         return result.get();
     }
 
-    public static Optional<ButtonType> waitForResult(Alert alert) {
-        final Optional<ButtonType>[] result = new Optional[]{Optional.empty()};
-        if (!Platform.isFxApplicationThread()) {
-            CountDownLatch latch = new CountDownLatch(1);
-            Platform.runLater(() -> {
-                result[0] = alert.showAndWait();
-                latch.countDown();
-            });
-            try {
-                latch.await();
-            } catch (InterruptedException ignored) {
-            }
-        } else {
-            result[0] = alert.showAndWait();
-        }
-        return result[0];
-    }
-
     public static Alert createAlert() {
         Alert alert = new Alert(Alert.AlertType.NONE);
         // In case settings are not loaded yet

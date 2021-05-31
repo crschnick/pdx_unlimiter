@@ -54,11 +54,6 @@ public final class Settings extends AbstractSettings {
             "playSoundOnBackgroundImport",
             true
     );
-    public final SettingsEntry.BooleanEntry startSteam = new SettingsEntry.BooleanEntry(
-            "START_STEAM",
-            "startSteam",
-            true
-    );
     public final SettingsEntry.BooleanEntry confirmDeletion = new SettingsEntry.BooleanEntry(
             "CONFIRM_DELETION",
             "confirmDeletion",
