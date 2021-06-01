@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
@@ -162,9 +163,10 @@ public interface GameInstallType {
             }
 
             var node = TextFormatParser.TEXT.parse(sf);
-            var langId = node.getNodeForKey("\"System\"")
-                    .getNodeForKey("\"language\"").getNodeForKey("value").getString();
-            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+            var langId = node
+                    .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
+                    .map(Node::getString);
+            return langId.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l)));
         }
     };
 
@@ -268,9 +270,10 @@ public interface GameInstallType {
             }
 
             var node = TextFormatParser.TEXT.parse(sf);
-            var langId = node.getNodeForKey("\"System\"")
-                    .getNodeForKey("\"language\"").getNodeForKey("value").getString();
-            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+            var langId = node
+                    .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
+                    .map(Node::getString);
+            return langId.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l)));
         }
 
         public Path getSteamSpecificFile(Path p) {
