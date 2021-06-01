@@ -84,7 +84,7 @@ dependencies {
     implementation files("$buildDir/generated-modules/commons-lang3-3.12.0.jar")
     implementation files("$buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation files("$buildDir/generated-modules/commons-collections4-4.4.jar")
-    implementation files("$buildDir/generated-modules/sentry-4.3.0.jar")
+    implementation files("$buildDir/generated-modules/sentry-5.0.0-beta.7.jar")
     implementation files("$buildDir/generated-modules/jnativehook-2.0.2.jar")
 
     implementation project(':pdxu-io')
@@ -108,7 +108,7 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact 'io.sentry:sentry:4.3.0'
+            artifact 'io.sentry:sentry:5.0.0-beta.7'
             moduleInfoSource = '''
                 module io.sentry {
                     exports io.sentry;
