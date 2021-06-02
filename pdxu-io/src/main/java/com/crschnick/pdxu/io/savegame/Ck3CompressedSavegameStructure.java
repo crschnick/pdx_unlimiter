@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 
@@ -10,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -56,7 +54,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
                 zout.putNextEntry(new ZipEntry("gamestate"));
-                NodeWriter.write(zout, StandardCharsets.UTF_8, new LinkedArrayNode(List.of(metaHeaderNode, gamestate)), "\t", 0);
+                NodeWriter.write(zout, StandardCharsets.UTF_8, gamestate, "\t", 0);
                 zout.closeEntry();
             }
         }
