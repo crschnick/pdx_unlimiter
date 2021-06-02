@@ -51,7 +51,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
 
             // Exclude trailing new line in meta length!
-            String header = new Ck3Header(true, true, false, metaBytes.length - 1).toString();
+            String header = new Ck3Header(true, true, false, metaBytes.length).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
@@ -73,7 +73,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
         }
 
         int metaStart = header.toString().length() + 1;
-        int contentStart = (int) (metaStart + header.metaLength()) + 1;
+        int contentStart = (int) (metaStart + header.metaLength());
 
         // Check if the header meta length is actually right. If not, manually search for the zip header start
         if (!Arrays.equals(input, contentStart, contentStart + 4, ZIP_HEADER, 0, 4)) {

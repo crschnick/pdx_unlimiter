@@ -96,13 +96,7 @@ public interface SavegameType {
         @Override
         public boolean isBinary(byte[] input) {
             var header = Arrays.copyOfRange(input, 0, Ck3Header.LENGTH);
-            if (Ck3Header.fromStartOfFile(header).binary()) {
-                return true;
-            }
-
-            // Fix for invalid headers created by rakaly
-            var first = Arrays.copyOfRange(input, Ck3Header.LENGTH + 1, Ck3Header.LENGTH + 5);
-            return !new String(first).equals("meta");
+            return Ck3Header.fromStartOfFile(header).binary();
         }
     };
 

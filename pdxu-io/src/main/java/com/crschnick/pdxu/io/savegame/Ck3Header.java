@@ -52,6 +52,6 @@ public record Ck3Header(boolean unknown, boolean compressed, boolean binary, lon
     @Override
     public String toString() {
         int type = (compressed ? 2 : 0) + (binary ? 1 : 0);
-        return "SAV0" + (unknown ? 1 : 0) + "0" + type + String.format("%08X", randomness) + String.format("%08X", metaLength);
+        return "SAV0" + (unknown ? 1 : 0) + "0" + type + String.format("%08x", randomness) + String.format("%08x", metaLength);
     }
 }

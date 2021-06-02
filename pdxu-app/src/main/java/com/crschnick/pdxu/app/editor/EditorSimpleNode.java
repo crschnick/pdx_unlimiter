@@ -18,16 +18,15 @@ public final class EditorSimpleNode extends EditorNode {
         this.backingNode = backingNode;
     }
 
-    public String updateText(String text) {
+    public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
 
         // Don't let length go to 0
         if (text.length() == 0 && !bn.isQuoted()) {
-            return bn.getString();
+            return;
         }
 
         bn.set(new ValueNode(text, bn.isQuoted()));
-        return text;
     }
 
     public void updateColor(Color c) {
