@@ -7,21 +7,21 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
-    private final boolean branch;
+    private final Long branchId;
     private final ObjectProperty<GameDate> date;
     private final ObjectProperty<Image> image;
 
-    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, boolean branch, GameDate date, Image image) {
+    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, Long branchId, GameDate date, Image image) {
         super(lastPlayed, name, campaignId);
-        this.branch = branch;
+        if (branchId != null && branchId < 0) {
+            throw new IllegalArgumentException();
+        }
+        this.branchId = branchId;
         this.date = new SimpleObjectProperty<>(date);
         this.image = new SimpleObjectProperty<>(image);
     }
@@ -75,6 +75,10 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
     }
 
     public boolean isBranch() {
-        return branch;
+        return branchId != null;
+    }
+
+    public long getBranchId() {
+        return branchId;
     }
 }

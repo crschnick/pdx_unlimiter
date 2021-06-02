@@ -44,6 +44,18 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     @Override
+    public boolean setIfPresent(String key, Node value) {
+        evaluateAllValueNodes();
+        for (int i = 0; i < values.size(); i++) {
+            if (isKeyAt(key, i)) {
+                values.set(i, value);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public int size() {
         return values.size();
     }

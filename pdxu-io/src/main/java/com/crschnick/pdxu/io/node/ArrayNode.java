@@ -47,6 +47,15 @@ public abstract class ArrayNode extends Node {
         return new LinkedArrayNode(List.of(begin, toInsert, end));
     }
 
+    public final void set(String key, Node value) {
+        var r = setIfPresent(key, value);
+        if (!r) {
+            throw new IllegalArgumentException("Key " + key + " not found");
+        }
+    }
+
+    public abstract boolean setIfPresent(String key, Node value);
+
     public abstract int size();
 
     public abstract boolean isKeyAt(String key, int index);

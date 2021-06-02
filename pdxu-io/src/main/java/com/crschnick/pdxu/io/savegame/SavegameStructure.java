@@ -9,8 +9,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public interface SavegameStructure {
+
+    public static final String PDXU_ID_FLAG_NAME = "pdxu_campaign_id";
 
     SavegameStructure EU4_PLAINTEXT = new PlaintextSavegameStructure(
             "EU4txt".getBytes(),
@@ -18,11 +22,11 @@ public interface SavegameStructure {
             TextFormatParser.EU4,
             c -> UUID.nameUUIDFromBytes(c.get().getNodeForKey("countries")
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes()),
-            c -> {
-                int rand = new Random().nextInt(Integer.MAX_VALUE);
+            (c, id) -> {
+                var uuid = UUID.nameUUIDFromBytes(String.valueOf(id).getBytes());
                 c.get().getNodeForKey("countries")
-                        .getNodeForKey("REB").getNodeForKey("decision_seed").getValueNode().set(
-                        new ValueNode(String.valueOf(rand), false));
+                        .getNodeForKey("REB").getNodeForKey("decision_seed")
+                        .getValueNode().set(new ValueNode(String.valueOf(id), false));
             });
 
     SavegameStructure EU4_COMPRESSED = new ZipSavegameStructure(
@@ -51,8 +55,11 @@ public interface SavegameStructure {
             "gamestate",
             TextFormatParser.HOI4,
             c -> UUID.fromString(c.get().getNodeForKey("game_unique_id").getString()),
-            c -> c.get().getNodeForKey("game_unique_id").getValueNode().set(
-                    new ValueNode(UUID.randomUUID().toString(), false)));
+            (c, id) -> {
+                var uuid = UUID.nameUUIDFromBytes(String.valueOf(id).getBytes());
+                c.get().getNodeForKey("game_unique_id").getValueNode().set(
+                        new ValueNode(uuid.toString(), false));
+            });
 
 
     SavegameStructure STELLARIS = new ZipSavegameStructure(
@@ -83,8 +90,8 @@ public interface SavegameStructure {
                 new Random(seed).nextBytes(b);
                 return UUID.nameUUIDFromBytes(b);
             },
-            c -> c.get().getNodeForKey("playthrough_id").getValueNode().set(
-                    new ValueNode(String.valueOf(new Random().nextInt(Integer.MAX_VALUE)), false))) {
+            (c,id) -> c.get().getNodeForKey("playthrough_id").getValueNode().set(
+                    new ValueNode(String.valueOf(id), false))) {
 
         @Override
         public void writeData(OutputStream out, ArrayNode node) throws IOException {
@@ -114,14 +121,44 @@ public interface SavegameStructure {
         }
     };
 
+
+    private static Optional<UUID> getIdFromPreviousWar(SavegameContent c) {
+        AtomicReference<UUID> uuid = new AtomicReference<>();
+        c.get().getNodesForKey("previous_war").forEach(n -> {
+            n.getNodeForKeyIfExistent("history").ifPresent(h -> {
+                h.forEach((date, entry) -> {
+                    if (entry.hasKey("battle")) {
+                        var losses = entry.getNodeForKey("battle").getNodeForKey("attacker").getNodeForKey("losses");
+                        uuid.set(UUID.nameUUIDFromBytes(losses.getString().getBytes()));
+                    }
+                });
+            });
+        });
+        return Optional.ofNullable(uuid.get());
+    }
+
+    private static void setIdForPreviousWar(SavegameContent c, long id) {
+        AtomicBoolean found = new AtomicBoolean();
+        c.get().getNodesForKey("previous_war").forEach(n -> {
+            n.getNodeForKeyIfExistent("history").ifPresent(h -> {
+                h.forEach((date, entry) -> {
+                    if (entry.hasKey("battle") && !found.get()) {
+                        var losses = entry.getNodeForKey("battle").getNodeForKey("attacker").getNodeForKey("losses");
+                        losses.getValueNode().set(new ValueNode(String.valueOf(id), false));
+                        found.set(true);
+                    }
+                });
+            });
+        });
+    }
+
     SavegameStructure VIC2 = new PlaintextSavegameStructure(
             null,
             "gamestate",
             TextFormatParser.VIC2,
-            c -> UUID.nameUUIDFromBytes(NodeWriter.writeToBytes(
-                    (ArrayNode) c.get().getNodeForKey("previous_war"), Integer.MAX_VALUE, "")),
-            c -> {
-
+            c -> getIdFromPreviousWar(c).get(),
+            (c,id) -> {
+                setIdForPreviousWar(c, id);
             }) {
 
         @Override
@@ -149,7 +186,7 @@ public interface SavegameStructure {
 
     UUID getCampaignIdHeuristic(SavegameContent c);
 
-    void generateNewCampaignIdHeuristic(SavegameContent c);
+    void generateNewCampaignIdHeuristic(SavegameContent c, Long id);
 
     SavegameParseResult parse(byte[] input);
 

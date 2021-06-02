@@ -34,6 +34,16 @@ public final class LinkedArrayNode extends ArrayNode {
     }
 
     @Override
+    public boolean setIfPresent(String key, Node value) {
+        for (var ar : arrayNodes) {
+            if (ar.setIfPresent(key, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public int size() {
         return arrayNodes.stream().mapToInt(ArrayNode::size).sum();
     }

@@ -186,6 +186,7 @@ public abstract class FileImportTarget {
         private final SavegameStorage<?, ?> savegameStorage;
         protected Path path;
         private Instant timestamp;
+        private Long branchId;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
             this.savegameStorage = savegameStorage;

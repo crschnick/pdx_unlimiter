@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PlaintextSavegameStructure implements SavegameStructure {
@@ -17,9 +17,10 @@ public class PlaintextSavegameStructure implements SavegameStructure {
     private final String name;
     private final TextFormatParser parser;
     private final Function<SavegameContent, UUID> idExtractor;
-    private final Consumer<SavegameContent> idGenerator;
+    private final BiConsumer<SavegameContent, Long> idGenerator;
 
-    public PlaintextSavegameStructure(byte[] header, String name, TextFormatParser parser, Function<SavegameContent, UUID> idExtractor, Consumer<SavegameContent> idGenerator) {
+    public PlaintextSavegameStructure(byte[] header, String name, TextFormatParser parser,
+                                      Function<SavegameContent, UUID> idExtractor, BiConsumer<SavegameContent, Long> idGenerator) {
         this.header = header;
         this.name = name;
         this.parser = parser;
@@ -44,8 +45,8 @@ public class PlaintextSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public void generateNewCampaignIdHeuristic(SavegameContent c) {
-        idGenerator.accept(c);
+    public void generateNewCampaignIdHeuristic(SavegameContent c, Long id) {
+        idGenerator.accept(c, id);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class PlaintextSavegameStructure implements SavegameStructure {
 
         try {
             var node = parser.parse(input, header != null ? header.length + 1 : 0);
-            return new SavegameParseResult.Success(Map.of(name, node));
+            return new SavegameParseResult.Success(new SavegameContent(Map.of(name, node)));
         } catch (ParseException e) {
             return new SavegameParseResult.Error(e);
         }
