@@ -24,10 +24,9 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
                     new Random(seed).nextBytes(b);
                     return UUID.nameUUIDFromBytes(b);
                 },
-                c -> {
-                    int rand = new Random().nextInt(Integer.MAX_VALUE);
+                (c, id) -> {
                     c.get("gamestate").getNodeForKey("random_seed").getValueNode().set(
-                            new ValueNode(String.valueOf(rand), false));
+                            new ValueNode(String.valueOf(id), false));
                 });
     }
 

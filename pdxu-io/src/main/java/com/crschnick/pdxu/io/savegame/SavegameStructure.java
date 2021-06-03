@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public interface SavegameStructure {
 
-    public static final String PDXU_ID_FLAG_NAME = "pdxu_campaign_id";
-
     SavegameStructure EU4_PLAINTEXT = new PlaintextSavegameStructure(
             "EU4txt".getBytes(),
             "gamestate",
@@ -23,7 +21,6 @@ public interface SavegameStructure {
             c -> UUID.nameUUIDFromBytes(c.get().getNodeForKey("countries")
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes()),
             (c, id) -> {
-                var uuid = UUID.nameUUIDFromBytes(String.valueOf(id).getBytes());
                 c.get().getNodeForKey("countries")
                         .getNodeForKey("REB").getNodeForKey("decision_seed")
                         .getValueNode().set(new ValueNode(String.valueOf(id), false));
@@ -37,11 +34,10 @@ public interface SavegameStructure {
                     new ZipSavegameStructure.SavegamePart("gamestate", "*")),
             c -> UUID.nameUUIDFromBytes(c.get("gamestate").getNodeForKey("countries")
                     .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes()),
-            c -> {
-                int rand = new Random().nextInt(Integer.MAX_VALUE);
+            (c, id) -> {
                 c.get("gamestate").getNodeForKey("countries")
                         .getNodeForKey("REB").getNodeForKey("decision_seed").getValueNode().set(
-                        new ValueNode(String.valueOf(rand), false));
+                        new ValueNode(String.valueOf(id), false));
             },
             "rnw.zip");
 
@@ -73,10 +69,9 @@ public interface SavegameStructure {
                 new Random(seed).nextBytes(b);
                 return UUID.nameUUIDFromBytes(b);
             },
-            c -> {
-                int rand = new Random().nextInt(Integer.MAX_VALUE);
+            (c, id) -> {
                 c.get("gamestate").getNodeForKey("random_seed").getValueNode().set(
-                        new ValueNode(String.valueOf(rand), false));
+                        new ValueNode(String.valueOf(id), false));
             });
 
 
@@ -111,8 +106,8 @@ public interface SavegameStructure {
                 new Random(seed).nextBytes(b);
                 return UUID.nameUUIDFromBytes(b);
             },
-            c -> c.get("gamestate").getNodeForKey("playthrough_id").getValueNode().set(
-                    new ValueNode(String.valueOf(new Random().nextInt(Integer.MAX_VALUE)), false))) {
+            (c, id) -> c.get("gamestate").getNodeForKey("playthrough_id").getValueNode().set(
+                    new ValueNode(String.valueOf(id), false))) {
 
         @Override
         public void writeData(OutputStream out, ArrayNode node) throws IOException {
@@ -186,7 +181,7 @@ public interface SavegameStructure {
 
     UUID getCampaignIdHeuristic(SavegameContent c);
 
-    void generateNewCampaignIdHeuristic(SavegameContent c, Long id);
+    void generateNewCampaignIdHeuristic(SavegameContent c, int id);
 
     SavegameParseResult parse(byte[] input);
 

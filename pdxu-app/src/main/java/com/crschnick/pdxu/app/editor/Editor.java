@@ -3,7 +3,7 @@ package com.crschnick.pdxu.app.editor;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.target.EditTarget;
 import com.crschnick.pdxu.app.gui.editor.GuiEditor;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
@@ -15,14 +15,14 @@ public class Editor {
     private static final Map<EditorState, Stage> editors = new ConcurrentHashMap<>();
 
     public static void createNewEditor(EditTarget target) {
-        Map<String, ArrayNode> nodes;
+        SavegameContent content;
         try {
-            nodes = target.parse();
+            content = target.parse();
         } catch (Exception e) {
             ErrorHandler.handleException(e, null, target.getFile());
             return;
         }
-        EditorState state = new EditorState(target.getName(), nodes, target.getParser(), n -> {
+        EditorState state = new EditorState(target.getName(), content, target.getParser(), n -> {
             try {
                 target.write(n);
             } catch (Exception e) {

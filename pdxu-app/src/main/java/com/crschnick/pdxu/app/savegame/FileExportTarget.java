@@ -45,7 +45,9 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
         @Override
         public Path export() throws IOException {
-            var out = savegameDir.resolve(storage.getCompatibleName(entry, false));
+            var col = storage.getSavegameCollection(entry);
+            var name = col.getOutputName(storage.getCollectionFileName(col), storage.getEntryFileName(entry));
+            var out = savegameDir.resolve(name + "." + storage.getType().getFileEnding());
             storage.copySavegameTo(entry, out);
             return out;
         }

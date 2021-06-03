@@ -154,6 +154,16 @@ public class GuiSavegameEntry {
             staticButtons.getChildren().add(report);
         }
         {
+            Button branch = new JFXButton();
+            branch.setGraphic(new FontIcon());
+            branch.setOnMouseClicked((m) -> {
+                SavegameActions.branch(e);
+            });
+            branch.getStyleClass().add("branch-button");
+            GuiTooltips.install(branch, "Create new branch with the savegame");
+            staticButtons.getChildren().add(branch);
+        }
+        {
             Button copy = new JFXButton();
             copy.setGraphic(new FontIcon());
             copy.setOnMouseClicked((m) -> {

@@ -1,11 +1,10 @@
 package com.crschnick.pdxu.app.editor.target;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 public abstract class EditTarget {
@@ -25,9 +24,9 @@ public abstract class EditTarget {
         return Optional.of(new SavegameEditTarget(file, type));
     }
 
-    public abstract Map<String, ArrayNode> parse() throws Exception;
+    public abstract SavegameContent parse() throws Exception;
 
-    public abstract void write(Map<String, ArrayNode> nodeMap) throws Exception;
+    public abstract void write(SavegameContent nodeMap) throws Exception;
 
     public abstract TextFormatParser getParser();
 

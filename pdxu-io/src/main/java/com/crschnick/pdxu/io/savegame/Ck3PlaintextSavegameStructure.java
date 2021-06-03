@@ -40,10 +40,9 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public void generateNewCampaignIdHeuristic(SavegameContent c) {
-        int rand = new Random().nextInt(Integer.MAX_VALUE);
+    public void generateNewCampaignIdHeuristic(SavegameContent c, int id) {
         c.get().getNodeForKey("random_seed").getValueNode().set(
-                new ValueNode(String.valueOf(rand), false));
+                new ValueNode(String.valueOf(id), false));
     }
 
     @Override
@@ -59,7 +58,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
         int metaStart = header.toString().length() + 1;
         try {
             var node = getParser().parse(input, metaStart);
-            return new SavegameParseResult.Success(Map.of("gamestate", node));
+            return new SavegameParseResult.Success(new SavegameContent(Map.of("gamestate", node)));
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);
         }

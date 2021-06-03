@@ -3,11 +3,9 @@ package com.crschnick.pdxu.app.editor.target;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.SavegameInfo;
-
-import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
 
@@ -21,12 +19,12 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     }
 
     @Override
-    public Map<String, ArrayNode> parse() throws Exception {
+    public SavegameContent parse() throws Exception {
         return target.parse();
     }
 
     @Override
-    public void write(Map<String, ArrayNode> nodeMap) throws Exception {
+    public void write(SavegameContent nodeMap) throws Exception {
         target.write(nodeMap);
         SavegameActions.reloadSavegame(entry);
     }

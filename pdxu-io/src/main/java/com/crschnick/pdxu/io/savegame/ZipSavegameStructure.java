@@ -10,7 +10,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -22,9 +22,10 @@ public class ZipSavegameStructure implements SavegameStructure {
     private final Set<SavegamePart> parts;
     private final String[] ignored;
     private final Function<SavegameContent, UUID> idExtractor;
-    private final Consumer<SavegameContent> idGenerator;
+    private final BiConsumer<SavegameContent, Integer> idGenerator;
 
-    public ZipSavegameStructure(byte[] header, TextFormatParser parser, Set<SavegamePart> parts, Function<SavegameContent, UUID> idExtractor, Consumer<SavegameContent> idGenerator, String... ignored) {
+    public ZipSavegameStructure(byte[] header, TextFormatParser parser, Set<SavegamePart> parts, Function<SavegameContent, UUID> idExtractor,
+                                BiConsumer<SavegameContent, Integer> idGenerator, String... ignored) {
         this.header = header;
         this.parser = parser;
         this.parts = parts;
@@ -39,8 +40,8 @@ public class ZipSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public void generateNewCampaignIdHeuristic(SavegameContent c) {
-        idGenerator.accept(c);
+    public void generateNewCampaignIdHeuristic(SavegameContent c, int id) {
+        idGenerator.accept(c, id);
     }
 
     protected SavegameParseResult parseInput(byte[] input, int offset) {
@@ -71,7 +72,7 @@ public class ZipSavegameStructure implements SavegameStructure {
 
                     var bytes = zipIn.readAllBytes();
                     if (header != null && !SavegameStructure.validateHeader(header, bytes)) {
-                        return new SavegameParseResult.Invalid("File " + part.get().identifier() + " has an invalid header");
+                        return new SavegameParseResult.Invalid("File " + part.get().name() + " has an invalid header");
                     }
 
                     var node = parser.parse(bytes, header != null ? header.length + 1 : 0);
@@ -86,7 +87,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                     return new SavegameParseResult.Invalid("Missing parts: " + String.join(", ", missingParts));
                 }
 
-                return new SavegameParseResult.Success(nodes);
+                return new SavegameParseResult.Success(new SavegameContent(nodes));
             }
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);

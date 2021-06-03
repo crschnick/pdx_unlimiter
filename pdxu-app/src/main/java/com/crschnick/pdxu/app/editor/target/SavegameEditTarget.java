@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.editor.target;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameStructure;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
@@ -20,7 +21,7 @@ public class SavegameEditTarget extends EditTarget {
     }
 
     @Override
-    public Map<String, ArrayNode> parse() throws Exception {
+    public SavegameContent parse() throws Exception {
         var bytes = Files.readAllBytes(file);
         structure = type.determineStructure(bytes);
 
@@ -33,7 +34,7 @@ public class SavegameEditTarget extends EditTarget {
     }
 
     @Override
-    public void write(Map<String, ArrayNode> nodeMap) throws Exception {
+    public void write(SavegameContent nodeMap) throws Exception {
         structure.write(file, nodeMap);
     }
 

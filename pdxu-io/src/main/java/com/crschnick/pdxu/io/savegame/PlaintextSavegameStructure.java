@@ -17,10 +17,10 @@ public class PlaintextSavegameStructure implements SavegameStructure {
     private final String name;
     private final TextFormatParser parser;
     private final Function<SavegameContent, UUID> idExtractor;
-    private final BiConsumer<SavegameContent, Long> idGenerator;
+    private final BiConsumer<SavegameContent, Integer> idGenerator;
 
     public PlaintextSavegameStructure(byte[] header, String name, TextFormatParser parser,
-                                      Function<SavegameContent, UUID> idExtractor, BiConsumer<SavegameContent, Long> idGenerator) {
+                                      Function<SavegameContent, UUID> idExtractor, BiConsumer<SavegameContent, Integer> idGenerator) {
         this.header = header;
         this.name = name;
         this.parser = parser;
@@ -45,7 +45,7 @@ public class PlaintextSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public void generateNewCampaignIdHeuristic(SavegameContent c, Long id) {
+    public void generateNewCampaignIdHeuristic(SavegameContent c, int id) {
         idGenerator.accept(c, id);
     }
 

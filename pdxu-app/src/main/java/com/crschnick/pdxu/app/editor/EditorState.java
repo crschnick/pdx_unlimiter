@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.editor;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,9 +24,9 @@ public class EditorState {
     private final ListProperty<NavEntry> navPath;
     private final EditorFilter filter;
     private final ListProperty<EditorNode> content;
-    private final Consumer<Map<String, ArrayNode>> saveFunc;
+    private final Consumer<SavegameContent> saveFunc;
 
-    public EditorState(String fileName, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
+    public EditorState(String fileName, SavegameContent sgContent, TextFormatParser parser, Consumer<SavegameContent> saveFunc) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
@@ -39,7 +39,7 @@ public class EditorState {
 
         rootNodes = new HashMap<>();
         int counter = 0;
-        for (var e : nodes.entrySet()) {
+        for (var e : sgContent.entrySet()) {
             rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
     }
@@ -49,8 +49,9 @@ public class EditorState {
             return;
         }
 
-        saveFunc.accept(rootNodes.entrySet().stream().collect(
+        var content = new SavegameContent(rootNodes.entrySet().stream().collect(
                 Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toWritableNode())));
+        saveFunc.accept(content);
         dirtyProperty().set(false);
     }
 

@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public abstract class FileImportTarget {
+
+    private static final Pattern PDXU_BRANCH_PATTERN = Pattern.compile("(.+?)(?:\\.branch-(\\d+))?");
 
     public static List<StandardImportTarget> createStandardImportsTargets(String toImport) {
         Path p;
@@ -186,6 +189,7 @@ public abstract class FileImportTarget {
         private final SavegameStorage<?, ?> savegameStorage;
         protected Path path;
         private Instant timestamp;
+        private String baseName;
         private Long branchId;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
@@ -198,6 +202,17 @@ public abstract class FileImportTarget {
             } catch (IOException e) {
                 // In some conditions, the import target may already not exist anymore.
                 timestamp = Instant.EPOCH;
+            }
+
+            var name = FilenameUtils.getBaseName(path.getFileName().toString());
+            var matcher = PDXU_BRANCH_PATTERN.matcher(name);
+            if (matcher.matches()) {
+                baseName = matcher.group(1);
+                if (matcher.groupCount() == 3) {
+                    branchId = Long.parseLong(matcher.group(2));
+                }
+            } else {
+                baseName = name;
             }
         }
 
@@ -228,7 +243,7 @@ public abstract class FileImportTarget {
                 }
 
                 onFinish.accept(savegameStorage.importSavegame(
-                        path, null, true, getSourceFileChecksum(), null));
+                        path, null, true, getSourceFileChecksum(), branchId));
             }, true);
         }
 
@@ -249,7 +264,7 @@ public abstract class FileImportTarget {
 
         @Override
         public String getName() {
-            return FilenameUtils.getBaseName(path.toString());
+            return baseName;
         }
 
         public Path getPath() {
@@ -285,6 +300,10 @@ public abstract class FileImportTarget {
                 // will be thrown because the file doesn't exist anymore
                 return null;
             }
+        }
+
+        public Long getBranchId() {
+            return branchId;
         }
     }
 

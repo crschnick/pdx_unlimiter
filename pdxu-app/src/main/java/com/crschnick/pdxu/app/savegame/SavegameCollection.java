@@ -25,6 +25,8 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
         this.uuid = uuid;
     }
 
+    public abstract String getOutputName(String fileName, String entryName);
+
     public void onSavegameLoad(SavegameEntry<T, I> entry) {
     }
 

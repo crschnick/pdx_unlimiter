@@ -38,6 +38,14 @@ public class SavegameActions {
         }));
     }
 
+    public static <T, I extends SavegameInfo<T>> void branch(SavegameEntry<T, I> entry) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameContext.withSavegame(entry, ctx -> {
+                ctx.getStorage().createNewBranch(entry);
+            });
+        }, true);
+    }
+
     public static <T, I extends SavegameInfo<T>> void openSavegame(SavegameEntry<T, I> entry) {
         SavegameContext.withSavegame(entry, ctx -> {
             ThreadHelper.open(ctx.getStorage().getSavegameDataDirectory(entry));
@@ -165,7 +173,7 @@ public class SavegameActions {
                 }
                 var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
                 folder.ifPresent(f -> {
-                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
+                    //ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
                 });
             });
         }, true);
@@ -213,8 +221,7 @@ public class SavegameActions {
             SavegameContext.withSavegame(e, ctx -> {
                 var sgs = ctx.getStorage();
                 var in = sgs.getSavegameFile(e);
-                sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
-                        sgs.getSavegameCollection(e));
+                //sgs.importSavegame(in, "Copy of " + e.getName(), false, null, sgs.getSavegameCollection(e));
             });
         }, true);
     }

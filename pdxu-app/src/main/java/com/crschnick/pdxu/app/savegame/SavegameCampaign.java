@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
-    private final Long branchId;
+    private final Integer branchId;
     private final ObjectProperty<GameDate> date;
     private final ObjectProperty<Image> image;
 
-    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, Long branchId, GameDate date, Image image) {
+    public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, Integer branchId, GameDate date, Image image) {
         super(lastPlayed, name, campaignId);
         if (branchId != null && branchId < 0) {
             throw new IllegalArgumentException();
@@ -24,6 +24,11 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
         this.branchId = branchId;
         this.date = new SimpleObjectProperty<>(date);
         this.image = new SimpleObjectProperty<>(image);
+    }
+
+    @Override
+    public String getOutputName(String fileName, String entryName) {
+        return fileName + (isBranch() ? "branch-" + getBranchId() : "");
     }
 
     @Override
@@ -78,7 +83,7 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
         return branchId != null;
     }
 
-    public long getBranchId() {
+    public int getBranchId() {
         return branchId;
     }
 }
