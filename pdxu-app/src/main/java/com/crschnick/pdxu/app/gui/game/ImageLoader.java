@@ -33,6 +33,11 @@ public class ImageLoader {
     }
 
     public static Image cut(Image img, Rectangle2D r) {
+        // Don't try to cut if image has not been found
+        if (img == DEFAULT_IMAGE) {
+            return DEFAULT_IMAGE;
+        }
+
         PixelReader reader = img.getPixelReader();
         try {
             return new WritableImage(reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());

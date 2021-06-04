@@ -59,18 +59,26 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
     public static <T, I extends SavegameInfo<T>> void withSavegameAsync(
             SavegameEntry<T, I> e,
             Consumer<SavegameContext<T, I>> con) {
-        var ctx = getContext(e);
-        if (ctx.getInfo() != null) {
-            con.accept(ctx);
+        var ctx = getContextIfExistent(e);
+        if (ctx.isEmpty()) {
+            return;
+        }
+
+        if (ctx.get().getInfo() != null) {
+            con.accept(ctx.get());
         } else {
             e.infoProperty().addListener(new javafx.beans.value.ChangeListener<>() {
                 @Override
                 public void changed(ObservableValue<? extends I> observable, I oldValue, I newValue) {
                     if (newValue != null) {
-                        var ctx = getContext(e);
-                        ctx.info = newValue;
+                        var ctx = getContextIfExistent(e);
+                        if (ctx.isEmpty()) {
+                            return;
+                        }
+
+                        ctx.get().info = newValue;
                         Platform.runLater(() -> {
-                            con.accept(ctx);
+                            con.accept(ctx.get());
                         });
                     } else {
                         // Remove listener if info is unloaded
