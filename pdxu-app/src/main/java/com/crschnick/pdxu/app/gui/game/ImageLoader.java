@@ -34,7 +34,12 @@ public class ImageLoader {
 
     public static Image cut(Image img, Rectangle2D r) {
         PixelReader reader = img.getPixelReader();
-        return new WritableImage(reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());
+        try {
+            return new WritableImage(reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+            return DEFAULT_IMAGE;
+        }
     }
 
     static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
