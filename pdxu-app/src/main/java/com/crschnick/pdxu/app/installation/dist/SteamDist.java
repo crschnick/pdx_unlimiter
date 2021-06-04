@@ -76,8 +76,9 @@ public class SteamDist extends GameDist {
                 }
             }
         } else {
+            boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> dir.startsWith(ld));
             var steamFile = g.getInstallType().getSteamSpecificFile(dir);
-            if (Files.exists(steamFile)) {
+            if (inSteamLibraryDir && Files.exists(steamFile)) {
                 var basicDist = GameDists.getBasicDistFromDirectory(g, dir);
                 if (basicDist.isPresent()) {
                     return Optional.of(new SteamDist(g, dir, basicDist.get()));

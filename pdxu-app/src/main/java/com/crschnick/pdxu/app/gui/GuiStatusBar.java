@@ -75,7 +75,13 @@ public class GuiStatusBar {
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
         javafx.beans.value.ChangeListener<List<FileImportTarget.StandardImportTarget>> l = (c, o, n) -> {
-            Platform.runLater(() -> latest.setText(PdxuI18n.get("LATEST") + ": " + (n.size() > 0 ? n.get(0).getName() : PdxuI18n.get("NONE"))));
+            Platform.runLater(() -> {
+                var name = n.stream()
+                        .findFirst()
+                        .map(FileImportTarget.StandardImportTarget::getName)
+                        .orElse(PdxuI18n.get("NONE"));
+                latest.setText(PdxuI18n.get("LATEST") + ": " + name);
+            });
         };
 
         var watcher = SavegameWatcher.ALL.get(g);
