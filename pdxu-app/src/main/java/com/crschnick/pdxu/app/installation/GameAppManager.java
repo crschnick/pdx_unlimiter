@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.Optional;
 
 public final class GameAppManager {
 
@@ -74,14 +74,19 @@ public final class GameAppManager {
 
     private void update() {
         if ((activeGame.get() == null)) {
-            var process = Arrays.stream(Game.values())
-                    .map(g -> new GameApp(ProcessHandle.allProcesses()
-                            .filter(p -> p.info().command()
-                                    .map(cs -> isInstanceOfGame(cs, g)).orElse(false))
-                            .findAny().orElse(null), g)
-                    )
-                    .filter(ga -> ga.getProcess() != null)
-                    .findAny();
+            var processes = ProcessHandle.allProcesses().toList();
+            Optional<GameApp> process = Optional.empty();
+            for (var ph : processes) {
+                var cmd = ph.info().command().orElse(null);
+                if (cmd != null) {
+                    for (var g : Game.values()) {
+                        if (isInstanceOfGame(cmd, g)) {
+                            process = Optional.of(new GameApp(ph, g));
+                            break;
+                        }
+                    }
+                }
+            }
             if (process.isPresent()) {
                 logger.info("Detected new running game instance of " + process.get().getGame().getId());
                 activeGame.set(process.get());
