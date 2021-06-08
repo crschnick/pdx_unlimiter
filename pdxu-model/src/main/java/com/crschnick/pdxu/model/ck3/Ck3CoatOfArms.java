@@ -234,12 +234,16 @@ public final class Ck3CoatOfArms {
             c.instances = n.getNodesForKey("instance").stream().map(i -> {
                 Instance instance = new Instance();
                 i.getNodeForKeyIfExistent("position").ifPresent(p -> {
-                    instance.x = p.getNodeArray().get(0).getDouble();
-                    instance.y = p.getNodeArray().get(1).getDouble();
+                    if (p.isArray()) {
+                        instance.x = p.getNodeArray().get(0).getDouble();
+                        instance.y = p.getNodeArray().get(1).getDouble();
+                    }
                 });
                 i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
-                    instance.scaleX = s.getNodeArray().get(0).getDouble();
-                    instance.scaleY = s.getNodeArray().get(1).getDouble();
+                    if (s.isArray()) {
+                        instance.scaleX = s.getNodeArray().get(0).getDouble();
+                        instance.scaleY = s.getNodeArray().get(1).getDouble();
+                    }
                 });
                 i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
                     instance.rotation = r.getInteger();
