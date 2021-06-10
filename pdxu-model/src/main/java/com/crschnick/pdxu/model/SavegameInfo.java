@@ -1,11 +1,9 @@
 package com.crschnick.pdxu.model;
 
 import java.util.List;
-import java.util.UUID;
 
 public abstract class SavegameInfo<T> {
 
-    protected UUID campaignHeuristic;
     protected List<String> mods;
     protected List<String> dlcs;
     protected boolean ironman;
@@ -37,10 +35,6 @@ public abstract class SavegameInfo<T> {
 
     public boolean isBinary() {
         return binary;
-    }
-
-    public UUID getCampaignHeuristic() {
-        return campaignHeuristic;
     }
 
     public boolean hasOnePlayerTag() {

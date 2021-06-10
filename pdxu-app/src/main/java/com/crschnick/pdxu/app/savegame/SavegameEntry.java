@@ -19,6 +19,11 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final SavegameNotes notes;
     private final List<String> sourceFileChecksums;
 
+    public SavegameEntry(SavegameEntry<T,I> otherEntry, UUID uuid) {
+        this(otherEntry.getName(), uuid, otherEntry.getContentChecksum(),
+                otherEntry.getDate(), otherEntry.getNotes(), otherEntry.getSourceFileChecksums());
+    }
+
     public SavegameEntry(String name, UUID uuid,
                          String contentChecksum, GameDate date, SavegameNotes notes,
                          List<String> sourceFileChecksums) {

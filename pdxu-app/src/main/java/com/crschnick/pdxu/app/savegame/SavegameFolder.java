@@ -9,7 +9,7 @@ import java.util.UUID;
 public class SavegameFolder<T, I extends SavegameInfo<T>> extends SavegameCollection<T, I> {
 
     public SavegameFolder(Instant lastPlayed, String name, UUID uuid) {
-        super(lastPlayed, name, uuid);
+        super(storage, lastPlayed, name, uuid);
     }
 
     @Override

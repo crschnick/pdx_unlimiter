@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import com.crschnick.pdxu.io.node.ValueNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -8,9 +9,12 @@ import com.crschnick.pdxu.io.parser.TextFormatParser;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public interface SavegameStructure {
 
@@ -117,41 +121,68 @@ public interface SavegameStructure {
     };
 
 
-    private static Optional<UUID> getIdFromPreviousWar(SavegameContent c) {
-        AtomicReference<UUID> uuid = new AtomicReference<>();
-        c.get().getNodesForKey("previous_war").forEach(n -> {
+    private static UUID getIdFromPreviousWar(SavegameContent c) {
+        for (var n : c.get().getNodesForKey("previous_war")) {
+            AtomicInteger sum = new AtomicInteger();
             n.getNodeForKeyIfExistent("history").ifPresent(h -> {
                 h.forEach((date, entry) -> {
-                    if (entry.hasKey("battle")) {
-                        var losses = entry.getNodeForKey("battle").getNodeForKey("attacker").getNodeForKey("losses");
-                        uuid.set(UUID.nameUUIDFromBytes(losses.getString().getBytes()));
+                    if (entry.isArray() && entry.hasKey("battle")) {
+                        var b = entry.getNodeForKey("battle");
+                        b.getNodeForKeyIfExistent("attacker").ifPresent(att -> {
+                            att.getNodeForKeyIfExistent("artillery").ifPresent(art -> sum.addAndGet(art.getInteger()));
+                            att.getNodeForKeyIfExistent("cavalry").ifPresent(art -> sum.addAndGet(art.getInteger()));
+                            att.getNodeForKeyIfExistent("infantry").ifPresent(art -> sum.addAndGet(art.getInteger()));
+                            att.getNodeForKeyIfExistent("losses").ifPresent(art -> sum.addAndGet(art.getInteger()));
+                        });
                     }
                 });
             });
-        });
-        return Optional.ofNullable(uuid.get());
+            if (sum.get() != 0) {
+                return UUID.nameUUIDFromBytes(String.valueOf(sum).getBytes());
+            }
+        }
+        throw new IllegalStateException();
     }
 
-    private static void setIdForPreviousWar(SavegameContent c, long id) {
-        AtomicBoolean found = new AtomicBoolean();
-        c.get().getNodesForKey("previous_war").forEach(n -> {
+    private static void setIdForPreviousWar(SavegameContent c, int id) {
+        var toSet = new ValueNode(String.valueOf(id), false);
+        var toZero = new ValueNode("0", false);
+        for (var n : c.get().getNodesForKey("previous_war")) {
+            final boolean[] set = {false};
+            Consumer<Node> con = entry -> {
+                if (set[0]) {
+                    entry.getValueNode().set(toZero);
+                } else {
+                    entry.getValueNode().set(toSet);
+                    set[0] = true;
+                }
+            };
             n.getNodeForKeyIfExistent("history").ifPresent(h -> {
                 h.forEach((date, entry) -> {
-                    if (entry.hasKey("battle") && !found.get()) {
-                        var losses = entry.getNodeForKey("battle").getNodeForKey("attacker").getNodeForKey("losses");
-                        losses.getValueNode().set(new ValueNode(String.valueOf(id), false));
-                        found.set(true);
+                    if (entry.isArray() && entry.hasKey("battle")) {
+                        var b = entry.getNodeForKey("battle");
+                        b.getNodeForKeyIfExistent("attacker").ifPresent(att -> {
+                            att.getNodeForKeyIfExistent("artillery").ifPresent(con);
+                            att.getNodeForKeyIfExistent("cavalry").ifPresent(con);
+                            att.getNodeForKeyIfExistent("infantry").ifPresent(con);
+                            att.getNodeForKeyIfExistent("losses").ifPresent(con);
+                        });
                     }
                 });
             });
-        });
+            if (set[0]) {
+                return;
+            }
+        }
+
+        throw new IllegalStateException();
     }
 
     SavegameStructure VIC2 = new PlaintextSavegameStructure(
             null,
             "gamestate",
             TextFormatParser.VIC2,
-            c -> getIdFromPreviousWar(c).get(),
+            c -> getIdFromPreviousWar(c),
             (c,id) -> {
                 setIdForPreviousWar(c, id);
             }) {
