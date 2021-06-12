@@ -37,7 +37,7 @@ public record Ck3Header(boolean unknown, boolean compressed, boolean binary, lon
 
     public static Ck3Header fromString(String header) {
         if (!header.startsWith("SAV000") && !header.startsWith("SAV010")) {
-            throw new IllegalArgumentException("Invalid CK3 header begin");
+            throw new IllegalArgumentException("Invalid CK3 header start: " + header.substring(0, Math.min(6, header.length())));
         }
 
         boolean unknown = Integer.parseInt(header.substring(4, 5)) == 1;
