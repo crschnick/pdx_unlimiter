@@ -5,6 +5,9 @@ import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.gui.game.ImageLoader;
 import com.crschnick.pdxu.app.util.ConfigHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
+import com.crschnick.pdxu.app.util.integration.RakalyHelper;
+import com.crschnick.pdxu.io.parser.ParseException;
+import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +42,19 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
         this.branchId = branchId;
         this.date = new SimpleObjectProperty<>(date);
         this.image = new SimpleObjectProperty<>(image);
+    }
+
+    public boolean delete(SavegameEntry<T, I> e) {
+        try {
+            FileUtils.deleteDirectory(getDirectory().resolve(e.getUuid().toString()).toFile());
+        } catch (IOException ex) {
+            ErrorHandler.handleException(ex);
+        }
+
+        getSavegames().remove(e);
+        onSavegamesChange();
+        saveData();
+        return true;
     }
 
     @Override
@@ -100,15 +116,15 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
     }
 
     @Override
-    public void copyTo(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
+    public boolean copyTo(SavegameEntry<T, I> entry) {
         var info = entry.getInfo();
         if (info == null) {
-            return;
+            return false;
         }
 
         if (branchId == null) {
             GuiErrorReporter.showSimpleErrorMessage("Can't move savegame to campaign, since the campaign is not a branch.\nPlease create a new branch to allow for moving.");
-            return;
+            return false;
         }
 
         if (info.isIronman()) {
@@ -116,23 +132,26 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
             try {
                 FileUtils.copyDirectory(
                         srcDir,
-                        storage.getSavegameDataDirectory().resolve(getUuid().toString())
-                                .resolve(entry.getUuid().toString()).toFile());
+                        getDirectory().resolve(entry.getUuid().toString()).toFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
-                return;
+                return false;
             }
         } else if (!info.isBinary()) {
             try {
-                Files.createDirectory(storage.getSavegameDataDirectory()
-                        .resolve(getUuid().toString()).resolve(entry.getUuid().toString()));
+                var entryPath = getDirectory().resolve(entry.getUuid().toString());
+                Files.createDirectory(entryPath);
 
-                FileUtils.copyDirectory(
-                        srcDir,
-                        getSavegameDataDirectory().resolve(to.getUuid().toString()).resolve(entry.getUuid().toString()).toFile());
+                byte[] bytes = Files.readAllBytes(storage.getSavegameFile(entry));
+                var type = storage.getType();
+                var struc = type.determineStructure(bytes);
+                var c = struc.parse(bytes).success().map(s -> s.content).orElseThrow();
+                struc.generateNewCampaignIdHeuristic(c, branchId);
+                struc.write(entryPath.resolve(storage.getSaveFileName()), c);
+                JsonHelper.writeObject(info, entryPath.resolve(storage.getInfoFileName()));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
-                return;
+                return false;
             }
         } else {
             GuiErrorReporter.showSimpleErrorMessage("Can't move a binary non-ironman savegame.");
@@ -140,9 +159,10 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> extends Savega
 
         getSavegames().add(entry);
         onSavegamesChange();
+        return true;
     }
 
-    public synchronized void addNewEntryn(
+    public void addNewEntry(
             String checksum,
             I info,
             String name,

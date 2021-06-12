@@ -45,7 +45,9 @@ public abstract class SavegameCollection<T, I extends SavegameInfo<T>> {
 
     public abstract JsonNode serialize();
 
-    public abstract void copyTo(SavegameStorage<T,I> storage, SavegameEntry<T,I> entry);
+    public abstract boolean delete(SavegameEntry<T, I> e);
+
+    public abstract boolean copyTo(SavegameEntry<T,I> entry);
 
     public abstract String getOutputName(String fileName, String entryName);
 

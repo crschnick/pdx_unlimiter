@@ -1,12 +1,13 @@
 package com.crschnick.pdxu.model.ck2;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.model.*;
+import com.crschnick.pdxu.model.GameDateType;
+import com.crschnick.pdxu.model.GameVersion;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfoException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,11 +27,6 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
             binary = false;
 
             tag = new Ck2Tag(n.getNodeForKey("player_realm").getString(), n.getNodeForKey("player_name").getString());
-
-            long seed = n.getNodeForKey("playthrough_id").getLong();
-            byte[] b = new byte[20];
-            new Random(seed).nextBytes(b);
-            campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             allTags = new ArrayList<>();
 

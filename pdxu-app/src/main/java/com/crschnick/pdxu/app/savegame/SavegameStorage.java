@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.savegame;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
-import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.util.ConfigHelper;
@@ -12,8 +11,8 @@ import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.ParseException;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
+import com.crschnick.pdxu.io.savegame.SavegameStructure;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.SavegameInfoException;
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import org.apache.commons.collections4.BidiMap;
@@ -38,9 +36,9 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
@@ -169,9 +167,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         try {
             FileUtils.deleteDirectory(campaignPath.toFile());
         } catch (IOException e) {
-            // Don't show the user this error. It sometimes happens when the file is
-            // used by another process or even an antivirus program
-            logger.error("Could not delete collection " + c.getName(), c);
+            ErrorHandler.handleException(e);
         }
 
         this.collections.remove(c);
@@ -179,29 +175,36 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         saveData();
     }
 
-
     synchronized void delete(SavegameEntry<T, I> e) {
         SavegameCollection<T, I> c = getSavegameCollection(e);
         if (!this.collections.contains(c) || !c.getSavegames().contains(e)) {
             return;
         }
 
-        Path campaignPath = path.resolve(c.getUuid().toString());
-        try {
-            FileUtils.deleteDirectory(campaignPath.resolve(e.getUuid().toString()).toFile());
-        } catch (IOException ex) {
-            // Don't show the user this error. It sometimes happens when the file is
-            // used by another process or even an antivirus program
-            logger.error("Could not delete entry " + e.getName(), ex);
+        if (c.delete(e)) {
+            if (c.getSavegames().size() == 0) {
+                delete(c);
+                saveData();
+            }
+        }
+    }
+
+    synchronized void move(SavegameCollection<T,I> target, SavegameEntry<T, I> entry) {
+        if (target.getSavegames().contains(entry)) {
+            return;
         }
 
-        c.getSavegames().remove(e);
-        c.onSavegamesChange();
-        if (c.getSavegames().size() == 0) {
-            delete(c);
+        var source = getSavegameCollection(entry);
+        if (target.copyTo(entry)) {
+            source.delete(entry);
         }
+    }
 
-        saveData();
+    public synchronized void createNewBranch(
+            SavegameEntry<T,I> e) {
+        SavegameCampaignFactory.createNewBranch(this, e).ifPresent(cam -> {
+            this.collections.add(cam);
+        });
     }
 
     public synchronized void loadEntry(SavegameEntry<T, I> e) {
@@ -400,10 +403,11 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             String sourceFileChecksum,
             Long branchId) {
         logger.debug("Parsing file " + file.toString());
-        final SavegameParseResult[] result = new SavegameParseResult[1];
+        SavegameParseResult result;
         String checksum;
         byte[] bytes;
         boolean melted;
+        SavegameStructure struc;
         try {
             bytes = Files.readAllBytes(file);
             checksum = checksum(bytes);
@@ -429,58 +433,57 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                 data = bytes;
                 melted = false;
             }
-            var struc = type.determineStructure(data);
-            result[0] = struc.parse(data);
+            struc = type.determineStructure(data);
+            result = struc.parse(data);
         } catch (Exception ex) {
             return Optional.of(new SavegameParseResult.Error(ex));
         }
 
-        final SavegameParseResult[] resultToReturn = new SavegameParseResult[1];
-        result[0].visit(new SavegameParseResult.Visitor() {
-            @Override
-            public void success(SavegameParseResult.Success s) {
-                logger.debug("Parsing was successful. Loading info ...");
-                I info = null;
-                try {
-                    info = infoFactory.apply(s.combinedNode(), melted);
-                } catch (SavegameInfoException e) {
-                    resultToReturn[0] = new SavegameParseResult.Error(e);
-                    return;
+
+        if (result.success().isPresent()) {
+            SavegameParseResult.Success s = result.success().get();
+            logger.debug("Parsing was successful. Loading info ...");
+            I info;
+            try {
+                info = infoFactory.apply(s.combinedNode(), melted);
+            } catch (SavegameInfoException e) {
+                return Optional.of(new SavegameParseResult.Error(e));
+            }
+
+            UUID collectionUuid;
+            if (info.isIronman() && branchId != null) {
+                var campaign = getCampaignForBranchId(branchId)
+                        .orElseThrow(() -> new IllegalArgumentException("Unknown branch id"));
+                collectionUuid = campaign.getUuid();
+                logger.debug("Savegame has branch id in file name");
+            } else {
+                collectionUuid = struc.getCampaignIdHeuristic(s.content);
+            }
+
+            logger.debug("Collection UUID is " + collectionUuid.toString());
+            getSavegameCollection(collectionUuid).ifPresentOrElse(col -> {
+                logger.debug("Adding new entry to existing collection");
+                col.addNewEntry(checksum, info, name, sourceFileChecksum);
+            }, () -> {
+                Optional<SavegameCampaign<T,I>> campaign = SavegameCampaignFactory.importSavegameData(
+                        this, collectionUuid, info, bytes, checksum, sourceFileChecksum);
+                campaign.ifPresent(SavegameStorage.this.collections::add);
+            });
+            return Optional.empty();
+        } else {
+            result.visit(new SavegameParseResult.Visitor() {
+                @Override
+                public void error(SavegameParseResult.Error e) {
+                    logger.error("An error occured during parsing: " + e.error.getMessage());
                 }
 
-                UUID collectionUuid;
-                if (info.isIronman() && branchId != null) {
-                    var campaign = getCampaignForBranchId(branchId)
-                            .orElseThrow(() -> new IllegalArgumentException("Unknown branch id"));
-                    collectionUuid = campaign.getUuid();
-                    logger.debug("Savegame has branch id in file name");
-                } else {
-                    collectionUuid = info.getCampaignHeuristic();
+                @Override
+                public void invalid(SavegameParseResult.Invalid iv) {
+                    logger.error("Savegame is invalid: " + iv.message);
                 }
-                logger.debug("Collection UUID is " + collectionUuid.toString());
-                getSavegameCollection(collectionUuid).ifPresentOrElse(col -> {
-                    logger.debug("Adding new entry " + e.getName());
-                    col.addNewEntry(checksum, info, name, sourceFileChecksum);
-                }, () -> {
-                    Optional<SavegameCollection<T,I>> campaign = SavegameCampaignFactory.importSavegameData(
-                            this, collectionUuid, info, bytes, sourceFileChecksum);
-                    campaign.ifPresent(SavegameStorage.this.collections::add);
-                });
-            }
-
-            @Override
-            public void error(SavegameParseResult.Error e) {
-                logger.error("An error occured during parsing: " + e.error.getMessage());
-                resultToReturn[0] = e;
-            }
-
-            @Override
-            public void invalid(SavegameParseResult.Invalid iv) {
-                logger.error("Savegame is invalid: " + iv.message);
-                resultToReturn[0] = iv;
-            }
-        });
-        return Optional.ofNullable(resultToReturn[0]);
+            });
+            return Optional.of(result);
+        }
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {

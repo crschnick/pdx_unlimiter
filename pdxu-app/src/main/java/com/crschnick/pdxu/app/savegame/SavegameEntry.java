@@ -33,7 +33,7 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         this.uuid = uuid;
         this.info = new SimpleObjectProperty<>(null);
         this.date = date;
-        this.notes = notes;
+        this.notes = notes != null ? notes : SavegameNotes.empty();
         this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
     }
 

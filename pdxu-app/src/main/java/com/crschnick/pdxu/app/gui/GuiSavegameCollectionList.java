@@ -1,20 +1,15 @@
 package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
-import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXTextField;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CAMPAIGN_LIST;
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CAMPAIGN_TOP_BAR;
@@ -40,25 +35,6 @@ public class GuiSavegameCollectionList {
         box.setSpacing(8);
         box.getStyleClass().add(CLASS_CAMPAIGN_TOP_BAR);
         box.setAlignment(Pos.CENTER);
-        Button create = new Button();
-        create.getStyleClass().add(GuiStyle.CLASS_NEW);
-        create.setGraphic(new FontIcon());
-        create.setOnAction(e -> {
-            SavegameStorage.get(SavegameManagerState.get().current()).addNewFolder("New Folder");
-            e.consume();
-        });
-
-        if (SavegameManagerState.get().current() == null) {
-            create.setDisable(true);
-        }
-        SavegameManagerState.get().onGameChange(n -> {
-            create.setDisable(n == null);
-        });
-
-        GuiTooltips.install(create, "Create new folder");
-        box.getChildren().add(create);
-
-        box.getChildren().add(new Separator(Orientation.VERTICAL));
 
         TextField filter = new JFXTextField();
         filter.setOnMouseClicked(e -> {

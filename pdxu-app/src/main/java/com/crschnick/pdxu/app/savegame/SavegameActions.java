@@ -66,7 +66,7 @@ public class SavegameActions {
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegame(entry, ctx -> {
-                ctx.getStorage().moveEntry(collection, entry);
+                ctx.getStorage().move(collection, entry);
             });
         }, false);
     }
@@ -100,26 +100,26 @@ public class SavegameActions {
         if (r == null) {
             return;
         }
-        r.visit(new SavegameParseResult.Visitor() {
-            @Override
-            public void success(SavegameParseResult.Success s) {
-                try {
-                    var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode(), false);
-                    var campaignId = info.getCampaignHeuristic();
-                    SavegameStorage.get(g).getSavegameCollection(campaignId)
-                            .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
-                        TaskExecutor.getInstance().submitTask(() -> {
-                            SavegameStorage.get(g).loadEntry(entry);
-                            SavegameContext.withSavegame(entry, ctx -> {
-                                GameDistLauncher.continueSavegame(entry, false);
-                            });
-                        }, true);
-                    });
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            }
-        });
+//        r.visit(new SavegameParseResult.Visitor() {
+//            @Override
+//            public void success(SavegameParseResult.Success s) {
+//                try {
+//                    var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode(), false);
+//                    var campaignId = info.getCampaignHeuristic();
+//                    SavegameStorage.get(g).getSavegameCollection(campaignId)
+//                            .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
+//                        TaskExecutor.getInstance().submitTask(() -> {
+//                            SavegameStorage.get(g).loadEntry(entry);
+//                            SavegameContext.withSavegame(entry, ctx -> {
+//                                GameDistLauncher.continueSavegame(entry, false);
+//                            });
+//                        }, true);
+//                    });
+//                } catch (Exception e) {
+//                    ErrorHandler.handleException(e);
+//                }
+//            }
+//        });
     }
 
     public static void importLatestSavegame(Game g) {
@@ -162,21 +162,21 @@ public class SavegameActions {
             return;
         }
 
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegame(e, ctx -> {
-                Path meltedFile;
-                try {
-                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                    return;
-                }
-                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
-                folder.ifPresent(f -> {
-                    //ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
-                });
-            });
-        }, true);
+//        TaskExecutor.getInstance().submitTask(() -> {
+//            SavegameContext.withSavegame(e, ctx -> {
+//                Path meltedFile;
+//                try {
+//                    meltedFile = RakalyHelper.meltSavegame(ctx.getStorage().getSavegameFile(e));
+//                } catch (Exception ex) {
+//                    ErrorHandler.handleException(ex);
+//                    return;
+//                }
+//                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
+//                folder.ifPresent(f -> {
+//                    //ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
+//                });
+//            });
+//        }, true);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {

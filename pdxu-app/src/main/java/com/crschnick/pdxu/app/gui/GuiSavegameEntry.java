@@ -333,9 +333,6 @@ public class GuiSavegameEntry {
                         var container = createEmptyContainer();
                         ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
 
-                        // Clear caches if necessary after being done with loading
-                        CacheManager.getInstance().onEntryLoadFinish();
-
                         Platform.runLater(() -> {
                             loading.setVisible(false);
                             stack.getChildren().set(1, container);

@@ -5,8 +5,6 @@ import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,11 +24,6 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             i.date = GameDateType.STELLARIS.fromString(n.getNodesForKey("date").get(0).getString());
 
             i.binary = false;
-
-            long seed = n.getNodeForKey("random_seed").getLong();
-            byte[] b = new byte[20];
-            new Random(seed).nextBytes(b);
-            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new ArrayList<>();
             n.getNodeForKey("country").forEach((k, v) -> {

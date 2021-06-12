@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -123,7 +124,7 @@ public class SavegameCampaignFactory {
     }
 
     private static <T,I extends SavegameInfo<T>>  Image createImage(SavegameStorage<T,I> storage, I info) {
-        var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
+        var img = GameGuiFactory.<T, I>get(SavegameStorage.ALL.inverseBidiMap().get(storage))
                 .tagImage(info, info.getTag());
         return img;
     }
@@ -133,13 +134,10 @@ public class SavegameCampaignFactory {
             UUID campaignUuid,
             I info,
             byte[] bytes,
+            String checksum,
             String sourceFileChecksum) {
         var campaignPath = storage.getSavegameDataDirectory()
                 .resolve(campaignUuid.toString());
-        if (Files.exists(campaignPath)) {
-            throw new IllegalStateException();
-        }
-
 
         try {
             var entryUuid = UUID.randomUUID();
@@ -152,10 +150,12 @@ public class SavegameCampaignFactory {
             var campaign = new SavegameCampaign<>(storage, Instant.now(),
                     storage.getDefaultCampaignName(info), campaignUuid, null, info.getDate(),
                     createImage(storage, info));
-            campaign.savegames.add(new SavegameEntry<>(info.getDate().toString(), entryUuid, checksum, info.getDate(), null, sourceFileChecksum));
+            campaign.savegames.add(new SavegameEntry<T,I>(info.getDate().toString(), entryUuid, checksum, info.getDate(), null, sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of()));
             campaign.saveData();
+            return Optional.of(campaign);
         } catch (Exception e) {
             ErrorHandler.handleException(e);
+            return Optional.empty();
         }
     }
 }

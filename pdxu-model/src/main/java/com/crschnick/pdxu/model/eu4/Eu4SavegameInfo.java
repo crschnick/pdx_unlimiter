@@ -60,9 +60,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
-            e.campaignHeuristic = UUID.nameUUIDFromBytes(n.getNodeForKey("countries")
-                    .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
-
             e.allTags = new ArrayList<>();
             n.getNodeForKey("countries").forEach((k, v) -> {
                 e.allTags.add(Eu4Tag.fromNode(k, v));

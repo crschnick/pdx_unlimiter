@@ -4,7 +4,6 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.model.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
         try {
             i.tag = new Hoi4Tag(n.getNodeForKey("player").getString(), n.getNodeForKey("ideology").getString());
             i.date = GameDateType.HOI4.fromString(n.getNodeForKey("date").getString());
-            i.campaignHeuristic = UUID.fromString(n.getNodeForKey("game_unique_id").getString());
             i.ironman = melted;
             i.binary = melted;
 

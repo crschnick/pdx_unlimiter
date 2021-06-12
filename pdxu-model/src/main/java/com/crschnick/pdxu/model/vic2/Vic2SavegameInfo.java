@@ -1,13 +1,13 @@
 package com.crschnick.pdxu.model.vic2;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.io.node.NodeWriter;
-import com.crschnick.pdxu.model.*;
+import com.crschnick.pdxu.model.GameDateType;
+import com.crschnick.pdxu.model.GameVersion;
+import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.SavegameInfoException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
 
@@ -42,13 +42,6 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
 
             // Hardcode version
             version = new GameVersion(3, 4, 0, 0);
-
-            if (!n.hasKey("previous_war")) {
-                throw new SavegameInfoException("Can't determine campaign when no previous wars are present.");
-            } else {
-                campaignHeuristic = UUID.nameUUIDFromBytes(NodeWriter.writeToBytes(
-                        (ArrayNode) n.getNodeForKey("previous_war"), Integer.MAX_VALUE, ""));
-            }
         } catch (SavegameInfoException e) {
             throw e;
         } catch (Throwable e) {
