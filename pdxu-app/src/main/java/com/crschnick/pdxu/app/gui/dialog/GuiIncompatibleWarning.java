@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class GuiIncompatibleWarning {
 
     public static boolean showIncompatibleWarning(GameInstallation installation, SavegameInfo<?> info) {
-        StringBuilder builder = new StringBuilder("Selected savegame is incompatible. Launching it anyway, can cause problems.\n");
+        StringBuilder builder = new StringBuilder();
         if (SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
@@ -32,7 +32,7 @@ public class GuiIncompatibleWarning {
                 .map(m -> installation.getModForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingMods) {
-            builder.append("\nThe following Mods are missing:\n").append(info.getMods().stream()
+            builder.append("The following Mods are missing:\n").append(info.getMods().stream()
                     .map(s -> {
                         var m = installation.getModForSavegameId(s);
                         return (m.isPresent() ? null : "- " + s);
@@ -54,6 +54,11 @@ public class GuiIncompatibleWarning {
                     .collect(Collectors.joining("\n")));
         }
 
+        var text = new TextArea(builder.toString());
+        text.setPrefHeight(200);
+        text.setEditable(false);
+        text.setPadding(Insets.EMPTY);
+
         var launch = new ButtonType("Launch anyway");
         return GuiDialogHelper.showBlockingAlert(alert -> {
             alert.setAlertType(Alert.AlertType.WARNING);
@@ -61,7 +66,8 @@ public class GuiIncompatibleWarning {
             alert.getButtonTypes().add(ButtonType.CLOSE);
             alert.getButtonTypes().add(launch);
             alert.setTitle("Incompatible savegame");
-            alert.setHeaderText(builder.toString());
+            alert.setHeaderText("Selected savegame is incompatible. Launching it anyway, can cause problems");
+            alert.getDialogPane().setContent(text);
         }).orElse(ButtonType.CLOSE).equals(launch);
     }
 
