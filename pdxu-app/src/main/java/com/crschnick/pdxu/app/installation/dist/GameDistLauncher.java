@@ -54,7 +54,7 @@ public class GameDistLauncher {
         SavegameContext.withSavegame(e, ctx -> {
             if (SavegameCompatibility.determineForEntry(e) != SavegameCompatibility.Compatbility.COMPATIBLE) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
-                        ctx.getInstallation(), e);
+                        ctx.getInstallation(), ctx.getInfo());
                 if (!startAnyway) {
                     return;
                 }
@@ -72,7 +72,12 @@ public class GameDistLauncher {
     }
 
     private static <T, I extends SavegameInfo<T>> void setupContinueGame(SavegameEntry<T, I> e) throws Exception {
-        var ctx = SavegameContext.getContext(e);
+        var ctxOpt = SavegameContext.getContextIfExistent(e).filter(c -> c.getInfo() != null);
+        if (ctxOpt.isEmpty()) {
+            return;
+        }
+
+        var ctx = ctxOpt.get();
         var exportTarget = FileExportTarget.createExportTarget(e);
         var path = exportTarget.export();
         ctx.getInstallation().getType().writeLaunchConfig(
@@ -82,12 +87,12 @@ public class GameDistLauncher {
                 path);
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
-        var dlcs = e.getInfo().getDlcs().stream()
+        var dlcs = ctx.getInfo().getDlcs().stream()
                 .map(d -> ctx.getInstallation().getDlcForName(d))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-        var mods = e.getInfo().getMods() != null ?e.getInfo().getMods().stream()
+        var mods = ctx.getInfo().getMods() != null ? ctx.getInfo().getMods().stream()
                 .map(m -> ctx.getInstallation().getModForSavegameId(m))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

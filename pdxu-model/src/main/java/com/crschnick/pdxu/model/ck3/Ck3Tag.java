@@ -56,6 +56,10 @@ public class Ck3Tag {
         }
 
         long id = n.getNodeForKey("currently_played_characters").getNodeArray().get(0).getLong();
+        if (!n.getNodeForKey("living").hasKey(String.valueOf(id))) {
+            return Optional.empty();
+        }
+
         var personNode = n.getNodeForKey("living").getNodeForKey(String.valueOf(id));
         var house = new Ck3House(
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString()),
@@ -67,11 +71,11 @@ public class Ck3Tag {
 
         var tagTitles = new ArrayList<Ck3Title>();
         var tagClaims = new ArrayList<Ck3Title>();
-        personNode.getNodeForKey("landed_data").getNodeForKeyIfExistent("domain").ifPresent(domain -> {
+        personNode.getNodeForKeysIfExistent("landed_data", "domain").ifPresent(domain -> {
             tagTitles.addAll(domain.getNodeArray().stream()
                     .map(idNode -> titles.get(idNode.getLong()))
                     .collect(Collectors.toList()));
-            personNode.getNodeForKey("alive_data").getNodeForKeyIfExistent("claim").ifPresent(claims -> {
+            personNode.getNodeForKeysIfExistent("alive_data", "claim").ifPresent(claims -> {
                 tagClaims.addAll(claims.getNodeArray().stream()
                         .map(c -> titles.get(c.getNodeForKey("title").getLong()))
                         .collect(Collectors.toList()));

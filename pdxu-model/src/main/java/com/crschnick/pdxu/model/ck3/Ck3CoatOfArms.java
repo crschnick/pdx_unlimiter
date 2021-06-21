@@ -207,7 +207,9 @@ public final class Ck3CoatOfArms {
 
         private static Emblem fromTexturedEmblemNode(Node n) {
             Emblem c = new Emblem();
-            c.file = n.getNodeForKey("texture").getString();
+            n.getNodeForKeyIfExistent("texture").ifPresentOrElse(tex -> {
+                c.file = tex.getString();
+            }, () -> c.file = "_default.dds");
             c.colors = new ArrayList<>();
             c.instances = List.of(new Instance());
 
@@ -220,7 +222,9 @@ public final class Ck3CoatOfArms {
 
         private static Emblem fromColoredEmblemNode(Node n) {
             Emblem c = new Emblem();
-            c.file = n.getNodeForKey("texture").getString();
+            n.getNodeForKeyIfExistent("texture").ifPresentOrElse(tex -> {
+                c.file = tex.getString();
+            }, () -> c.file = "_default.dds");
 
             c.colors = new ArrayList<>();
             // Even color1 can sometimes be missing

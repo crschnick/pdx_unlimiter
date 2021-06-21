@@ -94,7 +94,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         getContextIfExistent(e).ifPresent(con);
     }
 
-    private static <T, I extends SavegameInfo<T>> Optional<SavegameContext<T, I>> getContextIfExistent(
+    public static <T, I extends SavegameInfo<T>> Optional<SavegameContext<T, I>> getContextIfExistent(
             SavegameEntry<T, I> e) {
         var g = getForSavegame(e);
         if (g == null) {

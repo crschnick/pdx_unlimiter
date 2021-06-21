@@ -646,15 +646,6 @@ public abstract class SavegameStorage<
         }
     }
 
-    void reloadSavegame(SavegameEntry<T, I> e) {
-        logger.debug("Reloading savegame");
-        e.unload();
-
-        invalidateSavegameInfo(e);
-
-        loadEntry(e);
-    }
-
     private String checksum(byte[] content) {
         MessageDigest d = null;
         try {
@@ -778,19 +769,19 @@ public abstract class SavegameStorage<
                 .findAny();
     }
 
-    public String getEntryName(SavegameEntry<T, I> e) {
+    public synchronized String getEntryName(SavegameEntry<T, I> e) {
         String cn = getSavegameCollection(e).getName();
         String en = e.getName();
         return cn + " (" + en + ")";
     }
 
-    public Optional<SavegameEntry<T,I>> getEntryForSourceFile(String sourceFileChecksum) {
+    public synchronized Optional<SavegameEntry<T,I>> getEntryForSourceFile(String sourceFileChecksum) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
                 .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
                 .findAny();
     }
 
-    public boolean hasImportedSourceFile(String sourceFileChecksum) {
+    public synchronized boolean hasImportedSourceFile(String sourceFileChecksum) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
                 .anyMatch(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum));
     }

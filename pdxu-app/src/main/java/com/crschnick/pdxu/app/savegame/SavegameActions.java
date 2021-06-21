@@ -14,6 +14,7 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -203,7 +204,10 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegame(e, ctx -> {
-                ctx.getStorage().reloadSavegame(e);
+                LoggerFactory.getLogger(SavegameActions.class).debug("Reloading savegame");
+                e.unload();
+                ctx.getStorage().invalidateSavegameInfo(e);
+                ctx.getStorage().loadEntry(e);
             });
         }, false);
     }

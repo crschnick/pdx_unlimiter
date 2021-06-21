@@ -73,24 +73,21 @@ public class ConverterHelper {
                 .resolve("CK3toEU4").resolve("output").resolve(getOutputName(entry)).toString();
     }
 
-    public static void writeConfig(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) {
+    public static void writeConfig(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) throws IOException {
         var config = Settings.getInstance().ck3toeu4Dir.getValue()
                 .resolve("CK3toEU4").resolve("configuration.txt");
-        try {
-            var writer = Files.newBufferedWriter(config);
-            writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserDir().toString());
-            writeLine(writer, "CK3directory", GameInstallation.ALL.get(Game.CK3).getInstallDir().toString());
-            writeLine(writer, "EU4directory", GameInstallation.ALL.get(Game.EU4).getInstallDir().toString());
-            writeLine(writer, "targetGameModPath", getEu4ModDir());
-            writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getSavegameFile(entry).toString());
-            writeLine(writer, "output_name", getOutputName(entry));
-            for (var e : values.entrySet()) {
-                writeLine(writer, e.getKey(), e.getValue());
-            }
-            writer.close();
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
+
+        var writer = Files.newBufferedWriter(config);
+        writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserDir().toString());
+        writeLine(writer, "CK3directory", GameInstallation.ALL.get(Game.CK3).getInstallDir().toString());
+        writeLine(writer, "EU4directory", GameInstallation.ALL.get(Game.EU4).getInstallDir().toString());
+        writeLine(writer, "targetGameModPath", getEu4ModDir());
+        writeLine(writer, "SaveGame", SavegameStorage.ALL.get(Game.CK3).getSavegameFile(entry).toString());
+        writeLine(writer, "output_name", getOutputName(entry));
+        for (var e : values.entrySet()) {
+            writeLine(writer, e.getKey(), e.getValue());
         }
+        writer.close();
     }
 
     public static void convertCk3ToEu4(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
@@ -107,10 +104,11 @@ public class ConverterHelper {
         if (!GuiConverterConfig.showConfig(values)) {
             return;
         }
-        ConverterHelper.writeConfig(entry, values);
 
         TaskExecutor.getInstance().submitTask(() -> {
             try {
+                ConverterHelper.writeConfig(entry, values);
+
                 var handle = new ProcessBuilder(Settings.getInstance().ck3toeu4Dir.getValue()
                         .resolve("CK3toEU4")
                         .resolve("CK3ToEU4Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "")).toString())
