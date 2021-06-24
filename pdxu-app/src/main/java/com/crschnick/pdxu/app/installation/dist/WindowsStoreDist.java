@@ -30,6 +30,10 @@ public final class WindowsStoreDist extends PdxLauncherDist {
             return Optional.empty();
         }
 
+        if (!SystemUtils.IS_OS_WINDOWS_10 && !SystemUtils.IS_OS_WINDOWS_8) {
+            return Optional.empty();
+        }
+
         // Prevent querying for appx-package if we can rule out that the given dir is a windows store dist
         if (dir != null && !dir.toString().contains("WindowsApps")) {
             return Optional.empty();
@@ -40,6 +44,7 @@ public final class WindowsStoreDist extends PdxLauncherDist {
             // Important: Use out-string to increase output width. Otherwise long file paths can be wrapped!
             var proc = new ProcessBuilder("powershell.exe", "Get-AppxPackage",
                     g.getWindowsStoreName(), "|", "out-string", "-width", "300")
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             var in = new String(proc.getInputStream().readAllBytes());
             proc.waitFor();

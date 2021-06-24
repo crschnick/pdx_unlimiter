@@ -76,6 +76,7 @@ public class ConverterHelper {
     public static void writeConfig(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry, Map<String, String> values) throws IOException {
         var config = Settings.getInstance().ck3toeu4Dir.getValue()
                 .resolve("CK3toEU4").resolve("configuration.txt");
+        FileUtils.forceMkdirParent(config.toFile());
 
         var writer = Files.newBufferedWriter(config);
         writeLine(writer, "CK3DocDirectory", GameInstallation.ALL.get(Game.CK3).getUserDir().toString());

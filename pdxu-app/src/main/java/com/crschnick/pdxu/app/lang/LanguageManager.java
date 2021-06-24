@@ -9,6 +9,8 @@ import com.crschnick.pdxu.app.util.JsonHelper;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.LocaleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LanguageManager {
 
@@ -16,6 +18,7 @@ public class LanguageManager {
 
     private static LanguageManager INSTANCE;
     private final BidiMap<String, Language> languages = new DualHashBidiMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(LanguageManager.class);
 
     public static void init() {
         INSTANCE = new LanguageManager();
@@ -28,10 +31,12 @@ public class LanguageManager {
 
     private void load() {
         try {
+            logger.debug("Loading languages ...");
             var n = JsonHelper.read(PdxuInstallation.getInstance().getLanguageLocation().resolve("languages.json"));
             n.get("languages").fields().forEachRemaining(e -> {
                 var loc = LocaleUtils.toLocale(e.getValue().textValue());
                 languages.put(e.getKey(), new Language(loc, e.getKey(), loc.getDisplayName(loc)));
+                logger.debug("Loaded " + loc.getDisplayName(loc));
             });
         } catch (Exception e) {
             ErrorHandler.handleException(e);

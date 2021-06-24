@@ -5,6 +5,8 @@ import com.crschnick.pdxu.app.util.OsHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -28,6 +30,8 @@ public class GameDists {
             LegacyLauncherDist::getDist,
             NoLauncherDist::getDist
     );
+
+    private static final Logger logger = LoggerFactory.getLogger(GameDists.class);
 
     public static Optional<GameDist> detectDist(Game g, boolean checkXbox) {
         return getCompoundDistFromDirectory(g, null, checkXbox)
@@ -54,9 +58,12 @@ public class GameDists {
         // Basic dists do require a directory
         Objects.requireNonNull(dir);
 
+        logger.trace("Looking for basic dist in " + dir);
         for (var e : BASIC_DISTS) {
+            logger.trace("Testing dist " + e.toString());
             var r = e.apply(g, dir);
             if (r.isPresent()) {
+                logger.trace("Found working dist " + r.get().getName());
                 return r;
             }
         }
@@ -64,9 +71,12 @@ public class GameDists {
     }
 
     private static Optional<GameDist> getCompoundDistFromDirectory(Game g, Path dir, boolean checkXbox) {
+        logger.trace("Looking for compound dist in " + dir);
         for (var e : checkXbox ? ALL_COMPOUND_TYPES : FAST_COMPOUND_TYPES) {
+            logger.trace("Testing dist " + e.toString());
             var r = e.apply(g, dir);
             if (r.isPresent()) {
+                logger.trace("Found working dist " + r.get().getName());
                 return r;
             }
         }
