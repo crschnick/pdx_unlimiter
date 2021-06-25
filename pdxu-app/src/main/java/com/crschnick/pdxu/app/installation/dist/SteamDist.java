@@ -11,6 +11,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -41,6 +42,9 @@ public class SteamDist extends GameDist {
         return steamDir.map(Path::of);
     }
 
+    private static final Pattern STEAM_LIBRARY_DIR_OLD = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
+    private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");
+
     private static List<Path> getSteamLibraryPaths() {
         var p = getSteamPath();
         if (p.isEmpty()) {
@@ -52,18 +56,30 @@ public class SteamDist extends GameDist {
 
         try {
             var libraryFoldersFile = Files.readString(p.get().resolve("steamapps").resolve("libraryfolders.vdf"));
-            Pattern pattern = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
             libraryFoldersFile.lines().forEach(line -> {
-                var m = pattern.matcher(line);
-                if (m.find()) {
-                    list.add(Path.of(m.group(1)).resolve("steamapps").resolve("common"));
-                }
+                try {
+                    var m = STEAM_LIBRARY_DIR_OLD.matcher(line);
+                    if (m.find()) {
+                        list.add(Path.of(m.group(1)).resolve("steamapps").resolve("common"));
+                    }
+                    m = STEAM_LIBRARY_DIR_NEW.matcher(line);
+                    if (m.find()) {
+                        list.add(Path.of(m.group(1)).resolve("steamapps").resolve("common"));
+                    }
+                } catch (InvalidPathException ignored) {}
             });
         } catch (Exception e) {
             return list;
         }
 
         return list;
+    }
+
+    private static boolean isInSteamLibraryDir(Path dir) {
+        boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> dir.startsWith(ld));
+        boolean looksLikeSteamLibDir = dir.getNameCount() > 3 && Files.exists(
+                dir.getParent().getParent().getParent().resolve("libraryfolder.vdf"));
+        return inSteamLibraryDir || looksLikeSteamLibDir;
     }
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
@@ -76,7 +92,7 @@ public class SteamDist extends GameDist {
                 }
             }
         } else {
-            boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> dir.startsWith(ld));
+            boolean inSteamLibraryDir = isInSteamLibraryDir(dir);
             var steamFile = g.getInstallType().getSteamSpecificFile(dir);
             if (inSteamLibraryDir && Files.exists(steamFile)) {
                 var basicDist = GameDists.getBasicDistFromDirectory(g, dir);
