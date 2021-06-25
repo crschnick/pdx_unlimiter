@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class GuiListView {
 
+    @SuppressWarnings("unchecked")
     public static <T> Region createViewOfList(
             ListProperty<T> list,
             Function<T, Node> nodeFactory) {

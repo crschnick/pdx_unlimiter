@@ -229,7 +229,7 @@ public abstract class SettingsEntry<T> {
             } else {
                 String fullMsg = PdxuI18n.get("CHOICE_VALUE_ERROR", name);
                 GuiErrorReporter.showSimpleErrorMessage(fullMsg);
-                this.value.set(mapping.keySet().iterator().next());
+                setDefault(true);
             }
         }
 

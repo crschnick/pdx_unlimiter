@@ -114,11 +114,9 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
-            e.ruler = Ruler.fromCountryNode(e.date, n.getNodeForKey("countries").getNodeForKey(tag),
-                    "monarch_heir", "monarch", "queen").orElse(
+            e.ruler = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag),"monarch").orElse(
                     new Ruler("MISSING", "MISSING RULER", -1, -1, -1));
-            e.heir = Ruler.fromCountryNode(e.date,
-                    n.getNodeForKey("countries").getNodeForKey(tag), "heir").orElse(null);
+            e.heir = Ruler.fromCountryNode(n.getNodeForKey("countries").getNodeForKey(tag), "heir").orElse(null);
             for (Node dep : n.getNodeForKey("diplomacy").getNodesForKey("dependency")) {
                 String first = dep.getNodeForKey("first").getString();
                 String second = dep.getNodeForKey("second").getString();
@@ -330,48 +328,38 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             this.mil = mil;
         }
 
-        public static Optional<Ruler> fromCountryNode(GameDate date, Node n, String... types) {
+        public static Optional<Ruler> fromCountryNode(Node n, String t) {
+            if (!n.hasKey(t)) {
+                return Optional.empty();
+            }
+
+            int personId = n.getNodeForKey(t).getNodeForKey("id").getInteger();
             AtomicReference<Optional<Ruler>> current = new AtomicReference<>(Optional.empty());
             n.getNodeForKey("history").forEach((k, v) -> {
-                for (String type : types) {
+                for (String type : new String[] {"monarch_heir", "monarch", "queen", "heir"}) {
                     if (GameDateType.EU4.isDate(k) && v.hasKey(type)) {
                         // Sometimes there are multiple monarchs in one event Node ... wtf?
-                        Node r = v.getNodesForKey(type).get(0);
-
-                        // Exclude queen consorts
-                        if (r.hasKey("consort")) {
-                            continue;
-                        }
-
-                        // Exclude dead rulers
-                        if (r.hasKey("death_date")) {
-                            boolean dead = GameDateType.EU4.fromString(r.getNodeForKey("death_date").getString())
-                                    .compareTo(date) <= 0;
-                            if (dead) {
-                                current.set(Optional.empty());
+                        for (Node r : v.getNodesForKey(type)) {
+                            if (!r.hasKey("id")) {
                                 continue;
                             }
-                        }
 
-                        // If we have a new heir, but the heir has already succeeded, List the current heir to null
-                        boolean succeeded = type.equals("heir") && r.hasKey("succeeded");
-                        if (succeeded) {
-                            current.set(Optional.empty());
-                            continue;
+                            int rId = r.getNodeForKey("id").getNodeForKey("id").getInteger();
+                            if (rId == personId) {
+                                String name = r.getNodeForKey("name").getString();
+                                String fullName = name;
+                                if (r.hasKey("dynasty")) {
+                                    fullName = name + " " + r.getNodeForKey("dynasty").getString();
+                                }
+                                current.set(Optional.of(new Ruler(
+                                        name,
+                                        fullName,
+                                        r.getNodeForKey("ADM").getInteger(),
+                                        r.getNodeForKey("DIP").getInteger(),
+                                        r.getNodeForKey("MIL").getInteger())));
+                                return;
+                            }
                         }
-
-                        String name = r.getNodeForKey("name").getString();
-                        String fullName = name;
-                        if (r.hasKey("dynasty")) {
-                            fullName = name + " " + r.getNodeForKey("dynasty").getString();
-                        }
-
-                        current.set(Optional.of(new Ruler(
-                                name,
-                                fullName,
-                                r.getNodeForKey("ADM").getInteger(),
-                                r.getNodeForKey("DIP").getInteger(),
-                                r.getNodeForKey("MIL").getInteger())));
                     }
                 }
             });
