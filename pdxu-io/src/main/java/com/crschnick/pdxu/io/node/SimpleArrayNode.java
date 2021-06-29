@@ -181,7 +181,11 @@ public final class SimpleArrayNode extends ArrayNode {
     protected void writeFlatInternal(NodeWriter writer) throws IOException {
         for (int i = 0; i < values.size(); i++) {
             writer.space();
-            writer.write(context, valueScalars[i]);
+            if (values.get(i) == null) {
+                writer.write(context, valueScalars[i]);
+            } else {
+                values.get(i).write(writer);
+            }
         }
     }
 
