@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
-import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import org.apache.commons.io.FileUtils;
@@ -96,19 +95,28 @@ public class EditorExternalState {
     public void startEdit(EditorState state, EditorNode node) {
         var ext = getForNode(node);
         if (ext.isPresent()) {
-            ThreadHelper.open(ext.get().file);
+            openFile(ext.get().file.toString());
             return;
         }
 
-        Path file = TEMP.resolve(UUID.randomUUID().toString() + ".pdxt");
+        Path file = TEMP.resolve(UUID.randomUUID() + ".pdxt");
         try (var out = Files.newOutputStream(file)) {
             NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(), "  ", 0);
             var entry = new Entry(file, node, state);
             entry.registerChange();
             openEntries.add(entry);
-            ThreadHelper.open(file);
+            openFile(file.toString());
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
+        }
+    }
+
+    private void openFile(String file) {
+        var editor = EditorSettings.getInstance().externalEditor.getValue();
+        try {
+            Runtime.getRuntime().exec(editor + " \"" + file + "\"");
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
         }
     }
 

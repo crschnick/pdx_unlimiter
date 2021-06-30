@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
-import com.crschnick.pdxu.app.core.ComponentManager;
 import com.crschnick.pdxu.app.editor.EditorSettings;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import javafx.scene.control.Alert;
@@ -47,7 +46,7 @@ public class GuiEditorSettings {
 
         Optional<ButtonType> r = alert.showAndWait();
         if (r.isPresent() && r.get().equals(ButtonType.APPLY)) {
-            ComponentManager.reloadSettings(() -> applyFuncs.forEach(ru -> ru.run()));
+            applyFuncs.forEach(ru -> ru.run());
         }
     }
 }

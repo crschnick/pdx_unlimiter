@@ -185,7 +185,6 @@ public class GuiSettingsComponents {
             }
             m.consume();
         };
-        textArea.setOnMouseClicked(eh);
 
         Button b = new Button();
         b.setGraphic(new FontIcon());

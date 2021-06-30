@@ -55,6 +55,13 @@ public class GuiMenuBar {
         pdxu.getItems().add(export);
 
 
+        MenuItem tri = new MenuItem("Translate");
+        tri.setOnAction((a) -> {
+            GuiTranslate.showTranslatationAlert();
+        });
+        pdxu.getItems().add(tri);
+
+
         Menu about = new Menu(PdxuI18n.get("ABOUT"));
 
         MenuItem src = new MenuItem(PdxuI18n.get("CONTRIBUTE"));
@@ -125,14 +132,6 @@ public class GuiMenuBar {
         });
         dev.getItems().add(gc);
 
-        Menu tr = new Menu("Translate");
-
-        MenuItem tri = new MenuItem("Translate");
-        tri.setOnAction((a) -> {
-            GuiTranslate.showTranslatationAlert();
-        });
-        tr.getItems().add(tri);
-
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
@@ -142,7 +141,6 @@ public class GuiMenuBar {
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
             menuBar.getMenus().add(dev);
         }
-        menuBar.getMenus().add(tr);
         return menuBar;
     }
 

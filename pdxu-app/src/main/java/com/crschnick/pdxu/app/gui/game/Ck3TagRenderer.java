@@ -40,11 +40,6 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-
-
-
-
-
     private static Map<String, javafx.scene.paint.Color> loadPredefinedColors(GameFileContext ctx) {
         var file = CascadeDirectoryHelper.openFile(
                 Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
