@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -21,19 +23,22 @@ public class EditorState {
     private final BooleanProperty dirty;
     private final Map<String, EditorNode> rootNodes;
     private final EditorExternalState externalState;
-    private final ListProperty<NavEntry> navPath;
+    private final ListProperty<EditorNavPath.NavEntry> navPath;
     private final EditorFilter filter;
     private final ListProperty<EditorNode> content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
+    private final ObjectProperty<GameFileContext> fileContext;
+    private EditorNavHistory navHistory;
 
-    public EditorState(String fileName, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
+    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
 
+        this.fileContext = new SimpleObjectProperty<>(fileContext);
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
-        navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<NavEntry>()));
+        navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<EditorNavPath.NavEntry>()));
         filter = new EditorFilter(this);
         content = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -42,6 +47,7 @@ public class EditorState {
         for (var e : nodes.entrySet()) {
             rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
+        this.navHistory = new EditorNavHistory(rootNodes);
     }
 
     public void save() {
@@ -62,21 +68,21 @@ public class EditorState {
 
     private void rebuildPath() {
         EditorNode current = null;
-        List<NavEntry> newPath = new ArrayList<>();
+        List<EditorNavPath.NavEntry> newPath = new ArrayList<>();
         for (var navEl : navPath) {
             if (current == null) {
-                current = rootNodes.get(navEl.editorNode.getKeyName().get());
-                newPath.add(new NavEntry(current, 0));
+                current = rootNodes.get(navEl.getEditorNode().getKeyName().get());
+                newPath.add(new EditorNavPath.NavEntry(current, 0));
                 continue;
             }
 
             var newEditorNode = current.expand().stream()
-                    .filter(en -> navEl.editorNode.getParentIndex() == en.getParentIndex() &&
-                            en.getDisplayKeyName().equals(navEl.editorNode.getDisplayKeyName()))
+                    .filter(en -> navEl.getEditorNode().getParentIndex() == en.getParentIndex() &&
+                            en.getDisplayKeyName().equals(navEl.getEditorNode().getDisplayKeyName()))
                     .findFirst();
             if (newEditorNode.isPresent()) {
                 current = newEditorNode.get();
-                newPath.add(new NavEntry(newEditorNode.get(), navEl.getScroll()));
+                newPath.add(new EditorNavPath.NavEntry(newEditorNode.get(), navEl.getScroll()));
             } else {
                 break;
             }
@@ -108,7 +114,14 @@ public class EditorState {
         }
         var selected = navPath.size() > 0 ? navPath.get(navPath.size() - 1) : null;
         content.set(FXCollections.observableArrayList(
-                selected != null ? createEditorNodes(selected.editorNode) : rootNodes.values()));
+                selected != null ? createEditorNodes(selected.getEditorNode()) : rootNodes.values()));
+    }
+
+    public void navigateTo(NodePointer pointer) {
+        EditorNavPath.createNavPath(getRootNodes().values(), pointer).ifPresent(n -> {
+            this.navPath.set(FXCollections.observableArrayList(n.getPath()));
+        });
+        update(false);
     }
 
     public void navigateTo(EditorNode newNode) {
@@ -116,11 +129,11 @@ public class EditorState {
             navPath.clear();
         } else {
             int index = navPath.stream()
-                    .map(NavEntry::getEditorNode)
+                    .map(EditorNavPath.NavEntry::getEditorNode)
                     .collect(Collectors.toList())
                     .indexOf(newNode);
             if (index == -1) {
-                navPath.add(new NavEntry(newNode, 0));
+                navPath.add(new EditorNavPath.NavEntry(newNode, 0));
             } else {
                 navPath.removeIf(n -> navPath.indexOf(n) > index);
             }
@@ -129,11 +142,11 @@ public class EditorState {
         update(false);
     }
 
-    public ObservableList<NavEntry> getNavPath() {
+    public ObservableList<EditorNavPath.NavEntry> getNavPath() {
         return navPath.get();
     }
 
-    public ListProperty<NavEntry> navPathProperty() {
+    public ListProperty<EditorNavPath.NavEntry> navPathProperty() {
         return navPath;
     }
 
@@ -165,25 +178,11 @@ public class EditorState {
         return parser;
     }
 
-    public static class NavEntry {
-        private final EditorNode editorNode;
-        private final DoubleProperty scroll;
+    public GameFileContext getFileContext() {
+        return fileContext.get();
+    }
 
-        private NavEntry(EditorNode editorNode, double scroll) {
-            this.editorNode = editorNode;
-            this.scroll = new SimpleDoubleProperty(scroll);
-        }
-
-        public EditorNode getEditorNode() {
-            return editorNode;
-        }
-
-        public double getScroll() {
-            return scroll.get();
-        }
-
-        public DoubleProperty scrollProperty() {
-            return scroll;
-        }
+    public Map<String, EditorNode> getRootNodes() {
+        return rootNodes;
     }
 }

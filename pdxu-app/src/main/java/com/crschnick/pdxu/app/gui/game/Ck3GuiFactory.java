@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.War;
@@ -51,7 +52,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             rulerNode.getChildren().add(box);
         }
         {
-            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(info, ruler.getHouse()),
+            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(ruler.getHouse(), GameFileContext.fromInfo(info)),
                     "house-icon");
             GuiTooltips.install(house, "House " + info.getHouseName());
             rulerNode.getChildren().add(house);
@@ -113,7 +114,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 titles.stream().filter(t -> !t.getType().equals(Ck3Title.Type.BARONY)).collect(Collectors.toList()),
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagRenderer.titleImage(info, t), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3TagRenderer.titleImage(t, GameFileContext.fromInfo(info)), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("title-row");

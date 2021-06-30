@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor.target;
 
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
@@ -10,9 +11,11 @@ import java.util.Optional;
 
 public abstract class EditTarget {
 
+    protected final GameFileContext fileContext;
     protected final Path file;
 
-    public EditTarget(Path file) {
+    public EditTarget(GameFileContext fileContext, Path file) {
+        this.fileContext = fileContext;
         this.file = file;
     }
 
@@ -31,11 +34,13 @@ public abstract class EditTarget {
 
     public abstract TextFormatParser getParser();
 
-    public String getName() {
-        return file.getFileName().toString();
-    }
-
     public Path getFile() {
         return file;
+    }
+
+    public abstract String getName();
+
+    public GameFileContext getFileContext() {
+        return fileContext;
     }
 }

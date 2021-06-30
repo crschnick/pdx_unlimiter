@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor.target;
 
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
@@ -11,11 +12,14 @@ import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
 
+    private final SavegameStorage<T,I> storage;
     private final SavegameEntry<T, I> entry;
     private final EditTarget target;
 
     public StorageEditTarget(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry, EditTarget target) {
-        super(storage.getSavegameFile(entry));
+        super(GameFileContext.fromInfo(entry.getInfo()),
+                storage.getSavegameFile(entry));
+        this.storage = storage;
         this.entry = entry;
         this.target = target;
     }
@@ -34,5 +38,10 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     @Override
     public TextFormatParser getParser() {
         return target.getParser();
+    }
+
+    @Override
+    public String getName() {
+        return storage.getEntryName(entry);
     }
 }

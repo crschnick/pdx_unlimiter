@@ -34,24 +34,54 @@
 }
 
 .editor-nav-bar {
-  -fx-font-size: 11pt;
   -fx-background-color: #EEEEEEFF;
 -fx-border-color: #CCCCCCFF;
 -fx-border-width: 0.1em;
 }
 
+.editor-nav-bar-container .jfx-button {
+  -fx-padding: 0.5em;
+}
+
+.editor-nav-bar .jfx-button {
+  -fx-padding: 0.5em 0.2em 0.5em 0.2em;
+}
+
 .editor-grid .jfx-button {
 -fx-padding: 0.1 0.2em 0.05em 0.2em;
-  -fx-font-family: "monospaced";
 }
 
 .editor-grid .text-field {
 -fx-padding: 0.25em 0.2em 0.25em 0.2em;
 -fx-border-width: 0 1em 0 1em;
-  -fx-font-family: "monospaced";
+-jfx-unfocus-color: transparent;
 }
 
 .jfx-color-picker .color-label {
 -fx-padding: 0;
 -fx-alignment: center;
+}
+
+.list-expand-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-json";
+}
+
+.coa-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-eye";
+}
+
+
+.nav-back-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-arrow-left-bold";
+}
+
+.nav-forward-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-arrow-right-bold";
+}
+
+.coa-options {
+-fx-padding: 0.5em;
+  -fx-background-color: #EEEEEEFF;
+-fx-border-color: #CCCCCCFF;
+-fx-border-width: 0.1em;
 }

@@ -1,9 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.PdxuApp;
-import com.crschnick.pdxu.app.editor.EditorFilter;
-import com.crschnick.pdxu.app.editor.EditorNode;
-import com.crschnick.pdxu.app.editor.EditorState;
+import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -19,7 +17,6 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class GuiEditor {
 
@@ -47,7 +44,7 @@ public class GuiEditor {
         v.setFillWidth(true);
         v.setPadding(new Insets(20, 20, 20, 20));
         v.getStyleClass().add("editor-nav-bar-container");
-        v.getChildren().add(createNavigationBar(state));
+        v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
         var topBars = new VBox(
                 GuiEditorMenuBar.createMenuBar(state),
                 v);
@@ -61,57 +58,6 @@ public class GuiEditor {
 
         return layout;
     }
-
-    private static Region createNavigationBar(EditorState edState) {
-        HBox bar = new HBox();
-        bar.setAlignment(Pos.CENTER_LEFT);
-        bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
-
-        Consumer<List<EditorState.NavEntry>> updateBar = l -> {
-            Platform.runLater(() -> {
-                bar.getChildren().clear();
-                {
-                    var initBtn = new JFXButton(edState.getFileName());
-                    initBtn.setOnAction(e -> {
-                        edState.navigateTo(null);
-                    });
-                    bar.getChildren().add(initBtn);
-                }
-
-                l.forEach(en -> {
-                    var btn = new JFXButton(en.getEditorNode().getNavigationName());
-                    btn.setMnemonicParsing(false);
-                    {
-                        var sep = new Label(">");
-                        sep.setAlignment(Pos.CENTER);
-                        bar.getChildren().add(sep);
-                    }
-                    btn.setOnAction(e -> {
-                        edState.navigateTo(en.getEditorNode());
-                    });
-                    bar.getChildren().add(btn);
-                });
-
-                if (l.size() > 0) {
-                    Button edit = new JFXButton();
-                    edit.setGraphic(new FontIcon());
-                    edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-                    edit.setOnAction(e -> {
-                        edState.getExternalState().startEdit(edState, l.get(l.size() - 1).getEditorNode());
-                    });
-                    edit.setPadding(new Insets(4, 4, 2, 4));
-                    bar.getChildren().add(edit);
-                }
-            });
-        };
-        updateBar.accept(edState.getNavPath());
-        edState.navPathProperty().addListener((c, o, n) -> {
-            updateBar.accept(n);
-        });
-
-        return bar;
-    }
-
 
     private static void createNodeList(BorderPane pane, EditorState edState) {
         edState.contentProperty().addListener((c, o, n) -> {
@@ -171,6 +117,19 @@ public class GuiEditor {
             if (n.getDirectParent() != null) {
                 HBox actions = new HBox();
                 actions.setFillHeight(true);
+                actions.setAlignment(Pos.CENTER_RIGHT);
+
+                if (n.isReal()) {
+                    EditorNodePointers.create(state, (EditorSimpleNode) n).ifPresent(np -> {
+                        var b = new JFXButton();
+                        b.setGraphic(new FontIcon());
+                        b.getStyleClass().add("jump-to-def-button");
+                        GuiTooltips.install(b, "Jump to definition");
+                        b.setOnAction(e -> state.navigateTo(np));
+                        actions.getChildren().add(b);
+                        b.prefHeightProperty().bind(actions.heightProperty());
+                    });
+                }
 
                 Button edit = new JFXButton();
                 edit.setGraphic(new FontIcon());

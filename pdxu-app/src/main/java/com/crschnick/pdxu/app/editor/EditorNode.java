@@ -91,6 +91,8 @@ public abstract class EditorNode {
 
     public abstract EditorSimpleNode getRealParent();
 
+    public abstract ArrayNode getContent();
+
     public abstract List<EditorNode> expand();
 
     public abstract ArrayNode toWritableNode();

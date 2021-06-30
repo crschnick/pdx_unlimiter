@@ -47,7 +47,10 @@ public class CascadeDirectoryHelper {
                 .map(GameMod::getPath)
                 .collect(Collectors.toList());
 
-        dirs.add(ctx.getInstall().getType().getModBasePath(ctx.getInstall().getInstallDir()));
+        if (ctx.getInstall() != null) {
+            dirs.add(ctx.getInstall().getType().getModBasePath(ctx.getInstall().getInstallDir()));
+        }
+
         return dirs;
     }
 

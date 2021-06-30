@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor.target;
 
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameStructure;
@@ -15,7 +16,7 @@ public class SavegameEditTarget extends EditTarget {
     private SavegameStructure structure;
 
     public SavegameEditTarget(Path file, SavegameType type) {
-        super(file);
+        super(GameFileContext.empty(), file);
         this.type = type;
     }
 
@@ -40,5 +41,10 @@ public class SavegameEditTarget extends EditTarget {
     @Override
     public TextFormatParser getParser() {
         return structure.getParser();
+    }
+
+    @Override
+    public String getName() {
+        return file.getFileName().toString();
     }
 }

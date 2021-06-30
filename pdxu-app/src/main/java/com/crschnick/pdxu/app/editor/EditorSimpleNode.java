@@ -18,6 +18,12 @@ public final class EditorSimpleNode extends EditorNode {
         this.backingNode = backingNode;
     }
 
+    @Override
+    public ArrayNode getContent() {
+        return getKeyName().map(s -> ArrayNode.singleKeyNode(s, getBackingNode()))
+                .orElse(ArrayNode.array(List.of(getBackingNode())));
+    }
+
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
 
