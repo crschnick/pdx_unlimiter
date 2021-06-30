@@ -25,7 +25,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import org.apache.commons.lang3.SystemUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
@@ -163,6 +165,44 @@ public class GuiSettingsComponents {
         return hbox;
     }
 
+    private static Region programEntryNode(SettingsEntry.ProgramEntry pe, Set<Runnable> applyFuncs) {
+        TextField textArea = new TextField();
+        EventHandler<MouseEvent> eh = (m) -> {
+            FileChooser dirChooser = new FileChooser();
+            if (SystemUtils.IS_OS_WINDOWS) {
+                dirChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Executable", "*.exe"));
+            }
+            if (!textArea.getText().isEmpty()) {
+                Path p = Path.of(textArea.getText());
+                if (Files.exists(p)) {
+                    dirChooser.setInitialDirectory(p.toFile());
+                }
+            }
+            dirChooser.setTitle(PdxuI18n.get("SELECT_PROGRAM", pe.getName()));
+            File file = dirChooser.showOpenDialog(((Node) m.getTarget()).getScene().getWindow());
+            if (file != null && file.exists()) {
+                textArea.setText(file.toString());
+            }
+            m.consume();
+        };
+        textArea.setOnMouseClicked(eh);
+
+        Button b = new Button();
+        b.setGraphic(new FontIcon());
+        b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
+        b.setOnMouseClicked(eh);
+
+        textArea.setText(Optional.ofNullable(pe.getValue())
+                .orElse(""));
+        applyFuncs.add(() -> {
+            pe.set(textArea.getText().equals("") ? null : textArea.getText());
+        });
+
+        HBox hbox = new HBox(textArea, b);
+        HBox.setHgrow(textArea, Priority.ALWAYS);
+        return hbox;
+    }
+
     private static Region booleanEntryNode(SettingsEntry.BooleanEntry be, Set<Runnable> applyFuncs) {
         JFXCheckBox cb = new JFXCheckBox();
         cb.setSelected(be.getValue());
@@ -237,6 +277,8 @@ public class GuiSettingsComponents {
                 val = choiceEntryNode((SettingsEntry.ChoiceEntry<?>) entry, applyFuncs);
             } else if (entry.getType().equals(SettingsEntry.Type.GAME)) {
                 val = distEntryNode((SettingsEntry.GameDirectory) entry, applyFuncs);
+            } else if (entry.getType().equals(SettingsEntry.Type.PROGRAM)) {
+                val = programEntryNode((SettingsEntry.ProgramEntry) entry, applyFuncs);
             } else {
                 throw new IllegalArgumentException();
             }

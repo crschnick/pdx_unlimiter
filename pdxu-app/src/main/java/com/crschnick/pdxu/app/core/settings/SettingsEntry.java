@@ -159,7 +159,8 @@ public abstract class SettingsEntry<T> {
         STRING,
         PATH,
         CHOICE,
-        GAME
+        GAME,
+        PROGRAM
     }
 
 
@@ -208,7 +209,6 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Integer newValue) {
-            //TODO check range
             super.set(newValue);
         }
 
@@ -401,6 +401,23 @@ public abstract class SettingsEntry<T> {
             } else {
                 return new TextNode(value.get().toString());
             }
+        }
+    }
+
+    public static final class ProgramEntry extends SimpleEntry<String> {
+
+        public ProgramEntry(String id, String serializationName, String defaultValue) {
+            super(id, serializationName, Type.PROGRAM, defaultValue);
+        }
+
+        @Override
+        public void set(JsonNode node) {
+            this.value.set(node.textValue());
+        }
+
+        @Override
+        public JsonNode toNode() {
+            return new TextNode(value.get());
         }
     }
 

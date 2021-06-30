@@ -1,9 +1,8 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.editor.EditorState;
-import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
 import com.crschnick.pdxu.app.util.Hyperlinks;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -23,14 +22,9 @@ public class GuiEditorMenuBar {
 
 
         Menu editor = new Menu("Editor");
-        MenuItem cte = new MenuItem("Change text editor");
+        MenuItem cte = new MenuItem("Editor Settings");
         cte.setOnAction((a) -> {
-            GuiDialogHelper.showBlockingAlert(alert -> {
-                alert.setAlertType(Alert.AlertType.INFORMATION);
-                alert.setTitle("Change text editor");
-                alert.setHeaderText("If you want to change the text editor used when clicking on the edit button,\n" +
-                        "create a new .pdxt file and choose the default program that should be used to open it.");
-            });
+            GuiEditorSettings.showEditorSettings();
         });
         editor.getItems().add(cte);
 

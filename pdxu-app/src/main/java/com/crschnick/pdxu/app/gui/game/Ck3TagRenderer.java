@@ -143,13 +143,6 @@ public class Ck3TagRenderer {
         var houseImg = renderImage(coa, ctx, size, cloth);
         applyMask(houseImg, GameImage.CK3_HOUSE_MASK);
 
-//        for (var sub : coa.getSubs()) {
-//            var rawPatternImg = pattern(coaG, sub, info);
-//            for (var emblem : sub.getEmblems()) {
-//                emblem(coaImg, rawPatternImg, sub, emblem, info);
-//            }
-//        }
-
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -189,14 +182,6 @@ public class Ck3TagRenderer {
     public static Image renderTitleImage(Ck3CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
         var titleImg = renderImage(coa, ctx, size, cloth);
         applyMask(titleImg, GameImage.CK3_TITLE_MASK);
-
-
-//        for (var sub : coa.getSubs()) {
-//            var rawPatternImg = pattern(coaG, sub, info);
-//            for (var emblem : sub.getEmblems()) {
-//                emblem(coaImg, rawPatternImg, sub, emblem, info);
-//            }
-//        }
 
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
