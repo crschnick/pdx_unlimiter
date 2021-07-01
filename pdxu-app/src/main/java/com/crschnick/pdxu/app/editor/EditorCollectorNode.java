@@ -92,6 +92,11 @@ public final class EditorCollectorNode extends EditorNode {
         return ArrayNode.sameKeyArray(keyName, nodes);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
     public List<Node> getNodes() {
         return nodes;
     }

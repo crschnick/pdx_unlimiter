@@ -93,6 +93,8 @@ public abstract class EditorNode {
 
     public abstract ArrayNode getContent();
 
+    public abstract boolean isEmpty();
+
     public abstract List<EditorNode> expand();
 
     public abstract ArrayNode toWritableNode();

@@ -49,8 +49,6 @@ public class EditorContent {
             return false;
         }
 
-        boolean front = newPage > navigation.getPage();
-        navigation.setScroll(front ? 0.0 : 1.0);
         navigation.setPage(newPage);
         int offset = pageSizes.subList(0, navigation.getPage()).stream().mapToInt(Integer::intValue).sum();
         int length = pageSizes.get(navigation.getPage());
@@ -63,10 +61,12 @@ public class EditorContent {
     }
 
     public void previousPage() {
+        navigation.setScroll(1.0);
         goToPage(navigation.getPage() - 1);
     }
 
     public void nextPage() {
+        navigation.setScroll(0.0);
         goToPage(navigation.getPage() + 1);
     }
 
@@ -91,6 +91,7 @@ public class EditorContent {
         rebuildEditorNodes();
         rebuildPageSizes();
 
+        changeScroll(0.0);
         int oldPage = navigation.getPage();
         if (!goToPage(oldPage)) {
             goToPage(0);

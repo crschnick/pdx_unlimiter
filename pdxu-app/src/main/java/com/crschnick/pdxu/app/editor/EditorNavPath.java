@@ -7,6 +7,21 @@ import java.util.stream.Collectors;
 
 public class EditorNavPath {
 
+    public static boolean areNodePathsEqual(EditorNavPath p1, EditorNavPath p2) {
+        if (p1.getPath().size() != p2.getPath().size()) {
+            return false;
+        }
+
+        for (int i = 0; i < p1.getPath().size(); i++) {
+            if (!p1.getPath().get(i).getEditorNode().getNavigationName().equals(
+                    p2.getPath().get(i).getEditorNode().getNavigationName())) {
+                break;
+            }
+        }
+
+        return true;
+    }
+
     public static class NavEntry {
         private final EditorNode editorNode;
         private int page;

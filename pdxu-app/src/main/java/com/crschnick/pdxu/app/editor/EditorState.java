@@ -21,7 +21,6 @@ public class EditorState {
     private final BooleanProperty dirty;
     private final Map<String, EditorNode> rootNodes;
     private final EditorExternalState externalState;
-    private final ObjectProperty<EditorNavPath> navPath;
     private final EditorFilter filter;
     private final EditorContent content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
@@ -36,7 +35,6 @@ public class EditorState {
         this.fileContext = new SimpleObjectProperty<>(fileContext);
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
-        navPath = new SimpleObjectProperty<>(EditorNavPath.empty());
         filter = new EditorFilter(this);
         content = new EditorContent(this);
 
@@ -59,7 +57,7 @@ public class EditorState {
     }
 
     public void init() {
-        navigateTo(this.navPath.get());
+        content.navigate(navHistory.getCurrent().getLast());
     }
 
     public void onFilterChange() {
@@ -80,7 +78,7 @@ public class EditorState {
     }
 
     public void onFileChanged() {
-        var newPath = EditorNavPath.verify(this.navPath.get(), rootNodes.values());
+        var newPath = EditorNavPath.verify(this.navHistory.getCurrent(), rootNodes.values());
         this.navigateTo(newPath);
         dirtyProperty().set(true);
     }
@@ -93,12 +91,15 @@ public class EditorState {
 
     public void navigateTo(EditorNavPath path) {
         this.navHistory.changeNavPath(path);
-        this.navPath.set(path);
         content.navigate(path.getLast());
     }
 
     public void navigateTo(EditorNode newNode) {
-        var newPath = EditorNavPath.navigateTo(this.navPath.get(), newNode);
+        if (newNode != null && newNode.isEmpty()) {
+            return;
+        }
+
+        var newPath = EditorNavPath.navigateTo(this.navHistory.getCurrent(), newNode);
         navigateTo(newPath);
     }
 
@@ -132,14 +133,6 @@ public class EditorState {
 
     public Map<String, EditorNode> getRootNodes() {
         return rootNodes;
-    }
-
-    public EditorNavPath getNavPath() {
-        return navPath.get();
-    }
-
-    public ObjectProperty<EditorNavPath> navPathProperty() {
-        return navPath;
     }
 
     public EditorNavHistory getNavHistory() {

@@ -97,8 +97,8 @@ public class GuiEditorNavBar {
                 });
             });
         };
-        updateBar.accept(edState.getNavPath());
-        edState.navPathProperty().addListener((c, o, n) -> {
+        updateBar.accept(edState.getNavHistory().getCurrent());
+        edState.getNavHistory().currentProperty().addListener((c, o, n) -> {
             updateBar.accept(n);
         });
         return bar;
@@ -113,20 +113,13 @@ public class GuiEditorNavBar {
         edit.setGraphic(new FontIcon());
         edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
         edit.setOnAction(e -> {
-            //edState.getExternalState().startEdit(edState, l.get(l.size() - 1).getEditorNode());
+            edState.getExternalState().startEdit(edState, edState.getNavHistory().getCurrent().getLast().getEditorNode());
         });
+        edit.disableProperty().bind(Bindings.createBooleanBinding(
+                () -> edState.getNavHistory().getCurrent().getLast().getEditorNode() == null,
+                edState.getNavHistory().currentProperty()));
         edit.setPadding(new Insets(4, 4, 2, 4));
         p.getChildren().setAll(edit);
-
-        Consumer<EditorNavPath> updateBar = l -> {
-            Platform.runLater(() -> {
-                edit.setDisable(l.getPath().size() == 0);
-            });
-        };
-        updateBar.accept(edState.getNavPath());
-        edState.navPathProperty().addListener((c, o, n) -> {
-            updateBar.accept(n);
-        });
         return p;
     }
 }

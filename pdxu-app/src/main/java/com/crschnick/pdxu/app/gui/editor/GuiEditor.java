@@ -68,7 +68,7 @@ public class GuiEditor {
                     if (ne == null) {
                         return;
                     }
-                    if (edState.getNavPath().getPath().size() > 0) {
+                    if (edState.getNavHistory().getCurrent().getPath().size() > 0) {
                         sp.setVvalue(edState.getContent().getScroll());
                         sp.vvalueProperty().addListener((sc,so,sn) -> {
                             edState.getContent().changeScroll(sn.doubleValue());

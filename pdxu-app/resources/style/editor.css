@@ -50,7 +50,7 @@
 }
 
 .editor-grid .jfx-button {
--fx-padding: 0.1 0.2em 0.05em 0.2em;
+-fx-padding: 0.25em 0.2em 0.25em 0.2em;
 }
 
 .editor-grid .text-field {

@@ -30,10 +30,10 @@ public abstract class GuiEditorNodeTagFactory {
 
         @Override
         public Node create(EditorState state, EditorSimpleNode node) {
-            var b = new JFXButton("ab");
+            var b = new JFXButton();
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
-            GuiTooltips.install(b, "Open in coat of arms designer");
+            GuiTooltips.install(b, "Open in coat of arms preview window");
             b.setOnAction(e -> {
                 var viewer = new GuiCk3CoaViewer(state, node);
                 viewer.createStage();
