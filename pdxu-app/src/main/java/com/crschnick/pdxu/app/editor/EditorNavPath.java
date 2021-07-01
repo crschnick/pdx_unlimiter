@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.editor;
 
-import com.crschnick.pdxu.app.editor.EditorNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -16,25 +15,33 @@ public class EditorNavPath {
 
     public static class NavEntry {
         private final EditorNode editorNode;
-        private final IntegerProperty page;
-        private final DoubleProperty scroll;
+        private int page;
+        private double scroll;
 
-        NavEntry(EditorNode editorNode, double scroll) {
+        public NavEntry(EditorNode editorNode, int page, double scroll) {
             this.editorNode = editorNode;
-            this.page = new SimpleIntegerProperty(0);
-            this.scroll = new SimpleDoubleProperty(scroll);
+            this.page = page;
+            this.scroll = scroll;
+        }
+
+        public void setPage(int page) {
+            this.page = page;
+        }
+
+        public void setScroll(double scroll) {
+            this.scroll = scroll;
+        }
+
+        public int getPage() {
+            return page;
+        }
+
+        public double getScroll() {
+            return scroll;
         }
 
         public EditorNode getEditorNode() {
             return editorNode;
-        }
-
-        public double getScroll() {
-            return scroll.get();
-        }
-
-        public DoubleProperty scrollProperty() {
-            return scroll;
         }
     }
 
@@ -52,7 +59,7 @@ public class EditorNavPath {
             var found = pointer.sub(0, 1).isValid(e.getContent());
             if (found) {
                 current = e;
-                newPath.add(new NavEntry(e, 0));
+                newPath.add(new NavEntry(e, 0, 0.0));
                 break;
             }
         }

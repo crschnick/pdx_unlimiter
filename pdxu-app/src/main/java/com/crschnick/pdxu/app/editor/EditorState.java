@@ -25,7 +25,7 @@ public class EditorState {
     private final EditorExternalState externalState;
     private final ListProperty<EditorNavPath.NavEntry> navPath;
     private final EditorFilter filter;
-    private final ListProperty<EditorNode> content;
+    private final EditorContent content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
     private final ObjectProperty<GameFileContext> fileContext;
     private EditorNavHistory navHistory;
@@ -40,7 +40,7 @@ public class EditorState {
         externalState = new EditorExternalState();
         navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<EditorNavPath.NavEntry>()));
         filter = new EditorFilter(this);
-        content = new SimpleListProperty<>(FXCollections.observableArrayList());
+        content = new EditorContent(this);
 
         rootNodes = new HashMap<>();
         int counter = 0;
@@ -58,12 +58,6 @@ public class EditorState {
         saveFunc.accept(rootNodes.entrySet().stream().collect(
                 Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toWritableNode())));
         dirtyProperty().set(false);
-    }
-
-    public List<EditorNode> createEditorNodes(EditorNode parent) {
-        var editorNodes = parent.expand();
-        var filtered = filter.filter(editorNodes);
-        return filtered;
     }
 
     private void rebuildPath() {
@@ -91,7 +85,7 @@ public class EditorState {
     }
 
     public void onDelete() {
-        update(true);
+        content.basicContentChange();
         dirtyProperty().set(true);
     }
 
@@ -112,9 +106,9 @@ public class EditorState {
         if (updatePath) {
             rebuildPath();
         }
-        var selected = navPath.size() > 0 ? navPath.get(navPath.size() - 1) : null;
-        content.set(FXCollections.observableArrayList(
-                selected != null ? createEditorNodes(selected.getEditorNode()) : rootNodes.values()));
+        var selected = navPath.size() > 0 ? navPath.get(navPath.size() - 1) :
+                new EditorNavPath.NavEntry(null, 0.0);
+        content.navigate(selected);
     }
 
     public void navigateTo(NodePointer pointer) {
@@ -154,11 +148,7 @@ public class EditorState {
         return filter;
     }
 
-    public ObservableList<EditorNode> getContent() {
-        return content.get();
-    }
-
-    public ListProperty<EditorNode> contentProperty() {
+    public EditorContent getContent() {
         return content;
     }
 

@@ -60,7 +60,7 @@ public class GuiEditor {
     }
 
     private static void createNodeList(BorderPane pane, EditorState edState) {
-        edState.contentProperty().addListener((c, o, n) -> {
+        edState.getContent().shownNodesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 var grid = createNodeList(edState, n);
                 ScrollPane sp = new ScrollPane(grid);
@@ -69,8 +69,10 @@ public class GuiEditor {
                         return;
                     }
                     if (edState.getNavPath().size() > 0) {
-                        sp.setVvalue(edState.getNavPath().get(edState.getNavPath().size() - 1).getScroll());
-                        edState.getNavPath().get(edState.getNavPath().size() - 1).scrollProperty().bind(sp.vvalueProperty());
+                        sp.setVvalue(edState.getContent().getScroll());
+                        sp.vvalueProperty().addListener((sc,so,sn) -> {
+                            edState.getContent().changeScroll(sn.doubleValue());
+                        });
                     }
                 });
                 sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -103,9 +105,21 @@ public class GuiEditor {
                 new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
                 new ColumnConstraints(), new ColumnConstraints());
 
-        int nodeCount = Math.min(nodes.size(), 100);
-        for (int i = 0; i < nodeCount; i++) {
-            var n = nodes.get(i);
+        int offset = 0;
+        if (state.getContent().canGoToPreviousPage()) {
+            Button next = new JFXButton("Previous page");
+            next.setOnAction(e -> {
+                state.getContent().previousPage();
+            });
+            HBox box = new HBox(new FontIcon("mdi-arrow-up"), next, new FontIcon("mdi-arrow-up"));
+            box.setAlignment(Pos.CENTER);
+            grid.add(createGridElement(box, 0), 0, 0, 5, 1);
+            offset = 1;
+        }
+
+        int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
+        for (int i = offset; i < nodeCount + offset; i++) {
+            var n = nodes.get(i - offset);
             var kn = createGridElement(new Label(n.getDisplayKeyName()), i);
             kn.setAlignment(Pos.CENTER_LEFT);
 
@@ -155,6 +169,17 @@ public class GuiEditor {
 
             grid.add(createGridElement(new Region(), i), 5, i);
         }
+
+        if (state.getContent().canGoToNextPage()) {
+            Button next = new JFXButton("Next");
+            next.setOnAction(e -> {
+                state.getContent().nextPage();
+            });
+            HBox box = new HBox(new FontIcon("mdi-arrow-down"), next, new FontIcon("mdi-arrow-down"));
+            box.setAlignment(Pos.CENTER);
+            grid.add(createGridElement(box, nodeCount + offset), 0, nodeCount + offset, 5, 1);
+        }
+
         return grid;
     }
 
