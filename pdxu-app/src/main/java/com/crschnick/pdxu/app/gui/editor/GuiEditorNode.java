@@ -50,6 +50,7 @@ public class GuiEditorNode {
                 state.onColorChanged();
             });
             box.getChildren().add(picker);
+            box.setAlignment(Pos.CENTER);
             HBox.setHgrow(picker, Priority.ALWAYS);
         } else {
             var ar = createArrayDisplay(n, state);

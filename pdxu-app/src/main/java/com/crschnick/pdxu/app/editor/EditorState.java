@@ -4,15 +4,13 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,12 +21,12 @@ public class EditorState {
     private final BooleanProperty dirty;
     private final Map<String, EditorNode> rootNodes;
     private final EditorExternalState externalState;
-    private final ListProperty<EditorNavPath.NavEntry> navPath;
+    private final ObjectProperty<EditorNavPath> navPath;
     private final EditorFilter filter;
     private final EditorContent content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
     private final ObjectProperty<GameFileContext> fileContext;
-    private EditorNavHistory navHistory;
+    private final EditorNavHistory navHistory;
 
     public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
         this.parser = parser;
@@ -38,7 +36,7 @@ public class EditorState {
         this.fileContext = new SimpleObjectProperty<>(fileContext);
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
-        navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<EditorNavPath.NavEntry>()));
+        navPath = new SimpleObjectProperty<>(EditorNavPath.empty());
         filter = new EditorFilter(this);
         content = new EditorContent(this);
 
@@ -47,7 +45,7 @@ public class EditorState {
         for (var e : nodes.entrySet()) {
             rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
-        this.navHistory = new EditorNavHistory(rootNodes);
+        this.navHistory = new EditorNavHistory(this);
     }
 
     public void save() {
@@ -60,28 +58,12 @@ public class EditorState {
         dirtyProperty().set(false);
     }
 
-    private void rebuildPath() {
-        EditorNode current = null;
-        List<EditorNavPath.NavEntry> newPath = new ArrayList<>();
-        for (var navEl : navPath) {
-            if (current == null) {
-                current = rootNodes.get(navEl.getEditorNode().getKeyName().get());
-                newPath.add(new EditorNavPath.NavEntry(current, 0));
-                continue;
-            }
+    public void init() {
+        navigateTo(this.navPath.get());
+    }
 
-            var newEditorNode = current.expand().stream()
-                    .filter(en -> navEl.getEditorNode().getParentIndex() == en.getParentIndex() &&
-                            en.getDisplayKeyName().equals(navEl.getEditorNode().getDisplayKeyName()))
-                    .findFirst();
-            if (newEditorNode.isPresent()) {
-                current = newEditorNode.get();
-                newPath.add(new EditorNavPath.NavEntry(newEditorNode.get(), navEl.getScroll()));
-            } else {
-                break;
-            }
-        }
-        navPath.set(FXCollections.observableList(newPath));
+    public void onFilterChange() {
+        content.basicContentChange();
     }
 
     public void onDelete() {
@@ -98,50 +80,26 @@ public class EditorState {
     }
 
     public void onFileChanged() {
-        update(true);
+        var newPath = EditorNavPath.verify(this.navPath.get(), rootNodes.values());
+        this.navigateTo(newPath);
         dirtyProperty().set(true);
-    }
-
-    void update(boolean updatePath) {
-        if (updatePath) {
-            rebuildPath();
-        }
-        var selected = navPath.size() > 0 ? navPath.get(navPath.size() - 1) :
-                new EditorNavPath.NavEntry(null, 0.0);
-        content.navigate(selected);
     }
 
     public void navigateTo(NodePointer pointer) {
         EditorNavPath.createNavPath(getRootNodes().values(), pointer).ifPresent(n -> {
-            this.navPath.set(FXCollections.observableArrayList(n.getPath()));
+            navigateTo(n);
         });
-        update(false);
+    }
+
+    public void navigateTo(EditorNavPath path) {
+        this.navHistory.changeNavPath(path);
+        this.navPath.set(path);
+        content.navigate(path.getLast());
     }
 
     public void navigateTo(EditorNode newNode) {
-        if (newNode == null) {
-            navPath.clear();
-        } else {
-            int index = navPath.stream()
-                    .map(EditorNavPath.NavEntry::getEditorNode)
-                    .collect(Collectors.toList())
-                    .indexOf(newNode);
-            if (index == -1) {
-                navPath.add(new EditorNavPath.NavEntry(newNode, 0));
-            } else {
-                navPath.removeIf(n -> navPath.indexOf(n) > index);
-            }
-        }
-
-        update(false);
-    }
-
-    public ObservableList<EditorNavPath.NavEntry> getNavPath() {
-        return navPath.get();
-    }
-
-    public ListProperty<EditorNavPath.NavEntry> navPathProperty() {
-        return navPath;
+        var newPath = EditorNavPath.navigateTo(this.navPath.get(), newNode);
+        navigateTo(newPath);
     }
 
     public EditorFilter getFilter() {
@@ -174,5 +132,17 @@ public class EditorState {
 
     public Map<String, EditorNode> getRootNodes() {
         return rootNodes;
+    }
+
+    public EditorNavPath getNavPath() {
+        return navPath.get();
+    }
+
+    public ObjectProperty<EditorNavPath> navPathProperty() {
+        return navPath;
+    }
+
+    public EditorNavHistory getNavHistory() {
+        return navHistory;
     }
 }

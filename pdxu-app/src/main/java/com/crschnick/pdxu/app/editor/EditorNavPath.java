@@ -1,15 +1,9 @@
 package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.io.node.NodePointer;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EditorNavPath {
 
@@ -45,10 +39,35 @@ public class EditorNavPath {
         }
     }
 
-    private List<NavEntry> path;
+    private final List<NavEntry> path;
 
     public EditorNavPath(List<NavEntry> path) {
         this.path = path;
+        if (path.size() == 0) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static EditorNavPath empty() {
+        return new EditorNavPath(List.of(new NavEntry(null, 0, 0.0)));
+    }
+
+    public static EditorNavPath navigateTo(EditorNavPath path, EditorNode node) {
+        if (node == null) {
+            return empty();
+        } else {
+            int index = path.getPath().stream()
+                    .map(EditorNavPath.NavEntry::getEditorNode)
+                    .collect(Collectors.toList())
+                    .indexOf(node);
+            if (index == -1) {
+                var newList = new ArrayList<>(path.getPath());
+                newList.add(new EditorNavPath.NavEntry(node, 0, 0.0));
+                return new EditorNavPath(newList);
+            } else {
+                return new EditorNavPath(path.getPath().subList(0, index + 1));
+            }
+        }
     }
 
     public static Optional<EditorNavPath> createNavPath(Collection<EditorNode> rootNodes, NodePointer pointer) {
@@ -77,7 +96,7 @@ public class EditorNavPath {
                 return Optional.empty();
             } else {
                 //TODO: Fix scroll
-                newPath.add(new NavEntry(found.get(), 0));
+                newPath.add(new NavEntry(found.get(), 0, 0.0));
                 current = found.get();
             }
         }
@@ -92,7 +111,7 @@ public class EditorNavPath {
         for (var navEl : input.getPath()) {
             if (current == null) {
                 current = navEl.getEditorNode();
-                newPath.add(new EditorNavPath.NavEntry(current, 0));
+                newPath.add(new EditorNavPath.NavEntry(current, 0, 0.0));
                 continue;
             }
 
@@ -102,7 +121,7 @@ public class EditorNavPath {
                     .findFirst();
             if (newEditorNode.isPresent()) {
                 current = newEditorNode.get();
-                newPath.add(new EditorNavPath.NavEntry(newEditorNode.get(), navEl.getScroll()));
+                newPath.add(new EditorNavPath.NavEntry(newEditorNode.get(), navEl.getPage(), navEl.getScroll()));
             } else {
                 break;
             }
@@ -110,7 +129,11 @@ public class EditorNavPath {
         return new EditorNavPath(newPath);
     }
 
+    public NavEntry getLast() {
+        return path.get(path.size() - 1);
+    }
+
     public List<NavEntry> getPath() {
-        return path;
+        return Collections.unmodifiableList(path);
     }
 }

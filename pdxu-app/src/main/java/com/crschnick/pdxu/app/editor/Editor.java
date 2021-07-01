@@ -32,7 +32,7 @@ public class Editor {
 
         Platform.runLater(() -> {
             Stage stage = GuiEditor.createStage(state);
-            state.update(false);
+            state.init();
             editors.put(state, stage);
             stage.setOnCloseRequest(e -> {
                 editors.remove(state);

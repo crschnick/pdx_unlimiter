@@ -8,6 +8,7 @@ import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -18,7 +19,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class GuiEditorNavBar {
@@ -50,6 +50,8 @@ public class GuiEditorNavBar {
             backButton.setGraphic(new FontIcon());
             backButton.setAlignment(Pos.CENTER);
             box.getChildren().add(backButton);
+            backButton.disableProperty().bind(Bindings.not(state.getNavHistory().canGoBackProperty()));
+            backButton.setOnAction(e -> state.getNavHistory().goBack());
         }
         {
             var forwardButton = new JFXButton();
@@ -58,6 +60,8 @@ public class GuiEditorNavBar {
             forwardButton.setGraphic(new FontIcon());
             forwardButton.setAlignment(Pos.CENTER);
             box.getChildren().add(forwardButton);
+            forwardButton.disableProperty().bind(Bindings.not(state.getNavHistory().canGoForwardProperty()));
+            forwardButton.setOnAction(e -> state.getNavHistory().goForward());
         }
         return box;
     }
@@ -67,7 +71,7 @@ public class GuiEditorNavBar {
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
 
-        Consumer<List<EditorNavPath.NavEntry>> updateBar = l -> {
+        Consumer<EditorNavPath> updateBar = l -> {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
                 {
@@ -78,7 +82,7 @@ public class GuiEditorNavBar {
                     bar.getChildren().add(initBtn);
                 }
 
-                l.forEach(en -> {
+                l.getPath().subList(1, l.getPath().size()).forEach(en -> {
                     var btn = new JFXButton(en.getEditorNode().getNavigationName());
                     btn.setMnemonicParsing(false);
                     {
@@ -114,9 +118,9 @@ public class GuiEditorNavBar {
         edit.setPadding(new Insets(4, 4, 2, 4));
         p.getChildren().setAll(edit);
 
-        Consumer<List<EditorNavPath.NavEntry>> updateBar = l -> {
+        Consumer<EditorNavPath> updateBar = l -> {
             Platform.runLater(() -> {
-                edit.setDisable(l.size() == 0);
+                edit.setDisable(l.getPath().size() == 0);
             });
         };
         updateBar.accept(edState.getNavPath());

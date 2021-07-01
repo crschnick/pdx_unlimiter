@@ -20,15 +20,15 @@ public class EditorFilter {
         filterString = new SimpleStringProperty("");
         filterString.addListener((c, o, n) -> {
             if (filterKeys.get() || filterValues.get()) {
-                state.update(false);
+                state.onFilterChange();
             }
         });
         caseSensitive = new SimpleBooleanProperty();
-        caseSensitive.addListener((c, o, n) -> state.update(false));
+        caseSensitive.addListener((c, o, n) -> state.onFilterChange());
         filterKeys = new SimpleBooleanProperty(true);
-        filterKeys.addListener((c, o, n) -> state.update(false));
+        filterKeys.addListener((c, o, n) -> state.onFilterChange());
         filterValues = new SimpleBooleanProperty(true);
-        filterValues.addListener((c, o, n) -> state.update(false));
+        filterValues.addListener((c, o, n) -> state.onFilterChange());
     }
 
     private boolean contains(String s) {

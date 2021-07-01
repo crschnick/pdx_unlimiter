@@ -28,23 +28,25 @@
 }
 
 .editor-nav-bar-container {
-  -fx-padding: 0.7em;
+  -fx-padding: 0.4em;
 -fx-border-color: #CCCCCCFF;
 -fx-border-width: 0 0 0.1em 0;
+  -fx-font-size: 11pt;
 }
 
 .editor-nav-bar {
   -fx-background-color: #EEEEEEFF;
 -fx-border-color: #CCCCCCFF;
 -fx-border-width: 0.1em;
+  -fx-padding: 0 0.3em 0 0.3em;
 }
 
 .editor-nav-bar-container .jfx-button {
-  -fx-padding: 0.5em;
+  -fx-padding: 0.6em;
 }
 
 .editor-nav-bar .jfx-button {
-  -fx-padding: 0.5em 0.2em 0.5em 0.2em;
+  -fx-padding: 0.2em 0.2em 0.2em 0.2em;
 }
 
 .editor-grid .jfx-button {

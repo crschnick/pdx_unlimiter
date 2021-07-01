@@ -50,12 +50,8 @@ public class EditorContent {
         }
 
         boolean front = newPage > navigation.getPage();
-        if (front) {
-            navigation.scrollProperty().set(0.0);
-        } else {
-            navigation.scrollProperty().set(1.0);
-        }
-        navigation.pageProperty().set(newPage);
+        navigation.setScroll(front ? 0.0 : 1.0);
+        navigation.setPage(newPage);
         int offset = pageSizes.subList(0, navigation.getPage()).stream().mapToInt(Integer::intValue).sum();
         int length = pageSizes.get(navigation.getPage());
         shownNodes.set(filteredNodes.subList(offset, offset + length));
@@ -63,7 +59,7 @@ public class EditorContent {
     }
 
     public void changeScroll(double s) {
-        navigation.scrollProperty().set(s);
+        navigation.setScroll(s);
     }
 
     public void previousPage() {
