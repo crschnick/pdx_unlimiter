@@ -4,23 +4,89 @@ package com.crschnick.pdxu.app.gui.editor;
 import com.crschnick.pdxu.app.editor.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.gui.game.ImageLoader;
+import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.jfoenix.controls.JFXButton;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public abstract class GuiEditorNodeTagFactory {
 
-    public abstract boolean checkIfApplicable(EditorState state, EditorSimpleNode node);
+    private final Game game;
+
+    public GuiEditorNodeTagFactory(Game game) {
+        this.game = game;
+    }
+
+    public final boolean checkIfApplicable(EditorState state, EditorSimpleNode node) {
+        if (!state.getFileContext().getGame().equals(game)) {
+            return false;
+        }
+
+        return checkIfNodeIsApplicable(state, node);
+    }
+
+    protected abstract boolean checkIfNodeIsApplicable(EditorState state, EditorSimpleNode node);
 
     public abstract Node create(EditorState state, EditorSimpleNode node);
 
-    private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(new GuiEditorNodeTagFactory() {
+    static abstract class ImagePreviewNodeTagFactory extends GuiEditorNodeTagFactory {
+
+        private final Function<EditorSimpleNode, Path> fileFunction;
+
+        public ImagePreviewNodeTagFactory(Game game, Function<EditorSimpleNode, Path> fileFunction) {
+            super(game);
+            this.fileFunction = fileFunction;
+        }
+
         @Override
-        public boolean checkIfApplicable(EditorState state, EditorSimpleNode node) {
+        public Node create(EditorState state, EditorSimpleNode node) {
+            var b = new Label();
+            b.setAlignment(Pos.CENTER);
+            b.setGraphic(new FontIcon());
+            b.getStyleClass().add("coa-button");
+            CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
+                var img = ImageLoader.loadImage(found);
+                var imgView = new ImageView(img);
+                var tt = GuiTooltips.createTooltip(imgView);
+                tt.setShowDelay(Duration.ZERO);
+                b.setTooltip(tt);
+            });
+            return b;
+        }
+    }
+
+    static final class Ck3ImagePreviewNodeTagFactory extends ImagePreviewNodeTagFactory {
+
+        private final String nodeName;
+
+        public Ck3ImagePreviewNodeTagFactory(Path base, String nodeName) {
+            super(Game.CK3, node -> GameInstallation.ALL.get(Game.CK3).getInstallDir().resolve("game")
+                    .resolve(base).resolve(node.getBackingNode().getString()));
+            this.nodeName = nodeName;
+        }
+
+        @Override
+        public boolean checkIfNodeIsApplicable(EditorState state, EditorSimpleNode node) {
+            return node.getKeyName().map(k -> k.equals(nodeName)).orElse(false);
+        }
+    }
+
+    private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(new GuiEditorNodeTagFactory(Game.CK3) {
+        @Override
+        public boolean checkIfNodeIsApplicable(EditorState state, EditorSimpleNode node) {
             if (node.getBackingNode().isArray()) {
                 ArrayNode ar = (ArrayNode) node.getBackingNode();
                 return ar.hasKey("pattern");
@@ -40,7 +106,8 @@ public abstract class GuiEditorNodeTagFactory {
             });
             return b;
         }
-    });
+    }, new Ck3ImagePreviewNodeTagFactory(Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern"),
+            new Ck3ImagePreviewNodeTagFactory(Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture"));
 
     public static Optional<Node> createTag(EditorState state, EditorSimpleNode node) {
         for (var fac : FACTORIES) {

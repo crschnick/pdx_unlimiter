@@ -12,10 +12,11 @@ public class EditorNavPath {
             return false;
         }
 
-        for (int i = 0; i < p1.getPath().size(); i++) {
+        // Start from 1, since editor node at 0 is always null
+        for (int i = 1; i < p1.getPath().size(); i++) {
             if (!p1.getPath().get(i).getEditorNode().getNavigationName().equals(
                     p2.getPath().get(i).getEditorNode().getNavigationName())) {
-                break;
+                return false;
             }
         }
 
@@ -61,6 +62,9 @@ public class EditorNavPath {
         if (path.size() == 0) {
             throw new IllegalArgumentException();
         }
+        if (path.get(0).getEditorNode() != null) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public static EditorNavPath empty() {
@@ -88,9 +92,10 @@ public class EditorNavPath {
     public static Optional<EditorNavPath> createNavPath(Collection<EditorNode> rootNodes, NodePointer pointer) {
         EditorNode current = null;
         List<NavEntry> newPath = new ArrayList<>();
+        newPath.add(new NavEntry(null, 0, 0.0));
 
         for (var e : rootNodes) {
-            var found = pointer.sub(0, 1).isValid(e.getContent());
+            var found = pointer.sub(0, 1).isValid(((EditorSimpleNode) e).getBackingNode());
             if (found) {
                 current = e;
                 newPath.add(new NavEntry(e, 0, 0.0));

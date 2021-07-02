@@ -25,6 +25,7 @@ public class GuiEditorNode {
 
     static Region createValueDisplay(EditorNode n, EditorState state) {
         HBox box = new HBox();
+        box.setAlignment(Pos.CENTER);
         box.setFillHeight(true);
         if (n.isReal()) {
             GuiEditorNodeTagFactory.createTag(state, (EditorSimpleNode) n).ifPresent(node -> {

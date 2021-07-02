@@ -15,6 +15,13 @@ public class GuiTooltips {
         return tt;
     }
 
+    public static Tooltip createTooltip(Node node) {
+        var tt = new FocusTooltip();
+        tt.setGraphic(node);
+        tt.styleProperty().setValue("-fx-background-color: #333333FF;");
+        return tt;
+    }
+
     public static Node helpNode(String text) {
         Label q = new Label(" ? ");
         q.setStyle("-fx-border-color: #333333FF;");
@@ -26,8 +33,6 @@ public class GuiTooltips {
     }
 
     public static void install(Node node, String text) {
-        // TODO
-        // Attempt to fix weird tooltip errors by forcing the platform thread to do the installation
         Platform.runLater(() -> {
             var tt = GuiTooltips.createTooltip(text);
             tt.setShowDelay(Duration.millis(350));
@@ -37,6 +42,9 @@ public class GuiTooltips {
     }
 
     private static class FocusTooltip extends Tooltip {
+
+        public FocusTooltip() {
+        }
 
         public FocusTooltip(String string) {
             super(string);
