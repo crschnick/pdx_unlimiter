@@ -8,6 +8,15 @@ import java.util.List;
 
 public class EditorContent {
 
+    public static List<Integer> calculatePageSizes(List<EditorNode> nodes) {
+        List<Integer> pageSizes = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i += EditorSettings.getInstance().pageSize.getValue()) {
+            int size = Math.min(nodes.size() - i, EditorSettings.getInstance().pageSize.getValue());
+            pageSizes.add(size);
+        }
+        return pageSizes;
+    }
+
     private EditorState state;
     private EditorNavPath.NavEntry navigation;
     private List<Integer> pageSizes;
@@ -31,13 +40,17 @@ public class EditorContent {
         }
     }
 
+    private void rebuildFilteredEditorNodes() {
+        filteredNodes = state.getFilter().filter(allNodes);
+    }
+
     private void rebuildEditorNodes() {
         if (navigation.getEditorNode() == null) {
             allNodes = new ArrayList<>(state.getRootNodes().values());
         } else {
             allNodes = navigation.getEditorNode().expand();
         }
-        filteredNodes = state.getFilter().filter(allNodes);
+        rebuildFilteredEditorNodes();
     }
 
     private boolean goToPage(int newPage) {
@@ -78,6 +91,12 @@ public class EditorContent {
         return navigation.getPage() < pageSizes.size() - 1;
     }
 
+    public void filterChange() {
+        rebuildPageSizes();
+        rebuildFilteredEditorNodes();
+
+    }
+
     public void basicContentChange() {
         rebuildPageSizes();
 
@@ -113,5 +132,9 @@ public class EditorContent {
 
     public ObjectProperty<List<EditorNode>> shownNodesProperty() {
         return shownNodes;
+    }
+
+    public List<Integer> getPageSizes() {
+        return pageSizes;
     }
 }

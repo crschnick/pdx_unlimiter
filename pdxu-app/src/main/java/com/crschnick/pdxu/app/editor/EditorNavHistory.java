@@ -79,7 +79,7 @@ public class EditorNavHistory {
 
 
     public void navigateTo(NodePointer pointer) {
-        EditorNavPath.createNavPath(state.getRootNodes().values(), pointer).ifPresent(n -> {
+        EditorNavPath.createNavPath(state, pointer).ifPresent(n -> {
             navigateTo(n);
         });
     }
