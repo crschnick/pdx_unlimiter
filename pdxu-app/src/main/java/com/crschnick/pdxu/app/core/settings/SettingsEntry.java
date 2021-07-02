@@ -240,6 +240,11 @@ public abstract class SettingsEntry<T> {
             this.secret = secret;
         }
 
+        public StringEntry(String id, String serializationName, Type type, String defaultValue) {
+            super(id, serializationName, type, defaultValue);
+            this.secret = false;
+        }
+
         protected void setupLogger() {
             this.value.addListener((c, o, n) -> {
                 if (secret) {
@@ -404,20 +409,10 @@ public abstract class SettingsEntry<T> {
         }
     }
 
-    public static final class ProgramEntry extends SimpleEntry<String> {
+    public static final class ProgramEntry extends StringEntry {
 
         public ProgramEntry(String id, String serializationName, String defaultValue) {
             super(id, serializationName, Type.PROGRAM, defaultValue);
-        }
-
-        @Override
-        public void set(JsonNode node) {
-            this.value.set(node.textValue());
-        }
-
-        @Override
-        public JsonNode toNode() {
-            return new TextNode(value.get());
         }
     }
 

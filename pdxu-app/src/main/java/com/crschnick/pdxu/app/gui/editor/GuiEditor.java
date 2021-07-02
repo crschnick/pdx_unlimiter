@@ -139,7 +139,7 @@ public class GuiEditor {
                         b.setGraphic(new FontIcon());
                         b.getStyleClass().add("jump-to-def-button");
                         GuiTooltips.install(b, "Jump to definition");
-                        b.setOnAction(e -> state.navigateTo(np));
+                        b.setOnAction(e -> state.getNavHistory().navigateTo(np));
                         actions.getChildren().add(b);
                         b.prefHeightProperty().bind(actions.heightProperty());
                     });

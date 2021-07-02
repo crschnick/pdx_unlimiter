@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
+import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import org.apache.commons.io.FileUtils;
@@ -113,6 +114,11 @@ public class EditorExternalState {
 
     private void openFile(String file) {
         var editor = EditorSettings.getInstance().externalEditor.getValue();
+        if (editor == null) {
+            GuiEditorSettings.showEditorSettings();
+            return;
+        }
+
         try {
             Runtime.getRuntime().exec(editor + " \"" + file + "\"");
         } catch (IOException e) {

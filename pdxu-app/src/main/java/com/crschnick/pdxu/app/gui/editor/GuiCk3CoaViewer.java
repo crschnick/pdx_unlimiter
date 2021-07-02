@@ -5,17 +5,19 @@ import com.crschnick.pdxu.app.editor.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 
 public class GuiCk3CoaViewer {
 
-    private GuiCk3CoaViewerState state;
+    private final GuiCk3CoaViewerState state;
 
     public GuiCk3CoaViewer(EditorState edState, EditorSimpleNode editorNode) {
         this.state = new GuiCk3CoaViewerState(edState, editorNode);
@@ -28,6 +30,8 @@ public class GuiCk3CoaViewer {
         stage.getIcons().add(icon);
 
         stage.setTitle("Coat of arms preview");
+        var scene = new Scene(createLayout(), 720, 600);
+        scene.getAccelerators().put(KeyCombination.keyCombination("F5"), () -> state.updateImage());
         stage.setScene(new Scene(createLayout(), 720, 600));
         GuiStyle.addStylesheets(stage.getScene());
         stage.show();
@@ -48,10 +52,27 @@ public class GuiCk3CoaViewer {
         layout.requestFocus();
 
         HBox topBar = new HBox();
+        topBar.setAlignment(Pos.CENTER);
+        topBar.setFillHeight(true);
         topBar.getStyleClass().add("coa-options");
-        topBar.setSpacing(10);
+
+        Button refresh = new Button();
+        refresh.setOnAction(e -> {
+            state.updateImage();
+        });
+        refresh.setGraphic(new FontIcon("mdi-refresh"));
+        topBar.getChildren().add(refresh);
+
+        var spacer = new Region();
+        topBar.getChildren().add(spacer);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox coaOptionsBar = new HBox();
+        coaOptionsBar.setSpacing(10);
+        state.init(coaOptionsBar);
+        topBar.getChildren().add(coaOptionsBar);
+
         layout.setTop(topBar);
-        state.init(topBar);
 
         layout.setCenter(new ImageView(state.getImage()));
         state.imageProperty().addListener((c,o,n) -> {

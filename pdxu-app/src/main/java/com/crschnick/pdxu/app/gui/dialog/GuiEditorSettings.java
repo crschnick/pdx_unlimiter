@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.core.settings.SettingsIO;
 import com.crschnick.pdxu.app.editor.EditorSettings;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import javafx.scene.control.Alert;
@@ -33,8 +34,7 @@ public class GuiEditorSettings {
                 GuiSettingsComponents.section("PERFORMANCE", applyFuncs,
                         s.enabledNodeTags,
                         s.enabledNodeJumps,
-                        s.pageSize,
-                        s.navHistorySize));
+                        s.pageSize));
         vbox.setSpacing(10);
         var sp = new ScrollPane(vbox);
         sp.setFitToWidth(true);
@@ -47,6 +47,7 @@ public class GuiEditorSettings {
         Optional<ButtonType> r = alert.showAndWait();
         if (r.isPresent() && r.get().equals(ButtonType.APPLY)) {
             applyFuncs.forEach(ru -> ru.run());
+            SettingsIO.save(EditorSettings.getInstance());
         }
     }
 }

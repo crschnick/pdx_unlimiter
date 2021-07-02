@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
@@ -15,58 +16,81 @@ public class EditorNavHistory {
     private final ObjectProperty<EditorNavPath> current;
     private final EditorState state;
     private final List<EditorNavPath> history;
-    private final IntegerProperty position;
+    private final IntegerProperty historyPos;
 
     public EditorNavHistory(EditorState state) {
+        var init = new EditorNavPath.NavEntry(null, 0, 0.0);
         this.history = new ArrayList<>();
-        this.current = new SimpleObjectProperty<>(new EditorNavPath(List.of(
-                new EditorNavPath.NavEntry(null, 0, 0.0))));
+        this.current = new SimpleObjectProperty<>(new EditorNavPath(List.of(init)));
+        this.history.add(current.get());
         this.state = state;
-        this.position = new SimpleIntegerProperty(0);
+        this.historyPos = new SimpleIntegerProperty(0);
     }
 
     public BooleanBinding canGoBackProperty() {
-        return Bindings.createBooleanBinding(() -> position.get() > 0, position);
+        return Bindings.createBooleanBinding(() -> historyPos.get() > 0, historyPos);
     }
 
     public BooleanBinding canGoForwardProperty() {
-        return Bindings.createBooleanBinding(() -> position.get() < history.size() - 1, position);
+        return Bindings.createBooleanBinding(() -> historyPos.get() < history.size() - 1, historyPos);
     }
 
     public void goBack() {
-        if (position.get() == 0) {
+        if (historyPos.get() == 0) {
             return;
         }
 
-        state.navigateTo(history.get(position.get()));
-        position.set(position.get() - 1);
+        historyPos.set(historyPos.get() - 1);
+        var goTo = history.get(historyPos.get());
+        this.current.set(goTo);
+        state.getContent().navigate(goTo.getLast());
     }
 
     public void goForward() {
-        if (position.get() == history.size() - 1) {
+        if (historyPos.get() == history.size()) {
             return;
         }
 
-        position.set(position.get() + 1);
-        state.navigateTo(history.get(position.get()));
+        historyPos.set(historyPos.get() + 1);
+        var goTo = history.get(historyPos.get());
+        this.current.set(goTo);
+        state.getContent().navigate(goTo.getLast());
     }
 
     private void removeHistoryAfterPos() {
-        if (history.size() > position.get() + 1) {
-            history.subList(position.get() + 1, history.size()).clear();
+        if (history.size() > historyPos.get() + 1) {
+            history.subList(historyPos.get() + 1, history.size()).clear();
         }
     }
 
-    public void changeNavPath(EditorNavPath p) {
+    public void navigateTo(EditorNavPath p) {
         if (EditorNavPath.areNodePathsEqual(current.get(), p)) {
             return;
         }
 
         removeHistoryAfterPos();
 
-        this.history.add(current.get());
-        position.set(position.get() + 1);
         this.current.set(p);
+        this.state.getContent().navigate(p.getLast());
+
+        this.history.add(p);
+        historyPos.set(historyPos.get() + 1);
+    }
+
+
+    public void navigateTo(NodePointer pointer) {
+        EditorNavPath.createNavPath(state.getRootNodes().values(), pointer).ifPresent(n -> {
+            navigateTo(n);
+        });
+    }
+
+    public void navigateTo(EditorNode newNode) {
+        if (newNode != null && newNode.isEmpty()) {
+            return;
+        }
+
+        var newPath = EditorNavPath.navigateTo(current.get(), newNode);
+        navigateTo(newPath);
     }
 
     public EditorNavPath getCurrent() {

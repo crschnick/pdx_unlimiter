@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -79,28 +78,8 @@ public class EditorState {
 
     public void onFileChanged() {
         var newPath = EditorNavPath.verify(this.navHistory.getCurrent(), rootNodes.values());
-        this.navigateTo(newPath);
+        this.navHistory.navigateTo(newPath);
         dirtyProperty().set(true);
-    }
-
-    public void navigateTo(NodePointer pointer) {
-        EditorNavPath.createNavPath(getRootNodes().values(), pointer).ifPresent(n -> {
-            navigateTo(n);
-        });
-    }
-
-    public void navigateTo(EditorNavPath path) {
-        this.navHistory.changeNavPath(path);
-        content.navigate(path.getLast());
-    }
-
-    public void navigateTo(EditorNode newNode) {
-        if (newNode != null && newNode.isEmpty()) {
-            return;
-        }
-
-        var newPath = EditorNavPath.navigateTo(this.navHistory.getCurrent(), newNode);
-        navigateTo(newPath);
     }
 
     public EditorFilter getFilter() {

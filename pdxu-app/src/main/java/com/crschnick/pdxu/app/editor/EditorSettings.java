@@ -2,34 +2,41 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.core.settings.AbstractSettings;
 import com.crschnick.pdxu.app.core.settings.SettingsEntry;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import org.apache.commons.collections4.BidiMap;
-import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class EditorSettings extends AbstractSettings {
 
-    private static final BidiMap<String, String> INDENTATION_TYPES = new DualHashBidiMap<>(Map.of(
-            "1 space", " ",
-            "2 spaces", "  ",
-            "4 spaces", "    ",
-            "1 tab", "\t",
-            "2 tabs", "\t\t"));
+    private static BidiMap<String, String> indentationTypes() {
+        LinkedHashMap<String, String> m = new LinkedHashMap<>();
+        m.put("1 " + PdxuI18n.get("SPACE"), " ");
+        m.put("2 " + PdxuI18n.get("SPACES"), "  ");
+        m.put("4 " + PdxuI18n.get("SPACES"), "    ");
+        m.put("1 " + PdxuI18n.get("TAB"), "\t");
+        m.put("2 " + PdxuI18n.get("TABS"), "\t\t");
+        return new DualLinkedHashBidiMap<>(m);
+    };
+
+    private static BidiMap<String, String> indentationIdentity() {
+        LinkedHashMap<String, String> m = new LinkedHashMap<>();
+        m.put(" ", " ");
+        m.put("  ", "  ");
+        m.put("    ", "    ");
+        m.put("\t", "\t");
+        m.put("\t\t", "\t\t");
+        return new DualLinkedHashBidiMap<>(m);
+    };
 
     public final SettingsEntry.ChoiceEntry<String> indentation = new SettingsEntry.ChoiceEntry<>(
-            "IDENTATION",
+            "INDENTATION",
             "indentation",
             "\t",
-            INDENTATION_TYPES.inverseBidiMap(),
-            t -> INDENTATION_TYPES.inverseBidiMap().get(t)
-    );
-    public final SettingsEntry.IntegerEntry navHistorySize = new SettingsEntry.IntegerEntry(
-            "NAV_HISTORY_SIZE",
-            "navHistorySize",
-            25,
-            5,
-            100
+            indentationIdentity(),
+            t -> indentationTypes().inverseBidiMap().get(t)
     );
     public final SettingsEntry.IntegerEntry pageSize = new SettingsEntry.IntegerEntry(
             "PAGE_SIZE",

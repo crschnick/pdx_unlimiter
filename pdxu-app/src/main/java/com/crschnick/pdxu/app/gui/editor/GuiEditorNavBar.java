@@ -77,7 +77,7 @@ public class GuiEditorNavBar {
                 {
                     var initBtn = new JFXButton("(root)");
                     initBtn.setOnAction(e -> {
-                        edState.navigateTo((EditorNode) null);
+                        edState.getNavHistory().navigateTo((EditorNode) null);
                     });
                     bar.getChildren().add(initBtn);
                 }
@@ -91,7 +91,7 @@ public class GuiEditorNavBar {
                         bar.getChildren().add(sep);
                     }
                     btn.setOnAction(e -> {
-                        edState.navigateTo(en.getEditorNode());
+                        edState.getNavHistory().navigateTo(en.getEditorNode());
                     });
                     bar.getChildren().add(btn);
                 });
