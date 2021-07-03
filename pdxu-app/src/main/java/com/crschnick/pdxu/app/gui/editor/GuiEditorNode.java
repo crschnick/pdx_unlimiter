@@ -1,9 +1,6 @@
 package com.crschnick.pdxu.app.gui.editor;
 
-import com.crschnick.pdxu.app.editor.EditorCollectorNode;
-import com.crschnick.pdxu.app.editor.EditorNode;
-import com.crschnick.pdxu.app.editor.EditorSimpleNode;
-import com.crschnick.pdxu.app.editor.EditorState;
+import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.io.node.Node;
@@ -85,7 +82,10 @@ public class GuiEditorNode {
             preview.setGraphic(new FontIcon());
             preview.setOnMouseEntered(e -> {
                 var tt = GuiTooltips.createTooltip(NodeWriter.writeToString(
-                        n.toWritableNode(), 15, "  "));
+                        n.toWritableNode(),
+                        EditorSettings.getInstance().maxTooltipLines.getMax(),
+                        EditorSettings.getInstance().indentation.getValue()));
+                tt.setWrapText(false);
                 tt.setShowDelay(Duration.ZERO);
                 Tooltip.install(preview, tt);
             });

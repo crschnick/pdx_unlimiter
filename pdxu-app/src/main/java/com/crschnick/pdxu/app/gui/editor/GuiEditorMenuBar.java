@@ -1,7 +1,9 @@
 package com.crschnick.pdxu.app.gui.editor;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -36,6 +38,11 @@ public class GuiEditorMenuBar {
         });
         help.getItems().add(guide);
 
+        MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
+        is.setOnAction((a) -> {
+            ErrorHandler.reportIssue(null);
+        });
+        help.getItems().add(is);
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);

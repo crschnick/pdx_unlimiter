@@ -52,6 +52,7 @@ public class GuiEditorNavBar {
             box.getChildren().add(backButton);
             backButton.disableProperty().bind(Bindings.not(state.getNavHistory().canGoBackProperty()));
             backButton.setOnAction(e -> state.getNavHistory().goBack());
+            backButton.setFocusTraversable(false);
         }
         {
             var forwardButton = new JFXButton();
@@ -62,6 +63,7 @@ public class GuiEditorNavBar {
             box.getChildren().add(forwardButton);
             forwardButton.disableProperty().bind(Bindings.not(state.getNavHistory().canGoForwardProperty()));
             forwardButton.setOnAction(e -> state.getNavHistory().goForward());
+            forwardButton.setFocusTraversable(false);
         }
         return box;
     }
@@ -76,6 +78,7 @@ public class GuiEditorNavBar {
                 bar.getChildren().clear();
                 {
                     var initBtn = new JFXButton("(root)");
+                    initBtn.setFocusTraversable(false);
                     initBtn.setOnAction(e -> {
                         edState.getNavHistory().navigateTo((EditorNode) null);
                     });
@@ -84,6 +87,7 @@ public class GuiEditorNavBar {
 
                 l.getPath().subList(1, l.getPath().size()).forEach(en -> {
                     var btn = new JFXButton(en.getEditorNode().getNavigationName());
+                    btn.setFocusTraversable(false);
                     btn.setMnemonicParsing(false);
                     {
                         var sep = new Label("/");
@@ -110,6 +114,7 @@ public class GuiEditorNavBar {
         p.setAlignment(Pos.CENTER);
 
         Button edit = new JFXButton();
+        edit.setFocusTraversable(false);
         edit.setGraphic(new FontIcon());
         edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
         edit.setOnAction(e -> {

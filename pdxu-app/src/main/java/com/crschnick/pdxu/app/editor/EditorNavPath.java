@@ -9,6 +9,14 @@ import java.util.stream.IntStream;
 public class EditorNavPath {
 
     public static int getViewIndex(NavEntry e, List<Integer> pageSizes) {
+        if (pageSizes.size() == 0) {
+            return 0;
+        }
+
+        if (e.getPage() >= pageSizes.size()) {
+            return 0;
+        }
+
         int index = 0;
         for (int i = 0; i < e.getPage(); i++) {
             index += pageSizes.get(i);

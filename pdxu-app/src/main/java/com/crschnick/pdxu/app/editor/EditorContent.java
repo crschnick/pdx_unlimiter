@@ -69,6 +69,22 @@ public class EditorContent {
         return true;
     }
 
+    private double getViewShare() {
+        int focusedNode = EditorNavPath.getViewIndex(navigation, pageSizes);
+        return (double) focusedNode / filteredNodes.size();
+    }
+
+    private void goToViewShare(double vs) {
+        int index = (int) (vs * filteredNodes.size());
+        var ne = EditorNavPath.createInView(navigation.getEditorNode(), index, pageSizes);
+        if (!goToPage(ne.getPage())) {
+            changeScroll(0.0);
+            goToPage(0);
+            return;
+        }
+        changeScroll(ne.getScroll());
+    }
+
     public void changeScroll(double s) {
         navigation.setScroll(s);
     }
@@ -92,34 +108,31 @@ public class EditorContent {
     }
 
     public void filterChange() {
-        rebuildPageSizes();
+        double vs = getViewShare();
         rebuildFilteredEditorNodes();
-
-    }
-
-    public void basicContentChange() {
         rebuildPageSizes();
-
-        int oldPage = navigation.getPage();
-        if (!goToPage(oldPage)) {
-            goToPage(0);
-        }
+        goToViewShare(vs);
     }
 
     public void completeContentChange() {
+        double vs = getViewShare();
         rebuildEditorNodes();
         rebuildPageSizes();
-
-        changeScroll(0.0);
-        int oldPage = navigation.getPage();
-        if (!goToPage(oldPage)) {
-            goToPage(0);
-        }
+        goToViewShare(vs);
     }
 
     public void navigate(EditorNavPath.NavEntry navEntry) {
         this.navigation = navEntry;
-        this.completeContentChange();
+        rebuildEditorNodes();
+        rebuildPageSizes();
+        if (!goToPage(navEntry.getPage())) {
+            changeScroll(0.0);
+            goToPage(0);
+        }
+    }
+
+    public int getPage() {
+        return navigation.getPage();
     }
 
     public double getScroll() {

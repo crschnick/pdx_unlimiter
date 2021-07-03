@@ -5,6 +5,8 @@ l_english:
  IMPORTS: "Imports"
  IRONY: "Irony mod manager"
  USE_GAME_LANGUAGE: "Use game language"
+ MAX_TOOLTIP_SIZE: "Max tooltip width"
+ MAX_TOOLTIP_SIZE_DESC: "The maximum width of node preview tooltips in pixels."
  USE_GAME_LANGUAGE_DESC: "Always use the language that the currently selected game is in.\nIf this is enabled, the custom language setting below is not used. Note that the translations are incomplete!"
  LANGUAGE: "Language"
  LANGUAGE_DESC: "The custom interface language to use.\nOnly is applied, if the 'Use game language' setting is false."

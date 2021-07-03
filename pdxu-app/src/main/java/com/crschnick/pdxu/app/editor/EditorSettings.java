@@ -45,13 +45,6 @@ public class EditorSettings extends AbstractSettings {
             50,
             1000
     );
-    public final SettingsEntry.IntegerEntry maxTooltipWidth = new SettingsEntry.IntegerEntry(
-            "MAX_TOOLTIP_SIZE",
-            "maxTooltipWidth",
-            800,
-            100,
-            2000
-    );
     public final SettingsEntry.IntegerEntry maxTooltipLines = new SettingsEntry.IntegerEntry(
             "MAX_TOOLTIP_LINES",
             "maxTooltipLines",

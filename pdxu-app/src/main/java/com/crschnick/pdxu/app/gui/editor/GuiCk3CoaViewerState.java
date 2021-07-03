@@ -27,23 +27,16 @@ public class GuiCk3CoaViewerState {
         this.displayType = new SimpleObjectProperty<>(REALM);
         this.image = new SimpleObjectProperty<>(ImageLoader.DEFAULT_IMAGE);
         this.parsedCoa = new SimpleObjectProperty<>(Ck3CoatOfArms.fromNode(editorNode.getBackingNode()));
-
-        setupListeners();
     }
 
     void init(HBox box) {
         GuiCk3CoaDisplayType.init(this, box);
-        updateImage();
+        refresh();
     }
 
-    private void setupListeners() {
-//        editorNode.backingNodeProperty().addListener((c,o,n) -> {
-//            parsedCoa.set(Ck3CoatOfArms.fromNode(n));
-//        });
-
-        parsedCoa.addListener((c,o,n) -> {
-            updateImage();
-        });
+    void refresh() {
+        parsedCoa.set(Ck3CoatOfArms.fromNode(editorNode.getBackingNode()));
+        updateImage();
     }
 
     void updateImage() {

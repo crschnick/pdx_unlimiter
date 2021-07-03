@@ -107,7 +107,7 @@ public class GuiEditor {
 
         int offset = 0;
         if (state.getContent().canGoToPreviousPage()) {
-            Button next = new JFXButton("Previous page");
+            Button next = new JFXButton("Go to previous page (" + (state.getContent().getPage() - 1) + ")");
             next.setOnAction(e -> {
                 state.getContent().previousPage();
             });
@@ -161,8 +161,8 @@ public class GuiEditor {
                     n.delete();
                     state.onDelete();
                 });
-                actions.getChildren().add(del);
-                del.prefHeightProperty().bind(actions.heightProperty());
+                //actions.getChildren().add(del);
+                //del.prefHeightProperty().bind(actions.heightProperty());
 
                 grid.add(createGridElement(actions, i), 4, i);
             }
@@ -171,7 +171,7 @@ public class GuiEditor {
         }
 
         if (state.getContent().canGoToNextPage()) {
-            Button next = new JFXButton("Next");
+            Button next = new JFXButton("Go to next page (" + (state.getContent().getPage() + 1) + ")");
             next.setOnAction(e -> {
                 state.getContent().nextPage();
             });

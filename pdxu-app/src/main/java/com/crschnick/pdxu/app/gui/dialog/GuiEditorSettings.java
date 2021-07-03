@@ -28,7 +28,6 @@ public class GuiEditorSettings {
                         s.externalEditor,
                         s.indentation,
                         s.warnOnTypeChange,
-                        s.maxTooltipWidth,
                         s.maxTooltipLines),
                 new Separator(),
                 GuiSettingsComponents.section("PERFORMANCE", applyFuncs,

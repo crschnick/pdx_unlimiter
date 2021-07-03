@@ -9,7 +9,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -31,8 +32,8 @@ public class GuiCk3CoaViewer {
 
         stage.setTitle("Coat of arms preview");
         var scene = new Scene(createLayout(), 720, 600);
-        scene.getAccelerators().put(KeyCombination.keyCombination("F5"), () -> state.updateImage());
-        stage.setScene(new Scene(createLayout(), 720, 600));
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F5), () -> state.refresh());
+        stage.setScene(scene);
         GuiStyle.addStylesheets(stage.getScene());
         stage.show();
     }
@@ -58,7 +59,7 @@ public class GuiCk3CoaViewer {
 
         Button refresh = new Button();
         refresh.setOnAction(e -> {
-            state.updateImage();
+            state.refresh();
         });
         refresh.setGraphic(new FontIcon("mdi-refresh"));
         topBar.getChildren().add(refresh);

@@ -12,8 +12,6 @@ l_english:
   INDENTATION_DESC: "Indentation characters that will be used when using the external editor and preview tooltips."
   PAGE_SIZE: "Page size"
   PAGE_SIZE_DESC: "The amount of nodes that are shown per page.\nThe more nodes are shown, the longer it takes to load new nodes."
-  MAX_TOOLTIP_SIZE: "Max tooltip width"
-  MAX_TOOLTIP_SIZE_DESC: "The maximum width of node preview tooltips in pixels."
   MAX_TOOLTIP_LINES: "Max tooltip lines"
   MAX_TOOLTIP_LINES_DESC: "The maximum lines of node preview tooltips."
   ENABLE_NODE_TAGS: "Enable node tags"

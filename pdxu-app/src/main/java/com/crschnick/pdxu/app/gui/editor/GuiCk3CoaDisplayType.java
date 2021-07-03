@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui.editor;
 
-import com.crschnick.pdxu.app.gui.editor.GuiCk3CoaViewerState;
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
 import com.crschnick.pdxu.app.gui.game.ImageLoader;
 import com.crschnick.pdxu.app.installation.GameFileContext;

@@ -60,11 +60,11 @@ public class EditorState {
     }
 
     public void onFilterChange() {
-        content.basicContentChange();
+        content.filterChange();
     }
 
     public void onDelete() {
-        content.basicContentChange();
+        content.completeContentChange();
         dirtyProperty().set(true);
     }
 
@@ -78,7 +78,12 @@ public class EditorState {
 
     public void onFileChanged() {
         var newPath = EditorNavPath.verify(this.navHistory.getCurrent(), rootNodes.values());
-        this.navHistory.navigateTo(newPath);
+        if (EditorNavPath.areNodePathsEqual(this.navHistory.getCurrent(), newPath)) {
+            this.content.completeContentChange();
+        } else {
+            this.navHistory.replaceCurrentNavPath(newPath);
+        }
+
         dirtyProperty().set(true);
     }
 

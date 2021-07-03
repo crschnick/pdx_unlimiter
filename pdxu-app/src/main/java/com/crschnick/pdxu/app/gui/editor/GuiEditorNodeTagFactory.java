@@ -68,6 +68,40 @@ public abstract class GuiEditorNodeTagFactory {
         }
     }
 
+    static class InfoNodeTagFactory extends GuiEditorNodeTagFactory {
+
+        private final String keyName;
+        private final Function<EditorSimpleNode, String> descFunction;
+
+        public InfoNodeTagFactory(Game game, String keyName, Function<EditorSimpleNode, String> descFunction) {
+            super(game);
+            this.keyName = keyName;
+            this.descFunction = descFunction;
+        }
+
+        public InfoNodeTagFactory(Game game, String keyName, String desc) {
+            super(game);
+            this.keyName = keyName;
+            this.descFunction = e -> desc;
+        }
+
+        @Override
+        protected boolean checkIfNodeIsApplicable(EditorState state, EditorSimpleNode node) {
+            return node.getKeyName().map(k -> k.equals(keyName)).orElse(false);
+        }
+
+        @Override
+        public Node create(EditorState state, EditorSimpleNode node) {
+            var b = new Label();
+            b.setAlignment(Pos.CENTER);
+            b.setGraphic(new FontIcon("mdi-information-outline"));
+            b.setOnMouseEntered(e -> {
+                GuiTooltips.install(b, descFunction.apply(node));
+            });
+            return b;
+        }
+    }
+
     static final class Ck3ImagePreviewNodeTagFactory extends ImagePreviewNodeTagFactory {
 
         private final String nodeName;
@@ -107,7 +141,8 @@ public abstract class GuiEditorNodeTagFactory {
             return b;
         }
     }, new Ck3ImagePreviewNodeTagFactory(Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern"),
-            new Ck3ImagePreviewNodeTagFactory(Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture"));
+            new Ck3ImagePreviewNodeTagFactory(Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture"),
+            new InfoNodeTagFactory(Game.CK3, "meta_data", "The meta data of this savegame that is shown in the main menu. Editing anything inside of it only changes the main menu display, not the actual data in-game."));
 
     public static Optional<Node> createTag(EditorState state, EditorSimpleNode node) {
         for (var fac : FACTORIES) {

@@ -63,6 +63,12 @@ public class EditorNavHistory {
         }
     }
 
+    public void replaceCurrentNavPath(EditorNavPath p) {
+        this.current.set(p);
+        this.state.getContent().navigate(p.getLast());
+        this.history.set(historyPos.get(), p);
+    }
+
     public void navigateTo(EditorNavPath p) {
         if (EditorNavPath.areNodePathsEqual(current.get(), p)) {
             return;

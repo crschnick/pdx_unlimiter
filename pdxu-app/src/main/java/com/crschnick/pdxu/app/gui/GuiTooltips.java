@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui;
 
+import com.crschnick.pdxu.app.core.settings.Settings;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -12,6 +13,8 @@ public class GuiTooltips {
     public static Tooltip createTooltip(String text) {
         var tt = new FocusTooltip(text);
         tt.styleProperty().setValue("-fx-font-size: 1em; -fx-background-color: #333333FF;");
+        tt.setMaxWidth(Settings.getInstance().maxTooltipWidth.getValue());
+        tt.setWrapText(true);
         return tt;
     }
 
