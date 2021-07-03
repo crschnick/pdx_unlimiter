@@ -138,7 +138,7 @@ public class GuiEditor {
                         var b = new JFXButton();
                         b.setGraphic(new FontIcon());
                         b.getStyleClass().add("jump-to-def-button");
-                        GuiTooltips.install(b, "Jump to definition");
+                        GuiTooltips.install(b, "Jump to " + np);
                         b.setOnAction(e -> state.getNavHistory().navigateTo(np));
                         actions.getChildren().add(b);
                         b.prefHeightProperty().bind(actions.heightProperty());
@@ -151,6 +151,7 @@ public class GuiEditor {
                 edit.setOnAction(e -> {
                     state.getExternalState().startEdit(state, n);
                 });
+                GuiTooltips.install(edit, "Open in external text editor");
                 actions.getChildren().add(edit);
                 edit.prefHeightProperty().bind(actions.heightProperty());
 

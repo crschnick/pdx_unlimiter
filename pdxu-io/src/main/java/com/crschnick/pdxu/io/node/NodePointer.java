@@ -4,10 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class NodePointer {
 
-    public static record Element(String name, int index, Predicate<Node> selector) {}
+    public static record Element(String name, int index, Predicate<Node> selector) {
+
+        public String toString() {
+            if (name != null) {
+                return name;
+            }
+            if (index != -1) {
+                return "[" + index + "]";
+            }
+            if (selector != null) {
+                return "$[...]";
+            }
+            throw new IllegalArgumentException();
+        }
+    }
 
     public static class Builder {
 
@@ -45,10 +60,10 @@ public final class NodePointer {
         if (path.size() == 0) {
             throw new IllegalArgumentException();
         }
+    }
 
-        if (path.get(0).name == null) {
-            throw new IllegalArgumentException();
-        }
+    public String toString() {
+        return "/" + path.stream().map(Element::toString).collect(Collectors.joining("/"));
     }
 
     public NodePointer sub(int begin, int end) {

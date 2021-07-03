@@ -3,28 +3,45 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.io.node.NodePointer;
-import com.crschnick.pdxu.io.node.ValueNode;
 
 import java.util.List;
 import java.util.Optional;
 
 public class EditorNodePointers {
 
-    public static Optional<NodePointer> createEu4(EditorState state, EditorSimpleNode node) {
+    private static final List<String> EU4_PROVINCE_KEYS = List.of("capital", "original_capital", "trade_port");
+    private static final List<String> EU4_RELIGION_KEYS = List.of("religion", "dominant_religion");
+    private static final List<String> EU4_TRADE_KEYS = List.of("trade");
+    private static final List<String> EU4_POWER_NAMES = List.of("ADM", "DIP", "MIL");
+
+    public static NodePointer createEu4(EditorState state, EditorSimpleNode node) {
+        var keyOpt = node.getKeyName();
         var n = node.getBackingNode();
         if (n.isValue()) {
             var s = n.getString();
-            if (s.length() == 3 && Character.isLetter(s.charAt(0)) && s.toUpperCase().equals(s)) {
-                return Optional.of(NodePointer.builder().name("countries").name(s).build());
-            }
-
-            if (!((ValueNode) n).isQuoted()) {
-                var religion = NodePointer.builder().name("religions").name(s).build();
-                return Optional.of(religion);
+            if (s.length() == 3 && Character.isLetter(s.charAt(0)) && s.toUpperCase().equals(s) && !EU4_POWER_NAMES.contains(s)) {
+                return NodePointer.builder().name("countries").name(s).build();
             }
         }
 
-        return Optional.empty();
+        if (keyOpt.isPresent() && n.isValue()) {
+            var key = keyOpt.get();
+            var s = n.getString();
+            if (EU4_PROVINCE_KEYS.contains(key)) {
+                return NodePointer.builder().name("provinces").name("-" + s).build();
+            }
+
+            if (EU4_RELIGION_KEYS.contains(key)) {
+                return NodePointer.builder().name("religions").name(s).build();
+            }
+
+            if (EU4_TRADE_KEYS.contains(key)) {
+                return NodePointer.builder().name("trade").name("node").selector(tn -> tn.hasKey("definitions") &&
+                        tn.getNodeForKey("definitions").getString().equals(s)).build();
+            }
+        }
+
+        return null;
     }
 
     public static NodePointer createCk3(EditorState state, EditorSimpleNode node) {
@@ -92,7 +109,7 @@ public class EditorNodePointers {
 
     public static Optional<NodePointer> create(EditorState state, EditorSimpleNode node) {
         if (state.getFileContext().getGame() == Game.EU4) {
-            return createEu4(state, node);
+            return Optional.ofNullable(createEu4(state, node));
         }
 
         if (state.getFileContext().getGame() == Game.CK3) {

@@ -16,6 +16,18 @@ public class ThreadHelper {
         return t;
     }
 
+    public static void browseDirectory(Path file) {
+        var t = new Thread(() -> {
+            try {
+                Desktop.getDesktop().open(file.getParent().toFile());
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
     public static void browse(String uri) {
         var t = new Thread(() -> {
             try {

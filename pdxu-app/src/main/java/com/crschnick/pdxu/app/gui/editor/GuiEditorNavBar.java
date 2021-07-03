@@ -117,6 +117,7 @@ public class GuiEditorNavBar {
         edit.setFocusTraversable(false);
         edit.setGraphic(new FontIcon());
         edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+        GuiTooltips.install(edit, "Open in external text editor");
         edit.setOnAction(e -> {
             edState.getExternalState().startEdit(edState, edState.getNavHistory().getCurrent().getLast().getEditorNode());
         });

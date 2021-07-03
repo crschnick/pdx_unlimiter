@@ -8,11 +8,13 @@ import com.crschnick.pdxu.app.gui.game.ImageLoader;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -53,16 +55,27 @@ public abstract class GuiEditorNodeTagFactory {
 
         @Override
         public Node create(EditorState state, EditorSimpleNode node) {
-            var b = new Label();
+            var b = new JFXButton();
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
-            CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
-                var img = ImageLoader.loadImage(found);
-                var imgView = new ImageView(img);
-                var tt = GuiTooltips.createTooltip(imgView);
-                tt.setShowDelay(Duration.ZERO);
-                b.setTooltip(tt);
+            b.setOnAction(e -> {
+                CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
+                    ThreadHelper.browseDirectory(found);
+                });
+            });
+            b.setOnMouseEntered(e -> {
+                if (b.getTooltip() != null) {
+                    return;
+                }
+
+                CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
+                    var img = ImageLoader.loadImage(found);
+                    var imgView = new ImageView(img);
+                    var tt = GuiTooltips.createTooltip(imgView);
+                    tt.setShowDelay(Duration.ZERO);
+                    b.setTooltip(tt);
+                });
             });
             return b;
         }
@@ -96,7 +109,13 @@ public abstract class GuiEditorNodeTagFactory {
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon("mdi-information-outline"));
             b.setOnMouseEntered(e -> {
-                GuiTooltips.install(b, descFunction.apply(node));
+                if (b.getTooltip() != null) {
+                    return;
+                }
+
+                var tt = GuiTooltips.createTooltip(descFunction.apply(node));
+                tt.setShowDelay(Duration.ZERO);
+                Tooltip.install(b, tt);
             });
             return b;
         }
