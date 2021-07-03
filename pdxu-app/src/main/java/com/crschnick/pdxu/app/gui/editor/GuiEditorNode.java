@@ -24,7 +24,7 @@ public class GuiEditorNode {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
         box.setFillHeight(true);
-        if (n.isReal()) {
+        if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
             GuiEditorNodeTagFactory.createTag(state, (EditorSimpleNode) n).ifPresent(node -> {
                 box.getChildren().add(node);
             });

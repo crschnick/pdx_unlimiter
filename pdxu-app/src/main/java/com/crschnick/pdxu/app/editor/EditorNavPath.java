@@ -34,7 +34,7 @@ public class EditorNavPath {
 
             sum += pageSizes.get(page);
         }
-        throw new IllegalArgumentException();
+        return new NavEntry(node, pageSizes.size() -1, 1.0);
     }
 
     public static boolean areNodePathsEqual(EditorNavPath p1, EditorNavPath p2) {
@@ -132,7 +132,8 @@ public class EditorNavPath {
                 break;
             }
         }
-        if (newPath.size() == 0) {
+        // Not found
+        if (current == null) {
             return Optional.empty();
         }
 

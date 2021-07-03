@@ -133,7 +133,7 @@ public class GuiEditor {
                 actions.setFillHeight(true);
                 actions.setAlignment(Pos.CENTER_RIGHT);
 
-                if (n.isReal()) {
+                if (n.isReal() && EditorSettings.getInstance().enableNodeJumps.getValue()) {
                     EditorNodePointers.create(state, (EditorSimpleNode) n).ifPresent(np -> {
                         var b = new JFXButton();
                         b.setGraphic(new FontIcon());

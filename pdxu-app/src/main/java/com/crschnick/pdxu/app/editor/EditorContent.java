@@ -54,6 +54,13 @@ public class EditorContent {
     }
 
     private boolean goToPage(int newPage) {
+        // If there are no nodes to show
+        if (newPage == 0 && pageSizes.size() == 0) {
+            navigation.setPage(newPage);
+            shownNodes.set(List.of());
+            return true;
+        }
+
         if (newPage > pageSizes.size() - 1) {
             return false;
         }

@@ -7,7 +7,7 @@
 }
 
 .jump-to-def-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-export";
+    -fx-icon-code: "mdi-arrow-right-bold-circle-outline";
 }
 
 .clear-button .ikonli-font-icon {

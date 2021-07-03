@@ -31,8 +31,8 @@ public class GuiEditorSettings {
                         s.maxTooltipLines),
                 new Separator(),
                 GuiSettingsComponents.section("PERFORMANCE", applyFuncs,
-                        s.enabledNodeTags,
-                        s.enabledNodeJumps,
+                        s.enableNodeTags,
+                        s.enableNodeJumps,
                         s.pageSize));
         vbox.setSpacing(10);
         var sp = new ScrollPane(vbox);

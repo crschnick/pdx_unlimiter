@@ -52,14 +52,14 @@ public class EditorSettings extends AbstractSettings {
             5,
             30
     );
-    public final SettingsEntry.BooleanEntry enabledNodeTags = new SettingsEntry.BooleanEntry(
+    public final SettingsEntry.BooleanEntry enableNodeTags = new SettingsEntry.BooleanEntry(
             "ENABLE_NODE_TAGS",
-            "enabledNodeTags",
+            "enableNodeTags",
             true
     );
-    public final SettingsEntry.BooleanEntry enabledNodeJumps = new SettingsEntry.BooleanEntry(
+    public final SettingsEntry.BooleanEntry enableNodeJumps = new SettingsEntry.BooleanEntry(
             "ENABLE_NODE_JUMPS",
-            "enabledNodeJumps",
+            "enableNodeJumps",
             true
     );
     public final SettingsEntry.BooleanEntry warnOnTypeChange = new SettingsEntry.BooleanEntry(
