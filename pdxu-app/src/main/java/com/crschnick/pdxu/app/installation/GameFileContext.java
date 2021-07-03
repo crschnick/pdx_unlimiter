@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
@@ -49,6 +51,10 @@ public class GameFileContext {
                 .map(GameInstallation.ALL.get(g)::getModForFileName)
                         .flatMap(Optional::stream)
                         .collect(Collectors.toList()));
+    }
+
+    public TextFormatParser getParser() {
+        return SavegameStorage.get(getGame()).getType().getParser();
     }
 
     public Game getGame() {

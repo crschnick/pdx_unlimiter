@@ -40,7 +40,7 @@ public class SavegameEditTarget extends EditTarget {
 
     @Override
     public TextFormatParser getParser() {
-        return structure.getParser();
+        return structure.getType().getParser();
     }
 
     @Override

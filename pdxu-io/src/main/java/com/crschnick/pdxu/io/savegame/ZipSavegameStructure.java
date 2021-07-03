@@ -2,7 +2,6 @@ package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
-import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,13 +18,13 @@ import java.util.zip.ZipInputStream;
 public class ZipSavegameStructure implements SavegameStructure {
 
     private final byte[] header;
-    private final TextFormatParser parser;
+    private final SavegameType type;
     private final Set<SavegamePart> parts;
     private final String[] ignored;
 
-    public ZipSavegameStructure(byte[] header, TextFormatParser parser, Set<SavegamePart> parts, String... ignored) {
+    public ZipSavegameStructure(byte[] header,SavegameType type, Set<SavegamePart> parts, String... ignored) {
         this.header = header;
-        this.parser = parser;
+        this.type = type;
         this.parts = parts;
         this.ignored = ignored;
     }
@@ -61,7 +60,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                         return new SavegameParseResult.Invalid("File " + part.get().identifier() + " has an invalid header");
                     }
 
-                    var node = parser.parse(bytes, header != null ? header.length + 1 : 0);
+                    var node = type.getParser().parse(bytes, header != null ? header.length + 1 : 0);
                     nodes.put(part.get().name(), node);
                 }
 
@@ -97,7 +96,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                         partOut.write(header);
                         partOut.write("\n".getBytes());
                     }
-                    NodeWriter.write(partOut, parser.getCharset(), e.getValue(), "\t", 0);
+                    NodeWriter.write(partOut, type.getParser().getCharset(), e.getValue(), "\t", 0);
                 }
             }
         }
@@ -109,8 +108,8 @@ public class ZipSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public TextFormatParser getParser() {
-        return parser;
+    public SavegameType getType() {
+        return type;
     }
 
     public record SavegamePart(String name, String identifier) {

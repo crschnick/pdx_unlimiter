@@ -2,7 +2,6 @@ package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
-import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +16,7 @@ import java.util.zip.ZipOutputStream;
 public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
 
     public Ck3CompressedSavegameStructure() {
-        super(null, TextFormatParser.CK3, Set.of(new SavegamePart("gamestate", "gamestate")));
+        super(null, SavegameType.CK3, Set.of(new SavegamePart("gamestate", "gamestate")));
     }
 
     private static final int MAX_SEARCH = 150000;

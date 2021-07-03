@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.io.savegame;
 
+import com.crschnick.pdxu.io.parser.TextFormatParser;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -45,6 +47,11 @@ public interface SavegameType {
                 return false;
             }
         }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.eu4();
+        }
     };
 
     SavegameType HOI4 = new SavegameType() {
@@ -68,6 +75,11 @@ public interface SavegameType {
         public boolean isBinary(byte[] input) {
             var header = Arrays.copyOfRange(input, 0, 7);
             return new String(header).equals("HOI4bin");
+        }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.hoi4();
         }
     };
 
@@ -98,6 +110,11 @@ public interface SavegameType {
             var header = Arrays.copyOfRange(input, 0, Ck3Header.LENGTH);
             return Ck3Header.fromStartOfFile(header).binary();
         }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.ck3();
+        }
     };
 
 
@@ -121,6 +138,11 @@ public interface SavegameType {
         @Override
         public boolean isBinary(byte[] input) {
             return false;
+        }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.stellaris();
         }
     };
 
@@ -150,6 +172,11 @@ public interface SavegameType {
         public boolean isBinary(byte[] input) {
             return false;
         }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.ck2();
+        }
     };
 
     SavegameType VIC2 = new SavegameType() {
@@ -172,6 +199,11 @@ public interface SavegameType {
         @Override
         public boolean isBinary(byte[] input) {
             return false;
+        }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.vic2();
         }
     };
 
@@ -196,4 +228,6 @@ public interface SavegameType {
     String getFileEnding();
 
     boolean isBinary(byte[] input);
+
+    TextFormatParser getParser();
 }
