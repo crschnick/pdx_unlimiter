@@ -18,9 +18,9 @@
 
 .editor-filter-bar {
   -fx-padding: 0.5em;
-  -fx-background-color: white;
--fx-border-color: #CCCCCCFF;
--fx-border-width: 0.15em 0 0 0;
+  -fx-background-color: #00ad1533;
+-fx-border-color: #AAAAAAFF;
+-fx-border-width: 0.05em 0 0 0;
 }
 
 .editor .menu {
@@ -29,15 +29,16 @@
 
 .editor-nav-bar-container {
   -fx-padding: 0.4em;
--fx-border-color: #CCCCCCFF;
--fx-border-width: 0 0 0.1em 0;
+-fx-border-color: #AAAAAAFF;
+  -fx-background-color: #00ad1533;
+-fx-border-width: 0 0 0.05em 0;
   -fx-font-size: 11pt;
 }
 
 .editor-nav-bar {
   -fx-background-color: #EEEEEEFF;
--fx-border-color: #CCCCCCFF;
--fx-border-width: 0.1em;
+-fx-border-color: #AAAAAAFF;
+-fx-border-width: 0.05em;
   -fx-padding: 0 0.3em 0 0.3em;
 }
 

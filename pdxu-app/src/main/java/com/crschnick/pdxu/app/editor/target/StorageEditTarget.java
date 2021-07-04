@@ -12,16 +12,22 @@ import java.util.Map;
 
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
 
+    private final GameFileContext context;
     private final SavegameStorage<T,I> storage;
     private final SavegameEntry<T, I> entry;
     private final EditTarget target;
 
     public StorageEditTarget(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry, EditTarget target) {
-        super(GameFileContext.fromInfo(entry.getInfo()),
-                storage.getSavegameFile(entry));
+        super(storage.getSavegameFile(entry));
         this.storage = storage;
         this.entry = entry;
         this.target = target;
+        this.context = GameFileContext.fromInfo(entry.getInfo());
+    }
+
+    @Override
+    public boolean isSavegame() {
+        return target.isSavegame();
     }
 
     @Override
@@ -43,5 +49,10 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     @Override
     public String getName() {
         return storage.getEntryName(entry);
+    }
+
+    @Override
+    public GameFileContext getFileContext() {
+        return context;
     }
 }

@@ -1,41 +1,56 @@
 package com.crschnick.pdxu.app.editor.target;
 
-import com.crschnick.pdxu.app.editor.EditorSettings;
+import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.NodeWriter;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
 public class ExternalEditTarget extends EditTarget {
 
-    public ExternalEditTarget(GameFileContext fileContext, Path file) {
-        super(fileContext, file);
-    }
+    private final EditTarget target;
 
-    @Override
-    public Map<String, ArrayNode> parse() throws Exception {
-        return Map.of(getName(), getParser().parse(file));
-    }
+    public ExternalEditTarget(Path file) {
+        super(file);
 
-    @Override
-    public void write(Map<String, ArrayNode> nodeMap) throws Exception {
-        try (var out = Files.newOutputStream(file)) {
-            NodeWriter.write(out, getParser().getCharset(), nodeMap.values().iterator().next(),
-                    EditorSettings.getInstance().indentation.getValue(), 0);
+        SavegameType t = SavegameType.getTypeForFile(file);
+        if (t != null) {
+            target = new SavegameEditTarget(file, t);
+        } else {
+            target = new DataFileEditTarget(GameFileContext.forGame(SavegameManagerState.get().current()), file);
         }
     }
 
     @Override
+    public boolean isSavegame() {
+        return target.isSavegame();
+    }
+
+    @Override
+    public Map<String, ArrayNode> parse() throws Exception {
+        return target.parse();
+    }
+
+    @Override
+    public void write(Map<String, ArrayNode> nodeMap) throws Exception {
+        target.write(nodeMap);
+    }
+
+    @Override
     public TextFormatParser getParser() {
-        return fileContext.getParser();
+        return target.getParser();
     }
 
     @Override
     public String getName() {
-        return file.getFileName().toString();
+        return target.getName();
+    }
+
+    @Override
+    public GameFileContext getFileContext() {
+        return target.getFileContext();
     }
 }

@@ -1,4 +1,10 @@
+import com.crschnick.pdxu.app.editor.adapter.Ck3SavegameAdapter;
+import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
+import com.crschnick.pdxu.app.editor.adapter.Eu4SavegameAdapter;
+
 module com.crschnick.pdxu.app {
+    uses com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
+    provides EditorSavegameAdapter with Eu4SavegameAdapter, Ck3SavegameAdapter;
     requires com.realityinteractive.imageio.tga;
     requires org.apache.commons.lang;
     requires org.apache.commons.io;

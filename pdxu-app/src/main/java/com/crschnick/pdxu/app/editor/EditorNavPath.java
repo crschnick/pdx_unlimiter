@@ -161,7 +161,7 @@ public class EditorNavPath {
     }
 
 
-    public static EditorNavPath verify(EditorNavPath input, Collection<EditorNode> rootNodes) {
+    public static EditorNavPath verify(EditorNavPath input) {
         EditorNode current = null;
         List<EditorNavPath.NavEntry> newPath = new ArrayList<>();
         for (var navEl : input.getPath()) {

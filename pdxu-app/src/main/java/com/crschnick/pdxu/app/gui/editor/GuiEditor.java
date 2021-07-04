@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.editor.*;
+import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -107,7 +108,7 @@ public class GuiEditor {
 
         int offset = 0;
         if (state.getContent().canGoToPreviousPage()) {
-            Button next = new JFXButton("Go to previous page (" + (state.getContent().getPage() - 1) + ")");
+            Button next = new JFXButton("Go to previous page (" + (state.getContent().getPage()) + ")");
             next.setOnAction(e -> {
                 state.getContent().previousPage();
             });
@@ -123,9 +124,9 @@ public class GuiEditor {
             var kn = createGridElement(new Label(n.getDisplayKeyName()), i);
             kn.setAlignment(Pos.CENTER_LEFT);
 
-            grid.add(kn, 0, i);
-            grid.add(createGridElement(new Label("="), i), 1, i);
-            grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 2, i);
+            grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);
+            grid.add(kn, 1, i);
+            grid.add(createGridElement(new Label("="), i), 2, i);
             grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
 
             if (n.getDirectParent() != null) {
@@ -134,15 +135,17 @@ public class GuiEditor {
                 actions.setAlignment(Pos.CENTER_RIGHT);
 
                 if (n.isReal() && EditorSettings.getInstance().enableNodeJumps.getValue()) {
-                    EditorNodePointers.create(state, (EditorSimpleNode) n).ifPresent(np -> {
+                    var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                            .createNodeJump(state, (EditorSimpleNode) n);
+                    if (pointer != null) {
                         var b = new JFXButton();
                         b.setGraphic(new FontIcon());
                         b.getStyleClass().add("jump-to-def-button");
-                        GuiTooltips.install(b, "Jump to " + np);
-                        b.setOnAction(e -> state.getNavHistory().navigateTo(np));
+                        GuiTooltips.install(b, "Jump to " + pointer);
+                        b.setOnAction(e -> state.getNavHistory().navigateTo(pointer));
                         actions.getChildren().add(b);
                         b.prefHeightProperty().bind(actions.heightProperty());
-                    });
+                    }
                 }
 
                 Button edit = new JFXButton();
@@ -172,7 +175,7 @@ public class GuiEditor {
         }
 
         if (state.getContent().canGoToNextPage()) {
-            Button next = new JFXButton("Go to next page (" + (state.getContent().getPage() + 1) + ")");
+            Button next = new JFXButton("Go to next page (" + (state.getContent().getPage() + 2) + ")");
             next.setOnAction(e -> {
                 state.getContent().nextPage();
             });

@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -18,20 +19,22 @@ public class EditorState {
     private final String fileName;
     private final TextFormatParser parser;
     private final BooleanProperty dirty;
-    private final Map<String, EditorNode> rootNodes;
+    private final Map<String, EditorSimpleNode> rootNodes;
     private final EditorExternalState externalState;
     private final EditorFilter filter;
     private final EditorContent content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
     private final ObjectProperty<GameFileContext> fileContext;
     private final EditorNavHistory navHistory;
+    private final boolean savegame;
 
-    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
+    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
 
         this.fileContext = new SimpleObjectProperty<>(fileContext);
+        this.savegame = savegame;
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
         filter = new EditorFilter(this);
@@ -77,7 +80,7 @@ public class EditorState {
     }
 
     public void onFileChanged() {
-        var newPath = EditorNavPath.verify(this.navHistory.getCurrent(), rootNodes.values());
+        var newPath = EditorNavPath.verify(this.navHistory.getCurrent());
         if (EditorNavPath.areNodePathsEqual(this.navHistory.getCurrent(), newPath)) {
             this.content.completeContentChange();
         } else {
@@ -115,11 +118,19 @@ public class EditorState {
         return fileContext.get();
     }
 
-    public Map<String, EditorNode> getRootNodes() {
+    public Map<String, EditorSimpleNode> getRootNodes() {
         return rootNodes;
     }
 
     public EditorNavHistory getNavHistory() {
         return navHistory;
+    }
+
+    public ArrayNode getBackingNode() {
+        return new LinkedArrayNode(rootNodes.values().stream().map(en -> en.getBackingNode().getArrayNode()).toList());
+    }
+
+    public boolean isSavegame() {
+        return savegame;
     }
 }

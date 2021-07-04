@@ -11,11 +11,9 @@ import java.util.Optional;
 
 public abstract class EditTarget {
 
-    protected final GameFileContext fileContext;
     protected final Path file;
 
-    public EditTarget(GameFileContext fileContext, Path file) {
-        this.fileContext = fileContext;
+    public EditTarget(Path file) {
         this.file = file;
     }
 
@@ -27,6 +25,8 @@ public abstract class EditTarget {
 
         return Optional.of(new SavegameEditTarget(file, type));
     }
+
+    public abstract boolean isSavegame();
 
     public abstract Map<String, ArrayNode> parse() throws Exception;
 
@@ -40,7 +40,5 @@ public abstract class EditTarget {
 
     public abstract String getName();
 
-    public GameFileContext getFileContext() {
-        return fileContext;
-    }
+    public abstract GameFileContext getFileContext();
 }

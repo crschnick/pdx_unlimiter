@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.EditorState;
+import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.Hyperlinks;
@@ -44,11 +45,32 @@ public class GuiEditorMenuBar {
         });
         help.getItems().add(is);
 
+
+        Menu jump = new Menu("Jump to");
+        Runnable fillJumps = () -> {
+            if (state.isSavegame()) {
+                var jumps = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createCommonJumps(state);
+                jumps.forEach((k,v) -> {
+                    MenuItem j = new MenuItem(k);
+                    j.setOnAction((a) -> {
+                        state.getNavHistory().navigateTo(v);
+                    });
+                    jump.getItems().add(j);
+                });
+            }
+        };
+        fillJumps.run();
+        jump.setOnShowing(e -> {
+            jump.getItems().clear();
+            fillJumps.run();
+        });
+
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(file);
         menuBar.getMenus().add(editor);
         menuBar.getMenus().add(help);
+        menuBar.getMenus().add(jump);
         return menuBar;
     }
 }
