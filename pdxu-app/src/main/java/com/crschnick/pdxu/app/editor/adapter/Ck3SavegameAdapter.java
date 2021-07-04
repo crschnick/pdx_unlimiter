@@ -13,6 +13,7 @@ import com.jfoenix.controls.JFXButton;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,7 +77,15 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
-        return Map.of();
+        var player = state.getBackingNode().getNodeForKey("currently_played_characters").getNodeArray().get(0);
+        var playerDyn = state.getBackingNode().getNodeForKeys("living", player.getString(), "dynasty_house");
+        var map = new LinkedHashMap<String, NodePointer>();
+        map.put("Player character", NodePointer.builder().name("living").name(player.getString()).build());
+        map.put("Player realm", NodePointer.builder().name("living").name(player.getString())
+                .name("landed_data").name("domain").build());
+        map.put("Player house/dynasty", NodePointer.builder().name("dynasties").name("dynasty_house")
+                .name(playerDyn.getString()).build());
+        return map;
     }
 
     private static final List<String> DYNASTY_KEYS = List.of("dynasty_house", "dynasty");
@@ -139,6 +148,10 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public NodePointer createNodeJump(EditorState state, EditorSimpleNode node) {
+        if (!state.isSavegame()) {
+            return null;
+        }
+
         var keyOpt = node.getKeyName();
         if (keyOpt.isPresent() && node.getBackingNode().isValue()) {
             return get(keyOpt.get(), node.getBackingNode().getString());

@@ -1,9 +1,8 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 
-import com.crschnick.pdxu.app.editor.EditorNavPath;
-import com.crschnick.pdxu.app.editor.EditorNode;
-import com.crschnick.pdxu.app.editor.EditorState;
+import com.crschnick.pdxu.app.editor.*;
+import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -113,19 +112,36 @@ public class GuiEditorNavBar {
         p.setFillHeight(true);
         p.setAlignment(Pos.CENTER);
 
-        Button edit = new JFXButton();
-        edit.setFocusTraversable(false);
-        edit.setGraphic(new FontIcon());
-        edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-        GuiTooltips.install(edit, "Open in external text editor");
-        edit.setOnAction(e -> {
-            edState.getExternalState().startEdit(edState, edState.getNavHistory().getCurrent().getLast().getEditorNode());
+        edState.getNavHistory().currentProperty().addListener((c,o,n) -> {
+            if (p.getChildren().size() == 2) {
+                p.getChildren().remove(0);
+            }
+
+            if (n.getLast().getEditorNode() != null && n.getLast().getEditorNode().isReal() &&
+                    EditorSettings.getInstance().enableNodeTags.getValue()) {
+                var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
+                        .createNodeTag(edState, (EditorSimpleNode) n.getLast().getEditorNode());
+                if (tag != null) {
+                    p.getChildren().add(0, tag);
+                }
+            }
         });
-        edit.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> edState.getNavHistory().getCurrent().getLast().getEditorNode() == null,
-                edState.getNavHistory().currentProperty()));
-        edit.setPadding(new Insets(4, 4, 2, 4));
-        p.getChildren().setAll(edit);
+
+        {
+            Button edit = new JFXButton();
+            edit.setFocusTraversable(false);
+            edit.setGraphic(new FontIcon());
+            edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+            GuiTooltips.install(edit, "Open in external text editor");
+            edit.setOnAction(e -> {
+                edState.getExternalState().startEdit(edState, edState.getNavHistory().getCurrent().getLast().getEditorNode());
+            });
+            edit.disableProperty().bind(Bindings.createBooleanBinding(
+                    () -> edState.getNavHistory().getCurrent().getLast().getEditorNode() == null,
+                    edState.getNavHistory().currentProperty()));
+            edit.setPadding(new Insets(4, 4, 2, 4));
+            p.getChildren().add(edit);
+        }
         return p;
     }
 }
