@@ -3,6 +3,7 @@ package com.crschnick.pdxu.io.node;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 public final class SimpleArrayNode extends ArrayNode {
 
@@ -142,22 +143,10 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
-        evaluateAllValueNodes();
-
-        String key;
-        for (int i = 0; i < values.size(); i++) {
-            if (!hasKeyAtIndex(i)) {
-                if (!includeNullKeys) {
-                    continue;
-                } else {
-                    key = null;
-                }
-            } else {
-                key = context.evaluate(keyScalars[i]);
-            }
-
-            c.accept(key, values.get(i));
-        }
+        forEach((k, v) -> {
+            c.accept(k, v);
+            return true;
+        }, includeNullKeys);
     }
 
     protected void writeInternal(NodeWriter writer) throws IOException {
@@ -175,6 +164,29 @@ public final class SimpleArrayNode extends ArrayNode {
             }
             writer.newLine();
         }
+    }
+
+    @Override
+    public boolean forEach(BiPredicate<String, Node> c, boolean includeNullKeys) {
+        evaluateAllValueNodes();
+
+        String key;
+        for (int i = 0; i < values.size(); i++) {
+            if (!hasKeyAtIndex(i)) {
+                if (!includeNullKeys) {
+                    continue;
+                } else {
+                    key = null;
+                }
+            } else {
+                key = context.evaluate(keyScalars[i]);
+            }
+
+            if (!c.test(key, values.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

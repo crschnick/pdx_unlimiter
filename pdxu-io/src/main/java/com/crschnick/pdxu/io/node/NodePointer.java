@@ -117,4 +117,8 @@ public final class NodePointer {
 
         return Optional.empty();
     }
+
+    public List<Element> getPath() {
+        return path;
+    }
 }

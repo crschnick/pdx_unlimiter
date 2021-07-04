@@ -88,13 +88,13 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public ArrayNode getContent() {
-        return ArrayNode.sameKeyArray(keyName, nodes);
+    public int getSize() {
+        return nodes.size();
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
+    public ArrayNode getContent() {
+        return ArrayNode.sameKeyArray(keyName, nodes);
     }
 
     public List<Node> getNodes() {

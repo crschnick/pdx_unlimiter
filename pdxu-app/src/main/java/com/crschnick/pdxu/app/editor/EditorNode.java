@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public abstract class EditorNode {
@@ -22,6 +23,54 @@ public abstract class EditorNode {
         this.parentIndex = parentIndex;
     }
 
+    public static Optional<EditorNode> fastEditorSimpleNodeSearch(EditorNode parent, ArrayNode ar, String key) {
+        AtomicInteger parentIndex = new AtomicInteger();
+        AtomicInteger index = new AtomicInteger();
+        AtomicInteger previousKeyStart = new AtomicInteger();
+        AtomicReference<EditorSimpleNode> found = new AtomicReference<>();
+        ar.forEach((k, v) -> {
+            if (k != null) {
+                boolean endsHere = index.get() + 1 == ar.size() ||
+                        !ar.isKeyAt(k, index.get() + 1);
+                if (!endsHere) {
+                    index.getAndIncrement();
+                    return true;
+                }
+
+                int start = previousKeyStart.get();
+                int end = index.get();
+                boolean shouldCollect = end > start;
+                if (shouldCollect) {
+                    index.getAndIncrement();
+                    parentIndex.getAndIncrement();
+                }
+
+                previousKeyStart.set(end + 1);
+
+                if (shouldCollect) {
+                    return true;
+                }
+            } else {
+                previousKeyStart.incrementAndGet();
+            }
+
+            if (k != null && k.equals(key)) {
+                found.set(new EditorSimpleNode(
+                        parent,
+                        k,
+                        parentIndex.get(),
+                        index.get(),
+                        v));
+                return false;
+            }
+
+            parentIndex.getAndIncrement();
+            index.getAndIncrement();
+            return true;
+        }, true);
+        return Optional.ofNullable(found.get());
+    }
+
     public static List<EditorNode> create(EditorNode parent, ArrayNode ar) {
         var result = new ArrayList<EditorNode>();
         AtomicInteger parentIndex = new AtomicInteger();
@@ -29,7 +78,7 @@ public abstract class EditorNode {
         AtomicInteger previousKeyStart = new AtomicInteger();
         ar.forEach((k, v) -> {
             if (k != null) {
-                boolean endsHere = index.get() + 1 == ar.getNodeArray().size() ||
+                boolean endsHere = index.get() + 1 == ar.size() ||
                         !ar.isKeyAt(k, index.get() + 1);
                 if (!endsHere) {
                     index.getAndIncrement();
@@ -93,8 +142,6 @@ public abstract class EditorNode {
 
     public abstract ArrayNode getContent();
 
-    public abstract boolean isEmpty();
-
     public abstract List<EditorNode> expand();
 
     public abstract ArrayNode toWritableNode();
@@ -108,6 +155,8 @@ public abstract class EditorNode {
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);
     }
+
+    public abstract int getSize();
 
     public int getParentIndex() {
         return parentIndex;

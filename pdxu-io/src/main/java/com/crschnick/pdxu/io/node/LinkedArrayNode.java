@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 public final class LinkedArrayNode extends ArrayNode {
 
@@ -162,6 +163,16 @@ public final class LinkedArrayNode extends ArrayNode {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public boolean forEach(BiPredicate<String, Node> c, boolean includeNullKeys) {
+        for (var ar : arrayNodes) {
+            if (!ar.forEach(c, includeNullKeys)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

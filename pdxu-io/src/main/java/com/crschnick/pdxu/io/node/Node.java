@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 public abstract class Node {
 
@@ -16,6 +17,10 @@ public abstract class Node {
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean forEach(BiPredicate<String, Node> c, boolean includeNullKeys) {
         throw new UnsupportedOperationException();
     }
 

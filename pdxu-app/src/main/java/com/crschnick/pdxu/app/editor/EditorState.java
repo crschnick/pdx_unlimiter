@@ -59,7 +59,7 @@ public class EditorState {
     }
 
     public void init() {
-        content.navigate(navHistory.getCurrent().getLast());
+        content.navigate(navHistory.getCurrent().getEditorNode(), 0, 0.0);
     }
 
     public void onFilterChange() {

@@ -24,15 +24,6 @@ public final class EditorSimpleNode extends EditorNode {
                 .orElse(ArrayNode.array(List.of(getBackingNode())));
     }
 
-    @Override
-    public boolean isEmpty() {
-        if (!backingNode.isArray()) {
-            return false;
-        }
-
-        return backingNode.getArrayNode().isEmpty();
-    }
-
     public void updateText(String text) {
         ValueNode bn = (ValueNode) backingNode;
 
@@ -144,6 +135,11 @@ public final class EditorSimpleNode extends EditorNode {
                 throw new IllegalArgumentException();
             }
         }
+    }
+
+    @Override
+    public int getSize() {
+        return backingNode.getArrayNode().size();
     }
 
     public int getKeyIndex() {

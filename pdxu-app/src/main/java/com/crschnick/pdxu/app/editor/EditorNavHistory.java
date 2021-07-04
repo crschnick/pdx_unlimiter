@@ -19,9 +19,9 @@ public class EditorNavHistory {
     private final IntegerProperty historyPos;
 
     public EditorNavHistory(EditorState state) {
-        var init = new EditorNavPath.NavEntry(null, 0, 0.0);
+        var init = EditorNavPath.empty();
         this.history = new ArrayList<>();
-        this.current = new SimpleObjectProperty<>(new EditorNavPath(List.of(init)));
+        this.current = new SimpleObjectProperty<>(init);
         this.history.add(current.get());
         this.state = state;
         this.historyPos = new SimpleIntegerProperty(0);
@@ -43,7 +43,7 @@ public class EditorNavHistory {
         historyPos.set(historyPos.get() - 1);
         var goTo = history.get(historyPos.get());
         this.current.set(goTo);
-        state.getContent().navigate(goTo.getLast());
+        state.getContent().navigate(goTo.getEditorNode(), goTo.getPage(), goTo.getScroll());
     }
 
     public void goForward() {
@@ -54,7 +54,7 @@ public class EditorNavHistory {
         historyPos.set(historyPos.get() + 1);
         var goTo = history.get(historyPos.get());
         this.current.set(goTo);
-        state.getContent().navigate(goTo.getLast());
+        state.getContent().navigate(goTo.getEditorNode(), goTo.getPage(), goTo.getScroll());
     }
 
     private void removeHistoryAfterPos() {
@@ -65,7 +65,7 @@ public class EditorNavHistory {
 
     public void replaceCurrentNavPath(EditorNavPath p) {
         this.current.set(p);
-        this.state.getContent().navigate(p.getLast());
+        this.state.getContent().navigate(p.getEditorNode(), p.getPage(), p.getScroll());
         this.history.set(historyPos.get(), p);
     }
 
@@ -77,7 +77,7 @@ public class EditorNavHistory {
         removeHistoryAfterPos();
 
         this.current.set(p);
-        this.state.getContent().navigate(p.getLast());
+        this.state.getContent().navigate(p.getEditorNode(), p.getPage(), p.getScroll());
 
         this.history.add(p);
         historyPos.set(historyPos.get() + 1);
@@ -91,10 +91,6 @@ public class EditorNavHistory {
     }
 
     public void navigateTo(EditorNode newNode) {
-        if (newNode != null && newNode.isEmpty()) {
-            return;
-        }
-
         var newPath = EditorNavPath.navigateTo(current.get(), newNode);
         navigateTo(newPath);
     }
