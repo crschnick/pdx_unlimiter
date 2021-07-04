@@ -4,9 +4,8 @@ import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.editor.target.EditTarget;
-import com.crschnick.pdxu.app.editor.target.DataFileEditTarget;
+import com.crschnick.pdxu.app.editor.target.ExternalEditTarget;
 import com.crschnick.pdxu.app.gui.editor.GuiEditor;
-import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
@@ -29,8 +28,7 @@ public class Editor {
             FileChooser c = new FileChooser();
             File file = c.showOpenDialog(PdxuApp.getApp().getStage());
             if (file != null && file.exists()) {
-                var target = new DataFileEditTarget(
-                        GameFileContext.forGame(SavegameManagerState.get().current()), file.toPath());
+                var target = new ExternalEditTarget(file.toPath());
                 createNewEditor(target);
             }
         });

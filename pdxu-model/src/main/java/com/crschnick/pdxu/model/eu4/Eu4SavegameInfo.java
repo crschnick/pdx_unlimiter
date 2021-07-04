@@ -32,6 +32,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private int manpower;
     private int maxManpower;
     private int totalDev;
+    private int totalAutonomyDev;
     private int prestige;
     private int stability;
     private int adm;
@@ -110,7 +111,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
 
             e.prestige = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("prestige").getDouble();
-            e.totalDev = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("realm_development").getDouble();
+            e.totalDev = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("raw_development").getDouble();
+            e.totalAutonomyDev = (int) n.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("development").getDouble();
 
 
             e.wars = War.fromActiveWarsNode(e.allTags, tag, n);
@@ -454,5 +456,9 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public boolean isAchievementOk() {
         return achievementOk;
+    }
+
+    public int getTotalAutonomyDev() {
+        return totalAutonomyDev;
     }
 }

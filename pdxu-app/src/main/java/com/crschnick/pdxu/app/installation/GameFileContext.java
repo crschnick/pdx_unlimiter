@@ -40,6 +40,10 @@ public class GameFileContext {
         return new GameFileContext(g, List.of());
     }
 
+    public static GameFileContext forType(SavegameType t) {
+        return new GameFileContext(TYPE_MAP.get(t), List.of());
+    }
+
     public GameFileContext(Game game, List<GameMod> mods) {
         this.game = game;
         this.mods = mods;

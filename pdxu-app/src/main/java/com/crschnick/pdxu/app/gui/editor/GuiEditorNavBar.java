@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.gui.GuiStyle;
@@ -119,10 +120,14 @@ public class GuiEditorNavBar {
 
             if (n.getLast().getEditorNode() != null && n.getLast().getEditorNode().isReal() &&
                     EditorSettings.getInstance().enableNodeTags.getValue()) {
-                var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
-                        .createNodeTag(edState, (EditorSimpleNode) n.getLast().getEditorNode());
-                if (tag != null) {
-                    p.getChildren().add(0, tag);
+                try {
+                    var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
+                            .createNodeTag(edState, (EditorSimpleNode) n.getLast().getEditorNode());
+                    if (tag != null) {
+                        p.getChildren().add(0, tag);
+                    }
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
                 }
             }
         });

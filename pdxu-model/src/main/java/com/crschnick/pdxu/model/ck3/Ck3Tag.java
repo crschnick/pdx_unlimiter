@@ -61,6 +61,10 @@ public class Ck3Tag {
         }
 
         var personNode = n.getNodeForKey("living").getNodeForKey(String.valueOf(id));
+        if (!personNode.hasKey("landed_data")) {
+            return Optional.empty();
+        }
+
         var house = new Ck3House(
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString()),
                 Ck3CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms")));

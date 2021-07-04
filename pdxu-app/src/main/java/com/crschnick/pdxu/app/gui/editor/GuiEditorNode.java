@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.editor;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
@@ -26,10 +27,14 @@ public class GuiEditorNode {
         box.setAlignment(Pos.CENTER);
         box.setFillHeight(true);
         if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
-            var tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                    .createNodeTag(state, (EditorSimpleNode) n);
-            if (tag != null) {
-                box.getChildren().add(tag);
+            try {
+                var tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                        .createNodeTag(state, (EditorSimpleNode) n);
+                if (tag != null) {
+                    box.getChildren().add(tag);
+                }
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
             }
         }
 

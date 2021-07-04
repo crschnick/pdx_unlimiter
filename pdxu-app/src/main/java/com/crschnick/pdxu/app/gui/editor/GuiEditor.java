@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.PdxuApp;
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.gui.GuiStyle;
@@ -135,16 +136,20 @@ public class GuiEditor {
                 actions.setAlignment(Pos.CENTER_RIGHT);
 
                 if (n.isReal() && EditorSettings.getInstance().enableNodeJumps.getValue()) {
+                    try {
                     var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
                             .createNodeJump(state, (EditorSimpleNode) n);
-                    if (pointer != null) {
-                        var b = new JFXButton();
-                        b.setGraphic(new FontIcon());
-                        b.getStyleClass().add("jump-to-def-button");
-                        GuiTooltips.install(b, "Jump to " + pointer);
-                        b.setOnAction(e -> state.getNavHistory().navigateTo(pointer));
-                        actions.getChildren().add(b);
-                        b.prefHeightProperty().bind(actions.heightProperty());
+                        if (pointer != null) {
+                            var b = new JFXButton();
+                            b.setGraphic(new FontIcon());
+                            b.getStyleClass().add("jump-to-def-button");
+                            GuiTooltips.install(b, "Jump to " + pointer);
+                            b.setOnAction(e -> state.getNavHistory().navigateTo(pointer));
+                            actions.getChildren().add(b);
+                            b.prefHeightProperty().bind(actions.heightProperty());
+                        }
+                    } catch (Exception ex) {
+                        ErrorHandler.handleException(ex);
                     }
                 }
 

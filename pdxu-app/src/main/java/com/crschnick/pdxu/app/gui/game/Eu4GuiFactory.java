@@ -111,6 +111,22 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         addNode(pane, stack);
     }
 
+    private void addDevelopmentEntry(
+            JFXMasonryPane pane,
+            int totalDev, int autonomyDev) {
+        var label = new Label(autonomyDev + " / " + totalDev,
+                GameImage.imageNode(EU4_ICON_DEV, CLASS_IMAGE_ICON));
+        label.setMinWidth(Region.USE_PREF_SIZE);
+        label.setEllipsisString("");
+
+        var stack = new StackPane(label);
+        stack.setAlignment(Pos.CENTER);
+        stack.setMinWidth(label.getPrefWidth());
+        stack.getStyleClass().add("number");
+        GuiTooltips.install(stack, "Autonomy-based development / Total development");
+        addNode(pane, stack);
+    }
+
     private void addPowersEntry(
             JFXMasonryPane pane, int adm, int dip, int mil) {
         var label = createPowersNode(adm, dip, mil);
@@ -201,7 +217,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
         addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
         addPowersEntry(grid, info.getAdm(), info.getDip(), info.getMil());
-        addIntegerEntry(grid, EU4_ICON_DEV, info.getTotalDev(), "Development", false);
+        addDevelopmentEntry(grid, info.getTotalDev(), info.getTotalAutonomyDev());
 
         for (Eu4SavegameInfo.War war : info.getWars()) {
             createDiplomacyRow(grid, i, imageNode(EU4_ICON_WAR, CLASS_IMAGE_ICON), war.getEnemies(),

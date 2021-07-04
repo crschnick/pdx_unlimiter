@@ -49,14 +49,18 @@ public class GuiEditorMenuBar {
         Menu jump = new Menu("Jump to");
         Runnable fillJumps = () -> {
             if (state.isSavegame()) {
-                var jumps = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createCommonJumps(state);
-                jumps.forEach((k,v) -> {
-                    MenuItem j = new MenuItem(k);
-                    j.setOnAction((a) -> {
-                        state.getNavHistory().navigateTo(v);
+                try {
+                    var jumps = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createCommonJumps(state);
+                    jumps.forEach((k, v) -> {
+                        MenuItem j = new MenuItem(k);
+                        j.setOnAction((a) -> {
+                            state.getNavHistory().navigateTo(v);
+                        });
+                        jump.getItems().add(j);
                     });
-                    jump.getItems().add(j);
-                });
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
             }
         };
         fillJumps.run();

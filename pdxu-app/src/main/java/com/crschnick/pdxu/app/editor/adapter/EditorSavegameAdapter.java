@@ -17,9 +17,9 @@ public interface EditorSavegameAdapter {
     Map<Game, EditorSavegameAdapter> ALL = ServiceLoader.load(EditorSavegameAdapter.class)
             .stream().map(prov -> prov.get()).collect(Collectors.toMap(adap -> adap.getGame(), Function.identity()));
 
-    Map<String, NodePointer> createCommonJumps(EditorState state);
+    Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception;
 
-    NodePointer createNodeJump(EditorState state, EditorSimpleNode node);
+    NodePointer createNodeJump(EditorState state, EditorSimpleNode node) throws Exception;
 
-    javafx.scene.Node createNodeTag(EditorState state, EditorSimpleNode node);
+    javafx.scene.Node createNodeTag(EditorState state, EditorSimpleNode node) throws Exception;
 }

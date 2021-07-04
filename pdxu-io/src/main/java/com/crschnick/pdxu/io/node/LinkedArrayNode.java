@@ -150,7 +150,7 @@ public final class LinkedArrayNode extends ArrayNode {
                 return r.get();
             }
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Invalid key " + key);
     }
 
     @Override
@@ -168,8 +168,8 @@ public final class LinkedArrayNode extends ArrayNode {
     public List<Node> getNodesForKey(String key) {
         List<Node> found = new ArrayList<>();
         for (var ar : arrayNodes) {
-            var r = ar.getNodeForKeyIfExistent(key);
-            r.ifPresent(found::add);
+            var r = ar.getNodesForKey(key);
+            found.addAll(r);
         }
         return found;
     }

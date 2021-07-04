@@ -55,6 +55,6 @@ public class SavegameEditTarget extends EditTarget {
 
     @Override
     public GameFileContext getFileContext() {
-        return null;
+        return GameFileContext.forType(type);
     }
 }

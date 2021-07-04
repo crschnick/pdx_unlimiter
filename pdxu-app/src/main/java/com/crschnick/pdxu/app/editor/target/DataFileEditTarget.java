@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class DataFileEditTarget extends EditTarget {
 
-    private GameFileContext context;
+    private final GameFileContext context;
 
     public DataFileEditTarget(GameFileContext fileContext, Path file) {
         super(file);
