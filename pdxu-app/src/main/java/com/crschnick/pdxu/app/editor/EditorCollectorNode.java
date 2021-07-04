@@ -56,7 +56,7 @@ public final class EditorCollectorNode extends EditorNode {
 
     @Override
     public String getNavigationName() {
-        return keyName;
+        return keyName + "(s)";
     }
 
     @Override
@@ -85,6 +85,16 @@ public final class EditorCollectorNode extends EditorNode {
                 firstNodeIndex,
                 nodes.size());
         this.nodes = newNode.getNodeArray();
+    }
+
+    @Override
+    public ArrayNode getContent() {
+        return ArrayNode.sameKeyArray(keyName, nodes);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
     }
 
     public List<Node> getNodes() {

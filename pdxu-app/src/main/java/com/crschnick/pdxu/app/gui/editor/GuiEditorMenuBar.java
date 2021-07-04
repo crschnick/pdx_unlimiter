@@ -1,9 +1,11 @@
 package com.crschnick.pdxu.app.gui.editor;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.EditorState;
-import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
+import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.Hyperlinks;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -23,14 +25,9 @@ public class GuiEditorMenuBar {
 
 
         Menu editor = new Menu("Editor");
-        MenuItem cte = new MenuItem("Change text editor");
+        MenuItem cte = new MenuItem("Editor Settings");
         cte.setOnAction((a) -> {
-            GuiDialogHelper.showBlockingAlert(alert -> {
-                alert.setAlertType(Alert.AlertType.INFORMATION);
-                alert.setTitle("Change text editor");
-                alert.setHeaderText("If you want to change the text editor used when clicking on the edit button,\n" +
-                        "create a new .pdxt file and choose the default program that should be used to open it.");
-            });
+            GuiEditorSettings.showEditorSettings();
         });
         editor.getItems().add(cte);
 
@@ -42,12 +39,38 @@ public class GuiEditorMenuBar {
         });
         help.getItems().add(guide);
 
+        MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
+        is.setOnAction((a) -> {
+            ErrorHandler.reportIssue(null);
+        });
+        help.getItems().add(is);
+
+
+        Menu jump = new Menu("Jump to");
+        Runnable fillJumps = () -> {
+            if (state.isSavegame()) {
+                var jumps = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createCommonJumps(state);
+                jumps.forEach((k,v) -> {
+                    MenuItem j = new MenuItem(k);
+                    j.setOnAction((a) -> {
+                        state.getNavHistory().navigateTo(v);
+                    });
+                    jump.getItems().add(j);
+                });
+            }
+        };
+        fillJumps.run();
+        jump.setOnShowing(e -> {
+            jump.getItems().clear();
+            fillJumps.run();
+        });
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(file);
         menuBar.getMenus().add(editor);
         menuBar.getMenus().add(help);
+        menuBar.getMenus().add(jump);
         return menuBar;
     }
 }

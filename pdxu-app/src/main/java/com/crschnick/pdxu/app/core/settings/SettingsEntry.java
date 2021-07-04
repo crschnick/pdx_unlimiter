@@ -35,13 +35,38 @@ public abstract class SettingsEntry<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(SettingsEntry.class);
 
+    /**
+     * Supplies the displayed name of this entry in the settings menu.
+     */
     protected final Supplier<String> name;
+
+    /**
+     * Supplies the displayed description of this entry in the settings menu.
+     */
     protected final Supplier<String> description;
+
+    /**
+     * The key name that will be used for the entry when being saved to a file.
+     */
     protected final String serializationName;
+
+    /**
+     * The value type of this settings entry.
+     */
     protected final Type type;
+
+    /**
+     * The value of this settings entry.
+     */
     protected ObjectProperty<T> value;
 
-
+    /**
+     * Creates a new settings entry using an i18n key name, a serialization name, and a type.
+     *
+     * @param id the i18n key name
+     * @param serializationName the key name that will be used for the entry when being saved to a file
+     * @param type the type of the entry
+     */
     public SettingsEntry(String id, String serializationName, Type type) {
         this.name = () -> PdxuI18n.get(id);
         this.serializationName = serializationName;
@@ -51,6 +76,16 @@ public abstract class SettingsEntry<T> {
         setupLogger();
     }
 
+    /**
+     * Creates a new settings entry with support for a dynamic name and description.
+     *
+     * @param name a supplier for the displayed name (should be localized)
+     * @param description a supplier for the displayed description (should be localized)
+     * @param serializationName the key name that will be used for the entry when being saved to a file
+     * @param type the type of the entry
+     *
+     * @see SettingsEntry#SettingsEntry(String, String, Type)
+     */
     public SettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type) {
         this.name = name;
         this.description = description;
@@ -66,14 +101,36 @@ public abstract class SettingsEntry<T> {
         });
     }
 
+    /**
+     * Sets the value using a Json node.
+     *
+     * @param node the json node
+     */
     public abstract void set(JsonNode node);
 
+    /**
+     * Converts the value into a Json node.
+     * Should be compatible with {@link #set(JsonNode)}.
+     *
+     * @return the json node
+     */
     public abstract JsonNode toNode();
 
+    /**
+     * Sets the value of this entry.
+     * This method can be overridden to enable custom behaviour when changing the value.
+     *
+     * @param newValue the new value
+     */
     public void set(T newValue) {
         value.set(newValue);
     }
 
+    /**
+     * Sets the value of this entry to a default value.
+     * This method will be called when no value has been
+     * set for this entry when parsing a settings file.
+     */
     public abstract void setDefault(boolean settingsExist);
 
     public String getName() {
@@ -102,7 +159,8 @@ public abstract class SettingsEntry<T> {
         STRING,
         PATH,
         CHOICE,
-        GAME
+        GAME,
+        PROGRAM
     }
 
 
@@ -151,7 +209,6 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(Integer newValue) {
-            //TODO check range
             super.set(newValue);
         }
 
@@ -181,6 +238,11 @@ public abstract class SettingsEntry<T> {
         public StringEntry(String id, String serializationName, String defaultValue, boolean secret) {
             super(id, serializationName, Type.STRING, defaultValue);
             this.secret = secret;
+        }
+
+        public StringEntry(String id, String serializationName, Type type, String defaultValue) {
+            super(id, serializationName, type, defaultValue);
+            this.secret = false;
         }
 
         protected void setupLogger() {
@@ -344,6 +406,13 @@ public abstract class SettingsEntry<T> {
             } else {
                 return new TextNode(value.get().toString());
             }
+        }
+    }
+
+    public static final class ProgramEntry extends StringEntry {
+
+        public ProgramEntry(String id, String serializationName, String defaultValue) {
+            super(id, serializationName, Type.PROGRAM, defaultValue);
         }
     }
 

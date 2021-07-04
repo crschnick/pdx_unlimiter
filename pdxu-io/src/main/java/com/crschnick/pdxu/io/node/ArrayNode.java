@@ -47,6 +47,15 @@ public abstract class ArrayNode extends Node {
         return new LinkedArrayNode(List.of(begin, toInsert, end));
     }
 
+    @Override
+    public ArrayNode getArrayNode() {
+        return this;
+    }
+
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
     public abstract int size();
 
     public abstract boolean isKeyAt(String key, int index);

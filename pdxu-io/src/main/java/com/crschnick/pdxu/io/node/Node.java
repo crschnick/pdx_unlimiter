@@ -25,6 +25,10 @@ public abstract class Node {
         throw new UnsupportedOperationException();
     }
 
+    public ArrayNode getArrayNode() {
+        throw new UnsupportedOperationException();
+    }
+
     public List<Node> getNodeArray() {
         throw new UnsupportedOperationException();
     }
@@ -65,15 +69,19 @@ public abstract class Node {
         throw new UnsupportedOperationException();
     }
 
-    public Optional<Node> getNodeForKeysIfExistent(String... keys) {
+    public Node getNodeForKeys(String... keys) {
         var current = this;
         for (var key : keys) {
             current = current.getNodeForKeyIfExistent(key).orElse(null);
             if (current == null) {
-                return Optional.empty();
+                return null;
             }
         }
-        return Optional.of(current);
+        return current;
+    }
+
+    public Optional<Node> getNodeForKeysIfExistent(String... keys) {
+        return Optional.ofNullable(getNodeForKeys(keys));
     }
 
     public Optional<Node> getNodeForKeyIfExistent(String key) {

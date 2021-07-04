@@ -1,16 +1,16 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -19,29 +19,33 @@ public class EditorState {
     private final String fileName;
     private final TextFormatParser parser;
     private final BooleanProperty dirty;
-    private final Map<String, EditorNode> rootNodes;
+    private final Map<String, EditorSimpleNode> rootNodes;
     private final EditorExternalState externalState;
-    private final ListProperty<NavEntry> navPath;
     private final EditorFilter filter;
-    private final ListProperty<EditorNode> content;
+    private final EditorContent content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
+    private final ObjectProperty<GameFileContext> fileContext;
+    private final EditorNavHistory navHistory;
+    private final boolean savegame;
 
-    public EditorState(String fileName, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc) {
+    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
 
+        this.fileContext = new SimpleObjectProperty<>(fileContext);
+        this.savegame = savegame;
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
-        navPath = new SimpleListProperty<>(FXCollections.observableArrayList(new CopyOnWriteArrayList<NavEntry>()));
         filter = new EditorFilter(this);
-        content = new SimpleListProperty<>(FXCollections.observableArrayList());
+        content = new EditorContent(this);
 
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
             rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
         }
+        this.navHistory = new EditorNavHistory(this);
     }
 
     public void save() {
@@ -54,38 +58,16 @@ public class EditorState {
         dirtyProperty().set(false);
     }
 
-    public List<EditorNode> createEditorNodes(EditorNode parent) {
-        var editorNodes = parent.expand();
-        var filtered = filter.filter(editorNodes);
-        return filtered;
+    public void init() {
+        content.navigate(navHistory.getCurrent().getLast());
     }
 
-    private void rebuildPath() {
-        EditorNode current = null;
-        List<NavEntry> newPath = new ArrayList<>();
-        for (var navEl : navPath) {
-            if (current == null) {
-                current = rootNodes.get(navEl.editorNode.getKeyName().get());
-                newPath.add(new NavEntry(current, 0));
-                continue;
-            }
-
-            var newEditorNode = current.expand().stream()
-                    .filter(en -> navEl.editorNode.getParentIndex() == en.getParentIndex() &&
-                            en.getDisplayKeyName().equals(navEl.editorNode.getDisplayKeyName()))
-                    .findFirst();
-            if (newEditorNode.isPresent()) {
-                current = newEditorNode.get();
-                newPath.add(new NavEntry(newEditorNode.get(), navEl.getScroll()));
-            } else {
-                break;
-            }
-        }
-        navPath.set(FXCollections.observableList(newPath));
+    public void onFilterChange() {
+        content.filterChange();
     }
 
     public void onDelete() {
-        update(true);
+        content.completeContentChange();
         dirtyProperty().set(true);
     }
 
@@ -98,54 +80,21 @@ public class EditorState {
     }
 
     public void onFileChanged() {
-        update(true);
-        dirtyProperty().set(true);
-    }
-
-    void update(boolean updatePath) {
-        if (updatePath) {
-            rebuildPath();
-        }
-        var selected = navPath.size() > 0 ? navPath.get(navPath.size() - 1) : null;
-        content.set(FXCollections.observableArrayList(
-                selected != null ? createEditorNodes(selected.editorNode) : rootNodes.values()));
-    }
-
-    public void navigateTo(EditorNode newNode) {
-        if (newNode == null) {
-            navPath.clear();
+        var newPath = EditorNavPath.verify(this.navHistory.getCurrent());
+        if (EditorNavPath.areNodePathsEqual(this.navHistory.getCurrent(), newPath)) {
+            this.content.completeContentChange();
         } else {
-            int index = navPath.stream()
-                    .map(NavEntry::getEditorNode)
-                    .collect(Collectors.toList())
-                    .indexOf(newNode);
-            if (index == -1) {
-                navPath.add(new NavEntry(newNode, 0));
-            } else {
-                navPath.removeIf(n -> navPath.indexOf(n) > index);
-            }
+            this.navHistory.replaceCurrentNavPath(newPath);
         }
 
-        update(false);
-    }
-
-    public ObservableList<NavEntry> getNavPath() {
-        return navPath.get();
-    }
-
-    public ListProperty<NavEntry> navPathProperty() {
-        return navPath;
+        dirtyProperty().set(true);
     }
 
     public EditorFilter getFilter() {
         return filter;
     }
 
-    public ObservableList<EditorNode> getContent() {
-        return content.get();
-    }
-
-    public ListProperty<EditorNode> contentProperty() {
+    public EditorContent getContent() {
         return content;
     }
 
@@ -165,25 +114,23 @@ public class EditorState {
         return parser;
     }
 
-    public static class NavEntry {
-        private final EditorNode editorNode;
-        private final DoubleProperty scroll;
+    public GameFileContext getFileContext() {
+        return fileContext.get();
+    }
 
-        private NavEntry(EditorNode editorNode, double scroll) {
-            this.editorNode = editorNode;
-            this.scroll = new SimpleDoubleProperty(scroll);
-        }
+    public Map<String, EditorSimpleNode> getRootNodes() {
+        return rootNodes;
+    }
 
-        public EditorNode getEditorNode() {
-            return editorNode;
-        }
+    public EditorNavHistory getNavHistory() {
+        return navHistory;
+    }
 
-        public double getScroll() {
-            return scroll.get();
-        }
+    public ArrayNode getBackingNode() {
+        return new LinkedArrayNode(rootNodes.values().stream().map(en -> en.getBackingNode().getArrayNode()).toList());
+    }
 
-        public DoubleProperty scrollProperty() {
-            return scroll;
-        }
+    public boolean isSavegame() {
+        return savegame;
     }
 }

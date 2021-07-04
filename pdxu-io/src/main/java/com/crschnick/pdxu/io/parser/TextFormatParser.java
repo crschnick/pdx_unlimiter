@@ -15,35 +15,47 @@ public final class TextFormatParser {
 
     public static final TextFormatParser TEXT = new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.ALL, s -> true);
 
-    public static final TextFormatParser EU4 = new TextFormatParser(
-            StandardCharsets.ISO_8859_1,
-            TaggedNode.NO_TAGS,
-            s -> s.equals("map_area_data"));
+    public static TextFormatParser eu4() {
+        return new TextFormatParser(
+                StandardCharsets.ISO_8859_1,
+                TaggedNode.NO_TAGS,
+                s -> s.equals("map_area_data"));
+    }
 
-    public static final TextFormatParser CK3 = new TextFormatParser(
-            StandardCharsets.UTF_8,
-            TaggedNode.COLORS,
-            s -> false);
+    public static TextFormatParser ck3() {
+        return new TextFormatParser(
+                StandardCharsets.UTF_8,
+                TaggedNode.COLORS,
+                s -> false);
+    }
 
-    public static final TextFormatParser HOI4 = new TextFormatParser(
-            StandardCharsets.UTF_8,
-            TaggedNode.COLORS,
-            s -> false);
+    public static TextFormatParser hoi4() {
+        return new TextFormatParser(
+                StandardCharsets.UTF_8,
+                TaggedNode.COLORS,
+                s -> false);
+    }
 
-    public static final TextFormatParser STELLARIS = new TextFormatParser(
-            StandardCharsets.UTF_8,
-            TaggedNode.COLORS,
-            s -> false);
+    public static TextFormatParser stellaris() {
+        return new TextFormatParser(
+                StandardCharsets.UTF_8,
+                TaggedNode.COLORS,
+                s -> false);
+    }
 
-    public static final TextFormatParser CK2 = new TextFormatParser(
-            StandardCharsets.ISO_8859_1,
-            TaggedNode.NO_TAGS,
-            s -> false);
+    public static TextFormatParser ck2() {
+        return new TextFormatParser(
+                StandardCharsets.ISO_8859_1,
+                TaggedNode.NO_TAGS,
+                s -> false);
+    }
 
-    public static final TextFormatParser VIC2 = new TextFormatParser(
-            StandardCharsets.ISO_8859_1,
-            TaggedNode.NO_TAGS,
-            s -> false);
+    public static TextFormatParser vic2() {
+        return new TextFormatParser(
+                StandardCharsets.ISO_8859_1,
+                TaggedNode.NO_TAGS,
+                s -> false);
+    }
 
     private final Charset charset;
     private final TaggedNode.TagType[] possibleTags;

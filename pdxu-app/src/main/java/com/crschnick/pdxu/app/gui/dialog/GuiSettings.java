@@ -36,6 +36,7 @@ public class GuiSettings {
                 new Separator(),
                 GuiSettingsComponents.section("INTERFACE", applyFuncs,
                         s.fontSize,
+                        s.maxTooltipWidth,
                         s.confirmDeletion,
                         s.useGameLanguage,
                         s.language),

@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.settings.SavedState;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.editor.EditorExternalState;
+import com.crschnick.pdxu.app.editor.EditorSettings;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.GameInstallation;
@@ -57,6 +58,7 @@ public class ComponentManager {
             LanguageManager.init();
             // Load settings after window setup since settings entries can create dialog windows to notify the user
             Settings.init();
+            EditorSettings.init();
             PdxuApp.getApp().setupBasicWindowContent();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);

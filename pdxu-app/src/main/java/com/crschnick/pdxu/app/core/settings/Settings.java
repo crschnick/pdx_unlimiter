@@ -131,6 +131,13 @@ public final class Settings extends AbstractSettings {
             Path.of("Ck3ToEu4", "CK3ToEU4Converter.exe"),
             () -> null
     );
+    public final SettingsEntry.IntegerEntry maxTooltipWidth = new SettingsEntry.IntegerEntry(
+            "MAX_TOOLTIP_SIZE",
+            "maxTooltipWidth",
+            600,
+            100,
+            2000
+    );
     public final SettingsEntry.ThirdPartyDirectory ironyDir = new SettingsEntry.ThirdPartyDirectory(
             "IRONY_DIR",
             "ironyDir",

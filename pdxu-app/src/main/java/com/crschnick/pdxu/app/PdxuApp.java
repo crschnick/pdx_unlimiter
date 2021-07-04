@@ -161,4 +161,8 @@ public class PdxuApp extends Application {
     public Image getIcon() {
         return icon;
     }
+
+    public Stage getStage() {
+        return stage;
+    }
 }

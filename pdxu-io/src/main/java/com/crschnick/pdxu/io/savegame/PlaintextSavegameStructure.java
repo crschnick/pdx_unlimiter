@@ -2,7 +2,6 @@ package com.crschnick.pdxu.io.savegame;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.ParseException;
-import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,12 +12,12 @@ public class PlaintextSavegameStructure implements SavegameStructure {
 
     protected final byte[] header;
     private final String name;
-    private final TextFormatParser parser;
+    private final SavegameType type;
 
-    public PlaintextSavegameStructure(byte[] header, String name, TextFormatParser parser) {
+    public PlaintextSavegameStructure(byte[] header, String name, SavegameType type) {
         this.header = header;
         this.name = name;
-        this.parser = parser;
+        this.type = type;
     }
 
     @Override
@@ -39,7 +38,7 @@ public class PlaintextSavegameStructure implements SavegameStructure {
         }
 
         try {
-            var node = parser.parse(input, header != null ? header.length + 1 : 0);
+            var node = type.getParser().parse(input, header != null ? header.length + 1 : 0);
             return new SavegameParseResult.Success(Map.of(name, node));
         } catch (ParseException e) {
             return new SavegameParseResult.Error(e);
@@ -47,7 +46,7 @@ public class PlaintextSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public TextFormatParser getParser() {
-        return parser;
+    public SavegameType getType() {
+        return type;
     }
 }

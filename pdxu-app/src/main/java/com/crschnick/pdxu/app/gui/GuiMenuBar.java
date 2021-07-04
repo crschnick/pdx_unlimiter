@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ComponentManager;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.editor.Editor;
 import com.crschnick.pdxu.app.gui.dialog.*;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
@@ -32,6 +33,13 @@ public class GuiMenuBar {
     private static MenuBar createMenuBar() {
 
         Menu pdxu = new Menu("Pdx-Unlimiter");
+
+        MenuItem ed = new MenuItem(PdxuI18n.get("OPEN_EDITOR"));
+        ed.setOnAction((a) -> {
+            Editor.openExternalFile();
+        });
+        pdxu.getItems().add(ed);
+
         MenuItem c = new MenuItem(PdxuI18n.get("CHANGE_SETTINGS"));
         c.setOnAction((a) -> {
             GuiSettings.showSettings();
@@ -53,6 +61,13 @@ public class GuiMenuBar {
             });
         });
         pdxu.getItems().add(export);
+
+
+        MenuItem tri = new MenuItem("Translate");
+        tri.setOnAction((a) -> {
+            GuiTranslate.showTranslatationAlert();
+        });
+        pdxu.getItems().add(tri);
 
 
         Menu about = new Menu(PdxuI18n.get("ABOUT"));
@@ -125,14 +140,6 @@ public class GuiMenuBar {
         });
         dev.getItems().add(gc);
 
-        Menu tr = new Menu("Translate");
-
-        MenuItem tri = new MenuItem("Translate");
-        tri.setOnAction((a) -> {
-            GuiTranslate.showTranslatationAlert();
-        });
-        tr.getItems().add(tri);
-
 
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
@@ -142,7 +149,6 @@ public class GuiMenuBar {
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
             menuBar.getMenus().add(dev);
         }
-        menuBar.getMenus().add(tr);
         return menuBar;
     }
 
