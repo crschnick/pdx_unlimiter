@@ -1,4 +1,4 @@
-package com.crschnick.pdxu.app.editor;
+package com.crschnick.pdxu.app.editor.node;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
@@ -10,22 +10,22 @@ import java.util.function.Predicate;
 public final class EditorCollectorNode extends EditorNode {
 
     private final int firstNodeIndex;
-    private List<Node> nodes;
+    private final int length;
 
-    public EditorCollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, List<Node> nodes) {
+    public EditorCollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, int length) {
         super(directParent, keyName, parentIndex);
         this.firstNodeIndex = firstNodeIndex;
-        this.nodes = nodes;
+        this.length = length;
     }
 
     @Override
     public void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
-        getRealParent().updateNodeAtIndex(replacementValue, keyName, firstNodeIndex + index);
+        getParent().updateNodeAtIndex(replacementValue, keyName, firstNodeIndex + index);
     }
 
     @Override
     public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
-        getRealParent().replacePart(
+        getParent().replacePart(
                 ArrayNode.sameKeyArray(keyName, toInsert.getNodeArray()),
                 firstNodeIndex + beginIndex,
                 length);
@@ -33,10 +33,10 @@ public final class EditorCollectorNode extends EditorNode {
 
     @Override
     public void delete() {
-        getRealParent().replacePart(
+        getParent().replacePart(
                 ArrayNode.emptyArray(),
                 firstNodeIndex,
-                nodes.size());
+                getSize());
     }
 
     @Override
@@ -46,7 +46,7 @@ public final class EditorCollectorNode extends EditorNode {
 
     @Override
     public boolean filterValue(NodeMatcher matcher) {
-        return nodes.stream().anyMatch(n -> n.matches(matcher));
+        return getNodes().stream().anyMatch(n -> n.matches(matcher));
     }
 
     @Override
@@ -65,39 +65,43 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public EditorSimpleNode getRealParent() {
-        return (EditorSimpleNode) getDirectParent();
-    }
-
-    @Override
     public List<EditorNode> expand() {
-        return EditorNode.create(this, ArrayNode.array(nodes));
+        return EditorNode.create(this, ArrayNode.array(getNodes()));
     }
 
     public ArrayNode toWritableNode() {
-        return ArrayNode.array(nodes);
+        return ArrayNode.array(getNodes());
     }
 
     @Override
     public void update(ArrayNode newNode) {
-        getRealParent().replacePart(
+        getParent().replacePart(
                 ArrayNode.sameKeyArray(keyName, newNode.getNodeArray()),
                 firstNodeIndex,
-                nodes.size());
-        this.nodes = newNode.getNodeArray();
+                getSize());
     }
 
     @Override
     public int getSize() {
-        return nodes.size();
+        return length;
+    }
+
+    @Override
+    public Node getNodeAtIndex(int index) {
+        return getParent().getNodeAtIndex(firstNodeIndex + index);
+    }
+
+    @Override
+    public List<Node> getNodesInRange(int index, int length) {
+        return getParent().getNodesInRange(firstNodeIndex + index, length);
     }
 
     @Override
     public ArrayNode getContent() {
-        return ArrayNode.sameKeyArray(keyName, nodes);
+        return ArrayNode.sameKeyArray(keyName, getNodes());
     }
 
     public List<Node> getNodes() {
-        return nodes;
+        return getParent().getNodesInRange(firstNodeIndex, firstNodeIndex + length);
     }
 }

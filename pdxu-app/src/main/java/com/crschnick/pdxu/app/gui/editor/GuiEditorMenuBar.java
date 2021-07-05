@@ -54,7 +54,7 @@ public class GuiEditorMenuBar {
                     jumps.forEach((k, v) -> {
                         MenuItem j = new MenuItem(k);
                         j.setOnAction((a) -> {
-                            state.getNavHistory().navigateTo(v);
+                            state.getNavigation().navigateTo(v);
                         });
                         jump.getItems().add(j);
                     });

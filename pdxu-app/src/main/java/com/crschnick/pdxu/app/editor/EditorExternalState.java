@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
+import com.crschnick.pdxu.app.editor.node.EditorNode;
 import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;

@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.editor.adapter;
 
-import com.crschnick.pdxu.app.editor.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.editor.GuiCk3CoaViewer;
@@ -162,7 +162,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             return get(keyOpt.get(), node.getBackingNode().getNodeArray().get(0).getString());
         }
 
-        var parentKey = Optional.ofNullable(node.getDirectParent())
+        var parentKey = Optional.ofNullable(node.getParent())
                 .flatMap(p -> p.getKeyName());
         if (parentKey.isPresent() && node.getBackingNode().isValue()) {
             return get(parentKey.get(), node.getBackingNode().getString());

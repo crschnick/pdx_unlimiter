@@ -3,6 +3,9 @@ package com.crschnick.pdxu.app.gui.editor;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
+import com.crschnick.pdxu.app.editor.node.EditorCollectorNode;
+import com.crschnick.pdxu.app.editor.node.EditorNode;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.io.node.Node;
@@ -80,7 +83,7 @@ public class GuiEditorNode {
             btn.getStyleClass().add("list-expand-button");
             btn.setGraphic(icon);
             btn.setAlignment(Pos.CENTER);
-            btn.setOnAction(e -> state.getNavHistory().navigateToChild(n));
+            btn.setOnAction(e -> state.getNavigation().navigateToChild(n));
             box.getChildren().add(btn);
         }
 

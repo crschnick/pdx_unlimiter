@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.editor.node.EditorNode;
 import com.crschnick.pdxu.io.node.NodeMatcher;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

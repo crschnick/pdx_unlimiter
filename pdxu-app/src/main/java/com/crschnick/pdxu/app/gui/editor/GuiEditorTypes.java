@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
-import com.crschnick.pdxu.app.editor.EditorNode;
-import com.crschnick.pdxu.app.editor.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorNode;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.io.node.Node;
 import javafx.geometry.Insets;

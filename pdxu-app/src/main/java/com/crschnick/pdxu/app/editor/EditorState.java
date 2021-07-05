@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.editor.node.EditorRootNode;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
@@ -19,13 +20,13 @@ public class EditorState {
     private final String fileName;
     private final TextFormatParser parser;
     private final BooleanProperty dirty;
-    private final Map<String, EditorSimpleNode> rootNodes;
+    private final Map<String, EditorRootNode> rootNodes;
     private final EditorExternalState externalState;
     private final EditorFilter filter;
     private final EditorContent content;
     private final Consumer<Map<String, ArrayNode>> saveFunc;
     private final ObjectProperty<GameFileContext> fileContext;
-    private final EditorNavHistory navHistory;
+    private final EditorNavigation navigation;
     private final boolean savegame;
 
     public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame) {
@@ -43,9 +44,9 @@ public class EditorState {
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
-            rootNodes.put(e.getKey(), new EditorSimpleNode(null, e.getKey(), counter, counter, e.getValue()));
+            rootNodes.put(e.getKey(), new EditorRootNode(e.getKey(), counter, e.getValue()));
         }
-        this.navHistory = new EditorNavHistory(this);
+        this.navigation = new EditorNavigation(this);
     }
 
     public void save() {
@@ -59,7 +60,7 @@ public class EditorState {
     }
 
     public void init() {
-        content.navigate(navHistory.getCurrent().getEditorNode(), 0, 0.0);
+        content.navigate(navigation.getCurrent().getEditorNode(), 0, 0.0);
     }
 
     public void onFilterChange() {
@@ -80,11 +81,11 @@ public class EditorState {
     }
 
     public void onFileChanged() {
-        var newPath = EditorNavPath.verify(this.navHistory.getCurrent().path());
-        if (EditorNavPath.areNodePathsEqual(this.navHistory.getCurrent().path(), newPath)) {
+        var newPath = EditorNavPath.rebuild(this.navigation.getCurrent().path());
+        if (EditorNavPath.areNodePathsEqual(this.navigation.getCurrent().path(), newPath)) {
             this.content.completeContentChange();
         } else {
-            this.navHistory.replaceCurrentNavPath(newPath);
+            this.navigation.replaceCurrentNavPath(newPath);
         }
 
         dirtyProperty().set(true);
@@ -118,12 +119,12 @@ public class EditorState {
         return fileContext.get();
     }
 
-    public Map<String, EditorSimpleNode> getRootNodes() {
+    public Map<String, EditorRootNode> getRootNodes() {
         return rootNodes;
     }
 
-    public EditorNavHistory getNavHistory() {
-        return navHistory;
+    public EditorNavigation getNavigation() {
+        return navigation;
     }
 
     public ArrayNode getBackingNode() {

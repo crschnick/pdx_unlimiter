@@ -4,6 +4,7 @@ package com.crschnick.pdxu.app.gui.editor;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -50,8 +51,8 @@ public class GuiEditorNavBar {
             backButton.setGraphic(new FontIcon());
             backButton.setAlignment(Pos.CENTER);
             box.getChildren().add(backButton);
-            backButton.disableProperty().bind(Bindings.not(state.getNavHistory().canGoBackProperty()));
-            backButton.setOnAction(e -> state.getNavHistory().goBack());
+            backButton.disableProperty().bind(Bindings.not(state.getNavigation().canGoBackProperty()));
+            backButton.setOnAction(e -> state.getNavigation().goBack());
             backButton.setFocusTraversable(false);
         }
         {
@@ -61,8 +62,8 @@ public class GuiEditorNavBar {
             forwardButton.setGraphic(new FontIcon());
             forwardButton.setAlignment(Pos.CENTER);
             box.getChildren().add(forwardButton);
-            forwardButton.disableProperty().bind(Bindings.not(state.getNavHistory().canGoForwardProperty()));
-            forwardButton.setOnAction(e -> state.getNavHistory().goForward());
+            forwardButton.disableProperty().bind(Bindings.not(state.getNavigation().canGoForwardProperty()));
+            forwardButton.setOnAction(e -> state.getNavigation().goForward());
             forwardButton.setFocusTraversable(false);
         }
         return box;
@@ -80,7 +81,7 @@ public class GuiEditorNavBar {
                     var initBtn = new JFXButton("(root)");
                     initBtn.setFocusTraversable(false);
                     initBtn.setOnAction(e -> {
-                        edState.getNavHistory().navigateToParent(null);
+                        edState.getNavigation().navigateToParent(null);
                     });
                     bar.getChildren().add(initBtn);
                 }
@@ -95,14 +96,14 @@ public class GuiEditorNavBar {
                         bar.getChildren().add(sep);
                     }
                     btn.setOnAction(e -> {
-                        edState.getNavHistory().navigateToParent(en);
+                        edState.getNavigation().navigateToParent(en);
                     });
                     bar.getChildren().add(btn);
                 });
             });
         };
-        updateBar.accept(edState.getNavHistory().getCurrent());
-        edState.getNavHistory().currentProperty().addListener((c, o, n) -> {
+        updateBar.accept(edState.getNavigation().getCurrent());
+        edState.getNavigation().currentProperty().addListener((c, o, n) -> {
             updateBar.accept(n);
         });
         return bar;
@@ -113,7 +114,7 @@ public class GuiEditorNavBar {
         p.setFillHeight(true);
         p.setAlignment(Pos.CENTER);
 
-        edState.getNavHistory().currentProperty().addListener((c,o,n) -> {
+        edState.getNavigation().currentProperty().addListener((c, o, n) -> {
             if (p.getChildren().size() == 2) {
                 p.getChildren().remove(0);
             }
@@ -139,11 +140,11 @@ public class GuiEditorNavBar {
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
             GuiTooltips.install(edit, "Open in external text editor");
             edit.setOnAction(e -> {
-                edState.getExternalState().startEdit(edState, edState.getNavHistory().getCurrent().getEditorNode());
+                edState.getExternalState().startEdit(edState, edState.getNavigation().getCurrent().getEditorNode());
             });
             edit.disableProperty().bind(Bindings.createBooleanBinding(
-                    () -> edState.getNavHistory().getCurrent().getEditorNode() == null,
-                    edState.getNavHistory().currentProperty()));
+                    () -> edState.getNavigation().getCurrent().getEditorNode() == null,
+                    edState.getNavigation().currentProperty()));
             edit.setPadding(new Insets(4, 4, 2, 4));
             p.getChildren().add(edit);
         }

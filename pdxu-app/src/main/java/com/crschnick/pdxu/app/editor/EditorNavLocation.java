@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.editor.node.EditorNode;
+
 import java.util.List;
 
 public record EditorNavLocation(EditorNavPath path, int page, double scroll) {
@@ -16,7 +18,7 @@ public record EditorNavLocation(EditorNavPath path, int page, double scroll) {
         int sum = 0;
         for (int page = 0; page < pageSizes.size(); page++) {
             if (sum + pageSizes.get(page) > approxIndex) {
-                double scroll = (approxIndex - sum) / pageSizes.get(page);
+                double scroll = (approxIndex - sum + 1) / pageSizes.get(page);
                 return new EditorNavLocation(path, page, scroll);
             }
 

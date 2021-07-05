@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.editor.node.EditorNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -11,14 +12,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditorNavHistory {
+public class EditorNavigation {
 
     private final ObjectProperty<EditorNavLocation> current;
     private final EditorState state;
     private final List<EditorNavLocation> history;
     private final IntegerProperty historyPos;
 
-    public EditorNavHistory(EditorState state) {
+    public EditorNavigation(EditorState state) {
         var init = new EditorNavLocation(EditorNavPath.empty(), 0, 0.0);
         this.history = new ArrayList<>();
         this.current = new SimpleObjectProperty<>(init);
@@ -66,8 +67,8 @@ public class EditorNavHistory {
     public void replaceCurrentNavPath(EditorNavPath p) {
         if (!EditorNavPath.areNodePathsEqual(p, current.get().path())) {
             var loc = new EditorNavLocation(p);
-            this.current.set(loc);
             this.state.getContent().navigate(p.getEditorNode(), 0, 0.0);
+            this.current.set(loc);
             this.history.set(historyPos.get(), loc);
         }
     }

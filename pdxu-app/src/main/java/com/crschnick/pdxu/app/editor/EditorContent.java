@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.editor.node.EditorNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 

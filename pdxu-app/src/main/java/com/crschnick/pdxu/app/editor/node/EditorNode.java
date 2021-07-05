@@ -1,4 +1,4 @@
-package com.crschnick.pdxu.app.editor;
+package com.crschnick.pdxu.app.editor.node;
 
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
@@ -59,8 +59,7 @@ public abstract class EditorNode {
                         parent,
                         k,
                         parentIndex.get(),
-                        index.get(),
-                        v));
+                        index.get()));
                 return false;
             }
 
@@ -95,7 +94,7 @@ public abstract class EditorNode {
                             k,
                             parentIndex.get(),
                             start,
-                            new ArrayList<>(ar.getNodeArray().subList(start, end + 1))));
+                            end - start + 1));
                     index.getAndIncrement();
                     parentIndex.getAndIncrement();
                 }
@@ -113,8 +112,7 @@ public abstract class EditorNode {
                     parent,
                     k,
                     parentIndex.get(),
-                    index.get(),
-                    v));
+                    index.get()));
 
             parentIndex.getAndIncrement();
             index.getAndIncrement();
@@ -138,7 +136,9 @@ public abstract class EditorNode {
 
     public abstract boolean isReal();
 
-    public abstract EditorSimpleNode getRealParent();
+    public final EditorNode getParent() {
+        return directParent;
+    }
 
     public abstract ArrayNode getContent();
 
@@ -148,15 +148,15 @@ public abstract class EditorNode {
 
     public abstract void update(ArrayNode newNode);
 
-    public EditorNode getDirectParent() {
-        return directParent;
-    }
-
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);
     }
 
     public abstract int getSize();
+
+    public abstract Node getNodeAtIndex(int index);
+
+    public abstract List<Node> getNodesInRange(int index, int length);
 
     public int getParentIndex() {
         return parentIndex;

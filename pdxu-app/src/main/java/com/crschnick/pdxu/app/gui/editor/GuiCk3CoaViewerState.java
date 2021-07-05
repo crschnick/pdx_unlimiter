@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 
-import com.crschnick.pdxu.app.editor.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.game.ImageLoader;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;

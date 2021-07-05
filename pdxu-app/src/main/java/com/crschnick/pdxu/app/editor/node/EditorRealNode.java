@@ -1,0 +1,58 @@
+package com.crschnick.pdxu.app.editor.node;
+
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodeMatcher;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+public abstract class EditorRealNode extends EditorNode {
+
+    public EditorRealNode(EditorNode directParent, String keyName, int parentIndex) {
+        super(directParent, keyName, parentIndex);
+    }
+
+    @Override
+    public ArrayNode getContent() {
+        return getKeyName().map(s -> ArrayNode.singleKeyNode(s, getBackingNode()))
+                .orElse(ArrayNode.array(List.of(getBackingNode())));
+    }
+
+    @Override
+    public boolean filterKey(Predicate<String> filter) {
+        return filter.test(getDisplayKeyName());
+    }
+
+    @Override
+    public boolean filterValue(NodeMatcher matcher) {
+        return this.getBackingNode().matches(matcher);
+    }
+
+    @Override
+    public boolean isReal() {
+        return true;
+    }
+
+    @Override
+    public List<EditorNode> expand() {
+        return EditorNode.create(this, (ArrayNode) getBackingNode());
+    }
+
+    public ArrayNode toWritableNode() {
+        return getBackingNode().isArray() ? (ArrayNode) getBackingNode() :
+                ArrayNode.array(List.of(getBackingNode()));
+    }
+
+    @Override
+    public int getSize() {
+        return getBackingNode().getArrayNode().size();
+    }
+
+    public abstract Node getBackingNode();
+
+    @Override
+    public List<Node> getNodesInRange(int index, int length) {
+        return getBackingNode().getNodeArray().subList(index, index + length);
+    }
+}

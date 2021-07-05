@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.editor;
 
+import com.crschnick.pdxu.app.editor.node.EditorNode;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import java.util.ArrayList;
@@ -101,7 +103,7 @@ public class EditorNavPath {
     }
 
 
-    public static EditorNavPath verify(EditorNavPath input) {
+    public static EditorNavPath rebuild(EditorNavPath input) {
         EditorNode current = null;
         List<EditorNode> newPath = new ArrayList<>();
         for (var navEl : input.getPath()) {

@@ -4,6 +4,8 @@ import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.*;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
+import com.crschnick.pdxu.app.editor.node.EditorNode;
+import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -70,7 +72,7 @@ public class GuiEditor {
                     if (ne == null) {
                         return;
                     }
-                    if (edState.getNavHistory().getCurrent().path().getPath().size() > 0) {
+                    if (edState.getNavigation().getCurrent().path().getPath().size() > 0) {
                         sp.setVvalue(edState.getContent().getScroll());
                         sp.vvalueProperty().addListener((sc,so,sn) -> {
                             edState.getContent().changeScroll(sn.doubleValue());
@@ -130,7 +132,7 @@ public class GuiEditor {
             grid.add(createGridElement(new Label("="), i), 2, i);
             grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
 
-            if (n.getDirectParent() != null) {
+            if (n.getParent() != null) {
                 HBox actions = new HBox();
                 actions.setFillHeight(true);
                 actions.setAlignment(Pos.CENTER_RIGHT);
@@ -144,7 +146,7 @@ public class GuiEditor {
                             b.setGraphic(new FontIcon());
                             b.getStyleClass().add("jump-to-def-button");
                             GuiTooltips.install(b, "Jump to " + pointer);
-                            b.setOnAction(e -> state.getNavHistory().navigateTo(pointer));
+                            b.setOnAction(e -> state.getNavigation().navigateTo(pointer));
                             actions.getChildren().add(b);
                             b.prefHeightProperty().bind(actions.heightProperty());
                         }
