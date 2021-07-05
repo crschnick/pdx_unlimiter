@@ -126,6 +126,16 @@ public class EditorContent {
         this.scroll = s;
     }
 
+    public EditorNavLocation navigateAndFocus(EditorNavPath path, EditorNode focus) {
+        this.node = path.getEditorNode();
+        rebuildEditorNodes();
+        rebuildPageSizes();
+        var newLoc = EditorNavLocation.nodeInFocus(filteredNodes, allNodes.size(), path, focus);
+        goToPage(newLoc.page());
+        changeScroll(newLoc.scroll());
+        return newLoc;
+    }
+
     public void previousPage() {
         changeScroll(1.0);
         goToPage(getPage() - 1);

@@ -2,44 +2,126 @@ package com.crschnick.pdxu.io.node;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class NodePointer {
 
-    public static record Element(String name, int index, Predicate<Node> selector) {
+    public static interface Element {
 
-        public String toString() {
-            if (name != null) {
-                return name;
-            }
-            if (index != -1) {
-                return "[" + index + "]";
-            }
-            if (selector != null) {
-                return "$[...]";
-            }
-            throw new IllegalArgumentException();
+        Node tryMatch(Node n);
+
+        default String getKey() {
+            return null;
         }
     }
+
+    public static final record NameElement(String name) implements Element {
+
+        @Override
+        public Node tryMatch(Node n) {
+            return n.getNodeForKeyIfExistent(name).orElse(null);
+        }
+
+        @Override
+        public String getKey() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    public static final record IndexElement(int index) implements Element {
+
+        @Override
+        public Node tryMatch(Node n) {
+            if (n.getNodeArray().size() > index) {
+                return n.getNodeArray().get(index);
+            }
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + index + "]";
+        }
+    }
+
+    public static final record SupplierElement(Supplier<String> keySupplier) implements Element {
+
+        @Override
+        public Node tryMatch(Node n) {
+            var name = keySupplier.get();
+            if (name != null) {
+                return n.getNodeForKeyIfExistent(name).orElse(null);
+            }
+            return null;
+        }
+
+        @Override
+        public String getKey() {
+            return keySupplier.get();
+        }
+
+        @Override
+        public String toString() {
+            return "[$s]";
+        }
+    }
+
+    public static final record SelectorElement(Predicate<Node> selector) implements Element {
+
+        @Override
+        public Node tryMatch(Node n) {
+            var res = n.getNodeArray().stream()
+                    .filter(selector)
+                    .findAny();
+            return res.orElse(null);
+        }
+
+        @Override
+        public String toString() {
+            return "[$(...)]";
+        }
+    }
+
 
     public static class Builder {
 
         private final List<Element> path = new ArrayList<>();
 
         public Builder name(String name) {
-            path.add(new Element(name, -1, null));
+            path.add(new NameElement(name));
             return this;
         }
 
         public Builder index(int index) {
-            path.add(new Element(null, index, null));
+            path.add(new IndexElement(index));
             return this;
         }
 
         public Builder selector(Predicate<Node> selector) {
-            path.add(new Element(null, -1, selector));
+            path.add(new SelectorElement(selector));
+            return this;
+        }
+
+        public Builder pointer(Node context, NodePointer pointer) {
+            return pointer(context, pointer, n -> n.getString());
+        }
+
+        public Builder pointer(Node context, NodePointer pointer, Function<Node, String> converter) {
+            path.add(new SupplierElement(() -> {
+                var res = pointer.get(context);
+                if (res != null) {
+                    return converter.apply(res);
+                }
+                return null;
+            }));
             return this;
         }
 
@@ -75,48 +157,22 @@ public final class NodePointer {
     }
 
     public boolean isValid(Node input) {
-        return get(input).isPresent();
+        return get(input) != null;
     }
 
-    public Optional<Node> get(Node input) {
+    public Node get(Node input) {
         Node current = input;
         for (Element value : path) {
-            var found = tryMatch(current, value);
-            if (found.isEmpty()) {
-                return Optional.empty();
+            var found = value.tryMatch(current);
+            if (found == null) {
+                return null;
             } else {
-                current = found.get();
+                current = found;
             }
         }
-        return Optional.of(input);
+        return input;
     }
 
-    private Optional<Node> tryMatch(Node current, Element e) {
-        if (!current.isArray()) {
-            return Optional.empty();
-        }
-
-        if (e.selector != null) {
-            var selector = current.getNodeArray().stream()
-                    .filter(e.selector)
-                    .findAny();
-            if (selector.isPresent()) {
-                return selector;
-            }
-        }
-
-        if (e.index != -1) {
-            if (current.getNodeArray().size() > e.index) {
-                return Optional.of(current.getNodeArray().get(e.index));
-            }
-        }
-
-        if (e.name != null) {
-            return current.getNodeForKeyIfExistent(e.name);
-        }
-
-        return Optional.empty();
-    }
 
     public List<Element> getPath() {
         return path;

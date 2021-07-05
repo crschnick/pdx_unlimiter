@@ -80,7 +80,7 @@ public class GuiEditorNode {
             btn.getStyleClass().add("list-expand-button");
             btn.setGraphic(icon);
             btn.setAlignment(Pos.CENTER);
-            btn.setOnAction(e -> state.getNavHistory().navigateTo(n));
+            btn.setOnAction(e -> state.getNavHistory().navigateToChild(n));
             box.getChildren().add(btn);
         }
 

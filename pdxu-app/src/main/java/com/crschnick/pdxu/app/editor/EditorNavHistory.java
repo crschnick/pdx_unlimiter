@@ -13,13 +13,13 @@ import java.util.List;
 
 public class EditorNavHistory {
 
-    private final ObjectProperty<EditorNavPath> current;
+    private final ObjectProperty<EditorNavLocation> current;
     private final EditorState state;
-    private final List<EditorNavPath> history;
+    private final List<EditorNavLocation> history;
     private final IntegerProperty historyPos;
 
     public EditorNavHistory(EditorState state) {
-        var init = EditorNavPath.empty();
+        var init = new EditorNavLocation(EditorNavPath.empty(), 0, 0.0);
         this.history = new ArrayList<>();
         this.current = new SimpleObjectProperty<>(init);
         this.history.add(current.get());
@@ -43,7 +43,7 @@ public class EditorNavHistory {
         historyPos.set(historyPos.get() - 1);
         var goTo = history.get(historyPos.get());
         this.current.set(goTo);
-        state.getContent().navigate(goTo.getEditorNode(), goTo.getPage(), goTo.getScroll());
+        state.getContent().navigate(goTo.getEditorNode(), goTo.page(), goTo.scroll());
     }
 
     public void goForward() {
@@ -54,7 +54,7 @@ public class EditorNavHistory {
         historyPos.set(historyPos.get() + 1);
         var goTo = history.get(historyPos.get());
         this.current.set(goTo);
-        state.getContent().navigate(goTo.getEditorNode(), goTo.getPage(), goTo.getScroll());
+        state.getContent().navigate(goTo.getEditorNode(), goTo.page(), goTo.scroll());
     }
 
     private void removeHistoryAfterPos() {
@@ -64,22 +64,26 @@ public class EditorNavHistory {
     }
 
     public void replaceCurrentNavPath(EditorNavPath p) {
-        this.current.set(p);
-        this.state.getContent().navigate(p.getEditorNode(), p.getPage(), p.getScroll());
-        this.history.set(historyPos.get(), p);
+        if (!EditorNavPath.areNodePathsEqual(p, current.get().path())) {
+            var loc = new EditorNavLocation(p);
+            this.current.set(loc);
+            this.state.getContent().navigate(p.getEditorNode(), 0, 0.0);
+            this.history.set(historyPos.get(), loc);
+        }
     }
 
     public void navigateTo(EditorNavPath p) {
-        if (EditorNavPath.areNodePathsEqual(current.get(), p)) {
+        if (EditorNavPath.areNodePathsEqual(current.get().path(), p)) {
             return;
         }
 
         removeHistoryAfterPos();
 
-        this.current.set(p);
-        this.state.getContent().navigate(p.getEditorNode(), p.getPage(), p.getScroll());
+        var newLoc = new EditorNavLocation(p, 0, 0.0);
+        this.current.set(newLoc);
+        this.state.getContent().navigate(p.getEditorNode(), newLoc.page(), newLoc.scroll());
 
-        this.history.add(p);
+        this.history.add(newLoc);
         historyPos.set(historyPos.get() + 1);
     }
 
@@ -90,16 +94,33 @@ public class EditorNavHistory {
         });
     }
 
-    public void navigateTo(EditorNode newNode) {
-        var newPath = EditorNavPath.navigateTo(current.get(), newNode);
-        navigateTo(newPath);
+    public void navigateToChild(EditorNode newNode) {
+        var list = new ArrayList<>(current.get().path().getPath());
+        list.add(newNode);
+        navigateTo(new EditorNavPath(list));
     }
 
-    public EditorNavPath getCurrent() {
+    public void navigateToParent(EditorNode newNode) {
+        if (getCurrent().getEditorNode().equals(newNode)) {
+            return;
+        }
+
+        removeHistoryAfterPos();
+
+        var newPath = EditorNavPath.parentPath(getCurrent().path(), newNode);
+        var inFocus = current.get().path().getPath().get(newPath.getPath().size());
+        var newLoc = state.getContent().navigateAndFocus(newPath, inFocus);
+
+        this.current.set(newLoc);
+        this.history.add(newLoc);
+        historyPos.set(historyPos.get() + 1);
+    }
+
+    public EditorNavLocation getCurrent() {
         return current.get();
     }
 
-    public ObjectProperty<EditorNavPath> currentProperty() {
+    public ObjectProperty<EditorNavLocation> currentProperty() {
         return current;
     }
 }

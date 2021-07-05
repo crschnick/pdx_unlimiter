@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.settings.Settings;
+import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.Hyperlinks;
@@ -56,12 +57,17 @@ public class RakalyWebHelper {
                         "--user", Settings.getInstance().rakalyUserId.getValue(),
                         "--api-key", Settings.getInstance().rakalyApiKey.getValue(),
                         copy.toString())
-                        .redirectError(ProcessBuilder.Redirect.DISCARD)
+                        .redirectErrorStream(true)
                         .start();
                 var out = new String(proc.getInputStream().readAllBytes());
-                out.lines().findFirst().ifPresent(l -> {
-                    ThreadHelper.browse("https://rakaly.com/eu4/saves/" + l);
-                });
+                proc.waitFor();
+                if (proc.exitValue() != 0) {
+                    GuiErrorReporter.showSimpleErrorMessage(out);
+                } else {
+                    out.lines().findFirst().ifPresent(l -> {
+                        ThreadHelper.browse("https://rakaly.com/eu4/saves/" + l);
+                    });
+                }
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }

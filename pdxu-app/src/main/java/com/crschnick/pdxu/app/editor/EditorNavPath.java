@@ -25,77 +25,38 @@ public class EditorNavPath {
     }
 
     private final List<EditorNode> path;
-    private final int page;
-    private final double scroll;
-
-    public EditorNavPath(List<EditorNode> path, int page, double scroll) {
+    public EditorNavPath(List<EditorNode> path) {
         this.path = path;
-        this.page = page;
-        this.scroll = scroll;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public double getScroll() {
-        return scroll;
     }
 
     public EditorNode getEditorNode() {
         return path.get(path.size() - 1);
     }
 
-    public static EditorNavPath pathInFocus(List<EditorNode> path, EditorNode focus) {
-        if (path.size() == 1) {
-            return empty();
-        }
-
-        if (path.size() == 2) {
-            return new EditorNavPath(path, 0, 0.0);
-        }
-
-        var nodeSize = path.get(path.size() - 2).getSize();
-        var pageSizes = EditorContent.calculatePageSizes(nodeSize);
-        var last = path.get(path.size() - 1);
-        int sum = 0;
-        for (int page = 0; page < pageSizes.size(); page++) {
-            if (sum + pageSizes.get(page) > last.getParentIndex()) {
-                double scroll = (double) (last.getParentIndex() - sum) / pageSizes.get(page);
-                return new EditorNavPath(path, page, scroll);
-            }
-
-            sum += pageSizes.get(page);
-        }
-        return new EditorNavPath(path, pageSizes.size() -1, 1.0);
-    }
-
     public static EditorNavPath empty() {
         var list = new ArrayList<EditorNode>();
         list.add(null);
-        return new EditorNavPath(list, 0, 0.0);
+        return new EditorNavPath(list);
     }
 
-    public static EditorNavPath navigateTo(EditorNavPath path, EditorNode node) {
+    public static EditorNavPath parentPath(EditorNavPath path, EditorNode node) {
         if (node == null) {
             return empty();
         } else {
             int index = path.getPath().indexOf(node);
             if (index == -1) {
-                var newList = new ArrayList<>(path.getPath());
-                newList.add(node);
-                return new EditorNavPath(newList, 0, 0.0);
+                throw new IllegalArgumentException("Node not found in path");
             } else {
-                return fromPath(path.getPath().subList(0, index + 1));
+                return new EditorNavPath(path.getPath().subList(0, index + 1));
             }
         }
     }
 
     private static Optional<EditorNode> fastEditorNodeFind(EditorNode current, NodePointer sub) {
-        if (current.isReal() && sub.getPath().get(0).name() != null) {
+        if (current.isReal() && sub.getPath().get(0).getKey() != null) {
             EditorSimpleNode s = (EditorSimpleNode) current;
             return EditorNode.fastEditorSimpleNodeSearch(
-                    current, s.getBackingNode().getArrayNode(), sub.getPath().get(0).name());
+                    current, s.getBackingNode().getArrayNode(), sub.getPath().get(0).getKey());
         }
 
         var exp = current.expand();
@@ -136,7 +97,7 @@ public class EditorNavPath {
             }
         }
 
-        return Optional.of(fromPath(newPath));
+        return Optional.of(new EditorNavPath(newPath));
     }
 
 
@@ -161,7 +122,7 @@ public class EditorNavPath {
                 break;
             }
         }
-        return fromPath(newPath);
+        return new EditorNavPath(newPath);
     }
 
     public List<EditorNode> getPath() {

@@ -73,19 +73,19 @@ public class GuiEditorNavBar {
         bar.setAlignment(Pos.CENTER_LEFT);
         bar.getStyleClass().add(GuiStyle.CLASS_EDITOR_NAVIGATION);
 
-        Consumer<EditorNavPath> updateBar = l -> {
+        Consumer<EditorNavLocation> updateBar = l -> {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
                 {
                     var initBtn = new JFXButton("(root)");
                     initBtn.setFocusTraversable(false);
                     initBtn.setOnAction(e -> {
-                        edState.getNavHistory().navigateTo((EditorNode) null);
+                        edState.getNavHistory().navigateToParent(null);
                     });
                     bar.getChildren().add(initBtn);
                 }
 
-                l.getPath().subList(1, l.getPath().size()).forEach(en -> {
+                l.path().getPath().subList(1, l.path().getPath().size()).forEach(en -> {
                     var btn = new JFXButton(en.getNavigationName());
                     btn.setFocusTraversable(false);
                     btn.setMnemonicParsing(false);
@@ -95,7 +95,7 @@ public class GuiEditorNavBar {
                         bar.getChildren().add(sep);
                     }
                     btn.setOnAction(e -> {
-                        edState.getNavHistory().navigateTo(en);
+                        edState.getNavHistory().navigateToParent(en);
                     });
                     bar.getChildren().add(btn);
                 });

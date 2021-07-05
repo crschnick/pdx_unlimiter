@@ -80,8 +80,8 @@ public class EditorState {
     }
 
     public void onFileChanged() {
-        var newPath = EditorNavPath.verify(this.navHistory.getCurrent());
-        if (EditorNavPath.areNodePathsEqual(this.navHistory.getCurrent(), newPath)) {
+        var newPath = EditorNavPath.verify(this.navHistory.getCurrent().path());
+        if (EditorNavPath.areNodePathsEqual(this.navHistory.getCurrent().path(), newPath)) {
             this.content.completeContentChange();
         } else {
             this.navHistory.replaceCurrentNavPath(newPath);
