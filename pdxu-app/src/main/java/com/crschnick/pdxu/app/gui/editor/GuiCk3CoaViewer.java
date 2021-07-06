@@ -1,9 +1,8 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.PdxuApp;
-import com.crschnick.pdxu.app.editor.node.EditorRealNode;
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,7 +11,10 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -66,8 +68,8 @@ public class GuiCk3CoaViewer {
         topBar.getChildren().add(refresh);
 
         var spacer = new Region();
+        spacer.setMinWidth(20);
         topBar.getChildren().add(spacer);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         HBox coaOptionsBar = new HBox();
         coaOptionsBar.setSpacing(10);

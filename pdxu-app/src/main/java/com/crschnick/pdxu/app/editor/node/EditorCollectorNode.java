@@ -38,7 +38,8 @@ public final class EditorCollectorNode extends EditorNode {
         }
 
         for (int i = firstNodeIndex; i < firstNodeIndex + length; i++) {
-            if (!getParent().getNavigationNameAtRawIndex(i).equals(getNavigationName())) {
+            var prk = getParent().getNavigationNameAtRawIndex(i);
+            if (!prk.equals(getNavigationName())) {
                 return false;
             }
         }

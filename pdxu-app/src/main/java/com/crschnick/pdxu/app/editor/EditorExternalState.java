@@ -55,8 +55,11 @@ public class EditorExternalState {
                                 if (valid) {
                                     e.registerChange();
                                     ArrayNode newNode = e.state.getParser().parse(changed);
-                                    e.editorNode.update(newNode);
-                                    e.state.onFileChanged();
+                                    boolean empty = newNode.size() == 0;
+                                    if (!empty) {
+                                        e.editorNode.update(newNode);
+                                        e.state.onFileChanged();
+                                    }
                                 }
                             }
                         } catch (Exception ex) {
