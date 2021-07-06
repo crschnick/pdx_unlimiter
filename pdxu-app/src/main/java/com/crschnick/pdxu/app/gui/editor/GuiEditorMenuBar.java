@@ -31,19 +31,17 @@ public class GuiEditorMenuBar {
         });
         editor.getItems().add(cte);
 
-        Menu help = new Menu("Help");
-
         MenuItem guide = new MenuItem("Editor Guide");
         guide.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.EDITOR_GUIDE);
         });
-        help.getItems().add(guide);
+        editor.getItems().add(guide);
 
         MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
         is.setOnAction((a) -> {
             ErrorHandler.reportIssue(null);
         });
-        help.getItems().add(is);
+        editor.getItems().add(is);
 
 
         Menu jump = new Menu("Jump to");
@@ -57,6 +55,7 @@ public class GuiEditorMenuBar {
                             state.getNavigation().navigateTo(v);
                         });
                         jump.getItems().add(j);
+                        j.setDisable(v == null);
                     });
                 } catch (Exception ex) {
                     ErrorHandler.handleException(ex);
@@ -73,7 +72,6 @@ public class GuiEditorMenuBar {
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(file);
         menuBar.getMenus().add(editor);
-        menuBar.getMenus().add(help);
         menuBar.getMenus().add(jump);
         return menuBar;
     }

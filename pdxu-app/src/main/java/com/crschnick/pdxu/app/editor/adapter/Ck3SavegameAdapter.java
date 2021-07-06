@@ -85,6 +85,15 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
                 .name("landed_data").name("domain").build());
         map.put("Player house/dynasty", NodePointer.builder().name("dynasties").name("dynasty_house")
                 .name(playerDyn.getString()).build());
+        var primaryTitle = NodePointer.builder().name("landed_titles").name("landed_titles").pointerEvaluation(
+                state.getBackingNode(),
+                NodePointer.builder().name("living").name(player.getString()).name("landed_data").name("domain").index(0).build()
+        ).build();
+        map.put("Player primary title", primaryTitle);
+        var primaryTitleCoaId = NodePointer.fromBase(primaryTitle).name("coat_of_arms_id").build();
+        var primaryTitleCoa = NodePointer.builder().name("coat_of_arms")
+                .name("coat_of_arms_manager_database").pointerEvaluation(state.getBackingNode(), primaryTitleCoaId).build();
+        map.put("Player primary title coat of arms", primaryTitleCoa);
         return map;
     }
 

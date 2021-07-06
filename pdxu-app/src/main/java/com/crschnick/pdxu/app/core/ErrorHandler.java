@@ -6,6 +6,7 @@ import io.sentry.*;
 import io.sentry.protocol.SentryId;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -25,12 +26,34 @@ public class ErrorHandler {
     private static boolean errorReporterShowing = false;
     private static boolean startupCompleted = false;
 
+    private static String replaceUserPaths(String msg) {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return msg.replaceAll("\\\\Users\\\\.+?\\\\", "\\\\<UserDir>\\\\");
+        } else {
+            return msg.replaceAll("/home/.+?/", "/<UserDir>/");
+        }
+    }
+
+    private static void clearUserPaths(SentryEvent event) {
+        if (event.getExceptions() == null) {
+            return;
+        }
+
+        for (var ex : event.getExceptions()) {
+            ex.setValue(replaceUserPaths(ex.getValue()));
+        }
+    }
+
     private static void setOptions() {
         Sentry.init(sentryOptions -> {
             sentryOptions.setEnvironment("production");
             sentryOptions.setServerName(System.getProperty("os.name"));
             sentryOptions.setRelease(PdxuInstallation.getInstance().getVersion());
             sentryOptions.setDsn("https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262");
+            sentryOptions.setBeforeSend((event, hint) -> {
+                clearUserPaths(event);
+                return event;
+            });
 
             if (!PdxuInstallation.getInstance().isProduction()) {
                 sentryOptions.setTracesSampleRate(null);

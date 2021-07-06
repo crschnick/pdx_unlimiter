@@ -93,7 +93,16 @@ public final class NodePointer {
 
     public static class Builder {
 
-        private final List<Element> path = new ArrayList<>();
+        private final List<Element> path;
+
+        public Builder() {
+            this.path = new ArrayList<>();
+        }
+
+        public Builder(NodePointer pointer) {
+            this.path = new ArrayList<>(pointer.path);
+        }
+
 
         public Builder name(String name) {
             path.add(new NameElement(name));
@@ -110,11 +119,16 @@ public final class NodePointer {
             return this;
         }
 
-        public Builder pointer(Node context, NodePointer pointer) {
-            return pointer(context, pointer, n -> n.getString());
+        public Builder pointerEvaluation(Node context, NodePointer pointer) {
+            return pointerEvaluation(context, pointer, n -> {
+                if (!n.isValue()) {
+                    return null;
+                }
+                return n.getString();
+            });
         }
 
-        public Builder pointer(Node context, NodePointer pointer, Function<Node, String> converter) {
+        public Builder pointerEvaluation(Node context, NodePointer pointer, Function<Node, String> converter) {
             path.add(new SupplierElement(() -> {
                 var res = pointer.get(context);
                 if (res != null) {
@@ -132,6 +146,10 @@ public final class NodePointer {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Builder fromBase(NodePointer pointer) {
+        return new Builder(pointer);
     }
 
     private final List<Element> path;
@@ -170,7 +188,7 @@ public final class NodePointer {
                 current = found;
             }
         }
-        return input;
+        return current;
     }
 
 
