@@ -1,10 +1,11 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.editor.*;
+import com.crschnick.pdxu.app.editor.EditorSettings;
+import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
-import com.crschnick.pdxu.app.editor.node.EditorCollectorNode;
 import com.crschnick.pdxu.app.editor.node.EditorNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.util.ColorHelper;
@@ -32,7 +33,7 @@ public class GuiEditorNode {
         if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
             try {
                 var tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                        .createNodeTag(state, (EditorSimpleNode) n);
+                        .createNodeTag(state, (EditorRealNode) n);
                 if (tag != null) {
                     box.getChildren().add(tag);
                 }
@@ -41,7 +42,7 @@ public class GuiEditorNode {
             }
         }
 
-        if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isValue()) {
+        if (n.isReal() && ((EditorRealNode) n).getBackingNode().isValue()) {
             var tf = new JFXTextField(((EditorSimpleNode) n).getBackingNode().getString());
             tf.setAlignment(Pos.CENTER);
             tf.textProperty().addListener((c, o, ne) -> {
@@ -50,8 +51,8 @@ public class GuiEditorNode {
             });
             box.getChildren().add(tf);
             HBox.setHgrow(tf, Priority.ALWAYS);
-        } else if (n.isReal() && ((EditorSimpleNode) n).getBackingNode().isTagged() &&
-                ((EditorSimpleNode) n).getBackingNode().describe().getValueType().equals(Node.ValueType.COLOR)) {
+        } else if (n.isReal() && ((EditorRealNode) n).getBackingNode().isTagged() &&
+                ((EditorRealNode) n).getBackingNode().describe().getValueType().equals(Node.ValueType.COLOR)) {
             var picker = new JFXColorPicker(ColorHelper.fromGameColor(GameColor.fromColorNode(
                     ((EditorSimpleNode) n).getBackingNode())));
             picker.valueProperty().addListener((c, o, ne) -> {
@@ -75,8 +76,7 @@ public class GuiEditorNode {
         box.setSpacing(5);
 
         {
-            int length = n.isReal() ? ((EditorSimpleNode) n).getBackingNode().getNodeArray().size() :
-                    ((EditorCollectorNode) n).getNodes().size();
+            int length = n.getSize();
             var btn = new JFXButton("List (" + length + ")");
             var icon = new FontIcon();
             GuiTooltips.install(icon, "Expand node");

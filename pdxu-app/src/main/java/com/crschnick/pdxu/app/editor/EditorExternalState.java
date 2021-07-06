@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.editor;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
 import com.crschnick.pdxu.app.editor.node.EditorNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.gui.dialog.GuiEditorSettings;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
@@ -48,12 +49,15 @@ public class EditorExternalState {
                                     " vs current one: " + e.getLastModified());
                             if (e.hasChanged()) {
                                 logger.trace("Registering change for file " + TEMP.relativize(e.file) +
-                                        " for editor node " + e.editorNode.getDisplayKeyName());
-
-                                e.registerChange();
-                                ArrayNode newNode = e.state.getParser().parse(changed);
-                                e.editorNode.update(newNode);
-                                e.state.onFileChanged();
+                                        " for editor node " + e.editorNode.getNavigationName());
+                                boolean valid = e.editorNode.isValid();
+                                logger.trace("Editor node " + e.editorNode.getNavigationName() + " validity: " + valid);
+                                if (valid) {
+                                    e.registerChange();
+                                    ArrayNode newNode = e.state.getParser().parse(changed);
+                                    e.editorNode.update(newNode);
+                                    e.state.onFileChanged();
+                                }
                             }
                         } catch (Exception ex) {
                             ErrorHandler.handleException(ex, null, changed);
@@ -94,7 +98,7 @@ public class EditorExternalState {
         return Optional.empty();
     }
 
-    public void startEdit(EditorState state, EditorNode node) {
+    public void startEdit(EditorState state, EditorRealNode node) {
         var ext = getForNode(node);
         if (ext.isPresent()) {
             openFile(ext.get().file.toString());
@@ -130,11 +134,11 @@ public class EditorExternalState {
 
     public static class Entry {
         private final Path file;
-        private final EditorNode editorNode;
+        private final EditorRealNode editorNode;
         private final EditorState state;
         private Instant lastModified;
 
-        public Entry(Path file, EditorNode editorNode, EditorState state) {
+        public Entry(Path file, EditorRealNode editorNode, EditorState state) {
             this.file = file;
             this.editorNode = editorNode;
             this.state = state;

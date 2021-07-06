@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.editor.adapter;
 
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.io.node.NodePointer;
@@ -21,12 +21,12 @@ public class Hoi4SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public NodePointer createNodeJump(EditorState state, EditorSimpleNode node) {
+    public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
         return null;
     }
 
     @Override
-    public Node createNodeTag(EditorState state, EditorSimpleNode node) {
+    public Node createNodeTag(EditorState state, EditorRealNode node) {
         return null;
     }
 }

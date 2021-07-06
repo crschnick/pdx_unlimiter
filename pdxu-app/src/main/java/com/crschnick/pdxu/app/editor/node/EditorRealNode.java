@@ -21,7 +21,7 @@ public abstract class EditorRealNode extends EditorNode {
 
     @Override
     public boolean filterKey(Predicate<String> filter) {
-        return filter.test(getDisplayKeyName());
+        return filter.test(getNavigationName());
     }
 
     @Override
@@ -33,6 +33,8 @@ public abstract class EditorRealNode extends EditorNode {
     public boolean isReal() {
         return true;
     }
+
+    public abstract void update(ArrayNode newNode);
 
     @Override
     public List<EditorNode> expand() {
@@ -50,6 +52,12 @@ public abstract class EditorRealNode extends EditorNode {
     }
 
     public abstract Node getBackingNode();
+
+    @Override
+    public String getNavigationNameAtIndex(int index) {
+        var s = getBackingNode().getArrayNode().getKeyAt(index);
+        return s != null ? s : getNavigationName() + "[" + index + "]";
+    }
 
     @Override
     public List<Node> getNodesInRange(int index, int length) {

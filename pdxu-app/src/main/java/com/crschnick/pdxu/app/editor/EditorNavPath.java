@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.editor;
 
 import com.crschnick.pdxu.app.editor.node.EditorNode;
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import java.util.ArrayList;
@@ -27,8 +27,14 @@ public class EditorNavPath {
     }
 
     private final List<EditorNode> path;
+
     public EditorNavPath(List<EditorNode> path) {
         this.path = path;
+    }
+
+    public EditorNavPath(EditorNavPath path, EditorNode node) {
+        this.path = new ArrayList<>(path.getPath());
+        this.path.add(node);
     }
 
     public EditorNode getEditorNode() {
@@ -56,7 +62,7 @@ public class EditorNavPath {
 
     private static Optional<EditorNode> fastEditorNodeFind(EditorNode current, NodePointer sub) {
         if (current.isReal() && sub.getPath().get(0).getKey() != null) {
-            EditorSimpleNode s = (EditorSimpleNode) current;
+            EditorRealNode s = (EditorRealNode) current;
             return EditorNode.fastEditorSimpleNodeSearch(
                     current, s.getBackingNode().getArrayNode(), sub.getPath().get(0).getKey());
         }
@@ -102,24 +108,16 @@ public class EditorNavPath {
         return Optional.of(new EditorNavPath(newPath));
     }
 
-
     public static EditorNavPath rebuild(EditorNavPath input) {
-        EditorNode current = null;
         List<EditorNode> newPath = new ArrayList<>();
         for (var navEl : input.getPath()) {
-            if (current == null) {
-                current = navEl;
-                newPath.add(current);
+            if (navEl == null) {
+                newPath.add(null);
                 continue;
             }
 
-            var newEditorNode = current.expand().stream()
-                    .filter(en -> navEl.getParentIndex() == en.getParentIndex() &&
-                            en.getDisplayKeyName().equals(navEl.getDisplayKeyName()))
-                    .findFirst();
-            if (newEditorNode.isPresent()) {
-                current = newEditorNode.get();
-                newPath.add(newEditorNode.get());
+            if (navEl.isValid()) {
+                newPath.add(navEl);
             } else {
                 break;
             }

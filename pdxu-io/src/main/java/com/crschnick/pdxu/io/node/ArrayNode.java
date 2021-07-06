@@ -68,6 +68,8 @@ public abstract class ArrayNode extends Node {
 
     protected abstract boolean isFlat();
 
+    public abstract String getKeyAt(int index);
+
     @Override
     public String toDebugValue() {
         return NodeWriter.writeToString(this, Integer.MAX_VALUE, " ");

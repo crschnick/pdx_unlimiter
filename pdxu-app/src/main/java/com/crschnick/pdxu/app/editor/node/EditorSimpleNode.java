@@ -44,33 +44,10 @@ public final class EditorSimpleNode extends EditorRealNode {
         getParent().updateNodeAtIndex(updatedNode, keyName, getKeyIndex());
     }
 
-    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
-        ArrayNode ar = (ArrayNode) getBackingNode();
-        var updatedNode = ar.replacePart(toInsert, beginIndex, length);
-
-        // Update parent node to reflect change
-        getParent().updateNodeAtIndex(updatedNode, keyName, getKeyIndex());
-    }
-
-    @Override
-    public void delete() {
-        getParent().replacePart(ArrayNode.emptyArray(), getKeyIndex(), 1);
-    }
-
-    @Override
-    public String getDisplayKeyName() {
-        return getKeyName().orElse("[" + keyIndex + "]");
-    }
-
-    @Override
-    public String getNavigationName() {
-        return getKeyName().orElseGet(() -> getParent().getNavigationName() + "[" + keyIndex + "]");
-    }
-
     public void update(ArrayNode newNode) {
         if (getBackingNode().isArray()) {
             // Update parent node to reflect change
-            getParent().updateNodeAtIndex(this.getBackingNode(), keyName, getKeyIndex());
+            getParent().updateNodeAtIndex(newNode, keyName, getKeyIndex());
         } else {
             if (newNode.getNodeArray().size() != 1) {
                 throw new IllegalArgumentException("Can't assign array with size != 1 to value node");

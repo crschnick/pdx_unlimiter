@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.gui.game.ImageLoader;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
 import javafx.beans.property.ObjectProperty;
@@ -17,11 +17,11 @@ public class GuiCk3CoaViewerState {
 
     private ObjectProperty<GuiCk3CoaDisplayType> displayType;
     private EditorState state;
-    private EditorSimpleNode editorNode;
+    private EditorRealNode editorNode;
     private ObjectProperty<Ck3CoatOfArms> parsedCoa;
     private ObjectProperty<Image> image;
 
-    GuiCk3CoaViewerState(EditorState state, EditorSimpleNode editorNode) {
+    GuiCk3CoaViewerState(EditorState state, EditorRealNode editorNode) {
         this.state = state;
         this.editorNode = editorNode;
         this.displayType = new SimpleObjectProperty<>(REALM);

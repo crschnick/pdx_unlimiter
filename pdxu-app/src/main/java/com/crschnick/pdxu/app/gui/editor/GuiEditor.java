@@ -2,10 +2,12 @@ package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.editor.*;
+import com.crschnick.pdxu.app.editor.EditorFilter;
+import com.crschnick.pdxu.app.editor.EditorSettings;
+import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.editor.node.EditorNode;
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -72,9 +74,10 @@ public class GuiEditor {
                     if (ne == null) {
                         return;
                     }
+
                     if (edState.getNavigation().getCurrent().path().getPath().size() > 0) {
                         sp.setVvalue(edState.getContent().getScroll());
-                        sp.vvalueProperty().addListener((sc,so,sn) -> {
+                        sp.vvalueProperty().addListener((sc, so, sn) -> {
                             edState.getContent().changeScroll(sn.doubleValue());
                         });
                     }
@@ -124,7 +127,7 @@ public class GuiEditor {
         int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
         for (int i = offset; i < nodeCount + offset; i++) {
             var n = nodes.get(i - offset);
-            var kn = createGridElement(new Label(n.getDisplayKeyName()), i);
+            var kn = createGridElement(new Label(n.getNavigationName()), i);
             kn.setAlignment(Pos.CENTER_LEFT);
 
             grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);
@@ -132,15 +135,14 @@ public class GuiEditor {
             grid.add(createGridElement(new Label("="), i), 2, i);
             grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
 
-            if (n.getParent() != null) {
-                HBox actions = new HBox();
-                actions.setFillHeight(true);
-                actions.setAlignment(Pos.CENTER_RIGHT);
-
-                if (n.isReal() && EditorSettings.getInstance().enableNodeJumps.getValue()) {
+            HBox actions = new HBox();
+            actions.setFillHeight(true);
+            actions.setAlignment(Pos.CENTER_RIGHT);
+            if (n.isReal()) {
+                if (EditorSettings.getInstance().enableNodeJumps.getValue()) {
                     try {
                     var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                            .createNodeJump(state, (EditorSimpleNode) n);
+                            .createNodeJump(state, (EditorRealNode) n);
                         if (pointer != null) {
                             var b = new JFXButton();
                             b.setGraphic(new FontIcon());
@@ -159,24 +161,13 @@ public class GuiEditor {
                 edit.setGraphic(new FontIcon());
                 edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
                 edit.setOnAction(e -> {
-                    state.getExternalState().startEdit(state, n);
+                    state.getExternalState().startEdit(state, (EditorRealNode) n);
                 });
                 GuiTooltips.install(edit, "Open in external text editor");
                 actions.getChildren().add(edit);
                 edit.prefHeightProperty().bind(actions.heightProperty());
-
-                Button del = new JFXButton();
-                del.setGraphic(new FontIcon());
-                del.getStyleClass().add(GuiStyle.CLASS_DELETE);
-                del.setOnAction(e -> {
-                    n.delete();
-                    state.onDelete();
-                });
-                //actions.getChildren().add(del);
-                //del.prefHeightProperty().bind(actions.heightProperty());
-
-                grid.add(createGridElement(actions, i), 4, i);
             }
+            grid.add(createGridElement(actions, i), 4, i);
 
             grid.add(createGridElement(new Region(), i), 5, i);
         }

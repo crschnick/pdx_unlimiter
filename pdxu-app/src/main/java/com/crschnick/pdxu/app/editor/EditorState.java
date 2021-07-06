@@ -67,11 +67,6 @@ public class EditorState {
         content.filterChange();
     }
 
-    public void onDelete() {
-        content.completeContentChange();
-        dirtyProperty().set(true);
-    }
-
     public void onTextChanged() {
         dirtyProperty().set(true);
     }

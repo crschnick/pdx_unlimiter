@@ -122,17 +122,15 @@ public abstract class EditorNode {
 
     public abstract void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index);
 
-    public abstract void replacePart(ArrayNode toInsert, int beginIndex, int length);
-
-    public abstract void delete();
-
     public abstract boolean filterKey(Predicate<String> filter);
 
     public abstract boolean filterValue(NodeMatcher matcher);
 
-    public abstract String getDisplayKeyName();
+    public final String getNavigationName() {
+        return getKeyName().orElseGet(() -> getParent().getNavigationName() + "[" + parentIndex + "]");
+    }
 
-    public abstract String getNavigationName();
+    public abstract String getNavigationNameAtIndex(int index);
 
     public abstract boolean isReal();
 
@@ -146,7 +144,13 @@ public abstract class EditorNode {
 
     public abstract ArrayNode toWritableNode();
 
-    public abstract void update(ArrayNode newNode);
+    public final boolean isValid() {
+        if (getParent() == null) {
+            return true;
+        }
+
+        return getParent().isValid() && getParent().getNavigationNameAtIndex(parentIndex).equals(getNavigationName());
+    }
 
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);

@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.editor.adapter;
 
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.io.node.NodePointer;
@@ -27,7 +27,7 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> EU4_POWER_NAMES = List.of("ADM", "DIP", "MIL");
 
     @Override
-    public NodePointer createNodeJump(EditorState state, EditorSimpleNode node) {
+    public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
         var keyOpt = node.getKeyName();
         var n = node.getBackingNode();
         if (n.isValue()) {
@@ -57,7 +57,7 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public javafx.scene.Node createNodeTag(EditorState state, EditorSimpleNode node) {
+    public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node) {
         return null;
     }
 }

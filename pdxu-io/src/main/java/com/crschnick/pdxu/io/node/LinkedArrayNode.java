@@ -19,7 +19,7 @@ public final class LinkedArrayNode extends ArrayNode {
 
     @Override
     public String toString() {
-        return "LinkedArrayNode(" + getNodeArray().size() + ") }";
+        return "LinkedArrayNode(" + getNodeArray().size() + ")";
     }
 
     @Override
@@ -109,6 +109,12 @@ public final class LinkedArrayNode extends ArrayNode {
     @Override
     protected boolean isFlat() {
         return arrayNodes.stream().allMatch(ArrayNode::isFlat);
+    }
+
+    @Override
+    public String getKeyAt(int index) {
+        int list = getArrayNodeForIndex(index);
+        return arrayNodes.get(list).getKeyAt(getLocalIndex(list, index));
     }
 
     @Override

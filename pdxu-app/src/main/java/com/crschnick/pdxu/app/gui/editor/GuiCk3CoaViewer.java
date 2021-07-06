@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.PdxuApp;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.GuiStyle;
@@ -20,7 +21,7 @@ public class GuiCk3CoaViewer {
 
     private final GuiCk3CoaViewerState state;
 
-    public GuiCk3CoaViewer(EditorState edState, EditorSimpleNode editorNode) {
+    public GuiCk3CoaViewer(EditorState edState, EditorRealNode editorNode) {
         this.state = new GuiCk3CoaViewerState(edState, editorNode);
     }
 

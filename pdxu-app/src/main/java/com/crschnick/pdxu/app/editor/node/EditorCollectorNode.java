@@ -24,22 +24,6 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
-        getParent().replacePart(
-                ArrayNode.sameKeyArray(keyName, toInsert.getNodeArray()),
-                firstNodeIndex + beginIndex,
-                length);
-    }
-
-    @Override
-    public void delete() {
-        getParent().replacePart(
-                ArrayNode.emptyArray(),
-                firstNodeIndex,
-                getSize());
-    }
-
-    @Override
     public boolean filterKey(Predicate<String> filter) {
         return filter.test(keyName);
     }
@@ -50,13 +34,8 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public String getDisplayKeyName() {
-        return keyName + "(s)";
-    }
-
-    @Override
-    public String getNavigationName() {
-        return keyName + "(s)";
+    public String getNavigationNameAtIndex(int index) {
+        return getNavigationName() + "[" + index + "]";
     }
 
     @Override
@@ -71,14 +50,6 @@ public final class EditorCollectorNode extends EditorNode {
 
     public ArrayNode toWritableNode() {
         return ArrayNode.array(getNodes());
-    }
-
-    @Override
-    public void update(ArrayNode newNode) {
-        getParent().replacePart(
-                ArrayNode.sameKeyArray(keyName, newNode.getNodeArray()),
-                firstNodeIndex,
-                getSize());
     }
 
     @Override
@@ -102,6 +73,6 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     public List<Node> getNodes() {
-        return getParent().getNodesInRange(firstNodeIndex, firstNodeIndex + length);
+        return getParent().getNodesInRange(firstNodeIndex, length);
     }
 }

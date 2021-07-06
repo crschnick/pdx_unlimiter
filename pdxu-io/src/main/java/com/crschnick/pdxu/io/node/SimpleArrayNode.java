@@ -214,6 +214,15 @@ public final class SimpleArrayNode extends ArrayNode {
         return false;
     }
 
+    @Override
+    public String getKeyAt(int index) {
+        if (!hasKeyAtIndex(index)) {
+            return null;
+        }
+
+        return context.evaluate(keyScalars[index]);
+    }
+
     private boolean hasKeyAtIndex(int index) {
         if (keyScalars == null) {
             return false;

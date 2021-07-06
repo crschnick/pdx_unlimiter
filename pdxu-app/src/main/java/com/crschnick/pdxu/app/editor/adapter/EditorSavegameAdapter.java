@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.editor.adapter;
 
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.io.node.NodePointer;
@@ -19,7 +19,7 @@ public interface EditorSavegameAdapter {
 
     Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception;
 
-    NodePointer createNodeJump(EditorState state, EditorSimpleNode node) throws Exception;
+    NodePointer createNodeJump(EditorState state, EditorRealNode node) throws Exception;
 
-    javafx.scene.Node createNodeTag(EditorState state, EditorSimpleNode node) throws Exception;
+    javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node) throws Exception;
 }

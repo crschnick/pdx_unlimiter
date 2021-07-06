@@ -22,26 +22,6 @@ public class EditorRootNode extends EditorRealNode {
     }
 
     @Override
-    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
-        this.root = root.replacePart(toInsert, beginIndex, length);
-    }
-
-    @Override
-    public void delete() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getDisplayKeyName() {
-        return keyName;
-    }
-
-    @Override
-    public String getNavigationName() {
-        return keyName;
-    }
-
-    @Override
     public void update(ArrayNode newNode) {
         this.root = newNode;
     }

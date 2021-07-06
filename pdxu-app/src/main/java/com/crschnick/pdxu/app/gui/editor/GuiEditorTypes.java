@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
 import com.crschnick.pdxu.app.editor.node.EditorNode;
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.io.node.Node;
 import javafx.geometry.Insets;
@@ -27,7 +27,7 @@ public class GuiEditorTypes {
 
     public static Region createTypeNode(EditorNode n) {
         if (n.isReal()) {
-            var desc = ((EditorSimpleNode) n).getBackingNode().describe();
+            var desc = ((EditorRealNode) n).getBackingNode().describe();
             return GuiEditorTypes.createTypeNode(desc);
         } else {
             return createCollectorTypeNode();

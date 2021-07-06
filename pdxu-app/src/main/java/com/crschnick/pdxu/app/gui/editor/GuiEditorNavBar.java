@@ -2,9 +2,11 @@ package com.crschnick.pdxu.app.gui.editor;
 
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.editor.*;
+import com.crschnick.pdxu.app.editor.EditorNavLocation;
+import com.crschnick.pdxu.app.editor.EditorSettings;
+import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.jfoenix.controls.JFXButton;
@@ -115,22 +117,24 @@ public class GuiEditorNavBar {
         p.setAlignment(Pos.CENTER);
 
         edState.getNavigation().currentProperty().addListener((c, o, n) -> {
-            if (p.getChildren().size() == 2) {
-                p.getChildren().remove(0);
-            }
-
-            if (n.getEditorNode() != null && n.getEditorNode().isReal() &&
-                    EditorSettings.getInstance().enableNodeTags.getValue()) {
-                try {
-                    var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
-                            .createNodeTag(edState, (EditorSimpleNode) n.getEditorNode());
-                    if (tag != null) {
-                        p.getChildren().add(0, tag);
-                    }
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
+            Platform.runLater(() -> {
+                if (p.getChildren().size() == 2) {
+                    p.getChildren().remove(0);
                 }
-            }
+
+                if (n.getEditorNode() != null && n.getEditorNode().isReal() &&
+                        EditorSettings.getInstance().enableNodeTags.getValue()) {
+                    try {
+                        var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
+                                .createNodeTag(edState, (EditorRealNode) n.getEditorNode());
+                        if (tag != null) {
+                            p.getChildren().add(0, tag);
+                        }
+                    } catch (Exception ex) {
+                        ErrorHandler.handleException(ex);
+                    }
+                }
+            });
         });
 
         {
@@ -140,10 +144,11 @@ public class GuiEditorNavBar {
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
             GuiTooltips.install(edit, "Open in external text editor");
             edit.setOnAction(e -> {
-                edState.getExternalState().startEdit(edState, edState.getNavigation().getCurrent().getEditorNode());
+                edState.getExternalState().startEdit(edState, (EditorRealNode) edState.getNavigation().getCurrent().getEditorNode());
             });
             edit.disableProperty().bind(Bindings.createBooleanBinding(
-                    () -> edState.getNavigation().getCurrent().getEditorNode() == null,
+                    () -> edState.getNavigation().getCurrent().getEditorNode() == null ||
+                            !edState.getNavigation().getCurrent().getEditorNode().isReal(),
                     edState.getNavigation().currentProperty()));
             edit.setPadding(new Insets(4, 4, 2, 4));
             p.getChildren().add(edit);

@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.editor.adapter;
 
-import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.EditorState;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.editor.GuiCk3CoaViewer;
@@ -22,7 +22,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
     static class CoaPreview extends GuiEditorNodeTagFactory {
         @Override
-        public boolean checkIfApplicable(EditorState state, EditorSimpleNode node) {
+        public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
             if (node.getBackingNode().isArray()) {
                 ArrayNode ar = (ArrayNode) node.getBackingNode();
                 return ar.hasKey("pattern");
@@ -31,7 +31,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
 
         @Override
-        public javafx.scene.Node create(EditorState state, EditorSimpleNode node) {
+        public javafx.scene.Node create(EditorState state, EditorRealNode node) {
             var b = new JFXButton();
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
@@ -55,7 +55,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
 
         @Override
-        public boolean checkIfApplicable(EditorState state, EditorSimpleNode node) {
+        public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
             return node.getKeyName().map(k -> k.equals(nodeName)).orElse(false);
         }
     }
@@ -67,7 +67,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             new ImagePreview(
                     Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory("meta_data",
-                    "The meta data of this savegame that is shown in the main menu." +
+                    "The meta data of this savegame that is shown in the main menu. " +
                             "Editing anything inside of it only changes the main menu display, not the actual data in-game."));
 
     @Override
@@ -147,7 +147,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public NodePointer createNodeJump(EditorState state, EditorSimpleNode node) {
+    public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
         if (!state.isSavegame()) {
             return null;
         }
@@ -172,7 +172,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public javafx.scene.Node createNodeTag(EditorState state, EditorSimpleNode node) {
+    public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node) {
         return FACTORIES.stream()
                 .filter(fac -> fac.checkIfApplicable(state, node))
                 .findFirst().map(fac -> fac.create(state, node))
