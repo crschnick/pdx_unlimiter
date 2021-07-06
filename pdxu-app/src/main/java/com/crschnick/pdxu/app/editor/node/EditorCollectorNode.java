@@ -19,8 +19,36 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
-        getParent().updateNodeAtIndex(replacementValue, keyName, firstNodeIndex + index);
+    public boolean isValid() {
+        if (!getParent().isValid()) {
+            return false;
+        }
+
+        boolean priorValid = firstNodeIndex == 0 ||
+                !getParent().getNavigationNameAtRawIndex(firstNodeIndex - 1).equals(getNavigationName());
+        if (!priorValid) {
+            return false;
+        }
+
+        int endIndex = firstNodeIndex + length - 1;
+        boolean posteriorValid = endIndex == getParent().getSize() - 1 ||
+                !getParent().getNavigationNameAtRawIndex(endIndex + 1).equals(getNavigationName());
+        if (!posteriorValid) {
+            return false;
+        }
+
+        for (int i = firstNodeIndex; i < firstNodeIndex + length; i++) {
+            if (!getParent().getNavigationNameAtRawIndex(i).equals(getNavigationName())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index) {
+        getParent().updateNodeAtRawIndex(replacementValue, keyName, firstNodeIndex + index);
     }
 
     @Override
@@ -34,7 +62,7 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public String getNavigationNameAtIndex(int index) {
+    public String getNavigationNameAtRawIndex(int index) {
         return getNavigationName() + "[" + index + "]";
     }
 
@@ -58,13 +86,13 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public Node getNodeAtIndex(int index) {
-        return getParent().getNodeAtIndex(firstNodeIndex + index);
+    public Node getNodeAtRawIndex(int index) {
+        return getParent().getNodeAtRawIndex(firstNodeIndex + index);
     }
 
     @Override
-    public List<Node> getNodesInRange(int index, int length) {
-        return getParent().getNodesInRange(firstNodeIndex + index, length);
+    public List<Node> getNodesInRawRange(int index, int length) {
+        return getParent().getNodesInRawRange(firstNodeIndex + index, length);
     }
 
     @Override
@@ -73,6 +101,6 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     public List<Node> getNodes() {
-        return getParent().getNodesInRange(firstNodeIndex, length);
+        return getParent().getNodesInRawRange(firstNodeIndex, length);
     }
 }

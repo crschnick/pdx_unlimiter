@@ -12,7 +12,7 @@ public record EditorNavLocation(EditorNavPath path, int page, double scroll) {
             return new EditorNavLocation(path);
         }
 
-        var approxIndex = focus.getParentIndex() * ((double) content.size() / totalSize);
+        var approxIndex = focus.getIndexInParent() * ((double) content.size() / totalSize);
         var nodeSize = content.size();
         var pageSizes = EditorContent.calculatePageSizes(nodeSize);
         int sum = 0;

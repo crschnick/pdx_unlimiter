@@ -1,9 +1,7 @@
 package com.crschnick.pdxu.app.gui.editor;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.editor.EditorSettings;
 import com.crschnick.pdxu.app.editor.EditorState;
-import com.crschnick.pdxu.app.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.app.editor.node.EditorNode;
 import com.crschnick.pdxu.app.editor.node.EditorRealNode;
 import com.crschnick.pdxu.app.editor.node.EditorSimpleNode;
@@ -30,17 +28,6 @@ public class GuiEditorNode {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
         box.setFillHeight(true);
-        if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
-            try {
-                var tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                        .createNodeTag(state, (EditorRealNode) n);
-                if (tag != null) {
-                    box.getChildren().add(tag);
-                }
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
-            }
-        }
 
         if (n.isReal() && ((EditorRealNode) n).getBackingNode().isValue()) {
             var tf = new JFXTextField(((EditorSimpleNode) n).getBackingNode().getString());

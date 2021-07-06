@@ -11,11 +11,11 @@ import java.util.List;
 
 public final class EditorSimpleNode extends EditorRealNode {
 
-    private final int keyIndex;
+    private final int rawIndexInParentNode;
 
-    public EditorSimpleNode(EditorNode directParent, String keyName, int parentIndex, int keyIndex) {
+    public EditorSimpleNode(EditorNode directParent, String keyName, int parentIndex, int rawIndexInParentNode) {
         super(directParent, keyName, parentIndex);
-        this.keyIndex = keyIndex;
+        this.rawIndexInParentNode = rawIndexInParentNode;
     }
 
     public void updateText(String text) {
@@ -35,19 +35,19 @@ public final class EditorSimpleNode extends EditorRealNode {
         cn.set(newColorNode);
     }
 
-    public void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
+    public void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index) {
         ArrayNode ar = (ArrayNode) getBackingNode();
 
         var replacement = toInsertKeyName != null ?
                 ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
         var updatedNode = ar.replacePart(replacement, index, 1);
-        getParent().updateNodeAtIndex(updatedNode, keyName, getKeyIndex());
+        getParent().updateNodeAtRawIndex(updatedNode, keyName, getRawIndexInParentNode());
     }
 
     public void update(ArrayNode newNode) {
         if (getBackingNode().isArray()) {
             // Update parent node to reflect change
-            getParent().updateNodeAtIndex(newNode, keyName, getKeyIndex());
+            getParent().updateNodeAtRawIndex(newNode, keyName, getRawIndexInParentNode());
         } else {
             if (newNode.getNodeArray().size() != 1) {
                 throw new IllegalArgumentException("Can't assign array with size != 1 to value node");
@@ -64,16 +64,21 @@ public final class EditorSimpleNode extends EditorRealNode {
         }
     }
 
+    public boolean isValid() {
+        return getParent().isValid() && getParent().getNavigationNameAtRawIndex(rawIndexInParentNode).equals(getNavigationName());
+    }
+
+
     @Override
-    public Node getNodeAtIndex(int index) {
+    public Node getNodeAtRawIndex(int index) {
         return getBackingNode().getNodeArray().get(index);
     }
 
-    public int getKeyIndex() {
-        return keyIndex;
+    public int getRawIndexInParentNode() {
+        return rawIndexInParentNode;
     }
 
     public Node getBackingNode() {
-        return getParent().getNodeAtIndex(getParentIndex());
+        return getParent().getNodeAtRawIndex(rawIndexInParentNode);
     }
 }

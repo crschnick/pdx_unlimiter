@@ -54,13 +54,13 @@ public abstract class EditorRealNode extends EditorNode {
     public abstract Node getBackingNode();
 
     @Override
-    public String getNavigationNameAtIndex(int index) {
+    public String getNavigationNameAtRawIndex(int index) {
         var s = getBackingNode().getArrayNode().getKeyAt(index);
         return s != null ? s : getNavigationName() + "[" + index + "]";
     }
 
     @Override
-    public List<Node> getNodesInRange(int index, int length) {
+    public List<Node> getNodesInRawRange(int index, int length) {
         return getBackingNode().getNodeArray().subList(index, index + length);
     }
 }

@@ -15,10 +15,15 @@ public class EditorRootNode extends EditorRealNode {
     }
 
     @Override
-    public void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index) {
+    public void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index) {
         var replacement = toInsertKeyName != null ?
                 ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
         root = root.replacePart(replacement, index, 1);
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
     }
 
     @Override
@@ -27,7 +32,7 @@ public class EditorRootNode extends EditorRealNode {
     }
 
     @Override
-    public Node getNodeAtIndex(int index) {
+    public Node getNodeAtRawIndex(int index) {
         return root.getNodeArray().get(index);
     }
 

@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.SepiaTone;
@@ -23,6 +24,7 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.Objects;
 
 public class GuiEditor {
 
@@ -90,7 +92,7 @@ public class GuiEditor {
         });
     }
 
-    private static StackPane createGridElement(Region child, int row) {
+    private static StackPane createGridElement(Node child, int row) {
         var s = new StackPane();
         s.getStyleClass().add("pane");
         if (row % 2 != 0) {
@@ -109,7 +111,7 @@ public class GuiEditor {
         var cc = new ColumnConstraints();
         cc.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(
-                new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
+                new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
                 new ColumnConstraints(), new ColumnConstraints());
 
         int offset = 0;
@@ -133,7 +135,19 @@ public class GuiEditor {
             grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);
             grid.add(kn, 1, i);
             grid.add(createGridElement(new Label("="), i), 2, i);
-            grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 3, i);
+
+            Node tag = null;
+            if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
+                try {
+                    tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                            .createNodeTag(state, (EditorRealNode) n);
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
+            }
+            grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i), 3, i);
+
+            grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 4, i);
 
             HBox actions = new HBox();
             actions.setFillHeight(true);
@@ -167,9 +181,9 @@ public class GuiEditor {
                 actions.getChildren().add(edit);
                 edit.prefHeightProperty().bind(actions.heightProperty());
             }
-            grid.add(createGridElement(actions, i), 4, i);
+            grid.add(createGridElement(actions, i), 5, i);
 
-            grid.add(createGridElement(new Region(), i), 5, i);
+            grid.add(createGridElement(new Region(), i), 6, i);
         }
 
         if (state.getContent().canGoToNextPage()) {
@@ -179,7 +193,7 @@ public class GuiEditor {
             });
             HBox box = new HBox(new FontIcon("mdi-arrow-down"), next, new FontIcon("mdi-arrow-down"));
             box.setAlignment(Pos.CENTER);
-            grid.add(createGridElement(box, nodeCount + offset), 0, nodeCount + offset, 5, 1);
+            grid.add(createGridElement(box, nodeCount + offset), 0, nodeCount + offset, 6, 1);
         }
 
         return grid;

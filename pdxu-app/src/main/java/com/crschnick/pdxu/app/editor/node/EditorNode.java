@@ -14,13 +14,13 @@ import java.util.function.Predicate;
 public abstract class EditorNode {
 
     protected final String keyName;
-    private final int parentIndex;
-    private final EditorNode directParent;
+    private final int indexInParent;
+    private final EditorNode parent;
 
-    public EditorNode(EditorNode directParent, String keyName, int parentIndex) {
-        this.directParent = directParent;
+    public EditorNode(EditorNode parent, String keyName, int indexInParent) {
+        this.parent = parent;
         this.keyName = keyName;
-        this.parentIndex = parentIndex;
+        this.indexInParent = indexInParent;
     }
 
     public static Optional<EditorNode> fastEditorSimpleNodeSearch(EditorNode parent, ArrayNode ar, String key) {
@@ -120,22 +120,22 @@ public abstract class EditorNode {
         return result;
     }
 
-    public abstract void updateNodeAtIndex(Node replacementValue, String toInsertKeyName, int index);
+    public abstract void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index);
 
     public abstract boolean filterKey(Predicate<String> filter);
 
     public abstract boolean filterValue(NodeMatcher matcher);
 
     public final String getNavigationName() {
-        return getKeyName().orElseGet(() -> getParent().getNavigationName() + "[" + parentIndex + "]");
+        return getKeyName().orElseGet(() -> getParent().getNavigationName() + "[" + indexInParent + "]");
     }
 
-    public abstract String getNavigationNameAtIndex(int index);
+    public abstract String getNavigationNameAtRawIndex(int index);
 
     public abstract boolean isReal();
 
     public final EditorNode getParent() {
-        return directParent;
+        return parent;
     }
 
     public abstract ArrayNode getContent();
@@ -144,13 +144,7 @@ public abstract class EditorNode {
 
     public abstract ArrayNode toWritableNode();
 
-    public final boolean isValid() {
-        if (getParent() == null) {
-            return true;
-        }
-
-        return getParent().isValid() && getParent().getNavigationNameAtIndex(parentIndex).equals(getNavigationName());
-    }
+    public abstract boolean isValid();
 
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);
@@ -158,11 +152,11 @@ public abstract class EditorNode {
 
     public abstract int getSize();
 
-    public abstract Node getNodeAtIndex(int index);
+    public abstract Node getNodeAtRawIndex(int index);
 
-    public abstract List<Node> getNodesInRange(int index, int length);
+    public abstract List<Node> getNodesInRawRange(int index, int length);
 
-    public int getParentIndex() {
-        return parentIndex;
+    public int getIndexInParent() {
+        return indexInParent;
     }
 }
