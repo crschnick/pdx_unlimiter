@@ -35,8 +35,12 @@ public class SteamDist extends GameDist {
                 steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
             }
         } else if (SystemUtils.IS_OS_LINUX) {
-            String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toString();
-            steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+            try {
+                String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toRealPath().toString();
+                steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
         }
 
         return steamDir.map(Path::of);
