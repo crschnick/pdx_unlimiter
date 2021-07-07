@@ -68,11 +68,15 @@ public final class SimpleArrayNode extends ArrayNode {
         return new SimpleArrayNode(context, ks, vs, values.subList(begin, begin + length));
     }
 
+    private void evaluateNodeAt(int i) {
+        if (values.get(i) == null) {
+            values.set(i, new ValueNode(context, valueScalars[i]));
+        }
+    }
+
     private void evaluateAllValueNodes() {
         for (int i = 0; i < values.size(); i++) {
-            if (values.get(i) == null) {
-                values.set(i, new ValueNode(context, valueScalars[i]));
-            }
+            evaluateNodeAt(i);
         }
     }
 
@@ -260,10 +264,7 @@ public final class SimpleArrayNode extends ArrayNode {
         for (int i = 0; i < values.size(); i++) {
             if (isKeyAt(i, b)) {
                 // Initialize value node if we haven't done that already
-                if (values.get(i) == null) {
-                    values.set(i, new ValueNode(context, valueScalars[i]));
-                }
-
+                evaluateNodeAt(i);
                 return values.get(i);
             }
         }
@@ -297,6 +298,7 @@ public final class SimpleArrayNode extends ArrayNode {
         List<Node> found = new ArrayList<>();
         for (int i = 0; i < values.size(); i++) {
             if (isKeyAt(i, b)) {
+                evaluateNodeAt(i);
                 found.add(values.get(i));
             }
         }

@@ -51,10 +51,11 @@ public class GameFileContext {
 
     public static GameFileContext fromInfo(SavegameInfo<?> info) {
         var g = INFO_MAP.get(info.getClass());
-        return new GameFileContext(g, info.getMods().stream()
+        List<GameMod> mods = info.getMods() != null ? info.getMods().stream()
                 .map(GameInstallation.ALL.get(g)::getModForFileName)
-                        .flatMap(Optional::stream)
-                        .collect(Collectors.toList()));
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()) : List.of();
+        return new GameFileContext(g, mods);
     }
 
     public TextFormatParser getParser() {
