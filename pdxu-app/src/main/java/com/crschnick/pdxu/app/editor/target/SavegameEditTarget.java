@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.editor.target;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameStructure;
@@ -14,6 +15,7 @@ public class SavegameEditTarget extends EditTarget {
 
     protected final SavegameType type;
     private SavegameStructure structure;
+    private boolean binary;
 
     public SavegameEditTarget(Path file, SavegameType type) {
         super(file);
@@ -26,10 +28,16 @@ public class SavegameEditTarget extends EditTarget {
     }
 
     @Override
+    public boolean canSave() {
+        return super.canSave() && !binary;
+    }
+
+    @Override
     public Map<String, ArrayNode> parse() throws Exception {
         var bytes = Files.readAllBytes(file);
+        binary = type.isBinary(bytes);
         if (type.isBinary(bytes)) {
-            throw new IllegalArgumentException("Binary/Ironman savegames are not supported. Please use the Ironman converter first");
+            bytes = RakalyHelper.toPlaintext(file);
         }
 
         structure = type.determineStructure(bytes);
@@ -53,7 +61,7 @@ public class SavegameEditTarget extends EditTarget {
 
     @Override
     public String getName() {
-        return file.getFileName().toString();
+        return file.getFileName().toString() + (binary ? " (Binary/Read-only)" : "");
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,10 @@ public abstract class EditTarget {
         }
 
         return Optional.of(new SavegameEditTarget(file, type));
+    }
+
+    public boolean canSave() {
+        return Files.isWritable(file);
     }
 
     public abstract boolean isSavegame();

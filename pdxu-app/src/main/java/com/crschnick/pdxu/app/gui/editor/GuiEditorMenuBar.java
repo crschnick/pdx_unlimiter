@@ -22,6 +22,9 @@ public class GuiEditorMenuBar {
             state.save();
         });
         file.getItems().add(c);
+        if (!state.canSave()) {
+            c.setDisable(true);
+        }
 
 
         Menu editor = new Menu("Editor");

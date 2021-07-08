@@ -28,14 +28,16 @@ public class EditorState {
     private final ObjectProperty<GameFileContext> fileContext;
     private final EditorNavigation navigation;
     private final boolean savegame;
+    private final boolean canSave;
 
-    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame) {
+    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean canSave) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
 
         this.fileContext = new SimpleObjectProperty<>(fileContext);
         this.savegame = savegame;
+        this.canSave = canSave;
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
         filter = new EditorFilter(this);
@@ -128,5 +130,9 @@ public class EditorState {
 
     public boolean isSavegame() {
         return savegame;
+    }
+
+    public boolean canSave() {
+        return canSave;
     }
 }

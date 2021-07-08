@@ -33,7 +33,7 @@ public class Editor {
             FileChooser c = new FileChooser();
             List<File> file = c.showOpenMultipleDialog(PdxuApp.getApp().getStage());
             if (file != null) {
-                file.forEach(f -> openExternalDataFile(f.toPath()));
+                file.forEach(f -> createNewEditor(new ExternalEditTarget(f.toPath())));
             }
         });
     }
@@ -68,7 +68,7 @@ public class Editor {
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
-        }, target.isSavegame());
+        }, target.isSavegame(), target.canSave());
 
         Platform.runLater(() -> {
             Stage stage = GuiEditor.createStage(state);
