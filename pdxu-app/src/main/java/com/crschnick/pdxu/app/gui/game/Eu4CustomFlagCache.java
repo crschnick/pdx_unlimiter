@@ -38,7 +38,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
 
             var colorsFile = GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("common")
                     .resolve("custom_country_colors").resolve("00_custom_country_colors.txt");
-            var content = TextFormatParser.TEXT.parse(colorsFile);
+            var content = TextFormatParser.text().parse(colorsFile);
             content.forEach((k, v) -> {
                 if (k.equals("flag_color")) {
                     flagColors.add(GameColor.fromRgbArray(v));

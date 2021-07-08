@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.FileWatchManager;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.settings.Settings;
+import com.crschnick.pdxu.app.editor.Editor;
 import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import javafx.application.Platform;
@@ -12,12 +13,14 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class FileImporter {
 
@@ -68,6 +71,19 @@ public class FileImporter {
 
         logger.debug("Deleting queue file " + queueFile);
         FileUtils.deleteQuietly(queueFile.toFile());
+    }
+
+    public static void onFileDrop(List<File> files) {
+        for (var file : files) {
+            Editor.openExternalDataFile(file.toPath());
+        }
+
+        var importTargets = files.stream()
+                .map(File::toString)
+                .map(FileImportTarget::createTargets)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        FileImporter.importTargets(importTargets);
     }
 
     public static void importTargets(Collection<? extends FileImportTarget> targets) {

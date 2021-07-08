@@ -6,7 +6,6 @@ import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
@@ -21,10 +20,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class GuiLayout {
 
@@ -114,12 +109,7 @@ public class GuiLayout {
             if (event.getGestureSource() == null && event.getDragboard().hasFiles()) {
                 event.setDropCompleted(true);
                 Dragboard db = event.getDragboard();
-                var importTargets = db.getFiles().stream()
-                        .map(File::toString)
-                        .map(FileImportTarget::createTargets)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList());
-                FileImporter.importTargets(importTargets);
+                FileImporter.onFileDrop(db.getFiles());
             }
             event.consume();
         });

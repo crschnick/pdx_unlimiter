@@ -13,7 +13,9 @@ import java.util.function.Predicate;
 
 public final class TextFormatParser {
 
-    public static final TextFormatParser TEXT = new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.ALL, s -> true);
+    public static TextFormatParser text() {
+        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.ALL, s -> true);
+    }
 
     public static TextFormatParser eu4() {
         return new TextFormatParser(
@@ -109,7 +111,7 @@ public final class TextFormatParser {
             return r;
         } catch (Throwable t) {
             // Catch also errors!
-            throw new ParseException(t);
+            throw new ParseException("Parser failed around offset " + tokenizer.getScalarsStart()[slIndex], t);
         } finally {
             // Always reset!
             reset();

@@ -29,7 +29,7 @@ public class Ck3Backgrounds {
                     .resolve("common").resolve("landed_titles").resolve("00_landed_titles.txt");
 
             try {
-                ArrayNode node = TextFormatParser.TEXT.parse(file);
+                ArrayNode node = TextFormatParser.text().parse(file);
                 cache.addColors(node);
             } catch (Exception e) {
                 ErrorHandler.handleException(e, "Couldn't parse title data", file);

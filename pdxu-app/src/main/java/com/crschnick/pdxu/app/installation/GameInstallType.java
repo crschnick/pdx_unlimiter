@@ -162,7 +162,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.TEXT.parse(sf);
+            var node = TextFormatParser.text().parse(sf);
             var langId = node
                     .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
                     .map(Node::getString);
@@ -269,7 +269,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.TEXT.parse(sf);
+            var node = TextFormatParser.text().parse(sf);
             var langId = node
                     .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
                     .map(Node::getString);
@@ -352,7 +352,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.TEXT.parse(sf);
+            var node = TextFormatParser.text().parse(sf);
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }
@@ -369,7 +369,7 @@ public interface GameInstallType {
                 return List.of();
             }
 
-            var node = TextFormatParser.TEXT.parse(sf);
+            var node = TextFormatParser.text().parse(sf);
             var mods = node.getNodeForKeyIfExistent("last_mods");
             if (mods.isEmpty()) {
                 return List.of();
@@ -448,7 +448,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.TEXT.parse(sf);
+            var node = TextFormatParser.text().parse(sf);
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }
@@ -574,7 +574,7 @@ public interface GameInstallType {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.TEXT.parse(sf);
+            var node = TextFormatParser.text().parse(sf);
             var langId = node.getNodeForKey("language").getString();
             return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
         }

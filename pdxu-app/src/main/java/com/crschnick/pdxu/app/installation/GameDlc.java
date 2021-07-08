@@ -30,7 +30,7 @@ public class GameDlc {
             return Optional.empty();
         }
 
-        Node node = TextFormatParser.TEXT.parse(filePath);
+        Node node = TextFormatParser.text().parse(filePath);
         GameDlc dlc = new GameDlc();
         dlc.expansion = node.getNodeForKeyIfExistent("category")
                 .map(n -> n.getString().equals("expansion"))

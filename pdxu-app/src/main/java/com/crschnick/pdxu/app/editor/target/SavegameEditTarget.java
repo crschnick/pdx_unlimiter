@@ -28,8 +28,11 @@ public class SavegameEditTarget extends EditTarget {
     @Override
     public Map<String, ArrayNode> parse() throws Exception {
         var bytes = Files.readAllBytes(file);
-        structure = type.determineStructure(bytes);
+        if (type.isBinary(bytes)) {
+            throw new IllegalArgumentException("Binary/Ironman savegames are not supported. Please use the Ironman converter first");
+        }
 
+        structure = type.determineStructure(bytes);
         var succ = structure.parse(bytes).success();
         if (succ.isPresent()) {
             return succ.get().content;

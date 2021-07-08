@@ -46,7 +46,7 @@ public class Ck3TagRenderer {
                 ctx);
         if (file.isPresent()) {
             try {
-                Node node = TextFormatParser.TEXT.parse(file.get());
+                Node node = TextFormatParser.text().parse(file.get());
                 Map<String, javafx.scene.paint.Color> map = new HashMap<>();
                 node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
                     n.forEach((k, v) -> {

@@ -84,6 +84,14 @@ public class TextFormatTokenizer {
         }
     }
 
+    private void checkUnclosedArrays() {
+        for (int i = 1; i < arraySizeStack.size(); i++) {
+            tokenTypes[tokenCounter] = CLOSE_GROUP;
+            tokenCounter++;
+        }
+        arraySizeStack.clear();
+    }
+
     public void tokenize() {
         tokenTypes[0] = OPEN_GROUP;
         arraySizes[0] = 0;
@@ -94,6 +102,7 @@ public class TextFormatTokenizer {
         for (; i <= bytes.length; i++) {
             tokenizeIteration();
         }
+        checkUnclosedArrays();
         tokenTypes[tokenCounter] = CLOSE_GROUP;
     }
 

@@ -7,11 +7,16 @@ import com.crschnick.pdxu.app.editor.target.EditTarget;
 import com.crschnick.pdxu.app.editor.target.ExternalEditTarget;
 import com.crschnick.pdxu.app.gui.editor.GuiEditor;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,12 +31,27 @@ public class Editor {
 
         Platform.runLater(() -> {
             FileChooser c = new FileChooser();
-            File file = c.showOpenDialog(PdxuApp.getApp().getStage());
-            if (file != null && file.exists()) {
-                var target = new ExternalEditTarget(file.toPath());
-                createNewEditor(target);
+            List<File> file = c.showOpenMultipleDialog(PdxuApp.getApp().getStage());
+            if (file != null) {
+                file.forEach(f -> openExternalDataFile(f.toPath()));
             }
         });
+    }
+
+    public static void openExternalDataFile(Path file) {
+        if (Files.isDirectory(file)) {
+            try {
+                Files.list(file).forEach(f -> openExternalDataFile(f));
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+            }
+            return;
+        }
+
+        var type = SavegameType.getTypeForFile(file);
+        if (type == null) {
+            createNewEditor(new ExternalEditTarget(file));
+        }
     }
 
     public static void createNewEditor(EditTarget target) {

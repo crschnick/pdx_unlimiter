@@ -96,11 +96,21 @@ public class EditorContent {
     }
 
     private double getViewShare() {
+        if (filteredNodes.size() == 0) {
+            return 0.0;
+        }
+
         int focusedNode = getViewIndex();
         return (double) focusedNode / filteredNodes.size();
     }
 
     private void goToViewShare(double vs) {
+        if (vs == 0.0 || pageSizes.size() == 0) {
+            changeScroll(0.0);
+            goToPage(0);
+            return;
+        }
+
         int index = (int) (vs * filteredNodes.size());
         int sum = 0;
         for (int page = 0; page < pageSizes.size(); page++) {

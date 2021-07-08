@@ -45,7 +45,7 @@ public class StellarisTagRenderer {
         }
 
         try {
-            Node node = TextFormatParser.TEXT.parse(file.get());
+            Node node = TextFormatParser.text().parse(file.get());
             return loadPredefinedStellarisColors(node);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
