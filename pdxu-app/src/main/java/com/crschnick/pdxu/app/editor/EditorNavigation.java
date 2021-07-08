@@ -102,6 +102,10 @@ public class EditorNavigation {
     }
 
     public void navigateToParent(EditorNode newNode) {
+        if (getCurrent().getEditorNode() == null) {
+            return;
+        }
+
         if (getCurrent().getEditorNode().equals(newNode)) {
             return;
         }
