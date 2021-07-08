@@ -26,6 +26,11 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     }
 
     @Override
+    public boolean canSave() {
+        return target.canSave();
+    }
+
+    @Override
     public boolean isSavegame() {
         return target.isSavegame();
     }

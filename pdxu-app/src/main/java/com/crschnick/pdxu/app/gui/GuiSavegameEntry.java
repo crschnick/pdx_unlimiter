@@ -268,20 +268,16 @@ public class GuiSavegameEntry {
             dynamicButtons.getChildren().add(convert);
         }
 
-        {
+        SavegameContext.withSavegameAsync(e, ctx -> {
+            boolean binary = ctx.getInfo().isBinary();
             Button edit = new JFXButton();
-            edit.setGraphic(new FontIcon());
+            edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
             edit.setOnMouseClicked((m) -> {
                 SavegameActions.editSavegame(e);
             });
-            edit.getStyleClass().add(CLASS_EDIT);
             GuiTooltips.install(edit, "Edit savegame");
-            SavegameContext.withSavegameAsync(e, ctx -> {
-                if (!ctx.getInfo().isBinary()) {
-                    dynamicButtons.getChildren().add(0, edit);
-                }
-            });
-        }
+            dynamicButtons.getChildren().add(0, edit);
+        });
 
 
         HBox buttonBar = new HBox(dynamicButtons, staticButtons);
