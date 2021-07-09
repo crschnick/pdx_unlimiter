@@ -35,8 +35,8 @@ public class RakalyWebHelper {
         var file = FileUtils.getTempDirectory().toPath().resolve("pdxu_rakaly_blob.js");
         try (var out = new BufferedOutputStream(Files.newOutputStream(file), 10000000)) {
             out.write("""
-                    function createFile() {
-                        var data = new Uint8Array([
+                    function createBuffer() {
+                        var buffer = new Uint8Array([
                             """.getBytes(StandardCharsets.UTF_8));
 
             for (int i = 0; i < bytes.length; i++) {
@@ -48,11 +48,8 @@ public class RakalyWebHelper {
             }
 
             out.write("""
-                    
                         ]);
-                        return new File(data, "test.eu4", {
-                            type: "application/zip",
-                        })
+                        return buffer;
                     }
                     """.getBytes(StandardCharsets.UTF_8));
         }
