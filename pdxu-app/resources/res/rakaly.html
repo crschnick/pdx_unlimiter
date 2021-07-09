@@ -1,0 +1,20 @@
+<html>
+<body>
+<script src="pdxu_rakaly_blob.js"></script>
+<script>
+    var buffer = createBuffer().buffer;
+    var file = new File([buffer], "savegame.eu4", {
+        type: "application/octet-stream",
+    });
+    function postFile() {
+        console.log('Posting file ...')
+        newWindow.postMessage(file, "*", [buffer]);
+        console.log('Posted file!')
+        window.close();
+    }
+
+    var newWindow = window.open('http://rakaly.com/eu4/analyze')
+    setTimeout(postFile, 1000);
+</script>
+</body>
+</html>
