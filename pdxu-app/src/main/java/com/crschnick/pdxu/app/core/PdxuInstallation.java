@@ -31,7 +31,7 @@ public class PdxuInstallation {
     public static void init() {
         var i = new PdxuInstallation();
 
-        Path appPath = Path.of(System.getProperty("java.home"));
+        Path appPath = Path.of(System.getProperty("java.home")).getParent();
         i.image = Files.exists(appPath.resolve("version"));
         i.production = i.image;
         i.version = "unknown";
@@ -162,13 +162,11 @@ public class PdxuInstallation {
     }
 
     public Path getExecutableLocation() {
-        Path appPath = Path.of(System.getProperty("java.home"));
+        Path appPath = Path.of(System.getProperty("java.home")).getParent();
         if (SystemUtils.IS_OS_WINDOWS) {
-            return appPath.resolve("bin").resolve("java.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return appPath.resolve("bin").resolve("java");
+            return appPath.resolve("Pdx-Unlimter.exe");
         } else {
-            return appPath.resolve("bin").resolve("java.exe");
+            return appPath.resolve("Pdx-Unlimter");
         }
     }
 

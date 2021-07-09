@@ -9,6 +9,8 @@ import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.editor.gui.GuiEditor;
 import com.crschnick.pdxu.editor.target.EditTarget;
 import com.crschnick.pdxu.editor.target.ExternalEditTarget;
+import com.crschnick.pdxu.editor.target.SavegameEditTarget;
+import com.crschnick.pdxu.editor.target.StorageEditTarget;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.SavegameInfo;
@@ -36,7 +38,10 @@ public class Editor implements EditorProvider {
 
     @Override
     public <T, I extends SavegameInfo<T>> void openSavegame(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
-
+        var file = storage.getSavegameFile(entry);
+        var target = new StorageEditTarget<>(storage, entry,
+                new SavegameEditTarget(file, SavegameType.getTypeForFile(file)));
+        createNewEditor(target);
     }
 
     public void openExternalFile() {
