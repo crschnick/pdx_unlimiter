@@ -1,0 +1,17 @@
+<html>
+<body>
+<script src="pdxu_rakaly_blob.js"></script>
+<script>
+    var file = createFile()
+    function postFile() {
+        console.log('Posting file ...')
+        newWindow.postMessage(file, "*");
+        console.log('Posted file!')
+        //window.close();
+    }
+
+    var newWindow = window.open('http://rakaly.com/eu4/analyze')
+    setTimeout(postFile, 3000);
+</script>
+</body>
+</html>
