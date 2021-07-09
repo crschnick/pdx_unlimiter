@@ -83,15 +83,14 @@ With this editor you can edit any file that is saved in a Paradox text format.
 This includes EU4 and CK3 non-ironman savegames, all Stellaris savegames, and
 any game data files for mods and other purposes.
 
-The editor supports two different styles of editing savegame files.
+![Editor](misc/editor.png)
+
+The editor supports multiple different styles of editing savegame files.
 The first one, the more simple version, allows you to edit already existing values for entries.
 It is meant for users that are new to savegame editing, is relatively user-friendly,
 and tries to prevent users from making savegames invalid or corrupt.
-
-The second editing style, a more advanced version, allows you to use your
-favourite text-editor to completely change the data structure if wanted.
-Even though as an advanced user you already edited Paradox text format files
-with a text editor, using the Pdx-Unlimiter editor has the following advantages:
+However, it also allows you to use your
+favourite text-editor and to completely change the data structure if wanted.
 
 - You don't have to deal with compressed savegames, the editor does all
   the extracting and repackaging of zipped savegame files for you
@@ -102,8 +101,11 @@ with a text editor, using the Pdx-Unlimiter editor has the following advantages:
 
 - You can easily navigate the hierarchical data with filters compared to the
   laborious process of locating a specific entry with a text editor search function
+  
+- The editor can visualize certain data entries and provide more context.
+  The most prominent example would be the coat of arms preview
 
-![Editor](misc/editor.png)
+![Coa](misc/coa.png)
 
 **Usage guide:** [Editing savegames](https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide)
 
