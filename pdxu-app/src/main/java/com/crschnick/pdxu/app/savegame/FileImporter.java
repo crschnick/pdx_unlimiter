@@ -1,11 +1,7 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.FileWatchManager;
-import com.crschnick.pdxu.app.core.PdxuInstallation;
-import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.core.*;
 import com.crschnick.pdxu.app.core.settings.Settings;
-import com.crschnick.pdxu.app.editor.Editor;
 import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import javafx.application.Platform;
@@ -75,7 +71,7 @@ public class FileImporter {
 
     public static void onFileDrop(List<File> files) {
         for (var file : files) {
-            Editor.openExternalDataFile(file.toPath());
+            EditorProvider.get().openExternalDataFile(file.toPath());
         }
 
         var importTargets = files.stream()

@@ -1,0 +1,104 @@
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    maven {
+        url = 'https://maven.nikr.net/'
+    }
+    maven { url "https://jitpack.io" }
+}
+
+addDependenciesModuleInfo {
+    overwriteExistingFiles = true
+    jdepsExtraArgs = ['-q']
+    outputDirectory = file("$rootProject.buildDir/generated-modules")
+    modules {
+        module {
+            artifact 'com.1stleg:jnativehook:2.0.2'
+            moduleInfoSource = '''
+                module org.jnativehook {
+                    exports org.jnativehook;
+                    exports org.jnativehook.keyboard;
+                    requires java.logging;
+                    requires java.desktop;
+                }
+            '''
+        }
+        module {
+            artifact 'io.sentry:sentry:5.0.1'
+            moduleInfoSource = '''
+                module io.sentry {
+                    exports io.sentry;
+                    opens io.sentry to com.google.gson;
+                    
+                    exports io.sentry.protocol;
+                    opens io.sentry.protocol to com.google.gson;
+                    
+                    exports io.sentry.adapters;
+                    opens io.sentry.adapters to com.google.gson;
+                    
+                    exports io.sentry.config;
+                    opens io.sentry.config to com.google.gson;
+                    
+                    exports io.sentry.transport;
+                    opens io.sentry.transport to com.google.gson;
+                    
+                    exports io.sentry.util;
+                    opens io.sentry.util to com.google.gson;
+                    
+                    requires com.google.gson;
+                }
+            '''
+        }
+        module {
+            artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
+            moduleInfoSource = '''
+                module com.realityinteractive.imageio.tga {
+                    requires java.desktop;
+                    exports com.realityinteractive.imageio.tga;
+                }
+            '''
+        }
+        module {
+            artifact 'net.nikr:dds:1.0.0'
+            moduleInfoSource = '''
+                module net.nikr.dds {
+                    requires java.desktop;
+                    exports net.nikr.dds;
+                }
+            '''
+        }
+        module {
+            artifact 'org.apache.commons:commons-lang3:3.12.0'
+            moduleInfoSource = '''
+                module org.apache.commons.lang {
+                    exports org.apache.commons.lang3;
+                    exports org.apache.commons.lang3.function;
+                    exports org.apache.commons.lang3.arch;
+                    exports org.apache.commons.lang3.reflect;
+                }
+            '''
+        }
+        module {
+            artifact 'org.apache.commons:commons-collections4:4.4'
+            moduleInfoSource = '''
+                module org.apache.commons.collections4 {
+                    exports org.apache.commons.collections4;
+                    exports org.apache.commons.collections4.bidimap;
+                }
+            '''
+        }
+        module {
+            artifact 'commons-io:commons-io:2.8.0'
+            moduleInfoSource = '''
+                module org.apache.commons.io {
+                    exports org.apache.commons.io;
+                    exports org.apache.commons.io.file;
+                    exports org.apache.commons.io.input;
+                    exports org.apache.commons.io.filefilter;
+                }
+            '''
+        }
+    }
+}

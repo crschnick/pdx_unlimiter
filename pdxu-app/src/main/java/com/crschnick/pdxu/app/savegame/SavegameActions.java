@@ -1,10 +1,8 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.core.EditorProvider;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
-import com.crschnick.pdxu.app.editor.Editor;
-import com.crschnick.pdxu.app.editor.target.EditTarget;
-import com.crschnick.pdxu.app.editor.target.StorageEditTarget;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
@@ -191,12 +189,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegame(e, ctx -> {
-                var in = ctx.getStorage().getSavegameFile(e);
-                var target = EditTarget.create(in);
-                target.ifPresent(t -> {
-                    var storageTarget = new StorageEditTarget<>(ctx.getStorage(), e, t);
-                    Editor.createNewEditor(storageTarget);
-                });
+                EditorProvider.get().openSavegame(ctx.getStorage(), e);
             });
         }, true);
     }

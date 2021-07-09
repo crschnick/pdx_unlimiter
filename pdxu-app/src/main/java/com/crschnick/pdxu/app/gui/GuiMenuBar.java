@@ -1,10 +1,6 @@
 package com.crschnick.pdxu.app.gui;
 
-import com.crschnick.pdxu.app.core.ComponentManager;
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.PdxuInstallation;
-import com.crschnick.pdxu.app.core.SavegameManagerState;
-import com.crschnick.pdxu.app.editor.Editor;
+import com.crschnick.pdxu.app.core.*;
 import com.crschnick.pdxu.app.gui.dialog.*;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
@@ -36,7 +32,7 @@ public class GuiMenuBar {
 
         MenuItem ed = new MenuItem(PdxuI18n.get("OPEN_EDITOR"));
         ed.setOnAction((a) -> {
-            Editor.openExternalFile();
+            EditorProvider.get().openExternalFile();
         });
         pdxu.getItems().add(ed);
 
