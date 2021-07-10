@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 public final class ValueNode extends Node {
 
     private static final byte DOUBLE_QUOTE_CHAR = 34;
-    private static final Pattern LONG = Pattern.compile("-?[0-9]+");
-    private static final Pattern DOUBLE = Pattern.compile("-?([0-9]+)\\.([0-9]+)");
+    private static final Pattern LONG = Pattern.compile("[+-]?[0-9]+");
+    private static final Pattern DOUBLE = Pattern.compile("[+-]?([0-9]+)\\.([0-9]+)");
 
     private NodeContext context;
     private int scalarIndex;
