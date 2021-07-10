@@ -23,6 +23,7 @@ module com.crschnick.pdxu.app {
     requires java.net.http;
     requires com.crschnick.pdxu.model;
     requires com.crschnick.pdxu.io;
+    requires jdk.httpserver;
 
     exports com.crschnick.pdxu.app;
     exports com.crschnick.pdxu.app.installation;

@@ -102,18 +102,6 @@ public final class Settings extends AbstractSettings {
             }
         }
     };
-    public final SettingsEntry.StringEntry rakalyUserId = new SettingsEntry.StringEntry(
-            "RAKALY_USER_ID",
-            "rakalyUserId",
-            null,
-            false
-    );
-    public final SettingsEntry.StringEntry rakalyApiKey = new SettingsEntry.StringEntry(
-            "RAKALY_API_KEY",
-            "rakalyApiKey",
-            null,
-            true
-    );
     public final SettingsEntry.StringEntry skanderbegApiKey = new SettingsEntry.StringEntry(
             "SKANDERBEG_API_KEY",
             "skanderbegApiKey",

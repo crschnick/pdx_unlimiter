@@ -43,8 +43,6 @@ public class GuiSettings {
                 new Separator(),
                 GuiSettingsComponents.section("IRONY", applyFuncs, s.ironyDir, s.launchIrony),
                 new Separator(),
-                GuiSettingsComponents.section("RAKALY", applyFuncs, s.rakalyUserId, s.rakalyApiKey),
-                new Separator(),
                 GuiSettingsComponents.section("CONVERTERS", applyFuncs, s.ck3toeu4Dir),
                 new Separator(),
                 GuiSettingsComponents.section("EU4SE", applyFuncs, s.enableEu4SaveEditor),

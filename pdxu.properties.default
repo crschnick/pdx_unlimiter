@@ -6,10 +6,6 @@
 # your installation and instead have a separate development environment.
 dataDir=
 
-# The location of a custom repository of
-# https://github.com/crschnick/pdxu_rakaly. Usually not needed.
-rakalyDir=
-
 # Enables the Developer entry in the menu bar that provides
 # a few additional features useful when developing.
 developerMode=true
