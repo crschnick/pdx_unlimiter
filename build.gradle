@@ -115,7 +115,14 @@ task copyLang(type: Copy) {
     from "${projectDir}/lang"
 }
 
-jpackage.finalizedBy(writeVersion, copyResources, copyLang)
+task copyStartScripts(type: Copy) {
+    into "${buildDir}/dist/Pdx-Unlimiter/bin"
+    from "${projectDir}/misc/pdxu.bat"
+    from "${projectDir}/misc/pdxu"
+}
+
+
+jpackage.finalizedBy(writeVersion, copyResources, copyLang, copyStartScripts)
 
 task createDist(type: Zip, dependsOn: jpackage) {
     destinationDirectory = buildDir
