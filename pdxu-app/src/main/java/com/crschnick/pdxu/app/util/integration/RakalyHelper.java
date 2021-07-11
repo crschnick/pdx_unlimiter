@@ -42,14 +42,14 @@ public class RakalyHelper {
                 "--retain",
                 "--to-stdout",
                 file.toString())
-                .redirectError(ProcessBuilder.Redirect.DISCARD)
+                .redirectErrorStream(true)
                 .start();
         var b = proc.getInputStream().readAllBytes();
         proc.waitFor();
         int returnCode = proc.exitValue();
 
         if (returnCode != 0 && returnCode != 1) {
-            throw new IOException("Rakaly melter failed with exit code " + returnCode);
+            throw new IOException("Rakaly melter failed with exit code " + returnCode + ". Cause:\n" + new String(b));
         }
 
         return b;

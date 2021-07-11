@@ -57,10 +57,10 @@ public class RakalyWebHelper {
         private SavegameStorage<?,?> storage;
 
         public void handle(HttpExchange t) throws IOException {
-            byte [] response;
+            byte [] response = new byte[0];
             if (t.getRequestURI().toString().equals("/pdxu_rakaly_blob.js")) {
                 response = writeJsBlob(Files.readAllBytes(storage.getSavegameFile(entry)));
-            } else {
+            } else if (t.getRequestURI().toString().equals("/")) {
                 var src = PdxuInstallation.getInstance().getResourceDir().resolve("web").resolve("rakaly.html");
                 response = Files.readAllBytes(src);
             }
@@ -104,7 +104,7 @@ public class RakalyWebHelper {
         }, true);
     }
 
-    public static void shutdownServer() {
+    public static void reset() {
         if (server != null) {
             server.stop(0);
             server = null;

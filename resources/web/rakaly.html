@@ -16,6 +16,7 @@
     var file = new File([buffer], "savegame.eu4", {
         type: "application/octet-stream",
     });
+
     function postFile() {
         console.log('Posting file ...')
         newWindow.postMessage(file, "*", [buffer]);
@@ -24,7 +25,11 @@
     }
 
     var newWindow = window.open('http://rakaly.com/eu4/analyze')
-    setTimeout(postFile, 1000);
+    window.addEventListener('message', (e) => {
+      if (e.data === "rakaly-loaded") {
+        postFile();
+      }
+    });
 </script>
 </body>
 </html>

@@ -142,7 +142,7 @@ public class ComponentManager {
             }
             PdxuI18n.reset();
             CacheManager.reset();
-            RakalyWebHelper.shutdownServer();
+            RakalyWebHelper.reset();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
