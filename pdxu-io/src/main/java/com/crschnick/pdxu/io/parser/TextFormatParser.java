@@ -183,8 +183,8 @@ public final class TextFormatParser {
             boolean isMissingKey = tt[index] == TextFormatTokenizer.EQUALS;
             if (isMissingKey) {
                 index++;
+                // Discard next node if there is one!
                 if (tt[index + 1] != TextFormatTokenizer.CLOSE_GROUP) {
-                    // Discard next node!
                     skipOverNextNode();
                 }
             }

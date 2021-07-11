@@ -20,6 +20,10 @@ public class GameMod {
             return Optional.empty();
         }
 
+        if (!p.toFile().canRead()) {
+            return Optional.empty();
+        }
+
         Node node;
         try {
             node = TextFormatParser.text().parse(p);

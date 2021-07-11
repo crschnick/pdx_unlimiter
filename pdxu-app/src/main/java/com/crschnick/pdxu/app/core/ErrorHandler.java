@@ -40,7 +40,9 @@ public class ErrorHandler {
         }
 
         for (var ex : event.getExceptions()) {
-            ex.setValue(replaceUserPaths(ex.getValue()));
+            if (ex.getValue() != null) {
+                ex.setValue(replaceUserPaths(ex.getValue()));
+            }
         }
     }
 

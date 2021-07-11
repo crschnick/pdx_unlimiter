@@ -117,10 +117,12 @@ task copyLang(type: Copy) {
 
 task copyStartScripts(type: Copy) {
     into "${buildDir}/dist/Pdx-Unlimiter/bin"
-    from "${projectDir}/misc/pdxu.bat"
-    from "${projectDir}/misc/pdxu"
+    if (DefaultNativePlatform.currentOperatingSystem.windows) {
+        from "${projectDir}/misc/pdxu.bat"
+    } else {
+        from "${projectDir}/misc/pdxu"
+    }
 }
-
 
 jpackage.finalizedBy(writeVersion, copyResources, copyLang, copyStartScripts)
 
