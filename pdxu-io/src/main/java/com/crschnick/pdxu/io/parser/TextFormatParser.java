@@ -161,6 +161,14 @@ public final class TextFormatParser {
         return null;
     }
 
+    private void skipOverNextNode() {
+        var res = parseNodeIfNotSimpleValue();
+        if (res == null) {
+            index++;
+            slIndex++;
+        }
+    }
+
     private ArrayNode parseArray() {
         var tt = tokenizer.getTokenTypes();
 
@@ -171,6 +179,15 @@ public final class TextFormatParser {
         var builder = new ArrayNode.Builder(context, size);
         while (true) {
             assert index < tt.length : "Reached EOF but found no closing group token";
+
+            boolean isMissingKey = tt[index] == TextFormatTokenizer.EQUALS;
+            if (isMissingKey) {
+                index++;
+                if (tt[index + 1] != TextFormatTokenizer.CLOSE_GROUP) {
+                    // Discard next node!
+                    skipOverNextNode();
+                }
+            }
 
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
                 assert size >= builder.getUsedSize() :
