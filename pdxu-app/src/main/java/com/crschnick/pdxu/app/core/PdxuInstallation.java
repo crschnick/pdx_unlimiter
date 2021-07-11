@@ -28,10 +28,19 @@ public class PdxuInstallation {
     private String latestVersion;
     private String logLevel = "debug";
 
+    private static Path getAppPath() {
+        Path path = Path.of(System.getProperty("java.home"));
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return path.getParent();
+        } else {
+            return path.getParent().getParent();
+        }
+    }
+
     public static void init() {
         var i = new PdxuInstallation();
 
-        Path appPath = Path.of(System.getProperty("java.home")).getParent();
+        Path appPath = getAppPath();
         i.image = Files.exists(appPath.resolve("version"));
         i.production = i.image;
         i.version = "unknown";
@@ -162,11 +171,11 @@ public class PdxuInstallation {
     }
 
     public Path getExecutableLocation() {
-        Path appPath = Path.of(System.getProperty("java.home")).getParent();
+        Path appPath = getAppPath();
         if (SystemUtils.IS_OS_WINDOWS) {
             return appPath.resolve("Pdx-Unlimter.exe");
         } else {
-            return appPath.resolve("Pdx-Unlimter");
+            return appPath.resolve("bin").resolve("Pdx-Unlimter");
         }
     }
 
