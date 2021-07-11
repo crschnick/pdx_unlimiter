@@ -106,11 +106,18 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> LIVING_KEYS = List.of(
             "dynasty_head", "head_of_house", "religious_head", "holder", "owner", "character",
             "target", "attacker", "defender", "claimant", "first", "second", "head",
-            "council", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals", "currently_played_characters", "knights");
+            "council", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals",
+            "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
+            "ruler_designer_characters", "");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
     private static final List<String> TITLE_KEYS = List.of("targeted_titles", "title", "domain");
+    private static final List<String> STORIES_KEYS = List.of("stories");
+    private static final List<String> SCHEMES_KEYS = List.of("schemes");
+    private static final List<String> REGIMENTS_KEYS = List.of("regiments");
+    private static final List<String> SECRETS_KEYS = List.of("secret", "secrets", "targeting_secrets");
+
 
     private NodePointer get(String key, String val) {
         if (DYNASTY_KEYS.contains(key)) {
@@ -150,6 +157,18 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
         if (TITLE_KEYS.contains(key)) {
             return NodePointer.builder().name("landed_titles").name("landed_titles").name(val).build();
+        }
+        if (STORIES_KEYS.contains(key)) {
+            return NodePointer.builder().name("stories").name("active").name(val).build();
+        }
+        if (SCHEMES_KEYS.contains(key)) {
+            return NodePointer.builder().name("schemes").name("active").name(val).build();
+        }
+        if (REGIMENTS_KEYS.contains(key)) {
+            return NodePointer.builder().name("armies").name("regiments").name(val).build();
+        }
+        if (SECRETS_KEYS.contains(key)) {
+            return NodePointer.builder().name("secrets").name("secrets").name(val).build();
         }
         
         return null;
