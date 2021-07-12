@@ -173,9 +173,9 @@ public class PdxuInstallation {
     public Path getExecutableLocation() {
         Path appPath = getAppPath();
         if (SystemUtils.IS_OS_WINDOWS) {
-            return appPath.resolve("Pdx-Unlimter.exe");
+            return appPath.resolve("Pdx-Unlimiter.exe");
         } else {
-            return appPath.resolve("bin").resolve("Pdx-Unlimter");
+            return appPath.resolve("bin").resolve("Pdx-Unlimiter");
         }
     }
 
