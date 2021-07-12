@@ -36,4 +36,5 @@ module com.crschnick.pdxu.app {
     exports com.crschnick.pdxu.app.lang;
     exports com.crschnick.pdxu.app.core.settings;
     exports com.crschnick.pdxu.app.gui.dialog;
+    exports com.crschnick.pdxu.app.installation.dist;
 }

@@ -313,11 +313,6 @@ public abstract class SettingsEntry<T> {
 
         protected boolean disabled;
 
-        public VetoableSettingsEntry(String id, String serializationName, Type type) {
-            super(id, serializationName, type);
-            this.disabled = false;
-        }
-
         public VetoableSettingsEntry(Supplier<String> name, Supplier<String> description, String serializationName, Type type) {
             super(name, description, serializationName, type);
             this.disabled = false;
@@ -382,11 +377,6 @@ public abstract class SettingsEntry<T> {
             this.disabled = false;
         }
 
-        public FailablePathEntry(Supplier<String> name, Supplier<String> description, String serializationName) {
-            super(name, description, serializationName, Type.PATH);
-            this.disabled = false;
-        }
-
         @Override
         public final void set(JsonNode node) {
             if (node.isNull()) {
@@ -441,7 +431,6 @@ public abstract class SettingsEntry<T> {
                 return true;
             } catch (InvalidInstallationException e) {
                 showInstallErrorMessage(e.getLocalisedMessage());
-                ErrorHandler.reportError(e, false, null);
                 return false;
             } catch (Exception e) {
                 showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());

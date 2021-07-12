@@ -164,7 +164,7 @@ public class GuiStatusBar {
                 buttons.getChildren().add(export);
             }
 
-            if (ctx.getInstallation().getDist().supportsLauncher()) {
+            if (e.getInfo() != null && ctx.getInstallation().getDist().supportsLauncher()) {
                 Button launch = new Button(PdxuI18n.get("START_LAUNCHER"));
                 launch.setGraphic(new FontIcon());
                 launch.getStyleClass().add("launcher-button");
@@ -178,7 +178,7 @@ public class GuiStatusBar {
                 buttons.getChildren().add(launch);
             }
 
-            if (ctx.getInstallation().getDist().supportsDirectLaunch()) {
+            if (e.getInfo() != null && ctx.getInstallation().getDist().supportsDirectLaunch()) {
                 ButtonBase launch;
                 if (ctx.getInstallation().getType().debugModeSwitch().isPresent()) {
                     var splitButton = new SplitMenuButton();
