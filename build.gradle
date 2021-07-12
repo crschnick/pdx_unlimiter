@@ -93,7 +93,11 @@ jlink {
     jpackage {
         imageOutputDir = file("$buildDir/dist")
         imageName = 'Pdx-Unlimiter'
-        icon = "misc/logo.ico"
+        if (DefaultNativePlatform.currentOperatingSystem.windows) {
+            icon = "misc/logo.ico"
+        } else {
+            icon = "misc/logo.png"
+        }
         skipInstaller = true
         applicationName = 'Pdx-Unlimiter'
     }
