@@ -57,6 +57,11 @@ public class ImageLoader {
             return DEFAULT_IMAGE;
         }
 
+        if (!Files.isReadable(p)) {
+            LoggerFactory.getLogger(ImageLoader.class).error("Image file " + p.toString() + " not readable.");
+            return DEFAULT_IMAGE;
+        }
+
         BufferedImage image;
         try {
             image = ImageIO.read(p.toFile());
@@ -116,6 +121,12 @@ public class ImageLoader {
     }
 
     public static void writePng(Image image, Path out) throws IOException {
+        if (!Files.isWritable(out)) {
+            if (!out.toFile().setWritable(true)) {
+                return;
+            }
+        }
+
         BufferedImage swingImage = new BufferedImage(
                 (int) image.getWidth(),
                 (int) image.getHeight(),

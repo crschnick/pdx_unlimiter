@@ -24,7 +24,8 @@ import java.util.zip.ZipOutputStream;
 public class ErrorHandler {
 
     private static boolean errorReporterShowing = false;
-    private static boolean startupCompleted = false;
+    private static boolean platformInitialized = false;
+    private static boolean platformShutdown = false;
 
     private static String replaceUserPaths(String msg) {
         if (SystemUtils.IS_OS_WINDOWS) {
@@ -87,7 +88,11 @@ public class ErrorHandler {
     }
 
     public static void setPlatformInitialized() {
-        startupCompleted = true;
+        platformInitialized = true;
+    }
+
+    public static void setPlatformShutdown() {
+        platformShutdown = true;
     }
 
     public static void registerThread(Thread thread) {
@@ -112,7 +117,7 @@ public class ErrorHandler {
             latch.await();
         } catch (InterruptedException ignored) {
         }
-        startupCompleted = true;
+        platformInitialized = true;
     }
 
     public static void handleTerminalException(Exception ex) {
@@ -128,7 +133,12 @@ public class ErrorHandler {
     }
 
     private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
-        if (!startupCompleted) {
+        if (platformShutdown) {
+            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
+            return;
+        }
+
+        if (!platformInitialized) {
             unpreparedStartup(ex);
         } else {
             LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);

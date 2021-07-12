@@ -88,6 +88,7 @@ public class ComponentManager {
 
     public static void finalTeardown() {
         TaskExecutor.getInstance().stop(() -> {
+            ErrorHandler.setPlatformShutdown();
             ComponentManager.reset();
             Platform.exit();
         });
