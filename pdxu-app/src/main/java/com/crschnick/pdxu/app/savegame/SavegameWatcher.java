@@ -42,18 +42,22 @@ public class SavegameWatcher {
         ALL.clear();
     }
 
+    private void initSavegames() {
+        updateSavegames();
+
+        List<Path> savegameDirs = install.getAllSavegameDirectories();
+        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
+            updateSavegames();
+        });
+    }
+
     public synchronized Optional<FileImportTarget.StandardImportTarget> getLatest() {
         return savegames.stream()
                 .findFirst();
     }
 
-    private synchronized void initSavegames() {
+    private synchronized void updateSavegames() {
         savegames.get().setAll(getLatestSavegames());
-
-        List<Path> savegameDirs = install.getAllSavegameDirectories();
-        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
-            savegames.get().setAll(getLatestSavegames());
-        });
     }
 
     private synchronized List<FileImportTarget.StandardImportTarget> getLatestSavegames() {
