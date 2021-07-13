@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
@@ -111,7 +112,7 @@ public class Ck3TagRenderer {
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_FRAME,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_FRAME);
         var useFrame = frames.getOrDefault(governmentShape, GameImage.CK3_REALM_FRAME);
-        g.drawImage(ImageLoader.fromFXImage(useFrame),
+        g.drawImage(ImageHelper.fromFXImage(useFrame),
                 3 * scaleFactor,
                 -8 * scaleFactor,
                 realmImg.getWidth() - (6 * scaleFactor),
@@ -119,7 +120,7 @@ public class Ck3TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        return ImageLoader.toFXImage(i);
+        return ImageHelper.toFXImage(i);
     }
 
     public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
@@ -152,7 +153,7 @@ public class Ck3TagRenderer {
                 null);
 
         g.drawImage(
-                ImageLoader.fromFXImage(GameImage.CK3_HOUSE_FRAME),
+                ImageHelper.fromFXImage(GameImage.CK3_HOUSE_FRAME),
                 -25 * scaleFactor,
                 -15 * scaleFactor,
                 houseImg.getWidth() + (33 * scaleFactor),
@@ -160,7 +161,7 @@ public class Ck3TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        return ImageLoader.toFXImage(i);
+        return ImageHelper.toFXImage(i);
     }
 
     public static Image houseImage(Ck3House house, GameFileContext ctx) {
@@ -192,7 +193,7 @@ public class Ck3TagRenderer {
                 null);
 
         g.drawImage(
-                ImageLoader.fromFXImage(GameImage.CK3_TITLE_FRAME),
+                ImageHelper.fromFXImage(GameImage.CK3_TITLE_FRAME),
                 -6 * scaleFactor,
                 -4 * scaleFactor,
                 titleImg.getWidth() + (11 * scaleFactor),
@@ -200,7 +201,7 @@ public class Ck3TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        return ImageLoader.toFXImage(i);
+        return ImageHelper.toFXImage(i);
     }
 
     public static Image titleImage(Ck3Title title, GameFileContext ctx) {
@@ -288,11 +289,11 @@ public class Ck3TagRenderer {
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(sub.getPatternFile()),
                     ctx);
-            patternFile.map(p -> ImageLoader.loadAwtImage(p, patternFunction)).ifPresent(img -> {
+            patternFile.map(p -> ImageHelper.loadAwtImage(p, patternFunction)).ifPresent(img -> {
                 g.drawImage(img, (int) (sub.getX() * size), (int) (sub.getY() * size),
                         (int) (sub.getScaleX() * size), (int) (sub.getScaleY() * size), null);
             });
-            return patternFile.map(p -> ImageLoader.loadAwtImage(p, null)).orElse(null);
+            return patternFile.map(p -> ImageHelper.loadAwtImage(p, null)).orElse(null);
         } else {
             return null;
         }
@@ -328,7 +329,7 @@ public class Ck3TagRenderer {
                 Path.of("gfx", "coat_of_arms",
                         (hasColor ? "colored" : "textured") + "_emblems").resolve(emblem.getFile()),
                 ctx);
-        path.map(p -> ImageLoader.loadAwtImage(p, customFilter)).ifPresent(img -> {
+        path.map(p -> ImageHelper.loadAwtImage(p, customFilter)).ifPresent(img -> {
 
             boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
             BufferedImage emblemToCullImage = null;

@@ -1,4 +1,4 @@
-package com.crschnick.pdxu.app.gui.game;
+package com.crschnick.pdxu.app.util;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.*;
 
-public class ImageLoader {
+public class ImageHelper {
 
     public static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
     public static final BufferedImage DEFAULT_AWT_IMAGE = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
@@ -47,18 +47,18 @@ public class ImageLoader {
         }
     }
 
-    static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
+    public static Image loadImage(Path p, Function<Integer, Integer> pixelSelector) {
         if (p == null) {
             return DEFAULT_IMAGE;
         }
 
         if (!Files.isRegularFile(p)) {
-            LoggerFactory.getLogger(ImageLoader.class).error("Image file " + p.toString() + " not found.");
+            LoggerFactory.getLogger(ImageHelper.class).error("Image file " + p.toString() + " not found.");
             return DEFAULT_IMAGE;
         }
 
         if (!Files.isReadable(p)) {
-            LoggerFactory.getLogger(ImageLoader.class).error("Image file " + p.toString() + " not readable.");
+            LoggerFactory.getLogger(ImageHelper.class).error("Image file " + p.toString() + " not readable.");
             return DEFAULT_IMAGE;
         }
 
@@ -82,7 +82,7 @@ public class ImageLoader {
         return img;
     }
 
-    static BufferedImage loadAwtImage(Path input, Function<Integer, Integer> pixelSelector) {
+    public static BufferedImage loadAwtImage(Path input, Function<Integer, Integer> pixelSelector) {
         try {
             BufferedImage image = ImageIO.read(input.toFile());
             if (pixelSelector != null) {
@@ -108,7 +108,7 @@ public class ImageLoader {
         return img;
     }
 
-    static BufferedImage fromFXImage(Image fxImage) {
+    public static BufferedImage fromFXImage(Image fxImage) {
         BufferedImage img = new BufferedImage(
                 (int) fxImage.getWidth(), (int) fxImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
         for (int x = 0; x < fxImage.getWidth(); x++) {
@@ -121,6 +121,10 @@ public class ImageLoader {
     }
 
     public static void writePng(Image image, Path out) throws IOException {
+        if (Files.isDirectory(out)) {
+            return;
+        }
+
         if (!Files.isWritable(out)) {
             if (!out.toFile().setWritable(true)) {
                 return;
@@ -141,7 +145,7 @@ public class ImageLoader {
         ImageIO.write(swingImage, "png", out.toFile());
     }
 
-    static void applyAlphaMask(BufferedImage awtImage, Image mask) {
+    public static void applyAlphaMask(BufferedImage awtImage, Image mask) {
         double xF = mask.getWidth() / awtImage.getWidth();
         double yF = mask.getHeight() / awtImage.getHeight();
         for (int x = 0; x < awtImage.getWidth(); x++) {

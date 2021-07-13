@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
@@ -42,7 +43,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     private Image hoi4TagNode(Path path, SavegameInfo<Hoi4Tag> info) {
         var in = CascadeDirectoryHelper.openFile(path, info);
-        return ImageLoader.loadImage(in.orElse(null), null);
+        return ImageHelper.loadImage(in.orElse(null), null);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
-import com.crschnick.pdxu.app.gui.game.ImageLoader;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
 import javafx.beans.property.*;
@@ -49,7 +49,7 @@ public abstract class GuiCk3CoaDisplayType {
 
         @Override
         public Image render(Ck3CoatOfArms coa, GameFileContext ctx) {
-            return ImageLoader.toFXImage(
+            return ImageHelper.toFXImage(
                     Ck3TagRenderer.renderImage(coa, ctx, size.get(), clothPattern.get()));
         }
     };

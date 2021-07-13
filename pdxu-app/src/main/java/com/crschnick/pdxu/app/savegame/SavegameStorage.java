@@ -4,7 +4,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
-import com.crschnick.pdxu.app.gui.game.ImageLoader;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
@@ -210,7 +210,7 @@ public abstract class SavegameStorage<
                 }
 
                 Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
-                Image image = ImageLoader.loadImage(
+                Image image = ImageHelper.loadImage(
                         getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
                 collections.add(new SavegameCampaign<>(lastDate, name, id, date, image));
             }
@@ -277,11 +277,12 @@ public abstract class SavegameStorage<
             ConfigHelper.writeConfig(getSavegameDataDirectory()
                     .resolve(campaign.getUuid().toString()).resolve("campaign.json"), campaignFileNode);
 
+            var imgFile = getSavegameDataDirectory()
+                    .resolve(campaign.getUuid().toString()).resolve("campaign.png");
             try {
-                ImageLoader.writePng(campaign.getImage(), getSavegameDataDirectory()
-                        .resolve(campaign.getUuid().toString()).resolve("campaign.png"));
+                ImageHelper.writePng(campaign.getImage(), imgFile);
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                logger.error("Couldn't write image " + imgFile, e);
             }
 
             ObjectNode campaignNode = JsonNodeFactory.instance.objectNode()

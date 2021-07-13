@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.editor.gui;
 
 
-import com.crschnick.pdxu.app.gui.game.ImageLoader;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
@@ -25,7 +25,7 @@ public class GuiCk3CoaViewerState {
         this.state = state;
         this.editorNode = editorNode;
         this.displayType = new SimpleObjectProperty<>(REALM);
-        this.image = new SimpleObjectProperty<>(ImageLoader.DEFAULT_IMAGE);
+        this.image = new SimpleObjectProperty<>(ImageHelper.DEFAULT_IMAGE);
         this.parsedCoa = new SimpleObjectProperty<>(Ck3CoatOfArms.fromNode(editorNode.getBackingNode()));
     }
 
@@ -41,7 +41,7 @@ public class GuiCk3CoaViewerState {
 
     void updateImage() {
         if (parsedCoa.get() == null) {
-            image.set(ImageLoader.DEFAULT_IMAGE);
+            image.set(ImageHelper.DEFAULT_IMAGE);
         } else {
             image.set(displayType.get().render(parsedCoa.get(), state.getFileContext()));
         }

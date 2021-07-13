@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.War;
@@ -78,7 +79,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     @Override
     public Image tagImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
         if (tag == null) {
-            return ImageLoader.DEFAULT_IMAGE;
+            return ImageHelper.DEFAULT_IMAGE;
         }
 
         return Ck3TagRenderer.realmImage(info, tag);

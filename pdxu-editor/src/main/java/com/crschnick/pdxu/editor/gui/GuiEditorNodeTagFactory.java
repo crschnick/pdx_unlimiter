@@ -2,7 +2,7 @@ package com.crschnick.pdxu.editor.gui;
 
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.app.gui.game.ImageLoader;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.EditorState;
@@ -49,7 +49,7 @@ public abstract class GuiEditorNodeTagFactory {
                 }
 
                 CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
-                    var img = ImageLoader.loadImage(found);
+                    var img = ImageHelper.loadImage(found);
                     var imgView = new ImageView(img);
                     var tt = GuiTooltips.createTooltip(imgView);
                     tt.setShowDelay(Duration.ZERO);

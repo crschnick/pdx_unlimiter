@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -57,10 +58,10 @@ public class StellarisTagRenderer {
         //TODO: Cache better
         var img = createBasicFlagImage(info, tag);
 
-        ImageLoader.applyAlphaMask(img, GameImage.STELLARIS_FLAG_MASK);
-        img.getGraphics().drawImage(ImageLoader.fromFXImage(GameImage.STELLARIS_FLAG_FRAME), 0, 0, IMG_SIZE, IMG_SIZE, null);
+        ImageHelper.applyAlphaMask(img, GameImage.STELLARIS_FLAG_MASK);
+        img.getGraphics().drawImage(ImageHelper.fromFXImage(GameImage.STELLARIS_FLAG_FRAME), 0, 0, IMG_SIZE, IMG_SIZE, null);
 
-        return ImageLoader.toFXImage(img);
+        return ImageHelper.toFXImage(img);
     }
 
     private static BufferedImage createBasicFlagImage(SavegameInfo<StellarisTag> info, StellarisTag tag) {
@@ -90,10 +91,10 @@ public class StellarisTagRenderer {
 
         var iconIn = CascadeDirectoryHelper.openFile(path, info);
         if (iconIn.isEmpty()) {
-            return ImageLoader.DEFAULT_AWT_IMAGE;
+            return ImageHelper.DEFAULT_AWT_IMAGE;
         }
 
-        var img = ImageLoader.loadAwtImage(iconIn.get(), null);
+        var img = ImageHelper.loadAwtImage(iconIn.get(), null);
         cache.icons.put(path, img);
         return img;
     }
@@ -117,10 +118,10 @@ public class StellarisTagRenderer {
 
         var in = CascadeDirectoryHelper.openFile(path, info);
         if (in.isEmpty()) {
-            return ImageLoader.DEFAULT_AWT_IMAGE;
+            return ImageHelper.DEFAULT_AWT_IMAGE;
         }
 
-        var img = ImageLoader.loadAwtImage(in.get(), customFilter);
+        var img = ImageHelper.loadAwtImage(in.get(), customFilter);
         cache.backgrounds.put(path, img);
         return img;
     }

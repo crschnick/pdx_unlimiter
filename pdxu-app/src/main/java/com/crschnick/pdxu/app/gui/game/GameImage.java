@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
@@ -118,7 +119,7 @@ public class GameImage {
         for (var field : GameImage.class.getFields()) {
             if (field.getType().equals(Image.class)) {
                 try {
-                    field.set(null, ImageLoader.DEFAULT_IMAGE);
+                    field.set(null, ImageHelper.DEFAULT_IMAGE);
                 } catch (IllegalAccessException e) {
                     ErrorHandler.handleException(e);
                 }
@@ -143,7 +144,7 @@ public class GameImage {
 
     public static Image getGameIcon(Game g) {
         var iconFile = GameInstallation.ALL.get(g).getDist().getIcon();
-        return ImageLoader.loadImage(iconFile);
+        return ImageHelper.loadImage(iconFile);
     }
 
     public static void loadCk3Images() {
@@ -151,73 +152,73 @@ public class GameImage {
         Path p = installPath.resolve("game");
         Path i = p.resolve("gfx").resolve("interface").resolve("icons");
 
-        CK3_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
+        CK3_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
 
-        CK3_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.CK3)
+        CK3_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.CK3)
                 .getType().chooseBackgroundImage(installPath));
-        CK3_TITLE_MASK = ImageLoader.loadImage(
+        CK3_TITLE_MASK = ImageHelper.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_mask.dds"));
-        CK3_TITLE_FRAME = ImageLoader.loadImage(
+        CK3_TITLE_FRAME = ImageHelper.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_86.dds"));
 
-        CK3_HOUSE_MASK = ImageLoader.loadImage(
+        CK3_HOUSE_MASK = ImageHelper.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("house_mask.dds"));
-        CK3_HOUSE_FRAME = ImageLoader.cut(ImageLoader.loadImage(
+        CK3_HOUSE_FRAME = ImageHelper.cut(ImageHelper.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("house_115.dds")), new Rectangle2D(150, 0, 150, 150));
         VIEWPORTS.put(CK3_HOUSE_FRAME, new Rectangle2D(150, 0, 150, 150));
 
 
-        CK3_SKILL_DIPLOMACY = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        CK3_SKILL_DIPLOMACY = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_DIPLOMACY, new Rectangle2D(0, 0, 60, 60));
 
-        CK3_SKILL_MARTIAL = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        CK3_SKILL_MARTIAL = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_MARTIAL, new Rectangle2D(60, 0, 60, 60));
 
-        CK3_SKILL_STEWARDSHIP = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        CK3_SKILL_STEWARDSHIP = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_STEWARDSHIP, new Rectangle2D(120, 0, 60, 60));
 
-        CK3_SKILL_INTRIGUE = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        CK3_SKILL_INTRIGUE = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_INTRIGUE, new Rectangle2D(180, 0, 60, 60));
 
-        CK3_SKILL_LEARNING = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        CK3_SKILL_LEARNING = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_LEARNING, new Rectangle2D(240, 0, 60, 60));
 
-        CK3_SKILL_PROWESS = ImageLoader.loadImage(i.resolve("icon_skills.dds"));
+        CK3_SKILL_PROWESS = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_PROWESS, new Rectangle2D(300, 0, 60, 60));
 
-        CK3_ICON_RULER = ImageLoader.loadImage(i.resolve("flat_icons").resolve("mapmode_kingdom.dds"));
-        CK3_ICON_HEIR = ImageLoader.loadImage(i.resolve("flat_icons").resolve("heir.dds"));
-        CK3_ICON_TITLES = ImageLoader.loadImage(i.resolve("message_feed").resolve("titles.dds"));
-        CK3_ICON_CLAIMS = ImageLoader.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
+        CK3_ICON_RULER = ImageHelper.loadImage(i.resolve("flat_icons").resolve("mapmode_kingdom.dds"));
+        CK3_ICON_HEIR = ImageHelper.loadImage(i.resolve("flat_icons").resolve("heir.dds"));
+        CK3_ICON_TITLES = ImageHelper.loadImage(i.resolve("message_feed").resolve("titles.dds"));
+        CK3_ICON_CLAIMS = ImageHelper.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
 
-        CK3_REALM_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("_default.dds"));
-        CK3_REALM_CLAN_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("clan_government.dds"));
-        CK3_REALM_REPUBLIC_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("republic_government.dds"));
-        CK3_REALM_THEOCRACY_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("theocracy_government.dds"));
-        CK3_REALM_TRIBAL_MASK = ImageLoader.loadImage(i.resolve("realm_masks").resolve("tribal_government.dds"));
+        CK3_REALM_MASK = ImageHelper.loadImage(i.resolve("realm_masks").resolve("_default.dds"));
+        CK3_REALM_CLAN_MASK = ImageHelper.loadImage(i.resolve("realm_masks").resolve("clan_government.dds"));
+        CK3_REALM_REPUBLIC_MASK = ImageHelper.loadImage(i.resolve("realm_masks").resolve("republic_government.dds"));
+        CK3_REALM_THEOCRACY_MASK = ImageHelper.loadImage(i.resolve("realm_masks").resolve("theocracy_government.dds"));
+        CK3_REALM_TRIBAL_MASK = ImageHelper.loadImage(i.resolve("realm_masks").resolve("tribal_government.dds"));
 
-        CK3_REALM_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("_default_115.dds"));
-        CK3_REALM_CLAN_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("clan_government_115.dds"));
-        CK3_REALM_REPUBLIC_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("republic_government_115.dds"));
-        CK3_REALM_THEOCRACY_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("theocracy_government_115.dds"));
-        CK3_REALM_TRIBAL_FRAME = ImageLoader.loadImage(i.resolve("realm_frames").resolve("tribal_government_115.dds"));
+        CK3_REALM_FRAME = ImageHelper.loadImage(i.resolve("realm_frames").resolve("_default_115.dds"));
+        CK3_REALM_CLAN_FRAME = ImageHelper.loadImage(i.resolve("realm_frames").resolve("clan_government_115.dds"));
+        CK3_REALM_REPUBLIC_FRAME = ImageHelper.loadImage(i.resolve("realm_frames").resolve("republic_government_115.dds"));
+        CK3_REALM_THEOCRACY_FRAME = ImageHelper.loadImage(i.resolve("realm_frames").resolve("theocracy_government_115.dds"));
+        CK3_REALM_TRIBAL_FRAME = ImageHelper.loadImage(i.resolve("realm_frames").resolve("tribal_government_115.dds"));
 
-        CK3_COA_OVERLAY = ImageLoader.loadImage(
+        CK3_COA_OVERLAY = ImageHelper.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("coa_overlay.dds"));
 
-        CK3_ICON_WAR = ImageLoader.loadImage(i.resolve("map_coa").resolve("icon_at_war_big.dds"));
-        CK3_ICON_ALLY = ImageLoader.loadImage(i.resolve("message_feed").resolve("alliance.dds"));
-        CK3_ICON_GOLD = ImageLoader.loadImage(i.resolve("icon_gold.dds"));
-        CK3_ICON_PRESTIGE = ImageLoader.loadImage(i.resolve("currencies").resolve("icon_prestige_01.dds"));
-        CK3_ICON_PIETY = ImageLoader.loadImage(i.resolve("currencies").resolve("icon_piety_christian_01.dds"));
-        CK3_ICON_SOLDIERS = ImageLoader.loadImage(i.resolve("icon_soldier.dds"));
-        CK3_ICON_RENOWN = ImageLoader.loadImage(i.resolve("currencies").resolve("icon_dynasty_prestige_01.dds"));
-        CK3_ICON_HEALTH = ImageLoader.loadImage(i.resolve("traits").resolve("_frame_health.dds"));
+        CK3_ICON_WAR = ImageHelper.loadImage(i.resolve("map_coa").resolve("icon_at_war_big.dds"));
+        CK3_ICON_ALLY = ImageHelper.loadImage(i.resolve("message_feed").resolve("alliance.dds"));
+        CK3_ICON_GOLD = ImageHelper.loadImage(i.resolve("icon_gold.dds"));
+        CK3_ICON_PRESTIGE = ImageHelper.loadImage(i.resolve("currencies").resolve("icon_prestige_01.dds"));
+        CK3_ICON_PIETY = ImageHelper.loadImage(i.resolve("currencies").resolve("icon_piety_christian_01.dds"));
+        CK3_ICON_SOLDIERS = ImageHelper.loadImage(i.resolve("icon_soldier.dds"));
+        CK3_ICON_RENOWN = ImageHelper.loadImage(i.resolve("currencies").resolve("icon_dynasty_prestige_01.dds"));
+        CK3_ICON_HEALTH = ImageHelper.loadImage(i.resolve("traits").resolve("_frame_health.dds"));
     }
 
     private static void loadStellarisImages() {
@@ -225,25 +226,25 @@ public class GameImage {
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
         Path f = installPath.resolve("gfx").resolve("interface").resolve("flags");
 
-        STELLARIS_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
-        STELLARIS_FLAG_MASK = ImageLoader.loadImage(f.resolve("empire_flag_200_mask.dds"));
-        STELLARIS_FLAG_FRAME = ImageLoader.loadImage(f.resolve("empire_flag_200_frame.dds"));
-        STELLARIS_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.STELLARIS)
+        STELLARIS_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        STELLARIS_FLAG_MASK = ImageHelper.loadImage(f.resolve("empire_flag_200_mask.dds"));
+        STELLARIS_FLAG_FRAME = ImageHelper.loadImage(f.resolve("empire_flag_200_frame.dds"));
+        STELLARIS_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.STELLARIS)
                 .getType().chooseBackgroundImage(installPath));
 
     }
 
     private static void loadCk2Images() {
         var installPath = GameInstallation.ALL.get(Game.CK2).getInstallDir();
-        CK2_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.CK2)
+        CK2_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.CK2)
                 .getType().chooseBackgroundImage(installPath));
     }
 
     private static void loadVic2Images() {
         var installPath = GameInstallation.ALL.get(Game.VIC2).getInstallDir();
-        VIC2_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.VIC2)
+        VIC2_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.VIC2)
                 .getType().chooseBackgroundImage(installPath));
-        VIC2_BACKGROUND = ImageLoader.cut(VIC2_BACKGROUND, new Rectangle2D(100, 100,
+        VIC2_BACKGROUND = ImageHelper.cut(VIC2_BACKGROUND, new Rectangle2D(100, 100,
                 VIC2_BACKGROUND.getWidth() - 200, VIC2_BACKGROUND.getHeight() - 200));
     }
 
@@ -251,15 +252,15 @@ public class GameImage {
         var installPath = GameInstallation.ALL.get(Game.HOI4).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface");
 
-        HOI4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("warning_icon.dds"));
-        HOI4_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
-        HOI4_ICON_DIFF_RECRUIT = ImageLoader.loadImage(i.resolve("difficulty_button_recruit.dds"));
-        HOI4_ICON_DIFF_REGULAR = ImageLoader.loadImage(i.resolve("difficulty_button_regular.dds"));
-        HOI4_ICON_DIFF_VETERAN = ImageLoader.loadImage(i.resolve("difficulty_button_veteran.dds"));
-        HOI4_ICON_DIFF_ELITE = ImageLoader.loadImage(i.resolve("difficulty_button_elite.dds"));
-        HOI4_ICON_DIFF_CIVILIAN = ImageLoader.loadImage(i.resolve("difficulty_button_civilian.dds"));
-        HOI4_FLAG_OVERLAY = ImageLoader.loadImage(i.resolve("flag_overlay.dds"));
-        HOI4_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.HOI4)
+        HOI4_ICON_VERSION_WARNING = ImageHelper.loadImage(i.resolve("warning_icon.dds"));
+        HOI4_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        HOI4_ICON_DIFF_RECRUIT = ImageHelper.loadImage(i.resolve("difficulty_button_recruit.dds"));
+        HOI4_ICON_DIFF_REGULAR = ImageHelper.loadImage(i.resolve("difficulty_button_regular.dds"));
+        HOI4_ICON_DIFF_VETERAN = ImageHelper.loadImage(i.resolve("difficulty_button_veteran.dds"));
+        HOI4_ICON_DIFF_ELITE = ImageHelper.loadImage(i.resolve("difficulty_button_elite.dds"));
+        HOI4_ICON_DIFF_CIVILIAN = ImageHelper.loadImage(i.resolve("difficulty_button_civilian.dds"));
+        HOI4_FLAG_OVERLAY = ImageHelper.loadImage(i.resolve("flag_overlay.dds"));
+        HOI4_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.HOI4)
                 .getType().chooseBackgroundImage(installPath));
 
     }
@@ -268,33 +269,33 @@ public class GameImage {
         var installPath = GameInstallation.ALL.get(Game.EU4).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface");
 
-        EU4_ICON_VASSAL = ImageLoader.loadImage(i.resolve("icon_vassal.dds"));
-        EU4_ICON_ALLIANCE = ImageLoader.loadImage(i.resolve("icon_alliance.dds"));
-        EU4_ICON_TRIBUTARY = ImageLoader.loadImage(i.resolve("subject_tributary_icon.dds"));
-        EU4_ICON_MARCH = ImageLoader.loadImage(i.resolve("icon_march.dds"));
-        EU4_ICON_TRUCE = ImageLoader.loadImage(i.resolve("icon_truce.dds"));
-        EU4_ICON_ROYAL_MARRIAGE = ImageLoader.loadImage(i.resolve("icon_diplomacy_royalmarriage.dds"));
-        EU4_ICON_GUARANTEE = ImageLoader.loadImage(i.resolve("icon_diplomacy_guaranting.dds"));
-        EU4_ICON_WAR = ImageLoader.loadImage(i.resolve("icon_diplomacy_war.dds"));
-        EU4_ICON_VERSION_WARNING = ImageLoader.loadImage(i.resolve("incompatible_warning_icon.dds"));
-        EU4_ICON_IRONMAN = ImageLoader.loadImage(i.resolve("ironman_icon.dds"));
-        EU4_ICON_RULER = ImageLoader.loadImage(
+        EU4_ICON_VASSAL = ImageHelper.loadImage(i.resolve("icon_vassal.dds"));
+        EU4_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("icon_alliance.dds"));
+        EU4_ICON_TRIBUTARY = ImageHelper.loadImage(i.resolve("subject_tributary_icon.dds"));
+        EU4_ICON_MARCH = ImageHelper.loadImage(i.resolve("icon_march.dds"));
+        EU4_ICON_TRUCE = ImageHelper.loadImage(i.resolve("icon_truce.dds"));
+        EU4_ICON_ROYAL_MARRIAGE = ImageHelper.loadImage(i.resolve("icon_diplomacy_royalmarriage.dds"));
+        EU4_ICON_GUARANTEE = ImageHelper.loadImage(i.resolve("icon_diplomacy_guaranting.dds"));
+        EU4_ICON_WAR = ImageHelper.loadImage(i.resolve("icon_diplomacy_war.dds"));
+        EU4_ICON_VERSION_WARNING = ImageHelper.loadImage(i.resolve("incompatible_warning_icon.dds"));
+        EU4_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        EU4_ICON_RULER = ImageHelper.loadImage(
                 i.resolve("tab_domestic_court.dds"));
         VIEWPORTS.put(EU4_ICON_RULER, new Rectangle2D(8, 10, 30, 30));
-        EU4_ICON_HEIR = ImageLoader.loadImage(i.resolve("monarch_heir_crown_icon.dds"));
-        EU4_ICON_ADM = ImageLoader.loadImage(i.resolve("icon_powers_administrative_in_text.dds"));
-        EU4_ICON_DIP = ImageLoader.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
-        EU4_ICON_MIL = ImageLoader.loadImage(i.resolve("icon_powers_military_in_text.dds"));
+        EU4_ICON_HEIR = ImageHelper.loadImage(i.resolve("monarch_heir_crown_icon.dds"));
+        EU4_ICON_ADM = ImageHelper.loadImage(i.resolve("icon_powers_administrative_in_text.dds"));
+        EU4_ICON_DIP = ImageHelper.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
+        EU4_ICON_MIL = ImageHelper.loadImage(i.resolve("icon_powers_military_in_text.dds"));
 
 
-        EU4_ICON_UNION_SENIOR = ImageLoader.loadImage(i.resolve("icon_diplomacy_leadunions.dds"));
-        EU4_ICON_UNION_JUNIOR = ImageLoader.loadImage(i.resolve("icon_diplomacy_inunion.dds"));
-        EU4_ICON_MANPOWER = ImageLoader.loadImage(i.resolve("icon_manpower2.dds"));
-        EU4_ICON_DEV = ImageLoader.loadImage(i.resolve("development_icon.dds"));
-        EU4_ICON_DUCATS = ImageLoader.loadImage(i.resolve("icon_gold.dds"));
-        EU4_ICON_PRESTIGE = ImageLoader.loadImage(i.resolve("icon_prestige.dds"));
-        EU4_ICON_STABILITY = ImageLoader.loadImage(i.resolve("icon_stability.dds"));
-        EU4_ICON_ACHIEVEMENT = ImageLoader.loadImage(i.resolve("button_achievements.dds"));
+        EU4_ICON_UNION_SENIOR = ImageHelper.loadImage(i.resolve("icon_diplomacy_leadunions.dds"));
+        EU4_ICON_UNION_JUNIOR = ImageHelper.loadImage(i.resolve("icon_diplomacy_inunion.dds"));
+        EU4_ICON_MANPOWER = ImageHelper.loadImage(i.resolve("icon_manpower2.dds"));
+        EU4_ICON_DEV = ImageHelper.loadImage(i.resolve("development_icon.dds"));
+        EU4_ICON_DUCATS = ImageHelper.loadImage(i.resolve("icon_gold.dds"));
+        EU4_ICON_PRESTIGE = ImageHelper.loadImage(i.resolve("icon_prestige.dds"));
+        EU4_ICON_STABILITY = ImageHelper.loadImage(i.resolve("icon_stability.dds"));
+        EU4_ICON_ACHIEVEMENT = ImageHelper.loadImage(i.resolve("button_achievements.dds"));
 
         Function<Integer, Integer> rnwFilter = (Integer rgb) -> {
             int r = (rgb >> 16) & 0xFF;
@@ -307,7 +308,7 @@ public class GameImage {
             }
             return rgb;
         };
-        EU4_ICON_RANDOM_NEW_WORLD = ImageLoader.loadImage(
+        EU4_ICON_RANDOM_NEW_WORLD = ImageHelper.loadImage(
                 i.resolve("frontend_random_world.dds"),
                 rnwFilter);
         VIEWPORTS.put(EU4_ICON_RANDOM_NEW_WORLD, new Rectangle2D(14, 0, 33, 30));
@@ -322,21 +323,21 @@ public class GameImage {
             }
             return rgb;
         };
-        EU4_ICON_CUSTOM_NATION = ImageLoader.loadImage(
+        EU4_ICON_CUSTOM_NATION = ImageHelper.loadImage(
                 i.resolve("frontend_custom_nation.dds"),
                 customFilter);
         VIEWPORTS.put(EU4_ICON_CUSTOM_NATION, new Rectangle2D(20, 5, 21, 21));
 
-        EU4_ICON_RELEASED_VASSAL = ImageLoader.loadImage(
+        EU4_ICON_RELEASED_VASSAL = ImageHelper.loadImage(
                 i.resolve("release_nation_icon.dds"));
         VIEWPORTS.put(EU4_ICON_RELEASED_VASSAL, new Rectangle2D(37, 0, 36, 30));
 
-        EU4_SHIELD_MASK = ImageLoader.loadImage(i.resolve("shield_mask.tga"));
-        EU4_SHIELD_FRAME = ImageLoader.loadImage(i.resolve("shield_frame.dds"));
-        EU4_SMALL_SHIELD_MASK = ImageLoader.loadImage(i.resolve("small_shield_mask.tga"));
-        EU4_SMALL_SHIELD_FRAME = ImageLoader.loadImage(i.resolve("small_shield_overlay.dds"));
+        EU4_SHIELD_MASK = ImageHelper.loadImage(i.resolve("shield_mask.tga"));
+        EU4_SHIELD_FRAME = ImageHelper.loadImage(i.resolve("shield_frame.dds"));
+        EU4_SMALL_SHIELD_MASK = ImageHelper.loadImage(i.resolve("small_shield_mask.tga"));
+        EU4_SMALL_SHIELD_FRAME = ImageHelper.loadImage(i.resolve("small_shield_overlay.dds"));
 
-        EU4_BACKGROUND = ImageLoader.loadImage(GameInstallation.ALL.get(Game.EU4)
+        EU4_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.EU4)
                 .getType().chooseBackgroundImage(installPath));
     }
 

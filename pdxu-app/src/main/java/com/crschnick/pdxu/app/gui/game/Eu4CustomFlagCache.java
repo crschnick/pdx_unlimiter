@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.util.ColorHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 
@@ -33,7 +34,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
         super(CacheManager.Scope.GAME_SPECIFIC);
 
         try {
-            emblems = ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("gfx")
+            emblems = ImageHelper.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("gfx")
                     .resolve("interface").resolve("client_state_symbols_large.dds"), null);
 
             var colorsFile = GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("common")
@@ -46,7 +47,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
             });
             content.getNodeForKey("textures").forEach((k, v) -> {
                 var tex = new Texture(
-                        ImageLoader.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve(
+                        ImageHelper.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve(
                                 Path.of(v.getNodeForKey("file").getString())), null),
                         v.getNodeForKey("size").getNodeForKey("x").getInteger(),
                         v.getNodeForKey("size").getNodeForKey("y").getInteger(),

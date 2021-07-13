@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui.game;
 import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import javafx.scene.image.Image;
@@ -21,14 +22,14 @@ public class Eu4TagRenderer {
     private static BufferedImage createBasicFlagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
         switch (tag.getType()) {
             case OBSERVER -> {
-                return ImageLoader.fromFXImage(eu4TagImage(GameImage.getEu4TagPath("REB"), info));
+                return ImageHelper.fromFXImage(eu4TagImage(GameImage.getEu4TagPath("REB"), info));
             }
             case NORMAL -> {
-                return ImageLoader.fromFXImage(eu4TagImage(info, tag));
+                return ImageHelper.fromFXImage(eu4TagImage(info, tag));
             }
             case COLONIAL_FLAG -> {
                 var ov = Eu4Tag.getTag(info.getAllTags(), tag.getColonialData().getOverlord());
-                BufferedImage flagImage = ImageLoader.fromFXImage(eu4TagImage(info, ov));
+                BufferedImage flagImage = ImageHelper.fromFXImage(eu4TagImage(info, ov));
                 Graphics g = flagImage.getGraphics();
 
                 java.awt.Color awtColor = ColorHelper.toAwtColor(ColorHelper.fromGameColor(tag.getCountryColor()));
@@ -67,7 +68,7 @@ public class Eu4TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        g.drawImage(ImageLoader.fromFXImage(GameImage.EU4_SMALL_SHIELD_FRAME),
+        g.drawImage(ImageHelper.fromFXImage(GameImage.EU4_SMALL_SHIELD_FRAME),
                 -2,
                 -4,
                 i.getWidth() + 4,
@@ -75,7 +76,7 @@ public class Eu4TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        var img = ImageLoader.toFXImage(i);
+        var img = ImageHelper.toFXImage(i);
         cached.put(tag.getTag(), img);
         return img;
     }
@@ -100,7 +101,7 @@ public class Eu4TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        g.drawImage(ImageLoader.fromFXImage(GameImage.EU4_SHIELD_FRAME),
+        g.drawImage(ImageHelper.fromFXImage(GameImage.EU4_SHIELD_FRAME),
                 -25,
                 0,
                 i.getWidth() + 50,
@@ -108,7 +109,7 @@ public class Eu4TagRenderer {
                 new java.awt.Color(0, 0, 0, 0),
                 null);
 
-        var img = ImageLoader.toFXImage(i);
+        var img = ImageHelper.toFXImage(i);
         cached.put(tag.getTag(), img);
         return img;
     }
@@ -135,7 +136,7 @@ public class Eu4TagRenderer {
 
     private static Image eu4TagImage(Path path, SavegameInfo<Eu4Tag> info) {
         var in = CascadeDirectoryHelper.openFile(path, info);
-        return ImageLoader.loadImage(in.orElse(null), null);
+        return ImageHelper.loadImage(in.orElse(null), null);
     }
 
     public static class Eu4TagImageCache extends CacheManager.Cache {

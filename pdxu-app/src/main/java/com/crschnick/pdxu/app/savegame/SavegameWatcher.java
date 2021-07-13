@@ -12,6 +12,7 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,7 +42,12 @@ public class SavegameWatcher {
         ALL.clear();
     }
 
-    private void initSavegames() {
+    public synchronized Optional<FileImportTarget.StandardImportTarget> getLatest() {
+        return savegames.stream()
+                .findFirst();
+    }
+
+    private synchronized void initSavegames() {
         savegames.get().setAll(getLatestSavegames());
 
         List<Path> savegameDirs = install.getAllSavegameDirectories();
@@ -50,7 +56,7 @@ public class SavegameWatcher {
         });
     }
 
-    private List<FileImportTarget.StandardImportTarget> getLatestSavegames() {
+    private synchronized List<FileImportTarget.StandardImportTarget> getLatestSavegames() {
         return install.getAllSavegameDirectories().stream()
                 .map(Path::toString)
                 .map(FileImportTarget::createStandardImportsTargets)

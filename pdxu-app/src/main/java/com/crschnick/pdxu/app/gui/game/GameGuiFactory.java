@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
@@ -109,7 +110,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public Pane createIcon() {
         var img = GameImage.getGameIcon(ALL.inverseBidiMap().get(this));
-        if (img.equals(ImageLoader.DEFAULT_IMAGE)) {
+        if (img.equals(ImageHelper.DEFAULT_IMAGE)) {
             var label = new Label("(" + ALL.inverseBidiMap().get(this).getAbbreviation() + ")");
             label.setAlignment(Pos.CENTER);
             var pane = new StackPane(label);
