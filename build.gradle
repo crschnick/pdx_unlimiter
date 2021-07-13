@@ -5,7 +5,7 @@ plugins {
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
-setVersion '2.8.1'
+setVersion '2.8.2'
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/pdxu.properties.default").getText())
