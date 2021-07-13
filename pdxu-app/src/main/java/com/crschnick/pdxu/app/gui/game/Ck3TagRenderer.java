@@ -31,7 +31,10 @@ import static com.crschnick.pdxu.app.util.ColorHelper.*;
 
 public class Ck3TagRenderer {
 
-    private static final int IMG_SIZE = 256;
+    private static final int REALM_DEFAULT_IMG_SIZE = 64;
+    private static final int HOUSE_DEFAULT_IMG_SIZE = 128;
+    private static final int TITLE_DEFAULT_IMG_SIZE = 64;
+    private static final int REF_IMG_SIZE = 256;
 
     private static final int PATTERN_COLOR_1 = 0x00FF0000;
     private static final int PATTERN_COLOR_2 = 0x00FFFF00;
@@ -61,6 +64,16 @@ public class Ck3TagRenderer {
         }
 
         return Map.of();
+    }
+
+    private static void renderImage(Graphics g, java.awt.Image img, double x, double y, double w, double h) {
+        g.drawImage(img,
+                (int) Math.round(x),
+                (int) Math.round(y),
+                (int) Math.round(w),
+                (int) Math.round(h),
+                new java.awt.Color(0, 0, 0, 0),
+                null);
     }
 
     public static BufferedImage renderImage(Ck3CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
@@ -93,17 +106,13 @@ public class Ck3TagRenderer {
         applyMask(realmImg, useMask);
         brighten(realmImg);
 
-        int scaleFactor = size / IMG_SIZE;
+        double scaleFactor = (double) size / REF_IMG_SIZE;
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(realmImg,
-                scaleFactor,
-                4 * scaleFactor,
+        renderImage(g, realmImg, scaleFactor, 4 * scaleFactor,
                 realmImg.getWidth() - scaleFactor,
-                realmImg.getHeight() - (4 * scaleFactor),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+                realmImg.getHeight() - (4 * scaleFactor));
 
 
         var frames = Map.of(
@@ -112,13 +121,11 @@ public class Ck3TagRenderer {
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_FRAME,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_FRAME);
         var useFrame = frames.getOrDefault(governmentShape, GameImage.CK3_REALM_FRAME);
-        g.drawImage(ImageHelper.fromFXImage(useFrame),
+        renderImage(g, ImageHelper.fromFXImage(useFrame),
                 3 * scaleFactor,
                 -8 * scaleFactor,
                 realmImg.getWidth() - (6 * scaleFactor),
-                realmImg.getHeight() + (20 * scaleFactor),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+                realmImg.getHeight() + (20 * scaleFactor));
 
         return ImageHelper.toFXImage(i);
     }
@@ -130,7 +137,7 @@ public class Ck3TagRenderer {
             return cachedImg;
         }
         Ck3CoatOfArms coa = tag.getCoatOfArms();
-        var img = renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromInfo(info), IMG_SIZE, true);
+        var img = renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromInfo(info), REALM_DEFAULT_IMG_SIZE, true);
         cache.realms.put(tag, img);
         return img;
     }
@@ -143,23 +150,19 @@ public class Ck3TagRenderer {
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        int scaleFactor = size / IMG_SIZE;
-        g.drawImage(houseImg,
+        double scaleFactor = (double) size / REF_IMG_SIZE;
+        renderImage(g, houseImg,
                 20 * scaleFactor,
                 20 * scaleFactor,
                 i.getWidth() - (40 * scaleFactor),
-                i.getHeight() - (40 * scaleFactor),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+                i.getHeight() - (40 * scaleFactor));
 
-        g.drawImage(
+        renderImage(g,
                 ImageHelper.fromFXImage(GameImage.CK3_HOUSE_FRAME),
                 -25 * scaleFactor,
                 -15 * scaleFactor,
                 houseImg.getWidth() + (33 * scaleFactor),
-                houseImg.getHeight() + (30 * scaleFactor),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+                houseImg.getHeight() + (30 * scaleFactor));
 
         return ImageHelper.toFXImage(i);
     }
@@ -170,7 +173,7 @@ public class Ck3TagRenderer {
         if (cachedImg != null) {
             return cachedImg;
         }
-        var img = renderHouseImage(house.getCoatOfArms(), ctx, IMG_SIZE, true);
+        var img = renderHouseImage(house.getCoatOfArms(), ctx, HOUSE_DEFAULT_IMG_SIZE, true);
         cache.houses.put(house, img);
         return img;
     }
@@ -183,23 +186,19 @@ public class Ck3TagRenderer {
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        int scaleFactor = size / IMG_SIZE;
-        g.drawImage(titleImg,
+        double scaleFactor = (double) size / REF_IMG_SIZE;
+        renderImage(g, titleImg,
                 13 * scaleFactor,
                 13 * scaleFactor,
                 i.getWidth() - (28 * scaleFactor),
-                i.getHeight() - (28 * scaleFactor),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+                i.getHeight() - (28 * scaleFactor));
 
-        g.drawImage(
+        renderImage(g,
                 ImageHelper.fromFXImage(GameImage.CK3_TITLE_FRAME),
                 -6 * scaleFactor,
                 -4 * scaleFactor,
                 titleImg.getWidth() + (11 * scaleFactor),
-                titleImg.getHeight() + (11 * scaleFactor),
-                new java.awt.Color(0, 0, 0, 0),
-                null);
+                titleImg.getHeight() + (11 * scaleFactor));
 
         return ImageHelper.toFXImage(i);
     }
@@ -212,7 +211,7 @@ public class Ck3TagRenderer {
         }
 
         Ck3CoatOfArms coa = title.getCoatOfArms();
-        var img = renderTitleImage(coa, ctx, IMG_SIZE, true);
+        var img = renderTitleImage(coa, ctx, TITLE_DEFAULT_IMG_SIZE, true);
         cache.titles.put(title, img);
         return img;
     }

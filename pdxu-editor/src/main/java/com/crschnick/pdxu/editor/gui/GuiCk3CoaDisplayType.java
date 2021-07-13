@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
-import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -27,7 +28,7 @@ public abstract class GuiCk3CoaDisplayType {
         cb.valueProperty().addListener((c,o,n) -> {
             con.accept(n);
         });
-        cb.setConverter(new StringConverter<T>() {
+        cb.setConverter(new StringConverter<>() {
             @Override
             public String toString(T object) {
                 return new DualHashBidiMap<>(choices).inverseBidiMap().get(object);
@@ -129,9 +130,12 @@ public abstract class GuiCk3CoaDisplayType {
     }
 
     public void addOptions(GuiCk3CoaViewerState state, HBox box) {
-        addChoice(state, box, "Size", 256, Map.of(
-                "256 x 256", 256,
-                "512 x 512", 512), size);
+        var sizes = new LinkedHashMap<String, Number>();
+        sizes.put("64 x 64", 64);
+        sizes.put("128 x 128", 128);
+        sizes.put("256 x 256", 256);
+        sizes.put("512 x 512", 512);
+        addChoice(state, box, "Size", 256, sizes, size);
         addChoice(state, box, "Cloth pattern", true, Map.of(
                 "enable", true,
                 "disable", false), clothPattern);
