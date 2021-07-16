@@ -77,17 +77,20 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
-        var player = state.getBackingNode().getNodeForKey("currently_played_characters").getNodeArray().get(0);
-        var playerDyn = state.getBackingNode().getNodeForKeys("living", player.getString(), "dynasty_house");
+        var player = NodePointer.builder().name("currently_played_characters").index(0).build();
+        var playerDyn = NodePointer.builder()
+                .name("living").pointerEvaluation(state.getBackingNode(), player).name("dynasty_house").build();
+
         var map = new LinkedHashMap<String, NodePointer>();
-        map.put("Player character", NodePointer.builder().name("living").name(player.getString()).build());
-        map.put("Player realm", NodePointer.builder().name("living").name(player.getString())
+        map.put("Player character", NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player).build());
+        map.put("Player realm", NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player)
                 .name("landed_data").name("domain").build());
         map.put("Player house/dynasty", NodePointer.builder().name("dynasties").name("dynasty_house")
-                .name(playerDyn.getString()).build());
+                .pointerEvaluation(state.getBackingNode(), playerDyn).build());
         var primaryTitle = NodePointer.builder().name("landed_titles").name("landed_titles").pointerEvaluation(
                 state.getBackingNode(),
-                NodePointer.builder().name("living").name(player.getString()).name("landed_data").name("domain").index(0).build()
+                NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player)
+                        .name("landed_data").name("domain").index(0).build()
         ).build();
         map.put("Player primary title", primaryTitle);
         var primaryTitleCoaId = NodePointer.fromBase(primaryTitle).name("coat_of_arms_id").build();
