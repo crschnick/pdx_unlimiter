@@ -79,6 +79,7 @@ public class ErrorHandler {
         var f = PdxuInstallation.getInstance().getSettingsLocation().resolve("error_exit");
         try {
             Files.createDirectories(f.getParent());
+            var res = f.toFile().setWritable(true);
             Files.writeString(f, "false");
         } catch (IOException ex) {
             LoggerFactory.getLogger(ErrorHandler.class).error("Could not write error_exit file", ex);
@@ -132,18 +133,7 @@ public class ErrorHandler {
         handleException(ex, msg, attachFile, false);
     }
 
-    private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
-        if (platformShutdown) {
-            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
-            return;
-        }
-
-        if (!platformInitialized) {
-            unpreparedStartup(ex);
-        } else {
-            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
-        }
-
+    private static CountDownLatch showErrorReporter(Throwable ex, Path attachFile, boolean terminal) {
         CountDownLatch latch = new CountDownLatch(1);
         Runnable run = () -> {
             boolean show = (PdxuInstallation.getInstance() == null ||
@@ -162,13 +152,27 @@ public class ErrorHandler {
         } else {
             Platform.runLater(run);
         }
+        return latch;
+    }
+
+    private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
+        if (!platformInitialized) {
+            unpreparedStartup(ex);
+        } else {
+            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
+        }
+
+        if (!platformShutdown) {
+            var latch = showErrorReporter(ex, attachFile, terminal);
+            if (terminal) {
+                try {
+                    latch.await();
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
 
         if (terminal) {
-            try {
-                latch.await();
-            } catch (InterruptedException ignored) {
-            }
-
             if (PdxuInstallation.getInstance() != null &&
                     PdxuInstallation.getInstance().getSettingsLocation() != null) {
                 var f = PdxuInstallation.getInstance().getSettingsLocation().resolve("error_exit");
