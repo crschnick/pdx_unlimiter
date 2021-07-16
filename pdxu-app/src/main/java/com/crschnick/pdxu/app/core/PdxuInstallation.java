@@ -27,6 +27,7 @@ public class PdxuInstallation {
     private boolean preRelease;
     private String latestVersion;
     private String logLevel = "debug";
+    private boolean standalone;
 
     private static Path getAppPath() {
         Path path = Path.of(System.getProperty("java.home"));
@@ -69,6 +70,9 @@ public class PdxuInstallation {
         } else {
             appInstallPath = i.dataDir;
         }
+
+        Path defaultAppInstallPath = appInstallPath.resolve("app");
+        i.standalone = appPath.equals(defaultAppInstallPath);
 
         i.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
         if (!Files.exists(i.eu4SeDir)) {
@@ -244,5 +248,9 @@ public class PdxuInstallation {
 
     public String getLogLevel() {
         return logLevel;
+    }
+
+    public boolean isStandalone() {
+        return standalone;
     }
 }

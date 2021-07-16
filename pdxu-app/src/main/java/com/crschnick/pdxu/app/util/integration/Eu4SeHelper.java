@@ -62,6 +62,10 @@ public class Eu4SeHelper {
     }
 
     public static boolean shouldShowButton(SavegameEntry<?, ?> entry, SavegameInfo<?> info) {
+        if (PdxuInstallation.getInstance().isStandalone()) {
+            return false;
+        }
+
         if (info.isBinary()) {
             return false;
         }

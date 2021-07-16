@@ -8,6 +8,7 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorageIO;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.MemoryHelper;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -29,6 +30,14 @@ public class GuiMenuBar {
     private static MenuBar createMenuBar() {
 
         Menu pdxu = new Menu("Pdx-Unlimiter");
+
+        if (PdxuInstallation.getInstance().isStandalone()) {
+            MenuItem lr = new MenuItem(PdxuI18n.get("CHECK_UPDATE"));
+            lr.setOnAction((a) -> {
+                ThreadHelper.browse(Hyperlinks.LATEST_RELEASE);
+            });
+            pdxu.getItems().add(lr);
+        }
 
         MenuItem ed = new MenuItem(PdxuI18n.get("OPEN_EDITOR"));
         ed.setOnAction((a) -> {

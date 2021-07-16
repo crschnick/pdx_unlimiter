@@ -1,4 +1,5 @@
 l_english:
+  CHECK_UPDATE: "Check for update"
   OPEN_EDITOR: "Open Pdx-U editor"
   SETTINGS: "Settings"
   CHANGE_SETTINGS: "Change settings"
