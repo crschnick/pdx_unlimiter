@@ -176,7 +176,8 @@ public final class Settings extends AbstractSettings {
     public void check() {
         boolean hasNoValidInstallation =
                 eu4.getValue() == null && ck3.getValue() == null &&
-                        hoi4.getValue() == null && stellaris.getValue() == null;
+                        hoi4.getValue() == null && stellaris.getValue() == null &&
+                        ck2.getValue() == null && vic2.getValue() == null;
         if (hasNoValidInstallation) {
             GuiErrorReporter.showSimpleErrorMessage("""
                     Welcome to the Pdx-Unlimiter!

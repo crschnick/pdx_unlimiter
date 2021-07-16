@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
 import com.crschnick.pdxu.app.core.ComponentManager;
+import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import javafx.scene.control.Alert;
@@ -45,9 +46,11 @@ public class GuiSettings {
                 new Separator(),
                 GuiSettingsComponents.section("CONVERTERS", applyFuncs, s.ck3toeu4Dir),
                 new Separator(),
-                GuiSettingsComponents.section("EU4SE", applyFuncs, s.enableEu4SaveEditor),
-                new Separator(),
                 GuiSettingsComponents.section("SKANDERBEG", applyFuncs, s.skanderbegApiKey));
+        if (!PdxuInstallation.getInstance().isStandalone()) {
+            vbox.getChildren().add(new Separator());
+            vbox.getChildren().add(GuiSettingsComponents.section("EU4SE", applyFuncs, s.enableEu4SaveEditor));
+        }
         vbox.setSpacing(10);
         var sp = new ScrollPane(vbox);
         sp.setFitToWidth(true);

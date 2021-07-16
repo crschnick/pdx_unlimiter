@@ -79,7 +79,6 @@ public class ErrorHandler {
         var f = PdxuInstallation.getInstance().getSettingsLocation().resolve("error_exit");
         try {
             Files.createDirectories(f.getParent());
-            var res = f.toFile().setWritable(true);
             Files.writeString(f, "false");
         } catch (IOException ex) {
             LoggerFactory.getLogger(ErrorHandler.class).error("Could not write error_exit file", ex);

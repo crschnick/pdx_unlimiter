@@ -54,7 +54,7 @@ public class ConfigHelper {
         }
 
         GuiErrorReporter.showSimpleErrorMessage("The backup config file " + backupFile.toString() +
-                " could also not be read.\nPlease check your hard drive for problems.");
+                " could also not be read.");
         return JsonNodeFactory.instance.objectNode();
     }
 
