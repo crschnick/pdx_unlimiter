@@ -481,9 +481,25 @@ public abstract class SettingsEntry<T> {
             });
         }
 
+        private boolean showResetDialog(String newDir) {
+            return GuiDialogHelper.showBlockingAlert(a -> {
+                a.setAlertType(Alert.AlertType.CONFIRMATION);
+                a.setTitle(PdxuI18n.get("STORAGE_DIR_DOES_NOT_EXIST_TITLE"));
+                a.setHeaderText(PdxuI18n.get("STORAGE_DIR_DOES_NOT_EXIST_TEXT", newDir));
+            }).map(t -> t.getButtonData().isDefaultButton()).orElse(false);
+        }
+
         @Override
         public void set(JsonNode node) {
-            this.value.set(Path.of(node.textValue()));
+            Path newPath = Path.of(node.textValue());
+            if (!Files.exists(newPath)) {
+                if (showResetDialog(newPath.toString())) {
+                    setDefault(true);
+                    return;
+                }
+            }
+
+            this.value.set(newPath);
         }
 
         @Override

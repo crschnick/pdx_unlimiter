@@ -23,6 +23,8 @@ l_english:
  STORAGE_DIR_DIALOG_TEXT: "You are trying to move your savegame storage from $FROM$\nto $TO$.\nThis will move all savegame files and may take a while."
  STORAGE_DIR_SAVEGAME_WARNING_TITLE: "Invalid internal storage location"
  STORAGE_DIR_SAVEGAME_WARNING_TEXT: "The directory you selected as the internal storage location of the Pdx-Unlimiter looks like a savegame directory of a game.\nPlease note that the internal storage of the Pdx-Unlimiter is not related to the savegame directories of Paradox games.\n"
+ STORAGE_DIR_DOES_NOT_EXIST_TITLE: "Storage directory does not exist"
+ STORAGE_DIR_DOES_NOT_EXIST_TEXT: "Storage directory $PATH$ does not exist anymore! Reset it to the default directory?"
  EU4SE: "Eu4SaveEditor"
  ENABLE_EU4SE: "Enable Eu4SaveEditor"
  ENABLE_EU4SE_DESC: "Specifies whether to enable the Eu4SaveEditor.\n\nIf you enable this, the Eu4SaveEditor will be downloaded and installed next time you start the Pdx-Unlimiter."
