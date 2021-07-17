@@ -492,7 +492,7 @@ public abstract class SettingsEntry<T> {
         @Override
         public void set(JsonNode node) {
             Path newPath = Path.of(node.textValue());
-            if (!Files.exists(newPath)) {
+            if (!Files.exists(newPath) || !Files.isWritable(newPath) || !Files.isDirectory(newPath)) {
                 if (showResetDialog(newPath.toString())) {
                     setDefault(true);
                     return;
