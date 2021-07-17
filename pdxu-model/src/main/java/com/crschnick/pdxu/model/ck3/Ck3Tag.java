@@ -134,7 +134,12 @@ public class Ck3Tag {
             var income = aliveNode.getNodeForKeyIfExistent("income").map(Node::getDouble).orElse(0.0).intValue();
             var piety = aliveNode.getNodeForKeysIfExistent("piety", "currency").map(Node::getDouble).orElse(0.0).intValue();
             var prestige = aliveNode.getNodeForKeysIfExistent("prestige", "currency").map(Node::getDouble).orElse(0.0).intValue();
-            allTags.add(new Ck3Tag(id, null, List.of(titleIds.get(primary)),
+
+            var titleFromId = titleIds.get(primary);
+            if (titleFromId == null) {
+                return;
+            }
+            allTags.add(new Ck3Tag(id, null, List.of(titleFromId),
                     null, gv, null, null, balance, strength, gold, income, piety, prestige));
         });
         return allTags;

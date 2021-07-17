@@ -70,7 +70,8 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             VBox box = new VBox();
             box.setAlignment(Pos.CENTER);
             box.getChildren().add(imageNode(imgs[i], "skill-icon"));
-            box.getChildren().add(new Label("" + ruler.getSkills().get(i)));
+            int skill = i < ruler.getSkills().size() ? ruler.getSkills().get(i) : 0;
+            box.getChildren().add(new Label("" + skill));
             skills.getChildren().add(box);
         }
         return skills;
