@@ -497,14 +497,14 @@ public abstract class SettingsEntry<T> {
             });
         }
 
-        private boolean isDirValid(Path newPath) {
+        private boolean isDirInvalid(Path newPath) {
             return !Files.exists(newPath) || !Files.isWritable(newPath) || !Files.isDirectory(newPath);
         }
 
         @Override
         public void set(JsonNode node) {
             Path newPath = Path.of(node.textValue());
-            if (!isDirValid(newPath)) {
+            if (isDirInvalid(newPath)) {
                 if (showResetDialog(newPath.toString())) {
                     setDefault(true);
                     return;
@@ -532,7 +532,7 @@ public abstract class SettingsEntry<T> {
                 return;
             }
 
-            if (!isDirValid(newPath)) {
+            if (isDirInvalid(newPath)) {
                 showInvalidDialog(newPath.toString());
                 return;
             }

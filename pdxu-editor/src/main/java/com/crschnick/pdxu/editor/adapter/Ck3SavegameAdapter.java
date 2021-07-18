@@ -82,6 +82,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
                 .name("living").pointerEvaluation(state.getBackingNode(), player).name("dynasty_house").build();
 
         var map = new LinkedHashMap<String, NodePointer>();
+        map.put("All player characters", NodePointer.builder().name("currently_played_characters").build());
         map.put("Player character", NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player).build());
         map.put("Player realm", NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player)
                 .name("landed_data").name("domain").build());

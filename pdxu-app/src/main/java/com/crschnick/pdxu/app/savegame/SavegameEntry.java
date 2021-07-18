@@ -60,10 +60,6 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     }
 
     public String getName() {
-        if (name.get().length() == 0) {
-            return "No name";
-        }
-
         return name.get();
     }
 
