@@ -664,6 +664,29 @@ public abstract class SavegameStorage<
         return c.toString();
     }
 
+    private boolean isInternalSavegame(Path file, byte[] bytes, boolean melted) {
+        if (!file.startsWith(getSavegameDataDirectory())) {
+            return false;
+        }
+
+        if (!file.getFileName().toString().equals(getSaveFileName())) {
+            return false;
+        }
+
+        try {
+            var entryId = UUID.fromString(file.getParent().getFileName().toString());
+            var campaignId = UUID.fromString(file.getParent().getParent().getFileName().toString());
+            I info = infoFactory.apply(null, melted);
+            if (getSavegameCollection(campaignId).isEmpty() ||
+                    getSavegameCollection(campaignId).get().getSavegames().stream().noneMatch(entry -> entry.getUuid().equals(entryId))) {
+                addNewEntryToCampaign(campaignId, entryId, null, info, getDefaultEntryName(info), null);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private Optional<SavegameParseResult> importSavegameData(
             Path file,
             String name,
