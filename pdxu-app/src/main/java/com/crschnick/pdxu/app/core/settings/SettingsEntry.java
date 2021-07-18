@@ -484,15 +484,27 @@ public abstract class SettingsEntry<T> {
         private boolean showResetDialog(String newDir) {
             return GuiDialogHelper.showBlockingAlert(a -> {
                 a.setAlertType(Alert.AlertType.CONFIRMATION);
-                a.setTitle(PdxuI18n.get("STORAGE_DIR_DOES_NOT_EXIST_TITLE"));
-                a.setHeaderText(PdxuI18n.get("STORAGE_DIR_DOES_NOT_EXIST_TEXT", newDir));
+                a.setTitle(PdxuI18n.get("STORAGE_DIR_RESET_TITLE"));
+                a.setHeaderText(PdxuI18n.get("STORAGE_DIR_RESET_TEXT", newDir));
             }).map(t -> t.getButtonData().isDefaultButton()).orElse(false);
+        }
+
+        private void showInvalidDialog(String newDir) {
+            GuiDialogHelper.showBlockingAlert(a -> {
+                a.setAlertType(Alert.AlertType.CONFIRMATION);
+                a.setTitle(PdxuI18n.get("STORAGE_DIR_INVALID_TITLE"));
+                a.setHeaderText(PdxuI18n.get("STORAGE_DIR_INVALID_TEXT", newDir));
+            });
+        }
+
+        private boolean isDirValid(Path newPath) {
+            return !Files.exists(newPath) || !Files.isWritable(newPath) || !Files.isDirectory(newPath);
         }
 
         @Override
         public void set(JsonNode node) {
             Path newPath = Path.of(node.textValue());
-            if (!Files.exists(newPath) || !Files.isWritable(newPath) || !Files.isDirectory(newPath)) {
+            if (!isDirValid(newPath)) {
                 if (showResetDialog(newPath.toString())) {
                     setDefault(true);
                     return;
@@ -517,6 +529,11 @@ public abstract class SettingsEntry<T> {
 
             if (newPath.startsWith(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive")))  {
                 showSavegameDirDialog();
+                return;
+            }
+
+            if (!isDirValid(newPath)) {
+                showInvalidDialog(newPath.toString());
                 return;
             }
 
