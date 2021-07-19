@@ -135,7 +135,7 @@ public class GuiMenuBar {
 
         MenuItem terminalError = new MenuItem("Throw terminal exception");
         terminalError.setOnAction((a) -> {
-            ErrorHandler.handleTerminalException(new RuntimeException("This is a test exception!"));
+            ErrorHandler.handleTerminalException(new RuntimeException("This is a terminal test exception!"));
         });
         dev.getItems().add(terminalError);
 

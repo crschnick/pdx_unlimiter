@@ -88,7 +88,7 @@ public class PdxuInstallation {
 
         Properties props = new Properties();
         if (i.production) {
-            i.standalone = appPath.equals(defaultAppInstallPath);
+            i.standalone = !appPath.equals(defaultAppInstallPath);
 
             try {
                 i.version = Files.readString(appPath.resolve("version"));
@@ -121,7 +121,7 @@ public class PdxuInstallation {
 
             i.standalone = Optional.ofNullable(props.get("simulateStandalone"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
-                    .orElse(appPath.equals(defaultAppInstallPath));
+                    .orElse(!appPath.equals(defaultAppInstallPath));
 
             i.production = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))

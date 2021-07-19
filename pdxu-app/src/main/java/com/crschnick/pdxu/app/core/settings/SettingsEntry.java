@@ -434,7 +434,7 @@ public abstract class SettingsEntry<T> {
                 return false;
             } catch (Exception e) {
                 showInstallErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
-                ErrorHandler.reportError(e, false, null);
+                ErrorHandler.reportError(e, false, null, false);
                 return false;
             }
         }

@@ -141,7 +141,7 @@ public class ErrorHandler {
             if (show) {
                 errorReporterShowing = true;
                 boolean shouldSendDiagnostics = GuiErrorReporter.showException(ex, terminal);
-                reportError(ex, shouldSendDiagnostics, attachFile);
+                reportError(ex, shouldSendDiagnostics, attachFile, terminal);
                 errorReporterShowing = false;
             }
 
@@ -190,7 +190,7 @@ public class ErrorHandler {
         }
     }
 
-    public static void reportError(Throwable t, boolean diag, Path attachFile) {
+    public static void reportError(Throwable t, boolean diag, Path attachFile, boolean terminal) {
         if (diag) {
             AtomicReference<SentryId> id = new AtomicReference<>();
             Sentry.withScope(scope -> {
@@ -198,6 +198,7 @@ public class ErrorHandler {
                     scope.addAttachment(new Attachment(l.toString()));
                 });
                 scope.setTag("diagnoticsData", "true");
+                Sentry.setExtra("terminal", String.valueOf(terminal));
                 id.set(Sentry.captureException(t));
             });
             if (attachFile != null) {
@@ -206,6 +207,7 @@ public class ErrorHandler {
         } else {
             Sentry.withScope(scope -> {
                 scope.setTag("diagnoticsData", "false");
+                Sentry.setExtra("terminal", String.valueOf(terminal));
                 Sentry.captureException(t);
             });
         }
