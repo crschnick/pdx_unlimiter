@@ -112,7 +112,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             "target", "attacker", "defender", "claimant", "first", "second", "head",
             "council", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals",
             "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
-            "ruler_designer_characters", "");
+            "ruler_designer_characters", "former_spouses", "participants");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
@@ -145,7 +145,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
                     .name(val).build();
         }
         if (HOLY_SITE_KEYS.contains(key)) {
-            return NodePointer.builder().name("religions").name("holy_sites").name(val).build();
+            return NodePointer.builder().name("religion").name("holy_sites").name(val).build();
         }
         if (LIVING_KEYS.contains(key)) {
             return NodePointer.builder().name("living").name(val).build();

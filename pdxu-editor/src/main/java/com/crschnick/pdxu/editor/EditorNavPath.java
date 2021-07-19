@@ -77,6 +77,10 @@ public class EditorNavPath {
     }
 
     public static Optional<EditorNavPath> createNavPath(EditorState state, NodePointer pointer) {
+        if (!pointer.isValid(state.getBackingNode())) {
+            return Optional.empty();
+        }
+
         EditorNode current = null;
         List<EditorNode> newPath = new ArrayList<>();
         newPath.add(null);

@@ -125,7 +125,7 @@ public class ImageHelper {
             return;
         }
 
-        if (!Files.isWritable(out)) {
+        if (Files.exists(out) && !Files.isWritable(out)) {
             if (!out.toFile().setWritable(true)) {
                 return;
             }
