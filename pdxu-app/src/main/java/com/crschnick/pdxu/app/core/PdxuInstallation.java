@@ -72,8 +72,6 @@ public class PdxuInstallation {
         }
 
         Path defaultAppInstallPath = appInstallPath.resolve("app");
-        i.standalone = appPath.equals(defaultAppInstallPath);
-
         i.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
         if (!Files.exists(i.eu4SeDir)) {
             i.eu4SeDir = null;
@@ -90,6 +88,8 @@ public class PdxuInstallation {
 
         Properties props = new Properties();
         if (i.production) {
+            i.standalone = appPath.equals(defaultAppInstallPath);
+
             try {
                 i.version = Files.readString(appPath.resolve("version"));
             } catch (IOException e) {
@@ -118,6 +118,10 @@ public class PdxuInstallation {
                     .map(val -> Path.of(val.toString()))
                     .filter(Path::isAbsolute);
             customDir.ifPresent(path -> i.dataDir = path);
+
+            i.standalone = Optional.ofNullable(props.get("simulateStandalone"))
+                    .map(val -> Boolean.parseBoolean(val.toString()))
+                    .orElse(appPath.equals(defaultAppInstallPath));
 
             i.production = Optional.ofNullable(props.get("simulateProduction"))
                     .map(val -> Boolean.parseBoolean(val.toString()))
