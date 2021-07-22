@@ -96,7 +96,11 @@ public interface SavegameType {
 
         @Override
         public boolean isCompressed(byte[] input) {
-            var header = Ck3Header.fromStartOfFile(input);
+            if (Ck3Header.skipsHeader(input)) {
+                return Ck3CompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            }
+
+            var header = Ck3Header.determineHeaderForFile(input);
             return header.compressed();
         }
 
@@ -107,8 +111,11 @@ public interface SavegameType {
 
         @Override
         public boolean isBinary(byte[] input) {
-            var header = Arrays.copyOfRange(input, 0, Ck3Header.LENGTH);
-            return Ck3Header.fromStartOfFile(header).binary();
+            if (Ck3Header.skipsHeader(input)) {
+                return false;
+            }
+
+            return Ck3Header.determineHeaderForFile(input).binary();
         }
 
         @Override

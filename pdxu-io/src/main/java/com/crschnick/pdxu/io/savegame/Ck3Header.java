@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.io.savegame;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -26,7 +28,13 @@ public record Ck3Header(boolean unknown, boolean compressed, boolean binary, lon
         this(unknown, compressed, binary, (new Random().nextLong() >>> 1) % 0xFFFFFFFFL + 1, metaLength);
     }
 
-    public static Ck3Header fromStartOfFile(byte[] data) {
+    public static boolean skipsHeader(byte[] input) {
+        return Arrays.equals(input, 0, 9,
+                "meta_data".getBytes(StandardCharsets.UTF_8), 0, 9);
+    }
+
+
+    public static Ck3Header determineHeaderForFile(byte[] data) {
         if (data.length < LENGTH) {
             throw new IllegalArgumentException();
         }

@@ -29,15 +29,20 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
 
     @Override
     public SavegameParseResult parse(byte[] input) {
-        var header = Ck3Header.fromStartOfFile(input);
-        if (header.binary()) {
-            throw new IllegalArgumentException("Binary savegames are not supported");
-        }
-        if (header.compressed()) {
-            throw new IllegalArgumentException("Compressed savegames are not supported");
-        }
+        int metaStart;
+        if (Ck3Header.skipsHeader(input)) {
+            metaStart = 0;
+        } else {
+            var header = Ck3Header.determineHeaderForFile(input);
+            if (header.binary()) {
+                throw new IllegalArgumentException("Binary savegames are not supported");
+            }
+            if (header.compressed()) {
+                throw new IllegalArgumentException("Compressed savegames are not supported");
+            }
 
-        int metaStart = header.toString().length() + 1;
+            metaStart = header.toString().length() + 1;
+        }
         try {
             var node = getType().getParser().parse(input, metaStart);
             return new SavegameParseResult.Success(Map.of("gamestate", node));

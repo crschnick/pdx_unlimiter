@@ -22,11 +22,11 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
     private static final int MAX_SEARCH = 150000;
     private static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
 
-    private static int indexOf(byte[] array, byte[] toFind) {
+    public static int indexOfCompressedGamestateStart(byte[] array) {
         for (int i = 0; i < MAX_SEARCH; ++i) {
             boolean found = true;
-            for (int j = 0; j < toFind.length; ++j) {
-                if (array[i + j] != toFind[j]) {
+            for (int j = 0; j < ZIP_HEADER.length; ++j) {
+                if (array[i + j] != ZIP_HEADER[j]) {
                     found = false;
                     break;
                 }
@@ -61,20 +61,25 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
 
     @Override
     public SavegameParseResult parse(byte[] input) {
-        var header = Ck3Header.fromStartOfFile(input);
-        if (header.binary()) {
-            throw new IllegalArgumentException("Binary savegames are not supported");
-        }
-        if (!header.compressed()) {
-            throw new IllegalArgumentException("Uncompressed savegames are not supported");
-        }
+        int contentStart;
+        if (Ck3Header.skipsHeader(input)) {
+            contentStart = indexOfCompressedGamestateStart(input);
+        } else {
+            var header = Ck3Header.determineHeaderForFile(input);
+            if (header.binary()) {
+                throw new IllegalArgumentException("Binary savegames are not supported");
+            }
+            if (!header.compressed()) {
+                throw new IllegalArgumentException("Uncompressed savegames are not supported");
+            }
 
-        int metaStart = header.toString().length() + 1;
-        int contentStart = (int) (metaStart + header.metaLength());
+            int metaStart = header.toString().length() + 1;
+            contentStart = (int) (metaStart + header.metaLength());
+        }
 
         // Check if the header meta length is actually right. If not, manually search for the zip header start
         if (!Arrays.equals(input, contentStart, contentStart + 4, ZIP_HEADER, 0, 4)) {
-            contentStart = indexOf(input, ZIP_HEADER);
+            contentStart = indexOfCompressedGamestateStart(input);
         }
 
         return parseInput(input, contentStart);
