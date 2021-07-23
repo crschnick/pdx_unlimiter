@@ -72,6 +72,11 @@ public final class Ck3CoatOfArms {
         }
 
         public static List<Sub> fromNode(Node n) {
+            // A sub entry must be an array
+            if (!n.isArray()) {
+                return List.of();
+            }
+
             List<Sub> subs = new ArrayList<>();
             if (!n.hasKey("instance")) {
                 subs.add(subInstance(n, null));

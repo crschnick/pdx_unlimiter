@@ -4,10 +4,12 @@ import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,10 @@ public class GameFileContext {
             Eu4SavegameInfo.class, Game.EU4,
             Ck3SavegameInfo.class, Game.CK3,
             Hoi4SavegameInfo.class, Game.HOI4,
-            StellarisSavegameInfo.class, Game.STELLARIS);
+            StellarisSavegameInfo.class, Game.STELLARIS,
+            Ck2SavegameInfo.class, Game.CK2,
+            Vic2SavegameInfo.class, Game.VIC2);
+
     private final Game game;
     private final List<GameMod> mods;
 

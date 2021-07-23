@@ -48,7 +48,7 @@ public class GuiEditorMenuBar {
 
         Menu jump = new Menu("Jump to");
         Runnable fillJumps = () -> {
-            if (state.isSavegame()) {
+            if (state.isSavegame() && state.getFileContext().getGame() != null) {
                 try {
                     var jumps = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createCommonJumps(state);
                     jumps.forEach((k, v) -> {
