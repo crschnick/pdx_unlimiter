@@ -1,7 +1,9 @@
 package com.crschnick.pdxu.editor.target;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
@@ -20,8 +22,22 @@ public class ExternalEditTarget extends EditTarget {
         if (t != null) {
             target = new SavegameEditTarget(file, t);
         } else {
-            target = new DataFileEditTarget(GameFileContext.forGame(SavegameManagerState.get().current()), file);
+            target = new DataFileEditTarget(determineContext(file), file);
         }
+    }
+
+    private GameFileContext determineContext(Path file) {
+        for (Game g : Game.values()) {
+            if (!g.isEnabled()) {
+                continue;
+            }
+
+            if (file.startsWith(GameInstallation.ALL.get(g).getInstallDir()) ||
+                    file.startsWith(GameInstallation.ALL.get(g).getUserDir())) {
+                return GameFileContext.forGame(g);
+            }
+        }
+        return GameFileContext.forGame(SavegameManagerState.get().current());
     }
 
     @Override

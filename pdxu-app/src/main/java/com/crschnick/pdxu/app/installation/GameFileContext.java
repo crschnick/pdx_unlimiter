@@ -64,6 +64,10 @@ public class GameFileContext {
     }
 
     public TextFormatParser getParser() {
+        if (getGame() == null) {
+            return TextFormatParser.text();
+        }
+
         return SavegameStorage.get(getGame()).getType().getParser();
     }
 

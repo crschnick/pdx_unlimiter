@@ -11,7 +11,8 @@ module com.crschnick.pdxu.editor {
             com.crschnick.pdxu.editor.adapter.Hoi4SavegameAdapter,
             com.crschnick.pdxu.editor.adapter.StellarisSavegameAdapter,
             com.crschnick.pdxu.editor.adapter.Ck2SavegameAdapter,
-            com.crschnick.pdxu.editor.adapter.Vic2SavegameAdapter;
+            com.crschnick.pdxu.editor.adapter.Vic2SavegameAdapter,
+            com.crschnick.pdxu.editor.adapter.NoGameAdapter;
 
     exports com.crschnick.pdxu.editor to com.crschnick.pdxu.app;
 

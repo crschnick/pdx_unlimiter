@@ -153,7 +153,7 @@ public class GuiEditor {
             actions.setFillHeight(true);
             actions.setAlignment(Pos.CENTER_RIGHT);
             if (n.isReal()) {
-                if (EditorSettings.getInstance().enableNodeJumps.getValue() && state.getFileContext().getGame() != null) {
+                if (EditorSettings.getInstance().enableNodeJumps.getValue()) {
                     try {
                     var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
                             .createNodeJump(state, (EditorRealNode) n);
