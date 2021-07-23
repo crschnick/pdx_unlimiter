@@ -118,7 +118,7 @@ public final class TextFormatParser {
         }
     }
 
-    private Node parseNodeIfNotSimpleValue() {
+    private Node parseNodeIfNotScalarValue() {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
             var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ?
@@ -162,7 +162,9 @@ public final class TextFormatParser {
     }
 
     private void skipOverNextNode() {
-        var res = parseNodeIfNotSimpleValue();
+        var res = parseNodeIfNotScalarValue();
+
+        // Node is a scalar, therefore move manually
         if (res == null) {
             index++;
             slIndex++;
@@ -182,9 +184,11 @@ public final class TextFormatParser {
 
             boolean isMissingKey = tt[index] == TextFormatTokenizer.EQUALS;
             if (isMissingKey) {
+                // Move over =
                 index++;
+
                 // Discard next node if there is one!
-                if (tt[index + 1] != TextFormatTokenizer.CLOSE_GROUP) {
+                if (tt[index] != TextFormatTokenizer.CLOSE_GROUP) {
                     skipOverNextNode();
                 }
             }
@@ -205,7 +209,7 @@ public final class TextFormatParser {
                 slIndex++;
                 index += 2;
 
-                Node result = parseNodeIfNotSimpleValue();
+                Node result = parseNodeIfNotScalarValue();
                 if (result == null) {
                     // System.out.println("key: " + context.evaluate(keyIndex));
                     // System.out.println("val: " + context.evaluate(slIndex));
@@ -229,7 +233,7 @@ public final class TextFormatParser {
                 int keyIndex = slIndex;
                 slIndex++;
                 index++;
-                Node result = parseNodeIfNotSimpleValue();
+                Node result = parseNodeIfNotScalarValue();
                 assert result != null : "KeyValue without equal sign must be an array node";
                 builder.putKeyAndNodeValue(keyIndex, result);
 
@@ -237,7 +241,7 @@ public final class TextFormatParser {
             }
 
             // Parse unnamed array element
-            Node result = parseNodeIfNotSimpleValue();
+            Node result = parseNodeIfNotScalarValue();
             if (result == null) {
                 builder.putScalarValue(slIndex);
                 index++;
