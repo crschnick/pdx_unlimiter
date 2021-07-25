@@ -2,8 +2,8 @@ package com.crschnick.pdxu.editor.gui;
 
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
@@ -16,6 +16,7 @@ import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.function.Function;
 
 public abstract class GuiEditorNodeTagFactory {
@@ -62,22 +63,17 @@ public abstract class GuiEditorNodeTagFactory {
 
     public static class InfoNodeTagFactory extends GuiEditorNodeTagFactory {
 
-        private final String keyName;
+        private final Set<String> keyNames;
         private final Function<EditorRealNode, String> descFunction;
 
-        public InfoNodeTagFactory(String keyName, Function<EditorRealNode, String> descFunction) {
-            this.keyName = keyName;
-            this.descFunction = descFunction;
-        }
-
-        public InfoNodeTagFactory(String keyName, String desc) {
-            this.keyName = keyName;
+        public InfoNodeTagFactory(Set<String> keyNames, String desc) {
+            this.keyNames = keyNames;
             this.descFunction = e -> desc;
         }
 
         @Override
         public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
-            return node.getKeyName().map(k -> k.equals(keyName)).orElse(false);
+            return node.getKeyName().map(k -> keyNames.contains(k)).orElse(false);
         }
 
         @Override

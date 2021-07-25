@@ -103,17 +103,42 @@ public abstract class GuiCk3CoaDisplayType {
     public static void init(GuiCk3CoaViewerState state, HBox box) {
         HBox options = new HBox();
         options.setSpacing(10);
-        box.getChildren().add(createChoices("Type", REALM, Map.of(
-                "None", NONE,
-                "Realm", REALM,
-                "House", HOUSE,
-                "Dynasty", DYNASTY,
-                "Title", TITLE), t -> {
+
+        var sizes = new LinkedHashMap<String, Number>();
+        sizes.put("64 x 64", 64);
+        sizes.put("128 x 128", 128);
+        sizes.put("256 x 256", 256);
+        sizes.put("512 x 512", 512);
+        box.getChildren().add(createChoices("Size", 256, sizes, t -> {
+            state.getDisplayType().size.set(t.intValue());
+            state.updateImage();
+        }));
+        state.getDisplayType().size.set(256);
+
+        var cloths = new LinkedHashMap<String, Boolean>();
+        cloths.put("enable", true);
+        cloths.put("disable", false);
+        box.getChildren().add(createChoices("Cloth pattern", true, cloths, t -> {
+            state.getDisplayType().clothPattern.set(t);
+            state.updateImage();
+        }));
+        state.getDisplayType().clothPattern.set(true);
+
+        var types = new LinkedHashMap<String, GuiCk3CoaDisplayType>();
+        types.put("None", NONE);
+        types.put("Realm", REALM);
+        types.put("House", HOUSE);
+        types.put("Dynasty", DYNASTY);
+        types.put("Title", TITLE);
+        box.getChildren().add(createChoices("Type", REALM, types, t -> {
+            t.size.set(state.getDisplayType().size.get());
+            t.clothPattern.set(state.getDisplayType().clothPattern.get());
             state.displayTypeProperty().set(t);
             options.getChildren().clear();
             t.addOptions(state, options);
             state.updateImage();
         }));
+
         REALM.addOptions(state, options);
         box.getChildren().add(options);
     }
@@ -130,15 +155,6 @@ public abstract class GuiCk3CoaDisplayType {
     }
 
     public void addOptions(GuiCk3CoaViewerState state, HBox box) {
-        var sizes = new LinkedHashMap<String, Number>();
-        sizes.put("64 x 64", 64);
-        sizes.put("128 x 128", 128);
-        sizes.put("256 x 256", 256);
-        sizes.put("512 x 512", 512);
-        addChoice(state, box, "Size", 256, sizes, size);
-        addChoice(state, box, "Cloth pattern", true, Map.of(
-                "enable", true,
-                "disable", false), clothPattern);
     }
 
     public abstract Image render(Ck3CoatOfArms coa, GameFileContext ctx);

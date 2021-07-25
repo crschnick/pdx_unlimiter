@@ -13,10 +13,7 @@ import com.jfoenix.controls.JFXButton;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
@@ -66,8 +63,8 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
                     Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern"),
             new ImagePreview(
                     Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture"),
-            new GuiEditorNodeTagFactory.InfoNodeTagFactory("meta_data",
-                    "The meta data of this savegame that is shown in the main menu. " +
+            new GuiEditorNodeTagFactory.InfoNodeTagFactory(Set.of("meta_data"),
+                    "Contains the meta data of this savegame that is shown in the main menu. " +
                             "Editing anything inside of it only changes the main menu display, not the actual data in-game."));
 
     @Override
@@ -101,7 +98,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         return map;
     }
 
-    private static final List<String> DYNASTY_KEYS = List.of("dynasty_house", "dynasty");
+    private static final List<String> DYNASTY_KEYS = List.of("dynasty_house", "dynasty", "historical");
     private static final List<String> CULTURE_KEYS = List.of("culture");
     private static final List<String> FAITH_KEYS = List.of("faith");
     private static final List<String> RELIGION_KEYS = List.of("religion");
