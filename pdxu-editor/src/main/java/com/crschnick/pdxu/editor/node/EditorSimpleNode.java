@@ -65,7 +65,15 @@ public final class EditorSimpleNode extends EditorRealNode {
     }
 
     public boolean isValid() {
-        return getParent().isValid() && getParent().getNavigationNameAtRawIndex(rawIndexInParentNode).equals(getNavigationName());
+        if (!getParent().isValid()) {
+            return false;
+        }
+
+        if (getParent().getSize() <= rawIndexInParentNode) {
+            return false;
+        }
+
+        return getParent().getNavigationNameAtRawIndex(rawIndexInParentNode).equals(getNavigationName());
     }
 
 
