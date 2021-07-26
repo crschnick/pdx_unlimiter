@@ -1,8 +1,10 @@
 package com.crschnick.pdxu.app.util;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.awt.*;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 
@@ -17,15 +19,23 @@ public class ThreadHelper {
     }
 
     public static void browseDirectory(Path file) {
-        var t = new Thread(() -> {
+        if (SystemUtils.IS_OS_WINDOWS) {
             try {
-                Desktop.getDesktop().open(file.getParent().toFile());
-            } catch (Exception e) {
+                Runtime.getRuntime().exec("explorer.exe /select," + file.toString());
+            } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
-        });
-        t.setDaemon(true);
-        t.start();
+        } else {
+            var t = new Thread(() -> {
+                try {
+                    Desktop.getDesktop().open(file.getParent().toFile());
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            });
+            t.setDaemon(true);
+            t.start();
+        }
     }
 
     public static void browse(String uri) {

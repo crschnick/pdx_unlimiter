@@ -20,6 +20,10 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     static class CoaPreview extends GuiEditorNodeTagFactory {
         @Override
         public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
+            if (!state.isContextGameEnabled()) {
+                return false;
+            }
+
             if (node.getBackingNode().isArray()) {
                 ArrayNode ar = (ArrayNode) node.getBackingNode();
                 return ar.hasKey("pattern");
@@ -45,24 +49,24 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
         private final String nodeName;
 
-        public ImagePreview(Path base, String nodeName) {
-            super(node -> GameInstallation.ALL.get(Game.CK3).getInstallDir().resolve("game")
+        public ImagePreview(Path base, String nodeName, String icon) {
+            super(icon, node -> GameInstallation.ALL.get(Game.CK3).getInstallDir().resolve("game")
                     .resolve(base).resolve(node.getBackingNode().getString()));
             this.nodeName = nodeName;
         }
 
         @Override
         public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
-            return node.getKeyName().map(k -> k.equals(nodeName)).orElse(false);
+            return state.isContextGameEnabled() && node.getKeyName().map(k -> k.equals(nodeName)).orElse(false);
         }
     }
 
     private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(
             new CoaPreview(),
             new ImagePreview(
-                    Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern"),
+                    Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
             new ImagePreview(
-                    Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture"),
+                    Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory(Set.of("meta_data"),
                     "Contains the meta data of this savegame that is shown in the main menu. " +
                             "Editing anything inside of it only changes the main menu display, not the actual data in-game."));

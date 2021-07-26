@@ -53,7 +53,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
 
     @Override
     public String getName() {
-        return storage.getEntryName(entry);
+        return storage.getEntryName(entry) + (entry.getInfo().isBinary() ? " (Binary/Read-only)" : "");
     }
 
     @Override

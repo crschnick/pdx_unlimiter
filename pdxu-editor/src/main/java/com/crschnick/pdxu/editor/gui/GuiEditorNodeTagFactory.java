@@ -27,9 +27,11 @@ public abstract class GuiEditorNodeTagFactory {
 
     public static abstract class ImagePreviewNodeTagFactory extends GuiEditorNodeTagFactory {
 
+        private final String icon;
         private final Function<EditorRealNode, Path> fileFunction;
 
-        public ImagePreviewNodeTagFactory(Function<EditorRealNode, Path> fileFunction) {
+        public ImagePreviewNodeTagFactory(String icon, Function<EditorRealNode, Path> fileFunction) {
+            this.icon = icon;
             this.fileFunction = fileFunction;
         }
 
@@ -37,8 +39,7 @@ public abstract class GuiEditorNodeTagFactory {
         public Node create(EditorState state, EditorRealNode node) {
             var b = new JFXButton();
             b.setAlignment(Pos.CENTER);
-            b.setGraphic(new FontIcon());
-            b.getStyleClass().add("coa-button");
+            b.setGraphic(new FontIcon(icon));
             b.setOnAction(e -> {
                 CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
                     ThreadHelper.browseDirectory(found);

@@ -135,4 +135,8 @@ public class EditorState {
     public boolean canSave() {
         return canSave;
     }
+
+    public boolean isContextGameEnabled() {
+        return fileContext.get().getGame() == null || fileContext.get().getGame().isEnabled();
+    }
 }

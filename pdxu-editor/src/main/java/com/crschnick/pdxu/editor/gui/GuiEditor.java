@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.editor.EditorFilter;
 import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
@@ -41,8 +42,20 @@ public class GuiEditor {
 
         stage.setScene(new Scene(GuiEditor.create(state), 720, 600));
         GuiStyle.addStylesheets(stage.getScene());
+        showMissingGameWarning(state);
         stage.show();
         return stage;
+    }
+
+    private static void showMissingGameWarning(EditorState state) {
+        if (!state.isContextGameEnabled()) {
+            GuiDialogHelper.showBlockingAlert(alert -> {
+                alert.setAlertType(Alert.AlertType.WARNING);
+                alert.setTitle("Missing game installation");
+                alert.setHeaderText("No installation has been set for " + state.getFileContext().getGame().getFullName() +
+                        ". You can still use the editor, but many useful features will be disabled until a valid game installation has been set in the settings menu.");
+            });
+        }
     }
 
     private static Region create(EditorState state) {
