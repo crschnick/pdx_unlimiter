@@ -106,6 +106,12 @@ public class PdxuInstallation {
             }
         } else {
             i.version = "dev";
+            if (!Files.exists(Path.of("pdxu.properties"))) {
+                System.err.println("You are running pdxu in a dev environment without proper setup. " +
+                        "See https://github.com/crschnick/pdx_unlimiter#development for details.");
+                System.exit(1);
+            }
+
             try {
                 props.load(Files.newInputStream(Path.of("pdxu.properties")));
             } catch (IOException e) {

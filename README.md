@@ -180,7 +180,7 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 To build this project, [JDK 16](https://openjdk.java.net/projects/jdk/16/) and gradle is required.
 You can build the gradle project with `gradlew build` or `gradlew.bat build`.
 For running, you can use `gradlew run`.
-You can use the generated file `app/pdxu.properties` to set some useful development options when needed.
+You can use the generated file `pdxu.properties` to set some useful development options when needed.
 
 Any contribution is welcomed!
 There are no real formal contribution guidelines right now, they will maybe come later.
