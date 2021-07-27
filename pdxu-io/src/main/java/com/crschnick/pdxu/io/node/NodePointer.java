@@ -2,6 +2,7 @@ package com.crschnick.pdxu.io.node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -11,9 +12,9 @@ public final class NodePointer {
 
     public static interface Element {
 
-        Node tryMatch(Node n);
+        Node tryMatch(Node root, Node n);
 
-        default String getKey() {
+        default String getKey(Node root, Node n) {
             return null;
         }
     }
@@ -21,12 +22,12 @@ public final class NodePointer {
     public static final record NameElement(String name) implements Element {
 
         @Override
-        public Node tryMatch(Node n) {
+        public Node tryMatch(Node root, Node n) {
             return n.getNodeForKeyIfExistent(name).orElse(null);
         }
 
         @Override
-        public String getKey() {
+        public String getKey(Node root, Node n) {
             return name;
         }
 
@@ -39,7 +40,7 @@ public final class NodePointer {
     public static final record IndexElement(int index) implements Element {
 
         @Override
-        public Node tryMatch(Node n) {
+        public Node tryMatch(Node root, Node n) {
             if (n.getNodeArray().size() > index) {
                 return n.getNodeArray().get(index);
             }
@@ -55,7 +56,7 @@ public final class NodePointer {
     public static final record SupplierElement(Supplier<String> keySupplier) implements Element {
 
         @Override
-        public Node tryMatch(Node n) {
+        public Node tryMatch(Node root, Node n) {
             var name = keySupplier.get();
             if (name != null) {
                 return n.getNodeForKeyIfExistent(name).orElse(null);
@@ -64,8 +65,30 @@ public final class NodePointer {
         }
 
         @Override
-        public String getKey() {
+        public String getKey(Node root, Node n) {
             return keySupplier.get();
+        }
+
+        @Override
+        public String toString() {
+            return "[$s]";
+        }
+    }
+
+    public static final record FunctionElement(BiFunction<Node, Node, String> keyFunc) implements Element {
+
+        @Override
+        public Node tryMatch(Node root, Node n) {
+            var name = keyFunc.apply(root, n);
+            if (name != null) {
+                return n.getNodeForKeyIfExistent(name).orElse(null);
+            }
+            return null;
+        }
+
+        @Override
+        public String getKey(Node root, Node n) {
+            return keyFunc.apply(root, n);
         }
 
         @Override
@@ -77,7 +100,7 @@ public final class NodePointer {
     public static final record SelectorElement(Predicate<Node> selector) implements Element {
 
         @Override
-        public Node tryMatch(Node n) {
+        public Node tryMatch(Node root, Node n) {
             var res = n.getNodeArray().stream()
                     .filter(selector)
                     .findAny();
@@ -114,13 +137,23 @@ public final class NodePointer {
             return this;
         }
 
+        public Builder supplier(Supplier<String> keySupplier) {
+            path.add(new SupplierElement(keySupplier));
+            return this;
+        }
+
+        public Builder function(BiFunction<Node, Node, String> keyFunc) {
+            path.add(new FunctionElement(keyFunc));
+            return this;
+        }
+
         public Builder selector(Predicate<Node> selector) {
             path.add(new SelectorElement(selector));
             return this;
         }
 
-        public Builder pointerEvaluation(Node context, NodePointer pointer) {
-            return pointerEvaluation(context, pointer, n -> {
+        public Builder pointerEvaluation(NodePointer pointer) {
+            return pointerEvaluation(pointer, n -> {
                 if (!n.isValue()) {
                     return null;
                 }
@@ -128,9 +161,9 @@ public final class NodePointer {
             });
         }
 
-        public Builder pointerEvaluation(Node context, NodePointer pointer, Function<Node, String> converter) {
-            path.add(new SupplierElement(() -> {
-                var res = pointer.get(context);
+        public Builder pointerEvaluation(NodePointer pointer, Function<Node, String> converter) {
+            path.add(new FunctionElement((root, current) -> {
+                var res = pointer.get(root);
                 if (res != null) {
                     return converter.apply(res);
                 }
@@ -178,10 +211,10 @@ public final class NodePointer {
         return get(input) != null;
     }
 
-    public Node get(Node input) {
-        Node current = input;
+    public Node get(Node root) {
+        Node current = root;
         for (Element value : path) {
-            var found = value.tryMatch(current);
+            var found = value.tryMatch(root, current);
             if (found == null) {
                 return null;
             } else {

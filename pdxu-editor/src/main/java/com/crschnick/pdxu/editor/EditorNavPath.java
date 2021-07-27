@@ -2,6 +2,7 @@ package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import java.util.ArrayList;
@@ -60,11 +61,14 @@ public class EditorNavPath {
         }
     }
 
-    private static Optional<EditorNode> fastEditorNodeFind(EditorNode current, NodePointer sub) {
-        if (current.isReal() && sub.getPath().get(0).getKey() != null) {
+    private static Optional<EditorNode> fastEditorNodeFind(EditorRootNode root, EditorNode current, NodePointer sub) {
+        if (current.isReal()) {
             EditorRealNode s = (EditorRealNode) current;
-            return EditorNode.fastEditorSimpleNodeSearch(
-                    current, s.getBackingNode().getArrayNode(), sub.getPath().get(0).getKey());
+            var key = sub.getPath().get(0).getKey(root.getBackingNode(), s.getBackingNode());
+            if (key != null) {
+                return EditorNode.fastEditorSimpleNodeSearch(
+                        current, s.getBackingNode().getArrayNode(), key);
+            }
         }
 
         var exp = current.expand();
@@ -81,26 +85,27 @@ public class EditorNavPath {
             return Optional.empty();
         }
 
-        EditorNode current = null;
+        EditorRootNode root = null;
         List<EditorNode> newPath = new ArrayList<>();
         newPath.add(null);
 
         for (var e : state.getRootNodes().values()) {
             var found = pointer.sub(0, 1).isValid((e).getBackingNode());
             if (found) {
-                current = e;
+                root = e;
                 newPath.add(e);
                 break;
             }
         }
         // Not found
-        if (current == null) {
+        if (root == null) {
             return Optional.empty();
         }
 
+        EditorNode current = root;
         for (int i = 0; i < pointer.size(); i++) {
             var sub = pointer.sub(i, i +1);
-            var found = fastEditorNodeFind(current, sub);
+            var found = fastEditorNodeFind(root, current, sub);
             if (found.isEmpty()) {
                 return Optional.empty();
             } else {

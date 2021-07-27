@@ -80,24 +80,23 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
         var player = NodePointer.builder().name("currently_played_characters").index(0).build();
         var playerDyn = NodePointer.builder()
-                .name("living").pointerEvaluation(state.getBackingNode(), player).name("dynasty_house").build();
+                .name("living").pointerEvaluation(player).name("dynasty_house").build();
 
         var map = new LinkedHashMap<String, NodePointer>();
         map.put("All player characters", NodePointer.builder().name("currently_played_characters").build());
-        map.put("Player character", NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player).build());
-        map.put("Player realm", NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player)
+        map.put("Player character", NodePointer.builder().name("living").pointerEvaluation(player).build());
+        map.put("Player realm", NodePointer.builder().name("living").pointerEvaluation(player)
                 .name("landed_data").name("domain").build());
         map.put("Player house/dynasty", NodePointer.builder().name("dynasties").name("dynasty_house")
-                .pointerEvaluation(state.getBackingNode(), playerDyn).build());
+                .pointerEvaluation(playerDyn).build());
         var primaryTitle = NodePointer.builder().name("landed_titles").name("landed_titles").pointerEvaluation(
-                state.getBackingNode(),
-                NodePointer.builder().name("living").pointerEvaluation(state.getBackingNode(), player)
+                NodePointer.builder().name("living").pointerEvaluation(player)
                         .name("landed_data").name("domain").index(0).build()
         ).build();
         map.put("Player primary title", primaryTitle);
         var primaryTitleCoaId = NodePointer.fromBase(primaryTitle).name("coat_of_arms_id").build();
         var primaryTitleCoa = NodePointer.builder().name("coat_of_arms")
-                .name("coat_of_arms_manager_database").pointerEvaluation(state.getBackingNode(), primaryTitleCoaId).build();
+                .name("coat_of_arms_manager_database").pointerEvaluation(primaryTitleCoaId).build();
         map.put("Player primary title coat of arms", primaryTitleCoa);
         return map;
     }
@@ -108,12 +107,13 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> RELIGION_KEYS = List.of("religion");
     private static final List<String> COA_KEYS = List.of("coat_of_arms_id");
     private static final List<String> HOLY_SITE_KEYS = List.of("holy_sites");
+    private static final List<String> COUNCIL_KEYS = List.of("council");
     private static final List<String> LIVING_KEYS = List.of(
             "dynasty_head", "head_of_house", "religious_head", "holder", "owner", "character",
             "target", "attacker", "defender", "claimant", "first", "second", "head",
-            "council", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals",
+            "court_owner", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals",
             "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
-            "ruler_designer_characters", "former_spouses", "participants");
+            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
@@ -147,6 +147,9 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
         if (HOLY_SITE_KEYS.contains(key)) {
             return NodePointer.builder().name("religion").name("holy_sites").name(val).build();
+        }
+        if (COUNCIL_KEYS.contains(key)) {
+            return NodePointer.builder().name("council_task_manager").name("active").name(val).build();
         }
         if (LIVING_KEYS.contains(key)) {
             return NodePointer.builder().name("living").name(val).build();
@@ -186,6 +189,19 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
 
         var keyOpt = node.getKeyName();
+        var parentKey = Optional.ofNullable(node.getParent())
+                .flatMap(p -> p.getKeyName());
+
+        // Character triggered events
+        if (keyOpt.isPresent() && parentKey.isPresent() && node.getBackingNode().isValue() && keyOpt.get().equals("identity")) {
+            var parent = node.getParent();
+            boolean isTypeChar = parent.isReal() && ((EditorRealNode) parent).getBackingNode().getNodeForKeyIfExistent("type")
+                    .map(t -> t.isValue() && t.getString().equals("char")).orElse(false);
+            if (isTypeChar) {
+                return NodePointer.builder().name("living").name(node.getBackingNode().getString()).build();
+            }
+        }
+
         if (keyOpt.isPresent() && node.getBackingNode().isValue()) {
             return get(keyOpt.get(), node.getBackingNode().getString());
         }
@@ -195,8 +211,6 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             return get(keyOpt.get(), node.getBackingNode().getNodeArray().get(0).getString());
         }
 
-        var parentKey = Optional.ofNullable(node.getParent())
-                .flatMap(p -> p.getKeyName());
         if (parentKey.isPresent() && node.getBackingNode().isValue()) {
             return get(parentKey.get(), node.getBackingNode().getString());
         }

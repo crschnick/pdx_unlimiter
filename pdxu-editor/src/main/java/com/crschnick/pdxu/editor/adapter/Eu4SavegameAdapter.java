@@ -18,7 +18,7 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
         return Map.of("Player country", NodePointer.builder().name("countries")
-                .pointerEvaluation(state.getBackingNode(), NodePointer.builder().name("player").build()).build());
+                .pointerEvaluation(NodePointer.builder().name("player").build()).build());
     }
 
     private static final List<String> EU4_PROVINCE_KEYS = List.of("capital", "original_capital", "trade_port");
