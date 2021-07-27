@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
+import javafx.scene.layout.Region;
 
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -21,5 +22,5 @@ public interface EditorSavegameAdapter {
 
     NodePointer createNodeJump(EditorState state, EditorRealNode node) throws Exception;
 
-    javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node) throws Exception;
+    javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) throws Exception;
 }

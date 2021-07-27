@@ -149,18 +149,18 @@ public class GuiEditor {
             grid.add(kn, 1, i);
             grid.add(createGridElement(new Label("="), i), 2, i);
 
+            Region valueDisplay = GuiEditorNode.createValueDisplay(n, state);
             Node tag = null;
             if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
                 try {
                     tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                            .createNodeTag(state, (EditorRealNode) n);
+                            .createNodeTag(state, (EditorRealNode) n, valueDisplay);
                 } catch (Exception ex) {
                     ErrorHandler.handleException(ex);
                 }
             }
             grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i), 3, i);
-
-            grid.add(createGridElement(GuiEditorNode.createValueDisplay(n, state), i), 4, i);
+            grid.add(createGridElement(valueDisplay, i), 4, i);
 
             HBox actions = new HBox();
             actions.setFillHeight(true);

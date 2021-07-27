@@ -1,15 +1,16 @@
 package com.crschnick.pdxu.editor.adapter;
 
-import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.editor.gui.GuiCk3CoaViewer;
-import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.editor.EditorState;
+import com.crschnick.pdxu.editor.gui.GuiCk3CoaViewer;
+import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
+import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.jfoenix.controls.JFXButton;
+import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
@@ -32,7 +33,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
 
         @Override
-        public javafx.scene.Node create(EditorState state, EditorRealNode node) {
+        public javafx.scene.Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
             var b = new JFXButton();
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
@@ -68,8 +69,9 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             new ImagePreview(
                     Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory(Set.of("meta_data"),
-                    "Contains the meta data of this savegame that is shown in the main menu. " +
-                            "Editing anything inside of it only changes the main menu display, not the actual data in-game."));
+                    "This node contains the meta data of this savegame that is shown in the main menu. " +
+                            "Editing anything inside of it only changes the main menu display, not the actual data in-game. " +
+                            "Do not edit this node if you want to change something in-game."));
 
     @Override
     public Game getGame() {
@@ -219,10 +221,10 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node) {
+    public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) {
         return FACTORIES.stream()
                 .filter(fac -> fac.checkIfApplicable(state, node))
-                .findFirst().map(fac -> fac.create(state, node))
+                .findFirst().map(fac -> fac.create(state, node, valueDisplay))
                 .orElse(null);
     }
 }

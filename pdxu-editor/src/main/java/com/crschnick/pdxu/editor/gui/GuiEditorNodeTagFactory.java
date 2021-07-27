@@ -1,7 +1,9 @@
 package com.crschnick.pdxu.editor.gui;
 
 
+import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
@@ -10,8 +12,11 @@ import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -23,7 +28,7 @@ public abstract class GuiEditorNodeTagFactory {
 
     public abstract boolean checkIfApplicable(EditorState state, EditorRealNode node);
 
-    public abstract Node create(EditorState state, EditorRealNode node);
+    public abstract Node create(EditorState state, EditorRealNode node, Region valueDisplay);
 
     public static abstract class ImagePreviewNodeTagFactory extends GuiEditorNodeTagFactory {
 
@@ -36,7 +41,7 @@ public abstract class GuiEditorNodeTagFactory {
         }
 
         @Override
-        public Node create(EditorState state, EditorRealNode node) {
+        public Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
             var b = new JFXButton();
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon(icon));
@@ -78,7 +83,7 @@ public abstract class GuiEditorNodeTagFactory {
         }
 
         @Override
-        public Node create(EditorState state, EditorRealNode node) {
+        public Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
             var b = new JFXButton();
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon("mdi-information-outline"));
@@ -91,6 +96,16 @@ public abstract class GuiEditorNodeTagFactory {
                 tt.setShowDelay(Duration.ZERO);
                 Tooltip.install(b, tt);
             });
+            if (valueDisplay != null) {
+                valueDisplay.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
+                    GuiDialogHelper.showBlockingAlert(alert -> {
+                        alert.getDialogPane().setMaxWidth(Settings.getInstance().maxTooltipWidth.getValue());
+                        alert.setAlertType(Alert.AlertType.WARNING);
+                        alert.setTitle("Node information");
+                        alert.setHeaderText(descFunction.apply(node));
+                    });
+                });
+            }
             return b;
         }
     }

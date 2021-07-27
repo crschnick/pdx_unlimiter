@@ -126,7 +126,7 @@ public class GuiEditorNavBar {
                         EditorSettings.getInstance().enableNodeTags.getValue()) {
                     try {
                         var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
-                                .createNodeTag(edState, (EditorRealNode) n.getEditorNode());
+                                .createNodeTag(edState, (EditorRealNode) n.getEditorNode(), null);
                         if (tag != null) {
                             p.getChildren().add(0, tag);
                         }

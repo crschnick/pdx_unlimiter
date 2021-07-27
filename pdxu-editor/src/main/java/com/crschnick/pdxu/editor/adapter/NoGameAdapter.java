@@ -5,6 +5,7 @@ import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class NoGameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public Node createNodeTag(EditorState state, EditorRealNode node) throws Exception {
+    public Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) throws Exception {
         return null;
     }
 }

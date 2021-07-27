@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.editor.adapter;
 
-import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.editor.EditorState;
+import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
+import javafx.scene.layout.Region;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node) {
+    public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) {
         return null;
     }
 }
