@@ -180,6 +180,10 @@ public class EditorContent {
     }
 
     public void navigate(EditorNode node, int page, double scroll) {
+        if (node != null && !node.isValid()) {
+            throw new IllegalArgumentException("Node is not valid");
+        }
+
         this.node = node;
         this.page = page;
         this.scroll = scroll;

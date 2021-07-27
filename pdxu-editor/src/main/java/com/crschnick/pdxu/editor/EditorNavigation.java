@@ -43,8 +43,7 @@ public class EditorNavigation {
 
         historyPos.set(historyPos.get() - 1);
         var goTo = history.get(historyPos.get());
-        this.current.set(goTo);
-        state.getContent().navigate(goTo.getEditorNode(), goTo.page(), goTo.scroll());
+        restoreNavLocation(goTo);
     }
 
     public void goForward() {
@@ -54,6 +53,14 @@ public class EditorNavigation {
 
         historyPos.set(historyPos.get() + 1);
         var goTo = history.get(historyPos.get());
+        restoreNavLocation(goTo);
+    }
+
+    private void restoreNavLocation(EditorNavLocation goTo) {
+        var rebuilt = EditorNavPath.rebuild(goTo.path());
+        if (!EditorNavPath.areNodePathsEqual(goTo.path(), rebuilt)) {
+            goTo = new EditorNavLocation(rebuilt);
+        }
         this.current.set(goTo);
         state.getContent().navigate(goTo.getEditorNode(), goTo.page(), goTo.scroll());
     }
