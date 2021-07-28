@@ -2,6 +2,8 @@ package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.gui.GuiStyle;
+import com.crschnick.pdxu.app.util.Hyperlinks;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import javafx.geometry.Insets;
@@ -59,6 +61,14 @@ public class GuiCk3CoaViewer {
         topBar.setAlignment(Pos.CENTER);
         topBar.setFillHeight(true);
         topBar.getStyleClass().add("coa-options");
+        topBar.setSpacing(5);
+
+        Button coaHelp = new Button();
+        coaHelp.setOnAction(e -> {
+            ThreadHelper.browse(Hyperlinks.CK3_COA_WIKI);
+        });
+        coaHelp.setGraphic(new FontIcon("mdi-help-circle-outline"));
+        topBar.getChildren().add(coaHelp);
 
         Button refresh = new Button();
         refresh.setOnAction(e -> {
