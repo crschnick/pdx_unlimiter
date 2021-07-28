@@ -51,9 +51,10 @@ public class GuiEditor {
         if (!state.isContextGameEnabled()) {
             GuiDialogHelper.showBlockingAlert(alert -> {
                 alert.setAlertType(Alert.AlertType.WARNING);
+                alert.getDialogPane().setMaxWidth(500);
                 alert.setTitle("Missing game installation");
                 alert.setHeaderText("No installation has been set for " + state.getFileContext().getGame().getFullName() +
-                        ". You can still use the editor, but many useful features will be disabled until a valid game installation has been set in the settings menu.");
+                        ". You can still use the editor to edit " + state.getFileContext().getGame().getFullName() + " savegames, but many useful features will be disabled until a valid game installation has been set in the settings menu.");
             });
         }
     }

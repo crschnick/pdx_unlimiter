@@ -187,11 +187,9 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegame(e, ctx -> {
-                EditorProvider.get().openSavegame(ctx.getStorage(), e);
-            });
-        }, true);
+        SavegameContext.withSavegame(e, ctx -> {
+            EditorProvider.get().openSavegame(ctx.getStorage(), e);
+        });
     }
 
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {

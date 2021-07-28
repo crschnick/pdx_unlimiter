@@ -53,7 +53,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             rulerNode.getChildren().add(box);
         }
         {
-            var house = GameImage.imageNode(Ck3TagRenderer.houseImage(ruler.getHouse(), GameFileContext.fromInfo(info)),
+            var house = GameImage.imageNode(Ck3TagCache.houseImage(ruler.getHouse(), GameFileContext.fromInfo(info)),
                     "house-icon");
             GuiTooltips.install(house, "House " + info.getHouseName());
             rulerNode.getChildren().add(house);
@@ -83,7 +83,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        return Ck3TagRenderer.realmImage(info, tag);
+        return Ck3TagCache.realmImage(info, tag);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 titles.stream().filter(t -> !t.getType().equals(Ck3Title.Type.BARONY)).collect(Collectors.toList()),
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagRenderer.titleImage(t, GameFileContext.fromInfo(info)), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3TagCache.titleImage(t, GameFileContext.fromInfo(info)), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("title-row");
@@ -160,7 +160,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 tags,
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagRenderer.realmImage(info, t), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3TagCache.realmImage(info, t), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("realm-row");

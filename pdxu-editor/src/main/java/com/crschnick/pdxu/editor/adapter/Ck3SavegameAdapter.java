@@ -115,7 +115,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             "target", "attacker", "defender", "claimant", "first", "second", "head",
             "court_owner", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals",
             "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
-            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor");
+            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor", "pretender");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");

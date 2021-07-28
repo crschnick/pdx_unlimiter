@@ -3,7 +3,7 @@ package com.crschnick.pdxu.editor;
 import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.EditorProvider;
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.editor.gui.GuiEditor;
@@ -45,10 +45,6 @@ public class Editor implements EditorProvider {
     }
 
     public void openExternalFile() {
-        if (SavegameManagerState.get().current() == null) {
-            return;
-        }
-
         Platform.runLater(() -> {
             FileChooser c = new FileChooser();
             List<File> file = c.showOpenMultipleDialog(PdxuApp.getApp().getStage());
@@ -75,29 +71,31 @@ public class Editor implements EditorProvider {
     }
 
     public void createNewEditor(EditTarget target) {
-        Map<String, ArrayNode> nodes;
-        try {
-            nodes = target.parse();
-        } catch (Exception e) {
-            ErrorHandler.handleException(e, null, target.getFile());
-            return;
-        }
-        EditorState state = new EditorState(target.getName(), target.getFileContext(), nodes, target.getParser(), n -> {
+        TaskExecutor.getInstance().submitTask(() -> {
+            Map<String, ArrayNode> nodes;
             try {
-                target.write(n);
+                nodes = target.parse();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                ErrorHandler.handleException(e, null, target.getFile());
+                return;
             }
-        }, target.isSavegame(), target.canSave());
+            EditorState state = new EditorState(target.getName(), target.getFileContext(), nodes, target.getParser(), n -> {
+                try {
+                    target.write(n);
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            }, target.isSavegame(), target.canSave());
 
-        Platform.runLater(() -> {
-            Stage stage = GuiEditor.createStage(state);
-            state.init();
-            editors.put(state, stage);
-            stage.setOnCloseRequest(e -> {
-                editors.remove(state);
+            Platform.runLater(() -> {
+                Stage stage = GuiEditor.createStage(state);
+                state.init();
+                editors.put(state, stage);
+                stage.setOnCloseRequest(e -> {
+                    editors.remove(state);
+                });
             });
-        });
+        }, true);
     }
 
     public static Map<EditorState, Stage> getEditors() {
