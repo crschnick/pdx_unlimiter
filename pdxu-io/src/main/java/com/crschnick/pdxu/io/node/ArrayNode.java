@@ -27,6 +27,8 @@ public abstract class ArrayNode extends Node {
         return new SimpleArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
     }
 
+    public abstract void setValueAt(int index, Node newValue);
+
     public final ArrayNode replacePart(ArrayNode toInsert, int beginIndex, int length) {
         if (beginIndex == 0 && length == size()) {
             return toInsert;

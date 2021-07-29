@@ -20,6 +20,8 @@ public interface EditorSavegameAdapter {
 
     Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception;
 
+    Map<String, Runnable> createScripts(EditorState state) throws Exception;
+
     NodePointer createNodeJump(EditorState state, EditorRealNode node) throws Exception;
 
     javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) throws Exception;

@@ -1,20 +1,22 @@
 package com.crschnick.pdxu.editor.adapter;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.gui.GuiCk3CoaViewer;
 import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.NodePointer;
+import com.crschnick.pdxu.io.node.*;
 import com.jfoenix.controls.JFXButton;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
@@ -101,6 +103,43 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
                 .name("coat_of_arms_manager_database").pointerEvaluation(primaryTitleCoaId).build();
         map.put("Player primary title coat of arms", primaryTitleCoa);
         return map;
+    }
+
+    private static void fixHair(EditorState state) {
+        boolean run = GuiDialogHelper.showBlockingAlert(alert -> {
+            alert.setTitle("CK3 hair fix for 1.2 savegames");
+            alert.setHeaderText("This script will attempt to fix the mass baldness of characters for savegames converted from CK3 version 1.2");
+            alert.setAlertType(Alert.AlertType.INFORMATION);
+        }).map(b -> b.getButtonData().isDefaultButton()).orElse(false);
+        if (!run) {
+            return;
+        }
+
+        ArrayNode living = state.getBackingNode().getNodeForKey("living").getArrayNode();
+        AtomicInteger counter = new AtomicInteger();
+        living.forEach((id, ch) -> {
+            if (!ch.hasKey("portrait_override")) {
+                String hairStyle = null;
+                if (ch.hasKey("female") && ch.getNodeForKey("female").getBoolean()) {
+                    hairStyle = "female_hair_western_01";
+                } else {
+                    hairStyle = "male_hair_western_01";
+                }
+                ArrayNode addition = ArrayNode.singleKeyNode("portrait_override",
+                        ArrayNode.singleKeyNode("portrait_modifier_overrides",
+                                ArrayNode.singleKeyNode("custom_hair", new ValueNode(hairStyle, true))));
+                ArrayNode replacement = new LinkedArrayNode(List.of(ch.getArrayNode(), addition));
+                living.setValueAt(counter.get(), replacement);
+            }
+            counter.getAndIncrement();
+        });
+
+        state.onFileChanged();
+    }
+
+    @Override
+    public Map<String, Runnable> createScripts(EditorState state) throws Exception {
+        return Map.of("Fix hairstyles", () -> fixHair(state));
     }
 
     private static final List<String> DYNASTY_KEYS = List.of("dynasty_house", "dynasty", "historical");

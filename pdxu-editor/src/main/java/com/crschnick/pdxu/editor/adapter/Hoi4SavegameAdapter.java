@@ -10,7 +10,10 @@ import javafx.scene.layout.Region;
 import java.util.Map;
 
 public class Hoi4SavegameAdapter implements EditorSavegameAdapter {
-
+    @Override
+    public Map<String, Runnable> createScripts(EditorState state) throws Exception {
+        return Map.of();
+    }
     @Override
     public Game getGame() {
         return Game.HOI4;

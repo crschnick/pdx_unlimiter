@@ -22,6 +22,11 @@ public class Ck2SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
+    public Map<String, Runnable> createScripts(EditorState state) throws Exception {
+        return Map.of();
+    }
+
+    @Override
     public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
         return null;
     }

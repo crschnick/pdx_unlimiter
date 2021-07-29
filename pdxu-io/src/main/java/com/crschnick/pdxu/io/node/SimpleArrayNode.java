@@ -45,6 +45,12 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     @Override
+    public void setValueAt(int index, Node newValue) {
+        evaluateAllValueNodes();
+        this.values.set(index, newValue);
+    }
+
+    @Override
     public int size() {
         return values.size();
     }

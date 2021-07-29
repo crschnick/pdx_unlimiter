@@ -14,7 +14,10 @@ public class NoGameAdapter implements EditorSavegameAdapter {
     public Game getGame() {
         return null;
     }
-
+    @Override
+    public Map<String, Runnable> createScripts(EditorState state) throws Exception {
+        return Map.of();
+    }
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception {
         return Map.of();

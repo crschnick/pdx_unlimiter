@@ -70,11 +70,40 @@ public class GuiEditorMenuBar {
             fillJumps.run();
         });
 
+        Menu scriptsEntry = new Menu("Scripts");
+        Runnable fillScripts = () -> {
+            if (state.isSavegame()) {
+                try {
+                    var scripts = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createScripts(state);
+                    scripts.forEach((k, v) -> {
+                        MenuItem j = new MenuItem(k);
+                        j.setOnAction((a) -> {
+                            try {
+                                v.run();
+                            } catch (Exception ex) {
+                                ErrorHandler.handleException(ex);
+                            }
+                        });
+                        scriptsEntry.getItems().add(j);
+                        j.setDisable(v == null);
+                    });
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
+            }
+        };
+        fillScripts.run();
+        scriptsEntry.setOnShowing(e -> {
+            scriptsEntry.getItems().clear();
+            fillScripts.run();
+        });
+
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().add(file);
         menuBar.getMenus().add(editor);
         menuBar.getMenus().add(jump);
+        menuBar.getMenus().add(scriptsEntry);
         return menuBar;
     }
 }

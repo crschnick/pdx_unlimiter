@@ -35,6 +35,12 @@ public final class LinkedArrayNode extends ArrayNode {
     }
 
     @Override
+    public void setValueAt(int index, Node newValue) {
+        int list = getArrayNodeForIndex(index);
+        arrayNodes.get(list).setValueAt(getLocalIndex(list, index), newValue);
+    }
+
+    @Override
     public int size() {
         return arrayNodes.stream().mapToInt(ArrayNode::size).sum();
     }
