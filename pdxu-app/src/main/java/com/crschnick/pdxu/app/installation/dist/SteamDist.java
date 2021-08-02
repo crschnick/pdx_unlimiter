@@ -36,8 +36,12 @@ public class SteamDist extends GameDist {
             }
         } else if (SystemUtils.IS_OS_LINUX) {
             try {
-                String s = Path.of(System.getProperty("user.home"), ".steam", "steam").toRealPath().toString();
-                steamDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+                var steamPath = Path.of(System.getProperty("user.home"), ".steam", "steam");
+                if (Files.exists(steamPath)) {
+                    // Resolve symlink
+                    var steamRealPath = steamPath.toRealPath();
+                    steamDir = Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+                }
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
