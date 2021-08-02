@@ -62,7 +62,7 @@ public class TextFormatTokenizer {
             // Pessimistic assumptions, should always hold!
 
             maxTokenCount = bytes.length / 2;
-            maxNodeCount = bytes.length / 5;
+            maxNodeCount = bytes.length / 4;
         }
 
         this.tokenTypes = new byte[maxTokenCount];
