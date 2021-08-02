@@ -30,6 +30,10 @@ public abstract class Node {
         throw new UnsupportedOperationException();
     }
 
+    public ValueNode getValueNode() {
+        throw new UnsupportedOperationException();
+    }
+
     public ArrayNode getArrayNode() {
         throw new UnsupportedOperationException();
     }

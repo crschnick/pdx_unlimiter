@@ -54,13 +54,8 @@ public final class EditorSimpleNode extends EditorRealNode {
             }
 
             var nodeToUse = newNode.getNodeArray().get(0);
-            if (nodeToUse.isTagged()) {
-                ((TaggedNode) getBackingNode()).set((TaggedNode) nodeToUse);
-            } else if (nodeToUse.isValue()) {
-                ((ValueNode) getBackingNode()).set((ValueNode) nodeToUse);
-            } else {
-                throw new IllegalArgumentException();
-            }
+            // Update parent node to reflect change
+            getParent().updateNodeAtRawIndex(nodeToUse, keyName, getRawIndexInParentNode());
         }
     }
 
