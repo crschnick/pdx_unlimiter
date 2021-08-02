@@ -63,21 +63,34 @@ public class ColorHelper {
 
     public static Color fromGameColor(GameColor color) {
         var c = color.getValues();
-        return switch (color.getType()) {
-            case HSV -> Color.hsb(
-                    Double.parseDouble(c.get(0)) * 360,
-                    Double.parseDouble(c.get(1)),
-                    Double.parseDouble(c.get(2)));
-            case HSV360 -> Color.hsb(
-                    Double.parseDouble(c.get(0)),
-                    Double.parseDouble(c.get(1)) / 360.0,
-                    Double.parseDouble(c.get(2)) / 360.0);
-            case RGB -> Color.color(
-                    Double.parseDouble(c.get(0)) / 255.0,
-                    Double.parseDouble(c.get(1)) / 255.0,
-                    Double.parseDouble(c.get(2)) / 255.0);
-            case HEX -> Color.valueOf("#" + color.getValues().get(0));
-            default -> throw new IllegalStateException("Unexpected value: " + color.getType());
-        };
+
+        try {
+
+            if (color.getType().equals(TaggedNode.TagType.HEX)) {
+                var c0 = c.size() > 0 ? color.getValues().get(0) : "000000";
+                return Color.valueOf("#" + c0);
+            }
+
+            double d0 = c.size() > 0 ? Double.parseDouble(c.get(0)) : 0.0;
+            double d1 = c.size() > 1 ? Double.parseDouble(c.get(1)) : 0.0;
+            double d2 = c.size() > 2 ? Double.parseDouble(c.get(2)) : 0.0;
+            return switch (color.getType()) {
+                case HSV -> Color.hsb(
+                        d0 * 360,
+                        d1,
+                        d2);
+                case HSV360 -> Color.hsb(
+                        d0,
+                        d1 / 360.0,
+                        d2 / 360.0);
+                case RGB -> Color.color(
+                        d0 / 255.0,
+                        d1 / 255.0,
+                        d2 / 255.0);
+                default -> throw new IllegalStateException("Unexpected value: " + color.getType());
+            };
+        } catch (Exception ex) {
+            return Color.BLACK;
+        }
     }
 }
