@@ -13,6 +13,13 @@ public interface SavegameType {
 
     SavegameType EU4 = new SavegameType() {
         @Override
+        public boolean matchesInput(byte[] input) {
+            var header = ZipSavegameStructure.getFirstHeader(input, "meta", 6);
+            return Arrays.equals("EU4txt".getBytes(), header) ||
+                    Arrays.equals("EU4bin".getBytes(), header);
+        }
+
+        @Override
         public SavegameStructure determineStructure(byte[] input) {
             if (isCompressed(input)) {
                 return SavegameStructure.EU4_COMPRESSED;
@@ -27,7 +34,7 @@ public interface SavegameType {
                 var zipIn = new ZipInputStream(new ByteArrayInputStream(input));
                 return zipIn.getNextEntry() != null;
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                return false;
             }
         }
 
@@ -57,6 +64,13 @@ public interface SavegameType {
     SavegameType HOI4 = new SavegameType() {
 
         @Override
+        public boolean matchesInput(byte[] input) {
+            var header = ZipSavegameStructure.getFirstHeader(input, "meta", 7);
+            return Arrays.equals("HOI4txt".getBytes(), header) ||
+                    Arrays.equals("HOI4bin".getBytes(), header);
+        }
+
+        @Override
         public SavegameStructure determineStructure(byte[] input) {
             return SavegameStructure.HOI4;
         }
@@ -84,6 +98,17 @@ public interface SavegameType {
     };
 
     SavegameType CK3 = new SavegameType() {
+
+        @Override
+        public boolean matchesInput(byte[] input) {
+            // Slow, but acceptable
+            try {
+                Ck3Header.determineHeaderForFile(input);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -128,6 +153,12 @@ public interface SavegameType {
     SavegameType STELLARIS = new SavegameType() {
 
         @Override
+        public boolean matchesInput(byte[] input) {
+            // Stellaris has no identifier to help with detection
+            return false;
+        }
+
+        @Override
         public SavegameStructure determineStructure(byte[] input) {
             return SavegameStructure.STELLARIS;
         }
@@ -154,6 +185,12 @@ public interface SavegameType {
     };
 
     SavegameType CK2 = new SavegameType() {
+
+        @Override
+        public boolean matchesInput(byte[] input) {
+            var header = ZipSavegameStructure.getFirstHeader(input, "meta", 6);
+            return Arrays.equals("CK2txt".getBytes(), header);
+        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -187,6 +224,12 @@ public interface SavegameType {
     };
 
     SavegameType VIC2 = new SavegameType() {
+
+        @Override
+        public boolean matchesInput(byte[] input) {
+            // Vic2 has no identifier to help with detection
+            return false;
+        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -227,6 +270,22 @@ public interface SavegameType {
         }
         return null;
     }
+
+    static SavegameType getTypeForInput(byte[] input) {
+        for (var ft : SavegameType.class.getFields()) {
+            try {
+                SavegameType t = (SavegameType) ft.get(null);
+                if (t.matchesInput(input)) {
+                    return t;
+                }
+            } catch (IllegalAccessException e) {
+                throw new AssertionError(e);
+            }
+        }
+        return null;
+    }
+
+    boolean matchesInput(byte[] input);
 
     SavegameStructure determineStructure(byte[] input);
 
