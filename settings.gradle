@@ -3,3 +3,5 @@ include 'pdxu-editor'
 include 'pdxu-app'
 include 'pdxu-model'
 include 'pdxu-io'
+
+rootProject.buildFileName = 'gradle/build.gradle'
