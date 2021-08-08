@@ -15,7 +15,7 @@ if (currentOS.isWindows()) {
     platform = 'mac'
 }
 
-apply from: "$rootDir/module_gen.gradle"
+apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {
     implementation "org.openjfx:javafx-base:16:${platform}"
