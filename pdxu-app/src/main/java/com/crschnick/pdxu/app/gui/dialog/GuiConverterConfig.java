@@ -17,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 
@@ -154,9 +153,8 @@ public class GuiConverterConfig {
         Node configNode;
         Map<String, String> translations;
         try {
-            configNode = TextFormatParser.text().parse(Files.readAllBytes(
-                    Settings.getInstance().ck3toeu4Dir.getValue()
-                            .resolve("Configuration").resolve("fronter-options.txt")));
+            configNode = TextFormatParser.text().parse(Settings.getInstance().ck3toeu4Dir.getValue()
+                            .resolve("Configuration").resolve("fronter-options.txt"));
             translations = LocalisationHelper.loadTranslations(Settings.getInstance().ck3toeu4Dir.getValue()
                     .resolve("Configuration").resolve("options.yml"), Language.ENGLISH);
         } catch (Exception e) {

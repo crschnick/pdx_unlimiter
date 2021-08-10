@@ -1,8 +1,5 @@
 package com.crschnick.pdxu.io.parser;
 
-import sun.misc.Unsafe;
-
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Stack;
 
@@ -15,25 +12,15 @@ public class TextFormatTokenizer {
     public static final byte EQUALS = 5;
 
     private static final byte DOUBLE_QUOTE_CHAR = 34;
-    private static final Unsafe unsafe;
     private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 
-    static {
-        try {
-            Field f = Unsafe.class.getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            unsafe = (Unsafe) f.get(null);
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-    }
-
+    private final boolean strict;
     private final byte[] bytes;
-    private final byte[] tokenTypes;
-    private final int[] scalarsStart;
-    private final short[] scalarsLength;
+    private byte[] tokenTypes;
+    private int[] scalarsStart;
+    private short[] scalarsLength;
     private final Stack<Integer> arraySizeStack;
-    private final int[] arraySizes;
+    private int[] arraySizes;
     private boolean isInQuotes;
     private boolean isInComment;
     private int nextScalarStart;
@@ -43,8 +30,9 @@ public class TextFormatTokenizer {
     private int arraySizesCounter;
     private boolean escapeChar;
 
-    public TextFormatTokenizer(byte[] bytes, int start) {
+    public TextFormatTokenizer(byte[] bytes, int start, boolean strict) {
         this.bytes = bytes;
+        this.strict = strict;
         this.nextScalarStart = 0;
         this.tokenCounter = 0;
 
@@ -77,6 +65,35 @@ public class TextFormatTokenizer {
         this.nextScalarStart = start;
     }
 
+    private void checkResize() {
+        var maxTokenCount = tokenTypes.length;
+        var maxNodeCount = scalarsStart.length;
+        if (this.tokenCounter >= maxTokenCount || this.nextScalarStart >= maxNodeCount) {
+            resize();
+        }
+    }
+
+    private void resize() {
+        var maxTokenCount = tokenTypes.length;
+        var maxNodeCount = scalarsStart.length;
+
+        var tokenTypes = new byte[maxTokenCount * 2];
+        System.arraycopy(this.tokenTypes, 0, tokenTypes, 0, maxTokenCount);
+        this.tokenTypes = tokenTypes;
+
+        var scalarsStart = new int[maxNodeCount * 2];
+        System.arraycopy(this.scalarsStart, 0, scalarsStart, 0, maxNodeCount);
+        this.scalarsStart = scalarsStart;
+
+        var scalarsLength = new short[maxNodeCount * 2];
+        System.arraycopy(this.scalarsLength, 0, scalarsLength, 0, maxNodeCount);
+        this.scalarsLength = scalarsLength;
+
+        var arraySizes = new int[maxNodeCount * 2];
+        System.arraycopy(this.arraySizes, 0, arraySizes, 0, maxNodeCount);
+        this.arraySizes = arraySizes;
+    }
+
     private void checkBom() {
         if (bytes.length >= 3 && Arrays.equals(bytes, 0, 3, UTF_8_BOM, 0, 3)) {
             this.nextScalarStart += 3;
@@ -84,7 +101,11 @@ public class TextFormatTokenizer {
         }
     }
 
-    private void checkUnclosedArrays() {
+    private void checkUnclosedArrays() throws ParseException {
+        if (strict && arraySizeStack.size() > 1) {
+            throw new ParseException("Missing closing } at the end of the file", i, bytes);
+        }
+
         for (int i = 1; i < arraySizeStack.size(); i++) {
             tokenTypes[tokenCounter] = CLOSE_GROUP;
             tokenCounter++;
@@ -92,7 +113,7 @@ public class TextFormatTokenizer {
         arraySizeStack.clear();
     }
 
-    public void tokenize() {
+    public void tokenize() throws ParseException {
         tokenTypes[0] = OPEN_GROUP;
         arraySizes[0] = 0;
         arraySizeStack.add(0);
@@ -110,7 +131,7 @@ public class TextFormatTokenizer {
         nextScalarStart = i + 1;
     }
 
-    private boolean checkCommentCase(char c) {
+    private boolean checkCommentCase(char c) throws ParseException {
         if (isInQuotes) {
             return false;
         }
@@ -132,7 +153,7 @@ public class TextFormatTokenizer {
         return true;
     }
 
-    private boolean checkQuoteCase(char c) {
+    private boolean checkQuoteCase(char c) throws ParseException {
         if (!isInQuotes) {
             if (c == '"') {
                 isInQuotes = true;
@@ -160,11 +181,11 @@ public class TextFormatTokenizer {
         return true;
     }
 
-    private void finishCurrentToken() {
+    private void finishCurrentToken() throws ParseException {
         finishCurrentToken(i);
     }
 
-    private void finishCurrentToken(int endExclusive) {
+    private void finishCurrentToken(int endExclusive) throws ParseException {
         boolean isCurrentToken = nextScalarStart < endExclusive;
         if (!isCurrentToken) {
             return;
@@ -174,8 +195,8 @@ public class TextFormatTokenizer {
 
         // Check for length overflow
         if (length < 0) {
-            throw new IndexOutOfBoundsException(
-                    "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) + ", which is too big");
+            throw new ParseException(
+                    "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) + ", which is too big", nextScalarStart, bytes);
         }
 
         assert length > 0 : "Scalar must be of length at least 1";
@@ -195,7 +216,7 @@ public class TextFormatTokenizer {
         nextScalarStart = endExclusive;
     }
 
-    private void checkForNewControlToken(byte controlToken) {
+    private void checkForNewControlToken(byte controlToken) throws ParseException {
         if (controlToken == 0) {
             return;
         }
@@ -207,13 +228,21 @@ public class TextFormatTokenizer {
             // Special case for additional close group token on top level
             // Happens in CK2 and VIC2
             if (arraySizeStack.size() == 1) {
+                if (strict) {
+                    throw new ParseException("Additional closing } at the of the file", i, bytes);
+                }
+
                 return;
             }
-
-            assert arraySizes[arraySizeStack.peek()] >= 0 : "Encountered invalid array size";
             arraySizeStack.pop();
         } else if (controlToken == EQUALS) {
-            arraySizes[arraySizeStack.peek()]--;
+            if (strict && arraySizes[arraySizeStack.peek()] == 0) {
+                throw new ParseException("Encountered invalid =", i, bytes);
+            }
+
+            if (arraySizes[arraySizeStack.peek()] > 0) {
+                arraySizes[arraySizeStack.peek()]--;
+            }
         } else if (controlToken == OPEN_GROUP) {
             arraySizes[arraySizeStack.peek()]++;
             arraySizeStack.add(arraySizesCounter++);
@@ -222,7 +251,7 @@ public class TextFormatTokenizer {
         tokenTypes[tokenCounter++] = controlToken;
     }
 
-    private void checkWhitespace(char c) {
+    private void checkWhitespace(char c) throws ParseException {
         boolean isWhitespace = (c == '\n' || c == '\r' || c == ' ' || c == '\t');
         if (isWhitespace) {
             finishCurrentToken();
@@ -230,12 +259,14 @@ public class TextFormatTokenizer {
         }
     }
 
-    private void tokenizeIteration() {
+    private void tokenizeIteration() throws ParseException {
         // Add extra new line at the end to simulate end of token
         char c = i == bytes.length ? '\n' : (char) bytes[i];
 
         if (checkCommentCase(c)) return;
         if (checkQuoteCase(c)) return;
+
+        checkResize();
 
         byte controlToken = 0;
         if (c == '{') {

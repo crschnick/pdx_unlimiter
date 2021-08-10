@@ -54,7 +54,8 @@ public class EditorExternalState {
                                 logger.trace("Editor node " + e.editorNode.getNavigationName() + " validity: " + valid);
                                 if (valid) {
                                     e.registerChange();
-                                    ArrayNode newNode = e.state.getParser().parse(changed);
+                                    // Use strict parsing rules!
+                                    ArrayNode newNode = e.state.getParser().parse(changed, true);
                                     boolean empty = newNode.size() == 0;
                                     if (!empty) {
                                         e.editorNode.update(newNode);
@@ -109,13 +110,16 @@ public class EditorExternalState {
         }
 
         Path file = TEMP.resolve(UUID.randomUUID() + ".pdxt");
-        try (var out = Files.newOutputStream(file)) {
-            NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(),
-                    EditorSettings.getInstance().indentation.getValue(), 0);
-            var entry = new Entry(file, node, state);
-            entry.registerChange();
-            openEntries.add(entry);
-            openFile(file.toString());
+        try {
+            FileUtils.forceMkdirParent(file.toFile());
+            try (var out = Files.newOutputStream(file)) {
+                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(),
+                        EditorSettings.getInstance().indentation.getValue(), 0);
+                var entry = new Entry(file, node, state);
+                entry.registerChange();
+                openEntries.add(entry);
+                openFile(file.toString());
+            }
         } catch (IOException ex) {
             ErrorHandler.handleException(ex);
         }

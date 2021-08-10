@@ -84,16 +84,20 @@ public final class TextFormatParser {
     }
 
     public final synchronized ArrayNode parse(Path file) throws IOException, ParseException {
-        return parse(Files.readAllBytes(file), 0);
+        return parse(Files.readAllBytes(file), 0, false);
     }
 
-    public final synchronized ArrayNode parse(byte[] input) throws ParseException {
-        return parse(input, 0);
+    public final synchronized ArrayNode parse(Path file, boolean strict) throws IOException, ParseException {
+        return parse(Files.readAllBytes(file), 0, strict);
     }
 
     public final synchronized ArrayNode parse(byte[] input, int start) throws ParseException {
+        return parse(input, start, false);
+    }
+
+    public final synchronized ArrayNode parse(byte[] input, int start, boolean strict) throws ParseException {
         try {
-            this.tokenizer = new TextFormatTokenizer(input, start);
+            this.tokenizer = new TextFormatTokenizer(input, start, strict);
 
             // var now = Instant.now();
             this.tokenizer.tokenize();
@@ -105,7 +109,7 @@ public final class TextFormatParser {
                     tokenizer.getScalarCount());
 
             // now = Instant.now();
-            ArrayNode r = parseArray();
+            ArrayNode r = parseArray(strict);
             // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
             return r;
@@ -118,7 +122,7 @@ public final class TextFormatParser {
         }
     }
 
-    private Node parseNodeIfNotScalarValue() {
+    private Node parseNodeIfNotScalarValue(boolean strict) {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
             var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ?
@@ -154,15 +158,15 @@ public final class TextFormatParser {
             assert tt[index] != TextFormatTokenizer.CLOSE_GROUP : "Encountered unexpected }";
 
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
-                return parseArray();
+                return parseArray(strict);
             }
         }
 
         return null;
     }
 
-    private void skipOverNextNode() {
-        var res = parseNodeIfNotScalarValue();
+    private void skipOverNextNode(boolean strict) {
+        var res = parseNodeIfNotScalarValue(strict);
 
         // Node is a scalar, therefore move manually
         if (res == null) {
@@ -171,7 +175,7 @@ public final class TextFormatParser {
         }
     }
 
-    private ArrayNode parseArray() {
+    private ArrayNode parseArray(boolean strict) {
         var tt = tokenizer.getTokenTypes();
 
         assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
@@ -182,14 +186,15 @@ public final class TextFormatParser {
         while (true) {
             assert index < tt.length : "Reached EOF but found no closing group token";
 
+            // Check for missing keys (only in non-strict mode)
             boolean isMissingKey = tt[index] == TextFormatTokenizer.EQUALS;
-            if (isMissingKey) {
+            if (!strict && isMissingKey) {
                 // Move over =
                 index++;
 
                 // Discard next node if there is one!
                 if (tt[index] != TextFormatTokenizer.CLOSE_GROUP) {
-                    skipOverNextNode();
+                    skipOverNextNode(strict);
                 }
             }
 
@@ -209,7 +214,7 @@ public final class TextFormatParser {
                 slIndex++;
                 index += 2;
 
-                Node result = parseNodeIfNotScalarValue();
+                Node result = parseNodeIfNotScalarValue(strict);
                 if (result == null) {
                     // System.out.println("key: " + context.evaluate(keyIndex));
                     // System.out.println("val: " + context.evaluate(slIndex));
@@ -233,7 +238,7 @@ public final class TextFormatParser {
                 int keyIndex = slIndex;
                 slIndex++;
                 index++;
-                Node result = parseNodeIfNotScalarValue();
+                Node result = parseNodeIfNotScalarValue(strict);
                 assert result != null : "KeyValue without equal sign must be an array node";
                 builder.putKeyAndNodeValue(keyIndex, result);
 
@@ -241,7 +246,7 @@ public final class TextFormatParser {
             }
 
             // Parse unnamed array element
-            Node result = parseNodeIfNotScalarValue();
+            Node result = parseNodeIfNotScalarValue(strict);
             if (result == null) {
                 builder.putScalarValue(slIndex);
                 index++;
