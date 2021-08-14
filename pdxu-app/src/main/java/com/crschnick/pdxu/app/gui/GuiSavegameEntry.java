@@ -268,17 +268,32 @@ public class GuiSavegameEntry {
             dynamicButtons.getChildren().add(convert);
         }
 
-        SavegameContext.withSavegameAsync(e, ctx -> {
-            boolean binary = ctx.getInfo().isBinary();
-            Button edit = new JFXButton();
-            edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
-            edit.setOnMouseClicked((m) -> {
-                SavegameActions.editSavegame(e);
-            });
-            GuiTooltips.install(edit, "Edit savegame");
-            dynamicButtons.getChildren().add(0, edit);
+        Button edit = new JFXButton();
+        edit.setOnMouseClicked((m) -> {
+            SavegameActions.editSavegame(e);
         });
-
+        GuiTooltips.install(edit, "Edit savegame");
+        e.stateProperty().addListener((c,o,n) -> {
+            boolean add = false;
+            if (n.equals(SavegameEntry.State.LOADED)) {
+                boolean binary = e.getInfo().isBinary();
+                edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
+                add = true;
+            }
+            if (n.equals(SavegameEntry.State.LOAD_FAILED)) {
+                edit.setGraphic(new FontIcon("mdi-pencil"));
+                add = true;
+            }
+            if (add) {
+                Platform.runLater(() -> {
+                    dynamicButtons.getChildren().add(0, edit);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    dynamicButtons.getChildren().remove(edit);
+                });
+            }
+        });
 
         HBox buttonBar = new HBox(dynamicButtons, staticButtons);
         buttonBar.setSpacing(40);

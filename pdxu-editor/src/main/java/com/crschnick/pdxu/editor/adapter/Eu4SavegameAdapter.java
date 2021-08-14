@@ -50,8 +50,8 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
             }
 
             if (EU4_TRADE_KEYS.contains(key)) {
-                return NodePointer.builder().name("trade").name("node").selector(tn -> tn.hasKey("definitions") &&
-                        tn.getNodeForKey("definitions").getString().equals(s)).build();
+                return NodePointer.builder().name("trade").name("node").selector(tn -> tn.isArray()
+                        && tn.hasKey("definitions") && tn.getNodeForKey("definitions").getString().equals(s)).build();
             }
         }
         return null;

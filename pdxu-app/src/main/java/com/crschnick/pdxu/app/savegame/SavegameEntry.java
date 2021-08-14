@@ -41,13 +41,13 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     }
 
     public void load(I newInfo) {
-        state.set(State.LOADED);
         info.set(newInfo);
+        state.set(State.LOADED);
     }
 
     public void unload() {
-        state.set(State.UNLOADED);
         info.set(null);
+        state.set(State.UNLOADED);
     }
 
     public boolean canLoad() {

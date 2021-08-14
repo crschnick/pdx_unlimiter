@@ -2,6 +2,7 @@ package com.crschnick.pdxu.io.node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -224,6 +225,9 @@ public final class NodePointer {
         return current;
     }
 
+    public Optional<Node> getIfPresent(Node root) {
+        return Optional.ofNullable(get(root));
+    }
 
     public List<Element> getPath() {
         return path;

@@ -53,6 +53,8 @@ public final class GameAppManager {
                 try {
                     update();
                     ThreadHelper.sleep(1000);
+                } catch (RuntimeException ex) {
+                    // Ignore weird "snapshot not available" exception
                 } catch (Exception ex) {
                     // Catch all exceptions to not terminate this thread if an error occurs!
                     ErrorHandler.handleException(ex);

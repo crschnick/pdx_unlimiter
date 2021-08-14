@@ -43,7 +43,7 @@ public final class WindowsStoreDist extends PdxLauncherDist {
             // This is somehow very slow. Why?
             // Important: Use out-string to increase output width. Otherwise long file paths can be wrapped!
             var proc = new ProcessBuilder("powershell.exe", "Get-AppxPackage",
-                    g.getWindowsStoreName(), "|", "out-string", "-width", "300")
+                    g.getWindowsStoreName(), "|", "out-string", "-width", "1000")
                     .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             var in = new String(proc.getInputStream().readAllBytes());

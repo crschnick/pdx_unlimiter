@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.model.stellaris;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameInfoException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
         try {
-            i.ironman = n.getNodeForKey("galaxy").getNodeForKeyIfExistent("ironman")
+            i.ironman = NodePointer.builder().name("galaxy").name("ironman").build().getIfPresent(n)
                     .map(Node::getBoolean).orElse(false);
 
             i.date = GameDateType.STELLARIS.fromString(n.getNodesForKey("date").get(0).getString());

@@ -22,7 +22,9 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
         this.storage = storage;
         this.entry = entry;
         this.target = target;
-        this.context = GameFileContext.fromInfo(entry.getInfo());
+        // If savegame failed to load, still allow for editing!
+        this.context = entry.getInfo() != null ? GameFileContext.fromInfo(entry.getInfo()) :
+                GameFileContext.forGame(SavegameStorage.ALL.inverseBidiMap().get(storage));
     }
 
     @Override
@@ -53,7 +55,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
 
     @Override
     public String getName() {
-        return storage.getEntryName(entry) + (entry.getInfo().isBinary() ? " (Binary/Read-only)" : "");
+        return storage.getEntryName(entry) + (entry.getInfo() != null && entry.getInfo().isBinary() ? " (Binary/Read-only)" : "");
     }
 
     @Override
