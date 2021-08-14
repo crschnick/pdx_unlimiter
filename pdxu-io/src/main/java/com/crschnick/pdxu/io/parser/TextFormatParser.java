@@ -127,7 +127,7 @@ public final class TextFormatParser {
     }
 
     private void updateLastKnownOffset() {
-        this.lastKnownOffset = context.getLiteralsBegin()[slIndex] + context.getLiteralsLength()[slIndex] + 1;
+        this.lastKnownOffset = context.getLiteralsBegin()[slIndex] + context.getLiteralsLength()[slIndex];
     }
 
     private Node parseNodeIfNotScalarValue(boolean strict) throws ParseException {
@@ -143,7 +143,7 @@ public final class TextFormatParser {
 
                 // Move over color id
                 index++;
-                slIndex++;
+                moveToNextScalar();
 
                 // Move over opening {
                 index++;
@@ -151,8 +151,7 @@ public final class TextFormatParser {
                 List<ValueNode> components = new ArrayList<>();
                 while (tt[index] != TextFormatTokenizer.CLOSE_GROUP) {
                     components.add(new ValueNode(context, slIndex));
-                    updateLastKnownOffset();
-                    slIndex++;
+                    moveToNextScalar();
                     index++;
                 }
 
@@ -177,6 +176,11 @@ public final class TextFormatParser {
         }
 
         return null;
+    }
+
+    private void moveToNextScalar() {
+        slIndex++;
+        updateLastKnownOffset();
     }
 
     private void skipOverNextNode(boolean strict) throws ParseException {
@@ -221,12 +225,13 @@ public final class TextFormatParser {
 
             boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
-                assert tt[index] == TextFormatTokenizer.STRING_UNQUOTED ||
-                        tt[index] == TextFormatTokenizer.STRING_QUOTED : "Expected key";
+                if (tt[index] != TextFormatTokenizer.STRING_UNQUOTED &&
+                        tt[index] != TextFormatTokenizer.STRING_QUOTED) {
+                    throw new ParseException("Expected key", lastKnownOffset, context.getData());
+                }
 
                 int keyIndex = slIndex;
-                updateLastKnownOffset();
-                slIndex++;
+                moveToNextScalar();
                 index += 2;
 
                 Node result = parseNodeIfNotScalarValue(strict);
@@ -236,7 +241,7 @@ public final class TextFormatParser {
 
                     builder.putKeyAndScalarValue(keyIndex, slIndex);
                     index++;
-                    slIndex++;
+                    moveToNextScalar();
                 } else {
                     // System.out.println("key: " + context.evaluate(keyIndex));
                     // System.out.println("val: " + result.toString());
@@ -251,7 +256,7 @@ public final class TextFormatParser {
                     tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
             if (isKeyValueWithoutEquals && keyWithoutEquals.test(context.evaluate(slIndex))) {
                 int keyIndex = slIndex;
-                slIndex++;
+                moveToNextScalar();
                 index++;
                 Node result = parseNodeIfNotScalarValue(strict);
                 assert result != null : "KeyValue without equal sign must be an array node";
@@ -265,7 +270,7 @@ public final class TextFormatParser {
             if (result == null) {
                 builder.putScalarValue(slIndex);
                 index++;
-                slIndex++;
+                moveToNextScalar();
             } else {
                 builder.putNodeValue(result);
             }
