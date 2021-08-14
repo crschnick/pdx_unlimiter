@@ -8,6 +8,7 @@ import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +134,11 @@ public class EditorExternalState {
         }
 
         try {
-            Runtime.getRuntime().exec(editor + " \"" + file + "\"");
+            // Linux editors do not like quotes around file paths
+            var fileName = SystemUtils.IS_OS_WINDOWS ? " \"" + file + "\"" : file;
+            var cmd = editor + " " + fileName;
+            logger.trace("Executing command: " + cmd);
+            Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }

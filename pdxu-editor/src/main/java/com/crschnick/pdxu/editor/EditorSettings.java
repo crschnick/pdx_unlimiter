@@ -71,7 +71,7 @@ public class EditorSettings extends AbstractSettings {
             "EXTERNAL_EDITOR",
             "externalEditor",
             SystemUtils.IS_OS_WINDOWS ? "notepad" : (System.getenv("VISUAL") != null ?
-                    System.getenv("VISUAL") : System.getenv("EDITOR"))
+                    System.getenv("VISUAL") : null)
     );
 
     private static EditorSettings INSTANCE;
