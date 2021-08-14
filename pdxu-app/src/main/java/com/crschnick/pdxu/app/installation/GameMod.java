@@ -28,7 +28,7 @@ public class GameMod {
         try {
             node = TextFormatParser.text().parse(p);
         } catch (ParseException ex) {
-            throw new ParseException("Could not parse malformed mod file " + p.toString(), ex);
+            throw new ParseException("Could not parse malformed mod file " + p.toString() + ":\n" + ex.getMessage(), ex);
         }
 
         // Quick check if mod data seems valid

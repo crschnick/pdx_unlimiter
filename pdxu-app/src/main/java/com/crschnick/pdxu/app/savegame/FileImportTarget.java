@@ -54,19 +54,9 @@ public abstract class FileImportTarget {
         List<StandardImportTarget> targets = new ArrayList<>();
         var type = SavegameType.getTypeForFile(p);
 
-        // Try to determine type from file
+        // Don't determine type from file contents with import targets
         if (type == null) {
-            try {
-                var bytes = Files.readAllBytes(p);
-                var detType = SavegameType.getTypeForInput(bytes);
-                if (detType != null) {
-                    type = detType;
-                } else {
-                    return List.of();
-                }
-            } catch (Exception ex) {
-                return List.of();
-            }
+            return List.of();
         }
 
         var storage = SavegameStorage.get(type);

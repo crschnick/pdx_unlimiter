@@ -2,7 +2,10 @@ package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import io.sentry.*;
+import io.sentry.Attachment;
+import io.sentry.Sentry;
+import io.sentry.SentryEvent;
+import io.sentry.UserFeedback;
 import io.sentry.protocol.SentryId;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;

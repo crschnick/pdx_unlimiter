@@ -4,15 +4,14 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
-import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.util.ConfigHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.io.parser.ParseException;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
@@ -575,7 +574,7 @@ public abstract class SavegameStorage<
             @Override
             public void invalid(SavegameParseResult.Invalid iv) {
                 e.fail();
-                ErrorHandler.handleException(new ParseException(iv.message), null, file);
+                ErrorHandler.handleException(new IllegalArgumentException(iv.message), null, file);
             }
         });
     }

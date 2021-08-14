@@ -4,7 +4,10 @@ import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 

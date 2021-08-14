@@ -66,6 +66,7 @@ public final class TextFormatParser {
     private int index;
     private int slIndex;
     private int arrayIndex;
+    private int lastKnownOffset;
     private TextFormatTokenizer tokenizer;
     private NodeContext context;
 
@@ -77,6 +78,7 @@ public final class TextFormatParser {
 
     private void reset() {
         this.index = 0;
+        this.lastKnownOffset = 0;
         this.slIndex = 0;
         this.arrayIndex = 0;
         this.tokenizer = null;
@@ -113,23 +115,31 @@ public final class TextFormatParser {
             // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
             return r;
-        } catch (Throwable t) {
+        } catch (ParseException ex) {
+            throw ex;
+        }  catch (Throwable t) {
             // Catch also errors!
-            throw new ParseException("Parser failed around offset " + tokenizer.getScalarsStart()[slIndex], t);
+            throw new ParseException(t);
         } finally {
             // Always reset!
             reset();
         }
     }
 
-    private Node parseNodeIfNotScalarValue(boolean strict) {
+    private void updateLastKnownOffset() {
+        this.lastKnownOffset = context.getLiteralsBegin()[slIndex] + context.getLiteralsLength()[slIndex] + 1;
+    }
+
+    private Node parseNodeIfNotScalarValue(boolean strict) throws ParseException {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
             var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ?
                     TaggedNode.getTagType(possibleTags, context, slIndex) : null;
 
             if (colorType != null) {
-                assert tt[index + 1] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
+                if (tt[index + 1] != TextFormatTokenizer.OPEN_GROUP) {
+                    throw new ParseException("Expected {", index, context.getData());
+                }
 
                 // Move over color id
                 index++;
@@ -141,6 +151,7 @@ public final class TextFormatParser {
                 List<ValueNode> components = new ArrayList<>();
                 while (tt[index] != TextFormatTokenizer.CLOSE_GROUP) {
                     components.add(new ValueNode(context, slIndex));
+                    updateLastKnownOffset();
                     slIndex++;
                     index++;
                 }
@@ -154,9 +165,12 @@ public final class TextFormatParser {
                 return new TaggedNode(colorType, components);
             }
         } else {
-            assert tt[index] != TextFormatTokenizer.EQUALS : "Encountered unexpected =";
-            assert tt[index] != TextFormatTokenizer.CLOSE_GROUP : "Encountered unexpected }";
-
+            if (tt[index] == TextFormatTokenizer.EQUALS) {
+                throw new ParseException("encountered unexpected =", index, context.getData());
+            }
+            if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
+                throw new ParseException("encountered unexpected }", index, context.getData());
+            }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
                 return parseArray(strict);
             }
@@ -165,7 +179,7 @@ public final class TextFormatParser {
         return null;
     }
 
-    private void skipOverNextNode(boolean strict) {
+    private void skipOverNextNode(boolean strict) throws ParseException {
         var res = parseNodeIfNotScalarValue(strict);
 
         // Node is a scalar, therefore move manually
@@ -175,7 +189,7 @@ public final class TextFormatParser {
         }
     }
 
-    private ArrayNode parseArray(boolean strict) {
+    private ArrayNode parseArray(boolean strict) throws ParseException {
         var tt = tokenizer.getTokenTypes();
 
         assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
@@ -211,6 +225,7 @@ public final class TextFormatParser {
                         tt[index] == TextFormatTokenizer.STRING_QUOTED : "Expected key";
 
                 int keyIndex = slIndex;
+                updateLastKnownOffset();
                 slIndex++;
                 index += 2;
 
