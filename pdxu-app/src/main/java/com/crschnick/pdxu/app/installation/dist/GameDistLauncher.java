@@ -29,6 +29,10 @@ public class GameDistLauncher {
     public static void startLauncher() {
         try {
             var game = SavegameManagerState.get().current();
+            if (game == null) {
+                return;
+            }
+
             if (Settings.getInstance().launchIrony.getValue()) {
                 IronyHelper.launchEntry(game, false);
             } else {

@@ -181,9 +181,7 @@ public class GuiMenuBar {
 
         JFXButton launch = new JFXButton(PdxuI18n.get("LAUNCH"));
         launch.setOnAction(e -> {
-            if (SavegameManagerState.get().current() != null) {
-                GameDistLauncher.startLauncher();
-            }
+            GameDistLauncher.startLauncher();
             e.consume();
         });
         launch.setGraphic(new FontIcon());
