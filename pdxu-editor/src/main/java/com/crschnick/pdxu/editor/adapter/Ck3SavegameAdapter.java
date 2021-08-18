@@ -83,23 +83,64 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         var player = NodePointer.builder().name("currently_played_characters").index(0).build();
         var playerDyn = NodePointer.builder()
                 .name("living").pointerEvaluation(player).name("dynasty_house").build();
+        var houseDyn = NodePointer.builder().name("dynasties").name("dynasty_house")
+                .pointerEvaluation(playerDyn).build();
+        var dynasty = NodePointer.builder().name("dynasties").name("dynasties")
+                .pointerEvaluation(NodePointer.fromBase(houseDyn).name("dynasty").build()).build();
+
 
         var map = new LinkedHashMap<String, NodePointer>();
         map.put("All player characters", NodePointer.builder().name("currently_played_characters").build());
         map.put("Player character", NodePointer.builder().name("living").pointerEvaluation(player).build());
         map.put("Player realm", NodePointer.builder().name("living").pointerEvaluation(player)
                 .name("landed_data").name("domain").build());
-        map.put("Player house/dynasty", NodePointer.builder().name("dynasties").name("dynasty_house")
-                .pointerEvaluation(playerDyn).build());
+        map.put("Player house", houseDyn);
+        map.put("Player dynasty", dynasty);
         var primaryTitle = NodePointer.builder().name("landed_titles").name("landed_titles").pointerEvaluation(
                 NodePointer.builder().name("living").pointerEvaluation(player)
                         .name("landed_data").name("domain").index(0).build()
         ).build();
         map.put("Player primary title", primaryTitle);
+
+
         var primaryTitleCoaId = NodePointer.fromBase(primaryTitle).name("coat_of_arms_id").build();
         var primaryTitleCoa = NodePointer.builder().name("coat_of_arms")
                 .name("coat_of_arms_manager_database").pointerEvaluation(primaryTitleCoaId).build();
         map.put("Player primary title coat of arms", primaryTitleCoa);
+
+
+        var houseCoaId = NodePointer.builder().name("coat_of_arms")
+                .name("coat_of_arms_manager_database").function((root, n) -> {
+            var houseCoa = NodePointer.fromBase(houseDyn).name("coat_of_arms_id").build();
+            var val = houseCoa.get(root);
+            if (val != null) {
+                return val.getString();
+            }
+
+            var dynCoa = NodePointer.fromBase(dynasty).name("coat_of_arms_id").build();
+            val = dynCoa.get(root);
+            if (val != null) {
+                return val.getString();
+            }
+
+            return null;
+        }).build();
+        map.put("Player house coat of arms", houseCoaId);
+
+
+        var dynastyCoa = NodePointer.builder().name("coat_of_arms")
+                .name("coat_of_arms_manager_database").function((root, n) -> {
+                    var dynCoa = NodePointer.fromBase(dynasty).name("coat_of_arms_id").build();
+                    var val = dynCoa.get(root);
+                    if (val != null) {
+                        return val.getString();
+                    }
+
+                    return null;
+                }).build();
+        map.put("Player dynasty coat of arms", dynastyCoa);
+
+
         return map;
     }
 
@@ -128,7 +169,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
     private NodePointer get(String key, String val) {
         if (DYNASTY_KEYS.contains(key)) {
-            return NodePointer.builder().name("dynasties").name("dynasty_house")
+            return NodePointer.builder().name("dynasties").name("dynasties")
                     .name(val).build();
         }
         if (CULTURE_KEYS.contains(key)) {
