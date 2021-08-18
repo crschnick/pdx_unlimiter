@@ -50,7 +50,7 @@ public class TextFormatTokenizer {
             // Pessimistic assumptions, should always hold!
 
             maxTokenCount = bytes.length / 2;
-            maxNodeCount = bytes.length / 4;
+            maxNodeCount = bytes.length / 5;
         }
 
         this.tokenTypes = new byte[maxTokenCount];
@@ -68,7 +68,7 @@ public class TextFormatTokenizer {
     private void checkResize() {
         var maxTokenCount = tokenTypes.length;
         var maxNodeCount = scalarsStart.length;
-        if (this.tokenCounter >= maxTokenCount || this.nextScalarStart >= maxNodeCount) {
+        if (this.tokenCounter >= maxTokenCount || this.scalarCounter >= maxNodeCount) {
             resize();
         }
     }
