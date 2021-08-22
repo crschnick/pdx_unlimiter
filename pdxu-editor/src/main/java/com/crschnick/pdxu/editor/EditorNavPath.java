@@ -3,6 +3,7 @@ package com.crschnick.pdxu.editor;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
+import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import java.util.ArrayList;
@@ -33,11 +34,6 @@ public class EditorNavPath {
         this.path = path;
     }
 
-    public EditorNavPath(EditorNavPath path, EditorNode node) {
-        this.path = new ArrayList<>(path.getPath());
-        this.path.add(node);
-    }
-
     public EditorNode getEditorNode() {
         return path.get(path.size() - 1);
     }
@@ -61,23 +57,32 @@ public class EditorNavPath {
         }
     }
 
-    private static Optional<EditorNode> fastEditorNodeFind(EditorRootNode root, EditorNode current, NodePointer sub) {
+    private static Optional<EditorNode> fastEditorNodeFind(ArrayNode content, EditorNode current, NodePointer sub) {
         if (current.isReal()) {
             EditorRealNode s = (EditorRealNode) current;
-            var key = sub.getPath().get(0).getKey(root.getBackingNode(), s.getBackingNode());
+            var key = sub.getPath().get(0).getKey(content, s.getBackingNode());
             if (key != null) {
                 return EditorNode.fastEditorSimpleNodeSearch(
                         current, s.getBackingNode().getArrayNode(), key);
+            } else {
+                var exp = current.expand();
+                for (var en : exp) {
+                    if (sub.isValid(en.getContent())) {
+                        return Optional.of(en);
+                    }
+                }
+                return Optional.empty();
             }
-        }
-
-        var exp = current.expand();
-        for (var en : exp) {
-            if (sub.isValid(en.getContent())) {
-                return Optional.of(en);
+        } else {
+            var expEdNodes =  current.expand();
+            for (var en : expEdNodes) {
+                var found = fastEditorNodeFind(content, en, sub);
+                if (found.isPresent()) {
+                    return found;
+                }
             }
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     public static Optional<EditorNavPath> createNavPath(EditorState state, NodePointer pointer) {
@@ -105,7 +110,7 @@ public class EditorNavPath {
         EditorNode current = root;
         for (int i = 0; i < pointer.size(); i++) {
             var sub = pointer.sub(i, i +1);
-            var found = fastEditorNodeFind(root, current, sub);
+            var found = fastEditorNodeFind(state.getBackingNode(), current, sub);
             if (found.isEmpty()) {
                 return Optional.empty();
             } else {

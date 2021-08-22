@@ -3,11 +3,14 @@ package com.crschnick.pdxu.editor.adapter;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.scene.layout.Region;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class Eu4SavegameAdapter implements EditorSavegameAdapter {
 
@@ -16,10 +19,55 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
         return Game.EU4;
     }
 
+    private NodePointer personPointer(EditorState state, NodePointer country, NodePointer personId) {
+        Predicate<Node> personPred = dateEntry -> {
+            if (!dateEntry.isArray()) {
+                return false;
+            }
+
+            var idn = dateEntry.getNodeForKeyIfExistent("id");
+            var id = personId.get(state.getBackingNode());
+            if (id != null && id.isValue() && idn.isPresent()) {
+                var nodeId = idn.get().getNodeForKeyIfExistent("id")
+                        .filter(Node::isValue)
+                        .map(Node::getString)
+                        .orElse("");
+                if (nodeId.equals(id.getString())) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        return NodePointer.fromBase(country).name("history").selector(node -> {
+            if (node.isArray()) {
+                for (Node dateEntry : node.getNodeArray()) {
+                    if (personPred.test(dateEntry)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).selector(personPred).build();
+    }
+
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
-        return Map.of("Player country", NodePointer.builder().name("countries")
-                .pointerEvaluation(NodePointer.builder().name("player").build()).build());
+        var map = new LinkedHashMap<String, NodePointer>();
+
+
+        var country = NodePointer.builder().name("countries")
+                .pointerEvaluation(NodePointer.builder().name("player").build()).build();
+        map.put("Player country", country);
+
+
+        var rulerId = NodePointer.fromBase(country).name("monarch").name("id").build();
+        var heirId = NodePointer.fromBase(country).name("heir").name("id").build();
+        map.put("Player country ruler", personPointer(state, country, rulerId));
+        map.put("Player country heir", personPointer(state, country, heirId));
+
+
+        return map;
     }
 
     private static final List<String> EU4_PROVINCE_KEYS = List.of("capital", "original_capital", "trade_port");
