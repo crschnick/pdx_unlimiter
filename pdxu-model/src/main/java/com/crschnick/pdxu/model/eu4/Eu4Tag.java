@@ -33,8 +33,8 @@ public final class Eu4Tag {
     }
 
     public static Eu4Tag fromNode(String tag, Node n) {
-        var mColor = GameColor.fromRgbArray(n.getNodeForKey("colors").getNodeForKey("map_color"));
-        var cColor = GameColor.fromRgbArray(n.getNodeForKey("colors").getNodeForKey("country_color"));
+        var mColor = n.getNodeForKeysIfExistent("colors", "map_color").map(GameColor::fromRgbArray).orElse(GameColor.BLACK);
+        var cColor = n.getNodeForKeysIfExistent("colors", "country_color").map(GameColor::fromRgbArray).orElse(GameColor.BLACK);
         String name = n.hasKey("name") ? n.getNodeForKey("name").getString() : null;
 
         FlagType t;
