@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public final class GameColor {
 
+    public static final GameColor BLACK = new GameColor(TaggedNode.TagType.RGB, List.of("0", "0", "0"));
+
     private TaggedNode.TagType type;
     private List<String> values;
 
