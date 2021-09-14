@@ -50,8 +50,9 @@ public class PdxuApp extends Application {
         boolean inBounds = false;
         for (Screen screen : Screen.getScreens()) {
             Rectangle2D visualBounds = screen.getVisualBounds();
+
             // Check whether the bounds intersect where the intersection is larger than 20 pixels!
-            if (visualBounds.intersects(new Rectangle2D(
+            if (s.getWindowWidth() > 40 && s.getWindowHeight() > 40 && visualBounds.intersects(new Rectangle2D(
                     s.getWindowX() + 20,
                     s.getWindowY() + 20,
                     s.getWindowWidth() - 40,
