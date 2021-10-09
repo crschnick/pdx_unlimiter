@@ -107,7 +107,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         stack.setAlignment(Pos.CENTER);
         stack.setMinWidth(label.getPrefWidth());
         stack.getStyleClass().add("number");
-        GuiTooltips.install(stack, PdxuI18n.get("DUCATS") + (loans != 0 ? " / " + PdxuI18n.get("OWED") : ""));
+        GuiTooltips.install(stack, PdxuI18n.get("TREASURY") + (loans != 0 ? " / " + PdxuI18n.get("TREASURY_OWED") : ""));
         addNode(pane, stack);
     }
 

@@ -37,7 +37,7 @@ l_english:
   AUTONOMY_DEV: "Autonomy-based development"
   TOTAL_DEV: "Total development"
   TREASURY: "Ducats in treasury"
-  OWED: "Owed ducats for loans"
+  TREASURY_OWED: "Owed ducats for loans"
   MANPOWER: "Manpower"
   MAX_MANPOWER: "Max Manpower"
   STABILITY: "Stability"
