@@ -5,6 +5,7 @@ import java.util.Locale;
 public class Language {
 
     public static Language ENGLISH = new Language(Locale.ENGLISH, "l_english", "English");
+    public static Language DEV_TEST = new Language(Locale.ENGLISH, "l_test", "Test");
 
     private final Locale locale;
     private final String id;

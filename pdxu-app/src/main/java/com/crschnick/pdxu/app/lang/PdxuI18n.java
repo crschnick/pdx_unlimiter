@@ -46,6 +46,10 @@ public final class PdxuI18n {
     }
 
     private static String getLocalised(String s, String... vars) {
+        if (LanguageManager.getInstance().getActiveLanguage() == Language.DEV_TEST) {
+            return "#" + s;
+        }
+
         var localisedString = map.get(s);
         if (localisedString == null) {
             LoggerFactory.getLogger(PdxuI18n.class).trace("No localisation found for key " + s);

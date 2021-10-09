@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -46,13 +47,12 @@ public class GuiSavegameEntryList {
         SavegameManagerState.get().onGameChange(n -> {
             if (n != null) {
                 Platform.runLater(() -> {
-                    text.setText("It seems like there are no imported savegames for " +
-                            n.getFullName() + " yet.\n");
+                    text.setText(PdxuI18n.get("NO_SAVEGAMES", n.getFullName()) + "\n");
                 });
             }
         });
 
-        Button importB = new Button("Import savegames");
+        Button importB = new Button(PdxuI18n.get("IMPORT_SAVEGAMES"));
         importB.setOnAction(e -> {
             GuiImporter.createImporterDialog();
             e.consume();
@@ -62,13 +62,12 @@ public class GuiSavegameEntryList {
         v.getChildren().add(importB);
 
         v.getChildren().add(new Label());
-        Label text2 = new Label("If you want to familiarize yourself with the Pdx-Unlimiter first, " +
-                "it is recommended to read the guide.");
+        Label text2 = new Label(PdxuI18n.get("FAMILIARIZE"));
         text2.setWrapText(true);
         text2.setTextAlignment(TextAlignment.CENTER);
         v.getChildren().add(text2);
 
-        Button guide = new Button("User Guide");
+        Button guide = new Button(PdxuI18n.get("USER_GUIDE"));
         guide.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.GUIDE);
         });

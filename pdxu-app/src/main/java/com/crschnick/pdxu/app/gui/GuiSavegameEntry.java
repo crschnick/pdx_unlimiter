@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
@@ -140,7 +141,7 @@ public class GuiSavegameEntry {
                 SavegameManagerState.<T, I>get().selectEntry(null);
             });
             export.getStyleClass().add(CLASS_EXPORT);
-            GuiTooltips.install(export, "Export to " + SavegameContext.getContext(e).getGame().getFullName() + " save games directory");
+            GuiTooltips.install(export, PdxuI18n.get("EXPORT_SAVEGAME", SavegameContext.getContext(e).getGame().getFullName()));
             staticButtons.getChildren().add(export);
         }
         {
@@ -150,7 +151,7 @@ public class GuiSavegameEntry {
                 ErrorHandler.reportIssue(SavegameContext.getContext(e).getStorage().getSavegameFile(e));
             });
             report.getStyleClass().add("report-button");
-            GuiTooltips.install(report, "Report an issue with the savegame");
+            GuiTooltips.install(report, PdxuI18n.get("REPORT_SAVEGAME_ISSUE"));
             staticButtons.getChildren().add(report);
         }
         {
@@ -160,7 +161,7 @@ public class GuiSavegameEntry {
                 SavegameActions.copySavegame(e);
             });
             copy.getStyleClass().add(CLASS_COPY);
-            GuiTooltips.install(copy, "Make a copy of the savegame");
+            GuiTooltips.install(copy, PdxuI18n.get("COPY_SAVEGAME"));
             staticButtons.getChildren().add(copy);
         }
         {
@@ -170,7 +171,7 @@ public class GuiSavegameEntry {
                 GuiSavegameNotes.showSavegameNotesDialog(e.getNotes());
             });
             notes.getStyleClass().add("notes-button");
-            GuiTooltips.install(notes, "Edit savegame notes");
+            GuiTooltips.install(notes, PdxuI18n.get("EDIT_SAVEGAME_NOTES"));
             staticButtons.getChildren().add(notes);
         }
 
@@ -180,14 +181,14 @@ public class GuiSavegameEntry {
             del.setOnMouseClicked((m) -> {
                 if (GuiDialogHelper.showBlockingAlert(alert -> {
                     alert.setAlertType(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Confirm deletion");
-                    alert.setHeaderText("Do you want to delete the selected savegame?");
+                    alert.setTitle(PdxuI18n.get("DELETE_SAVEGAME_TITLE"));
+                    alert.setHeaderText(PdxuI18n.get("DELETE_SAVEGAME_QUESTION"));
                 }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
                     SavegameActions.delete(e);
                 }
             });
             del.getStyleClass().add(CLASS_DELETE);
-            GuiTooltips.install(del, "Delete savegame");
+            GuiTooltips.install(del, PdxuI18n.get("DELETE_SAVEGAME"));
             staticButtons.getChildren().add(del);
         }
 
@@ -195,7 +196,7 @@ public class GuiSavegameEntry {
             Button open = new JFXButton();
             open.setGraphic(new FontIcon());
             open.getStyleClass().add("open-button");
-            GuiTooltips.install(open, "Open stored savegame location");
+            GuiTooltips.install(open, PdxuI18n.get("OPEN_SAVEGAME"));
             staticButtons.getChildren().add(open);
             open.setOnMouseClicked((m) -> {
                 SavegameActions.openSavegame(e);
@@ -213,7 +214,7 @@ public class GuiSavegameEntry {
                 SavegameActions.meltSavegame(e);
             });
             melt.getStyleClass().add(CLASS_MELT);
-            GuiTooltips.install(melt, "Melt savegame (Convert to Non-Ironman)");
+            GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameAsync(e, ctx -> {
                 if (ctx.getInfo().isBinary()) {
                     dynamicButtons.getChildren().add(melt);
@@ -229,7 +230,7 @@ public class GuiSavegameEntry {
                 RakalyWebHelper.uploadSavegame(eu4Entry);
             });
             upload.getStyleClass().add(CLASS_ANALYZE);
-            GuiTooltips.install(upload, "Upload and analyze with Rakaly.com");
+            GuiTooltips.install(upload, PdxuI18n.get("ANALYZE_RAKALY"));
             dynamicButtons.getChildren().add(upload);
 
 
@@ -239,7 +240,7 @@ public class GuiSavegameEntry {
                 SkanderbegHelper.uploadSavegame(eu4Entry);
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
-            GuiTooltips.install(uploadSkanderbeg, "Upload to Skanderbeg.pm");
+            GuiTooltips.install(uploadSkanderbeg, PdxuI18n.get("UPLOAD_SKANDERBEG"));
             dynamicButtons.getChildren().add(uploadSkanderbeg);
         }
 
@@ -251,7 +252,7 @@ public class GuiSavegameEntry {
                     Eu4SeHelper.open(e);
                 });
                 eu4Se.getStyleClass().add("eu4se-button");
-                GuiTooltips.install(eu4Se, "Open with Eu4SaveEditor");
+                GuiTooltips.install(eu4Se, PdxuI18n.get("EDIT_EU4SAVEEDITOR"));
                 dynamicButtons.getChildren().add(0, eu4Se);
             }
         });
@@ -264,7 +265,7 @@ public class GuiSavegameEntry {
                 ConverterHelper.convertCk3ToEu4(ck3Entry);
             });
             convert.getStyleClass().add(CLASS_CONVERT);
-            GuiTooltips.install(convert, "Convert to EU4 savegame");
+            GuiTooltips.install(convert, PdxuI18n.get("CONVERT_TO_EU4"));
             dynamicButtons.getChildren().add(convert);
         }
 
@@ -272,7 +273,7 @@ public class GuiSavegameEntry {
         edit.setOnMouseClicked((m) -> {
             SavegameActions.editSavegame(e);
         });
-        GuiTooltips.install(edit, "Edit savegame");
+        GuiTooltips.install(edit, PdxuI18n.get("EDIT_SAVEGAME"));
         e.stateProperty().addListener((c,o,n) -> {
             boolean add = false;
             if (n.equals(SavegameEntry.State.LOADED)) {

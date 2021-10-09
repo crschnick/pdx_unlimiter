@@ -91,7 +91,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         stack.setAlignment(Pos.CENTER);
         stack.getStyleClass().add("number");
         stack.setMinWidth(label.getPrefWidth());
-        GuiTooltips.install(stack, "Manpower / Max Manpower");
+        GuiTooltips.install(stack, PdxuI18n.get("MANPOWER") + " / " + PdxuI18n.get("MAX_MANPOWER"));
         addNode(pane, stack);
     }
 
@@ -107,7 +107,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         stack.setAlignment(Pos.CENTER);
         stack.setMinWidth(label.getPrefWidth());
         stack.getStyleClass().add("number");
-        GuiTooltips.install(stack, "Ducats in treasury" + (loans != 0 ? " / Owed ducats for loans" : ""));
+        GuiTooltips.install(stack, PdxuI18n.get("TREASURY") + (loans != 0 ? " / " + PdxuI18n.get("TREASURY_OWED") : ""));
         addNode(pane, stack);
     }
 
@@ -123,7 +123,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
         stack.setAlignment(Pos.CENTER);
         stack.setMinWidth(label.getPrefWidth());
         stack.getStyleClass().add("number");
-        GuiTooltips.install(stack, "Autonomy-based development / Total development");
+        GuiTooltips.install(stack, PdxuI18n.get("AUTONOMY_DEV") + " / " + PdxuI18n.get("TOTAL_DEV"));
         addNode(pane, stack);
     }
 
@@ -214,8 +214,8 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
 
         addDucatsEntry(grid, info.getTreasuryMoney(), info.getLoanedMoney());
         addManpowerEntry(grid, info.getManpower(), info.getMaxManpower());
-        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), "Stability", true);
-        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), "Prestige", true);
+        addIntegerEntry(grid, EU4_ICON_STABILITY, info.getStability(), PdxuI18n.get("STABILITY"), true);
+        addIntegerEntry(grid, EU4_ICON_PRESTIGE, info.getPrestige(), PdxuI18n.get("PRESTIGE"), true);
         addPowersEntry(grid, info.getAdm(), info.getDip(), info.getMil());
         addDevelopmentEntry(grid, info.getTotalDev(), info.getTotalAutonomyDev());
 

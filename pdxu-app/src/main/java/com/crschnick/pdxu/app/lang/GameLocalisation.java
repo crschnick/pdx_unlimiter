@@ -12,6 +12,10 @@ import java.util.Map;
 public class GameLocalisation {
 
     public static String getLocalisedValue(String key, SavegameInfo<?> info) {
+        if (LanguageManager.getInstance().getActiveLanguage() == Language.DEV_TEST) {
+            return key;
+        }
+
         var cache = CacheManager.getInstance().get(LocalisationCache.class);
         if (!cache.isLoaded()) {
             cache.loadLocalisations(

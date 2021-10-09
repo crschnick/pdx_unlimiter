@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
@@ -73,8 +74,8 @@ public class GuiSavegameCollection {
             del.setOnMouseClicked((m) -> {
                 if (GuiDialogHelper.showBlockingAlert(alert -> {
                     alert.setAlertType(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Confirm deletion");
-                    alert.setHeaderText("Do you want to delete the selected campaign? This will delete all savegames of it.");
+                    alert.setTitle(PdxuI18n.get("DELETE_CAMPAIGN_TITLE"));
+                    alert.setHeaderText(PdxuI18n.get("DELETE_CAMPAIGN_QUESTION"));
                 }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
                     SavegameActions.delete(c);
                 }

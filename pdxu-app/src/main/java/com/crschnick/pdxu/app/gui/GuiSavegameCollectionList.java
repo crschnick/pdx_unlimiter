@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXTextField;
@@ -44,7 +45,7 @@ public class GuiSavegameCollectionList {
         create.getStyleClass().add(GuiStyle.CLASS_NEW);
         create.setGraphic(new FontIcon());
         create.setOnAction(e -> {
-            SavegameStorage.get(SavegameManagerState.get().current()).addNewFolder("New Folder");
+            SavegameStorage.get(SavegameManagerState.get().current()).addNewFolder(PdxuI18n.get("NEW_FOLDER"));
             e.consume();
         });
 
@@ -55,7 +56,7 @@ public class GuiSavegameCollectionList {
             create.setDisable(n == null);
         });
 
-        GuiTooltips.install(create, "Create new folder");
+        GuiTooltips.install(create, PdxuI18n.get("CREATE_NEW_FOLDER"));
         box.getChildren().add(create);
 
         box.getChildren().add(new Separator(Orientation.VERTICAL));
