@@ -21,7 +21,7 @@ public abstract class GameDist {
 
     @Override
     public String toString() {
-        return game.getFullName() + " (" + name + ") at " + installLocation.toString();
+        return game.getInstallationName() + " (" + name + ") at " + installLocation.toString();
     }
 
     public Path getInstallLocation() {
@@ -33,7 +33,7 @@ public abstract class GameDist {
     }
 
     public Path determineUserDir() throws IOException {
-        return getGame().getInstallType().determineUserDir(getInstallLocation(), getGame().getFullName());
+        return getGame().getInstallType().determineUserDir(getInstallLocation(), getGame().getInstallationName());
     }
 
     public boolean isGameInstance(String cmd) {

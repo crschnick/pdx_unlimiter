@@ -47,7 +47,7 @@ public class GuiSavegameEntryList {
         SavegameManagerState.get().onGameChange(n -> {
             if (n != null) {
                 Platform.runLater(() -> {
-                    text.setText(PdxuI18n.get("NO_SAVEGAMES", n.getFullName()) + "\n");
+                    text.setText(PdxuI18n.get("NO_SAVEGAMES", n.getTranslatedFullName()) + "\n");
                 });
             }
         });

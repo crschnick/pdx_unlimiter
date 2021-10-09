@@ -411,15 +411,15 @@ public abstract class SettingsEntry<T> {
         private final Game game;
 
         GameDirectory(String serializationName, Game game) {
-            super(() -> PdxuI18n.get("GAME_DIR", game.getAbbreviation()),
-                    () -> PdxuI18n.get("GAME_DIR_DESC", game.getFullName()),
+            super(() -> PdxuI18n.get("GAME_DIR", game.getTranslatedAbbreviation()),
+                    () -> PdxuI18n.get("GAME_DIR_DESC", game.getTranslatedFullName()),
                     serializationName, Type.GAME);
             this.game = game;
         }
 
         private void showInstallErrorMessage(String msg) {
-            String fullMsg = PdxuI18n.get("GAME_DIR_ERROR", game.getFullName()) + ":\n\n" +
-                    msg + "\n\n" + PdxuI18n.get("GAME_DIR_ERROR_MSG", game.getFullName());
+            String fullMsg = PdxuI18n.get("GAME_DIR_ERROR", game.getTranslatedFullName()) + ":\n\n" +
+                    msg + "\n\n" + PdxuI18n.get("GAME_DIR_ERROR_MSG", game.getTranslatedFullName());
             GuiErrorReporter.showSimpleErrorMessage(fullMsg);
         }
 

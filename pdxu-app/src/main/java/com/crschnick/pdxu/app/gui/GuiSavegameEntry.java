@@ -141,7 +141,7 @@ public class GuiSavegameEntry {
                 SavegameManagerState.<T, I>get().selectEntry(null);
             });
             export.getStyleClass().add(CLASS_EXPORT);
-            GuiTooltips.install(export, PdxuI18n.get("EXPORT_SAVEGAME", SavegameContext.getContext(e).getGame().getFullName()));
+            GuiTooltips.install(export, PdxuI18n.get("EXPORT_SAVEGAME", SavegameContext.getContext(e).getGame().getTranslatedFullName()));
             staticButtons.getChildren().add(export);
         }
         {

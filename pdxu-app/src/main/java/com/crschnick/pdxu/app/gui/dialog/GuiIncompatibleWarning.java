@@ -81,8 +81,8 @@ public class GuiIncompatibleWarning {
             alert.getButtonTypes().add(ButtonType.CLOSE);
             alert.getButtonTypes().add(launchButton);
             alert.getButtonTypes().add(changeModsButton);
-            alert.setTitle(PdxuI18n.get("MOD_INFO_TITLE", game.getFullName()));
-            alert.setHeaderText(PdxuI18n.get("MOD_INFO", game.getFullName()));
+            alert.setTitle(PdxuI18n.get("MOD_INFO_TITLE", game.getTranslatedFullName()));
+            alert.setHeaderText(PdxuI18n.get("MOD_INFO", game.getTranslatedFullName()));
 
             String builder = enabledMods.stream()
                     .map(m -> "- " + m.getName())
