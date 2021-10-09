@@ -68,7 +68,7 @@ public class GuiMenuBar {
         pdxu.getItems().add(export);
 
 
-        MenuItem tri = new MenuItem("Translate");
+        MenuItem tri = new MenuItem(PdxuI18n.get("TRANSLATE"));
         tri.setOnAction((a) -> {
             GuiTranslate.showTranslatationAlert();
         });

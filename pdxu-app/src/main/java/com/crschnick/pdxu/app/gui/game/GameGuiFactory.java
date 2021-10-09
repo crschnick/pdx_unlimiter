@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui.game;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
@@ -138,17 +139,17 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         switch (SavegameCompatibility.determineForInfo(info)) {
             case COMPATIBLE -> {
                 version = new Label(info.getVersion().toString());
-                GuiTooltips.install(version, "Compatible version");
+                GuiTooltips.install(version, PdxuI18n.get("COMPATIBLE"));
                 version.getStyleClass().add(CLASS_COMPATIBLE);
             }
             case INCOMPATIBLE -> {
                 version = new Label(info.getVersion().toString());
-                GuiTooltips.install(version, "Incompatible savegame version");
+                GuiTooltips.install(version, PdxuI18n.get("INCOMPATIBLE"));
                 version.getStyleClass().add(CLASS_INCOMPATIBLE);
             }
             case UNKNOWN -> {
                 version = new Label(info.getVersion().toString());
-                GuiTooltips.install(version, "Version compatibility unknown");
+                GuiTooltips.install(version, PdxuI18n.get("UNKNOWN_COMPATIBILITY"));
                 version.getStyleClass().add("unknown-compatible");
             }
         }
@@ -167,15 +168,15 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         }
 
         if (info.getMods() != null && info.getMods().size() > 0) {
-            Label mods = new Label("Mods (" + info.getMods().size() + ")");
+            Label mods = new Label(PdxuI18n.get("MODS") + " (" + info.getMods().size() + ")");
             mods.setGraphic(new FontIcon());
             mods.getStyleClass().add(CLASS_CONTENT);
             GuiTooltips.install(mods,
-                    "Requires the following " + info.getMods().size() + " mods:\n" +
+                    PdxuI18n.get("MODS_REQUIRED") + ":\n" +
                             info.getMods().stream()
                                     .map(s -> {
                                         var m = installation.getModForSavegameId(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
+                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
                                     })
                                     .collect(Collectors.joining("\n")));
 
@@ -188,15 +189,15 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         }
 
         if (info.getDlcs().size() > 0) {
-            Label dlcs = new Label("DLCs (" + info.getDlcs().size() + ")");
+            Label dlcs = new Label(PdxuI18n.get("DLCS") + " (" + info.getDlcs().size() + ")");
             dlcs.setGraphic(new FontIcon());
             dlcs.getStyleClass().add(CLASS_CONTENT);
             GuiTooltips.install(dlcs,
-                    "Requires the following " + info.getDlcs().size() + " DLCs:\n" +
+                    PdxuI18n.get("DLCS_REQUIRED") + ":\n" +
                             info.getDlcs().stream()
                                     .map(s -> {
                                         var m = installation.getDlcForName(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (Missing)");
+                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
                                     })
                                     .collect(Collectors.joining("\n")));
             boolean missing = info.getDlcs().stream()
