@@ -112,7 +112,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     public Pane createIcon() {
         var img = GameImage.getGameIcon(ALL.inverseBidiMap().get(this));
         if (img.equals(ImageHelper.DEFAULT_IMAGE)) {
-            var label = new Label("(" + ALL.inverseBidiMap().get(this).getAbbreviation() + ")");
+            var label = new Label("(" + ALL.inverseBidiMap().get(this).getTranslatedAbbreviation() + ")");
             label.setAlignment(Pos.CENTER);
             var pane = new StackPane(label);
             pane.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));

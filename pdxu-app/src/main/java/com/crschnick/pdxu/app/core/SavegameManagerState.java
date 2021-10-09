@@ -253,7 +253,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
         unselectCollectionAndEntry();
         current.set(newGame);
-        logger.debug("Selected game " + (newGame != null ? newGame.getFullName() : "null"));
+        logger.debug("Selected game " + (newGame != null ? newGame.getInstallationName() : "null"));
         updateShownCollections();
     }
 

@@ -53,8 +53,8 @@ public class GuiEditor {
                 alert.setAlertType(Alert.AlertType.WARNING);
                 alert.getDialogPane().setMaxWidth(500);
                 alert.setTitle("Missing game installation");
-                alert.setHeaderText("No installation has been set for " + state.getFileContext().getGame().getFullName() +
-                        ". You can still use the editor to edit " + state.getFileContext().getGame().getFullName() + " savegames, but many useful features will be disabled until a valid game installation has been set in the settings menu.");
+                alert.setHeaderText("No installation has been set for " + state.getFileContext().getGame().getInstallationName() +
+                        ". You can still use the editor to edit " + state.getFileContext().getGame().getInstallationName() + " savegames, but many useful features will be disabled until a valid game installation has been set in the settings menu.");
             });
         }
     }

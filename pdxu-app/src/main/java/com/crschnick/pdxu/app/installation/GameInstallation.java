@@ -178,33 +178,33 @@ public final class GameInstallation {
 
     public void loadData() throws InvalidInstallationException {
         Game g = ALL.inverseBidiMap().get(this);
-        LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getAbbreviation() + " installation ...");
+        LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getTranslatedAbbreviation() + " installation ...");
 
         if (getInstallDir().startsWith(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
-            throw new InvalidInstallationException("INSTALL_DIR_IS_USER_DIR", g.getFullName(), g.getFullName());
+            throw new InvalidInstallationException("INSTALL_DIR_IS_USER_DIR", g.getInstallationName(), g.getInstallationName());
         }
 
         if (!Files.isRegularFile(type.getExecutable(getInstallDir()))) {
             var exec = getInstallDir().relativize(type.getExecutable(getInstallDir()));
-            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getFullName(), exec.toString(), getInstallDir().toString());
+            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getInstallationName(), exec.toString(), getInstallDir().toString());
         }
 
-        logger.debug(g.getAbbreviation() + " distribution type: " + this.dist.getName());
+        logger.debug(g.getTranslatedAbbreviation() + " distribution type: " + this.dist.getName());
 
         try {
             this.userDir = dist.determineUserDir();
-            logger.debug(g.getAbbreviation() + " user dir: " + this.userDir);
+            logger.debug(g.getTranslatedAbbreviation() + " user dir: " + this.userDir);
             if (!Files.exists(this.userDir)) {
                 throw new InvalidInstallationException(
-                        "GAME_DATA_PATH_DOES_NOT_EXIST", g.getAbbreviation(), this.userDir.toString());
+                        "GAME_DATA_PATH_DOES_NOT_EXIST", g.getTranslatedAbbreviation(), this.userDir.toString());
             }
 
             this.version = dist.determineVersion().map(type::getVersion)
                     .orElse(type.determineVersionFromInstallation(getInstallDir()))
                     .orElse(null);
-            logger.debug(g.getAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
+            logger.debug(g.getTranslatedAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
             this.language = type.determineLanguage(getInstallDir(), userDir).orElse(null);
-            logger.debug(g.getAbbreviation() + " language: " +
+            logger.debug(g.getTranslatedAbbreviation() + " language: " +
                     (this.language != null ? this.language.getDisplayName() : "unknown"));
             LoggerFactory.getLogger(getClass()).debug("Finished initialization");
         } catch (InvalidInstallationException e) {

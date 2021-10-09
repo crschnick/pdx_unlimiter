@@ -205,7 +205,7 @@ public class GuiMenuBar {
         StackPane spacer = new StackPane();
         Label game = new Label();
         SavegameManagerState.get().onGameChange(n -> {
-            String name = n != null ? n.getFullName() : PdxuI18n.get("NO_GAME");
+            String name = n != null ? n.getTranslatedFullName() : PdxuI18n.get("NO_GAME");
             Platform.runLater(() -> game.setText(name));
         });
         spacer.getChildren().add(game);

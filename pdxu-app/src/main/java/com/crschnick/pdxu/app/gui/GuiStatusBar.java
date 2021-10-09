@@ -64,7 +64,7 @@ public class GuiStatusBar {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(g.getFullName() + " (" + PdxuI18n.get("RUNNING") + ")",
+        Label text = new Label(g.getTranslatedFullName() + " (" + PdxuI18n.get("RUNNING") + ")",
                 GameGuiFactory.get(g).createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);

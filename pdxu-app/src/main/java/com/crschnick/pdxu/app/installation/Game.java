@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import java.util.List;
 
 public enum Game {
@@ -44,7 +46,7 @@ public enum Game {
 
     private final String id;
     private final String abbreviation;
-    private final String fullName;
+    private final String installName;
 
     private final String windowsStoreName;
     private final int steamAppId;
@@ -53,10 +55,10 @@ public enum Game {
 
     private final GameInstallType installType;
 
-    Game(String id, String abbreviation, String fullName, String windowsStoreName, int steamAppId, String paradoxGamesLauncherName, List<String> installDirNames, GameInstallType installType) {
+    Game(String id, String abbreviation, String installName, String windowsStoreName, int steamAppId, String paradoxGamesLauncherName, List<String> installDirNames, GameInstallType installType) {
         this.id = id;
         this.abbreviation = abbreviation;
-        this.fullName = fullName;
+        this.installName = installName;
         this.windowsStoreName = windowsStoreName;
         this.steamAppId = steamAppId;
         this.paradoxGamesLauncherName = paradoxGamesLauncherName;
@@ -86,16 +88,20 @@ public enum Game {
         return GameInstallation.ALL.containsKey(this);
     }
 
-    public String getAbbreviation() {
-        return abbreviation;
+    public String getTranslatedAbbreviation() {
+        return PdxuI18n.get(abbreviation + "_ABBREVIATION");
     }
 
     public String getId() {
         return id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getInstallationName() {
+        return installName;
+    }
+
+    public String getTranslatedFullName() {
+        return PdxuI18n.get(abbreviation);
     }
 
     public String getWindowsStoreName() {

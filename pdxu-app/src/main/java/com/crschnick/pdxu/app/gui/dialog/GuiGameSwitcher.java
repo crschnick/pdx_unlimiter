@@ -27,7 +27,7 @@ public class GuiGameSwitcher {
             desaturate.setSaturation(-1);
             icon.getStyleClass().add(GuiStyle.CLASS_GAME_ICON);
 
-            GuiTooltips.install(icon, game.getFullName());
+            GuiTooltips.install(icon, game.getTranslatedFullName());
             icon.setOnMouseClicked(e -> {
                 ComponentManager.switchGame(game);
                 alert.setResult(ButtonType.CLOSE);

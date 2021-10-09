@@ -93,7 +93,7 @@ public class SteamDist extends GameDist {
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
             for (var path : getSteamLibraryPaths()) {
-                var installDir = path.resolve(g.getFullName());
+                var installDir = path.resolve(g.getInstallationName());
                 var found = getDist(g, installDir);
                 if (found.isPresent()) {
                     return found;
