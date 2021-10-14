@@ -7,3 +7,4 @@ l_chinese:
   NONE: "无"
   IMPORT: "导入"
   KILL: "停止"
+  DEBUG_MODE: "调试模式" 
