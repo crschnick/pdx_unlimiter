@@ -49,7 +49,7 @@ l_chinese:
   CREATE_NEW_FOLDER: "新建文件夹"
   DELETE_CAMPAIGN_TITLE: "确认删除"
   DELETE_CAMPAIGN_QUESTION: "真的要删除此战役吗？这会删除战役下的所有存档！"
-  HOUSE: "$NAME$皇室"
+  HOUSE: "$NAME$王室"
   TREASURY_GOLD: "黄金储量"
   MONTHLY_INCOME: "每月收入"
   PIETY: "虔诚"
