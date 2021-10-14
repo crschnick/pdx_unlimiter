@@ -27,7 +27,7 @@ public enum Game {
             List.of("Crusader Kings III", "Crusader Kings 3"),
             GameInstallType.CK3),
 
-    STELLARIS("stellaris", "Stellaris", "Stellaris",
+    STELLARIS("stellaris", "STELLARIS", "Stellaris",
             "ParadoxInteractive.Stellaris-MicrosoftStoreEdition",
             281990,
             "stellaris",

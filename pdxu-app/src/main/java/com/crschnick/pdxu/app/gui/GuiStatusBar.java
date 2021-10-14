@@ -183,7 +183,7 @@ public class GuiStatusBar {
                     var splitButton = new SplitMenuButton();
                     splitButton.setText(PdxuI18n.get("CONTINUE_GAME"));
 
-                    var debugItem = new MenuItem("Debug mode");
+                    var debugItem = new MenuItem(PdxuI18n.get("DEBUG_MODE"));
                     debugItem.setGraphic(new FontIcon());
                     debugItem.getStyleClass().add("continue-button");
                     debugItem.setOnAction(event -> {

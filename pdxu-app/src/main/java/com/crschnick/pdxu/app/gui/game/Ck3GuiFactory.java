@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.SavegameInfo;
@@ -55,7 +56,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         {
             var house = GameImage.imageNode(Ck3TagCache.houseImage(ruler.getHouse(), GameFileContext.fromInfo(info)),
                     "house-icon");
-            GuiTooltips.install(house, "House " + info.getHouseName());
+            GuiTooltips.install(house, PdxuI18n.get("HOUSE", info.getHouseName()));
             rulerNode.getChildren().add(house);
         }
         return rulerNode;
@@ -140,7 +141,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         stack.setAlignment(Pos.CENTER);
         stack.setMinWidth(Region.USE_PREF_SIZE);
         stack.getStyleClass().add("number");
-        GuiTooltips.install(stack, "Gold in treasury / Monthly income");
+        GuiTooltips.install(stack, PdxuI18n.get("TREASURY_GOLD") + " / " + PdxuI18n.get("MONTHLY_INCOME"));
         addNode(pane, stack);
     }
 
@@ -177,20 +178,20 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         if (info.isIronman()) {
             var ironman = new StackPane(imageNode(CK3_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
             ironman.setAlignment(Pos.CENTER);
-            GuiTooltips.install(ironman, "Ironman savegame");
+            GuiTooltips.install(ironman, PdxuI18n.get("IRONMAN"));
             addNode(grid, ironman);
         }
 
         if (info.hasOnePlayerTag()) {
             addGoldEntry(grid, info.getTag().getGold(), info.getTag().getIncome());
-            addIntegerEntry(grid, CK3_ICON_PRESTIGE, info.getTag().getPrestige(), "Prestige", false);
-            addIntegerEntry(grid, CK3_ICON_PIETY, info.getTag().getPiety(), "Piety", false);
-            addIntegerEntry(grid, CK3_ICON_SOLDIERS, info.getTag().getStrength(), "Total soldiers", false);
+            addIntegerEntry(grid, CK3_ICON_PRESTIGE, info.getTag().getPrestige(), PdxuI18n.get("PRESTIGE"), false);
+            addIntegerEntry(grid, CK3_ICON_PIETY, info.getTag().getPiety(), PdxuI18n.get("PIETY"), false);
+            addIntegerEntry(grid, CK3_ICON_SOLDIERS, info.getTag().getStrength(), PdxuI18n.get("TOTAL_SOLDIERS"), false);
 
             createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
-                    info.getTag().getTitles(), "Titles", "titles");
+                    info.getTag().getTitles(), PdxuI18n.get("TITLES"), "titles");
             createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
-                    info.getTag().getClaims(), "Claims", "claims");
+                    info.getTag().getClaims(), PdxuI18n.get("CLAIMS"), "claims");
 
             for (War<Ck3Tag> war : ((Ck3SavegameInfo) info).getWars()) {
                 createRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),
@@ -200,7 +201,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
             createRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
                     ((Ck3SavegameInfo) info).getAllies(),
-                    "Allies", CLASS_ALLIANCE);
+                    PdxuI18n.get("ALLIES"), CLASS_ALLIANCE);
         }
 
         super.fillNodeContainer(info, grid);
