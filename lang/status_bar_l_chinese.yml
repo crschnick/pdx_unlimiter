@@ -1,0 +1,10 @@
+l_chinese:
+  EXPORT: "导出"
+  CONTINUE_GAME: "继续游戏"
+  START_LAUNCHER: "开启启动器"
+  RUNNING: "运行中"
+  LATEST: "最新"
+  NONE: "无"
+  IMPORT: "导入"
+  KILL: "停止"
+  DEBUG_MODE: "调试模式" 

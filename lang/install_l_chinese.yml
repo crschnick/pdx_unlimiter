@@ -1,0 +1,6 @@
+l_chinese:
+  ERROR_OCCURED: "发生了未知的错误：$CAUSE$"
+  GAME_DATA_PATH_NOT_FOUND: "无法在 $GAME$ 启动器中找到游戏用户文件路径"
+  INSTALL_DIR_IS_USER_DIR: "你选择了游戏的用户文件目录，但 Pdx-Unlimiter 需要的是安装目录。\n安装目录通常位于以下路径：\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- 任何可能的游戏安装路径"
+  GAME_DATA_PATH_DOES_NOT_EXIST: "侦测到 $GAME$ 已安装，但其用户数据目录 $DIR$ 不存在。\n请运行游戏至少一次来自动生成此目录。"
+  EXECUTABLE_NOT_FOUND: "无法在 $DIR$ 中找到 $GAME$ 的可执行文件 $FILE$。\n安装目录通常位于以下路径：\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- 任何可能的游戏安装路径"
