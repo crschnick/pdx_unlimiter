@@ -65,7 +65,7 @@ public interface GameInstallType {
 
         @Override
         public Optional<GameVersion> getVersion(String versionString) {
-            Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)\\.\\w+\\s.+")
+            Matcher m = Pattern.compile("\\w+\\s+v(\\d)\\.(\\d+)\\.(\\d+)\\.(\\d+)\\s+(\\w+)(?:\\.\\w+\\s.+)?")
                     .matcher(versionString);
             if (m.find()) {
                 return Optional.of(new GameNamedVersion(

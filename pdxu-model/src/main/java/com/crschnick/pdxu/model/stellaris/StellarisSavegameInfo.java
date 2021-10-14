@@ -65,14 +65,14 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
-            Pattern p = Pattern.compile("((\\w|\\s)*\\s*)v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
+            Pattern p = Pattern.compile("^((?:\\w|\\s)+?)\\s*v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?$");
             var vs = n.getNodesForKey("version").get(0).getString();
             Matcher m = p.matcher(vs);
             if (m.matches()) {
                 i.version = new GameNamedVersion(
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
-                        m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0, 0, m.group(1).trim());
+                        m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0, 0, m.group(1));
             } else {
                 throw new IllegalArgumentException("Invalid Stellaris version: " + vs);
             }
