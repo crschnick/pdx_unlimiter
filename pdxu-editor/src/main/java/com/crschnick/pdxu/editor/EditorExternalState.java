@@ -51,12 +51,12 @@ public class EditorExternalState {
                         if (!Files.exists(changed)) {
                             logger.trace("File " + TEMP.relativize(e.file) + " is probably still writing ...");
                             ThreadHelper.sleep(500);
-                        }
 
-                        // If still no read lock after 500ms, just don't parse it
-                        if (!Files.exists(changed)) {
-                            logger.trace("Could not obtain read lock even after timeout. Ignoring change ...");
-                            return;
+                            // If still no read lock after 500ms, just don't parse it
+                            if (!Files.exists(changed)) {
+                                logger.trace("Could not obtain read lock even after timeout. Ignoring change ...");
+                                return;
+                            }
                         }
 
                         try {
