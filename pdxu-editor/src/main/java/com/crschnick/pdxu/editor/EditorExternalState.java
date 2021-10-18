@@ -2,6 +2,7 @@ package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.gui.GuiEditorSettings;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +42,23 @@ public class EditorExternalState {
             }
 
             FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
-                if (!Files.exists(changed)) {
+                if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                    logger.trace("Editor entry file " + changed.toString() + " has been removed");
                     removeForFile(changed);
                 } else {
                     getForFile(changed).ifPresent(e -> {
+                        // Wait for edit to finish in case external editor has write lock
+                        if (!Files.exists(changed)) {
+                            logger.trace("File " + TEMP.relativize(e.file) + " is probably still writing ...");
+                            ThreadHelper.sleep(500);
+                        }
+
+                        // If still no read lock after 500ms, just don't parse it
+                        if (!Files.exists(changed)) {
+                            logger.trace("Could not obtain read lock even after timeout. Ignoring change ...");
+                            return;
+                        }
+
                         try {
                             logger.trace("Registering modification for file " + TEMP.relativize(e.file));
                             logger.trace("Last modification for file: " + e.lastModified.toString() +
@@ -100,6 +115,7 @@ public class EditorExternalState {
                 }
             }
         }
+        logger.trace("No editor entry found for change file " + file.toString());
         return Optional.empty();
     }
 
