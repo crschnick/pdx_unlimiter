@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.installation.dist;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.installation.Game;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -70,7 +69,8 @@ public final class WindowsStoreDist extends PdxLauncherDist {
                 return Optional.of(new WindowsStoreDist(g, pkgFamName.get(), loc.get()));
             }
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            // Ignore exception, usually caused by not finding powershell.exe.
+            // Probably because a messed up PATH?
         }
         return Optional.empty();
     }
