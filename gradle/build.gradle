@@ -128,17 +128,7 @@ task copyStartScripts(type: Copy) {
     }
 }
 
-task makeExecutable(type: DefaultTask) {
-    doLast {
-        if (DefaultNativePlatform.currentOperatingSystem.linux) {
-            file("${buildDir}/dist/Pdx-Unlimiter/Pdx-Unlimiter").executable = true
-            file("${buildDir}/dist/Pdx-Unlimiter/bin/pdxu").executable = true
-            file("${buildDir}/dist/Pdx-Unlimiter/resources/bin/rakaly_linux").executable = true
-        }
-    }
-}
-
-jpackage.finalizedBy(writeVersion, copyResources, copyLang, copyStartScripts, makeExecutable)
+jpackage.finalizedBy(writeVersion, copyResources, copyLang, copyStartScripts)
 
 task createDist(type: Zip, dependsOn: jpackage) {
     destinationDirectory = buildDir
