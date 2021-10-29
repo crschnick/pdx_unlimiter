@@ -100,6 +100,12 @@ public class GameDists {
                     installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive")
                             .resolve("games").resolve(g.getParadoxGamesLauncherName()));
                 }
+
+                // Epic Games path
+                if (g.getEpicGamesName() != null) {
+                    installDirSearchPaths.add(root.resolve("Program Files").resolve("Epic Games")
+                            .resolve(g.getEpicGamesName()));
+                }
             }
         } else {
             for (var name : g.getCommonInstallDirNames()) {
