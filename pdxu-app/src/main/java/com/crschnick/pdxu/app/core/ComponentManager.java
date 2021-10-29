@@ -37,6 +37,7 @@ public class ComponentManager {
 
             logger.info("Running pdxu with arguments: " + Arrays.toString(args));
             Arrays.stream(args).forEach(FileImporter::addToImportQueue);
+            PdxuInstallation.checkCorrectExtraction();
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
             }

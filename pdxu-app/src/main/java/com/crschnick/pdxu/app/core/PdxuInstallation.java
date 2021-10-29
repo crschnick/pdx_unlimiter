@@ -38,6 +38,18 @@ public class PdxuInstallation {
         }
     }
 
+    public static void checkCorrectExtraction() {
+        Path appPath = getAppPath();
+        boolean invalid = !Files.exists(appPath.resolve("bin"))
+                || !Files.exists(appPath.resolve("lang"))
+                || !Files.exists(appPath.resolve("resources"))
+                || !Files.exists(appPath.resolve("runtime"));
+        if (invalid) {
+            ErrorHandler.handleTerminalException(new IOException("Required files not found. " +
+                    "If you use the standalone distribution, please check whether you extracted the archive correctly."));
+        }
+    }
+
     public static void init() {
         var i = new PdxuInstallation();
 
