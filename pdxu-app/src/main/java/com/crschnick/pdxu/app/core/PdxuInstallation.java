@@ -40,9 +40,10 @@ public class PdxuInstallation {
 
     public static void checkCorrectExtraction() {
         Path appPath = getAppPath();
-        boolean invalid = !Files.exists(appPath.resolve("lang"))
+        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation() == null;
+        boolean invalid = image && (!Files.exists(appPath.resolve("lang"))
                 || !Files.exists(appPath.resolve("resources"))
-                || !Files.exists(appPath.resolve("runtime"));
+                || !Files.exists(appPath.resolve("runtime")));
         if (invalid) {
             ErrorHandler.handleTerminalException(new IOException("Required files not found. " +
                     "If you use the standalone distribution, please check whether you extracted the archive correctly."));
