@@ -8,30 +8,28 @@ import com.crschnick.pdxu.io.node.NodePointer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class EditorNavPath {
-
-    public static boolean areNodePathsEqual(EditorNavPath p1, EditorNavPath p2) {
-        if (p1.getPath().size() != p2.getPath().size()) {
-            return false;
-        }
-
-        // Start from 1, since editor node at 0 is always null
-        for (int i = 1; i < p1.getPath().size(); i++) {
-            if (!p1.getPath().get(i).getNavigationName().equals(
-                    p2.getPath().get(i).getNavigationName())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     private final List<EditorNode> path;
 
     public EditorNavPath(List<EditorNode> path) {
         this.path = path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EditorNavPath that = (EditorNavPath) o;
+        return path.equals(that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
     public EditorNode getEditorNode() {
@@ -122,21 +120,25 @@ public class EditorNavPath {
         return Optional.of(new EditorNavPath(newPath));
     }
 
-    public static EditorNavPath rebuild(EditorNavPath input) {
-        List<EditorNode> newPath = new ArrayList<>();
-        for (var navEl : input.getPath()) {
-            if (navEl == null) {
-                newPath.add(null);
-                continue;
-            }
+    public static EditorNavPath rebase(EditorNode base, EditorNavPath input) {
+        if (input.getPath().size() < 3) {
+            return input;
+        }
 
-            if (navEl.isValid()) {
-                newPath.add(navEl);
-            } else {
-                break;
+        List<EditorNode> newPath = new ArrayList<>();
+        newPath.add(null);
+        for (int i = 1; i < input.getPath().size(); i++) {
+            var current = input.getPath().get(i);
+            newPath.add(current);
+            if (current.equals(base)) {
+                return new EditorNavPath(newPath);
             }
         }
-        return new EditorNavPath(newPath);
+
+        // Handle case if base is not found in nav path
+        var defPath = new ArrayList<EditorNode>();
+        defPath.add(null);
+        return new EditorNavPath(defPath);
     }
 
     public List<EditorNode> getPath() {

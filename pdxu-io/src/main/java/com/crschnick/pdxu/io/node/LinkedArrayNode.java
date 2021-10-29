@@ -14,7 +14,7 @@ public final class LinkedArrayNode extends ArrayNode {
     private List<Node> joined;
 
     public LinkedArrayNode(List<ArrayNode> arrayNodes) {
-        this.arrayNodes = arrayNodes;
+        this.arrayNodes = new ArrayList<>(arrayNodes);
     }
 
     @Override
@@ -119,6 +119,7 @@ public final class LinkedArrayNode extends ArrayNode {
 
     @Override
     public List<Node> getNodeArray() {
+        // Lazy initialize joined list
         if (joined == null) {
             this.joined = new ArrayList<>();
             for (var n : arrayNodes) {
@@ -126,6 +127,7 @@ public final class LinkedArrayNode extends ArrayNode {
             }
             this.joined = Collections.unmodifiableList(joined);
         }
+
         return joined;
     }
 

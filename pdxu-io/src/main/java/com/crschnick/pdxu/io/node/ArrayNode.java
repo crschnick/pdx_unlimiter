@@ -7,19 +7,17 @@ import java.util.List;
 
 public abstract class ArrayNode extends Node {
 
-    public static ArrayNode emptyArray() {
-        return new SimpleArrayNode(new NodeContext(), null, null, List.of());
-    }
-
     public static ArrayNode array(List<Node> values) {
-        return new SimpleArrayNode(new NodeContext(), null, null, values);
+        // Defensive copy of values
+        return new SimpleArrayNode(new NodeContext(), null, null, new ArrayList<>(values));
     }
 
     public static ArrayNode sameKeyArray(String key, List<Node> values) {
         var ctx = new NodeContext(key, false);
         var ki = new int[values.size()];
         Arrays.fill(ki, 0);
-        return new SimpleArrayNode(ctx, ki, null, values);
+        // Defensive copy of values
+        return new SimpleArrayNode(ctx, ki, null, new ArrayList<>(values));
     }
 
     public static ArrayNode singleKeyNode(String key, Node value) {

@@ -57,10 +57,6 @@ public class EditorNavigation {
     }
 
     private void restoreNavLocation(EditorNavLocation goTo) {
-        var rebuilt = EditorNavPath.rebuild(goTo.path());
-        if (!EditorNavPath.areNodePathsEqual(goTo.path(), rebuilt)) {
-            goTo = new EditorNavLocation(rebuilt);
-        }
         this.current.set(goTo);
         state.getContent().navigate(goTo.getEditorNode(), goTo.page(), goTo.scroll());
     }
@@ -71,17 +67,25 @@ public class EditorNavigation {
         }
     }
 
-    public void replaceCurrentNavPath(EditorNavPath p) {
-        if (!EditorNavPath.areNodePathsEqual(p, current.get().path())) {
+    public void rebaseNavPaths(EditorNode base, EditorNavPath p) {
+        if (!p.equals(current.get().path())) {
             var loc = new EditorNavLocation(p);
             this.state.getContent().navigate(p.getEditorNode(), 0, 0.0);
             this.current.set(loc);
             this.history.set(historyPos.get(), loc);
+
+            // Rebase all history entries
+            for (int i = 0; i < this.history.size(); i++) {
+                var newNavPath = EditorNavPath.rebase(base, this.history.get(i).path());
+                if (!newNavPath.equals(this.history.get(i).path())) {
+                    this.history.set(i, new EditorNavLocation(newNavPath));
+                }
+            }
         }
     }
 
     public void navigateTo(EditorNavPath p) {
-        if (EditorNavPath.areNodePathsEqual(current.get().path(), p)) {
+        if (current.get().path().equals(p)) {
             return;
         }
 

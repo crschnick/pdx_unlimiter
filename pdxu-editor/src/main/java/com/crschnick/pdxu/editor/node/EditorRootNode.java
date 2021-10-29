@@ -4,6 +4,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 
 import java.util.List;
+import java.util.Objects;
 
 public class EditorRootNode extends EditorRealNode {
 
@@ -12,6 +13,20 @@ public class EditorRootNode extends EditorRealNode {
     public EditorRootNode(String keyName, int parentIndex, ArrayNode root) {
         super(null, keyName, parentIndex);
         this.root = root;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EditorRootNode that = (EditorRootNode) o;
+        return root.equals(that.root);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), root);
     }
 
     @Override

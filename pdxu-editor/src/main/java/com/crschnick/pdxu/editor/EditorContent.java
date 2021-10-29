@@ -1,8 +1,9 @@
 package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.editor.node.EditorNode;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +26,14 @@ public class EditorContent {
     private List<Integer> pageSizes;
     private List<EditorNode> allNodes;
     private List<EditorNode> filteredNodes;
-    private ObjectProperty<List<EditorNode>> shownNodes;
+    private ListProperty<EditorNode> shownNodes;
 
     public EditorContent(EditorState state) {
         this.state = state;
         this.pageSizes = new ArrayList<>();
         this.allNodes = new ArrayList<>();
         this.filteredNodes = new ArrayList<>();
-        this.shownNodes = new SimpleObjectProperty<>();
+        this.shownNodes = new SimpleListProperty<>(FXCollections.observableArrayList());
     }
 
     private void rebuildPageSizes() {
@@ -60,7 +61,7 @@ public class EditorContent {
         // If there are no nodes to show
         if (newPage == 0 && pageSizes.size() == 0) {
             this.page = newPage;
-            shownNodes.set(List.of());
+            shownNodes.clear();
             return true;
         }
 
@@ -75,7 +76,11 @@ public class EditorContent {
         this.page = newPage;
         int offset = pageSizes.subList(0, page).stream().mapToInt(Integer::intValue).sum();
         int length = pageSizes.get(page);
-        shownNodes.set(filteredNodes.subList(offset, offset + length));
+
+        // Ugly but necessary in case the editor nodes didn't change but the content values did
+        shownNodes.clear();
+        shownNodes.setAll(filteredNodes.subList(offset, offset + length));
+
         return true;
     }
 
@@ -208,7 +213,7 @@ public class EditorContent {
         return shownNodes.get();
     }
 
-    public ObjectProperty<List<EditorNode>> shownNodesProperty() {
+    public ListProperty<EditorNode> shownNodesProperty() {
         return shownNodes;
     }
 

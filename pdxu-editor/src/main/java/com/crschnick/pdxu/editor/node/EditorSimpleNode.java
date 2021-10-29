@@ -8,6 +8,7 @@ import com.crschnick.pdxu.io.node.ValueNode;
 import javafx.scene.paint.Color;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class EditorSimpleNode extends EditorRealNode {
 
@@ -16,6 +17,20 @@ public final class EditorSimpleNode extends EditorRealNode {
     public EditorSimpleNode(EditorNode directParent, String keyName, int parentIndex, int rawIndexInParentNode) {
         super(directParent, keyName, parentIndex);
         this.rawIndexInParentNode = rawIndexInParentNode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EditorSimpleNode that = (EditorSimpleNode) o;
+        return rawIndexInParentNode == that.rawIndexInParentNode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), rawIndexInParentNode);
     }
 
     public void updateText(String text) {
@@ -64,7 +79,7 @@ public final class EditorSimpleNode extends EditorRealNode {
             return false;
         }
 
-        if (getParent().getSize() <= rawIndexInParentNode) {
+        if (getParent().getRawSize() <= rawIndexInParentNode) {
             return false;
         }
 

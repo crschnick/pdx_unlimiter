@@ -6,6 +6,7 @@ import com.crschnick.pdxu.io.node.NodeMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -146,11 +147,24 @@ public abstract class EditorNode {
 
     public abstract boolean isValid();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EditorNode that = (EditorNode) o;
+        return indexInParent == that.indexInParent && Objects.equals(keyName, that.keyName) && parent.equals(that.parent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keyName, indexInParent, parent);
+    }
+
     public Optional<String> getKeyName() {
         return Optional.ofNullable(keyName);
     }
 
-    public abstract int getSize();
+    public abstract int getRawSize();
 
     public abstract Node getNodeAtRawIndex(int index);
 

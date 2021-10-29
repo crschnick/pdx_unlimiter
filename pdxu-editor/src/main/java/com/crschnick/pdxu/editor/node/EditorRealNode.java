@@ -47,7 +47,7 @@ public abstract class EditorRealNode extends EditorNode {
     }
 
     @Override
-    public int getSize() {
+    public int getRawSize() {
         return getBackingNode().getArrayNode().size();
     }
 

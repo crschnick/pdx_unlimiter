@@ -75,7 +75,7 @@ public class EditorExternalState {
                                     boolean empty = newNode.size() == 0;
                                     if (!empty) {
                                         e.editorNode.update(newNode);
-                                        e.state.onFileChanged();
+                                        e.state.onFileChanged(e.editorNode);
                                     }
                                 }
                             }

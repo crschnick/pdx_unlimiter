@@ -14,7 +14,8 @@ module com.crschnick.pdxu.editor {
             com.crschnick.pdxu.editor.adapter.Vic2SavegameAdapter,
             com.crschnick.pdxu.editor.adapter.NoGameAdapter;
 
-    exports com.crschnick.pdxu.editor to com.crschnick.pdxu.app;
+    exports com.crschnick.pdxu.editor;
+    exports com.crschnick.pdxu.editor.node;
 
     requires javafx.base;
     requires javafx.graphics;

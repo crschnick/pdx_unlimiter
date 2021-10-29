@@ -63,7 +63,7 @@ public class GuiEditorNode {
         box.setSpacing(5);
 
         {
-            int length = n.getSize();
+            int length = n.getRawSize();
             var btn = new JFXButton("List (" + length + ")");
             var icon = new FontIcon();
             GuiTooltips.install(icon, "Expand node");

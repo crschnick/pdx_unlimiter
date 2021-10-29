@@ -5,6 +5,7 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodeMatcher;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public final class EditorCollectorNode extends EditorNode {
@@ -19,8 +20,26 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EditorCollectorNode that = (EditorCollectorNode) o;
+        return firstNodeIndex == that.firstNodeIndex && length == that.length;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), firstNodeIndex, length);
+    }
+
+    @Override
     public boolean isValid() {
         if (!getParent().isValid()) {
+            return false;
+        }
+
+        if (getParent().getRawSize() <= firstNodeIndex + length) {
             return false;
         }
 
@@ -31,7 +50,7 @@ public final class EditorCollectorNode extends EditorNode {
         }
 
         int endIndex = firstNodeIndex + length - 1;
-        boolean posteriorValid = endIndex == getParent().getSize() - 1 ||
+        boolean posteriorValid = endIndex == getParent().getRawSize() - 1 ||
                 !getParent().getNavigationNameAtRawIndex(endIndex + 1).equals(getNavigationName());
         if (!posteriorValid) {
             return false;
@@ -82,7 +101,7 @@ public final class EditorCollectorNode extends EditorNode {
     }
 
     @Override
-    public int getSize() {
+    public int getRawSize() {
         return length;
     }
 
