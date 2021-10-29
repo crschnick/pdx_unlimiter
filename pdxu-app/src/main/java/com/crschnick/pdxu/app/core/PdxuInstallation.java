@@ -40,8 +40,7 @@ public class PdxuInstallation {
 
     public static void checkCorrectExtraction() {
         Path appPath = getAppPath();
-        boolean invalid = !Files.exists(appPath.resolve("bin"))
-                || !Files.exists(appPath.resolve("lang"))
+        boolean invalid = !Files.exists(appPath.resolve("lang"))
                 || !Files.exists(appPath.resolve("resources"))
                 || !Files.exists(appPath.resolve("runtime"));
         if (invalid) {
