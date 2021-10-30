@@ -144,7 +144,7 @@ public class EditorExternalState {
 
     private void openFile(String file) {
         var editor = EditorSettings.getInstance().externalEditor.getValue();
-        if (editor == null) {
+        if (editor == null || editor.length() == 0) {
             GuiEditorSettings.showEditorSettings();
             return;
         }
