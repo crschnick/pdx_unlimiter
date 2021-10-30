@@ -12,7 +12,7 @@ import java.util.Map;
 public class GameLocalisation {
 
     public static String getLocalisedValue(String key, SavegameInfo<?> info) {
-        if (LanguageManager.getInstance().getActiveLanguage() == Language.DEV_TEST) {
+        if (LanguageManager.getInstance().getActiveLanguage() == Language.TRANSLATION_HELPER) {
             return key;
         }
 

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class LanguageManager {
 
     public static final Language DEFAULT = Language.ENGLISH;
-    public static final Language DEV_TEST = Language.DEV_TEST;
+    public static final Language TRANSLATION_HELPER = Language.TRANSLATION_HELPER;
 
     private static LanguageManager INSTANCE;
     private final BidiMap<String, Language> languages = new DualHashBidiMap<>();
@@ -44,9 +44,7 @@ public class LanguageManager {
         }
 
         languages.put(DEFAULT.getId(), DEFAULT);
-        if (PdxuInstallation.getInstance().isDeveloperMode()) {
-            languages.put(DEV_TEST.getId(), DEV_TEST);
-        }
+        languages.put(TRANSLATION_HELPER.getId(), TRANSLATION_HELPER);
     }
 
     public Language getActiveLanguage() {

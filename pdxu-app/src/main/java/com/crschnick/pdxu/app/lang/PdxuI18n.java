@@ -46,7 +46,7 @@ public final class PdxuI18n {
     }
 
     private static String getLocalised(String s, String... vars) {
-        if (LanguageManager.getInstance().getActiveLanguage() == Language.DEV_TEST) {
+        if (LanguageManager.getInstance().getActiveLanguage() == Language.TRANSLATION_HELPER) {
             return "#" + s;
         }
 
