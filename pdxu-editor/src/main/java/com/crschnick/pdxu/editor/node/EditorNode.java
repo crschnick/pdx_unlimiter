@@ -152,7 +152,7 @@ public abstract class EditorNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EditorNode that = (EditorNode) o;
-        return indexInParent == that.indexInParent && Objects.equals(keyName, that.keyName) && parent.equals(that.parent);
+        return indexInParent == that.indexInParent && Objects.equals(keyName, that.keyName) && Objects.equals(parent, that.parent);
     }
 
     @Override
