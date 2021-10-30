@@ -404,6 +404,16 @@ public abstract class SettingsEntry<T> {
         public ProgramEntry(String id, String serializationName, String defaultValue) {
             super(id, serializationName, Type.PROGRAM, defaultValue);
         }
+
+        @Override
+        public void set(JsonNode node) {
+            // Compatibility fix for quoted values!
+            var t = node.textValue();
+            if (t.startsWith("\"") && t.endsWith("\"") && t.length() >= 2) {
+                t = t.substring(1, t.length() - 1);
+            }
+            this.value.set(t);
+        }
     }
 
     public static class GameDirectory extends VetoableSettingsEntry<GameDist> {

@@ -175,13 +175,14 @@ public class GuiSettingsComponents {
             if (!textArea.getText().isEmpty()) {
                 Path p = Path.of(textArea.getText());
                 if (Files.exists(p)) {
-                    dirChooser.setInitialDirectory(p.toFile());
+                    var toOpen = Files.isRegularFile(p) ? p.getParent() : p;
+                    dirChooser.setInitialDirectory(toOpen.toFile());
                 }
             }
             dirChooser.setTitle(PdxuI18n.get("SELECT_PROGRAM", pe.getName()));
             File file = dirChooser.showOpenDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
-                textArea.setText("\"" + file + "\"");
+                textArea.setText(file.toString());
             }
             m.consume();
         };
