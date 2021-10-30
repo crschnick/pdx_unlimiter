@@ -195,7 +195,7 @@ public class GuiSettingsComponents {
         textArea.setText(Optional.ofNullable(pe.getValue())
                 .orElse(""));
         applyFuncs.add(() -> {
-            pe.set(textArea.getText().equals("") ? null : textArea.getText());
+            pe.set(textArea.getText());
         });
 
         HBox hbox = new HBox(textArea, b);
