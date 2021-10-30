@@ -93,6 +93,7 @@ public class Editor implements EditorProvider {
                 editors.put(state, stage);
                 stage.setOnCloseRequest(e -> {
                     editors.remove(state);
+                    state.getExternalState().clearEditorLeftovers(state);
                 });
             });
         }, true);

@@ -142,6 +142,10 @@ public class EditorExternalState {
         }
     }
 
+    public void clearEditorLeftovers(EditorState destroyed) {
+        openEntries.removeIf(e -> e.state.equals(destroyed));
+    }
+
     private void openFile(String file) {
         var editor = EditorSettings.getInstance().externalEditor.getValue();
         if (editor == null || editor.length() == 0) {
