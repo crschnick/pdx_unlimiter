@@ -407,8 +407,9 @@ public abstract class SettingsEntry<T> {
 
         @Override
         public void set(JsonNode node) {
-            // Compatibility fix for quoted values!
+            // Compatibility fix for null values!
             var t = node.isNull() ? "" : node.textValue();
+            // Compatibility fix for quoted values!
             if (t.startsWith("\"") && t.endsWith("\"") && t.length() >= 2) {
                 t = t.substring(1, t.length() - 1);
             }
