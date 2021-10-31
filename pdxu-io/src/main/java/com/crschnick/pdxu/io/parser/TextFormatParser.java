@@ -19,7 +19,7 @@ public final class TextFormatParser {
 
     public static TextFormatParser eu4() {
         return new TextFormatParser(
-                StandardCharsets.ISO_8859_1,
+                Charset.forName("windows-1252"),
                 TaggedNode.NO_TAGS,
                 s -> s.equals("map_area_data"));
     }
@@ -47,14 +47,14 @@ public final class TextFormatParser {
 
     public static TextFormatParser ck2() {
         return new TextFormatParser(
-                StandardCharsets.ISO_8859_1,
+                Charset.forName("windows-1252"),
                 TaggedNode.NO_TAGS,
                 s -> false);
     }
 
     public static TextFormatParser vic2() {
         return new TextFormatParser(
-                StandardCharsets.ISO_8859_1,
+                Charset.forName("windows-1252"),
                 TaggedNode.NO_TAGS,
                 s -> false);
     }
