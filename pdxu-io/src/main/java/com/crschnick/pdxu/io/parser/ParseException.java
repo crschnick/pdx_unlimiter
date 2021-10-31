@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.io.parser;
 
+import com.crschnick.pdxu.io.node.NodeContext;
+
 public class ParseException extends Exception {
 
     private static int getUsedOffset(int offset, byte[] data) {
@@ -54,6 +56,11 @@ public class ParseException extends Exception {
         var snippet = new String(data, start, length);
         var msg = "Parser failed at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + snippet;
         return new ParseException(msg);
+    }
+
+    public static ParseException createFromLiteralIndex(String s, int lIndex, NodeContext ctx) {
+        var offset = ctx.getLiteralsBegin()[lIndex];
+        return create(s, offset, ctx.getData());
     }
 
     public ParseException(String message) {

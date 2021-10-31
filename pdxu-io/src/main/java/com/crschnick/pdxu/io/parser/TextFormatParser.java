@@ -138,7 +138,7 @@ public final class TextFormatParser {
 
             if (colorType != null) {
                 if (tt[index + 1] != TextFormatTokenizer.OPEN_GROUP) {
-                    throw ParseException.create("Expected {", index, context.getData());
+                    throw ParseException.createFromLiteralIndex("Expected {", slIndex, context);
                 }
 
                 // Move over color id
@@ -165,10 +165,10 @@ public final class TextFormatParser {
             }
         } else {
             if (tt[index] == TextFormatTokenizer.EQUALS) {
-                throw ParseException.create("encountered unexpected =", index, context.getData());
+                throw ParseException.createFromLiteralIndex("encountered unexpected =", slIndex, context);
             }
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                throw ParseException.create("encountered unexpected }", index, context.getData());
+                throw ParseException.createFromLiteralIndex("encountered unexpected }", slIndex, context);
             }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
                 return parseArray(strict);
@@ -236,15 +236,15 @@ public final class TextFormatParser {
 
                 Node result = parseNodeIfNotScalarValue(strict);
                 if (result == null) {
-                    // System.out.println("key: " + context.evaluate(keyIndex));
-                    // System.out.println("val: " + context.evaluate(slIndex));
+                    System.out.println("key: " + context.evaluate(keyIndex));
+                    System.out.println("val: " + context.evaluate(slIndex));
 
                     builder.putKeyAndScalarValue(keyIndex, slIndex);
                     index++;
                     moveToNextScalar();
                 } else {
-                    // System.out.println("key: " + context.evaluate(keyIndex));
-                    // System.out.println("val: " + result.toString());
+                    System.out.println("key: " + context.evaluate(keyIndex));
+                    System.out.println("val: " + result.toString());
 
                     builder.putKeyAndNodeValue(keyIndex, result);
                 }
