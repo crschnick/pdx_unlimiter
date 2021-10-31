@@ -120,6 +120,21 @@ public class EditorNavPath {
         return Optional.of(new EditorNavPath(newPath));
     }
 
+    public static EditorNavPath rebaseToValid(EditorNavPath input) {
+        List<EditorNode> newPath = new ArrayList<>();
+        newPath.add(null);
+        for (int i = 1; i < input.getPath().size(); i++) {
+            var current = input.getPath().get(i);
+            if (!current.isValid()) {
+                break;
+            }
+
+            newPath.add(current);
+        }
+
+        return new EditorNavPath(newPath);
+    }
+
     public static EditorNavPath rebase(EditorNode base, EditorNavPath input) {
         if (input.getPath().size() < 3) {
             return input;

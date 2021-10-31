@@ -57,6 +57,11 @@ public class EditorNavigation {
     }
 
     private void restoreNavLocation(EditorNavLocation goTo) {
+        var valid = EditorNavPath.rebaseToValid(goTo.path());
+        if (!goTo.path().equals(valid)) {
+            goTo = new EditorNavLocation(valid);
+        }
+
         this.current.set(goTo);
         state.getContent().navigate(goTo.getEditorNode(), goTo.page(), goTo.scroll());
     }
