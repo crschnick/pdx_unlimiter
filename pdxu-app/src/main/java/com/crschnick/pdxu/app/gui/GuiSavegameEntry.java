@@ -278,11 +278,15 @@ public class GuiSavegameEntry {
             boolean add = false;
             if (n.equals(SavegameEntry.State.LOADED)) {
                 boolean binary = e.getInfo().isBinary();
-                edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
+                Platform.runLater(() -> {
+                            edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
+                        });
                 add = true;
             }
             if (n.equals(SavegameEntry.State.LOAD_FAILED)) {
-                edit.setGraphic(new FontIcon("mdi-pencil"));
+                Platform.runLater(() -> {
+                            edit.setGraphic(new FontIcon("mdi-pencil"));
+                        });
                 add = true;
             }
             if (add) {
