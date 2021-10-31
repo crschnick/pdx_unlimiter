@@ -103,7 +103,7 @@ public class TextFormatTokenizer {
 
     private void checkUnclosedArrays() throws ParseException {
         if (strict && arraySizeStack.size() > 1) {
-            throw new ParseException("Missing closing } at the end of the file", i, bytes);
+            throw ParseException.create("Missing closing } at the end of the file", i, bytes);
         }
 
         for (int i = 1; i < arraySizeStack.size(); i++) {
@@ -195,7 +195,7 @@ public class TextFormatTokenizer {
 
         // Check for length overflow
         if (length < 0) {
-            throw new ParseException(
+            throw ParseException.create(
                     "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) + ", which is too big", nextScalarStart, bytes);
         }
 
@@ -229,7 +229,7 @@ public class TextFormatTokenizer {
             // Happens in CK2 and VIC2
             if (arraySizeStack.size() == 1) {
                 if (strict) {
-                    throw new ParseException("Additional closing } at the of the file", i, bytes);
+                    throw ParseException.create("Additional closing } at the of the file", i, bytes);
                 }
 
                 return;
@@ -237,7 +237,7 @@ public class TextFormatTokenizer {
             arraySizeStack.pop();
         } else if (controlToken == EQUALS) {
             if (strict && arraySizes[arraySizeStack.peek()] == 0) {
-                throw new ParseException("Encountered invalid =", i, bytes);
+                throw ParseException.create("Encountered invalid =", i, bytes);
             }
 
             if (arraySizes[arraySizeStack.peek()] > 0) {

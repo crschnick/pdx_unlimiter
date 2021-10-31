@@ -138,7 +138,7 @@ public final class TextFormatParser {
 
             if (colorType != null) {
                 if (tt[index + 1] != TextFormatTokenizer.OPEN_GROUP) {
-                    throw new ParseException("Expected {", index, context.getData());
+                    throw ParseException.create("Expected {", index, context.getData());
                 }
 
                 // Move over color id
@@ -165,10 +165,10 @@ public final class TextFormatParser {
             }
         } else {
             if (tt[index] == TextFormatTokenizer.EQUALS) {
-                throw new ParseException("encountered unexpected =", index, context.getData());
+                throw ParseException.create("encountered unexpected =", index, context.getData());
             }
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                throw new ParseException("encountered unexpected }", index, context.getData());
+                throw ParseException.create("encountered unexpected }", index, context.getData());
             }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
                 return parseArray(strict);
@@ -227,7 +227,7 @@ public final class TextFormatParser {
             if (isKeyValue) {
                 if (tt[index] != TextFormatTokenizer.STRING_UNQUOTED &&
                         tt[index] != TextFormatTokenizer.STRING_QUOTED) {
-                    throw new ParseException("Expected key", lastKnownOffset, context.getData());
+                    throw ParseException.create("Expected key", lastKnownOffset, context.getData());
                 }
 
                 int keyIndex = slIndex;

@@ -47,8 +47,17 @@ public class ParseException extends Exception {
         return i - 1;
     }
 
-    public ParseException(String s, int offset, byte[] data) {
-        super("Parser failed at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + new String(data, getDataStart(offset, data), getDataEnd(offset, data)));
+    public static ParseException create(String s, int offset, byte[] data) {
+        var start = getDataStart(offset, data);
+        var end = getDataEnd(offset, data);
+        var length = end - start + 1;
+        var snippet = new String(data, start, length);
+        var msg = "Parser failed at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + snippet;
+        return new ParseException(msg);
+    }
+
+    public ParseException(String message) {
+        super(message);
     }
 
     public ParseException(Throwable t) {
