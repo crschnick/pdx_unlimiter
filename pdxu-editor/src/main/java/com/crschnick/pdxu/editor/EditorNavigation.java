@@ -94,6 +94,9 @@ public class EditorNavigation {
             return;
         }
 
+        // Fix validity
+        p = EditorNavPath.rebaseToValid(p);
+
         removeHistoryAfterPos();
 
         var newLoc = new EditorNavLocation(p, 0, 0.0);
