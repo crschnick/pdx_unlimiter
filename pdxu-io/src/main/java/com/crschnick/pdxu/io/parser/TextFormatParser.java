@@ -236,15 +236,15 @@ public final class TextFormatParser {
 
                 Node result = parseNodeIfNotScalarValue(strict);
                 if (result == null) {
-                    System.out.println("key: " + context.evaluate(keyIndex));
-                    System.out.println("val: " + context.evaluate(slIndex));
+                    // System.out.println("key: " + context.evaluate(keyIndex));
+                    // System.out.println("val: " + context.evaluate(slIndex));
 
                     builder.putKeyAndScalarValue(keyIndex, slIndex);
                     index++;
                     moveToNextScalar();
                 } else {
-                    System.out.println("key: " + context.evaluate(keyIndex));
-                    System.out.println("val: " + result.toString());
+                    // System.out.println("key: " + context.evaluate(keyIndex));
+                    // System.out.println("val: " + result.toString());
 
                     builder.putKeyAndNodeValue(keyIndex, result);
                 }
