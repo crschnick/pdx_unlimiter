@@ -227,7 +227,7 @@ public final class TextFormatParser {
             if (isKeyValue) {
                 if (tt[index] != TextFormatTokenizer.STRING_UNQUOTED &&
                         tt[index] != TextFormatTokenizer.STRING_QUOTED) {
-                    throw ParseException.create("Expected key", lastKnownOffset, context.getData());
+                    throw ParseException.createFromOffset("Expected key", lastKnownOffset, context.getData());
                 }
 
                 int keyIndex = slIndex;

@@ -59,4 +59,8 @@ public final class NodeContext {
     public short[] getLiteralsLength() {
         return literalsLength;
     }
+
+    public int getLiteralsCount() {
+        return literalsCount;
+    }
 }

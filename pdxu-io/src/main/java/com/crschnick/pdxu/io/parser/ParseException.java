@@ -49,7 +49,10 @@ public class ParseException extends Exception {
         return i - 1;
     }
 
-    public static ParseException create(String s, int offset, byte[] data) {
+    public static ParseException createFromOffset(String s, int offset, byte[] data) {
+        // Clamp range
+        offset = Math.max(0, Math.min(offset, data.length - 1));
+
         var start = getDataStart(offset, data);
         var end = getDataEnd(offset, data);
         var length = end - start + 1;
@@ -59,8 +62,8 @@ public class ParseException extends Exception {
     }
 
     public static ParseException createFromLiteralIndex(String s, int lIndex, NodeContext ctx) {
-        var offset = ctx.getLiteralsBegin()[lIndex];
-        return create(s, offset, ctx.getData());
+        var offset = ctx.getLiteralsBegin()[Math.max(0, Math.min(ctx.getLiteralsCount() - 1, lIndex))];
+        return createFromOffset(s, offset, ctx.getData());
     }
 
     public ParseException(String message) {
