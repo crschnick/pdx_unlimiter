@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor.node;
 
+import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 
@@ -8,10 +9,12 @@ import java.util.Objects;
 
 public class EditorRootNode extends EditorRealNode {
 
+    private final EditorState state;
     private ArrayNode root;
 
-    public EditorRootNode(String keyName, int parentIndex, ArrayNode root) {
+    public EditorRootNode(String keyName, int parentIndex, EditorState state, ArrayNode root) {
         super(null, keyName, parentIndex);
+        this.state = state;
         this.root = root;
     }
 
@@ -21,12 +24,12 @@ public class EditorRootNode extends EditorRealNode {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         EditorRootNode that = (EditorRootNode) o;
-        return root.equals(that.root);
+        return state.equals(that.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), root);
+        return Objects.hash(super.hashCode(), state);
     }
 
     @Override
