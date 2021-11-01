@@ -151,9 +151,7 @@ public class EditorNavPath {
         }
 
         // Handle case if base is not found in nav path
-        var defPath = new ArrayList<EditorNode>();
-        defPath.add(null);
-        return new EditorNavPath(defPath);
+        return input;
     }
 
     public List<EditorNode> getPath() {

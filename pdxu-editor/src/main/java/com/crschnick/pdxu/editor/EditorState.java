@@ -47,7 +47,7 @@ public class EditorState {
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
-            rootNodes.put(e.getKey(), new EditorRootNode(e.getKey(), counter, e.getValue()));
+            rootNodes.put(e.getKey(), new EditorRootNode(e.getKey(), counter, this, e.getValue()));
         }
         this.navigation = new EditorNavigation(this);
     }
