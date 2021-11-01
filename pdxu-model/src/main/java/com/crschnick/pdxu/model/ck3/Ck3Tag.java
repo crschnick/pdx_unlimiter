@@ -122,6 +122,10 @@ public class Ck3Tag {
             var landedNode = v.getNodeForKey("landed_data");
             long id = Long.parseLong(k);
             var domain = v.getNodeForKey("landed_data").getNodeForKey("domain");
+            if (domain.getArrayNode().size() == 0) {
+                return;
+            }
+
             var primary = domain.getNodeArray().get(0).getLong();
             var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
             var balance = landedNode.getNodeForKeyIfExistent("balance")
