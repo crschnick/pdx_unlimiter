@@ -39,7 +39,7 @@ public final class EditorCollectorNode extends EditorNode {
             return false;
         }
 
-        if (getParent().getRawSize() <= firstNodeIndex + length) {
+        if (getParent().getRawSize() < firstNodeIndex + length) {
             return false;
         }
 
