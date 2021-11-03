@@ -1,6 +1,8 @@
-package com.crschnick.pdxu.app.info;
+package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;

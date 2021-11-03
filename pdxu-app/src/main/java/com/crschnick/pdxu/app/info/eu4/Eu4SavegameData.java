@@ -1,5 +1,6 @@
-package com.crschnick.pdxu.app.info;
+package com.crschnick.pdxu.app.info.eu4;
 
+import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 
@@ -27,5 +28,10 @@ public class Eu4SavegameData extends SavegameData {
 
     public List<Eu4Tag> getAllTags() {
         return allTags;
+    }
+
+    @Override
+    protected boolean determineIronman(ArrayNode node) {
+        return false;
     }
 }
