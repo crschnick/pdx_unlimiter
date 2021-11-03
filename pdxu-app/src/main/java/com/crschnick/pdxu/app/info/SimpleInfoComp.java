@@ -14,8 +14,8 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 
 public abstract class SimpleInfoComp extends SavegameInfoComp {
 
-    public SimpleInfoComp(ArrayNode node) {
-        super(node);
+    public SimpleInfoComp(ArrayNode node, SavegameData data) {
+        super(node, data);
     }
 
     protected abstract Image getImage();
@@ -24,8 +24,16 @@ public abstract class SimpleInfoComp extends SavegameInfoComp {
 
     protected abstract String getDisplayValue();
 
+    protected boolean shouldShow() {
+        return true;
+    }
+
     @Override
     public Region create() {
+        if (!shouldShow()) {
+            return null;
+        }
+
         var label = new Label(getDisplayValue(),
                 GameImage.imageNode(getImage(), CLASS_IMAGE_ICON));
         label.setMinWidth(Region.USE_PREF_SIZE);
