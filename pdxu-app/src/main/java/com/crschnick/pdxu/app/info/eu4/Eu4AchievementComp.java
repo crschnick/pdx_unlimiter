@@ -1,6 +1,8 @@
-package com.crschnick.pdxu.app.info;
+package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.gui.game.GameImage;
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
@@ -11,15 +13,8 @@ public class Eu4AchievementComp extends SimpleInfoComp {
 
     private boolean achievementOk;
 
-    public Eu4AchievementComp(ArrayNode node) {
-        super(node);
-    }
-
-    @Override
-    protected void init(ArrayNode node) {
-        achievementOk = NodePointer.builder().name("achievement_ok").build().getIfPresent(node)
-                .map(Node::getBoolean)
-                .orElse(false);
+    public Eu4AchievementComp(ArrayNode node, SavegameData data) {
+        super(node, data);
     }
 
     @Override
@@ -39,5 +34,12 @@ public class Eu4AchievementComp extends SimpleInfoComp {
     @Override
     protected String getDisplayValue() {
         return null;
+    }
+
+    @Override
+    protected void init(ArrayNode node, SavegameData data) {
+        achievementOk = NodePointer.builder().name("achievement_ok").build().getIfPresent(node)
+                .map(Node::getBoolean)
+                .orElse(false);
     }
 }
