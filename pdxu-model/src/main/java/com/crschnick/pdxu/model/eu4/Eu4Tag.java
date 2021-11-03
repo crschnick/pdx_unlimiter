@@ -13,6 +13,7 @@ public final class Eu4Tag {
 
     private static final Pattern COLONIAL_FLAG_TAG_PATTERN = Pattern.compile("C\\d\\d");
     private static final Pattern OBSERVER_FLAG_TAG_PATTERN = Pattern.compile("O\\d\\d");
+
     private FlagType flagType;
     private String tag;
     private GameColor mapColor;
