@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.model.GameDate;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -46,7 +46,7 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
         getSavegames().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
                 .min(Comparator.naturalOrder())
-                .map(s -> s.getInfo().getDate())
+                .map(s -> s.getInfo().getData().getDate())
                 .ifPresent(d -> dateProperty().setValue(d));
     }
 

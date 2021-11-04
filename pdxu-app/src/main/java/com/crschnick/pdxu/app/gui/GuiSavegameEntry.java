@@ -6,6 +6,9 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
@@ -14,10 +17,7 @@ import com.crschnick.pdxu.app.util.integration.ConverterHelper;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
 import com.crschnick.pdxu.app.util.integration.SkanderbegHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -312,7 +312,6 @@ public class GuiSavegameEntry {
             SavegameActions.editSavegame(e);
         });
         GuiTooltips.install(edit, PdxuI18n.get("EDIT_SAVEGAME"));
-
         ChangeListener<SavegameEntry.State> stateChange = new ChangeListener<>() {
             @Override
             public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
@@ -385,7 +384,7 @@ public class GuiSavegameEntry {
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
                         var container = createEmptyContainer();
-                        ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+                        //ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
 
                         Platform.runLater(() -> {
                             loading.setVisible(false);

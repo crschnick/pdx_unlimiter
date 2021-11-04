@@ -2,6 +2,8 @@ package com.crschnick.pdxu.app.util.integration;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
@@ -9,8 +11,6 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -81,7 +81,7 @@ public class Eu4SeHelper {
 
         if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(entry)) {
             Eu4SavegameInfo eu4i = (Eu4SavegameInfo) info;
-            return !eu4i.isRandomNewWorld();
+            return !eu4i.getData().eu4().isRandomNewWorld();
         } else {
             return false;
         }

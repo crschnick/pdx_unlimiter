@@ -13,13 +13,13 @@ import java.lang.reflect.InvocationTargetException;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
-public abstract class SavegameInfo<T extends SavegameData> {
+public abstract class SavegameInfo<T> {
 
-    protected T data;
+    protected SavegameData<T> data;
 
     protected SavegameInfo(ArrayNode node) throws Exception {
         try {
-            this.data = (T) getDataClass().getDeclaredConstructors()[0].newInstance(node);
+            this.data = (SavegameData<T>) getDataClass().getDeclaredConstructors()[0].newInstance(node);
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             ErrorHandler.handleTerminalException(e);
         }
@@ -40,7 +40,11 @@ public abstract class SavegameInfo<T extends SavegameData> {
         }
     }
 
-    protected abstract Class<T> getDataClass();
+    public SavegameData<T> getData() {
+        return data;
+    }
+
+    protected abstract Class<? extends SavegameData<T>> getDataClass();
 
     public final Region createContainer() {
         var container = createEmptyContainer();

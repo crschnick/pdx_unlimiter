@@ -24,10 +24,6 @@ public class Eu4RulerComp extends SavegameInfoComp {
 
     private Ruler ruler;
 
-    public Eu4RulerComp(ArrayNode node, SavegameData data) {
-        super(node, data);
-    }
-
     @Override
     protected void init(ArrayNode node, SavegameData data) {
         var rulerNode = NodePointer.builder()

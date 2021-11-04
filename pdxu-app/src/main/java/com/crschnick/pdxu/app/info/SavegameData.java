@@ -9,7 +9,7 @@ import com.crschnick.pdxu.model.GameVersion;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class SavegameData {
+public abstract class SavegameData<T> {
 
     protected GameDate date;
     protected UUID campaignHeuristic;
@@ -18,9 +18,22 @@ public abstract class SavegameData {
     protected boolean ironman;
     protected boolean binary;
     protected boolean observer;
-    protected GameVersion version;
 
-    protected abstract boolean determineIronman(ArrayNode node);
+    public SavegameData(ArrayNode node) {
+
+    }
+
+    public abstract T getTag();
+
+    public abstract GameVersion getVersion();
+
+    public abstract List<T> getAllTags();
+
+    public boolean hasOnePlayerTag() {
+        return getTag() != null;
+    }
+
+    protected abstract void init(ArrayNode node);
 
     public Eu4SavegameData eu4() {
         return (Eu4SavegameData) this;
@@ -56,9 +69,5 @@ public abstract class SavegameData {
 
     public boolean isObserver() {
         return observer;
-    }
-
-    public GameVersion getVersion() {
-        return version;
     }
 }

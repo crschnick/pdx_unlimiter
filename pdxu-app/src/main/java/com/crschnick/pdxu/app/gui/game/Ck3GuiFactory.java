@@ -1,14 +1,12 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.GameDate;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.ck3.Ck3Person;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -25,42 +23,6 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 import static com.crschnick.pdxu.app.gui.game.GameImage.*;
 
 public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
-
-    private static Region createRulerLabel(Ck3SavegameInfo info, Ck3Person ruler) {
-        HBox rulerNode = new HBox();
-        rulerNode.setSpacing(15);
-        rulerNode.setAlignment(Pos.CENTER);
-        rulerNode.getStyleClass().add("ruler-info");
-        {
-            VBox box = new VBox();
-            box.setSpacing(5);
-            box.alignmentProperty().set(Pos.CENTER);
-
-            {
-                var topBar = new HBox();
-                topBar.setSpacing(5);
-                topBar.setAlignment(Pos.CENTER);
-                topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
-                int age = GameDate.yearsBetween(ruler.getBirth(), info.getDate());
-                var title = new Label(info.getPlayerName() + ", " + age);
-                title.getStyleClass().add("ruler-name");
-                topBar.getChildren().add(title);
-
-                box.getChildren().add(topBar);
-            }
-
-            box.getChildren().add(createRulerStatsNode(info, ruler));
-            box.getStyleClass().add(CLASS_RULER);
-            rulerNode.getChildren().add(box);
-        }
-        {
-            var house = GameImage.imageNode(Ck3TagCache.houseImage(ruler.getHouse(), GameFileContext.fromInfo(info)),
-                    "house-icon");
-            GuiTooltips.install(house, PdxuI18n.get("HOUSE", info.getHouseName()));
-            rulerNode.getChildren().add(house);
-        }
-        return rulerNode;
-    }
 
     private static Region createRulerStatsNode(SavegameInfo<Ck3Tag> info, Ck3Person ruler) {
         var imgs = new Image[]{CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
@@ -167,43 +129,5 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         row.getStyleClass().add("realm-row");
         row.getStyleClass().add(style);
         addNode(pane, row);
-    }
-
-    @Override
-    public void fillNodeContainer(SavegameInfo<Ck3Tag> info, JFXMasonryPane grid) {
-        if (info.hasOnePlayerTag()) {
-            addNode(grid, createRulerLabel((Ck3SavegameInfo) info, info.getTag().getRuler()));
-        }
-
-        if (info.isIronman()) {
-            var ironman = new StackPane(imageNode(CK3_ICON_IRONMAN, CLASS_IMAGE_ICON, null));
-            ironman.setAlignment(Pos.CENTER);
-            GuiTooltips.install(ironman, PdxuI18n.get("IRONMAN"));
-            addNode(grid, ironman);
-        }
-
-        if (info.hasOnePlayerTag()) {
-            addGoldEntry(grid, info.getTag().getGold(), info.getTag().getIncome());
-            addIntegerEntry(grid, CK3_ICON_PRESTIGE, info.getTag().getPrestige(), PdxuI18n.get("PRESTIGE"), false);
-            addIntegerEntry(grid, CK3_ICON_PIETY, info.getTag().getPiety(), PdxuI18n.get("PIETY"), false);
-            addIntegerEntry(grid, CK3_ICON_SOLDIERS, info.getTag().getStrength(), PdxuI18n.get("TOTAL_SOLDIERS"), false);
-
-            createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_TITLES, "tag-icon"),
-                    info.getTag().getTitles(), PdxuI18n.get("TITLES"), "titles");
-            createTitleRow(grid, info, GameImage.imageNode(CK3_ICON_CLAIMS, "tag-icon"),
-                    info.getTag().getClaims(), PdxuI18n.get("CLAIMS"), "claims");
-
-            for (War<Ck3Tag> war : ((Ck3SavegameInfo) info).getWars()) {
-                createRealmRow(grid, info, imageNode(CK3_ICON_WAR, CLASS_IMAGE_ICON),
-                        war.isAttacker(info.getTag()) ? war.getDefenders() : war.getAttackers(),
-                        war.getTitle(), CLASS_WAR);
-            }
-
-            createRealmRow(grid, info, imageNode(CK3_ICON_ALLY, CLASS_IMAGE_ICON),
-                    ((Ck3SavegameInfo) info).getAllies(),
-                    PdxuI18n.get("ALLIES"), CLASS_ALLIANCE);
-        }
-
-        super.fillNodeContainer(info, grid);
     }
 }
