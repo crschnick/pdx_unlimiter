@@ -1,11 +1,11 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.gui.GuiStyle;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 import com.crschnick.pdxu.model.vic2.Vic2Tag;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;

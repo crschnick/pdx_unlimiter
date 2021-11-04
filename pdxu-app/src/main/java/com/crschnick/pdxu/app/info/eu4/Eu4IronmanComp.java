@@ -11,10 +11,6 @@ public class Eu4IronmanComp extends SimpleInfoComp {
 
     private boolean ironman;
 
-    public Eu4IronmanComp(ArrayNode node, SavegameData data) {
-        super(node, data);
-    }
-
     @Override
     protected Image getImage() {
         return GameImage.EU4_ICON_IRONMAN;

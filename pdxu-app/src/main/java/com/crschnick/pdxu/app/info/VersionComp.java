@@ -24,7 +24,7 @@ public class VersionComp extends SavegameInfoComp {
     @Override
     public Region create() {
         Label label = null;
-        switch (SavegameCompatibility.determineForInfo(version)) {
+        switch (SavegameCompatibility.determineForVersion(version)) {
             case COMPATIBLE -> {
                 label = new Label(version.toString());
                 GuiTooltips.install(label, PdxuI18n.get("COMPATIBLE"));

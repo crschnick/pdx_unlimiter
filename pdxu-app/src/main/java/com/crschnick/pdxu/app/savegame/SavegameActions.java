@@ -4,12 +4,12 @@ import com.crschnick.pdxu.app.core.EditorProvider;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
-            return ctx.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());
+            return ctx.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getData().getTag());
         });
     }
 
@@ -96,7 +96,7 @@ public class SavegameActions {
             public void success(SavegameParseResult.Success s) {
                 try {
                     var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode(), false);
-                    var campaignId = info.getCampaignHeuristic();
+                    var campaignId = info.getData().getCampaignHeuristic();
                     SavegameStorage.get(g).getSavegameCollection(campaignId)
                             .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
                         TaskExecutor.getInstance().submitTask(() -> {

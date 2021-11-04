@@ -4,6 +4,13 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
@@ -16,14 +23,7 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.SavegameInfoException;
-import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
-import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -129,15 +129,15 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(Ck3SavegameInfo info) {
-                if (info.isObserver()) {
+                if (info.getData().isObserver()) {
                     return "Observer";
                 }
 
-                if (!info.hasOnePlayerTag()) {
+                if (!info.getData().hasOnePlayerTag()) {
                     return "Unknown";
                 }
 
-                return info.getTag().getName();
+                return info.getData().getTag().getName();
             }
         });
         ALL.put(Game.STELLARIS, new SavegameStorage<>(
@@ -355,13 +355,13 @@ public abstract class SavegameStorage<
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 checksum,
-                info.getDate(),
+                info.getData().getDate(),
                 SavegameNotes.empty(),
                 sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
         if (this.getSavegameCollection(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
-                    .tagImage(info, info.getTag());
+                    .tagImage(info, info.getData().getTag());
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
                     getDefaultCampaignName(info),
@@ -388,7 +388,7 @@ public abstract class SavegameStorage<
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 checksum,
-                info.getDate(),
+                info.getData().getDate(),
                 SavegameNotes.empty(),
                 sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
         logger.debug("Adding new entry " + e.getName());
@@ -397,7 +397,7 @@ public abstract class SavegameStorage<
     }
 
     private String getDefaultEntryName(I info) {
-        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
+        return info.getData().getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
     }
 
     protected abstract String getDefaultCampaignName(I info);
@@ -743,7 +743,7 @@ public abstract class SavegameStorage<
 
                 UUID collectionUuid;
                 if (col == null) {
-                    collectionUuid = info.getCampaignHeuristic();
+                    collectionUuid = info.getData().getCampaignHeuristic();
                     logger.debug("Campaign UUID is " + collectionUuid.toString());
                 } else {
                     collectionUuid = col.getUuid();

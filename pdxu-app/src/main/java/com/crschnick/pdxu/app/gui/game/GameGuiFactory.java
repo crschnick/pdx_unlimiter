@@ -1,13 +1,9 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
-import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -26,14 +22,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
-public abstract class GameGuiFactory<T extends SavegameData, I extends SavegameInfo<T>> {
+public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
     public static final BidiMap<Game, GameGuiFactory<?, ?>> ALL = new DualHashBidiMap<>();
 
@@ -88,7 +80,7 @@ public abstract class GameGuiFactory<T extends SavegameData, I extends SavegameI
             });
         } else {
             prop = new SimpleObjectProperty<>(
-                    GameImage.imageNode(tagImage(entry.getInfo(), entry.getInfo().getTag()), CLASS_TAG_ICON));
+                    GameImage.imageNode(tagImage(entry.getInfo(), entry.getInfo().getData().getTag()), CLASS_TAG_ICON));
         }
         return prop;
     }
@@ -103,7 +95,7 @@ public abstract class GameGuiFactory<T extends SavegameData, I extends SavegameI
     }
 
     public Node tagNode(SavegameInfo<T> info) {
-        return GameImage.imageNode(tagImage(info, info.getTag()), CLASS_TAG_ICON);
+        return GameImage.imageNode(tagImage(info, info.getData().getTag()), CLASS_TAG_ICON);
     }
 
     public abstract Image tagImage(SavegameInfo<T> info, T tag);
@@ -133,81 +125,5 @@ public abstract class GameGuiFactory<T extends SavegameData, I extends SavegameI
             Platform.runLater(() -> prop.set(n.toString()));
         });
         return prop;
-    }
-
-    protected Label createVersionInfo(SavegameInfo<T> info) {
-        Label version = null;
-        switch (SavegameCompatibility.determineForInfo(info)) {
-            case COMPATIBLE -> {
-                version = new Label(info.getVersion().toString());
-                GuiTooltips.install(version, PdxuI18n.get("COMPATIBLE"));
-                version.getStyleClass().add(CLASS_COMPATIBLE);
-            }
-            case INCOMPATIBLE -> {
-                version = new Label(info.getVersion().toString());
-                GuiTooltips.install(version, PdxuI18n.get("INCOMPATIBLE"));
-                version.getStyleClass().add(CLASS_INCOMPATIBLE);
-            }
-            case UNKNOWN -> {
-                version = new Label(info.getVersion().toString());
-                GuiTooltips.install(version, PdxuI18n.get("UNKNOWN_COMPATIBILITY"));
-                version.getStyleClass().add("unknown-compatible");
-            }
-        }
-        return version;
-    }
-
-    public void fillNodeContainer(SavegameInfo<T> info, JFXMasonryPane grid) {
-        var installation = GameInstallation.ALL.get(ALL.inverseBidiMap().get(this));
-        var styleClass = ALL.inverseBidiMap().get(this).getId();
-        grid.getStyleClass().add(styleClass);
-
-        if (info.getVersion() != null) {
-            Label version = createVersionInfo(info);
-            version.setAlignment(Pos.CENTER);
-            addNode(grid, version);
-        }
-
-        if (info.getMods() != null && info.getMods().size() > 0) {
-            Label mods = new Label(PdxuI18n.get("MODS") + " (" + info.getMods().size() + ")");
-            mods.setGraphic(new FontIcon());
-            mods.getStyleClass().add(CLASS_CONTENT);
-            GuiTooltips.install(mods,
-                    PdxuI18n.get("MODS_REQUIRED") + ":\n" +
-                            info.getMods().stream()
-                                    .map(s -> {
-                                        var m = installation.getModForSavegameId(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
-                                    })
-                                    .collect(Collectors.joining("\n")));
-
-            boolean missing = info.getMods().stream()
-                    .map(m -> installation.getModForSavegameId(m))
-                    .anyMatch(Optional::isEmpty);
-            mods.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
-            mods.setAlignment(Pos.CENTER);
-            addNode(grid, mods);
-        }
-
-        if (info.getDlcs().size() > 0) {
-            Label dlcs = new Label(PdxuI18n.get("DLCS") + " (" + info.getDlcs().size() + ")");
-            dlcs.setGraphic(new FontIcon());
-            dlcs.getStyleClass().add(CLASS_CONTENT);
-            GuiTooltips.install(dlcs,
-                    PdxuI18n.get("DLCS_REQUIRED") + ":\n" +
-                            info.getDlcs().stream()
-                                    .map(s -> {
-                                        var m = installation.getDlcForName(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
-                                    })
-                                    .collect(Collectors.joining("\n")));
-            boolean missing = info.getDlcs().stream()
-                    .map(m -> installation.getDlcForName(m))
-                    .anyMatch(Optional::isEmpty);
-            dlcs.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
-            dlcs.setAlignment(Pos.CENTER);
-
-            addNode(grid, dlcs);
-        }
     }
 }

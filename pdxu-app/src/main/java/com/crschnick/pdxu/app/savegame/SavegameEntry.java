@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.model.GameDate;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.*;
 
 import java.util.ArrayList;

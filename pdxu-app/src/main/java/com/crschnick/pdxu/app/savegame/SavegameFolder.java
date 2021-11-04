@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.savegame;
 
 
-import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 
 import java.time.Instant;
 import java.util.UUID;

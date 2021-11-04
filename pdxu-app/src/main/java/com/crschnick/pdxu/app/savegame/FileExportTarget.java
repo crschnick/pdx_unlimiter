@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import org.apache.commons.io.FilenameUtils;
 
@@ -65,7 +65,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
             Path file;
             Path dir = savegameDir.resolve(FilenameUtils.getBaseName(
                     storage.getCompatibleName(entry, false)));
-            if (entry.getInfo().isIronman()) {
+            if (entry.getInfo().getData().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {
                 file = dir.resolve(entry.getDate().toString() + ".sav");

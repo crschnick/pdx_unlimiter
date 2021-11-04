@@ -1,10 +1,10 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.core.CacheManager;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import javafx.scene.image.Image;
 
@@ -28,7 +28,7 @@ public class Eu4TagRenderer {
                 return ImageHelper.fromFXImage(eu4TagImage(info, tag));
             }
             case COLONIAL_FLAG -> {
-                var ov = Eu4Tag.getTag(info.getAllTags(), tag.getColonialData().getOverlord());
+                var ov = Eu4Tag.getTag(info.getData().getAllTags(), tag.getColonialData().getOverlord());
                 BufferedImage flagImage = ImageHelper.fromFXImage(eu4TagImage(info, ov));
                 Graphics g = flagImage.getGraphics();
 

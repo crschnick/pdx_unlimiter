@@ -3,6 +3,9 @@ package com.crschnick.pdxu.app.gui;
 import com.crschnick.pdxu.app.core.*;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
@@ -14,10 +17,7 @@ import com.crschnick.pdxu.app.util.integration.ConverterHelper;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyWebHelper;
 import com.crschnick.pdxu.app.util.integration.SkanderbegHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -216,7 +216,7 @@ public class GuiSavegameEntry {
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameAsync(e, ctx -> {
-                if (ctx.getInfo().isBinary()) {
+                if (ctx.getInfo().getData().isBinary()) {
                     dynamicButtons.getChildren().add(melt);
                 }
             });
@@ -277,7 +277,7 @@ public class GuiSavegameEntry {
         e.stateProperty().addListener((c,o,n) -> {
             boolean add = false;
             if (n.equals(SavegameEntry.State.LOADED)) {
-                boolean binary = e.getInfo().isBinary();
+                boolean binary = e.getInfo().getData().isBinary();
                 Platform.runLater(() -> {
                             edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
                         });
@@ -337,7 +337,7 @@ public class GuiSavegameEntry {
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
                         var container = createEmptyContainer();
-                        ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+                        //ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
 
                         // Clear caches if necessary after being done with loading
                         CacheManager.getInstance().onEntryLoadFinish();
