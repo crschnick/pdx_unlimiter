@@ -37,7 +37,7 @@ public class SavegameCompatibility {
         });
     }
 
-    public static Compatbility determineForInfo(SavegameInfo<?> info) {
+    public static Compatbility determineForInfo(GameVersion version) {
         var i = GameInstallation.ALL.get(SavegameManagerState.get().current());
         if (i.getVersion() == null) {
             return Compatbility.UNKNOWN;
@@ -45,7 +45,7 @@ public class SavegameCompatibility {
 
         return areCompatible(
                 GameInstallation.ALL.get(SavegameManagerState.get().current()).getVersion(),
-                info.getVersion()) ? Compatbility.COMPATIBLE : Compatbility.INCOMPATIBLE;
+                version) ? Compatbility.COMPATIBLE : Compatbility.INCOMPATIBLE;
     }
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {
