@@ -2,8 +2,8 @@ package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.util.OsHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;

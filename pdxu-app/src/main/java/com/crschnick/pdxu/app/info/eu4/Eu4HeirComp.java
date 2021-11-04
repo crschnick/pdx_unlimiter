@@ -1,15 +1,9 @@
 package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.gui.game.GameImage;
-import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import javafx.scene.image.Image;
 
 public class Eu4HeirComp extends Eu4RulerComp {
-
-    public Eu4HeirComp(ArrayNode node, SavegameData data) {
-        super(node, data);
-    }
 
     @Override
     protected String getRulerKey() {

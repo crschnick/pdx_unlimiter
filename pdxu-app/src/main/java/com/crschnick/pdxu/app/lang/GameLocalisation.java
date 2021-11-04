@@ -1,9 +1,9 @@
 package com.crschnick.pdxu.app.lang;
 
 import com.crschnick.pdxu.app.core.CacheManager;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.nio.file.Path;
 import java.util.HashMap;

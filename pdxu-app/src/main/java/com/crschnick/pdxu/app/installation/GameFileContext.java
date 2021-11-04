@@ -1,15 +1,15 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
-import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class GameFileContext {
 
     public static GameFileContext fromInfo(SavegameInfo<?> info) {
         var g = INFO_MAP.get(info.getClass());
-        List<GameMod> mods = info.getMods() != null ? info.getMods().stream()
+        List<GameMod> mods = info.getData().getMods() != null ? info.getData().getMods().stream()
                 .map(GameInstallation.ALL.get(g)::getModForFileName)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList()) : List.of();

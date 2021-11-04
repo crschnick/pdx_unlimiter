@@ -13,10 +13,6 @@ public class Eu4AchievementComp extends SimpleInfoComp {
 
     private boolean achievementOk;
 
-    public Eu4AchievementComp(ArrayNode node, SavegameData data) {
-        super(node, data);
-    }
-
     @Override
     protected Image getImage() {
         return GameImage.EU4_ICON_ACHIEVEMENT;

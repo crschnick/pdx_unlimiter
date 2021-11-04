@@ -3,11 +3,11 @@ package com.crschnick.pdxu.app.util.integration;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,12 +31,12 @@ public class SkanderbegHelper {
         TaskExecutor.getInstance().submitTask(() -> {
             try {
                 byte[] body = Files.readAllBytes(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
-                if (entry.getInfo().isIronman()) {
-                    body = RakalyHelper.toEquivalentPlaintext(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
+                if (entry.getInfo().getData().isIronman()) {
+                    body = RakalyHelper.toPlaintext(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
                 }
 
                 String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4)
-                        .getValidOutputFileName(entry, true, null).toString());
+                        .getCompatibleName(entry, true));
                 ThreadHelper.browse("https://skanderbeg.pm/browse.php?id=" + saveId);
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());

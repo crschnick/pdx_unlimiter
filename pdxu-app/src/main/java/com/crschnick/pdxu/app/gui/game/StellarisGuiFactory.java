@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
@@ -31,10 +31,5 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
         return new Background(new BackgroundFill(
                 Color.GRAY,
                 CornerRadii.EMPTY, Insets.EMPTY));
-    }
-
-    @Override
-    public void fillNodeContainer(SavegameInfo<StellarisTag> info, JFXMasonryPane grid) {
-        super.fillNodeContainer(info, grid);
     }
 }

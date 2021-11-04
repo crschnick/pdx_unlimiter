@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.core;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.SavegameInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

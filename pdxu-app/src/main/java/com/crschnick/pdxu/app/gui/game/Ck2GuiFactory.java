@@ -1,10 +1,10 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.model.ck2.Ck2Tag;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;

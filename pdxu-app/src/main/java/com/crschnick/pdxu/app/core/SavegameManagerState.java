@@ -1,9 +1,13 @@
 package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.core.settings.SavedState;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.savegame.*;
+import com.crschnick.pdxu.app.savegame.SavegameCollection;
+import com.crschnick.pdxu.app.savegame.SavegameContext;
+import com.crschnick.pdxu.app.savegame.SavegameEntry;
+import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;

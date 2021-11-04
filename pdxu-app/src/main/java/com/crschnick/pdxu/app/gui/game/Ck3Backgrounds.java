@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.util.ColorHelper;
@@ -9,7 +10,6 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import javafx.scene.paint.Color;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 public class Ck3Backgrounds {
 
     public static Color getBackgroundColor(SavegameInfo<Ck3Tag> info) {
-        if (!info.hasOnePlayerTag()) {
+        if (!info.getData().hasOnePlayerTag()) {
             return ColorHelper.withAlpha(Color.BEIGE, 0.33);
         }
 
@@ -36,7 +36,7 @@ public class Ck3Backgrounds {
             }
         }
 
-        var key = info.getTag().getPrimaryTitle().getKey();
+        var key = info.getData().getTag().getPrimaryTitle().getKey();
         var color = cache.colors.containsKey(key) ? ColorHelper.fromGameColor(cache.colors.get(key)) : Color.TRANSPARENT;
         return ColorHelper.withAlpha(color, 0.33);
     }

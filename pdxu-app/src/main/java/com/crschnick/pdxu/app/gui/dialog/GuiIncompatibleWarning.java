@@ -1,12 +1,12 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -21,7 +21,7 @@ public class GuiIncompatibleWarning {
 
     public static boolean showIncompatibleWarning(GameInstallation installation, SavegameInfo<?> info) {
         StringBuilder builder = new StringBuilder();
-        if (SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
+        if (SavegameCompatibility.determineForVersion(info.getData().getVersion()) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
                     .append(installation.getVersion().toString()).append("\n")
@@ -35,11 +35,11 @@ public class GuiIncompatibleWarning {
                     .append(info.getVersion().toString());
         }
 
-        boolean missingMods = info.getMods() != null && info.getMods().stream()
+        boolean missingMods = info.getData().getMods() != null && info.getData().getMods().stream()
                 .map(m -> installation.getModForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingMods) {
-            builder.append("The following Mods are missing:\n").append(info.getMods().stream()
+            builder.append("The following Mods are missing:\n").append(info.getData().getMods().stream()
                     .map(s -> {
                         var m = installation.getModForSavegameId(s);
                         return (m.isPresent() ? null : "- " + s);
@@ -48,11 +48,11 @@ public class GuiIncompatibleWarning {
                     .collect(Collectors.joining("\n")));
         }
 
-        boolean missingDlc = info.getDlcs().stream()
+        boolean missingDlc = info.getData().getDlcs().stream()
                 .map(m -> installation.getDlcForName(m))
                 .anyMatch(Optional::isEmpty);
         if (missingDlc) {
-            builder.append("\n\nThe following DLCs are missing:\n").append(info.getDlcs().stream()
+            builder.append("\n\nThe following DLCs are missing:\n").append(info.getData().getDlcs().stream()
                     .map(s -> {
                         var m = installation.getDlcForName(s);
                         return (m.isPresent() ? null : "- " + s);
