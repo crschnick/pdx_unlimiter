@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
@@ -8,7 +10,6 @@ import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
-public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
+public abstract class GameGuiFactory<T extends SavegameData, I extends SavegameInfo<T>> {
 
     public static final BidiMap<Game, GameGuiFactory<?, ?>> ALL = new DualHashBidiMap<>();
 

@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.game.GameImage;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -13,10 +12,6 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 
 
 public abstract class SimpleInfoComp extends SavegameInfoComp {
-
-    public SimpleInfoComp(ArrayNode node, SavegameData data) {
-        super(node, data);
-    }
 
     protected abstract Image getImage();
 

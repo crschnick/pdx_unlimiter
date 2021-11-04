@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 
@@ -11,7 +12,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class SavegameContext<T, I extends SavegameInfo<T>> {
+public class SavegameContext<T extends SavegameData, I extends SavegameInfo<T>> {
 
     private Game game;
     private GameInstallation installation;
