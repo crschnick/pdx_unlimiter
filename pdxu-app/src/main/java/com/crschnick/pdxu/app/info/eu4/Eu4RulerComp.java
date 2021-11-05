@@ -65,6 +65,10 @@ public class Eu4RulerComp extends SavegameInfoComp {
 
     @Override
     public Region create() {
+        if (ruler == null) {
+            return null;
+        }
+
         VBox box = new VBox();
         var img = getIcon();
 

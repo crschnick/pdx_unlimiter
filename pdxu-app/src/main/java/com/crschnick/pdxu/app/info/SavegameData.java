@@ -5,10 +5,14 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameVersion;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.List;
 import java.util.UUID;
 
+@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({@JsonSubTypes.Type(value = Eu4SavegameData.class)})
 public abstract class SavegameData<T> {
 
     protected GameDate date;
@@ -19,8 +23,7 @@ public abstract class SavegameData<T> {
     protected boolean binary;
     protected boolean observer;
 
-    public SavegameData(ArrayNode node) {
-
+    public SavegameData() {
     }
 
     public abstract T getTag();

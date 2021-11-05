@@ -81,7 +81,9 @@ public class Eu4SeHelper {
 
         if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(entry)) {
             Eu4SavegameInfo eu4i = (Eu4SavegameInfo) info;
-            return !eu4i.getData().eu4().isRandomNewWorld();
+            //TODO
+            //return !eu4i.getData().eu4().isRandomNewWorld();
+            return false;
         } else {
             return false;
         }

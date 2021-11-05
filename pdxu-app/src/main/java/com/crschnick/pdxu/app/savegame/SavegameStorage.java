@@ -25,7 +25,7 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.SavegameInfoException;
+import com.crschnick.pdxu.app.info.SavegameInfoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -62,7 +63,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger;
     private final Class<I> infoClass;
-    private final FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory;
+    private final FailableFunction<Node, I, SavegameInfoException> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -70,12 +71,18 @@ public abstract class SavegameStorage<
     private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
-            FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory,
             String name,
             GameDateType dateType,
             SavegameType type,
             Class<I> infoClass) {
-        this.infoFactory = infoFactory;
+        this.infoFactory = node -> {
+            try {
+                return (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                ErrorHandler.handleTerminalException(e);
+                return null;
+            }
+        };
         this.name = name;
         this.type = type;
         this.dateType = dateType;
@@ -99,18 +106,16 @@ public abstract class SavegameStorage<
 
     public static void init() throws Exception {
         ALL.put(Game.EU4, new SavegameStorage<>(
-                (node, melted) -> Eu4SavegameInfo.fromSavegame(melted, node),
                 "eu4",
                 GameDateType.EU4,
                 SavegameType.EU4,
                 Eu4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Eu4SavegameInfo info) {
-                return GameLocalisation.getLocalisedValue(info.getTag().getTag(), info);
+                return GameLocalisation.getLocalisedValue(info.getData().getTag().getTag(), info);
             }
         });
         ALL.put(Game.HOI4, new SavegameStorage<>(
-                (node, melted) -> Hoi4SavegameInfo.fromSavegame(melted, node),
                 "hoi4",
                 GameDateType.HOI4,
                 SavegameType.HOI4,
@@ -122,7 +127,6 @@ public abstract class SavegameStorage<
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>(
-                (node, melted) -> Ck3SavegameInfo.fromSavegame(melted, node),
                 "ck3",
                 GameDateType.CK3,
                 SavegameType.CK3,
@@ -142,7 +146,6 @@ public abstract class SavegameStorage<
             }
         });
         ALL.put(Game.STELLARIS, new SavegameStorage<>(
-                (node, melted) -> StellarisSavegameInfo.fromSavegame(node),
                 "stellaris",
                 GameDateType.STELLARIS,
                 SavegameType.STELLARIS,
@@ -150,11 +153,10 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(StellarisSavegameInfo info) {
-                return info.getTag().getName();
+                return info.getData().getTag().getName();
             }
         });
         ALL.put(Game.CK2, new SavegameStorage<>(
-                (node, melted) -> new Ck2SavegameInfo(node),
                 "ck2",
                 GameDateType.CK2,
                 SavegameType.CK2,
@@ -162,11 +164,10 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(Ck2SavegameInfo info) {
-                return info.getTag().getRulerName();
+                return info.getData().getTag().getRulerName();
             }
         });
         ALL.put(Game.VIC2, new SavegameStorage<>(
-                (node, melted) -> new Vic2SavegameInfo(node),
                 "vic2",
                 GameDateType.VIC2,
                 SavegameType.VIC2,
@@ -449,7 +450,7 @@ public abstract class SavegameStorage<
             public void success(SavegameParseResult.Success s) {
                 try {
                     logger.debug("Parsing was successful. Loading info ...");
-                    I info = infoFactory.apply(s.content, melted);
+                    I info = infoFactory.apply(s.combinedNode());
                     e.load(info);
                     getSavegameCampaign(e).onSavegameLoad(e);
 
@@ -618,6 +619,29 @@ public abstract class SavegameStorage<
         return c.toString();
     }
 
+    private boolean isInternalSavegame(Path file, byte[] bytes, boolean melted) {
+        if (!file.startsWith(getSavegameDataDirectory())) {
+            return false;
+        }
+
+        if (!file.getFileName().toString().equals(getSaveFileName())) {
+            return false;
+        }
+
+        try {
+            var entryId = UUID.fromString(file.getParent().getFileName().toString());
+            var campaignId = UUID.fromString(file.getParent().getParent().getFileName().toString());
+            I info = infoFactory.apply(null);
+            if (getSavegameCollection(campaignId).isEmpty() ||
+                    getSavegameCollection(campaignId).get().getSavegames().stream().noneMatch(entry -> entry.getUuid().equals(entryId))) {
+                addNewEntryToCampaign(campaignId, entryId, null, info, getDefaultEntryName(info), null);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private Optional<SavegameParseResult> importSavegameData(
             Path file,
             boolean checkDuplicate,
@@ -668,7 +692,7 @@ public abstract class SavegameStorage<
                 logger.debug("Parsing was successful. Loading info ...");
                 I info = null;
                 try {
-                    info = infoFactory.apply(s.content, melted);
+                    info = infoFactory.apply(s.combinedNode());
                 } catch (SavegameInfoException e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;
