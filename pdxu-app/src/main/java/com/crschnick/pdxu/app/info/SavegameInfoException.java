@@ -1,4 +1,4 @@
-package com.crschnick.pdxu.model;
+package com.crschnick.pdxu.app.info;
 
 public class SavegameInfoException extends Exception {
 

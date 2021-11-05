@@ -39,4 +39,14 @@ module com.crschnick.pdxu.app {
     exports com.crschnick.pdxu.app.core.settings;
     exports com.crschnick.pdxu.app.gui.dialog;
     exports com.crschnick.pdxu.app.installation.dist;
+    exports com.crschnick.pdxu.app.info;
+
+    opens com.crschnick.pdxu.app to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info.eu4 to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info.ck3 to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info.hoi4 to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info.stellaris to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info.ck2 to com.fasterxml.jackson.databind;
+    opens com.crschnick.pdxu.app.info.vic2 to com.fasterxml.jackson.databind;
 }
