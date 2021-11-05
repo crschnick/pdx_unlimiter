@@ -22,6 +22,7 @@ if (currentOS.isWindows()) {
 }
 
 apply from: "$rootDir/gradle/module_gen.gradle"
+apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
     implementation "org.openjfx:javafx-base:16:${platform}"
@@ -33,7 +34,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
 

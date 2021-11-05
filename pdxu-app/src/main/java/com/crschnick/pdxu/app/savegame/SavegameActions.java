@@ -95,7 +95,7 @@ public class SavegameActions {
             @Override
             public void success(SavegameParseResult.Success s) {
                 try {
-                    var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode(), false);
+                    var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode());
                     var campaignId = info.getData().getCampaignHeuristic();
                     SavegameStorage.get(g).getSavegameCollection(campaignId)
                             .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {

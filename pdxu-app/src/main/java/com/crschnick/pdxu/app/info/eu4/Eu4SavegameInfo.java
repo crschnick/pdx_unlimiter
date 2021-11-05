@@ -12,7 +12,9 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Eu4IronmanComp ironman;
     private Eu4AchievementComp achievements;
 
-    protected Eu4SavegameInfo(ArrayNode node) throws Exception {
+    public Eu4SavegameInfo() {}
+
+    public Eu4SavegameInfo(ArrayNode node) throws Exception {
         super(node);
     }
 

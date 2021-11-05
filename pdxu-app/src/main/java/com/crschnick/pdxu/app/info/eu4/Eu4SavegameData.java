@@ -7,20 +7,21 @@ import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@JsonTypeName("eu4")
 public class Eu4SavegameData extends SavegameData<Eu4Tag> {
 
     private GameNamedVersion version;
     private Eu4Tag tag;
     private List<Eu4Tag> allTags;
 
-    public Eu4SavegameData(ArrayNode node) {
-        super(node);
+    public Eu4SavegameData() {
     }
 
     public Eu4Tag getTag() {

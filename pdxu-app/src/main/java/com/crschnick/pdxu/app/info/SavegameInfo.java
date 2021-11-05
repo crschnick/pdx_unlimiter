@@ -17,25 +17,31 @@ public abstract class SavegameInfo<T> {
 
     protected SavegameData<T> data;
 
-    protected SavegameInfo(ArrayNode node) throws Exception {
+    protected SavegameInfo() {}
+
+    protected SavegameInfo(ArrayNode node) throws SavegameInfoException {
         try {
-            this.data = (SavegameData<T>) getDataClass().getDeclaredConstructors()[0].newInstance(node);
+            this.data = (SavegameData<T>) getDataClass().getDeclaredConstructors()[0].newInstance();
+            this.data.init(node);
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             ErrorHandler.handleTerminalException(e);
         }
 
-        for (var field : getClass().getFields()) {
+        for (var field : getClass().getDeclaredFields()) {
             if (!SavegameInfoComp.class.isAssignableFrom(field.getType())) {
                 continue;
             }
 
+            SavegameInfoComp c = null;
             try {
+                field.setAccessible(true);
                 field.set(this, field.getType().getDeclaredConstructors()[0].newInstance());
+                c = (SavegameInfoComp) field.get(this);
             } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                 ErrorHandler.handleTerminalException(e);
+                return;
             }
 
-            SavegameInfoComp c = (SavegameInfoComp) field.get(this);
             c.init(node, this.data);
         }
     }
@@ -49,15 +55,18 @@ public abstract class SavegameInfo<T> {
     public final Region createContainer() {
         var container = createEmptyContainer();
 
-        for (var field : getClass().getFields()) {
+        for (var field : getClass().getDeclaredFields()) {
             if (!SavegameInfoComp.class.isAssignableFrom(field.getType())) {
                 continue;
             }
 
             try {
+                field.setAccessible(true);
                 SavegameInfoComp c = (SavegameInfoComp) field.get(this);
                 var region = c.create();
-                addNode(container, region);
+                if (region != null) {
+                    addNode(container, region);
+                }
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }

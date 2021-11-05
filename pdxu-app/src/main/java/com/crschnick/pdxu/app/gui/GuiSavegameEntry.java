@@ -336,7 +336,7 @@ public class GuiSavegameEntry {
             SavegameContext.withSavegame(entry, ctx -> {
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
-                        var container = createEmptyContainer();
+                        var container = ctx.getInfo().createContainer();
                         //ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
 
                         // Clear caches if necessary after being done with loading

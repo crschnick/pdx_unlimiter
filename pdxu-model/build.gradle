@@ -12,7 +12,8 @@ repositories {
     mavenCentral()
 }
 
+apply from: "$rootDir/gradle/jackson.gradle"
+
 dependencies {
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
     implementation project(':pdxu-io')
 }
