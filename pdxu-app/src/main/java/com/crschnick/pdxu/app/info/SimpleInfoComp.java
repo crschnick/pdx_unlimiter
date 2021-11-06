@@ -17,7 +17,9 @@ public abstract class SimpleInfoComp extends SavegameInfoComp {
 
     protected abstract String getTooltip();
 
-    protected abstract String getDisplayValue();
+    protected String getDisplayValue() {
+        return null;
+    }
 
     protected boolean shouldShow() {
         return true;
