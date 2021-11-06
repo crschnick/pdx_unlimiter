@@ -14,6 +14,7 @@ public class TextFormatTokenizer {
     private static final byte DOUBLE_QUOTE_CHAR = 34;
     private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 
+    private final String name;
     private final boolean strict;
     private final byte[] bytes;
     private byte[] tokenTypes;
@@ -30,7 +31,8 @@ public class TextFormatTokenizer {
     private int arraySizesCounter;
     private boolean escapeChar;
 
-    public TextFormatTokenizer(byte[] bytes, int start, boolean strict) {
+    public TextFormatTokenizer(String name, byte[] bytes, int start, boolean strict) {
+        this.name = name;
         this.bytes = bytes;
         this.strict = strict;
         this.tokenCounter = 0;
@@ -102,7 +104,7 @@ public class TextFormatTokenizer {
 
     private void checkUnclosedArrays() throws ParseException {
         if (strict && arraySizeStack.size() > 1) {
-            throw ParseException.createFromOffset("Missing closing } at the end of the file", i - 1, bytes);
+            throw ParseException.createFromOffset(name, "Missing closing } at the end of the file", i - 1, bytes);
         }
 
         for (int i = 1; i < arraySizeStack.size(); i++) {
@@ -194,7 +196,7 @@ public class TextFormatTokenizer {
 
         // Check for length overflow
         if (length < 0) {
-            throw ParseException.createFromOffset(
+            throw ParseException.createFromOffset(name,
                     "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) + ", which is too big", nextScalarStart, bytes);
         }
 
@@ -228,7 +230,7 @@ public class TextFormatTokenizer {
             // Happens in CK2 and VIC2
             if (arraySizeStack.size() == 1) {
                 if (strict) {
-                    throw ParseException.createFromOffset("Additional closing } at the of the file", i, bytes);
+                    throw ParseException.createFromOffset(name, "Additional closing } at the of the file", i, bytes);
                 }
 
                 return;
@@ -236,7 +238,7 @@ public class TextFormatTokenizer {
             arraySizeStack.pop();
         } else if (controlToken == EQUALS) {
             if (strict && arraySizes[arraySizeStack.peek()] == 0) {
-                throw ParseException.createFromOffset("Encountered invalid =", i, bytes);
+                throw ParseException.createFromOffset(name, "Encountered invalid =", i, bytes);
             }
 
             if (arraySizes[arraySizeStack.peek()] > 0) {

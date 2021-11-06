@@ -86,20 +86,20 @@ public final class TextFormatParser {
     }
 
     public final synchronized ArrayNode parse(Path file) throws IOException, ParseException {
-        return parse(Files.readAllBytes(file), 0, false);
+        return parse(file.getFileName().toString(), Files.readAllBytes(file), 0, false);
     }
 
-    public final synchronized ArrayNode parse(Path file, boolean strict) throws IOException, ParseException {
-        return parse(Files.readAllBytes(file), 0, strict);
+    public final synchronized ArrayNode parse(String name, Path file, boolean strict) throws IOException, ParseException {
+        return parse(name, Files.readAllBytes(file), 0, strict);
     }
 
-    public final synchronized ArrayNode parse(byte[] input, int start) throws ParseException {
-        return parse(input, start, false);
+    public final synchronized ArrayNode parse(String name, byte[] input, int start) throws ParseException {
+        return parse(name, input, start, false);
     }
 
-    public final synchronized ArrayNode parse(byte[] input, int start, boolean strict) throws ParseException {
+    public final synchronized ArrayNode parse(String name, byte[] input, int start, boolean strict) throws ParseException {
         try {
-            this.tokenizer = new TextFormatTokenizer(input, start, strict);
+            this.tokenizer = new TextFormatTokenizer(name, input, start, strict);
 
             // var now = Instant.now();
             this.tokenizer.tokenize();
@@ -111,7 +111,7 @@ public final class TextFormatParser {
                     tokenizer.getScalarCount());
 
             // now = Instant.now();
-            ArrayNode r = parseArray(strict);
+            ArrayNode r = parseArray(name, strict);
             // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
             return r;
@@ -130,7 +130,7 @@ public final class TextFormatParser {
         this.lastKnownOffset = context.getLiteralsBegin()[slIndex] + context.getLiteralsLength()[slIndex];
     }
 
-    private Node parseNodeIfNotScalarValue(boolean strict) throws ParseException {
+    private Node parseNodeIfNotScalarValue(String name, boolean strict) throws ParseException {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
             var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ?
@@ -138,7 +138,7 @@ public final class TextFormatParser {
 
             if (colorType != null) {
                 if (tt[index + 1] != TextFormatTokenizer.OPEN_GROUP) {
-                    throw ParseException.createFromLiteralIndex("Expected {", slIndex, context);
+                    throw ParseException.createFromLiteralIndex(name, "Expected {", slIndex, context);
                 }
 
                 // Move over color id
@@ -165,13 +165,13 @@ public final class TextFormatParser {
             }
         } else {
             if (tt[index] == TextFormatTokenizer.EQUALS) {
-                throw ParseException.createFromLiteralIndex("encountered unexpected =", slIndex, context);
+                throw ParseException.createFromLiteralIndex(name, "encountered unexpected =", slIndex, context);
             }
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                throw ParseException.createFromLiteralIndex("encountered unexpected }", slIndex, context);
+                throw ParseException.createFromLiteralIndex(name, "encountered unexpected }", slIndex, context);
             }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
-                return parseArray(strict);
+                return parseArray(name, strict);
             }
         }
 
@@ -183,8 +183,8 @@ public final class TextFormatParser {
         updateLastKnownOffset();
     }
 
-    private void skipOverNextNode(boolean strict) throws ParseException {
-        var res = parseNodeIfNotScalarValue(strict);
+    private void skipOverNextNode(String name, boolean strict) throws ParseException {
+        var res = parseNodeIfNotScalarValue(name, strict);
 
         // Node is a scalar, therefore move manually
         if (res == null) {
@@ -193,7 +193,7 @@ public final class TextFormatParser {
         }
     }
 
-    private ArrayNode parseArray(boolean strict) throws ParseException {
+    private ArrayNode parseArray(String name, boolean strict) throws ParseException {
         var tt = tokenizer.getTokenTypes();
 
         assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
@@ -212,7 +212,7 @@ public final class TextFormatParser {
 
                 // Discard next node if there is one!
                 if (tt[index] != TextFormatTokenizer.CLOSE_GROUP) {
-                    skipOverNextNode(strict);
+                    skipOverNextNode(name, strict);
                 }
             }
 
@@ -227,14 +227,14 @@ public final class TextFormatParser {
             if (isKeyValue) {
                 if (tt[index] != TextFormatTokenizer.STRING_UNQUOTED &&
                         tt[index] != TextFormatTokenizer.STRING_QUOTED) {
-                    throw ParseException.createFromOffset("Expected key", lastKnownOffset, context.getData());
+                    throw ParseException.createFromOffset(name, "Expected key", lastKnownOffset, context.getData());
                 }
 
                 int keyIndex = slIndex;
                 moveToNextScalar();
                 index += 2;
 
-                Node result = parseNodeIfNotScalarValue(strict);
+                Node result = parseNodeIfNotScalarValue(name, strict);
                 if (result == null) {
                     // System.out.println("key: " + context.evaluate(keyIndex));
                     // System.out.println("val: " + context.evaluate(slIndex));
@@ -258,7 +258,7 @@ public final class TextFormatParser {
                 int keyIndex = slIndex;
                 moveToNextScalar();
                 index++;
-                Node result = parseNodeIfNotScalarValue(strict);
+                Node result = parseNodeIfNotScalarValue(name, strict);
                 assert result != null : "KeyValue without equal sign must be an array node";
                 builder.putKeyAndNodeValue(keyIndex, result);
 
@@ -266,7 +266,7 @@ public final class TextFormatParser {
             }
 
             // Parse unnamed array element
-            Node result = parseNodeIfNotScalarValue(strict);
+            Node result = parseNodeIfNotScalarValue(name, strict);
             if (result == null) {
                 builder.putScalarValue(slIndex);
                 index++;

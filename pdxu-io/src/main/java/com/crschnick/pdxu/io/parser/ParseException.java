@@ -49,7 +49,7 @@ public class ParseException extends Exception {
         return i - 1;
     }
 
-    public static ParseException createFromOffset(String s, int offset, byte[] data) {
+    public static ParseException createFromOffset(String fileName, String s, int offset, byte[] data) {
         // Clamp range
         offset = Math.max(0, Math.min(offset, data.length - 1));
 
@@ -57,13 +57,13 @@ public class ParseException extends Exception {
         var end = getDataEnd(offset, data);
         var length = end - start + 1;
         var snippet = new String(data, start, length);
-        var msg = "Parser failed at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + snippet;
+        var msg = "Parser failed for " + fileName + " at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + snippet;
         return new ParseException(msg);
     }
 
-    public static ParseException createFromLiteralIndex(String s, int lIndex, NodeContext ctx) {
+    public static ParseException createFromLiteralIndex(String fileName, String s, int lIndex, NodeContext ctx) {
         var offset = ctx.getLiteralsBegin()[Math.max(0, Math.min(ctx.getLiteralsCount() - 1, lIndex))];
-        return createFromOffset(s, offset, ctx.getData());
+        return createFromOffset(fileName, s, offset, ctx.getData());
     }
 
     public ParseException(String message) {

@@ -44,7 +44,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
             metaStart = header.toString().length() + 1;
         }
         try {
-            var node = getType().getParser().parse(input, metaStart);
+            var node = getType().getParser().parse("gamestate", input, metaStart);
             return new SavegameParseResult.Success(Map.of("gamestate", node));
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);

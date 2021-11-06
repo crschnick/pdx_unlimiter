@@ -72,7 +72,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                         return new SavegameParseResult.Invalid("File " + part.get().identifier() + " has an invalid header");
                     }
 
-                    var node = type.getParser().parse(bytes, header != null ? header.length + 1 : 0);
+                    var node = type.getParser().parse(part.get().name, bytes, header != null ? header.length + 1 : 0);
                     nodes.put(part.get().name(), node);
                 }
 
