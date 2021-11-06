@@ -5,7 +5,7 @@ import javafx.scene.layout.Region;
 
 public abstract class SavegameInfoComp {
 
-    protected abstract void init(ArrayNode node, SavegameData data);
+    protected abstract void init(ArrayNode node, SavegameData<?> data);
 
     public abstract Region create();
 }

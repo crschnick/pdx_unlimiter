@@ -24,6 +24,10 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
     public Eu4SavegameData() {
     }
 
+    public String getTagName() {
+        return tag.getTag();
+    }
+
     public Eu4Tag getTag() {
         return tag;
     }
