@@ -7,31 +7,27 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import javafx.scene.image.Image;
 
-public class Eu4CustomNationComp extends SimpleInfoComp {
+public class Eu4PrestigeComp extends SimpleInfoComp {
 
-    private boolean customNationInWorld;
+    private int prestige;
 
     @Override
     protected void init(ArrayNode node, SavegameData<?> data) {
-        node.getNodeForKey("countries").forEach((k, v) -> {
-            if (v.hasKey("custom_nation_points")) {
-                customNationInWorld = true;
-            }
-        });
+        prestige = (int) node.getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("prestige").getDouble();
     }
 
     @Override
-    protected boolean shouldShow() {
-        return customNationInWorld;
+    protected String getDisplayValue() {
+        return String.valueOf(prestige);
     }
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_CUSTOM_NATION;
+        return GameImage.EU4_ICON_PRESTIGE;
     }
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("CUSTOM_NATION");
+        return PdxuI18n.get("PRESTIGE");
     }
 }
