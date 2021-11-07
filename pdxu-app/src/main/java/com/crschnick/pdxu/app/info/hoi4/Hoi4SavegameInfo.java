@@ -12,6 +12,11 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     }
 
     @Override
+    protected String getStyleClass() {
+        return "hoi4";
+    }
+
+    @Override
     protected Class<? extends SavegameData<Hoi4Tag>> getDataClass() {
         return null;
     }

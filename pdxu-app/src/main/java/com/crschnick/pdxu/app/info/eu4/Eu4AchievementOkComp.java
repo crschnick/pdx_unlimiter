@@ -9,13 +9,19 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.scene.image.Image;
 
-public class Eu4AchievementComp extends SimpleInfoComp {
+public class Eu4AchievementOkComp extends SimpleInfoComp {
 
+    private boolean ironman;
     private boolean achievementOk;
 
     @Override
     protected Image getImage() {
         return GameImage.EU4_ICON_ACHIEVEMENT;
+    }
+
+    @Override
+    protected boolean shouldShow() {
+        return ironman;
     }
 
     @Override
@@ -33,7 +39,8 @@ public class Eu4AchievementComp extends SimpleInfoComp {
     }
 
     @Override
-    protected void init(ArrayNode node, SavegameData data) {
+    protected void init(ArrayNode node, SavegameData<?> data) {
+        ironman = data.isIronman();
         achievementOk = NodePointer.builder().name("achievement_ok").build().getIfPresent(node)
                 .map(Node::getBoolean)
                 .orElse(false);

@@ -19,6 +19,11 @@ public class Eu4ReleasedVassalComp extends SimpleInfoComp {
     }
 
     @Override
+    protected boolean shouldShow() {
+        return releasedVassal;
+    }
+
+    @Override
     protected Image getImage() {
         return GameImage.EU4_ICON_RELEASED_VASSAL;
     }

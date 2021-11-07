@@ -12,6 +12,11 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     }
 
     @Override
+    protected String getStyleClass() {
+        return "ck3";
+    }
+
+    @Override
     protected Class<? extends SavegameData<Ck3Tag>> getDataClass() {
         return null;
     }

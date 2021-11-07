@@ -12,6 +12,11 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     }
 
     @Override
+    protected String getStyleClass() {
+        return "stellaris";
+    }
+
+    @Override
     protected Class<? extends SavegameData<StellarisTag>> getDataClass() {
         return null;
     }
