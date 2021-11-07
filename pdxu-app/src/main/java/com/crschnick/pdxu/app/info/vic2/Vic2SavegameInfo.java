@@ -12,6 +12,11 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
     }
 
     @Override
+    protected String getStyleClass() {
+        return "vic2";
+    }
+
+    @Override
     protected Class<? extends SavegameData<Vic2Tag>> getDataClass() {
         return null;
     }

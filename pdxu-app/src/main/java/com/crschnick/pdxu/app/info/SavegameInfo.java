@@ -50,6 +50,8 @@ public abstract class SavegameInfo<T> {
         return data;
     }
 
+    protected abstract String getStyleClass();
+
     protected abstract Class<? extends SavegameData<T>> getDataClass();
 
     public final Region createContainer() {
@@ -91,7 +93,7 @@ public abstract class SavegameInfo<T> {
                 () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
     }
 
-    private static JFXMasonryPane createEmptyContainer() {
+    private JFXMasonryPane createEmptyContainer() {
         JFXMasonryPane container = new JFXMasonryPane();
         container.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTAINER);
         container.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
@@ -103,6 +105,7 @@ public abstract class SavegameInfo<T> {
                         container.getPadding().getBottom() +
                         container.getPadding().getTop(), container.paddingProperty()));
         container.setLimitRow(3);
+        container.getStyleClass().add(getStyleClass());
         return container;
     }
 }
