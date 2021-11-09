@@ -79,7 +79,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 titles.stream().filter(t -> !t.getType().equals(Ck3Title.Type.BARONY)).collect(Collectors.toList()),
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagCache.titleImage(t, GameFileContext.fromInfo(info)), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3TagCache.titleImage(t, GameFileContext.fromData(info)), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("title-row");

@@ -26,7 +26,7 @@ public class Ck3TagCache {
             return cachedImg;
         }
         Ck3CoatOfArms coa = tag.getCoatOfArms();
-        var img = Ck3TagRenderer.renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromInfo(info), REALM_DEFAULT_IMG_SIZE, true);
+        var img = Ck3TagRenderer.renderRealmImage(coa, tag.getGovernmentName(), GameFileContext.fromData(info), REALM_DEFAULT_IMG_SIZE, true);
         cache.realms.put(tag, img);
         return img;
     }

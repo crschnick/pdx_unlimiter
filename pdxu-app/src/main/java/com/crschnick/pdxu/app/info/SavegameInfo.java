@@ -65,7 +65,7 @@ public abstract class SavegameInfo<T> {
             try {
                 field.setAccessible(true);
                 SavegameInfoComp c = (SavegameInfoComp) field.get(this);
-                var region = c.create();
+                var region = c.create(data);
                 if (region != null) {
                     addNode(container, region);
                 }

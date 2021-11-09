@@ -26,7 +26,7 @@ public class Eu4DevelopmentComp extends SavegameInfoComp {
     }
 
     @Override
-    public Region create() {
+    public Region create(SavegameData<?> data) {
         var label = new Label(autonomyDev + " / " + totalDev,
                 GameImage.imageNode(EU4_ICON_DEV, CLASS_IMAGE_ICON));
         label.setMinWidth(Region.USE_PREF_SIZE);

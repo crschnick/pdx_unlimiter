@@ -7,5 +7,5 @@ public abstract class SavegameInfoComp {
 
     protected abstract void init(ArrayNode node, SavegameData<?> data);
 
-    public abstract Region create();
+    public abstract Region create(SavegameData<?> data);
 }
