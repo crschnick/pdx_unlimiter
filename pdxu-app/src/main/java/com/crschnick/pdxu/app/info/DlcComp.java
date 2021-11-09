@@ -32,7 +32,7 @@ public class DlcComp extends SavegameInfoComp {
     }
 
     @Override
-    public Region create() {
+    public Region create(SavegameData<?> data) {
         if (dlcs.size() == 0) {
             return null;
         }

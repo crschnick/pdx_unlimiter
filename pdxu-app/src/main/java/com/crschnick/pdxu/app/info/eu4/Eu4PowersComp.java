@@ -26,7 +26,7 @@ public class Eu4PowersComp extends SavegameInfoComp {
     }
 
     @Override
-    public Region create() {
+    public Region create(SavegameData<?> data) {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
         Label admL = new Label(adm + "  ", imageNode(EU4_ICON_ADM, CLASS_POWER_ICON));

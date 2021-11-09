@@ -22,7 +22,7 @@ public class VersionComp extends SavegameInfoComp {
     }
 
     @Override
-    public Region create() {
+    public Region create(SavegameData<?> data) {
         Label label = null;
         switch (SavegameCompatibility.determineForVersion(version)) {
             case COMPATIBLE -> {
