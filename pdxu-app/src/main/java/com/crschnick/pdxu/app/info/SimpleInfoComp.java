@@ -26,7 +26,7 @@ public abstract class SimpleInfoComp extends SavegameInfoComp {
     }
 
     @Override
-    public Region create() {
+    public Region create(SavegameData<?> data) {
         if (!shouldShow()) {
             return null;
         }

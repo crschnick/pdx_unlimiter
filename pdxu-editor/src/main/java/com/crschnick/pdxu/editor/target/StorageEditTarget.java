@@ -25,7 +25,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
         this.entry = entry;
         this.target = target;
         // If savegame failed to load, still allow for editing!
-        this.context = entry.getInfo() != null ? GameFileContext.fromInfo(entry.getInfo()) :
+        this.context = entry.getInfo() != null ? GameFileContext.fromData(entry.getInfo()) :
                 GameFileContext.forGame(SavegameStorage.ALL.inverseBidiMap().get(storage));
     }
 

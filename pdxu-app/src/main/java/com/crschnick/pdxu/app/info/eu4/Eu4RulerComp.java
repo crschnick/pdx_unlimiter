@@ -64,7 +64,7 @@ public class Eu4RulerComp extends SavegameInfoComp {
     }
 
     @Override
-    public Region create() {
+    public Region create(SavegameData<?> data) {
         if (ruler == null) {
             return null;
         }
