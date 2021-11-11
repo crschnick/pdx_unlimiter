@@ -29,6 +29,7 @@ public final class PdxuI18n {
         try {
             Files.list(PdxuInstallation.getInstance().getLanguageLocation()).forEach(p -> {
                 if (LocalisationHelper.isLanguage(p, LanguageManager.getInstance().getActiveLanguage())) {
+                    map.clear();
                     map.putAll(LocalisationHelper.loadTranslations(p));
                 }
             });
@@ -38,7 +39,9 @@ public final class PdxuI18n {
     }
 
     public static void reset() {
-        map.clear();
+        // Don't clear language map when resetting to retain translation
+        // for error messages that are shown between reset() and init()
+        // map.clear();
     }
 
     public static String get(String s, String... vars) {
