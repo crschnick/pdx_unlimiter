@@ -41,15 +41,15 @@ public class JsonHelper {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
         return mapper.readTree(in.toFile());
     }
 
     public static void write(JsonNode node, Path out) throws IOException {
         JsonFactory f = new JsonFactory();
-        JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
-                .setPrettyPrinter(new DefaultPrettyPrinter());
-        new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-                .writeTree(g, node);
+        try (JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
+                .setPrettyPrinter(new DefaultPrettyPrinter())) {
+            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+                    .writeTree(g, node);
+        }
     }
 }
