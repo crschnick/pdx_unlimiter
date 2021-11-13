@@ -32,6 +32,12 @@ public class LocalisationHelper {
         try {
             try (var reader = new BufferedReader(new FileReader(file.toFile()))) {
                 String line = reader.readLine();
+
+                // Check for empty file!
+                if (line == null) {
+                    return false;
+                }
+
                 return line.contains(lang.getId());
             }
         } catch (Exception e) {
