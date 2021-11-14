@@ -73,6 +73,10 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
                 }
             });
             e.observer = !n.getNodeForKeyIfExistent("not_observer").map(Node::getBoolean).orElse(false);
+            if (tag.equals(Eu4Tag.INVALID_TAG_ID)) {
+                e.observer = true;
+            }
+
             e.randomNewWorld = n.getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
             e.ironman = melted;
             e.binary = e.ironman;

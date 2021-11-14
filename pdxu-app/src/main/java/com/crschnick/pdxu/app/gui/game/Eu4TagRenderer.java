@@ -21,7 +21,7 @@ public class Eu4TagRenderer {
 
     private static BufferedImage createBasicFlagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
         switch (tag.getType()) {
-            case OBSERVER -> {
+            case NO_FLAG -> {
                 return ImageHelper.fromFXImage(eu4TagImage(GameImage.getEu4TagPath("REB"), info));
             }
             case NORMAL -> {
