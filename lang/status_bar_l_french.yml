@@ -7,3 +7,4 @@ l_french:
   NONE: "Aucun"
   IMPORT: "Importer"
   KILL: "Terminer"
+  DEBUG_MODE: "Mode debug"
