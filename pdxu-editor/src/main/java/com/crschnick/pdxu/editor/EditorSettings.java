@@ -73,6 +73,13 @@ public class EditorSettings extends AbstractSettings {
             SystemUtils.IS_OS_WINDOWS ? "notepad" : (System.getenv("VISUAL") != null ?
                     System.getenv("VISUAL") : null)
     );
+    public final SettingsEntry.IntegerEntry externalEditorWaitInterval = new SettingsEntry.IntegerEntry(
+            "EXTERNAL_EDITOR_WAIT_INTERVAL",
+            "externalEditorWaitInterval",
+            500,
+            0,
+            3000
+    );
 
     private static EditorSettings INSTANCE;
 

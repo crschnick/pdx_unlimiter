@@ -35,7 +35,8 @@ public class GuiEditorSettings {
                 GuiSettingsComponents.section("PERFORMANCE", applyFuncs,
                         s.enableNodeTags,
                         s.enableNodeJumps,
-                        s.pageSize));
+                        s.pageSize,
+                        s.externalEditorWaitInterval));
         vbox.setSpacing(10);
         var sp = new ScrollPane(vbox);
         sp.setFitToWidth(true);

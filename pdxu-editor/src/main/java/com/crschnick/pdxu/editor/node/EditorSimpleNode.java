@@ -59,6 +59,11 @@ public final class EditorSimpleNode extends EditorRealNode {
         getParent().updateNodeAtRawIndex(updatedNode, keyName, getRawIndexInParentNode());
     }
 
+    @Override
+    public boolean isRoot() {
+        return false;
+    }
+
     public void update(ArrayNode newNode) {
         if (getBackingNode().isArray()) {
             // Update parent node to reflect change

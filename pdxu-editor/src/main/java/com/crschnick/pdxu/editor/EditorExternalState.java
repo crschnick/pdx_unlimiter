@@ -6,7 +6,6 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.gui.GuiEditorSettings;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import org.apache.commons.io.FileUtils;
@@ -48,14 +47,14 @@ public class EditorExternalState {
                     removeForFile(changed);
                 } else {
                     getForFile(changed).ifPresent(e -> {
-                        if (e.editorNode instanceof EditorRootNode) {
-                            ThreadHelper.sleep(1000);
+                        if (e.editorNode.isRoot()) {
+                            ThreadHelper.sleep(EditorSettings.getInstance().externalEditorWaitInterval.getValue());
                         }
 
                         // Wait for edit to finish in case external editor has write lock
                         if (!Files.exists(changed)) {
                             logger.trace("File " + TEMP.relativize(e.file) + " is probably still writing ...");
-                            ThreadHelper.sleep(500);
+                            ThreadHelper.sleep(EditorSettings.getInstance().externalEditorWaitInterval.getValue());
 
                             // If still no read lock after 500ms, just don't parse it
                             if (!Files.exists(changed)) {

@@ -34,6 +34,8 @@ public abstract class EditorRealNode extends EditorNode {
         return true;
     }
 
+    public abstract boolean isRoot();
+
     public abstract void update(ArrayNode newNode);
 
     @Override

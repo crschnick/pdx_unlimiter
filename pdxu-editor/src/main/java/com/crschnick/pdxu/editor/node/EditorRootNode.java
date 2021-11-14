@@ -45,6 +45,11 @@ public class EditorRootNode extends EditorRealNode {
     }
 
     @Override
+    public boolean isRoot() {
+        return true;
+    }
+
+    @Override
     public void update(ArrayNode newNode) {
         this.root = newNode;
     }
