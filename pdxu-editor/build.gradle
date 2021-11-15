@@ -5,6 +5,12 @@ plugins {
     id "org.moditect.gradleplugin"
 }
 
+java {
+    modularity.inferModulePath = true
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 def currentOS = DefaultNativePlatform.currentOperatingSystem;
 def platform
 if (currentOS.isWindows()) {
