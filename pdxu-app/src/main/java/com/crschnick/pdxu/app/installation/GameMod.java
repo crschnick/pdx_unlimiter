@@ -36,26 +36,30 @@ public class GameMod {
             return Optional.empty();
         }
 
-        GameMod mod = new GameMod();
-        mod.modFile = p;
-        mod.name = node.getNodeForKey("name").getString();
-        var path = node.getNodeForKeyIfExistent("path");
-        if (path.isEmpty()) {
-            var ar = node.getNodeForKeyIfExistent("archive");
-            if (ar.isPresent()) {
-                mod.legacyArchive = true;
-                // Sometimes, mod paths are messed up with a missing end quote
-                mod.path = Path.of(ar.get().getString().trim().replace("\"", ""));
+        try {
+            GameMod mod = new GameMod();
+            mod.modFile = p;
+            mod.name = node.getNodeForKey("name").getString();
+            var path = node.getNodeForKeyIfExistent("path");
+            if (path.isEmpty()) {
+                var ar = node.getNodeForKeyIfExistent("archive");
+                if (ar.isPresent()) {
+                    mod.legacyArchive = true;
+                    // Sometimes, mod paths are messed up with a missing end quote
+                    mod.path = Path.of(ar.get().getString().trim().replace("\"", ""));
+                } else {
+                    return Optional.empty();
+                }
             } else {
-                return Optional.empty();
+                // Sometimes, mod paths are messed up with a missing end quote
+                mod.path = Path.of(path.get().getString().trim().replace("\"", ""));
             }
-        } else {
-            // Sometimes, mod paths are messed up with a missing end quote
-            mod.path = Path.of(path.get().getString().trim().replace("\"", ""));
-        }
 
-        mod.supportedVersion = node.getNodeForKeyIfExistent("supported_version").map(Node::getString).orElse("*");
-        return Optional.of(mod);
+            mod.supportedVersion = node.getNodeForKeyIfExistent("supported_version").map(Node::getString).orElse("*");
+            return Optional.of(mod);
+        } catch (Exception ex) {
+            throw new ParseException("Could not parse malformed mod file " + p.toString() + ":\n" + ex.getMessage(), ex);
+        }
     }
 
     public Path getModFile() {
