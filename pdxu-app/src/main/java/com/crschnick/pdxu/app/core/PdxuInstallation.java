@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +32,19 @@ public class PdxuInstallation {
 
     private static Path getAppPath() {
         Path path = Path.of(System.getProperty("java.home"));
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return path.getParent();
-        } else {
-            return path.getParent().getParent();
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return path.getParent();
+            }
+            case LINUX -> {
+                return path.getParent().getParent();
+            }
+            case MAC -> {
+                return path.getParent().getParent().getParent().getParent();
+            }
+            default -> {
+                return null;
+            }
         }
     }
 
@@ -74,12 +84,15 @@ public class PdxuInstallation {
             i.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
         }
 
-        Path appInstallPath;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
-                    .resolve("Programs").resolve("Pdx-Unlimiter");
-        } else {
-            appInstallPath = i.dataDir;
+        Path appInstallPath = null;
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
+                        .resolve("Programs").resolve("Pdx-Unlimiter");
+            }
+            case LINUX, MAC -> {
+                appInstallPath = i.dataDir;
+            }
         }
 
         Path defaultAppInstallPath = appInstallPath.resolve("app");
@@ -197,10 +210,19 @@ public class PdxuInstallation {
 
     public Path getExecutableLocation() {
         Path appPath = getAppPath();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return appPath.resolve("Pdx-Unlimiter.exe");
-        } else {
-            return appPath.resolve("bin").resolve("Pdx-Unlimiter");
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return appPath.resolve("Pdx-Unlimiter.exe");
+            }
+            case LINUX -> {
+                return appPath.resolve("bin").resolve("Pdx-Unlimiter");
+            }
+            case MAC -> {
+                return appPath.resolve("Contents").resolve("MacOS").resolve("Pdx-Unlimiter");
+            }
+            default -> {
+                return null;
+            }
         }
     }
 
@@ -214,12 +236,19 @@ public class PdxuInstallation {
 
     public Path getRakalyExecutable() {
         Path dir = getResourceDir();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return dir.resolve("bin").resolve("rakaly_windows.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return dir.resolve("bin").resolve("rakaly_linux");
-        } else {
-            return dir.resolve("bin").resolve("rakaly_mac");
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return dir.resolve("bin").resolve("rakaly_windows.exe");
+            }
+            case LINUX -> {
+                return dir.resolve("bin").resolve("rakaly_linux");
+            }
+            case MAC -> {
+                return dir.resolve("bin").resolve("rakaly_mac");
+            }
+            default -> {
+                return null;
+            }
         }
     }
 

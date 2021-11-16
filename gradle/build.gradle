@@ -104,36 +104,52 @@ jlink {
         imageName = 'Pdx-Unlimiter'
         if (DefaultNativePlatform.currentOperatingSystem.windows) {
             icon = "misc/logo.ico"
-        } else {
+        } else if (DefaultNativePlatform.currentOperatingSystem.linux) {
             icon = "misc/logo.png"
+        } else {
+            icon = "misc/icns.png"
         }
         skipInstaller = true
         applicationName = 'Pdx-Unlimiter'
+
+        if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
+            macBundleName = 'Pdx-Unlimiter'
+        }
+    }
+}
+
+def getDistDir() {
+    if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
+        return "${buildDir}/dist/Pdx-Unlimiter.app/"
+    } else {
+        return "${buildDir}/dist/Pdx-Unlimiter/"
     }
 }
 
 task writeVersion(type: DefaultTask) {
     doLast {
-        file("${buildDir}/dist/Pdx-Unlimiter/version").write(String.valueOf(version))
+        file(getDistDir() + 'version').write(String.valueOf(version))
     }
 }
 
 task copyResources(type: Copy) {
-    into "${buildDir}/dist/Pdx-Unlimiter/resources"
+    into getDistDir() + 'resources'
     from "${projectDir}/resources"
 }
 
 task copyLang(type: Copy) {
-    into "${buildDir}/dist/Pdx-Unlimiter/lang"
+    into getDistDir() + 'lang'
     from "${projectDir}/lang"
 }
 
 task copyStartScripts(type: Copy) {
-    into "${buildDir}/dist/Pdx-Unlimiter/bin"
+    into getDistDir() + 'bin'
     if (DefaultNativePlatform.currentOperatingSystem.windows) {
         from "${projectDir}/misc/pdxu.bat"
-    } else {
+    } else if (DefaultNativePlatform.currentOperatingSystem.linux) {
         from "${projectDir}/misc/pdxu"
+    } else {
+
     }
 }
 
@@ -142,7 +158,7 @@ jpackage.finalizedBy(writeVersion, copyResources, copyLang, copyStartScripts)
 task createDist(type: Zip, dependsOn: jpackage) {
     destinationDirectory = buildDir
     archivesBaseName = "pdx_unlimiter"
-    archiveAppendix = DefaultNativePlatform.currentOperatingSystem.windows ? "windows" : "linux"
+    archiveAppendix = DefaultNativePlatform.currentOperatingSystem.windows ? "windows" : DefaultNativePlatform.currentOperatingSystem.linux ? "linux" : "mac"
     archiveVersion = ""
-    from "${buildDir}/dist/Pdx-Unlimiter"
+    from getDistDir()
 }
