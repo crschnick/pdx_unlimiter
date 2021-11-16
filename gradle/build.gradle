@@ -116,7 +116,7 @@ jlink {
 
 def getDistDir() {
     if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
-        return "${buildDir}/dist/Pdx-Unlimiter.app/"
+        return "${buildDir}/dist/Pdx-Unlimiter.app/Contents/"
     } else {
         return "${buildDir}/dist/Pdx-Unlimiter/"
     }
