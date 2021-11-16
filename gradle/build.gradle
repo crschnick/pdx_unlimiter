@@ -107,7 +107,7 @@ jlink {
         } else if (DefaultNativePlatform.currentOperatingSystem.linux) {
             icon = "misc/logo.png"
         } else {
-            icon = "misc/icns.png"
+            icon = "misc/logo.icns"
         }
         skipInstaller = true
         applicationName = 'Pdx-Unlimiter'
