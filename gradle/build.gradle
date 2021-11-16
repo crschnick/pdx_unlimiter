@@ -111,10 +111,6 @@ jlink {
         }
         skipInstaller = true
         applicationName = 'Pdx-Unlimiter'
-
-        if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
-            macBundleName = 'Pdx-Unlimiter'
-        }
     }
 }
 
