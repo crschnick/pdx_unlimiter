@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -601,10 +602,21 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized String getCompatibleName(SavegameEntry<?, ?> e, boolean includeEntryName) {
+    public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName) {
         var name = getSavegameCollection(e).getName() + (includeEntryName ?
-                " (" + e.getName() + ")." : ".") + type.getFileEnding();
-        return SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name);
+                " (" + e.getName() + ")" : "");
+        var comp = SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name);
+
+        // Try to return valid file name
+        if (comp.length() > 0) {
+            try {
+                return Path.of(comp + "." + type.getFileEnding());
+            } catch (InvalidPathException ignored) {
+            }
+        }
+
+        // Fallback
+        return Path.of("invalid-name." + type.getFileEnding());
     }
 
     public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {

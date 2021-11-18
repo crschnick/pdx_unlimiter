@@ -26,7 +26,7 @@ public class SavegameActions {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var sc = ctx.getStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(
-                    sc.getCompatibleName(entry, includeEntryName));
+                    sc.getValidOutputFileName(entry, includeEntryName));
             try {
                 sc.copySavegameTo(entry, out);
             } catch (IOException ioException) {
