@@ -24,10 +24,10 @@ if (currentOS.isWindows()) {
 apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {
-    implementation "org.openjfx:javafx-base:16:${platform}"
-    implementation "org.openjfx:javafx-controls:16:${platform}"
-    implementation "org.openjfx:javafx-graphics:16:${platform}"
-    implementation "org.openjfx:javafx-media:16:${platform}"
+    implementation "org.openjfx:javafx-base:17:${platform}"
+    implementation "org.openjfx:javafx-controls:17:${platform}"
+    implementation "org.openjfx:javafx-graphics:17:${platform}"
+    implementation "org.openjfx:javafx-media:17:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation 'com.google.code.gson:gson:2.8.6'
