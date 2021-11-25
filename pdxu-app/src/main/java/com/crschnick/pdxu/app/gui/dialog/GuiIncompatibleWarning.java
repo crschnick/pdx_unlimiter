@@ -26,6 +26,12 @@ public class GuiIncompatibleWarning {
                     .append(installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: ")
                     .append(info.getVersion().toString());
+        } else if (SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.UNKNOWN) {
+            builder.append("Unknown compatibility:\n")
+                    .append("- Game version: ")
+                    .append("Unknown").append("\n")
+                    .append("- Savegame version: ")
+                    .append(info.getVersion().toString());
         }
 
         boolean missingMods = info.getMods() != null && info.getMods().stream()
@@ -66,7 +72,7 @@ public class GuiIncompatibleWarning {
             alert.getButtonTypes().add(ButtonType.CLOSE);
             alert.getButtonTypes().add(launch);
             alert.setTitle("Incompatible savegame");
-            alert.setHeaderText("Selected savegame is incompatible. Launching it anyway, can cause problems");
+            alert.setHeaderText("Selected savegame may be incompatible. Launching it anyway, can cause problems");
             alert.getDialogPane().setContent(text);
         }).orElse(ButtonType.CLOSE).equals(launch);
     }

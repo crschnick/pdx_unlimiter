@@ -31,7 +31,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
 
             i.dlcs = List.of();
 
-            Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)\\s+.*");
+            Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\w+))?\\s+.*");
             Matcher m = p.matcher(n.getNodeForKey("version").getString());
             m.matches();
             i.version = new GameNamedVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)),
