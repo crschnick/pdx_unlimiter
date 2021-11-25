@@ -23,6 +23,7 @@ public final class GameAppManager {
 
     private final ObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
     private Instant lastImport;
+    private Instant lastKill;
     private boolean active = false;
     private Thread thread;
 
@@ -98,9 +99,19 @@ public final class GameAppManager {
             updateImportTimer();
 
             if (!activeGame.get().isAlive()) {
-                logger.info("Game instance of " + activeGame.get().getGame().getId() + " is dead");
+                var deadGame = activeGame.get().getGame();
+                logger.info("Game instance of " + deadGame.getId() + " is dead");
                 activeGame.get().onShutdown();
                 activeGame.set(null);
+
+                if (Settings.getInstance().importOnGameNormalExit.getValue()) {
+                    logger.info("Import on normal exit is enabled");
+                    boolean exitedNormally = lastKill == null || Duration.between(lastImport, Instant.now()).getSeconds() > 10;
+                    if (exitedNormally) {
+                        logger.info("Game instance of " + deadGame.getId() + " exited normally");
+                        SavegameActions.importLatestSavegame(deadGame);
+                    }
+                }
             }
         }
     }
@@ -139,11 +150,17 @@ public final class GameAppManager {
         }
     }
 
+    private void killGame(GameApp g) {
+        logger.info("Killing game");
+        lastKill = Instant.now();
+        g.kill();
+    }
+
     public void importLatestAndLaunch() {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {
             logger.info("Import latest savegame and launch");
-            g.kill();
+            killGame(g);
             SavegameActions.importLatestAndLaunch(g.getGame());
         }
     }
@@ -152,7 +169,7 @@ public final class GameAppManager {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {
             logger.info("Loading latest checkpoint");
-            g.kill();
+            killGame(g);
             SavegameActions.loadLatestSavegameCheckpoint(g.getGame());
         }
     }
@@ -161,7 +178,7 @@ public final class GameAppManager {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {
             logger.info("Killing active game");
-            g.kill();
+            killGame(g);
         }
     }
 

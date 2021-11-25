@@ -59,6 +59,11 @@ public final class Settings extends AbstractSettings {
             "confirmDeletion",
             true
     );
+    public final SettingsEntry.BooleanEntry importOnGameNormalExit = new SettingsEntry.BooleanEntry(
+            "IMPORT_ON_NORMAL_GAME_EXIT",
+            "importOnNormalGameExit",
+            false
+    );
     public final SettingsEntry.BooleanEntry launchIrony = new SettingsEntry.BooleanEntry(
             "LAUNCH_IRONY",
             "launchIrony",

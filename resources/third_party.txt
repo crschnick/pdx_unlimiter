@@ -1,6 +1,6 @@
-JDK 16 (http://jdk.java.net/16/) (GPL2 with the Classpath Exception)
+JDK 17 (http://jdk.java.net/17/) (GPL2 with the Classpath Exception)
 
-JavaFX 16 (https://openjfx.io/) (GPL v2)
+JavaFX 17 (https://openjfx.io/) (GPL v2)
 
 Rakaly (https://github.com/rakaly/cli) (MIT License)
 
