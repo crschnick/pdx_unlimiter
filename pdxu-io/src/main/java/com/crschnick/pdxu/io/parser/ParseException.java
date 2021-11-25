@@ -29,9 +29,14 @@ public class ParseException extends Exception {
         offset = getUsedOffset(offset, data);
 
         int i;
-        for (i = offset; i >= Math.max(offset - 30, 0); i--) {
+        boolean skippedLine = false;
+        for (i = offset; i >= Math.max(offset - 100, 0); i--) {
             if (data[i] == '\n') {
-                return i + 1;
+                if (!skippedLine) {
+                    skippedLine = true;
+                } else {
+                    return i + 1;
+                }
             }
         }
         return i + 1;
@@ -41,9 +46,14 @@ public class ParseException extends Exception {
         offset = getUsedOffset(offset, data);
 
         int i;
-        for (i = offset; i < Math.min(offset + 30, data.length); i++) {
+        boolean skippedLine = false;
+        for (i = offset; i < Math.min(offset + 100, data.length); i++) {
             if (data[i] == '\n') {
-                return i - 1;
+                if (!skippedLine) {
+                    skippedLine = true;
+                } else {
+                    return i - 1;
+                }
             }
         }
         return i - 1;
@@ -55,7 +65,7 @@ public class ParseException extends Exception {
 
         var start = getDataStart(offset, data);
         var end = getDataEnd(offset, data);
-        var length = end - start + 1;
+        var length = Math.max(end - start + 1, 0);
         var snippet = new String(data, start, length);
         var msg = "Parser failed for " + fileName + " at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + snippet;
         return new ParseException(msg);
