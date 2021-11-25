@@ -40,7 +40,7 @@ public class PdxuInstallation {
 
     public static void checkCorrectExtraction() {
         Path appPath = getAppPath();
-        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation() == null;
+        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
         boolean invalid = image && (!Files.exists(appPath.resolve("lang"))
                 || !Files.exists(appPath.resolve("resources"))
                 || !Files.exists(appPath.resolve("runtime")));
