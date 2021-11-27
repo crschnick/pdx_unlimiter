@@ -12,6 +12,9 @@ public class TextFormatTokenizer {
     public static final byte EQUALS = 5;
 
     private static final byte DOUBLE_QUOTE_CHAR = 34;
+    private static final byte SPACE_CHAR = 32;
+    private static final byte EQUALS_CHAR = 61;
+
     private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 
     private final String name;
@@ -217,8 +220,68 @@ public class TextFormatTokenizer {
         nextScalarStart = endExclusive;
     }
 
+    private byte getSuccessorByte() {
+        return i == bytes.length - 1 ? 0 : bytes[i + 1];
+    }
+
+    private void setSuccessorByte(byte b) {
+        if (i < bytes.length - 1) {
+            bytes[i + 1] = b;
+        }
+    }
+
+    private boolean checkForControlTokenKey(byte controlToken) throws ParseException {
+        if (controlToken == CLOSE_GROUP) {
+            if (getSuccessorByte() == EQUALS_CHAR) {
+                if (strict) {
+                    throw ParseException.createFromOffset(name, "Invalid key name }", i, bytes);
+                }
+
+                if (nextScalarStart == i) {
+                    finishCurrentToken();
+                    moveScalarStartToNext();
+                    return true;
+                }
+            }
+        }
+
+        if (controlToken == OPEN_GROUP) {
+            if (getSuccessorByte() == EQUALS_CHAR) {
+                if (strict) {
+                    throw ParseException.createFromOffset(name, "Invalid key name {", i, bytes);
+                }
+
+                if (nextScalarStart == i) {
+                    finishCurrentToken();
+                    moveScalarStartToNext();
+                    return true;
+                }
+            }
+        }
+
+        if (controlToken == EQUALS) {
+            if (getSuccessorByte() == EQUALS_CHAR) {
+                if (strict) {
+                    throw ParseException.createFromOffset(name, "Invalid key name =", i, bytes);
+                }
+
+                if (nextScalarStart == i) {
+                    finishCurrentToken();
+                    moveScalarStartToNext();
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void checkForNewControlToken(byte controlToken) throws ParseException {
         if (controlToken == 0) {
+            return;
+        }
+
+        if (checkForControlTokenKey(controlToken)) {
             return;
         }
 
@@ -235,6 +298,16 @@ public class TextFormatTokenizer {
 
                 return;
             }
+
+            if (getSuccessorByte() == EQUALS) {
+                if (strict) {
+                    throw ParseException.createFromOffset(name, "Invalid key name }", i, bytes);
+                }
+
+                setSuccessorByte(SPACE_CHAR);
+                return;
+            }
+
             arraySizeStack.pop();
         } else if (controlToken == EQUALS) {
             if (strict && arraySizes[arraySizeStack.peek()] == 0) {
