@@ -238,7 +238,7 @@ public class TextFormatTokenizer {
                 }
 
                 if (nextScalarStart == i) {
-                    finishCurrentToken();
+                    finishCurrentToken(i + 1);
                     moveScalarStartToNext();
                     return true;
                 }
@@ -252,7 +252,7 @@ public class TextFormatTokenizer {
                 }
 
                 if (nextScalarStart == i) {
-                    finishCurrentToken();
+                    finishCurrentToken(i + 1);
                     moveScalarStartToNext();
                     return true;
                 }
@@ -266,7 +266,7 @@ public class TextFormatTokenizer {
                 }
 
                 if (nextScalarStart == i) {
-                    finishCurrentToken();
+                    finishCurrentToken(i + 1);
                     moveScalarStartToNext();
                     return true;
                 }
