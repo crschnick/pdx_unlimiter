@@ -26,9 +26,13 @@ public class ThreadHelper {
                 ErrorHandler.handleException(e);
             }
         } else {
+            if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+                return;
+            }
+
             var t = new Thread(() -> {
                 try {
-                    Desktop.getDesktop().open(file.getParent().toFile());
+                    Desktop.getDesktop().browseFileDirectory(file.toFile());
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
