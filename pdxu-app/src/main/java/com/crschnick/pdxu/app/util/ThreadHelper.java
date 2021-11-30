@@ -27,6 +27,19 @@ public class ThreadHelper {
             }
         } else {
             if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+                if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+                    return;
+                }
+
+                var t = new Thread(() -> {
+                    try {
+                        Desktop.getDesktop().open(file.getParent().toFile());
+                    } catch (Exception e) {
+                        ErrorHandler.handleException(e);
+                    }
+                });
+                t.setDaemon(true);
+                t.start();
                 return;
             }
 
