@@ -66,7 +66,7 @@ public class ImageHelper {
         try {
             image = ImageIO.read(p.toFile());
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            LoggerFactory.getLogger(ImageHelper.class).error("Image file " + p.toString() + " not readable.", e);
             return DEFAULT_IMAGE;
         }
 
@@ -99,7 +99,7 @@ public class ImageHelper {
             }
             return image;
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            LoggerFactory.getLogger(ImageHelper.class).error("Image file " + input.toString() + " not readable.", e);
             return DEFAULT_AWT_IMAGE;
         }
     }
