@@ -27,7 +27,7 @@ public class ThreadHelper {
             }
         } else {
             if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
-                if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+                if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     return;
                 }
 
