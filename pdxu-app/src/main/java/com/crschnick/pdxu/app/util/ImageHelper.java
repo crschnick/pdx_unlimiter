@@ -70,6 +70,10 @@ public class ImageHelper {
             return DEFAULT_IMAGE;
         }
 
+        if (image == null) {
+            return DEFAULT_IMAGE;
+        }
+
         WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
         var iArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
         if (pixelSelector != null) {
