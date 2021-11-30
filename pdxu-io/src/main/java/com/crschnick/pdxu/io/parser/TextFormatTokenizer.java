@@ -233,10 +233,6 @@ public class TextFormatTokenizer {
     private boolean checkForControlTokenKey(byte controlToken) throws ParseException {
         if (controlToken == CLOSE_GROUP) {
             if (getSuccessorByte() == EQUALS_CHAR) {
-                if (strict) {
-                    throw ParseException.createFromOffset(name, "Invalid key name }", i, bytes);
-                }
-
                 if (nextScalarStart == i) {
                     return true;
                 }
@@ -245,10 +241,6 @@ public class TextFormatTokenizer {
 
         if (controlToken == OPEN_GROUP) {
             if (getSuccessorByte() == EQUALS_CHAR) {
-                if (strict) {
-                    throw ParseException.createFromOffset(name, "Invalid key name {", i, bytes);
-                }
-
                 if (nextScalarStart == i) {
                     return true;
                 }
@@ -257,10 +249,6 @@ public class TextFormatTokenizer {
 
         if (controlToken == EQUALS) {
             if (getSuccessorByte() == EQUALS_CHAR) {
-                if (strict) {
-                    throw ParseException.createFromOffset(name, "Invalid key name =", i, bytes);
-                }
-
                 if (nextScalarStart == i) {
                     return true;
                 }
