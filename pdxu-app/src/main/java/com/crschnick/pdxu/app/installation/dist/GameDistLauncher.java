@@ -113,11 +113,20 @@ public class GameDistLauncher {
         }
     }
 
+    public static boolean canChangeMods(Game game) {
+        return Settings.getInstance().launchIrony.getValue() ||
+                GameInstallation.ALL.get(game).getDist().supportsLauncher();
+    }
+
     private static void startLauncherDirectly() throws IOException {
         var game = SavegameManagerState.get().current();
         if (Settings.getInstance().launchIrony.getValue()) {
             IronyHelper.launchEntry(game, true);
         } else {
+            if (!GameInstallation.ALL.get(game).getDist().supportsLauncher()) {
+                return;
+            }
+
             GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
         }
     }

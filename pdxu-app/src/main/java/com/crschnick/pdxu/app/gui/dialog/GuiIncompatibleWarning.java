@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui.dialog;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.GameMod;
+import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.model.SavegameInfo;
@@ -86,7 +87,9 @@ public class GuiIncompatibleWarning {
             alert.getButtonTypes().clear();
             alert.getButtonTypes().add(ButtonType.CLOSE);
             alert.getButtonTypes().add(launchButton);
-            alert.getButtonTypes().add(changeModsButton);
+            if (GameDistLauncher.canChangeMods(game)) {
+                alert.getButtonTypes().add(changeModsButton);
+            }
             alert.setTitle(PdxuI18n.get("MOD_INFO_TITLE", game.getTranslatedFullName()));
             alert.setHeaderText(PdxuI18n.get("MOD_INFO", game.getTranslatedFullName()));
 
