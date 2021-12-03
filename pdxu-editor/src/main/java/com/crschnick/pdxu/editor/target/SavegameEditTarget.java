@@ -41,11 +41,15 @@ public class SavegameEditTarget extends EditTarget {
         }
 
         structure = type.determineStructure(bytes);
-        var succ = structure.parse(bytes).success();
+        var res = structure.parse(bytes);
+        var succ = res.success();
         if (succ.isPresent()) {
             return succ.get().content;
         } else {
-            throw new IllegalArgumentException();
+            var msg = res.error().map(e -> e.error.getMessage())
+                    .or(() -> res.invalid().map(i -> i.message))
+                    .orElse("");
+            throw new IllegalArgumentException(msg);
         }
     }
 

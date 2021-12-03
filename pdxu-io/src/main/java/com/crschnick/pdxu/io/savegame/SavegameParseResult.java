@@ -15,6 +15,14 @@ public abstract class SavegameParseResult {
         return Optional.empty();
     }
 
+    public Optional<Error> error() {
+        return Optional.empty();
+    }
+
+    public Optional<Invalid> invalid() {
+        return Optional.empty();
+    }
+
     public static class Success extends SavegameParseResult {
 
         public Map<String, ArrayNode> content;
@@ -50,6 +58,11 @@ public abstract class SavegameParseResult {
         public void visit(Visitor visitor) {
             visitor.error(this);
         }
+
+        @Override
+        public Optional<Error> error() {
+            return Optional.of(this);
+        }
     }
 
     public static class Invalid extends SavegameParseResult {
@@ -63,6 +76,11 @@ public abstract class SavegameParseResult {
         @Override
         public void visit(Visitor visitor) {
             visitor.invalid(this);
+        }
+
+        @Override
+        public Optional<Invalid> invalid() {
+            return Optional.of(this);
         }
     }
 
