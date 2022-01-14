@@ -84,7 +84,7 @@ public class GuiEditor {
     private static void createNodeList(BorderPane pane, EditorState edState) {
         edState.getContent().shownNodesProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
-                var grid = createNodeList(edState, n);
+                var grid = createNodeList(edState);
                 ScrollPane sp = new ScrollPane(grid);
                 sp.sceneProperty().addListener((ch, ol, ne) -> {
                     if (ne == null) {
@@ -119,7 +119,7 @@ public class GuiEditor {
         return s;
     }
 
-    private static GridPane createNodeList(EditorState state, List<EditorNode> nodes) {
+    private static GridPane createNodeList(EditorState state) {
         GridPane grid = new GridPane();
         grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
         var cc = new ColumnConstraints();
@@ -140,6 +140,7 @@ public class GuiEditor {
             offset = 1;
         }
 
+        var nodes = state.getContent().getShownNodes();
         int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
         for (int i = offset; i < nodeCount + offset; i++) {
             var n = nodes.get(i - offset);

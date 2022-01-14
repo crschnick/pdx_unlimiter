@@ -52,7 +52,7 @@ public class FileWatchManager {
         }
 
         active = true;
-        watcherThread = ThreadHelper.create("savegame watcher", true, () -> {
+        watcherThread = ThreadHelper.create("file watcher", true, () -> {
             while (active) {
                 WatchKey key;
                 try {
