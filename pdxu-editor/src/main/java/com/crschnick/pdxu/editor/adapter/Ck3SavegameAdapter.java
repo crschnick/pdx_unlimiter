@@ -27,7 +27,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
             if (node.getBackingNode().isArray()) {
                 ArrayNode ar = (ArrayNode) node.getBackingNode();
-                return ar.hasKey("pattern");
+                return ar.hasKey("pattern") || ar.hasKey("colored_emblem");
             }
             return false;
         }

@@ -35,6 +35,11 @@ public class GuiCk3CoaViewerState {
     }
 
     void refresh() {
+        // The data might not be valid anymore
+        if (!editorNode.isValid()) {
+            return;
+        }
+
         parsedCoa.set(Ck3CoatOfArms.fromNode(editorNode.getBackingNode()));
         updateImage();
     }
