@@ -72,21 +72,22 @@ public class EditorNavigation {
         }
     }
 
-    public void rebaseNavPaths(EditorNode base, EditorNavPath p) {
-        if (!p.equals(current.get().path())) {
-            var loc = new EditorNavLocation(p);
-            this.state.getContent().navigate(p.getEditorNode(), 0, 0.0);
-            this.current.set(loc);
-            this.history.set(historyPos.get(), loc);
+    public boolean rebaseNavPathsToValid() {
+        var currentValid = EditorNavPath.rebaseToValid(this.current.get().path());
+        var currentChanged = !currentValid.equals(current.get().path());
+        var newLoc = !currentChanged ? current.get() :
+                new EditorNavLocation(currentValid);
+        this.current.set(newLoc);
+        this.history.set(historyPos.get(), newLoc);
 
-            // Rebase all history entries
-            for (int i = 0; i < this.history.size(); i++) {
-                var newNavPath = EditorNavPath.rebase(base, this.history.get(i).path());
-                if (!newNavPath.equals(this.history.get(i).path())) {
-                    this.history.set(i, new EditorNavLocation(newNavPath));
-                }
+        // Rebase all history entries
+        for (int i = 0; i < this.history.size(); i++) {
+            var newNavPath = EditorNavPath.rebaseToValid(this.history.get(i).path());
+            if (!newNavPath.equals(this.history.get(i).path())) {
+                this.history.set(i, new EditorNavLocation(newNavPath));
             }
         }
+        return currentChanged;
     }
 
     public void navigateTo(EditorNavPath p) {

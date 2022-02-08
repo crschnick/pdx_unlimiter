@@ -135,25 +135,6 @@ public class EditorNavPath {
         return new EditorNavPath(newPath);
     }
 
-    public static EditorNavPath rebase(EditorNode base, EditorNavPath input) {
-        if (input.getPath().size() < 3) {
-            return input;
-        }
-
-        List<EditorNode> newPath = new ArrayList<>();
-        newPath.add(null);
-        for (int i = 1; i < input.getPath().size(); i++) {
-            var current = input.getPath().get(i);
-            newPath.add(current);
-            if (current.equals(base)) {
-                return new EditorNavPath(newPath);
-            }
-        }
-
-        // Handle case if base is not found in nav path
-        return input;
-    }
-
     public List<EditorNode> getPath() {
         return path;
     }
