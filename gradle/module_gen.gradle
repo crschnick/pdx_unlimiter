@@ -26,7 +26,7 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact 'io.sentry:sentry:5.0.1'
+            artifact 'io.sentry:sentry:5.6.1'
             moduleInfoSource = '''
                 module io.sentry {
                     exports io.sentry;
