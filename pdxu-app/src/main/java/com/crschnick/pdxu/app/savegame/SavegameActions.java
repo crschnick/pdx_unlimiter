@@ -45,6 +45,10 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void exportSavegame(SavegameEntry<T, I> e) {
         SavegameContext.withSavegame(e, ctx -> {
+            if (ctx.getInfo() == null) {
+                return;
+            }
+
             try {
                 FileExportTarget.createExportTarget(e).export();
             } catch (IOException ex) {

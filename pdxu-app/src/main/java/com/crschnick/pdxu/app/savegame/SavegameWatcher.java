@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
@@ -9,6 +10,7 @@ import javafx.collections.FXCollections;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -46,6 +48,17 @@ public class SavegameWatcher {
         updateSavegames();
 
         List<Path> savegameDirs = install.getAllSavegameDirectories();
+
+        // In case the savegame dir does exist, create it anyway to prevent
+        // having to reload/restart to get savegame changes later on
+        for (var dir : savegameDirs) {
+            try {
+                Files.createDirectories(dir);
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+        }
+
         FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
             updateSavegames();
         });

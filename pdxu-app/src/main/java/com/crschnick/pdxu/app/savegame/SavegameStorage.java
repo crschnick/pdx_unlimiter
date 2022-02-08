@@ -236,6 +236,12 @@ public abstract class SavegameStorage<
             String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
             var colFile = getSavegameDataDirectory().resolve(
                     collection.getUuid().toString()).resolve(typeName + ".json");
+
+            // Campaign file might not exist even though the directory exists. Do not fail in this case
+            if (!Files.exists(colFile)) {
+                continue;
+            }
+
             JsonNode campaignNode = JsonHelper.read(colFile);
             StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
                 UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
