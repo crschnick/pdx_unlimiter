@@ -286,7 +286,7 @@ public class Ck3TagRenderer {
             Graphics2D usedGraphics = hasMask ? (Graphics2D) emblemToCullImage.getGraphics() :
                     (Graphics2D) currentImage.getGraphics();
 
-            emblem.getInstances().stream().sorted(Comparator.comparingInt(i -> i.getDepth())).forEach(instance -> {
+            emblem.getInstances().stream().sorted(Comparator.comparingDouble(Ck3CoatOfArms.Instance::getDepth)).forEach(instance -> {
                 var scaleX = ((double) size / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
                 var scaleY = ((double) size / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
 

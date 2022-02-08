@@ -165,9 +165,10 @@ public final class Ck3CoatOfArms {
         private double scaleX = 1.0;
         private double scaleY = 1.0;
 
-        private int rotation = 0;
+        private double rotation = 0;
 
-        private int depth = 0;
+        // Since 1.5 the depth can be a double
+        private double depth = 0;
 
         public double getX() {
             return x;
@@ -185,11 +186,11 @@ public final class Ck3CoatOfArms {
             return scaleY;
         }
 
-        public int getRotation() {
+        public double getRotation() {
             return rotation;
         }
 
-        public int getDepth() {
+        public double getDepth() {
             return depth;
         }
     }
@@ -255,10 +256,10 @@ public final class Ck3CoatOfArms {
                     }
                 });
                 i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
-                    instance.rotation = r.getInteger();
+                    instance.rotation = r.getDouble();
                 });
                 i.getNodeForKeyIfExistent("depth").ifPresent(r -> {
-                    instance.depth = r.getInteger();
+                    instance.depth = r.getDouble();
                 });
                 return instance;
             }).collect(Collectors.toList());

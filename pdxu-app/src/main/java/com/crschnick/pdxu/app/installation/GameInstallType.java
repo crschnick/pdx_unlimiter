@@ -244,14 +244,16 @@ public interface GameInstallType {
 
         @Override
         public Optional<GameVersion> getVersion(String versionString) {
-            Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)\\s+\\((\\w+)\\)").matcher(versionString);
+            Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)(?:\\.(\\d+))?\\s+\\((.+)\\)").matcher(versionString);
             if (m.find()) {
+                var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
+                var name = m.group(5);
                 return Optional.of(new GameNamedVersion(
                         Integer.parseInt(m.group(1)),
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
-                        0,
-                        m.group(4)));
+                        fourth,
+                        name));
             } else {
                 return Optional.empty();
             }
