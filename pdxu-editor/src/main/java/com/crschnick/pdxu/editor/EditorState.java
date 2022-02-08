@@ -80,8 +80,8 @@ public class EditorState {
     }
 
     public void onFileChanged(EditorNode changed) {
-        // Rebuild content if either the currently shown editor node is changed
-        // or if an editor node of the current navigation path is no longer valid
+        // Rebuild content if either an element in the currently selected nav path is changed
+        // or if an editor node of the current nav path is no longer valid
         if (navigation.getCurrent().path().getPath().contains(changed) || this.navigation.rebaseNavPathsToValid()) {
             this.content.completeContentChange();
         }
