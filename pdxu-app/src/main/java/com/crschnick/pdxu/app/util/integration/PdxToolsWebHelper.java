@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RakalyWebHelper {
+public class PdxToolsWebHelper {
 
     private static byte[] writeJsBlob(byte[] bytes) throws IOException {
         List<byte[]> byteMap = new ArrayList<>(256);
@@ -58,10 +58,10 @@ public class RakalyWebHelper {
 
         public void handle(HttpExchange t) throws IOException {
             byte [] response = new byte[0];
-            if (t.getRequestURI().toString().equals("/pdxu_rakaly_blob.js")) {
+            if (t.getRequestURI().toString().equals("/pdx_tools_blob.js")) {
                 response = writeJsBlob(Files.readAllBytes(storage.getSavegameFile(entry)));
             } else if (t.getRequestURI().toString().equals("/")) {
-                var src = PdxuInstallation.getInstance().getResourceDir().resolve("web").resolve("rakaly.html");
+                var src = PdxuInstallation.getInstance().getResourceDir().resolve("web").resolve("pdx_tools.html");
                 response = Files.readAllBytes(src);
             }
 

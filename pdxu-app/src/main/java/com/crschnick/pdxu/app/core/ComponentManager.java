@@ -11,7 +11,7 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.savegame.SavegameWatcher;
-import com.crschnick.pdxu.app.util.integration.RakalyWebHelper;
+import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
@@ -144,7 +144,7 @@ public class ComponentManager {
             }
             PdxuI18n.reset();
             CacheManager.reset();
-            RakalyWebHelper.reset();
+            PdxToolsWebHelper.reset();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }

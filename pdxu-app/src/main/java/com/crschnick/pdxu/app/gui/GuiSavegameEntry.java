@@ -12,7 +12,7 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.integration.ConverterHelper;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
-import com.crschnick.pdxu.app.util.integration.RakalyWebHelper;
+import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
 import com.crschnick.pdxu.app.util.integration.SkanderbegHelper;
 import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
@@ -227,7 +227,7 @@ public class GuiSavegameEntry {
             Button upload = new JFXButton();
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
-                RakalyWebHelper.uploadSavegame(eu4Entry);
+                PdxToolsWebHelper.uploadSavegame(eu4Entry);
             });
             upload.getStyleClass().add(CLASS_ANALYZE);
             GuiTooltips.install(upload, PdxuI18n.get("ANALYZE_RAKALY"));

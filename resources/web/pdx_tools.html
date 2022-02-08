@@ -9,8 +9,8 @@
         }
     </style>
 <body>
-<iframe src="https://rakaly.com/loading"></iframe>
-<script src="pdxu_rakaly_blob.js"></script>
+<iframe src="https://pdx.tools/loading"></iframe>
+<script src="pdx_tools_blob.js"></script>
 <script>
     var buffer = createBuffer().buffer;
     var file = new File([buffer], "savegame.eu4", {
@@ -24,9 +24,9 @@
         window.close();
     }
 
-    var newWindow = window.open('http://rakaly.com/eu4/analyze')
+    var newWindow = window.open('http://pdx.tools')
     window.addEventListener('message', (e) => {
-      if (e.data === "rakaly-loaded") {
+      if (e.data === "pdx-tools-loaded") {
         postFile();
       }
     });

@@ -21,7 +21,7 @@ l_chinese:
   DELETE_SAVEGAME_QUESTION: "真的要删除此存档吗？"
   OPEN_SAVEGAME: "打开存档目录"
   MELT_SAVEGAME: "转换为非铁人存档"
-  ANALYZE_RAKALY: "上传至 Rakaly.com 并分析"
+  ANALYZE_RAKALY: "上传至 pdx.tools 并分析"
   UPLOAD_SKANDERBEG: "上传至 Skanderbeg.pm"
   EDIT_EU4SAVEEDITOR: "使用 Eu4SaveEditor 编辑"
   CONVERT_TO_EU4: "转换至 EU4 存档"

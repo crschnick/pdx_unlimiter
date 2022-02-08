@@ -123,7 +123,7 @@ favourite text-editor and to completely change the data structure if wanted.
 
 Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
 any ironman savegame into a text-based, non-ironman savegame.
-It also provides an easy-to-use frontend for the Rakaly converter,
+It also provides an easy-to-use frontend for the Rakaly Ironman converter,
 i.e. a graphical user interface to convert your own
 ironman savegames into playable and editable non-ironman savegames.
 
@@ -150,9 +150,9 @@ The Pdx-Unlimiter is also built as an application that gives you easy access to 
 other great community-made tools.
 The supported tools are:
 
-- [Rakaly](https://rakaly.com/eu4),
+- [PDX Tools](https://pdx.tools),
   a website to analyze and share your eu4 achievements and compete against other players.
-  It is possible to upload your EU4 savegames to rakaly and analyze them from there.
+  It is possible to analyze your EU4 savegames on PDX Tools without having to upload them.
 
 - [Skanderbeg](https://skanderbeg.pm),
   a website to generate maps and statistics for your savegames.
@@ -177,7 +177,7 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 # Development
 
-To build this project, [JDK 16](https://openjdk.java.net/projects/jdk/16/) and gradle is required.
+To build this project, [JDK 17](https://openjdk.java.net/projects/jdk/17/) and gradle is required.
 You can build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
 For running, you can use `gradle/gradlew run`.
 You can use the automatically generated file `pdxu.properties` to set some useful development options when needed.

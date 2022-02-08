@@ -71,6 +71,7 @@ jlink {
             '--compress', '2',
             '--no-header-files',
             '--no-man-pages']
+
     launcher {
         moduleName = 'com.crschnick.pdxu.app'
         mainClassName = 'com.crschnick.pdxu.app.Main'

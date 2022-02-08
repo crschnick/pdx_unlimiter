@@ -21,7 +21,7 @@ l_french:
   DELETE_SAVEGAME_QUESTION: "Voulez-vous supprimer la sauvegarde sélectionnée ?"
   OPEN_SAVEGAME: "Ouvrir l'emplacement de la sauvegarde"
   MELT_SAVEGAME: "'Melt' la sauvegarde (Convertir en Non Ironman)"
-  ANALYZE_RAKALY: "Publier et analyser avec Rakaly.com"
+  ANALYZE_RAKALY: "Publier et analyser avec pdx.tools"
   UPLOAD_SKANDERBEG: "Publier sur Skanderbeg.pm"
   EDIT_EU4SAVEEDITOR: "Éditer with Eu4SaveEditor"
   CONVERT_TO_EU4: "Convertir en sauvegarde EU4"

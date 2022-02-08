@@ -21,7 +21,7 @@ l_english:
   DELETE_SAVEGAME_QUESTION: "Do you want to delete the selected savegame?"
   OPEN_SAVEGAME: "Open stored savegame location"
   MELT_SAVEGAME: "Melt savegame (Convert to Non-Ironman)"
-  ANALYZE_RAKALY: "Upload and analyze with Rakaly.com"
+  ANALYZE_RAKALY: "Upload and analyze with pdx.tools"
   UPLOAD_SKANDERBEG: "Upload to Skanderbeg.pm"
   EDIT_EU4SAVEEDITOR: "Edit with Eu4SaveEditor"
   CONVERT_TO_EU4: "Convert to EU4 savegame"
