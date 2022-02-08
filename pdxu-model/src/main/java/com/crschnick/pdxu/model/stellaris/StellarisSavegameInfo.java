@@ -65,7 +65,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
 
-            Pattern p = Pattern.compile("^((?:\\w|\\s)+?)\\s*v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?$");
+            Pattern p = Pattern.compile("((?:\\w|\\s)+?)\\s*v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
             var vs = n.getNodesForKey("version").get(0).getString();
             Matcher m = p.matcher(vs);
             if (m.matches()) {
