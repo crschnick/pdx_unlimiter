@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,8 +62,16 @@ public class Eu4SeHelper {
         alert.showAndWait();
     }
 
-    public static boolean shouldShowButton(SavegameEntry<?, ?> entry, SavegameInfo<?> info) {
+    public static boolean isSupported() {
         if (PdxuInstallation.getInstance().isStandalone()) {
+            return false;
+        }
+
+        return SystemUtils.IS_OS_WINDOWS;
+    }
+
+    public static boolean shouldShowButton(SavegameEntry<?, ?> entry, SavegameInfo<?> info) {
+        if (!isSupported()) {
             return false;
         }
 

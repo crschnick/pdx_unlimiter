@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ComponentManager;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
@@ -48,7 +49,7 @@ public class GuiSettings {
                 GuiSettingsComponents.section("CONVERTERS", applyFuncs, s.ck3toeu4Dir),
                 new Separator(),
                 GuiSettingsComponents.section("SKANDERBEG", applyFuncs, s.skanderbegApiKey));
-        if (!PdxuInstallation.getInstance().isStandalone()) {
+        if (Eu4SeHelper.isSupported()) {
             vbox.getChildren().add(new Separator());
             vbox.getChildren().add(GuiSettingsComponents.section("EU4SE", applyFuncs, s.enableEu4SaveEditor));
         }
