@@ -18,6 +18,7 @@ module com.crschnick.pdxu.app {
     requires org.slf4j;
     requires org.slf4j.simple;
     requires io.sentry;
+    requires java.logging;
     requires org.apache.commons.collections4;
     requires java.desktop;
     requires java.net.http;

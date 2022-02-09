@@ -30,7 +30,7 @@ dependencies {
     implementation "org.openjfx:javafx-media:16:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
@@ -42,7 +42,7 @@ dependencies {
     implementation files("$rootProject.buildDir/generated-modules/commons-lang3-3.12.0.jar")
     implementation files("$rootProject.buildDir/generated-modules/commons-io-2.8.0.jar")
     implementation files("$rootProject.buildDir/generated-modules/commons-collections4-4.4.jar")
-    implementation files("$rootProject.buildDir/generated-modules/sentry-5.0.1.jar")
+    implementation files("$rootProject.buildDir/generated-modules/sentry-5.6.1.jar")
     implementation files("$rootProject.buildDir/generated-modules/jnativehook-2.0.2.jar")
 
     implementation project(':pdxu-io')
