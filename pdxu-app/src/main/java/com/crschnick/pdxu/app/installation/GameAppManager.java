@@ -158,7 +158,15 @@ public final class GameAppManager {
 
     public void importLatestAndLaunch() {
         var g = getActiveGame();
-        if (g != null && g.getGame().isEnabled()) {
+        if (g == null) {
+            return;
+        }
+
+        if (GameInstallation.ALL.get(g.getGame()).getDist().supportsDirectLaunch()) {
+            return;
+        }
+
+        if (g.getGame().isEnabled()) {
             logger.info("Import latest savegame and launch");
             killGame(g);
             SavegameActions.importLatestAndLaunch(g.getGame());
@@ -167,7 +175,15 @@ public final class GameAppManager {
 
     public void loadLatestCheckpoint() {
         var g = getActiveGame();
-        if (g != null && g.getGame().isEnabled()) {
+        if (g == null) {
+            return;
+        }
+
+        if (GameInstallation.ALL.get(g.getGame()).getDist().supportsDirectLaunch()) {
+            return;
+        }
+
+        if (g.getGame().isEnabled()) {
             logger.info("Loading latest checkpoint");
             killGame(g);
             SavegameActions.loadLatestSavegameCheckpoint(g.getGame());
