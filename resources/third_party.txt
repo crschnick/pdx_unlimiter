@@ -1,8 +1,10 @@
-JDK 17 (http://jdk.java.net/17/) (GPL2 with the Classpath Exception)
+OpenJDK 17 (http://jdk.java.net/17/) (GPL2 with the Classpath Exception)
+
+GraalVM Community Edition 21 (https://www.graalvm.org/) (GPL2 with the Classpath Exception)
 
 JavaFX 17 (https://openjfx.io/) (GPL v2)
 
-Rakaly (https://github.com/rakaly/cli) (MIT License)
+Rakaly CLI (https://github.com/rakaly/cli) (MIT License)
 
 Apache Commons IO (https://commons.apache.org/proper/commons-io/) (Apache License v2.0)
 
