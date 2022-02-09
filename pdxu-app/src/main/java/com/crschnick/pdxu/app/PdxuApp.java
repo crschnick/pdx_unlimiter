@@ -7,8 +7,11 @@ import com.crschnick.pdxu.app.core.settings.SavedState;
 import com.crschnick.pdxu.app.gui.GuiLayout;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import javafx.application.Application;
+import javafx.application.ConditionalFeature;
+import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -121,8 +124,12 @@ public class PdxuApp extends Application {
             title = title + "     OUTDATED: " + l + " available";
         }
         stage.setTitle(title);
-        Scene scene = new Scene(layout.getContent());
+
+        var aa = Platform.isSupported(ConditionalFeature.SCENE3D) ?
+                SceneAntialiasing.BALANCED : SceneAntialiasing.DISABLED;
+        var scene = new Scene(layout.getContent(), -1, -1, false, aa);
         stage.setScene(scene);
+
         GuiStyle.addStylesheets(scene);
         layout.getContent().requestLayout();
     }
