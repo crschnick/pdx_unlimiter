@@ -162,7 +162,7 @@ public final class GameAppManager {
             return;
         }
 
-        if (GameInstallation.ALL.get(g.getGame()).getDist().supportsDirectLaunch()) {
+        if (!GameInstallation.ALL.get(g.getGame()).getDist().supportsDirectLaunch()) {
             return;
         }
 
@@ -179,7 +179,7 @@ public final class GameAppManager {
             return;
         }
 
-        if (GameInstallation.ALL.get(g.getGame()).getDist().supportsDirectLaunch()) {
+        if (!GameInstallation.ALL.get(g.getGame()).getDist().supportsDirectLaunch()) {
             return;
         }
 
