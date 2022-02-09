@@ -116,30 +116,38 @@ jlink {
 
 def getDistDir() {
     if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
-        return "${buildDir}/dist/Pdx-Unlimiter.app/Contents/"
+        return "${buildDir}/dist/Pdx-Unlimiter.app/"
     } else {
         return "${buildDir}/dist/Pdx-Unlimiter/"
     }
 }
 
+def getResourcesDir() {
+    if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
+        return "${getDistDir()}/Contents/Resources"
+    } else {
+        return getDistDir()
+    }
+}
+
 task writeVersion(type: DefaultTask) {
     doLast {
-        file(getDistDir() + 'version').write(String.valueOf(version))
+        file(getResourcesDir() + 'version').write(String.valueOf(version))
     }
 }
 
 task copyResources(type: Copy) {
-    into getDistDir() + 'resources'
+    into getResourcesDir() + 'resources'
     from "${projectDir}/resources"
 }
 
 task copyLang(type: Copy) {
-    into getDistDir() + 'lang'
+    into getResourcesDir() + 'lang'
     from "${projectDir}/lang"
 }
 
 task copyStartScripts(type: Copy) {
-    into getDistDir() + 'bin'
+    into getResourcesDir() + 'bin'
     if (DefaultNativePlatform.currentOperatingSystem.windows) {
         from "${projectDir}/misc/pdxu.bat"
     } else if (DefaultNativePlatform.currentOperatingSystem.linux) {
