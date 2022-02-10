@@ -44,7 +44,7 @@ public class Editor implements EditorProvider {
         createNewEditor(target);
     }
 
-    public void openExternalFile() {
+    public void browseExternalFile() {
         Platform.runLater(() -> {
             FileChooser c = new FileChooser();
             List<File> file = c.showOpenMultipleDialog(PdxuApp.getApp().getStage());
@@ -54,10 +54,10 @@ public class Editor implements EditorProvider {
         });
     }
 
-    public void openExternalDataFile(Path file) {
+    public void openExternalFileIfNoSavegame(Path file) {
         if (Files.isDirectory(file)) {
             try {
-                Files.list(file).forEach(f -> openExternalDataFile(f));
+                Files.list(file).forEach(this::openExternalFileIfNoSavegame);
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

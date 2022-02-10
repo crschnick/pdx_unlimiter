@@ -41,7 +41,7 @@ public class GuiMenuBar {
 
         MenuItem ed = new MenuItem(PdxuI18n.get("OPEN_EDITOR"));
         ed.setOnAction((a) -> {
-            EditorProvider.get().openExternalFile();
+            EditorProvider.get().browseExternalFile();
         });
         pdxu.getItems().add(ed);
 
