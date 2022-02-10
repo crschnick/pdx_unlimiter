@@ -3,5 +3,5 @@ module com.crschnick.pdxu.io {
     exports com.crschnick.pdxu.io.savegame;
     exports com.crschnick.pdxu.io.node;
 
-    requires jdk.unsupported;
+    requires org.apache.commons.lang;
 }

@@ -11,3 +11,7 @@ java {
 repositories {
     mavenCentral()
 }
+
+dependencies {
+    implementation files("$rootProject.buildDir/generated-modules/commons-lang3-3.12.0.jar")
+}
