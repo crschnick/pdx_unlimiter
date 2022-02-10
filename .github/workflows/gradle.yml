@@ -23,7 +23,7 @@ jobs:
       - name: Verify Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Execute dist build
-        run: ./gradlew --info --stacktrace createDist
+        run: ./gradle/gradlew --info --stacktrace createDist
       - name: Upload mac dist as an artifact
         uses: actions/upload-artifact@v2
         with:
