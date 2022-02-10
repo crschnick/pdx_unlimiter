@@ -128,88 +128,94 @@ public class GuiEditor {
                 new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
                 new ColumnConstraints(), new ColumnConstraints());
 
-        int offset = 0;
-        if (state.getContent().canGoToPreviousPage()) {
-            Button next = new JFXButton("Go to previous page (" + (state.getContent().getPage()) + ")");
-            next.setOnAction(e -> {
-                state.getContent().previousPage();
-            });
-            HBox box = new HBox(new FontIcon("mdi-arrow-up"), next, new FontIcon("mdi-arrow-up"));
-            box.setAlignment(Pos.CENTER);
-            grid.add(createGridElement(box, 0), 0, 0, 5, 1);
-            offset = 1;
-        }
-
-        var nodes = state.getContent().getShownNodes();
-        int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
-        for (int i = offset; i < nodeCount + offset; i++) {
-            var n = nodes.get(i - offset);
-            var kn = createGridElement(new Label(n.getNavigationName()), i);
-            kn.setAlignment(Pos.CENTER_LEFT);
-
-            grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);
-            grid.add(kn, 1, i);
-            grid.add(createGridElement(new Label("="), i), 2, i);
-
-            Region valueDisplay = GuiEditorNode.createValueDisplay(n, state);
-            Node tag = null;
-            if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
-                try {
-                    tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                            .createNodeTag(state, (EditorRealNode) n, valueDisplay);
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                }
+        // Execute everything while the content is fixed
+        // to avoid multithreading issues
+        state.getContent().withFixedContent(c -> {
+            int offset;
+            if (c.canGoToPreviousPage()) {
+                Button next = new JFXButton("Go to previous page (" + (c.getPage()) + ")");
+                next.setOnAction(e -> {
+                    c.previousPage();
+                });
+                HBox box = new HBox(new FontIcon("mdi-arrow-up"), next, new FontIcon("mdi-arrow-up"));
+                box.setAlignment(Pos.CENTER);
+                grid.add(createGridElement(box, 0), 0, 0, 5, 1);
+                offset = 1;
+            } else {
+                offset = 0;
             }
-            grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i), 3, i);
-            grid.add(createGridElement(valueDisplay, i), 4, i);
 
-            HBox actions = new HBox();
-            actions.setFillHeight(true);
-            actions.setAlignment(Pos.CENTER_RIGHT);
-            if (n.isReal()) {
-                if (EditorSettings.getInstance().enableNodeJumps.getValue()) {
+            var nodes = c.getShownNodes();
+            int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
+            for (int i = offset; i < nodeCount + offset; i++) {
+                var n = nodes.get(i - offset);
+                var kn = createGridElement(new Label(n.getNavigationName()), i);
+                kn.setAlignment(Pos.CENTER_LEFT);
+
+                grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);
+                grid.add(kn, 1, i);
+                grid.add(createGridElement(new Label("="), i), 2, i);
+
+                Region valueDisplay = GuiEditorNode.createValueDisplay(n, state);
+                Node tag = null;
+                if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
                     try {
-                    var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                            .createNodeJump(state, (EditorRealNode) n);
-                        if (pointer != null) {
-                            var b = new JFXButton();
-                            b.setGraphic(new FontIcon());
-                            b.getStyleClass().add("jump-to-def-button");
-                            GuiTooltips.install(b, "Jump to " + pointer);
-                            b.setOnAction(e -> state.getNavigation().navigateTo(pointer));
-                            actions.getChildren().add(b);
-                            b.prefHeightProperty().bind(actions.heightProperty());
-                        }
+                        tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                                .createNodeTag(state, (EditorRealNode) n, valueDisplay);
                     } catch (Exception ex) {
                         ErrorHandler.handleException(ex);
                     }
                 }
+                grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i), 3, i);
+                grid.add(createGridElement(valueDisplay, i), 4, i);
 
-                Button edit = new JFXButton();
-                edit.setGraphic(new FontIcon());
-                edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-                edit.setOnAction(e -> {
-                    state.getExternalState().startEdit(state, (EditorRealNode) n);
-                });
-                GuiTooltips.install(edit, "Open in external text editor");
-                actions.getChildren().add(edit);
-                edit.prefHeightProperty().bind(actions.heightProperty());
+                HBox actions = new HBox();
+                actions.setFillHeight(true);
+                actions.setAlignment(Pos.CENTER_RIGHT);
+                if (n.isReal()) {
+                    if (EditorSettings.getInstance().enableNodeJumps.getValue()) {
+                        try {
+                            var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                                    .createNodeJump(state, (EditorRealNode) n);
+                            if (pointer != null) {
+                                var b = new JFXButton();
+                                b.setGraphic(new FontIcon());
+                                b.getStyleClass().add("jump-to-def-button");
+                                GuiTooltips.install(b, "Jump to " + pointer);
+                                b.setOnAction(e -> state.getNavigation().navigateTo(pointer));
+                                actions.getChildren().add(b);
+                                b.prefHeightProperty().bind(actions.heightProperty());
+                            }
+                        } catch (Exception ex) {
+                            ErrorHandler.handleException(ex);
+                        }
+                    }
+
+                    Button edit = new JFXButton();
+                    edit.setGraphic(new FontIcon());
+                    edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+                    edit.setOnAction(e -> {
+                        state.getExternalState().startEdit(state, (EditorRealNode) n);
+                    });
+                    GuiTooltips.install(edit, "Open in external text editor");
+                    actions.getChildren().add(edit);
+                    edit.prefHeightProperty().bind(actions.heightProperty());
+                }
+                grid.add(createGridElement(actions, i), 5, i);
+
+                grid.add(createGridElement(new Region(), i), 6, i);
             }
-            grid.add(createGridElement(actions, i), 5, i);
 
-            grid.add(createGridElement(new Region(), i), 6, i);
-        }
-
-        if (state.getContent().canGoToNextPage()) {
-            Button next = new JFXButton("Go to next page (" + (state.getContent().getPage() + 2) + ")");
-            next.setOnAction(e -> {
-                state.getContent().nextPage();
-            });
-            HBox box = new HBox(new FontIcon("mdi-arrow-down"), next, new FontIcon("mdi-arrow-down"));
-            box.setAlignment(Pos.CENTER);
-            grid.add(createGridElement(box, nodeCount + offset), 0, nodeCount + offset, 6, 1);
-        }
+            if (c.canGoToNextPage()) {
+                Button next = new JFXButton("Go to next page (" + (c.getPage() + 2) + ")");
+                next.setOnAction(e -> {
+                    c.nextPage();
+                });
+                HBox box = new HBox(new FontIcon("mdi-arrow-down"), next, new FontIcon("mdi-arrow-down"));
+                box.setAlignment(Pos.CENTER);
+                grid.add(createGridElement(box, nodeCount + offset), 0, nodeCount + offset, 6, 1);
+            }
+        });
 
         return grid;
     }

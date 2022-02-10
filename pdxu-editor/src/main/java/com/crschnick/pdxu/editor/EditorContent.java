@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class EditorContent {
 
@@ -34,6 +35,10 @@ public class EditorContent {
         this.allNodes = new ArrayList<>();
         this.filteredNodes = new ArrayList<>();
         this.shownNodes = new SimpleListProperty<>(FXCollections.observableArrayList());
+    }
+
+    public synchronized void withFixedContent(Consumer<EditorContent> c) {
+        c.accept(this);
     }
 
     private void rebuildPageSizes() {
@@ -138,11 +143,11 @@ public class EditorContent {
         changeScroll(1.0);
     }
 
-    public void changeScroll(double s) {
+    public synchronized void changeScroll(double s) {
         this.scroll = s;
     }
 
-    public EditorNavLocation navigateAndFocus(EditorNavPath path, EditorNode focus) {
+    public synchronized EditorNavLocation navigateAndFocus(EditorNavPath path, EditorNode focus) {
         this.node = path.getEditorNode();
         rebuildEditorNodes();
         rebuildPageSizes();
@@ -152,39 +157,39 @@ public class EditorContent {
         return newLoc;
     }
 
-    public void previousPage() {
+    public synchronized void previousPage() {
         changeScroll(1.0);
         goToPage(getPage() - 1);
     }
 
-    public void nextPage() {
+    public synchronized void nextPage() {
         changeScroll(0.0);
         goToPage(getPage() + 1);
     }
 
-    public boolean canGoToPreviousPage() {
+    public synchronized boolean canGoToPreviousPage() {
         return getPage() > 0;
     }
 
-    public boolean canGoToNextPage() {
+    public synchronized boolean canGoToNextPage() {
         return getPage() < pageSizes.size() - 1;
     }
 
-    public void filterChange() {
+    public synchronized void filterChange() {
         double vs = getViewShare();
         rebuildFilteredEditorNodes();
         rebuildPageSizes();
         goToViewShare(vs);
     }
 
-    public void completeContentChange() {
+    public synchronized void completeContentChange() {
         double vs = getViewShare();
         rebuildEditorNodes();
         rebuildPageSizes();
         goToViewShare(vs);
     }
 
-    public void navigate(EditorNode node, int page, double scroll) {
+    public synchronized void navigate(EditorNode node, int page, double scroll) {
         if (node != null && !node.isValid()) {
             throw new IllegalArgumentException("Node is not valid");
         }
@@ -201,23 +206,19 @@ public class EditorContent {
         }
     }
 
-    public int getPage() {
+    public synchronized int getPage() {
         return page;
     }
 
-    public double getScroll() {
+    public synchronized double getScroll() {
         return scroll;
     }
 
-    public List<EditorNode> getShownNodes() {
+    public synchronized List<EditorNode> getShownNodes() {
         return shownNodes.get();
     }
 
-    public ListProperty<EditorNode> shownNodesProperty() {
+    public synchronized ListProperty<EditorNode> shownNodesProperty() {
         return shownNodes;
-    }
-
-    public List<Integer> getPageSizes() {
-        return pageSizes;
     }
 }
