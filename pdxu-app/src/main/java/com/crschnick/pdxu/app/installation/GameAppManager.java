@@ -138,7 +138,7 @@ public final class GameAppManager {
         if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
             var clip = new AudioClip(PdxuInstallation.getInstance().getResourceDir().resolve("sound")
                     .resolve("import.wav").toUri().toString());
-            clip.play(0.1);
+            clip.play(0.2);
         }
     }
 
