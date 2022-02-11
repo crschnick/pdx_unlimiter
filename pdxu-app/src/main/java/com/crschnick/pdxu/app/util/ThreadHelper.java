@@ -27,7 +27,7 @@ public class ThreadHelper {
             }
         } else {
             if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
-                if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
                     return;
                 }
 
@@ -58,7 +58,11 @@ public class ThreadHelper {
     public static void browse(String uri) {
         var t = new Thread(() -> {
             try {
-                Desktop.getDesktop().browse(URI.create(uri));
+                if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    Runtime.getRuntime().exec("xdg-open " + uri);
+                } else {
+                    Desktop.getDesktop().browse(URI.create(uri));
+                }
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
@@ -70,7 +74,11 @@ public class ThreadHelper {
     public static void open(Path p) {
         var t = new Thread(() -> {
             try {
-                Desktop.getDesktop().open(p.toFile());
+                if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                    Runtime.getRuntime().exec("xdg-open " + p.toString());
+                } else {
+                    Desktop.getDesktop().open(p.toFile());
+                }
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
