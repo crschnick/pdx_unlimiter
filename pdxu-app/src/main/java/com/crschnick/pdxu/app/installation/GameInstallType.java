@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameNamedVersion;
@@ -566,7 +567,20 @@ public interface GameInstallType {
 
         @Override
         public Path getExecutable(Path p) {
-            return p.resolve(executableName + (SystemUtils.IS_OS_WINDOWS ? ".exe" : ""));
+            switch (SupportedOs.get()) {
+                case WINDOWS -> {
+                    return p.resolve(executableName + ".exe");
+                }
+                case LINUX -> {
+                    return p.resolve(executableName);
+                }
+                case MAC -> {
+                    return p.resolve(p.resolve(executableName + ".app")
+                            .resolve("Contents").resolve("MacOS").resolve(executableName));
+                }
+            }
+
+            throw new AssertionError();
         }
 
         @Override

@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.installation.dist;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.SystemUtils;
@@ -39,11 +40,18 @@ public class PdxLauncherDist extends GameDist {
 
     private static Optional<Path> getParadoxLauncherPath() {
         Optional<String> launcherDir = Optional.empty();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            launcherDir = WindowsRegistry.readRegistry("HKEY_CURRENT_USER\\SOFTWARE\\Paradox Interactive\\Paradox Launcher v2", "LauncherInstallation");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            String s = Path.of(System.getProperty("user.home")).resolve(".paradoxlauncher").toString();
-            launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                launcherDir = WindowsRegistry.readRegistry("HKEY_CURRENT_USER\\SOFTWARE\\Paradox Interactive\\Paradox Launcher v2", "LauncherInstallation");
+            }
+            case LINUX -> {
+                String s = Path.of(System.getProperty("user.home")).resolve(".paradoxlauncher").toString();
+                launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+            }
+            case MAC -> {
+                String s = OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").toString();
+                launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+            }
         }
 
         return launcherDir.map(Path::of);

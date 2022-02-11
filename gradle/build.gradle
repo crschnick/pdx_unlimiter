@@ -132,7 +132,7 @@ def getResourcesDir() {
 
 task writeVersion(type: DefaultTask) {
     doLast {
-        file(getResourcesDir() + 'version').write(String.valueOf(version))
+        file(getResourcesDir() + '/version').write(String.valueOf(version))
     }
 }
 

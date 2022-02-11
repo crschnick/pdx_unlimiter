@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
 import org.apache.commons.lang3.ArchUtils;
@@ -28,22 +29,31 @@ public class SteamDist extends GameDist {
 
     private static Optional<Path> getSteamPath() {
         Optional<String> steamDir = Optional.empty();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            if (ArchUtils.getProcessor().is64Bit()) {
-                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
-            } else {
-                steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
-            }
-        } else if (SystemUtils.IS_OS_LINUX) {
-            try {
-                var steamPath = Path.of(System.getProperty("user.home"), ".steam", "steam");
-                if (Files.exists(steamPath)) {
-                    // Resolve symlink
-                    var steamRealPath = steamPath.toRealPath();
-                    steamDir = Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                if (ArchUtils.getProcessor().is64Bit()) {
+                    steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+                } else {
+                    steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
                 }
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+            }
+            case LINUX -> {
+                try {
+                    var steamPath = Path.of(System.getProperty("user.home"), ".steam", "steam");
+                    if (Files.exists(steamPath)) {
+                        // Resolve symlink
+                        var steamRealPath = steamPath.toRealPath();
+                        steamDir = Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+                    }
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
+            }
+            case MAC -> {
+                var steamPath = Path.of(System.getProperty("user.home"), "Library", "Application Support", "Steam");
+                if (Files.exists(steamPath)) {
+                    steamDir = Optional.of(steamPath.toString());
+                }
             }
         }
 
@@ -53,6 +63,10 @@ public class SteamDist extends GameDist {
     private static final Pattern STEAM_LIBRARY_DIR_OLD = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
     private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");
 
+    private static Path getSteamAppsCommonDir(Path base) {
+        return base.resolve("steamapps").resolve("common");
+    }
+
     private static List<Path> getSteamLibraryPaths() {
         var p = getSteamPath();
         if (p.isEmpty()) {
@@ -60,7 +74,7 @@ public class SteamDist extends GameDist {
         }
 
         var list = new ArrayList<Path>();
-        list.add(p.get().resolve("steamapps").resolve("common"));
+        list.add(getSteamAppsCommonDir(p.get()));
 
         try {
             var libraryFoldersFile = Files.readString(p.get().resolve("steamapps").resolve("libraryfolders.vdf"));
@@ -68,11 +82,11 @@ public class SteamDist extends GameDist {
                 try {
                     var m = STEAM_LIBRARY_DIR_OLD.matcher(line);
                     if (m.find()) {
-                        list.add(Path.of(m.group(1)).resolve("steamapps").resolve("common"));
+                        list.add(getSteamAppsCommonDir(Path.of(m.group(1))));
                     }
                     m = STEAM_LIBRARY_DIR_NEW.matcher(line);
                     if (m.find()) {
-                        list.add(Path.of(m.group(1)).resolve("steamapps").resolve("common"));
+                        list.add(getSteamAppsCommonDir(Path.of(m.group(1))));
                     }
                 } catch (InvalidPathException ignored) {}
             });

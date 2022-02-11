@@ -42,10 +42,9 @@ public class PdxuInstallation {
             case MAC -> {
                 return path.getParent().getParent().getParent().getParent();
             }
-            default -> {
-                return null;
-            }
         }
+
+        throw new AssertionError();
     }
 
     public static void checkCorrectExtraction() {
@@ -68,8 +67,8 @@ public class PdxuInstallation {
         i.version = "unknown";
 
         if (i.image) {
-            i.languageDir = appPath.resolve("lang");
-            i.resourceDir = appPath.resolve("resources");
+            i.languageDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve("lang");
+            i.resourceDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") : appPath.resolve("resources");
         } else {
             i.languageDir = Path.of("lang");
             i.resourceDir = Path.of("resources");
@@ -159,7 +158,7 @@ public class PdxuInstallation {
         }
 
         i.logLevel = Optional.ofNullable(props.get("logLevel"))
-                .map(val -> val.toString())
+                .map(Object::toString)
                 .orElse("debug");
 
         i.developerMode = Optional.ofNullable(props.get("developerMode"))

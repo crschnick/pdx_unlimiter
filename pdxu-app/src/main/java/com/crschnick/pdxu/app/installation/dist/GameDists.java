@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.SystemUtils;
@@ -89,29 +90,37 @@ public class GameDists {
 
     private static List<Path> getInstallDirSearchPaths(Game g) {
         var installDirSearchPaths = new ArrayList<Path>();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            for (var root : FileSystems.getDefault().getRootDirectories()) {
-                for (var name : g.getCommonInstallDirNames()) {
-                    installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve(name));
-                }
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                for (var root : FileSystems.getDefault().getRootDirectories()) {
+                    for (var name : g.getCommonInstallDirNames()) {
+                        installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve(name));
+                    }
 
-                // Paradox Games Launcher path
-                if (g.getParadoxGamesLauncherName() != null) {
-                    installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive")
-                            .resolve("games").resolve(g.getParadoxGamesLauncherName()));
-                }
+                    // Paradox Games Launcher path
+                    if (g.getParadoxGamesLauncherName() != null) {
+                        installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive")
+                                .resolve("games").resolve(g.getParadoxGamesLauncherName()));
+                    }
 
-                // Epic Games path
-                if (g.getEpicGamesName() != null) {
-                    installDirSearchPaths.add(root.resolve("Program Files").resolve("Epic Games")
-                            .resolve(g.getEpicGamesName()));
+                    // Epic Games path
+                    if (g.getEpicGamesName() != null) {
+                        installDirSearchPaths.add(root.resolve("Program Files").resolve("Epic Games")
+                                .resolve(g.getEpicGamesName()));
+                    }
                 }
             }
-        } else {
-            for (var name : g.getCommonInstallDirNames()) {
-                installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name));
+            case LINUX -> {
+                // Common manual install location
+                for (var name : g.getCommonInstallDirNames()) {
+                    installDirSearchPaths.add(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name));
+                }
+            }
+            case MAC -> {
+                // Paradox games on macOS without Steam? Ehhh ...
             }
         }
+
         return installDirSearchPaths;
     }
 }
