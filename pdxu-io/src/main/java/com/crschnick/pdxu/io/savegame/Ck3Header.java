@@ -29,6 +29,10 @@ public record Ck3Header(boolean unknown, boolean compressed, boolean binary, lon
     }
 
     public static boolean skipsHeader(byte[] input) {
+        if (input.length < LENGTH) {
+            return true;
+        }
+
         return Arrays.equals(input, 0, 9,
                 "meta_data".getBytes(StandardCharsets.UTF_8), 0, 9);
     }
