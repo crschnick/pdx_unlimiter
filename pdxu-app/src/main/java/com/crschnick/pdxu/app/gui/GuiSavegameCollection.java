@@ -37,7 +37,7 @@ public class GuiSavegameCollection {
         {
             if (c instanceof SavegameCampaign) {
                 SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
-                SavegameContext.withCollection(c, gi -> {
+                SavegameContext.withCollectionContext(c, gi -> {
                     ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
                     prop.addListener((change, o, n) -> {
                         Platform.runLater(() -> {
@@ -92,7 +92,7 @@ public class GuiSavegameCollection {
             if (c instanceof SavegameCampaign) {
                 SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
                 Label date = new Label();
-                SavegameContext.withCollection(c, gi -> {
+                SavegameContext.withCollectionContext(c, gi -> {
                     date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
                 });
                 date.getStyleClass().add(CLASS_DATE);

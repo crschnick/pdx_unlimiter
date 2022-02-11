@@ -55,7 +55,7 @@ public class GameDistLauncher {
     }
 
     public static <T, I extends SavegameInfo<T>> void continueSavegame(SavegameEntry<T, I> e, boolean debug) {
-        SavegameContext.withSavegame(e, ctx -> {
+        SavegameContext.withSavegameContext(e, ctx -> {
             if (ctx.getInfo() == null) {
                 return;
             }

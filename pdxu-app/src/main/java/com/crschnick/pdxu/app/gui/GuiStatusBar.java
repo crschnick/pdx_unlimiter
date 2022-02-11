@@ -136,7 +136,7 @@ public class GuiStatusBar {
         buttons.setAlignment(Pos.CENTER);
         barPane.setRight(buttons);
 
-        SavegameContext.withSavegame(e, ctx -> {
+        SavegameContext.withSavegameContext(e, ctx -> {
             Label text = new Label(
                     ctx.getStorage().getEntryName(e),
                     ctx.getGuiFactory().createIcon());

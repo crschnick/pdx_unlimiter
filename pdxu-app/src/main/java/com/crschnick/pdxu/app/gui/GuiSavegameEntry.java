@@ -48,7 +48,7 @@ public class GuiSavegameEntry {
     private static <T, I extends SavegameInfo<T>> Region setupTopBar(SavegameEntry<T, I> e) {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
-        SavegameContext.withSavegameAsync(e, ctx -> {
+        SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
             topBar.setBackground(ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
         });
 
@@ -215,7 +215,7 @@ public class GuiSavegameEntry {
             });
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
-            SavegameContext.withSavegameAsync(e, ctx -> {
+            SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
                 if (ctx.getInfo().isBinary()) {
                     dynamicButtons.getChildren().add(melt);
                 }
@@ -244,7 +244,7 @@ public class GuiSavegameEntry {
             dynamicButtons.getChildren().add(uploadSkanderbeg);
         }
 
-        SavegameContext.withSavegameAsync(e, ctx -> {
+        SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
             if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
                 Button eu4Se = new JFXButton();
                 eu4Se.setGraphic(new FontIcon());
@@ -333,7 +333,7 @@ public class GuiSavegameEntry {
         stack.getChildren().add(createEmptyContainer());
 
         Runnable loadEntry = () -> {
-            SavegameContext.withSavegame(entry, ctx -> {
+            SavegameContext.withSavegameContext(entry, ctx -> {
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
                         var container = createEmptyContainer();

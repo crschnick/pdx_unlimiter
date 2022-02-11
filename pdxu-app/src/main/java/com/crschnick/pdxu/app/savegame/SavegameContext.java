@@ -37,7 +37,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         return sg.orElse(null);
     }
 
-    public static <T, I extends SavegameInfo<T>> void withCollection(
+    public static <T, I extends SavegameInfo<T>> void withCollectionContext(
             SavegameCollection<T, I> col,
             Consumer<SavegameContext<T, I>> con) {
         var g = getForCollection(col);
@@ -56,7 +56,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         con.accept(ctx);
     }
 
-    public static <T, I extends SavegameInfo<T>> void withSavegameAsync(
+    public static <T, I extends SavegameInfo<T>> void withSavegameInfoContextAsync(
             SavegameEntry<T, I> e,
             Consumer<SavegameContext<T, I>> con) {
         var ctx = getContextIfExistent(e);
@@ -89,7 +89,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         }
     }
 
-    public static <T, I extends SavegameInfo<T>> void withSavegame(
+    public static <T, I extends SavegameInfo<T>> void withSavegameContext(
             SavegameEntry<T, I> e, Consumer<SavegameContext<T, I>> con) {
         getContextIfExistent(e).ifPresent(con);
     }

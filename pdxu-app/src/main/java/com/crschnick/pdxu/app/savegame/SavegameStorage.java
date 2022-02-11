@@ -586,6 +586,12 @@ public abstract class SavegameStorage<
         });
     }
 
+    public synchronized Optional<SavegameEntry<T,I>> getEntryForStorageSavegameFile(Path file) {
+        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+                .filter(ch -> getSavegameFile(ch).equals(file))
+                .findAny();
+    }
+
     public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
         return getSavegameDataDirectory(e).resolve("savegame." + type.getFileEnding());
     }
@@ -816,7 +822,7 @@ public abstract class SavegameStorage<
         return cn + " (" + en + ")";
     }
 
-    public synchronized Optional<SavegameEntry<T,I>> getEntryForSourceFile(String sourceFileChecksum) {
+    public synchronized Optional<SavegameEntry<T,I>> getEntryForSourceFileChecksum(String sourceFileChecksum) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
                 .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
                 .findAny();

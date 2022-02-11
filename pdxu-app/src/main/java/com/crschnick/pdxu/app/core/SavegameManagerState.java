@@ -124,7 +124,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public void loadEntryAsync(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> SavegameContext.withSavegame(e, ctx -> {
+        TaskExecutor.getInstance().submitTask(() -> SavegameContext.withSavegameContext(e, ctx -> {
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
                             ctx.getStorage().getSavegameCollection(e))) {
@@ -308,7 +308,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 globalSelectedEntryPropertyInternal().set(null);
             }
         } else {
-            SavegameContext.withSavegame(e, ctx -> {
+            SavegameContext.withSavegameContext(e, ctx -> {
                 if (!ctx.getCollection().equals(globalSelectedCollection.get())) {
                     return;
                 }
