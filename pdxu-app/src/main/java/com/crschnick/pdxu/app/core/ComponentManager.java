@@ -11,6 +11,7 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.savegame.SavegameWatcher;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
 import javafx.application.Platform;
 import org.jnativehook.GlobalScreen;
@@ -41,6 +42,9 @@ public class ComponentManager {
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);
             }
+
+            // Start task executor early such that a shutdown can be performed from now on!
+            TaskExecutor.getInstance().start();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
@@ -63,7 +67,6 @@ public class ComponentManager {
             ErrorHandler.handleTerminalException(e);
         }
 
-        TaskExecutor.getInstance().start();
         TaskExecutor.getInstance().submitTask(ComponentManager::init, false);
         TaskExecutor.getInstance().submitTask(ComponentManager::initialFinalSetup, false);
     }
