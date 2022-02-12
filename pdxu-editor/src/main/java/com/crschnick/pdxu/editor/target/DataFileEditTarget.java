@@ -32,7 +32,7 @@ public class DataFileEditTarget extends EditTarget {
     @Override
     public Map<String, ArrayNode> parse() throws Exception {
         // Prevent users from opening non text files
-        if (EXCLUDED_EXTENSIONS.stream().anyMatch(end -> file.endsWith("." + end))) {
+        if (EXCLUDED_EXTENSIONS.stream().anyMatch(end -> file.toString().endsWith("." + end))) {
             throw new IllegalArgumentException("Files of type ." +
                     FilenameUtils.getExtension(file.toString()) + " are not supported by the editor");
         }
