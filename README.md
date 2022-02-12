@@ -7,9 +7,9 @@
 The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a
 powerful and smart savegame manager to quickly organize and play all of your savegames with ease.
 Furthermore, it also comes with an Ironman converter,
-a powerful savegame editor and navigator,
-some savescumming tools, integrations for various other
+a powerful savegame editor, some savescumming tools, integrations for various other
 great community-made tools, and full support for the following games:
+
 * Europa Universalis IV
 * Crusader Kings III
 * Hearts of Iron IV
@@ -37,6 +37,8 @@ This version does not come with an update functionality, so you have to manually
 - [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-windows.zip)
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-linux.zip)
 
+
+
 # Features
 
 The main components of the Pdx-Unlimiter are:
@@ -53,11 +55,12 @@ There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/wiki
 to answer some of your questions.
 
 
+
 ## Savegame manager
 
 Since keeping track of all your savegames is getting more complicated
 with every new savegame you start or backup you revert to,
-the Pdx-Unlimiter provides you with an easy-to-use interface for choosing the right save file.
+the Pdx-Unlimiter provides you with an easy-to-use interface for choosing the right save file of a campaign.
 This is done by collecting all savegames and creating a browsable and editable
 savegame history so you can load any prior saved version of a campaign.
 All types of savegames are supported, including Ironman and modded savegames.
@@ -71,6 +74,7 @@ without having to visit the Paradox Launcher or main menu.
 **Usage guide:** [Savegame management](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-importing-and-storage)
 
 
+
 ## Smart launcher
 
 The problem of playing modded savegames it that you always need to enable the right mods in the Paradox Launcher.
@@ -80,15 +84,18 @@ that is fully aware of which mods and DLCs are needed for a certain savegame,
 *before* you start the game.
 
 All savegames can be launched directly from
-within the Pdx-Unlimiter without needing to visit the main menu ever again.
+within the Pdx-Unlimiter without needing to visit the in-game main menu ever again.
 When you directly launch a savegame from within the Pdx-Unlimiter,
 the required mods and DLCs are automatically enabled without having to use Paradox launcher configurations.
 It is also checked whether a mod is missing or incompatible with the current version,
 so that nothing can potentially corrupt your savegames.
 This means that you never have to worry about keeping track of your mod
 configurations if you regularly switch between them.
+Skipping the main menu also saves a lot of time when loading a savegame.
 
 **Usage guide:** [Launching savegames](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#launching-savegames)
+
+
 
 ## Savegame editor
 
@@ -97,6 +104,7 @@ which can also be used as a savegame navigator to quickly find certain entries i
 With this editor you can edit any file that is saved in a Paradox text format.
 This includes EU4 and CK3 non-ironman savegames, all Stellaris savegames, and
 any game data files for mods and other purposes.
+You can use the included [Ironman converter](#ironman-converter) to also edit converted Ironman savegames.
 
 ![Editor](misc/editor.png)
 
@@ -104,8 +112,9 @@ The editor supports multiple different styles of editing savegame files.
 The first one, the more simple version, allows you to edit already existing values for entries.
 It is meant for users that are new to savegame editing, is relatively user-friendly,
 and tries to prevent users from making savegames invalid or corrupt.
-However, it also allows you to use your
+The second editing style allows you to use your
 favourite text-editor and to completely change the data structure if wanted.
+Using the Pdx-Unlimiter editor has the following benefits:
 
 - You don't have to deal with compressed savegames, the editor does all
   the extracting and repackaging of zipped savegame files for you
@@ -124,6 +133,8 @@ favourite text-editor and to completely change the data structure if wanted.
 
 **Usage guide:** [Editing savegames](https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide)
 
+
+
 ## Ironman converter
 
 Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
@@ -136,18 +147,28 @@ This is useful if you have ever encountered a situation in which you wanted to
 create a non-ironman copy of an ironman savegame, but couldn't because the games don't let you do it.
 You can for example use the included ironman converter
 to first create a non-ironman savegame and then edit it using the [Savegame editor](#savegame-editor).
+Moreover, you can also use the in-game console when playing converted savegames.
 
 **Usage guide:** [Ironman Converter](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-actions)
 
+
+
 ## Savescumming tools
 
-The Pdx-Unlimiter allows you to create a sort of savegame checkpoints
-using keyboard shortcuts while being ingame that you can always revert back to.
-If you want to revert to a previous savegame checkpoint,
+The Pdx-Unlimiter allows you to create savegame checkpoints using the GUI or keyboard shortcuts
+while being ingame.
+Having a history of previous savegames of your campaign available protects
+you against bugs, glitches, and terrible luck that can easily ruin campaigns.
+You can also enable a timed checkpoint option in the settings that will
+automatically create a campaign checkpoint every *x* minutes.
+
+If you want to load a previous savegame checkpoint,
 you can also kill the currently running Paradox game and load the latest save using a keystroke.
-This feature allows you to easily savescum, which is kinda necessary for hard achievements.
+This feature also allows you to easily savescum, which is kinda necessary for hard achievements.
 
 **Usage guide:** [Savescumming](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-checkpoints-and-savescumming)
+
+
 
 ## Third party tool integration
 
@@ -157,7 +178,7 @@ The supported tools are:
 
 - [PDX Tools](https://pdx.tools),
   a website to analyze and share your eu4 achievements and compete against other players.
-  It is possible to analyze your EU4 savegames on PDX Tools without having to upload them.
+  It is possible to analyze your EU4 savegames on PDX Tools with just one click without having to upload them.
 
 - [Skanderbeg](https://skanderbeg.pm),
   a website to generate maps and statistics for your savegames.
@@ -167,25 +188,31 @@ The supported tools are:
   This means that you can interact with the converter from within the Pdx-Unlimiter
   and basically convert any managed savegame with just one click as well.
 
-- The [Irony Mod Manager](https://bcssov.github.io/IronyModManager/),
-  which can replace the mod-management capabilities of the Paradox-Launcher.
+- The [Irony Mod Manager](https://bcssov.github.io/IronyModManager/), which can
+  replace the mod-management capabilities of the Paradox launcher, can be designated to be used
+  as the default launcher instead of the Paradox launcher.
 
 **Usage guide:** [Savegame tools](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide#savegame-actions)
 
+
+
 # Community and Support
 
-If you have suggestions, need help, run into any issues or just want to talk to other friendly people,
+If you have suggestions, need help, ran into any issues or just want to talk to other friendly people,
 you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 [![Banner](https://discordapp.com/api/guilds/786465137191682088/widget.png?style=banner3)](https://discord.gg/BVE4vxqFpU)
 
 
+
 # Development
 
-To build this project, [JDK 17](https://openjdk.java.net/projects/jdk/17/) and gradle is required.
+To build this project, [JDK 17](https://openjdk.java.net/projects/jdk/17/) is required.
 You can build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
 For running, you can use `gradle/gradlew run`.
-You can use the automatically generated file `pdxu.properties` to set some useful development options when needed.
+Note here that the gradle wrapper has been moved into the `gradle` subdirectory
+You can use the automatically generated file `pdxu.properties`, which is created when gradle is run the first time,
+to set some useful development options when needed.
 
 Any contribution is welcomed!
 There are no real formal contribution guidelines right now, they will maybe come later.
