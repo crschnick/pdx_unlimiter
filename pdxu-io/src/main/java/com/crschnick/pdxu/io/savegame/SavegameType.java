@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.io.savegame;
 
+import com.crschnick.pdxu.io.node.ValueNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 
 import java.io.ByteArrayInputStream;
@@ -7,6 +8,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Random;
+import java.util.UUID;
 import java.util.zip.ZipInputStream;
 
 public interface SavegameType {
@@ -59,6 +62,19 @@ public interface SavegameType {
         public TextFormatParser getParser() {
             return TextFormatParser.eu4();
         }
+
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            return UUID.nameUUIDFromBytes(c.get().getNodeForKey("countries")
+                    .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            int rand = new Random().nextInt(Integer.MAX_VALUE);
+            c.get().getNodeForKey("countries")
+                    .getNodeForKey("REB").getNodeForKey("decision_seed").getValueNode().set(
+                            new ValueNode(String.valueOf(rand), false));
+        }
     };
 
     SavegameType HOI4 = new SavegameType() {
@@ -94,6 +110,16 @@ public interface SavegameType {
         @Override
         public TextFormatParser getParser() {
             return TextFormatParser.hoi4();
+        }
+
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            return UUID.fromString(c.get().getNodeForKey("game_unique_id").getString());
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            c.get().getNodeForKey("game_unique_id").getValueNode().set(
+                    new ValueNode(UUID.randomUUID().toString(), false));
         }
     };
 
@@ -147,6 +173,21 @@ public interface SavegameType {
         public TextFormatParser getParser() {
             return TextFormatParser.ck3();
         }
+
+        @Override
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            long seed = c.get().getNodeForKey("random_seed").getLong();
+            byte[] b = new byte[20];
+            new Random(seed).nextBytes(b);
+            return UUID.nameUUIDFromBytes(b);
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            int rand = new Random().nextInt(Integer.MAX_VALUE);
+            c.get().getNodeForKey("random_seed").getValueNode().set(
+                    new ValueNode(String.valueOf(rand), false));
+        }
     };
 
 
@@ -181,6 +222,20 @@ public interface SavegameType {
         @Override
         public TextFormatParser getParser() {
             return TextFormatParser.stellaris();
+        }
+
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            long seed = c.get("gamestate").getNodeForKey("random_seed").getLong();
+            byte[] b = new byte[20];
+            new Random(seed).nextBytes(b);
+            return UUID.nameUUIDFromBytes(b);
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            int rand = new Random().nextInt(Integer.MAX_VALUE);
+            c.get("gamestate").getNodeForKey("random_seed").getValueNode().set(
+                    new ValueNode(String.valueOf(rand), false));
         }
     };
 
@@ -221,6 +276,19 @@ public interface SavegameType {
         public TextFormatParser getParser() {
             return TextFormatParser.ck2();
         }
+
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            long seed = c.get().getNodeForKey("playthrough_id").getLong();
+            byte[] b = new byte[20];
+            new Random(seed).nextBytes(b);
+            return UUID.nameUUIDFromBytes(b);
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            c.get("gamestate").getNodeForKey("playthrough_id").getValueNode().set(
+                    new ValueNode(String.valueOf(new Random().nextInt(Integer.MAX_VALUE)), false));
+        }
     };
 
     SavegameType VIC2 = new SavegameType() {
@@ -255,6 +323,15 @@ public interface SavegameType {
         public TextFormatParser getParser() {
             return TextFormatParser.vic2();
         }
+
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            return UUID.randomUUID();
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+
+        }
     };
 
     static SavegameType getTypeForFile(Path path) {
@@ -262,20 +339,6 @@ public interface SavegameType {
             try {
                 SavegameType t = (SavegameType) ft.get(null);
                 if (path.getFileName().toString().endsWith("." + t.getFileEnding())) {
-                    return t;
-                }
-            } catch (IllegalAccessException e) {
-                throw new AssertionError(e);
-            }
-        }
-        return null;
-    }
-
-    static SavegameType getTypeForInput(byte[] input) {
-        for (var ft : SavegameType.class.getFields()) {
-            try {
-                SavegameType t = (SavegameType) ft.get(null);
-                if (t.matchesInput(input)) {
                     return t;
                 }
             } catch (IllegalAccessException e) {
@@ -296,4 +359,8 @@ public interface SavegameType {
     boolean isBinary(byte[] input);
 
     TextFormatParser getParser();
+
+    UUID getCampaignIdHeuristic(SavegameContent c);
+
+    void generateNewCampaignIdHeuristic(SavegameContent c);
 }
