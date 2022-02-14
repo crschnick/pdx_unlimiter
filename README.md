@@ -127,9 +127,7 @@ Using the Pdx-Unlimiter editor has the following benefits:
   laborious process of locating a specific entry with a text editor search function
   
 - The editor can visualize certain data entries and provide more context.
-  The most prominent example would be the coat of arms preview
-
-![Coa](misc/coa.png)
+  The most prominent example would be the coat of arms preview for CK3 savegames
 
 **Usage guide:** [Editing savegames](https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide)
 
