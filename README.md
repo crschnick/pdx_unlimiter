@@ -17,13 +17,16 @@ great community-made tools, and full support for the following games:
 
 # Download
 
+Note that there might be some issues with Windows SmartScreen blocking the executable after downloading.
+If you are facing these issues, click on "More info" and then "Run anyway".
+You can read [this StackExchange post](https://security.stackexchange.com/a/139520) if you want to understand
+why this warning pops up.
+
 ### Installers
 
 Installers are the easiest way to get started.
-Note that there might be some issues with Windows SmartScreen blocking the installer.
-If you are facing these issues, click on "More info" and then "Run anyway".
-You can read [this post](https://security.stackexchange.com/a/139520) if you want to understand
-why this warning pops up.
+They set up everything automatically and also come with an automatic update feature,
+which you can also disable in the settings if you want.
 
 - [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi)
 - [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
