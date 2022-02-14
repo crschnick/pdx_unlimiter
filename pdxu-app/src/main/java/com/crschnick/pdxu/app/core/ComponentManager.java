@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.settings.SavedState;
 import com.crschnick.pdxu.app.core.settings.Settings;
+import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.GameInstallation;
@@ -98,6 +99,31 @@ public class ComponentManager {
         });
     }
 
+    private static void registerNativeHook() {
+        try {
+            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+                GlobalScreen.registerNativeHook();
+            }
+        } catch (Exception ex) {
+            GuiErrorReporter.showSimpleErrorMessage("Unable to register native hook.\n" +
+                    "This might be a permissions issue with your system. " +
+                    "In-game keyboard shortcuts will be unavailable!");
+            logger.warn("Unable to register native hook", ex);
+        }
+    }
+
+    private static void unregisterNativeHook() {
+        try {
+            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+                GlobalScreen.unregisterNativeHook();
+            }
+        } catch (Exception ex) {
+            GuiErrorReporter.showSimpleErrorMessage("Unable to unregister native hook.\n" +
+                    "This might be a permissions issue with your system.");
+            logger.warn("Unable to unregister native hook", ex);
+        }
+    }
+
     private static void init() {
         logger.debug("Initializing ...");
         try {
@@ -114,9 +140,7 @@ public class ComponentManager {
             FileImporter.init();
 
             EditorProvider.get().init();
-            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-                GlobalScreen.registerNativeHook();
-            }
+            registerNativeHook();
         } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
@@ -142,9 +166,7 @@ public class ComponentManager {
             SavegameWatcher.reset();
             SavegameStorage.reset();
             GameInstallation.reset();
-            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-                GlobalScreen.unregisterNativeHook();
-            }
+            unregisterNativeHook();
             PdxuI18n.reset();
             CacheManager.reset();
             PdxToolsWebHelper.reset();
