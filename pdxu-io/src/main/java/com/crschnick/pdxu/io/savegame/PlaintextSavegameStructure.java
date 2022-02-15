@@ -39,7 +39,7 @@ public class PlaintextSavegameStructure implements SavegameStructure {
 
         try {
             var node = type.getParser().parse(name, input, header != null ? header.length + 1 : 0);
-            return new SavegameParseResult.Success(Map.of(name, node));
+            return new SavegameParseResult.Success(new SavegameContent(Map.of(name, node)));
         } catch (ParseException e) {
             return new SavegameParseResult.Error(e);
         }

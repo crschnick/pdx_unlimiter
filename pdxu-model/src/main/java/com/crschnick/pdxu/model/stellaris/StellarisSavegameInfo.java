@@ -31,7 +31,6 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
             long seed = n.getNodeForKey("random_seed").getLong();
             byte[] b = new byte[20];
             new Random(seed).nextBytes(b);
-            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
 
             i.allTags = new ArrayList<>();
             n.getNodeForKey("country").forEach((k, v) -> {

@@ -15,11 +15,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private final List<Eu4Tag> marches = new ArrayList<>();
     private final List<Eu4Tag> marriages = new ArrayList<>();
     private final List<Eu4Tag> guarantees = new ArrayList<>();
-    private final Eu4Tag overlord = null;
     private final List<Eu4Tag> juniorPartners = new ArrayList<>();
-    private final Eu4Tag seniorPartner = null;
     private final List<Eu4Tag> tributaryJuniors = new ArrayList<>();
-    private final Eu4Tag tributarySenior = null;
     protected Eu4Tag tag;
     protected List<Eu4Tag> allTags;
     private boolean randomNewWorld;
@@ -61,9 +58,6 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
             e.dlcs = n.getNodeForKeyIfExistent("dlc_enabled").map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
                     .collect(Collectors.toList());
-
-            e.campaignHeuristic = UUID.nameUUIDFromBytes(n.getNodeForKey("countries")
-                    .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
 
             e.allTags = new ArrayList<>();
             n.getNodeForKey("countries").forEach((k, v) -> {

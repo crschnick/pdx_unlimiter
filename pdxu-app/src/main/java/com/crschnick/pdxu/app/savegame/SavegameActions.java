@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public class SavegameActions {
 
@@ -57,6 +59,18 @@ public class SavegameActions {
         });
     }
 
+    public static <T, I extends SavegameInfo<T>> void branch(SavegameEntry<T, I> entry) {
+        TaskExecutor.getInstance().submitTask(() -> {
+            SavegameContext.withSavegameInfoContextAsync(entry, ctx -> {
+                if (ctx.getInfo().isBinary()) {
+                    return;
+                }
+
+                ctx.getStorage().createNewBranch(entry);
+            });
+        }, true);
+    }
+
     public static <T, I extends SavegameInfo<T>> void moveEntry(
             SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
@@ -78,9 +92,9 @@ public class SavegameActions {
             return;
         }
 
+        SavegameType type = SavegameStorage.get(g).getType();
         SavegameParseResult r = null;
         try {
-            var type = SavegameStorage.get(g).getType();
             var file = savegames.get(0).path;
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
@@ -99,8 +113,7 @@ public class SavegameActions {
             @Override
             public void success(SavegameParseResult.Success s) {
                 try {
-                    var info = SavegameStorage.get(g).getInfoFactory().apply(s.combinedNode(), false);
-                    var campaignId = info.getCampaignHeuristic();
+                    var campaignId = type.getCampaignIdHeuristic(s.content);
                     SavegameStorage.get(g).getSavegameCollection(campaignId)
                             .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
                         TaskExecutor.getInstance().submitTask(() -> {

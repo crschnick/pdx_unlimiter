@@ -357,7 +357,8 @@ public abstract class SavegameStorage<
             String checksum,
             I info,
             String name,
-            String sourceFileChecksum) {
+            String sourceFileChecksum,
+            String defaultCampaignName) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
@@ -371,7 +372,7 @@ public abstract class SavegameStorage<
                     .tagImage(info, info.getTag());
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
-                    getDefaultCampaignName(info),
+                    defaultCampaignName != null ? defaultCampaignName : getDefaultCampaignName(info),
                     campainUuid,
                     e.getDate(),
                     img);
@@ -687,29 +688,6 @@ public abstract class SavegameStorage<
         return c.toString();
     }
 
-    private boolean isInternalSavegame(Path file, byte[] bytes, boolean melted) {
-        if (!file.startsWith(getSavegameDataDirectory())) {
-            return false;
-        }
-
-        if (!file.getFileName().toString().equals(getSaveFileName())) {
-            return false;
-        }
-
-        try {
-            var entryId = UUID.fromString(file.getParent().getFileName().toString());
-            var campaignId = UUID.fromString(file.getParent().getParent().getFileName().toString());
-            I info = infoFactory.apply(null, melted);
-            if (getSavegameCollection(campaignId).isEmpty() ||
-                    getSavegameCollection(campaignId).get().getSavegames().stream().noneMatch(entry -> entry.getUuid().equals(entryId))) {
-                addNewEntryToCampaign(campaignId, entryId, null, info, getDefaultEntryName(info), null);
-            }
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     private Optional<SavegameParseResult> importSavegameData(
             Path file,
             String name,
@@ -767,7 +745,7 @@ public abstract class SavegameStorage<
 
                 UUID collectionUuid;
                 if (col == null) {
-                    collectionUuid = info.getCampaignHeuristic();
+                    collectionUuid = type.getCampaignIdHeuristic(s.content);
                     logger.debug("Campaign UUID is " + collectionUuid.toString());
                 } else {
                     collectionUuid = col.getUuid();
@@ -785,7 +763,7 @@ public abstract class SavegameStorage<
                         JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 
                         if (col == null) {
-                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum);
+                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum, null);
                         } else {
                             addNewEntryToCollection(col, saveUuid, checksum, info, name, sourceFileChecksum);
                         }
@@ -808,6 +786,63 @@ public abstract class SavegameStorage<
             }
         });
         return Optional.ofNullable(resultToReturn[0]);
+    }
+
+    private void addEntryToCollection(UUID campaignId, byte[] bytes, String checksum, I info, String sourceFileChecksum, String defaultCampaignName) {
+        logger.debug("Campaign UUID is " + campaignId.toString());
+
+        UUID saveUuid = UUID.randomUUID();
+        logger.debug("Generated savegame UUID " + saveUuid.toString());
+
+        Path entryPath = getSavegameDataDirectory().resolve(campaignId.toString()).resolve(saveUuid.toString());
+        try {
+            FileUtils.forceMkdir(entryPath.toFile());
+            var file = entryPath.resolve(getSaveFileName());
+            Files.write(file, bytes);
+            JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
+
+            addNewEntryToCampaign(campaignId, saveUuid, checksum, info, null, sourceFileChecksum, defaultCampaignName);
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+    }
+
+    synchronized void createNewBranch(SavegameEntry<T,I> e) {
+        if (e.getInfo() == null || e.getInfo().isBinary()) {
+            return;
+        }
+
+        byte[] bytes;
+        try {
+            bytes = Files.readAllBytes(getSavegameFile(e));
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
+            return;
+        }
+        var checksum = checksum(bytes);
+
+        var struc = type.determineStructure(bytes);
+        var r = struc.parse(bytes);
+        r.visit(new SavegameParseResult.Visitor() {
+            @Override
+            public void success(SavegameParseResult.Success s) {
+                var c = s.content;
+                struc.getType().generateNewCampaignIdHeuristic(c);
+                I info = null;
+                try {
+                    info = infoFactory.apply(s.combinedNode(), false);
+                } catch (SavegameInfoException e) {
+                    ErrorHandler.handleException(e);
+                    return;
+                }
+
+                var targetId = struc.getType().getCampaignIdHeuristic(s.content);
+                var sourceName = getSavegameCollection(e).getName();
+                var newName = sourceName + " (New branch)";
+                addEntryToCollection(targetId, bytes, checksum, info, null, newName);
+                saveData();
+            }
+        });
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {

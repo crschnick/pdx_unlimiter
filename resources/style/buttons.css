@@ -14,6 +14,10 @@
  -fx-icon-code: "mdi-filter-remove";
 }
 
+.branch-button .ikonli-font-icon {
+    -fx-icon-code: "mdi-source-branch";
+}
+
 .help-button .ikonli-font-icon {
    -fx-icon-code: "mdi-help-circle-outline";
   }

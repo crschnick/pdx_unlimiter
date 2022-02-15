@@ -3,6 +3,7 @@ package com.crschnick.pdxu.editor.target;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +23,7 @@ public abstract class EditTarget {
 
     public abstract boolean isSavegame();
 
-    public abstract Map<String, ArrayNode> parse() throws Exception;
+    public abstract SavegameContent parse() throws Exception;
 
     public abstract void write(Map<String, ArrayNode> nodeMap) throws Exception;
 

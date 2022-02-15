@@ -15,7 +15,7 @@ public final class SavegameContent {
         this.nodes = nodes;
     }
 
-    public Node combinedNode() {
+    public ArrayNode combinedNode() {
         return new LinkedArrayNode(nodes.values().stream().toList());
     }
 
@@ -24,7 +24,7 @@ public final class SavegameContent {
     }
 
     public ArrayNode get() {
-        return nodes.values().iterator().next();
+        return combinedNode();
     }
 
     public ArrayNode get(String name) {

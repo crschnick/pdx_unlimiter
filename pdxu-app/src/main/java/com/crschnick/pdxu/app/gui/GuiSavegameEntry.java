@@ -257,6 +257,21 @@ public class GuiSavegameEntry {
             }
         });
 
+        SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+            if (ctx.getInfo().isBinary()) {
+                return;
+            }
+
+            Button branch = new JFXButton();
+            branch.setGraphic(new FontIcon());
+            branch.setOnMouseClicked((m) -> {
+                SavegameActions.branch(e);
+            });
+            branch.getStyleClass().add("branch-button");
+            GuiTooltips.install(branch, PdxuI18n.get("BRANCH_SAVEGAME"));
+            dynamicButtons.getChildren().add(0, branch);
+        });
+
         if (SavegameStorage.ALL.get(Game.CK3).contains(e) && Game.EU4.isEnabled()) {
             SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
             Button convert = new JFXButton();

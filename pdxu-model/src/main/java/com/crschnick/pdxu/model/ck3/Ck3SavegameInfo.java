@@ -29,11 +29,6 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
             i.binary = melted;
             i.date = GameDateType.CK3.fromString(n.getNodeForKey("date").getString());
 
-            long seed = n.getNodeForKey("random_seed").getLong();
-            byte[] b = new byte[20];
-            new Random(seed).nextBytes(b);
-            i.campaignHeuristic = UUID.nameUUIDFromBytes(b);
-
             i.allTags = Ck3Tag.fromNode(n);
             i.tag = Ck3Tag.getPlayerTag(n, i.allTags).orElse(null);
             i.observer = i.tag == null;

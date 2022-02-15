@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameStructure;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
@@ -58,7 +59,7 @@ public class SavegameEditTarget extends EditTarget {
     }
 
     @Override
-    public Map<String, ArrayNode> parse() throws Exception {
+    public SavegameContent parse() throws Exception {
         var bytes = getFileBytes();
         structure = type.determineStructure(bytes);
         var res = structure.parse(bytes);

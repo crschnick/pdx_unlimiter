@@ -12,6 +12,7 @@ import com.crschnick.pdxu.editor.target.ExternalEditTarget;
 import com.crschnick.pdxu.editor.target.SavegameEditTarget;
 import com.crschnick.pdxu.editor.target.StorageEditTarget;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.application.Platform;
@@ -72,7 +73,7 @@ public class Editor implements EditorProvider {
 
     public void createNewEditor(EditTarget target) {
         TaskExecutor.getInstance().submitTask(() -> {
-            Map<String, ArrayNode> nodes;
+            SavegameContent nodes;
             try {
                 nodes = target.parse();
             } catch (Exception e) {

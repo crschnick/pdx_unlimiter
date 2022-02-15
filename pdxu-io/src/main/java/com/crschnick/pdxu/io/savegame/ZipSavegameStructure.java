@@ -84,7 +84,7 @@ public class ZipSavegameStructure implements SavegameStructure {
                     return new SavegameParseResult.Invalid("Missing parts: " + String.join(", ", missingParts));
                 }
 
-                return new SavegameParseResult.Success(nodes);
+                return new SavegameParseResult.Success(new SavegameContent(nodes));
             }
         } catch (Throwable t) {
             return new SavegameParseResult.Error(t);

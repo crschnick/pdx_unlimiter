@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
 import java.nio.file.Path;
@@ -51,7 +52,7 @@ public class ExternalEditTarget extends EditTarget {
     }
 
     @Override
-    public Map<String, ArrayNode> parse() throws Exception {
+    public SavegameContent parse() throws Exception {
         return target.parse();
     }
 

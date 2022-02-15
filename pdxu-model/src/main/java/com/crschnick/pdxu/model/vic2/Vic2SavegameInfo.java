@@ -42,13 +42,6 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
 
             // Hardcode version
             version = new GameVersion(3, 4, 0, 0);
-
-            if (!n.hasKey("previous_war")) {
-                throw new SavegameInfoException("Can't determine campaign when no previous wars are present.");
-            } else {
-                campaignHeuristic = UUID.nameUUIDFromBytes(NodeWriter.writeToBytes(
-                        (ArrayNode) n.getNodeForKey("previous_war"), Integer.MAX_VALUE, ""));
-            }
         } catch (SavegameInfoException e) {
             throw e;
         } catch (Throwable e) {

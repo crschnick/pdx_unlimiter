@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -32,7 +33,7 @@ public class EditorState {
     private final boolean savegame;
     private final boolean canSave;
 
-    public EditorState(String fileName, GameFileContext fileContext, Map<String, ArrayNode> nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean canSave) {
+    public EditorState(String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean canSave) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
