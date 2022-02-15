@@ -1,0 +1,216 @@
+
+
+def changelogOut = new File(project.buildDir, 'changelog.md')
+task writeChangelog(type: DefaultTask) {
+    doLast {
+        changelogOut.text = 'abc'
+    }
+}
+
+jreleaser {
+    //noinspection GroovyAssignabilityCheck
+    release {
+        // Repo in which the release will be created.
+        //
+        github {
+            // Disables or enables publication to GitHub.
+            // defaults to `true`.
+            //
+            enabled = true
+
+            // Defines the connection timeout in seconds.
+            // Defaults to `20`.
+            //
+            connectTimeout = 20
+
+            // Defines the read timeout in seconds.
+            // Defaults to `60`.
+            //
+            readTimeout = 60
+
+            // The user or organization that owns the repository.
+            //
+            owner = 'crschnick'
+
+            // The name of the repository.
+            // If unspecified, will use ${project.name}.
+            //
+            name = 'pdx_unlimiter'
+
+            // The GitHub host url.
+            //
+            host = 'github.com'
+
+            // Username used for authoring commits. Must have write access to the repository.
+            // If left unspecified, the `JRELEASER_GITHUB_USERNAME`
+            // environment variable must be defined.
+            // Defaults to the repository's owner.
+            //
+            username = 'crschnick'
+
+            // Password or OAuth token with write access to the repository.
+            // If left unspecified, the `JRELEASER_GITHUB_TOKEN`
+            // environment variable must be defined.
+            //
+            // token = '__DO_NOT_SET_HERE__'
+
+            // The GitHub API endpoint to use.
+            // You can skip `/api/v1` as it will be added by default.
+            //
+            apiEndpoint = 'https://api.github.com'
+
+            // The tag associated with the release.
+            // May define a `JRELEASER_TAG_NAME` environment variable instead.
+            // If left unspecified, will use `v{{projectVersion}}`.
+            //
+            tagName = project.version
+
+            // The tag to compare against the release tag. Is used to fetch all commits between those tags.
+            // May define a `JRELEASER_PREVIOUS_TAG_NAME` environment variable instead.
+            // If left unspecified, will use the previous logical tag of `tagName`.
+            //
+            // previousTagName = 'v0.9.0'
+
+            // The name of the release.
+            // May define a `JRELEASER_RELEASE_NAME` environment variable instead.
+            // If left unspecified, will use `Release {{tagName}}`.
+            //
+            // releaseName = 'Release v1.0.0'
+
+            // Drops and creates an existing release with matching tag.
+            // May define a `JRELEASER_OVERWRITE` environment variable instead.
+            // Defaults to `false`.
+            //
+            overwrite = false
+
+            //
+            update {
+                // Appends artifacts to an existing release with matching tag,
+                // useful if `overwrite` is set to `false`.
+                // May define a `JRELEASER_UPDATE` environment variable instead.
+                // Defaults to `false`.
+                //
+                enabled = false
+
+                // Release sections to be updated.
+                // Valid values are [`TITLE`, `BODY`, `ASSETS`].
+                // Defaults to `ASSETS`.
+                //
+                section('ASSETS')
+            }
+
+            // Skips creating a tag.
+            // Useful when the tag was created externally.
+            // May define a `JRELEASER_SKIP_TAG` environment variable instead.
+            // Defaults to `false`.
+            //
+            skipTag = false
+
+            // Skips creating a release.
+            // Useful when release assets will be handled with an uploader.
+            // May define a `JRELEASER_SKIP_RELEASE` environment variable instead.
+            // Defaults to `false`.
+            //
+            skipRelease = false
+
+            // Signs commits with the configured credentials.
+            // The Signing section must be configured as well.
+            // Defaults to `false`.
+            //
+            sign = false
+
+            // The target branch to use.
+            // May define a `JRELEASER_BRANCH` environment variable instead.
+            // Defaults to the branch pointed by HEAD.
+            //
+            branch = 'master'
+
+            // Enables or disables asset upload.
+            // Valid values are [`NEVER`, `ALWAYS`, `RELEASE`, `SNAPSHOT`, `PRERELEASE`, `RELEASE_PRERELEASE`].
+            // Defaults to `ALWAYS`.
+            //
+            uploadAssets = 'RELEASE'
+
+            // Release files.
+            // Defaults to `true`.
+            //
+            files = true
+
+            // Release distribution artifacts.
+            // Defaults to `true`.
+            //
+            artifacts = true
+
+            // Release checksum files.
+            // Defaults to `true`.
+            //
+            checksums = true
+
+            // Release signature files.
+            // Defaults to `true`.
+            //
+            signatures = true
+
+            // Marks the release as a draft.
+            // May define a `JRELEASER_DRAFT` environment variable instead.
+            // Defaults to `false`.
+            //
+            draft = true
+
+            //
+            prerelease {
+                // Marks the release as prerelease.
+                // May define a `JRELEASER_PRERELEASE` environment variable instead.
+                // Defaults to `false`.
+                //
+                enabled = true
+
+                // A regex to determine if the project version is a prerelease
+                // May define a `JRELEASER_PRERELEASE_PATTERN` environment variable instead.
+                //
+                // pattern = '.*-pre'
+            }
+
+            // Links the release with a discussion.
+            // The named category must exist.
+            // Defaults to empty.
+            //
+            // discussionCategoryName = 'Announcements'
+
+            // Git author used to commit to the repository.
+            //
+            commitAuthor {
+                // Name used when authoring commits.
+                // Defaults to `jreleaserbot`.
+                //
+                name = 'crschnick'
+
+                // E-mail used when authoring commits.
+                // Defaults to `jreleaser@kordamp.org`.
+                //
+                email = 'crschnick@xpipe.io'
+            }
+
+            // Changelog customization.
+            //
+            changelog {
+                // Disables or enables the changelog.
+                // defaults to `true`.
+                //
+                enabled = true
+
+                // Path to an external file that contains the changelog, read as is.
+                // May be a relative path to the configuration file or an absolute path.
+                // If unspecified, JReleaser will automatically calculate the changelog.
+                //
+                external = changelogOut
+
+                // Enables or disables formatting options.
+                // Valid values are [`NEVER`, `ALWAYS`, `RELEASE`, `SNAPSHOT`].
+                // Defaults to `NEVER`.
+                //
+                formatted = 'NEVER'
+            }
+        }
+    }
+}

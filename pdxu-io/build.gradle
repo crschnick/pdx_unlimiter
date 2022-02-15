@@ -1,18 +1,13 @@
 plugins {
     id 'java'
-    id "org.moditect.gradleplugin"
-}
-
-java {
-    modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
 repositories {
     mavenCentral()
 }
 
+apply from: "$rootDir/gradle/java.gradle"
 apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {

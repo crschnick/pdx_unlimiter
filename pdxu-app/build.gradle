@@ -1,33 +1,13 @@
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-
 plugins {
     id 'java'
-    id "org.moditect.gradleplugin"
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
-java {
-    modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-def currentOS = DefaultNativePlatform.currentOperatingSystem;
-def platform
-if (currentOS.isWindows()) {
-    platform = 'win'
-} else if (currentOS.isLinux()) {
-    platform = 'linux'
-} else if (currentOS.isMacOsX()) {
-    platform = 'mac'
-}
-
+apply from: "$rootDir/gradle/java.gradle"
 apply from: "$rootDir/gradle/module_gen.gradle"
+apply from: "$rootDir/gradle/javafx.gradle"
 
 dependencies {
-    implementation "org.openjfx:javafx-base:16:${platform}"
-    implementation "org.openjfx:javafx-controls:16:${platform}"
-    implementation "org.openjfx:javafx-graphics:16:${platform}"
-    implementation "org.openjfx:javafx-media:16:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation 'com.google.code.gson:gson:2.8.9'

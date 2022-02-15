@@ -2,11 +2,7 @@ plugins {
     id 'java'
 }
 
-java {
-    modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
+apply from: "$rootDir/gradle/java.gradle"
 
 repositories {
     mavenCentral()
