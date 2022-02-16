@@ -53,7 +53,7 @@ public class SavegameEditTarget extends EditTarget {
         var bytes = Files.readAllBytes(file);
         binary = type.isBinary(bytes);
         if (type.isBinary(bytes)) {
-            bytes = RakalyHelper.toPlaintext(file);
+            bytes = RakalyHelper.toEquivalentPlaintext(file);
         }
         return bytes;
     }
@@ -76,7 +76,7 @@ public class SavegameEditTarget extends EditTarget {
 
     @Override
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
-        structure.write(file, nodeMap);
+        structure.write(file, new SavegameContent(nodeMap));
     }
 
     @Override

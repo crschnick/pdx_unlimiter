@@ -12,8 +12,8 @@ import java.util.Map;
 public class Ck3PlaintextSavegameStructure implements SavegameStructure {
 
     @Override
-    public void write(Path out, Map<String, ArrayNode> nodes) throws IOException {
-        var gamestate = nodes.get("gamestate");
+    public void write(Path out, SavegameContent content) throws IOException {
+        var gamestate = content.get("gamestate");
         ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
         var metaHeaderNode = ArrayNode.singleKeyNode("meta_data", meta);
 
@@ -46,7 +46,7 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
         try {
             var node = getType().getParser().parse("gamestate", input, metaStart);
             return new SavegameParseResult.Success(new SavegameContent(Map.of("gamestate", node)));
-        } catch (Throwable t) {
+        } catch (Exception t) {
             return new SavegameParseResult.Error(t);
         }
     }

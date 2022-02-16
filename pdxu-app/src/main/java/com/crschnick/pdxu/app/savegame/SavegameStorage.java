@@ -37,6 +37,8 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
+import org.apache.commons.lang3.function.FailableConsumer;
+import org.apache.commons.lang3.function.FailableRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -252,7 +254,7 @@ public abstract class SavegameStorage<
                 SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
                 List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
                         .map(n -> StreamSupport.stream(n.spliterator(), false)
-                                .map(sfc -> sfc.textValue())
+                                .map(JsonNode::textValue)
                                 .collect(Collectors.toList()))
                         .orElse(List.of());
                 collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
@@ -330,26 +332,6 @@ public abstract class SavegameStorage<
         });
 
         ConfigHelper.writeConfig(getDataFile(), n);
-    }
-
-    synchronized Optional<SavegameFolder<T, I>> getOrCreateFolder(String name) {
-        return this.collections.stream()
-                .filter(f -> f instanceof SavegameFolder && f.getName().equals(name))
-                .map(f -> (SavegameFolder<T, I>) f)
-                .findAny()
-                .or(() -> addNewFolder(name));
-    }
-
-    public synchronized Optional<SavegameFolder<T, I>> addNewFolder(String name) {
-        var col = new SavegameFolder<T, I>(Instant.now(), name, UUID.randomUUID());
-        try {
-            Files.createDirectory(getSavegameDataDirectory().resolve(col.getUuid().toString()));
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return Optional.empty();
-        }
-        this.collections.add(col);
-        return Optional.of(col);
     }
 
     public synchronized void addNewEntryToCampaign(
@@ -514,7 +496,7 @@ public abstract class SavegameStorage<
         try {
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.toPlaintext(file);
+                bytes = RakalyHelper.toEquivalentPlaintext(file);
                 melted = true;
             } else {
                 melted = false;
@@ -622,13 +604,36 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
+    public synchronized void melt(SavegameEntry<T,I> e) {
+        if (e.getInfo() == null) {
+            return;
+        }
+
+        if (!e.getInfo().isBinary()) {
+            return;
+        }
+
+        try {
+            var bytes = RakalyHelper.meltSavegameToBytes(SavegameContext.getContext(e));
+            var struc = type.determineStructure(bytes);
+            var succ = struc.parse(bytes).orThrow();
+            var c = succ.content;
+            type.generateNewCampaignIdHeuristic(c);
+            var targetCollection = type.getCampaignIdHeuristic(c);
+            var info = infoFactory.apply(succ.combinedNode(), false);
+            var name = getSavegameCollection(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
+            addEntryToCollection(targetCollection, file -> struc.write(file, c), null, info, null, name);
+            saveData();
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
+        }
+    }
+
     protected Optional<SavegameParseResult> importSavegame(
             Path file,
-            String name,
             boolean checkDuplicate,
-            String sourceFileChecksum,
-            SavegameCollection<T, I> folder) {
-        var status = importSavegameData(file, name, checkDuplicate, sourceFileChecksum, folder);
+            String sourceFileChecksum) {
+        var status = importSavegameData(file, checkDuplicate, sourceFileChecksum);
         saveData();
         return status;
     }
@@ -672,10 +677,8 @@ public abstract class SavegameStorage<
 
     private Optional<SavegameParseResult> importSavegameData(
             Path file,
-            String name,
             boolean checkDuplicate,
-            String sourceFileChecksum,
-            SavegameCollection<T, I> col) {
+            String sourceFileChecksum) {
         logger.debug("Parsing file " + file.toString());
         final SavegameParseResult[] result = new SavegameParseResult[1];
         String checksum;
@@ -700,7 +703,7 @@ public abstract class SavegameStorage<
 
             byte[] data;
             if (type.isBinary(bytes)) {
-                data = RakalyHelper.toPlaintext(file);
+                data = RakalyHelper.toEquivalentPlaintext(file);
                 melted = true;
             } else {
                 data = bytes;
@@ -726,7 +729,7 @@ public abstract class SavegameStorage<
                 }
 
                 var targetId = type.getCampaignIdHeuristic(s.content);
-                addEntryToCollection(targetId, bytes, checksum, info, null, null);
+                addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null);
             }
 
             @Override
@@ -744,7 +747,7 @@ public abstract class SavegameStorage<
         return Optional.ofNullable(resultToReturn[0]);
     }
 
-    private void addEntryToCollection(UUID campaignId, byte[] bytes, String checksum, I info, String sourceFileChecksum, String defaultCampaignName) {
+    private void addEntryToCollection(UUID campaignId, FailableConsumer<Path, Exception> writer, String checksum, I info, String sourceFileChecksum, String defaultCampaignName) {
         logger.debug("Campaign UUID is " + campaignId.toString());
 
         UUID saveUuid = UUID.randomUUID();
@@ -754,7 +757,7 @@ public abstract class SavegameStorage<
         try {
             FileUtils.forceMkdir(entryPath.toFile());
             var file = entryPath.resolve(getSaveFileName());
-            Files.write(file, bytes);
+            writer.accept(file);
             JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 
             addNewEntryToCampaign(campaignId, saveUuid, checksum, info, null, sourceFileChecksum, defaultCampaignName);
@@ -792,10 +795,10 @@ public abstract class SavegameStorage<
                     return;
                 }
 
-                var targetId = struc.getType().getCampaignIdHeuristic(s.content);
+                var targetId = struc.getType().getCampaignIdHeuristic(c);
                 var sourceName = getSavegameCollection(e).getName();
                 var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
-                addEntryToCollection(targetId, bytes, checksum, info, null, newName);
+                addEntryToCollection(targetId, file -> struc.write(file, c), checksum, info, null, newName);
                 saveData();
             }
         });
@@ -842,9 +845,5 @@ public abstract class SavegameStorage<
 
     public SavegameType getType() {
         return type;
-    }
-
-    public FailableBiFunction<Node, Boolean, I, SavegameInfoException> getInfoFactory() {
-        return infoFactory;
     }
 }

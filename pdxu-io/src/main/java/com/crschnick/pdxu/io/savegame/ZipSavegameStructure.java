@@ -86,15 +86,15 @@ public class ZipSavegameStructure implements SavegameStructure {
 
                 return new SavegameParseResult.Success(new SavegameContent(nodes));
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             return new SavegameParseResult.Error(t);
         }
     }
 
     @Override
-    public void write(Path out, Map<String, ArrayNode> nodes) throws IOException {
+    public void write(Path out, SavegameContent content) throws IOException {
         try (var fs = FileSystems.newFileSystem(out)) {
-            for (var e : nodes.entrySet()) {
+            for (var e : content.entrySet()) {
                 var usedPart = parts.stream()
                         .filter(part -> part.name().equals(e.getKey()))
                         .findAny();

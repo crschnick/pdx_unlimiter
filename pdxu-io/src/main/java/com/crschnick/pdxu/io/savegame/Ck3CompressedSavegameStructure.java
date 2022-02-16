@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -39,8 +38,8 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
     }
 
     @Override
-    public void write(Path file, Map<String, ArrayNode> nodes) throws IOException {
-        var gamestate = nodes.get("gamestate");
+    public void write(Path file, SavegameContent content) throws IOException {
+        var gamestate = content.get("gamestate");
         ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
         var metaHeaderNode = ArrayNode.singleKeyNode("meta_data", meta);
 

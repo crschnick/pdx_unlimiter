@@ -11,6 +11,8 @@ public abstract class SavegameParseResult {
 
     public abstract void visit(Visitor visitor);
 
+    public abstract Success orThrow() throws Exception;
+
     public Optional<Success> success() {
         return Optional.empty();
     }
@@ -41,6 +43,11 @@ public abstract class SavegameParseResult {
         }
 
         @Override
+        public Success orThrow() {
+            return this;
+        }
+
+        @Override
         public Optional<Success> success() {
             return Optional.of(this);
         }
@@ -48,10 +55,15 @@ public abstract class SavegameParseResult {
 
     public static class Error extends SavegameParseResult {
 
-        public Throwable error;
+        public Exception error;
 
-        public Error(Throwable error) {
+        public Error(Exception error) {
             this.error = error;
+        }
+
+        @Override
+        public Success orThrow() throws Exception {
+            throw error;
         }
 
         @Override
@@ -71,6 +83,11 @@ public abstract class SavegameParseResult {
 
         public Invalid(String message) {
             this.message = message;
+        }
+
+        @Override
+        public Success orThrow() throws Exception {
+            throw new IllegalArgumentException(message);
         }
 
         @Override

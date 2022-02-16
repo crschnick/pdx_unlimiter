@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 public class SavegameActions {
 
@@ -98,7 +97,7 @@ public class SavegameActions {
             var file = savegames.get(0).path;
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.toPlaintext(file);
+                bytes = RakalyHelper.toEquivalentPlaintext(file);
             }
             var struc = type.determineStructure(bytes);
             r = struc.parse(bytes);
@@ -172,17 +171,7 @@ public class SavegameActions {
 
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-                Path meltedFile;
-                try {
-                    meltedFile = RakalyHelper.meltSavegame(ctx);
-                } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
-                    return;
-                }
-                var folder = ctx.getStorage().getOrCreateFolder("Melted savegames");
-                folder.ifPresent(f -> {
-                    ctx.getStorage().importSavegame(meltedFile, null, true, null, f);
-                });
+                ctx.getStorage().melt(ctx.getEntry());
             });
         }, true);
     }
@@ -225,8 +214,8 @@ public class SavegameActions {
             SavegameContext.withSavegameContext(e, ctx -> {
                 var sgs = ctx.getStorage();
                 var in = sgs.getSavegameFile(e);
-                sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
-                        sgs.getSavegameCollection(e));
+//                sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
+//                        sgs.getSavegameCollection(e));
             });
         }, true);
     }

@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.io.savegame;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.ParseException;
 
 import java.io.IOException;
@@ -21,13 +20,13 @@ public class PlaintextSavegameStructure implements SavegameStructure {
     }
 
     @Override
-    public void write(Path out, Map<String, ArrayNode> nodes) throws IOException {
+    public void write(Path out, SavegameContent content) throws IOException {
         try (var partOut = Files.newOutputStream(out)) {
             if (header != null) {
                 partOut.write(header);
                 partOut.write("\n".getBytes());
             }
-            writeData(partOut, nodes.values().iterator().next());
+            writeData(partOut, content.entrySet().iterator().next().getValue());
         }
     }
 

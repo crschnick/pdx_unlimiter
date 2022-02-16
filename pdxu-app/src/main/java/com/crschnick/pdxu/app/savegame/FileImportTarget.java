@@ -137,7 +137,7 @@ public abstract class FileImportTarget {
                     Files.write(downloadedFile, data);
 
                     onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, null, true, null, null));
+                            .importSavegame(downloadedFile, true, null));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -229,7 +229,7 @@ public abstract class FileImportTarget {
                 }
 
                 onFinish.accept(savegameStorage.importSavegame(
-                        path, null, true, getSourceFileChecksum(), null));
+                        path, true, getSourceFileChecksum()));
             }, true);
         }
 

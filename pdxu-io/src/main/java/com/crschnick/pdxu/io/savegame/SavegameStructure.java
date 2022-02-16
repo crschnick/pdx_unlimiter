@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 
 public interface SavegameStructure {
@@ -91,7 +90,7 @@ public interface SavegameStructure {
         return Arrays.equals(first, header);
     }
 
-    void write(Path out, Map<String, ArrayNode> nodes) throws IOException;
+    void write(Path out, SavegameContent content) throws IOException;
 
     default void writeData(OutputStream out, ArrayNode node) throws IOException {
         NodeWriter.write(out, getType().getParser().getCharset(), node, "\t", 0);

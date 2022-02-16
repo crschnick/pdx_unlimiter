@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.util.integration;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
-import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -19,6 +18,15 @@ public class RakalyHelper {
      * Temp for ck3 melter fix.
      */
     public static Path meltSavegame(SavegameContext<?,?> infoContext) throws Exception {
+        var b = meltSavegameToBytes(infoContext);
+        Path temp = FileUtils.getTempDirectory().toPath()
+                .resolve("pdxu").resolve("melted." + infoContext.getStorage().getType().getFileEnding());
+        FileUtils.forceMkdirParent(temp.toFile());
+        Files.write(temp, b);
+        return temp;
+    }
+
+    public static byte[] meltSavegameToBytes(SavegameContext<?,?> infoContext) throws Exception {
         var melter = PdxuInstallation.getInstance().getRakalyExecutable();
         if (infoContext.getGame() == Game.CK3) {
             Ck3SavegameInfo ck3Info = (Ck3SavegameInfo) infoContext.getInfo();
@@ -45,11 +53,7 @@ public class RakalyHelper {
             throw new IOException("Rakaly melter failed with exit code " + returnCode);
         }
 
-        Path temp = FileUtils.getTempDirectory().toPath()
-                .resolve("pdxu").resolve("melted." + FilenameUtils.getExtension(file.toString()));
-        FileUtils.forceMkdirParent(temp.toFile());
-        Files.write(temp, b);
-        return temp;
+        return b;
     }
 
     public static Path meltSavegame(Path file) throws Exception {
@@ -76,7 +80,7 @@ public class RakalyHelper {
         return temp;
     }
 
-    public static byte[] toPlaintext(Path file) throws Exception {
+    public static byte[] toEquivalentPlaintext(Path file) throws Exception {
         var proc = new ProcessBuilder(
                 PdxuInstallation.getInstance().getRakalyExecutable().toString(),
                 "melt",
