@@ -106,9 +106,9 @@ public final class GameAppManager {
 
                 if (Settings.getInstance().importOnGameNormalExit.getValue()) {
                     logger.info("Import on normal exit is enabled");
-                    boolean exitedNormally = lastKill == null || Duration.between(lastImport, Instant.now()).getSeconds() > 10;
+                    boolean exitedNormally = lastKill == null || Duration.between(lastKill, Instant.now()).getSeconds() > 10;
                     if (exitedNormally) {
-                        logger.info("Game instance of " + deadGame.getId() + " exited normally");
+                        logger.info("Game instance of " + deadGame.getId() + " exited normally. Importing latest savegame");
                         SavegameActions.importLatestSavegame(deadGame);
                     }
                 }
