@@ -58,7 +58,7 @@ public class GuiStyle {
     public static String CLASS_MAP = "map-button";
     public static String CLASS_ANALYZE = "analyze-button";
     public static String CLASS_MELT = "melt-button";
-    public static String CLASS_NEW = "new-button";
+    public static String CLASS_SEARCH = "search-icon";
     public static String CLASS_FOLDER = "folder";
     public static String CLASS_CAMPAIGN_TOP_BAR = "campaign-top-bar";
     public static String CLASS_CONTENT_DIALOG = "content-dialog";

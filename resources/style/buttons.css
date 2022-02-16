@@ -103,8 +103,8 @@
 -fx-font-size: 4em;
 }
 
-.new-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-folder-plus"
+.search-icon .ikonli-font-icon {
+    -fx-icon-code: "mdi-magnify"
 }
 
 .filter-button .ikonli-font-icon {

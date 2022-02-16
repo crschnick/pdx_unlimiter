@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.ConfigHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
@@ -385,25 +386,6 @@ public abstract class SavegameStorage<
         c.onSavegamesChange();
     }
 
-    public synchronized void addNewEntryToCollection(
-            SavegameCollection<T, I> col,
-            UUID entryUuid,
-            String checksum,
-            I info,
-            String name,
-            String sourceFileChecksum) {
-        SavegameEntry<T, I> e = new SavegameEntry<>(
-                name != null ? name : getDefaultEntryName(info),
-                entryUuid,
-                checksum,
-                info.getDate(),
-                SavegameNotes.empty(),
-                sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
-        logger.debug("Adding new entry " + e.getName());
-        col.getSavegames().add(e);
-        col.onSavegamesChange();
-    }
-
     private String getDefaultEntryName(I info) {
         return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
     }
@@ -743,34 +725,8 @@ public abstract class SavegameStorage<
                     return;
                 }
 
-                UUID collectionUuid;
-                if (col == null) {
-                    collectionUuid = type.getCampaignIdHeuristic(s.content);
-                    logger.debug("Campaign UUID is " + collectionUuid.toString());
-                } else {
-                    collectionUuid = col.getUuid();
-                    logger.debug("Folder UUID is " + collectionUuid.toString());
-                }
-                UUID saveUuid = UUID.randomUUID();
-                logger.debug("Generated savegame UUID " + saveUuid.toString());
-
-                synchronized (this) {
-                    Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
-                    try {
-                        FileUtils.forceMkdir(entryPath.toFile());
-                        var file = entryPath.resolve(getSaveFileName());
-                        Files.write(file, bytes);
-                        JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
-
-                        if (col == null) {
-                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum, null);
-                        } else {
-                            addNewEntryToCollection(col, saveUuid, checksum, info, name, sourceFileChecksum);
-                        }
-                    } catch (Exception e) {
-                        ErrorHandler.handleException(e);
-                    }
-                }
+                var targetId = type.getCampaignIdHeuristic(s.content);
+                addEntryToCollection(targetId, bytes, checksum, info, null, null);
             }
 
             @Override
@@ -838,7 +794,7 @@ public abstract class SavegameStorage<
 
                 var targetId = struc.getType().getCampaignIdHeuristic(s.content);
                 var sourceName = getSavegameCollection(e).getName();
-                var newName = sourceName + " (New branch)";
+                var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
                 addEntryToCollection(targetId, bytes, checksum, info, null, newName);
                 saveData();
             }
