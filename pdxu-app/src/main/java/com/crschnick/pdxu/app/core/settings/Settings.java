@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.gui.dialog.GuiSettings;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LanguageManager;
+import com.crschnick.pdxu.app.launcher.SupportedLauncher;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.IronyHelper;
 import javafx.application.Platform;
@@ -62,11 +63,6 @@ public final class Settings extends AbstractSettings {
     public final SettingsEntry.BooleanEntry importOnGameNormalExit = new SettingsEntry.BooleanEntry(
             "IMPORT_ON_NORMAL_GAME_EXIT",
             "importOnNormalGameExit",
-            false
-    );
-    public final SettingsEntry.BooleanEntry launchIrony = new SettingsEntry.BooleanEntry(
-            "LAUNCH_IRONY",
-            "launchIrony",
             false
     );
     public final SettingsEntry.BooleanEntry enableEu4SaveEditor = new SettingsEntry.BooleanEntry(
@@ -138,6 +134,13 @@ public final class Settings extends AbstractSettings {
             Path.of("IronyModManager.exe"),
             () -> IronyHelper.getIronyDefaultInstallPath().orElse(null)
     );
+    public final SettingsEntry.ChoiceEntry<SupportedLauncher> launcher = new SettingsEntry.ChoiceEntry<>(
+            "LAUNCHER",
+            "launcher",
+            SupportedLauncher.DEFAULT,
+            SupportedLauncher.getAllLaunchers().inverseBidiMap(),
+            SupportedLauncher::getDisplayName
+    );
     public final SettingsEntry.BooleanEntry enabledTimedImports = new SettingsEntry.BooleanEntry(
             "TIMED_IMPORTS",
             "enabledTimedImports",
@@ -199,7 +202,7 @@ public final class Settings extends AbstractSettings {
 
         // Disable irony if needed
         if (ironyDir.getValue() == null) {
-            launchIrony.set(false);
+            //launchIrony.set(false);
         }
     }
 }

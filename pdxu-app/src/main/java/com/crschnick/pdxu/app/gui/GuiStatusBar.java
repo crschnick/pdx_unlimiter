@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.launcher.SupportedLauncher;
 import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;

@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.installation.*;
+import com.crschnick.pdxu.app.launcher.SupportedLauncher;
 import com.crschnick.pdxu.app.savegame.FileExportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
@@ -26,29 +27,12 @@ import java.util.stream.Collectors;
 
 public class GameDistLauncher {
 
-    public static void startLauncher() {
-        try {
-            var game = SavegameManagerState.get().current();
-            if (game == null) {
-                return;
-            }
-
-            if (Settings.getInstance().launchIrony.getValue()) {
-                IronyHelper.launchEntry(game, false);
-            } else {
-                GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
-            }
-        } catch (IOException ex) {
-            ErrorHandler.handleException(ex);
-        }
-    }
-
     public static void startLauncherWithContinueGame(SavegameEntry<?, ?> e) {
         GuiSavegameNotes.showSavegameNotesReminderDialog(e.getNotes());
 
         try {
             setupContinueGame(e);
-            startLauncherDirectly();
+            SupportedLauncher.startLauncher(SavegameManagerState.get().current(), true);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
         }
@@ -113,24 +97,6 @@ public class GameDistLauncher {
         }
     }
 
-    public static boolean canChangeMods(Game game) {
-        return Settings.getInstance().launchIrony.getValue() ||
-                GameInstallation.ALL.get(game).getDist().supportsLauncher();
-    }
-
-    private static void startLauncherDirectly() throws IOException {
-        var game = SavegameManagerState.get().current();
-        if (Settings.getInstance().launchIrony.getValue()) {
-            IronyHelper.launchEntry(game, true);
-        } else {
-            if (!GameInstallation.ALL.get(game).getDist().supportsLauncher()) {
-                return;
-            }
-
-            GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
-        }
-    }
-
     private static void startGameDirectly(SavegameEntry<?, ?> e, boolean debug) throws Exception {
         var ctx = SavegameContext.getContext(e);
         if (ctx.getGame().getInstallType().getModInfoStorageType() ==
@@ -142,17 +108,13 @@ public class GameDistLauncher {
                 if (b) {
                     ctx.getInstallation().startDirectly(debug);
                 } else {
-                    startLauncherDirectly();
+                    startLauncherWithContinueGame(e);
                 }
             }
             return;
         }
 
-        if (Settings.getInstance().launchIrony.getValue()) {
-            IronyHelper.launchEntry(ctx.getGame(), true);
-        } else {
-            ctx.getInstallation().startDirectly(debug);
-        }
+        ctx.getInstallation().startDirectly(debug);
     }
 
     private static void writeDlcLoadFileWithEnabledMods(

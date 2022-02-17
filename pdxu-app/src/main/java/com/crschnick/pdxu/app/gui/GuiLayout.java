@@ -9,9 +9,11 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.jfoenix.controls.JFXSpinner;
+import com.jfoenix.controls.JFXTabPane;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.control.Tab;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -24,12 +26,12 @@ import org.kordamp.ikonli.javafx.FontIcon;
 public class GuiLayout {
 
     private StackPane stack;
-    private BorderPane layout;
+    private JFXTabPane tabPane;
     private Pane loadingBg;
     private StackPane fileDropOverlay;
 
     public void setup() {
-        layout = new BorderPane();
+        tabPane = new JFXTabPane();
 
         JFXSpinner loading = new JFXSpinner();
         loadingBg = new StackPane(loading);
@@ -46,20 +48,26 @@ public class GuiLayout {
         fileDropOverlay.getStyleClass().add("file-drag");
         fileDropOverlay.setVisible(false);
 
-        stack = new StackPane(new Pane(), layout, loadingBg, fileDropOverlay);
+        stack = new StackPane(new Pane(), tabPane, loadingBg, fileDropOverlay);
         stack.setOpacity(0);
     }
 
     private void fillLayout() {
+        var savegameMgrLayout = new BorderPane();
         var menu = GuiMenuBar.createMenu();
-        layout.setTop(menu);
-
-        layout.setBottom(GuiStatusBar.createStatusBar());
-
+        savegameMgrLayout.setTop(menu);
+        savegameMgrLayout.setBottom(GuiStatusBar.createStatusBar());
         var pane = GuiSavegameEntryList.createCampaignEntryList();
-        layout.setCenter(pane);
+        savegameMgrLayout.setCenter(pane);
+        savegameMgrLayout.setLeft(GuiSavegameCollectionList.createCampaignList());
+        var savegameMgrTab = new Tab(null, savegameMgrLayout);
 
-        layout.setLeft(GuiSavegameCollectionList.createCampaignList());
+        var launcherLayout = new BorderPane();
+        savegameMgrLayout.setTop(GuiMenuBar.createMenu());
+        savegameMgrLayout.setBottom(GuiStatusBar.createStatusBar());
+        var launcherTab = new Tab(null, launcherLayout);
+
+        tabPane.getTabs().addAll(savegameMgrTab, launcherTab);
     }
 
     private void setGameLookAndFeel(Game g) {
@@ -123,9 +131,9 @@ public class GuiLayout {
 
         Platform.runLater(() -> {
             // Set font size
-            layout.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
+            tabPane.styleProperty().setValue("-fx-font-size: " + Settings.getInstance().fontSize.getValue() + "pt;");
             // Disable focus on startup
-            layout.requestFocus();
+            tabPane.requestFocus();
 
             fillLayout();
             setupDragAndDrop();

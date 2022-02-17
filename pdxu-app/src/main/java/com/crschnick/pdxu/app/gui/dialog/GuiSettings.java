@@ -44,7 +44,7 @@ public class GuiSettings {
                         s.useGameLanguage,
                         s.language),
                 new Separator(),
-                GuiSettingsComponents.section("IRONY", applyFuncs, s.ironyDir, s.launchIrony),
+                GuiSettingsComponents.section("LAUNCHER", applyFuncs, s.launcher, s.ironyDir),
                 new Separator(),
                 GuiSettingsComponents.section("CONVERTERS", applyFuncs, s.ck3toeu4Dir),
                 new Separator(),

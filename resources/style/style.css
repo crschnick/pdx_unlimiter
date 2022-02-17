@@ -15,6 +15,9 @@
 -fx-border-width: 0 0 0.075em 0;
 }
 
+.jfx-tab-pane .tab-header-area {
+-fx-pref-height: 0;
+}
 
 .loading {
 -fx-background-color: #FFFFFFcc;

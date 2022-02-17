@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.gui.dialog.*;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.launcher.SupportedLauncher;
 import com.crschnick.pdxu.app.savegame.SavegameStorageIO;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.MemoryHelper;
@@ -22,6 +23,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -181,7 +183,8 @@ public class GuiMenuBar {
 
         JFXButton launch = new JFXButton(PdxuI18n.get("LAUNCH"));
         launch.setOnAction(e -> {
-            GameDistLauncher.startLauncher();
+            var game = SavegameManagerState.get().currentGameProperty().get();
+            SupportedLauncher.startLauncher(game, false);
             e.consume();
         });
         launch.setGraphic(new FontIcon());
