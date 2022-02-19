@@ -43,7 +43,7 @@ public class SavegameEditTarget extends EditTarget {
         var entry = SavegameStorage.get(GameFileContext.forType(type).getGame()).getEntryForStorageSavegameFile(file);
         if (entry.isPresent()) {
             var ctx = SavegameContext.getContext(entry.get());
-            if (GameFileContext.forType(type).getGame() == Game.CK3 && ctx.getInfo().isBinary()) {
+            if (GameFileContext.forType(type).getGame() == Game.CK3 && ctx.getInfo() != null && ctx.getInfo().isBinary()) {
                 var melted = RakalyHelper.meltSavegame(ctx);
                 binary = true;
                 return Files.readAllBytes(melted);
