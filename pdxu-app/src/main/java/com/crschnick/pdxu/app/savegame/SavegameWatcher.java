@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -54,6 +55,8 @@ public class SavegameWatcher {
         for (var dir : savegameDirs) {
             try {
                 Files.createDirectories(dir);
+            } catch (AccessDeniedException ignored) {
+                // Ignore permission issues
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
