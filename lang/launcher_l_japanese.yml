@@ -1,0 +1,9 @@
+﻿l_japanese:
+ LAUNCH: "起動"
+ CHANGE_MODS: "Modを変更"
+ INCOMPATIBLE: "選択したセーブゲームに互換性がありません。とりあえず起動してみると、問題が発生することがあります。"
+ INCOMPATIBLE_VERSION: "非互換のバージョン"
+ GAME_VERSION: "ゲームバージョン"
+ SAVEGAME_VERSION: "セーブゲームのバージョン"
+ MOD_INFO_TITLE: "$GAME$mod情報"
+ MOD_INFO: "$GAME$セーブゲームでは、どのMODが必要かは保存されません。\nしたがって、正しいものを使用しているかどうか、手動で確認する必要があります。\n\n以下のMODが有効です:\n"

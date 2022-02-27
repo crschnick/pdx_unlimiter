@@ -11,6 +11,7 @@ module com.crschnick.pdxu.app {
     requires javafx.controls;
     requires javafx.media;
     requires org.jnativehook;
+    requires jdk.localedata;
     requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
     requires com.jfoenix;

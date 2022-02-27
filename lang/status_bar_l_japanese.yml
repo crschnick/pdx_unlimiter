@@ -1,0 +1,10 @@
+﻿l_japanese:
+ EXPORT: "出力"
+ CONTINUE_GAME: "ゲームを続ける"
+ START_LAUNCHER: "ランチャーで起動"
+ RUNNING: "実行中"
+ LATEST: "最新"
+ NONE: "なし"
+ IMPORT: "読み込み"
+ KILL: "死亡"
+ DEBUG_MODE: "デバッグモード"

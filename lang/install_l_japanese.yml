@@ -1,0 +1,6 @@
+﻿l_japanese:
+ ERROR_OCCURED: "予期せぬエラーが発生しました: $CAUSE$"
+ GAME_DATA_PATH_NOT_FOUND: "$GAME$ランチャーの設定ファイルにゲームデータのパスが見つからない"
+ INSTALL_DIR_IS_USER_DIR: "ゲームのユーザードキュメント・ディレクトリを選択されました。しかし、Pdx-Unlimiterはインストールディレクトリを必要とします。\n通常、ゲームのインストール場所は、次のような場所で見つけることができます。:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- その他、ゲームをインストールする場所"
+ GAME_DATA_PATH_DOES_NOT_EXIST: "$GAME$のインストールは検出されましたが、そのユーザーデータディレクトリ$DIR$が存在しません。\nこの問題を解決するには、ゲームを一度実行して生成してください。"
+ EXECUTABLE_NOT_FOUND: "$GAME$実行ファイル$FILE$がディレクトリ$DIR$に見当たりません。\n通常、ゲームのインストール場所は、以下のような場所で見つけることができます。:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- その他、ゲームをインストールする場所"
