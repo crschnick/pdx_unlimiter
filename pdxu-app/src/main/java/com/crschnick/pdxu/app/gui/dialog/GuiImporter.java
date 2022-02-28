@@ -63,7 +63,7 @@ public class GuiImporter {
     }
 
     private static Region createTargetNode(GuiImporterState.ImportEntry entry) {
-        Label name = new Label(entry.target().getName());
+        Label name = new Label(entry.target().getRawName());
         name.setTextOverrun(OverrunStyle.ELLIPSIS);
 
         JFXCheckBox cb = new JFXCheckBox();

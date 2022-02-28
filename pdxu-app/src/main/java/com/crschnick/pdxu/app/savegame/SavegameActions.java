@@ -27,7 +27,7 @@ public class SavegameActions {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var sc = ctx.getStorage();
             var out = FileUtils.getTempDirectory().toPath().resolve(
-                    sc.getValidOutputFileName(entry, includeEntryName));
+                    sc.getValidOutputFileName(entry, includeEntryName, null));
             try {
                 sc.copySavegameTo(entry, out);
             } catch (IOException ioException) {
@@ -52,7 +52,7 @@ public class SavegameActions {
 
             try {
                 FileExportTarget.createExportTarget(e).export();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
         });
@@ -212,10 +212,9 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegameContext(e, ctx -> {
-                var sgs = ctx.getStorage();
-                var in = sgs.getSavegameFile(e);
-//                sgs.importSavegame(in, "Copy of " + e.getName(), false, null,
-//                        sgs.getSavegameCollection(e));
+                var in = ctx.getStorage().getSavegameFile(e);
+                var campaignId = ctx.getCollection().getUuid();
+                ctx.getStorage().importSavegame(in, false, null, campaignId);
             });
         }, true);
     }

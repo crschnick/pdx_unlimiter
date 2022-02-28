@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 
 public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
@@ -35,7 +36,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         });
     }
 
-    public abstract Path export() throws IOException;
+    public abstract Path export() throws Exception;
 
     public static class StandardExportTarget<T, I extends SavegameInfo<T>> extends FileExportTarget<T, I> {
 
@@ -44,8 +45,11 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         }
 
         @Override
-        public Path export() throws IOException {
-            var out = savegameDir.resolve(storage.getValidOutputFileName(entry, false));
+        public Path export() throws Exception {
+            var customId = storage.getCustomCampaignId(entry);
+            var baseName = storage.getValidOutputFileName(entry, false,
+                    customId.map(u -> " (" + u + ")").orElse(null));
+            var out = savegameDir.resolve(baseName);
             storage.copySavegameTo(entry, out);
             return out;
         }
@@ -61,10 +65,13 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         }
 
         @Override
-        public Path export() throws IOException {
+        public Path export() throws Exception {
+            var customId = storage.getCustomCampaignId(entry);
+            var baseName = storage.getValidOutputFileName(entry, false,
+                    customId.map(u -> " (" + u + ")").orElse(null));
+
             Path file;
-            Path dir = savegameDir.resolve(FilenameUtils.getBaseName(
-                    storage.getValidOutputFileName(entry, false).toString()));
+            Path dir = savegameDir.resolve(baseName);
             if (entry.getInfo().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {

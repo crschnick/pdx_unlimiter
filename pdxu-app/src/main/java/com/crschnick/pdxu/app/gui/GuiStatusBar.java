@@ -79,7 +79,7 @@ public class GuiStatusBar {
         javafx.beans.value.ChangeListener<List<FileImportTarget.StandardImportTarget>> l = (c, o, n) -> {
             Platform.runLater(() -> {
                 var name = watcher.getLatest()
-                        .map(FileImportTarget.StandardImportTarget::getName)
+                        .map(FileImportTarget.StandardImportTarget::getRawName)
                         .orElse(PdxuI18n.get("NONE"));
                 latest.setText(PdxuI18n.get("LATEST") + ": " + name);
             });

@@ -578,9 +578,28 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName) {
+    public synchronized Optional<UUID> getCustomCampaignId(SavegameEntry<?, ?> e) throws Exception {
+        if (e.getInfo() == null) {
+            throw new IllegalStateException("Savegame info not available");
+        }
+
+        var file = getSavegameFile(e);
+        var bytes = Files.readAllBytes(file);
+        if (type.isBinary(bytes)) {
+            bytes = RakalyHelper.toEquivalentPlaintext(file);
+        }
+        var struc = type.determineStructure(bytes);
+        var content = struc.parse(bytes).success().map(s -> s.content)
+                .orElseThrow(() -> new IllegalStateException("Unable to parse savegame"));
+        var savegameCampaignId = type.getCampaignIdHeuristic(content);
+        var storageCampaignId = getSavegameCollection(e).getUuid();
+
+        return savegameCampaignId.equals(storageCampaignId) ? Optional.empty() : Optional.of(storageCampaignId);
+    }
+
+    public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName, String suffix) {
         var name = getSavegameCollection(e).getName() + (includeEntryName ?
-                " (" + e.getName() + ")" : "");
+                " (" + e.getName() + ")" : "") + (suffix != null ? suffix : "");
         var comp = SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name);
 
         // Try to return valid file name
@@ -592,7 +611,7 @@ public abstract class SavegameStorage<
         }
 
         // Fallback
-        return Path.of("invalid-name." + type.getFileEnding());
+        return Path.of("invalid-name" + (suffix != null ? suffix : "") + "." + type.getFileEnding());
     }
 
     public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
@@ -631,8 +650,9 @@ public abstract class SavegameStorage<
     protected Optional<SavegameParseResult> importSavegame(
             Path file,
             boolean checkDuplicate,
-            String sourceFileChecksum) {
-        var status = importSavegameData(file, checkDuplicate, sourceFileChecksum);
+            String sourceFileChecksum,
+            UUID customCampaignId) {
+        var status = importSavegameData(file, checkDuplicate, sourceFileChecksum, customCampaignId);
         saveData();
         return status;
     }
@@ -677,7 +697,8 @@ public abstract class SavegameStorage<
     private Optional<SavegameParseResult> importSavegameData(
             Path file,
             boolean checkDuplicate,
-            String sourceFileChecksum) {
+            String sourceFileChecksum,
+            UUID customCampaignId) {
         logger.debug("Parsing file " + file.toString());
         final SavegameParseResult[] result = new SavegameParseResult[1];
         String checksum;
@@ -727,7 +748,10 @@ public abstract class SavegameStorage<
                     return;
                 }
 
-                var targetId = type.getCampaignIdHeuristic(s.content);
+                if (customCampaignId != null) {
+                    logger.debug("Using custom campaign id: " + customCampaignId);
+                }
+                var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
                 addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null);
             }
 

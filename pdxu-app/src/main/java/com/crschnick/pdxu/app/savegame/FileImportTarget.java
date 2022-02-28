@@ -23,11 +23,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public abstract class FileImportTarget {
 
@@ -95,10 +93,34 @@ public abstract class FileImportTarget {
 
     public abstract void delete();
 
-    public abstract String getName();
+    protected abstract String getRawName();
+
+    private static final Pattern ID_MATCHER = Pattern.compile("^(.+?) \\((\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)$");
+
+    public String getName() {
+        var raw = getRawName();
+        var m = ID_MATCHER.matcher(raw);
+        if (m.matches()) {
+            return m.group(1);
+        }
+
+        return raw;
+    }
+
+    public Optional<UUID> getCampaignIdOverride() {
+        var raw = getRawName();
+        var m = ID_MATCHER.matcher(raw);
+        if (m.matches()) {
+            var id = m.group(2);
+            try {
+                return Optional.of(UUID.fromString(id));
+            } catch (Exception ignored) {}
+        }
+
+        return Optional.empty();
+    }
 
     public abstract Path getPath();
-
 
     public static final class DownloadImportTarget extends FileImportTarget {
 
@@ -137,7 +159,7 @@ public abstract class FileImportTarget {
                     Files.write(downloadedFile, data);
 
                     onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, true, null));
+                            .importSavegame(downloadedFile, true, null, getCampaignIdOverride().orElse(null)));
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
@@ -173,7 +195,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public String getName() {
+        public String getRawName() {
             return url.toString();
         }
 
@@ -218,7 +240,7 @@ public abstract class FileImportTarget {
                 return time;
             }
 
-            return getName().compareTo(o.getName());
+            return getRawName().compareTo(o.getRawName());
         }
 
         public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {
@@ -229,7 +251,7 @@ public abstract class FileImportTarget {
                 }
 
                 onFinish.accept(savegameStorage.importSavegame(
-                        path, true, getSourceFileChecksum()));
+                        path, true, getSourceFileChecksum(), getCampaignIdOverride().orElse(null)));
             }, true);
         }
 
@@ -249,7 +271,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public String getName() {
+        public String getRawName() {
             return FilenameUtils.getBaseName(path.toString());
         }
 
@@ -282,7 +304,7 @@ public abstract class FileImportTarget {
                 }
                 return c.toString();
             } catch (Exception e) {
-                // Even the exists check before is no guarantee that an IO exception
+                // Even the existence check before is no guarantee that no IO exception
                 // will be thrown because the file doesn't exist anymore
                 return null;
             }
@@ -296,7 +318,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public String getName() {
+        public String getRawName() {
             return path.getParent().getFileName().toString().split("_")[0] + " " + FilenameUtils.getBaseName(
                     path.getFileName().toString());
         }
@@ -309,7 +331,7 @@ public abstract class FileImportTarget {
         }
 
         @Override
-        public String getName() {
+        public String getRawName() {
             return path.getParent().getFileName().toString().split("_")[0];
         }
     }
