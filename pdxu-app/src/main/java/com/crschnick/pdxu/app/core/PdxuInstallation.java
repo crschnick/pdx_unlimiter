@@ -223,20 +223,6 @@ public class PdxuInstallation {
         }
     }
 
-    /**
-     * Temp for ck3 melter fix.
-     */
-    public Path getRakalyCk3LegacyExecutable() {
-        Path dir = getResourceDir();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return dir.resolve("bin").resolve("rakaly_windows_ck3_legacy.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return dir.resolve("bin").resolve("rakaly_linux_ck3_legacy");
-        } else {
-            return dir.resolve("bin").resolve("rakaly_mac_ck3_legacy");
-        }
-    }
-
     public Path getSettingsLocation() {
         return getDataDir().resolve("settings");
     }

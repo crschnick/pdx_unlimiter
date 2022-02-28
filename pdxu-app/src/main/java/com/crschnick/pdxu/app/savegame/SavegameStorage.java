@@ -38,7 +38,6 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
-import org.apache.commons.lang3.function.FailableRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -614,7 +613,7 @@ public abstract class SavegameStorage<
         }
 
         try {
-            var bytes = RakalyHelper.meltSavegameToBytes(SavegameContext.getContext(e));
+            var bytes = RakalyHelper.toMeltedPlaintext(getSavegameFile(e));
             var struc = type.determineStructure(bytes);
             var succ = struc.parse(bytes).orThrow();
             var c = succ.content;
