@@ -794,7 +794,6 @@ public abstract class SavegameStorage<
             if (type.isBinary(bytes)) {
                 bytes = RakalyHelper.toEquivalentPlaintext(getSavegameFile(e));
             }
-            checksum = checksum(bytes);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return;
@@ -810,13 +809,16 @@ public abstract class SavegameStorage<
         var c = s.content;
 
         UUID targetId;
+        FailableConsumer<Path, Exception> writer;
         if (!e.getInfo().isBinary() && !e.getInfo().isIronman()) {
             // Update savegame information itself if possible
             struc.getType().generateNewCampaignIdHeuristic(c);
             targetId = struc.getType().getCampaignIdHeuristic(c);
+            writer = file -> struc.write(file, c);
         } else {
             // Use random id otherwise
             targetId = UUID.randomUUID();
+            writer = file -> Files.copy(getSavegameFile(e), file);
         }
 
         // Generate new info
@@ -830,7 +832,7 @@ public abstract class SavegameStorage<
 
         var sourceName = getSavegameCollection(e).getName();
         var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
-        addEntryToCollection(targetId, file -> struc.write(file, c), checksum, info, null, newName);
+        addEntryToCollection(targetId, writer, checksum, info, null, newName);
         saveData();
     }
 
