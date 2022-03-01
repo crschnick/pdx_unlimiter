@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.model.ck2;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
@@ -19,8 +21,12 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
     public Ck2SavegameInfo() {
     }
 
-    public Ck2SavegameInfo(Node n) throws SavegameInfoException {
+    public Ck2SavegameInfo(SavegameContent c) throws SavegameInfoException {
         try {
+            Node n = c.get();
+
+            campaignHeuristic = SavegameType.CK2.getCampaignIdHeuristic(c);
+
             ironman = false;
             date = GameDateType.CK3.fromString(n.getNodesForKey("date").get(0).getString());
             binary = false;

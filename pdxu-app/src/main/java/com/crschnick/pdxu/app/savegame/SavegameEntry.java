@@ -50,6 +50,10 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         state.set(State.UNLOADED);
     }
 
+    public boolean isLoaded() {
+        return state.get() == State.LOADED;
+    }
+
     public boolean canLoad() {
         return state.get().equals(State.UNLOADED);
     }

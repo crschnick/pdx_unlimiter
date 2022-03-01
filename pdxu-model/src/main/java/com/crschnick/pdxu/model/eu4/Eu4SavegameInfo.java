@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.model.eu4;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.*;
 
 import java.util.*;
@@ -39,11 +41,15 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private GameNamedVersion version;
     private boolean achievementOk;
 
-    public static Eu4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
+    public static Eu4SavegameInfo fromSavegame(boolean melted, SavegameContent c) throws SavegameInfoException {
         try {
+            Node n = c.get();
+
             GameDate date = GameDateType.EU4.fromString(n.getNodeForKey("date").getString());
             String tag = n.getNodeForKey("player").getString();
             Eu4SavegameInfo e = new Eu4SavegameInfo();
+
+            e.campaignHeuristic = SavegameType.EU4.getCampaignIdHeuristic(c);
 
             Node ver = n.getNodeForKey("savegame_version");
             e.version = new GameNamedVersion(
@@ -73,7 +79,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
             e.randomNewWorld = n.getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
             e.ironman = melted;
-            e.binary = e.ironman;
+            e.binary = melted;
             e.achievementOk = n.getNodeForKeyIfExistent("achievement_ok").map(Node::getBoolean).orElse(false);
                     e.releasedVassal = n.getNodeForKey("countries").getNodeForKey(tag)
                     .getNodeForKeyIfExistent("has_switched_nation").map(Node::getBoolean).orElse(false);

@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.model.hoi4;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.*;
 
 import java.util.List;
@@ -15,9 +17,13 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     protected List<Hoi4Tag> allTags;
     private GameNamedVersion version;
 
-    public static Hoi4SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
+    public static Hoi4SavegameInfo fromSavegame(boolean melted, SavegameContent c) throws SavegameInfoException {
         Hoi4SavegameInfo i = new Hoi4SavegameInfo();
         try {
+            Node n = c.get();
+
+            i.campaignHeuristic = SavegameType.HOI4.getCampaignIdHeuristic(c);
+
             i.tag = new Hoi4Tag(n.getNodeForKey("player").getString(), n.getNodeForKey("ideology").getString());
             i.date = GameDateType.HOI4.fromString(n.getNodeForKey("date").getString());
             i.ironman = melted;

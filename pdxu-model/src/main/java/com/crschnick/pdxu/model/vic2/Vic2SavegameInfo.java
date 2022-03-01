@@ -3,6 +3,8 @@ package com.crschnick.pdxu.model.vic2;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodeWriter;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
@@ -18,8 +20,12 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
     public Vic2SavegameInfo() {
     }
 
-    public Vic2SavegameInfo(Node n) throws SavegameInfoException {
+    public Vic2SavegameInfo(SavegameContent c) throws SavegameInfoException {
         try {
+            Node n = c.get();
+
+            campaignHeuristic = SavegameType.VIC2.getCampaignIdHeuristic(c);
+
             ironman = false;
             date = GameDateType.VIC2.fromString(n.getNodesForKey("date").get(0).getString());
             binary = false;

@@ -47,8 +47,10 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         @Override
         public Path export() throws Exception {
             var customId = storage.getCustomCampaignId(entry);
-            var baseName = storage.getValidOutputFileName(entry, false,
-                    customId.map(u -> " (" + u + ")").orElse(null));
+            // Only try to add id suffix in case for ironman or binary ones
+            var suffix = entry.getInfo().isIronman() || entry.getInfo().isBinary() ?
+                    customId.map(u -> " (" + u + ")").orElse(null) : null;
+            var baseName = storage.getValidOutputFileName(entry, false, suffix);
             var out = savegameDir.resolve(baseName);
             storage.copySavegameTo(entry, out);
             return out;
@@ -67,8 +69,11 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         @Override
         public Path export() throws Exception {
             var customId = storage.getCustomCampaignId(entry);
-            var baseName = storage.getValidOutputFileName(entry, false,
-                    customId.map(u -> " (" + u + ")").orElse(null));
+            // Only try to add id suffix in case for ironman or binary ones
+            var suffix = entry.getInfo().isIronman() || entry.getInfo().isBinary() ?
+                    customId.map(u -> " (" + u + ")").orElse(null) : null;
+            var baseName = FilenameUtils.getBaseName(
+                    storage.getValidOutputFileName(entry, false, suffix).toString());
 
             Path file;
             Path dir = savegameDir.resolve(baseName);

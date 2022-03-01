@@ -13,6 +13,7 @@ import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
@@ -64,7 +65,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger;
     private final Class<I> infoClass;
-    private final FailableBiFunction<Node, Boolean, I, SavegameInfoException> infoFactory;
+    private final FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -72,7 +73,7 @@ public abstract class SavegameStorage<
     private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
-            FailableBiFunction<Node, Boolean, I, SavegameInfoException> infoFactory,
+            FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory,
             String name,
             GameDateType dateType,
             SavegameType type,
@@ -513,7 +514,7 @@ public abstract class SavegameStorage<
             public void success(SavegameParseResult.Success s) {
                 try {
                     logger.debug("Parsing was successful. Loading info ...");
-                    I info = infoFactory.apply(s.combinedNode(), melted);
+                    I info = infoFactory.apply(s.content, melted);
                     e.load(info);
                     getSavegameCollection(e).onSavegameLoad(e);
 
@@ -579,21 +580,12 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Optional<UUID> getCustomCampaignId(SavegameEntry<?, ?> e) throws Exception {
-        if (e.getInfo() == null) {
+        if (!e.isLoaded()) {
             throw new IllegalStateException("Savegame info not available");
         }
 
-        var file = getSavegameFile(e);
-        var bytes = Files.readAllBytes(file);
-        if (type.isBinary(bytes)) {
-            bytes = RakalyHelper.toEquivalentPlaintext(file);
-        }
-        var struc = type.determineStructure(bytes);
-        var content = struc.parse(bytes).success().map(s -> s.content)
-                .orElseThrow(() -> new IllegalStateException("Unable to parse savegame"));
-        var savegameCampaignId = type.getCampaignIdHeuristic(content);
+        var savegameCampaignId = e.getInfo().getCampaignHeuristic();
         var storageCampaignId = getSavegameCollection(e).getUuid();
-
         return savegameCampaignId.equals(storageCampaignId) ? Optional.empty() : Optional.of(storageCampaignId);
     }
 
@@ -638,7 +630,7 @@ public abstract class SavegameStorage<
             var c = succ.content;
             type.generateNewCampaignIdHeuristic(c);
             var targetCollection = type.getCampaignIdHeuristic(c);
-            var info = infoFactory.apply(succ.combinedNode(), false);
+            var info = infoFactory.apply(succ.content, false);
             var name = getSavegameCollection(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
             addEntryToCollection(targetCollection, file -> struc.write(file, c), null, info, null, name);
             saveData();
@@ -742,7 +734,7 @@ public abstract class SavegameStorage<
                 logger.debug("Parsing was successful. Loading info ...");
                 I info = null;
                 try {
-                    info = infoFactory.apply(s.combinedNode(), melted);
+                    info = infoFactory.apply(s.content, melted);
                 } catch (SavegameInfoException e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;
@@ -812,7 +804,7 @@ public abstract class SavegameStorage<
                 struc.getType().generateNewCampaignIdHeuristic(c);
                 I info = null;
                 try {
-                    info = infoFactory.apply(s.combinedNode(), false);
+                    info = infoFactory.apply(s.content, false);
                 } catch (SavegameInfoException e) {
                     ErrorHandler.handleException(e);
                     return;

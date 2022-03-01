@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.model.ck3;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
@@ -21,9 +23,13 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     private List<Ck3Tag> allies = new ArrayList<>();
     private GameVersion version;
 
-    public static Ck3SavegameInfo fromSavegame(boolean melted, Node n) throws SavegameInfoException {
+    public static Ck3SavegameInfo fromSavegame(boolean melted, SavegameContent c) throws SavegameInfoException {
         Ck3SavegameInfo i = new Ck3SavegameInfo();
         try {
+            Node n = c.get();
+
+            i.campaignHeuristic = SavegameType.CK3.getCampaignIdHeuristic(c);
+
             var meta = n.getNodeForKey("meta_data");
             i.ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
             i.binary = melted;

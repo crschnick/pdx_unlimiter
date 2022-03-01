@@ -2,6 +2,8 @@ package com.crschnick.pdxu.model.stellaris;
 
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.*;
 
 import java.util.ArrayList;
@@ -18,9 +20,13 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     protected List<StellarisTag> allTags;
     private GameNamedVersion version;
 
-    public static StellarisSavegameInfo fromSavegame(Node n) throws SavegameInfoException {
+    public static StellarisSavegameInfo fromSavegame(SavegameContent c) throws SavegameInfoException {
         StellarisSavegameInfo i = new StellarisSavegameInfo();
         try {
+            Node n = c.get();
+
+            i.campaignHeuristic = SavegameType.STELLARIS.getCampaignIdHeuristic(c);
+
             i.ironman = NodePointer.builder().name("galaxy").name("ironman").build().getIfPresent(n)
                     .map(Node::getBoolean).orElse(false);
 

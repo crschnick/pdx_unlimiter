@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public abstract class SavegameInfo<T> {
 
+    protected UUID campaignHeuristic;
     protected List<String> mods;
     protected List<String> dlcs;
     protected boolean ironman;
@@ -44,5 +45,9 @@ public abstract class SavegameInfo<T> {
 
     public boolean isObserver() {
         return observer;
+    }
+
+    public UUID getCampaignHeuristic() {
+        return campaignHeuristic;
     }
 }
