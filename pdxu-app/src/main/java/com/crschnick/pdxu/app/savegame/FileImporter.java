@@ -62,10 +62,10 @@ public class FileImporter {
 
         } else {
             for (FileImportTarget t : targets) {
-                logger.debug("Starting to import target " + t.getRawName() + " from " + input);
+                logger.debug("Starting to import target " + t.getName() + " from " + input);
                 t.importTarget(s -> {
                     if (Settings.getInstance().deleteOnImport.getValue()) {
-                        logger.debug("Deleting import target " + t.getRawName());
+                        logger.debug("Deleting import target " + t.getName());
                         t.delete();
                     }
                 });
@@ -98,7 +98,7 @@ public class FileImporter {
             });
 
             if (Settings.getInstance().deleteOnImport.getValue()) {
-                logger.debug("Deleting import target " + t.getRawName());
+                logger.debug("Deleting import target " + t.getName());
                 t.delete();
             }
         }));

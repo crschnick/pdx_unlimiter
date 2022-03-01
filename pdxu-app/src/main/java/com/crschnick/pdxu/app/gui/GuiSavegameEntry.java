@@ -258,10 +258,6 @@ public class GuiSavegameEntry {
         });
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-            if (ctx.getInfo().isBinary()) {
-                return;
-            }
-
             Button branch = new JFXButton();
             branch.setGraphic(new FontIcon());
             branch.setOnMouseClicked((m) -> {

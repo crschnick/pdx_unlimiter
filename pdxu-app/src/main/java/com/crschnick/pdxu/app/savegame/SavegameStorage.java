@@ -782,41 +782,56 @@ public abstract class SavegameStorage<
     }
 
     synchronized void createNewBranch(SavegameEntry<T,I> e) {
-        if (e.getInfo() == null || e.getInfo().isBinary()) {
+        if (!e.isLoaded()) {
             return;
         }
 
         byte[] bytes;
+        String checksum;
         try {
             bytes = Files.readAllBytes(getSavegameFile(e));
+            checksum = checksum(bytes);
+            if (type.isBinary(bytes)) {
+                bytes = RakalyHelper.toEquivalentPlaintext(getSavegameFile(e));
+            }
+            checksum = checksum(bytes);
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return;
         }
-        var checksum = checksum(bytes);
 
         var struc = type.determineStructure(bytes);
         var r = struc.parse(bytes);
-        r.visit(new SavegameParseResult.Visitor() {
-            @Override
-            public void success(SavegameParseResult.Success s) {
-                var c = s.content;
-                struc.getType().generateNewCampaignIdHeuristic(c);
-                I info = null;
-                try {
-                    info = infoFactory.apply(s.content, false);
-                } catch (SavegameInfoException e) {
-                    ErrorHandler.handleException(e);
-                    return;
-                }
+        if (r.success().isEmpty()) {
+            return;
+        }
 
-                var targetId = struc.getType().getCampaignIdHeuristic(c);
-                var sourceName = getSavegameCollection(e).getName();
-                var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
-                addEntryToCollection(targetId, file -> struc.write(file, c), checksum, info, null, newName);
-                saveData();
-            }
-        });
+        var s = r.success().get();
+        var c = s.content;
+
+        UUID targetId;
+        if (!e.getInfo().isBinary() && !e.getInfo().isIronman()) {
+            // Update savegame information itself if possible
+            struc.getType().generateNewCampaignIdHeuristic(c);
+            targetId = struc.getType().getCampaignIdHeuristic(c);
+        } else {
+            // Use random id otherwise
+            targetId = UUID.randomUUID();
+        }
+
+        // Generate new info
+        I info;
+        try {
+            info = infoFactory.apply(s.content, e.getInfo().isBinary());
+        } catch (SavegameInfoException ex) {
+            ErrorHandler.handleException(ex);
+            return;
+        }
+
+        var sourceName = getSavegameCollection(e).getName();
+        var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
+        addEntryToCollection(targetId, file -> struc.write(file, c), checksum, info, null, newName);
+        saveData();
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {

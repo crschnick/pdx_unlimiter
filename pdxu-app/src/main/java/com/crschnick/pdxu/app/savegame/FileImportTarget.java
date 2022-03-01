@@ -95,7 +95,7 @@ public abstract class FileImportTarget {
 
     protected abstract String getRawName();
 
-    private static final Pattern ID_MATCHER = Pattern.compile("^(.+?) \\((\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)$");
+    private static final Pattern ID_MATCHER = Pattern.compile("^(.+?) \\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)$");
 
     public String getName() {
         var raw = getRawName();
@@ -240,7 +240,7 @@ public abstract class FileImportTarget {
                 return time;
             }
 
-            return getRawName().compareTo(o.getRawName());
+            return getName().compareTo(o.getName());
         }
 
         public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {

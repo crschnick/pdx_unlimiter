@@ -25,12 +25,13 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry, boolean includeEntryName) {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
-            var sc = ctx.getStorage();
-            var out = FileUtils.getTempDirectory().toPath().resolve(
-                    sc.getValidOutputFileName(entry, includeEntryName, null));
+            var target = FileExportTarget.createExportTarget(
+                    FileUtils.getTempDirectory().toPath(), includeEntryName, entry);
+
+            Path out;
             try {
-                sc.copySavegameTo(entry, out);
-            } catch (IOException ioException) {
+                out = target.export();
+            } catch (Exception ioException) {
                 ErrorHandler.handleException(ioException);
                 return null;
             }
@@ -61,10 +62,6 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void branch(SavegameEntry<T, I> entry) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegameInfoContextAsync(entry, ctx -> {
-                if (ctx.getInfo().isBinary()) {
-                    return;
-                }
-
                 ctx.getStorage().createNewBranch(entry);
             });
         }, true);

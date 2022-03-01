@@ -6,32 +6,39 @@ import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.UUID;
 
 public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
-    protected Path savegameDir;
+    protected final Path targetDir;
+    protected final boolean includeEntryName;
     protected SavegameStorage<T, I> storage;
     protected SavegameEntry<T, I> entry;
 
-    FileExportTarget(Path savegameDir, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
-        this.savegameDir = savegameDir;
+    FileExportTarget(Path targetDir, boolean includeEntryName, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
+        this.targetDir = targetDir;
+        this.includeEntryName = includeEntryName;
         this.storage = storage;
         this.entry = entry;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(SavegameEntry<T, I> entry) {
+        return SavegameContext.mapSavegame(entry, ctx -> {
+            return createExportTarget(ctx.getInstallation().getSavegamesDir(), false, entry);
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(Path dir, boolean includeEntryName, SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             if (SavegameStorage.get(Game.STELLARIS).equals(ctx.getStorage())) {
                 return (FileExportTarget<T, I>) new StellarisExportTarget(
-                        ctx.getInstallation().getSavegamesDir(),
+                        dir,
+                        includeEntryName,
                         (SavegameStorage<StellarisTag, StellarisSavegameInfo>) ctx.getStorage(),
                         (SavegameEntry<StellarisTag, StellarisSavegameInfo>) entry);
             } else {
-                return new StandardExportTarget<>(ctx.getInstallation().getSavegamesDir(), ctx.getStorage(), entry);
+                return new StandardExportTarget<>(dir, includeEntryName, ctx.getStorage(), entry);
             }
         });
     }
@@ -40,8 +47,8 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
     public static class StandardExportTarget<T, I extends SavegameInfo<T>> extends FileExportTarget<T, I> {
 
-        public StandardExportTarget(Path savegameDir, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
-            super(savegameDir, storage, entry);
+        public StandardExportTarget(Path savegameDir, boolean includeEntryName, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry) {
+            super(savegameDir, includeEntryName, storage, entry);
         }
 
         @Override
@@ -50,8 +57,8 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
             // Only try to add id suffix in case for ironman or binary ones
             var suffix = entry.getInfo().isIronman() || entry.getInfo().isBinary() ?
                     customId.map(u -> " (" + u + ")").orElse(null) : null;
-            var baseName = storage.getValidOutputFileName(entry, false, suffix);
-            var out = savegameDir.resolve(baseName);
+            var baseName = storage.getValidOutputFileName(entry, includeEntryName, suffix);
+            var out = targetDir.resolve(baseName);
             storage.copySavegameTo(entry, out);
             return out;
         }
@@ -61,9 +68,10 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
         public StellarisExportTarget(
                 Path savegameDir,
+                boolean includeEntryName,
                 SavegameStorage<StellarisTag, StellarisSavegameInfo> storage,
                 SavegameEntry<StellarisTag, StellarisSavegameInfo> entry) {
-            super(savegameDir, storage, entry);
+            super(savegameDir, includeEntryName, storage, entry);
         }
 
         @Override
@@ -73,10 +81,10 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
             var suffix = entry.getInfo().isIronman() || entry.getInfo().isBinary() ?
                     customId.map(u -> " (" + u + ")").orElse(null) : null;
             var baseName = FilenameUtils.getBaseName(
-                    storage.getValidOutputFileName(entry, false, suffix).toString());
+                    storage.getValidOutputFileName(entry, includeEntryName, suffix).toString());
 
             Path file;
-            Path dir = savegameDir.resolve(baseName);
+            Path dir = targetDir.resolve(baseName);
             if (entry.getInfo().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {
