@@ -19,4 +19,8 @@ public class SavegameBranches {
 
         return true;
     }
+
+    public static boolean supportsRewrite(SavegameEntry<?,?> e) {
+        return !e.getInfo().isIronman() && !e.getInfo().isBinary();
+    }
 }

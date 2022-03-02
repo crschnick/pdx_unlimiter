@@ -50,7 +50,7 @@ public class SavegameWatcher {
 
         List<Path> savegameDirs = install.getAllSavegameDirectories();
 
-        // In case the savegame dir does exist, create it anyway to prevent
+        // In case the savegame dir does not exist, create it anyway to prevent
         // having to reload/restart to get savegame changes later on
         for (var dir : savegameDirs) {
             try {

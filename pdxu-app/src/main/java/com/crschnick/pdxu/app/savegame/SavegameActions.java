@@ -67,15 +67,6 @@ public class SavegameActions {
         }, true);
     }
 
-    public static <T, I extends SavegameInfo<T>> void moveEntry(
-            SavegameCollection<T, I> collection, SavegameEntry<T, I> entry) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegameContext(entry, ctx -> {
-                ctx.getStorage().moveEntry(collection, entry);
-            });
-        }, false);
-    }
-
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             return ctx.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getTag());

@@ -12,7 +12,6 @@ import com.crschnick.pdxu.app.util.ConfigHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
-import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
@@ -387,40 +386,6 @@ public abstract class SavegameStorage<
                 "Could not find savegame collection for entry " + e.getName()));
     }
 
-    synchronized void moveEntry(
-            SavegameCollection<T, I> to, SavegameEntry<T, I> entry) {
-        var from = getSavegameCollection(entry);
-        if (from == to) {
-            return;
-        }
-
-        var srcDir = getSavegameDataDirectory(entry).toFile();
-        try {
-            FileUtils.copyDirectory(
-                    srcDir,
-                    getSavegameDataDirectory().resolve(to.getUuid().toString()).resolve(entry.getUuid().toString()).toFile());
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-            return;
-        }
-
-        from.getSavegames().remove(entry);
-        from.onSavegamesChange();
-        to.getSavegames().add(entry);
-        to.onSavegamesChange();
-
-        try {
-            FileUtils.deleteDirectory(srcDir);
-        } catch (IOException e) {
-            ErrorHandler.handleException(e);
-        }
-        if (from.getSavegames().size() == 0) {
-            delete(from);
-        }
-
-        saveData();
-    }
-
     synchronized void delete(SavegameCollection<T, I> c) {
         if (!this.collections.contains(c)) {
             return;
@@ -579,7 +544,7 @@ public abstract class SavegameStorage<
         return Optional.empty();
     }
 
-    public synchronized Optional<UUID> getCustomCampaignId(SavegameEntry<?, ?> e) throws Exception {
+    public synchronized Optional<UUID> getCustomCampaignId(SavegameEntry<?, ?> e) {
         if (!e.isLoaded()) {
             throw new IllegalStateException("Savegame info not available");
         }

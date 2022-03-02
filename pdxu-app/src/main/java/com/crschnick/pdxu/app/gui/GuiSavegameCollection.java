@@ -15,8 +15,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.Glow;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -117,31 +115,6 @@ public class GuiSavegameCollection {
             info.getChildren().add(bottom);
         }
         btn.getChildren().add(info);
-
-        setupDragAndDrop(c, btn);
         return btn;
     }
-
-    private static <T, I extends SavegameInfo<T>> void setupDragAndDrop(SavegameCollection<T, I> c, HBox btn) {
-        btn.setOnDragOver(event -> {
-            if (event.getGestureSource() != btn && event.getSource() instanceof Node) {
-                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                btn.getChildren().get(0).setEffect(new Glow(1));
-            }
-
-            event.consume();
-        });
-
-        btn.setOnDragExited(event -> {
-            btn.getChildren().get(0).setEffect(null);
-        });
-
-        btn.setOnDragDropped(de -> {
-            Node src = (Node) de.getGestureSource();
-            @SuppressWarnings("unchecked")
-            SavegameEntry<T, I> entry = (SavegameEntry<T, I>) src.getProperties().get("list-item");
-            SavegameActions.moveEntry(c, entry);
-        });
-    }
-
 }
