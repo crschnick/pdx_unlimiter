@@ -557,7 +557,7 @@ public abstract class SavegameStorage<
     public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName, String suffix) {
         var name = getSavegameCollection(e).getName() + (includeEntryName ?
                 " (" + e.getName() + ")" : "") + (suffix != null ? suffix : "");
-        var comp = SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name);
+        var comp = SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name).trim();
 
         // Try to return valid file name
         if (comp.length() > 0) {
