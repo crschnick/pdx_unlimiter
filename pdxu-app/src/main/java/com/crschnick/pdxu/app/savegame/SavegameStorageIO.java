@@ -7,8 +7,9 @@ import com.crschnick.pdxu.model.SavegameInfo;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SavegameStorageIO {
 
@@ -28,18 +29,37 @@ public class SavegameStorageIO {
     }
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> storage, Path out) throws IOException {
+        var writtenCollections = new ArrayList<String>();
         for (SavegameCollection<T, I> c : storage.getCollections()) {
-            Path colDir = out.resolve(OsHelper.getFileSystemCompatibleName(c.getName() +
-                    " (" + c.getUuid().toString().substring(0, 8) + ")"));
+            var colName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenCollections);
+            writtenCollections.add(colName);
+
+            Path colDir = out.resolve(colName);
             FileUtils.forceMkdir(colDir.toFile());
+            var writtenEntries = new ArrayList<String>();
             for (SavegameEntry<T, I> e : c.getSavegames()) {
-                var name = e.getName() + " (" + e.getUuid().toString().substring(0, 8) + ")." +
-                        storage.getType().getFileEnding();
-                Path fileOut = colDir.resolve(OsHelper.getFileSystemCompatibleName(name));
-                if (!Files.exists(fileOut)) {
-                    storage.copySavegameTo(e, fileOut);
-                }
+                var eName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenEntries) +
+                        "." + storage.getType().getFileEnding();
+                writtenEntries.add(eName);
+
+                Path fileOut = colDir.resolve(OsHelper.getFileSystemCompatibleName(eName));
+                storage.copySavegameTo(e, fileOut);
             }
+        }
+    }
+
+    private static String getUniqueName(String start, List<String> written) {
+        if (!written.contains(start)) {
+            return start;
+        }
+
+        int counter = 1;
+        while (true) {
+            var newName = start + "(" + counter + ")";
+            if (!written.contains(newName)) {
+                return newName;
+            }
+            counter++;
         }
     }
 }
