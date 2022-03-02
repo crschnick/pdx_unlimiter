@@ -22,7 +22,12 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
     private static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
 
     public static int indexOfCompressedGamestateStart(byte[] array) {
-        for (int i = 0; i < MAX_SEARCH; ++i) {
+        if (array.length < ZIP_HEADER.length) {
+            return -1;
+        }
+
+        int end = Math.min(array.length, MAX_SEARCH - ZIP_HEADER.length);
+        for (int i = 0; i < end; ++i) {
             boolean found = true;
             for (int j = 0; j < ZIP_HEADER.length; ++j) {
                 if (array[i + j] != ZIP_HEADER[j]) {
