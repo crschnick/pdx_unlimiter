@@ -440,7 +440,7 @@ public interface GameInstallType {
                 }
             }
 
-            return p;
+            return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve("Victoria II");
         }
 
         @Override

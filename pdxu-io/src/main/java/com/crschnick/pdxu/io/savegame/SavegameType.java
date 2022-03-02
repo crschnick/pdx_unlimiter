@@ -6,6 +6,7 @@ import com.crschnick.pdxu.io.parser.TextFormatParser;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Random;
@@ -325,7 +326,8 @@ public interface SavegameType {
         }
 
         public UUID getCampaignIdHeuristic(SavegameContent c) {
-            return UUID.randomUUID();
+            var p = c.get().getNodeForKey("player").getString();
+            return UUID.nameUUIDFromBytes(p.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override

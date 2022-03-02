@@ -6,10 +6,7 @@ import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.app.savegame.SavegameActions;
-import com.crschnick.pdxu.app.savegame.SavegameContext;
-import com.crschnick.pdxu.app.savegame.SavegameEntry;
-import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.app.util.integration.ConverterHelper;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
@@ -258,6 +255,10 @@ public class GuiSavegameEntry {
         });
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+            if (!SavegameBranches.supportsBranching(e)) {
+                return;
+            }
+
             Button branch = new JFXButton();
             branch.setGraphic(new FontIcon());
             branch.setOnMouseClicked((m) -> {

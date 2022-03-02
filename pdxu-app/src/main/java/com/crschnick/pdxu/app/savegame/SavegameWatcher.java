@@ -54,7 +54,9 @@ public class SavegameWatcher {
         // having to reload/restart to get savegame changes later on
         for (var dir : savegameDirs) {
             try {
-                Files.createDirectories(dir);
+                if (!Files.exists(dir)) {
+                    Files.createDirectories(dir);
+                }
             } catch (AccessDeniedException ignored) {
                 // Ignore permission issues
             } catch (Exception ex) {
