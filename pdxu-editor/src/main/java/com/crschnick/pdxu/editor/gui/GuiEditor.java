@@ -9,7 +9,6 @@ import com.crschnick.pdxu.editor.EditorFilter;
 import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
-import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -24,7 +23,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.List;
 import java.util.Objects;
 
 public class GuiEditor {
@@ -40,7 +38,12 @@ public class GuiEditor {
             Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
         });
 
-        stage.setScene(new Scene(GuiEditor.create(state), 720, 600));
+        var node = GuiEditor.create(state);
+        stage.setScene(new Scene(node, 720, 600));
+
+        // Disable focus on startup
+        node.requestFocus();
+
         GuiStyle.addStylesheets(stage.getScene());
         showMissingGameWarning(state);
         stage.show();
@@ -74,10 +77,6 @@ public class GuiEditor {
         layout.setTop(topBars);
         createNodeList(layout, state);
         layout.setBottom(createFilterBar(state.getFilter()));
-
-        // Disable focus on startup
-        layout.requestFocus();
-
         return layout;
     }
 
