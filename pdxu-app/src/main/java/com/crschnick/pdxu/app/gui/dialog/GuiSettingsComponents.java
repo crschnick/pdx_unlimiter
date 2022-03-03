@@ -183,7 +183,7 @@ public class GuiSettingsComponents {
                 }
             }
 
-            dirChooser.setTitle(PdxuI18n.get("SELECT_PROGRAM", pe.getName()));
+            dirChooser.setTitle(PdxuI18n.get("SELECT_PROGRAM"));
             File file = dirChooser.showOpenDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
                 textArea.setText(file.toString());
