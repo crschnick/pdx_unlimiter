@@ -133,8 +133,9 @@ public class GuiSettingsComponents {
         TextField textArea = new TextField();
         EventHandler<MouseEvent> eh = (m) -> {
             DirectoryChooser dirChooser = new DirectoryChooser();
-            if (!textArea.getText().isEmpty()) {
-                Path p = Path.of(textArea.getText());
+            var text = textArea.getText().trim();
+            if (!text.isEmpty()) {
+                Path p = Path.of(text);
                 if (Files.exists(p)) {
                     dirChooser.setInitialDirectory(p.toFile());
                 }
@@ -157,7 +158,7 @@ public class GuiSettingsComponents {
         textArea.setText(Optional.ofNullable(de.getValue()).map(Path::toString)
                 .orElse(""));
         applyFuncs.add(() -> {
-            de.set(textArea.getText().equals("") ? null : Path.of(textArea.getText()));
+            de.set(textArea.getText().trim().equals("") ? null : Path.of(textArea.getText()));
         });
 
         HBox hbox = new HBox(textArea, b);
@@ -172,13 +173,16 @@ public class GuiSettingsComponents {
             if (SystemUtils.IS_OS_WINDOWS) {
                 dirChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Executable", "*.exe"));
             }
-            if (!textArea.getText().isEmpty()) {
-                Path p = Path.of(textArea.getText());
+
+            var text = textArea.getText().trim();
+            if (!text.isEmpty()) {
+                Path p = Path.of(text);
                 if (Files.exists(p)) {
                     var toOpen = Files.isRegularFile(p) ? p.getParent() : p;
                     dirChooser.setInitialDirectory(toOpen.toFile());
                 }
             }
+
             dirChooser.setTitle(PdxuI18n.get("SELECT_PROGRAM", pe.getName()));
             File file = dirChooser.showOpenDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null && file.exists()) {
