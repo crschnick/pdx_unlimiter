@@ -2,6 +2,7 @@ package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
+import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.gui.GuiEditorSettings;
 import com.crschnick.pdxu.editor.node.EditorNode;
@@ -85,7 +86,7 @@ public class EditorExternalState {
                                 }
                             }
                         } catch (Exception ex) {
-                            ErrorHandler.handleException(ex, null, changed);
+                            GuiErrorReporter.showSimpleErrorMessage(ex.getMessage());
                         }
                     });
                 }
