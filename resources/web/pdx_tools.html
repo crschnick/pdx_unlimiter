@@ -12,6 +12,8 @@
 <iframe src="https://pdx.tools/loading"></iframe>
 <script src="pdx_tools_blob.js"></script>
 <script>
+    // The createBuffer function is supplied by the dynamically generated file pdx_tools_blob.js.
+    // It contains the raw byte data of the savegame.
     var buffer = createBuffer().buffer;
     var file = new File([buffer], "savegame.eu4", {
         type: "application/octet-stream",
@@ -19,6 +21,7 @@
 
     function postFile() {
         console.log('Posting file ...')
+        // Important: The buffer has to be included as a transferable objects to avoid copying it to the new window.
         newWindow.postMessage(file, "*", [buffer]);
         console.log('Posted file!')
         window.close();
