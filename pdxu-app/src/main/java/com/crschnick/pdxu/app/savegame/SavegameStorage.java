@@ -592,12 +592,13 @@ public abstract class SavegameStorage<
             var bytes = RakalyHelper.toMeltedPlaintext(getSavegameFile(e));
             var struc = type.determineStructure(bytes);
             var succ = struc.parse(bytes).orThrow();
+            var checksum = checksum(bytes);
             var c = succ.content;
             type.generateNewCampaignIdHeuristic(c);
             var targetCollection = type.getCampaignIdHeuristic(c);
             var info = infoFactory.apply(succ.content, false);
             var name = getSavegameCollection(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
-            addEntryToCollection(targetCollection, file -> struc.write(file, c), null, info, null, name);
+            addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name);
             saveData();
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
@@ -803,7 +804,7 @@ public abstract class SavegameStorage<
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {
         return getCollections().stream().flatMap(SavegameCollection::entryStream)
-                .filter(ch -> ch.getContentChecksum().equals(cs))
+                .filter(ch -> ch.getContentChecksum() != null && ch.getContentChecksum().equals(cs))
                 .findAny();
     }
 
