@@ -10,6 +10,7 @@ import com.crschnick.pdxu.app.installation.InvalidInstallationException;
 import com.crschnick.pdxu.app.installation.dist.GameDist;
 import com.crschnick.pdxu.app.installation.dist.GameDists;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.OsHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -549,6 +550,13 @@ public abstract class SettingsEntry<T> {
             }
 
             if (!showConfirmationDialog(value.get().toString(), newPath.toString())) {
+                return;
+            }
+
+            // Allow to select any dir if storage is currently empty
+            var oldEmpty = SavegameStorage.ALL.values().stream().anyMatch(s -> s.getCollections().size() > 0);
+            if (oldEmpty) {
+                this.value.set(newPath);
                 return;
             }
 
