@@ -9,7 +9,6 @@ import com.crschnick.pdxu.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,8 +47,16 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                 Node flag = v.getNodeForKey("flag");
                 Node icon = flag.getNodeForKey("icon");
                 Node bg = flag.getNodeForKey("background");
+
+                // Fix for Stellaris 3.4
+                var nameNode = v.getNodeForKey("name");
+                var name = nameNode.isArray() ? null : nameNode.getString();
+                if (name == null) {
+                    name = c.get("meta").getNodeForKey("name").getString();
+                }
+
                 var tag = new StellarisTag(
-                        v.getNodeForKey("name").getString(),
+                        name,
                         icon.getNodeForKey("category").getString(),
                         icon.getNodeForKey("file").getString(),
                         bg.getNodeForKey("category").getString(),
