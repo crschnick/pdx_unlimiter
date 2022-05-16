@@ -93,7 +93,7 @@ public class ZipSavegameStructure implements SavegameStructure {
 
     @Override
     public void write(Path out, SavegameContent content) throws IOException {
-        try (var fs = FileSystems.newFileSystem(out)) {
+        try (var fs = FileSystems.newFileSystem(out, Map.of("create", true))) {
             for (var e : content.entrySet()) {
                 var usedPart = parts.stream()
                         .filter(part -> part.name().equals(e.getKey()))
