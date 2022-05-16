@@ -5,7 +5,8 @@ plugins {
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
-setVersion '2.10.0-pre'
+version '2.10.0-pre'
+def canonicalVersion = '2.10.0'
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/misc/pdxu.properties.default").getText())
@@ -93,6 +94,7 @@ jlink {
     }
 
     jpackage {
+        appVersion = canonicalVersion
         imageOutputDir = file("$buildDir/dist")
         imageName = 'Pdx-Unlimiter'
         if (DefaultNativePlatform.currentOperatingSystem.windows) {
