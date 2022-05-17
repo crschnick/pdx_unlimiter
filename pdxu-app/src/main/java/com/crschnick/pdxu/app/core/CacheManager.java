@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.core;
 
-import com.crschnick.pdxu.app.savegame.SavegameFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +23,6 @@ public class CacheManager {
 
     public static CacheManager getInstance() {
         return INSTANCE;
-    }
-
-    public void onEntryLoadFinish() {
-        var sc = SavegameManagerState.get().globalSelectedCollectionProperty().get();
-        if (sc instanceof SavegameFolder) {
-            logger.debug("Clearing savegame folder caches after load");
-            caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN_SPECIFIC));
-        }
     }
 
     public void onSelectedGameChange() {

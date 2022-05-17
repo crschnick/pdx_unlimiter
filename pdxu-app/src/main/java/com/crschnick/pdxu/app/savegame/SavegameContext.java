@@ -19,7 +19,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
     private SavegameStorage<T, I> storage;
     private SavegameInfo<T> info;
     private SavegameEntry<T, I> entry;
-    private SavegameCollection<T, I> collection;
+    private SavegameCampaign<T, I> collection;
 
     public static <T, I extends SavegameInfo<T>> Game getForSavegame(SavegameEntry<T, I> e) {
         Optional<Game> sg = SavegameStorage.ALL.entrySet().stream()
@@ -29,7 +29,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         return sg.orElse(null);
     }
 
-    public static <T, I extends SavegameInfo<T>> Game getForCollection(SavegameCollection<T, I> col) {
+    public static <T, I extends SavegameInfo<T>> Game getForCollection(SavegameCampaign<T, I> col) {
         Optional<Game> sg = SavegameStorage.ALL.entrySet().stream()
                 .filter(kv -> kv.getValue().getCollections().contains(col))
                 .findFirst()
@@ -38,7 +38,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
     }
 
     public static <T, I extends SavegameInfo<T>> void withCollectionContext(
-            SavegameCollection<T, I> col,
+            SavegameCampaign<T, I> col,
             Consumer<SavegameContext<T, I>> con) {
         var g = getForCollection(col);
         if (g == null) {
@@ -109,7 +109,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         ctx.info = e.getInfo();
         ctx.entry = e;
 
-        var col = SavegameStorage.<T, I>get(g).getSavegameCollection(e);
+        var col = SavegameStorage.<T, I>get(g).getSavegameCampaign(e);
         if (col == null) {
             return Optional.empty();
         }
@@ -141,7 +141,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         return entry;
     }
 
-    public SavegameCollection<T, I> getCollection() {
+    public SavegameCampaign<T, I> getCollection() {
         return collection;
     }
 

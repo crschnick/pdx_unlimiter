@@ -15,7 +15,6 @@ import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -101,7 +100,7 @@ public class SavegameActions {
             public void success(SavegameParseResult.Success s) {
                 try {
                     var campaignId = type.getCampaignIdHeuristic(s.content);
-                    SavegameStorage.get(g).getSavegameCollection(campaignId)
+                    SavegameStorage.get(g).getSavegameCampaign(campaignId)
                             .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
                         TaskExecutor.getInstance().submitTask(() -> {
                             SavegameStorage.get(g).loadEntry(entry);
@@ -172,7 +171,7 @@ public class SavegameActions {
         }, false);
     }
 
-    public static <T, I extends SavegameInfo<T>> void delete(SavegameCollection<T, I> c) {
+    public static <T, I extends SavegameInfo<T>> void delete(SavegameCampaign<T, I> c) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withCollectionContext(c, ctx -> {
                 ctx.getStorage().delete(c);

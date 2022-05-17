@@ -5,6 +5,10 @@ import java.util.stream.IntStream;
 
 public final class GameDate implements Comparable<GameDate> {
 
+    public static GameDate zero(GameDateType t) {
+        return new GameDate(0, 0, 0, 0, t);
+    }
+
     private int hour;
     private int day;
     private int month;

@@ -30,7 +30,7 @@ public class SavegameStorageIO {
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> storage, Path out) throws IOException {
         var writtenCollections = new ArrayList<String>();
-        for (SavegameCollection<T, I> c : storage.getCollections()) {
+        for (SavegameCampaign<T, I> c : storage.getCollections()) {
             var colName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenCollections);
             writtenCollections.add(colName);
 

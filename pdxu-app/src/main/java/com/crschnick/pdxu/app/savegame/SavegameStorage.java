@@ -69,7 +69,7 @@ public abstract class SavegameStorage<
     private final GameDateType dateType;
     private final Path path;
     private final SavegameType type;
-    private final ObservableSet<SavegameCollection<T, I>> collections = FXCollections.observableSet(new HashSet<>());
+    private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
             FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory,
@@ -229,15 +229,17 @@ public abstract class SavegameStorage<
                 }
 
                 Instant lastDate = Instant.parse(f.get(i).required("lastPlayed").textValue());
-                collections.add(new SavegameFolder<>(lastDate, name, id));
+                collections.add(new SavegameCampaign<>(lastDate, name, id, GameDate.zero(dateType), ImageHelper.DEFAULT_IMAGE));
             }
         }
 
 
-        for (SavegameCollection<T, I> collection : collections) {
-            String typeName = collection instanceof SavegameCampaign ? "campaign" : "folder";
-            var colFile = getSavegameDataDirectory().resolve(
-                    collection.getUuid().toString()).resolve(typeName + ".json");
+        for (SavegameCampaign<T, I> collection : collections) {
+            var campaignFile = getSavegameDataDirectory().resolve(
+                    collection.getUuid().toString()).resolve("campaign.json");
+            var folderFile = getSavegameDataDirectory().resolve(
+                    collection.getUuid().toString()).resolve("folder.json");
+            var colFile = Files.exists(campaignFile) ? campaignFile : folderFile;
 
             // Campaign file might not exist even though the directory exists. Do not fail in this case
             if (!Files.exists(colFile)) {
@@ -265,7 +267,7 @@ public abstract class SavegameStorage<
         ObjectNode n = JsonNodeFactory.instance.objectNode();
 
         ArrayNode c = n.putArray("campaigns");
-        getCollections().stream().filter(col -> col instanceof SavegameCampaign).forEach(col -> {
+        getCollections().forEach(col -> {
             SavegameCampaign<T, I> campaign = (SavegameCampaign<T, I>) col;
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
@@ -277,7 +279,7 @@ public abstract class SavegameStorage<
                             .put("uuid", entry.getUuid().toString())
                             .<ObjectNode>set("sourceFileChecksums", JsonNodeFactory.instance.arrayNode().addAll(
                                     entry.getSourceFileChecksums().stream()
-                                            .map(s -> new TextNode(s))
+                                            .map(TextNode::new)
                                             .collect(Collectors.toList())))
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
@@ -301,35 +303,6 @@ public abstract class SavegameStorage<
             c.add(campaignNode);
         });
 
-
-        ArrayNode f = n.putArray("folders");
-        getCollections().stream().filter(col -> col instanceof SavegameFolder).forEach(col -> {
-            SavegameFolder<T, I> folder = (SavegameFolder<T, I>) col;
-            ObjectNode folderFileNode = JsonNodeFactory.instance.objectNode();
-            ArrayNode entries = folderFileNode.putArray("entries");
-            folder.getSavegames().stream()
-                    .map(entry -> JsonNodeFactory.instance.objectNode()
-                            .put("name", entry.getName())
-                            .put("date", entry.getDate().toString())
-                            .put("checksum", entry.getContentChecksum())
-                            .put("uuid", entry.getUuid().toString())
-                            .<ObjectNode>set("sourceFileChecksums", JsonNodeFactory.instance.arrayNode().addAll(
-                                    entry.getSourceFileChecksums().stream()
-                                            .map(s -> new TextNode(s))
-                                            .collect(Collectors.toList())))
-                            .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
-                    .forEach(entries::add);
-
-            ConfigHelper.writeConfig(getSavegameDataDirectory()
-                    .resolve(folder.getUuid().toString()).resolve("folder.json"), folderFileNode);
-
-            ObjectNode folderNode = JsonNodeFactory.instance.objectNode()
-                    .put("name", folder.getName())
-                    .put("lastPlayed", folder.getLastPlayed().toString())
-                    .put("uuid", folder.getUuid().toString());
-            f.add(folderNode);
-        });
-
         ConfigHelper.writeConfig(getDataFile(), n);
     }
 
@@ -348,7 +321,7 @@ public abstract class SavegameStorage<
                 info.getDate(),
                 SavegameNotes.empty(),
                 sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
-        if (this.getSavegameCollection(campainUuid).isEmpty()) {
+        if (this.getSavegameCampaign(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
                     .tagImage(info, info.getTag());
@@ -361,7 +334,7 @@ public abstract class SavegameStorage<
             this.collections.add(newCampaign);
         }
 
-        SavegameCollection<T, I> c = this.getSavegameCollection(campainUuid).get();
+        SavegameCampaign<T, I> c = this.getSavegameCampaign(campainUuid).get();
         logger.debug("Adding new entry " + e.getName());
         c.add(e);
         c.onSavegamesChange();
@@ -378,7 +351,7 @@ public abstract class SavegameStorage<
                 .anyMatch(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
     }
 
-    public synchronized SavegameCollection<T, I> getSavegameCollection(SavegameEntry<?, ?> e) {
+    public synchronized SavegameCampaign<T, I> getSavegameCampaign(SavegameEntry<?, ?> e) {
         var campaign = collections.stream()
                 .filter(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
                 .findAny();
@@ -386,7 +359,7 @@ public abstract class SavegameStorage<
                 "Could not find savegame collection for entry " + e.getName()));
     }
 
-    synchronized void delete(SavegameCollection<T, I> c) {
+    synchronized void delete(SavegameCampaign<T, I> c) {
         if (!this.collections.contains(c)) {
             return;
         }
@@ -407,7 +380,7 @@ public abstract class SavegameStorage<
 
 
     synchronized void delete(SavegameEntry<T, I> e) {
-        SavegameCollection<T, I> c = getSavegameCollection(e);
+        SavegameCampaign<T, I> c = getSavegameCampaign(e);
         if (!this.collections.contains(c) || !c.getSavegames().contains(e)) {
             return;
         }
@@ -447,7 +420,7 @@ public abstract class SavegameStorage<
             try {
                 e.startLoading();
                 e.load(JsonHelper.readObject(infoClass, getSavegameInfoFile(e)));
-                getSavegameCollection(e).onSavegameLoad(e);
+                getSavegameCampaign(e).onSavegameLoad(e);
                 return;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
@@ -481,7 +454,7 @@ public abstract class SavegameStorage<
                     logger.debug("Parsing was successful. Loading info ...");
                     I info = infoFactory.apply(s.content, melted);
                     e.load(info);
-                    getSavegameCollection(e).onSavegameLoad(e);
+                    getSavegameCampaign(e).onSavegameLoad(e);
 
 
                     // Clear old info files
@@ -517,7 +490,7 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Optional<SavegameEntry<T,I>> getEntryForStorageSavegameFile(Path file) {
-        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
                 .filter(ch -> getSavegameFile(ch).equals(file))
                 .findAny();
     }
@@ -531,12 +504,12 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Path getSavegameDataDirectory(SavegameEntry<?, ?> e) {
-        Path campaignPath = path.resolve(getSavegameCollection(e).getUuid().toString());
+        Path campaignPath = path.resolve(getSavegameCampaign(e).getUuid().toString());
         return campaignPath.resolve(e.getUuid().toString());
     }
 
-    public synchronized Optional<SavegameCollection<T, I>> getSavegameCollection(UUID uuid) {
-        for (SavegameCollection<T, I> c : collections) {
+    public synchronized Optional<SavegameCampaign<T, I>> getSavegameCampaign(UUID uuid) {
+        for (SavegameCampaign<T, I> c : collections) {
             if (c.getUuid().equals(uuid)) {
                 return Optional.of(c);
             }
@@ -550,12 +523,12 @@ public abstract class SavegameStorage<
         }
 
         var savegameCampaignId = e.getInfo().getCampaignHeuristic();
-        var storageCampaignId = getSavegameCollection(e).getUuid();
+        var storageCampaignId = getSavegameCampaign(e).getUuid();
         return savegameCampaignId.equals(storageCampaignId) ? Optional.empty() : Optional.of(storageCampaignId);
     }
 
     public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName, String suffix) {
-        var name = getSavegameCollection(e).getName() + (includeEntryName ?
+        var name = getSavegameCampaign(e).getName() + (includeEntryName ?
                 " (" + e.getName() + ")" : "") + (suffix != null ? suffix : "");
         var comp = SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name).trim();
 
@@ -597,7 +570,7 @@ public abstract class SavegameStorage<
             type.generateNewCampaignIdHeuristic(c);
             var targetCollection = type.getCampaignIdHeuristic(c);
             var info = infoFactory.apply(succ.content, false);
-            var name = getSavegameCollection(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
+            var name = getSavegameCampaign(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
             addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name);
             saveData();
         } catch (Exception ex) {
@@ -796,32 +769,32 @@ public abstract class SavegameStorage<
             return;
         }
 
-        var sourceName = getSavegameCollection(e).getName();
+        var sourceName = getSavegameCampaign(e).getName();
         var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
         addEntryToCollection(targetId, writer, checksum, info, null, newName);
         saveData();
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {
-        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
                 .filter(ch -> ch.getContentChecksum() != null && ch.getContentChecksum().equals(cs))
                 .findAny();
     }
 
     public synchronized String getEntryName(SavegameEntry<T, I> e) {
-        String cn = getSavegameCollection(e).getName();
+        String cn = getSavegameCampaign(e).getName();
         String en = e.getName();
         return cn + " (" + en + ")";
     }
 
     public synchronized Optional<SavegameEntry<T,I>> getEntryForSourceFileChecksum(String sourceFileChecksum) {
-        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
                 .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
                 .findAny();
     }
 
     public synchronized boolean hasImportedSourceFile(String sourceFileChecksum) {
-        return getCollections().stream().flatMap(SavegameCollection::entryStream)
+        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
                 .anyMatch(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum));
     }
 
@@ -833,7 +806,7 @@ public abstract class SavegameStorage<
         return getSavegameDataDirectory().resolve("campaigns.json");
     }
 
-    public ObservableSet<SavegameCollection<T, I>> getCollections() {
+    public ObservableSet<SavegameCampaign<T, I>> getCollections() {
         return collections;
     }
 

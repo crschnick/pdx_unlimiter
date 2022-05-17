@@ -3,10 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.core.settings.SavedState;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.savegame.SavegameCollection;
-import com.crschnick.pdxu.app.savegame.SavegameContext;
-import com.crschnick.pdxu.app.savegame.SavegameEntry;
-import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -24,12 +21,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     private static final SavegameManagerState<?, ?> INSTANCE = new SavegameManagerState<>();
     private final SimpleObjectProperty<Game> current = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCollection =
+    private final SimpleObjectProperty<SavegameCampaign<T, I>> globalSelectedCollection =
             new SimpleObjectProperty<>();
     private final SimpleObjectProperty<SavegameEntry<T, I>> globalSelectedEntry =
             new SimpleObjectProperty<>();
     private final Filter filter = new Filter();
-    private final ListProperty<SavegameCollection<T, I>> shownCollections = new SimpleListProperty<>(
+    private final ListProperty<SavegameCampaign<T, I>> shownCollections = new SimpleListProperty<>(
             FXCollections.observableList(new CopyOnWriteArrayList<>()));
     private final ListProperty<SavegameEntry<T, I>> shownEntries = new SimpleListProperty<>(
             FXCollections.observableList(new CopyOnWriteArrayList<>()));
@@ -70,7 +67,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     private void addShownContentChangeListeners() {
-        var colListener = (SetChangeListener<? super SavegameCollection<?, ?>>) c -> {
+        var colListener = (SetChangeListener<? super SavegameCampaign<Object, SavegameInfo<Object>>>) c -> {
             updateShownCollections();
         };
         current.addListener((c, o, n) -> {
@@ -103,11 +100,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         change.accept(current());
     }
 
-    public ReadOnlyObjectProperty<SavegameCollection<T, I>> globalSelectedCollectionProperty() {
+    public ReadOnlyObjectProperty<SavegameCampaign<T, I>> globalSelectedCollectionProperty() {
         return globalSelectedCollection;
     }
 
-    private SimpleObjectProperty<SavegameCollection<T, I>> globalSelectedCampaignPropertyInternal() {
+    private SimpleObjectProperty<SavegameCampaign<T, I>> globalSelectedCampaignPropertyInternal() {
         return globalSelectedCollection;
     }
 
@@ -127,14 +124,14 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         TaskExecutor.getInstance().submitTask(() -> SavegameContext.withSavegameContext(e, ctx -> {
             if (globalSelectedCampaignPropertyInternal().get() != null &&
                     globalSelectedCampaignPropertyInternal().get().equals(
-                            ctx.getStorage().getSavegameCollection(e))) {
+                            ctx.getStorage().getSavegameCampaign(e))) {
 
                 ctx.getStorage().loadEntry(e);
             }
         }), false);
     }
 
-    public void unloadCollectionAsync(SavegameCollection<T, I> col) {
+    public void unloadCollectionAsync(SavegameCampaign<T, I> col) {
         TaskExecutor.getInstance().submitTask(() -> {
             logger.debug("Unloading collection " + col.getName());
             for (var e : col.getSavegames()) {
@@ -200,7 +197,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 newCollections.remove(col);
             }
         });
-        newCollections.sort(Comparator.comparing(SavegameCollection::getLastPlayed, Comparator.reverseOrder()));
+        newCollections.sort(Comparator.comparing(SavegameCampaign::getLastPlayed, Comparator.reverseOrder()));
         shownCollections.set(newCollections);
 
         if (globalSelectedCollection.isNotNull().get()) {
@@ -226,7 +223,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         return shownEntries;
     }
 
-    public ListProperty<SavegameCollection<T, I>> getShownCollections() {
+    public ListProperty<SavegameCampaign<T, I>> getShownCollections() {
         return shownCollections;
     }
 
@@ -268,7 +265,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }, false);
     }
 
-    public void selectCollectionAsync(SavegameCollection<T, I> c) {
+    public void selectCollectionAsync(SavegameCampaign<T, I> c) {
         if (globalSelectedCollection.isNotNull().get() && globalSelectedCollection.get().equals(c)) {
             return;
         }
@@ -345,7 +342,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             return filter;
         }
 
-        public boolean shouldShow(SavegameCollection<?, ?> col) {
+        public boolean shouldShow(SavegameCampaign<T, I> col) {
             if (col.getName().toLowerCase().contains(filter.get().toLowerCase())) {
                 return true;
             }

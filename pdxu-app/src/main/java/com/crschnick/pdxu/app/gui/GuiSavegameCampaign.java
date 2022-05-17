@@ -23,35 +23,28 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
-public class GuiSavegameCollection {
+public class GuiSavegameCampaign {
 
     public static <T, I extends SavegameInfo<T>> Node createCampaignButton(
-            SavegameCollection<T, I> c) {
+            SavegameCampaign<T, I> c) {
         HBox btn = new HBox();
         btn.setOnMouseClicked((m) -> SavegameManagerState.<T, I>get().selectCollectionAsync(c));
         btn.setAlignment(Pos.CENTER);
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         {
-            if (c instanceof SavegameCampaign) {
-                SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
-                SavegameContext.withCollectionContext(c, gi -> {
-                    ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
-                    prop.addListener((change, o, n) -> {
-                        Platform.runLater(() -> {
-                            btn.getChildren().set(0, prop.getValue());
-                        });
+            SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
+            SavegameContext.withCollectionContext(c, gi -> {
+                ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
+                prop.addListener((change, o, n) -> {
+                    Platform.runLater(() -> {
+                        btn.getChildren().set(0, prop.getValue());
                     });
-                    Node w = prop.getValue();
-                    w.getStyleClass().add(CLASS_TAG_ICON);
-                    btn.getChildren().add(w);
                 });
-            } else {
-                Node l = new FontIcon();
-                l.getStyleClass().add(CLASS_FOLDER);
-                l.getStyleClass().add(CLASS_TAG_ICON);
-                btn.getChildren().add(l);
-            }
+                Node w = prop.getValue();
+                w.getStyleClass().add(CLASS_TAG_ICON);
+                btn.getChildren().add(w);
+            });
         }
 
         VBox info = new VBox();

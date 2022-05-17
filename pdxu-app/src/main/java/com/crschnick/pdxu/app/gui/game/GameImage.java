@@ -354,10 +354,6 @@ public class GameImage {
     }
 
     public static Pane imageNode(Image i, String styleClass, String tt) {
-        if (i == null) {
-            throw new NullPointerException();
-        }
-
         ImageView v = new ImageView(i);
         StackPane pane = new StackPane(v);
         pane.setAlignment(Pos.CENTER);
