@@ -28,18 +28,24 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
       - name: Execute dist build
         run: ./gradle/gradlew --info clean createDist
+
+      - name: unzip artifact for deployment
+        run: unzip build/pdx_unlimiter-windows.zip
+
       - name: Upload mac dist as an artifact
         uses: actions/upload-artifact@v2
         with:
           name: pdx_unlimiter-mac
           path: build/pdx_unlimiter-mac.zip
           if-no-files-found: ignore
+
       - name: Upload Windows dist as an artifact
         uses: actions/upload-artifact@v2
         with:
           name: pdx_unlimiter-windows
-          path: build/pdx_unlimiter-windows.zip
+          path: build/pdx_unlimiter-windows
           if-no-files-found: ignore
+
       - name: Upload Linux dist as an artifact
         uses: actions/upload-artifact@v2
         with:
