@@ -30,7 +30,7 @@ jobs:
         run: ./gradle/gradlew --info clean createDist
 
       - name: unzip artifact for deployment
-        run: unzip build/pdx_unlimiter-windows.zip
+        run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows
 
       - name: Upload mac dist as an artifact
         uses: actions/upload-artifact@v2
