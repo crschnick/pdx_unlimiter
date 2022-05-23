@@ -48,11 +48,12 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
                 Node icon = flag.getNodeForKey("icon");
                 Node bg = flag.getNodeForKey("background");
 
-                // Fix for Stellaris 3.4
                 var nameNode = v.getNodeForKey("name");
+                // Fix for Stellaris 3.4
                 var name = nameNode.isArray() ? null : nameNode.getString();
                 if (name == null) {
-                    name = c.get("meta").getNodeForKey("name").getString();
+                    // Stellaris 3.4 doesn't give us the names of empires anymore, just the key
+                    name = k.equals("0") ? c.get("meta").getNodeForKey("name").getString() : "Unknown";
                 }
 
                 var tag = new StellarisTag(
