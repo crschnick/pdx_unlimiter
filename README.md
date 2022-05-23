@@ -40,7 +40,8 @@ This version does not come with an update functionality, so you have to manually
 - [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-windows.zip)
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-linux.zip)
 
-
+You can also find information on how to obtain pre-releases and the latest development builds in
+the [Downloads](https://github.com/crschnick/pdx_unlimiter/wiki/Downloads) section in the wiki.
 
 # Features
 
