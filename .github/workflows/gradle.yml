@@ -39,20 +39,20 @@ jobs:
       - name: Upload mac dist as an artifact
         uses: actions/upload-artifact@v2
         with:
-          name: pdx_unlimiter-mac
-          path: build/pdx_unlimiter-mac.zip
+          name: pdx_unlimiter-mac-dev.zip
+          path: build/pdx_unlimiter-mac
           if-no-files-found: ignore
 
       - name: Upload Windows dist as an artifact
         uses: actions/upload-artifact@v2
         with:
-          name: pdx_unlimiter-windows
+          name: pdx_unlimiter-windows-dev.zip
           path: build/pdx_unlimiter-windows
           if-no-files-found: ignore
 
       - name: Upload Linux dist as an artifact
         uses: actions/upload-artifact@v2
         with:
-          name: pdx_unlimiter-linux
-          path: build/pdx_unlimiter-linux.zip
+          name: pdx_unlimiter-linux-dev.zip
+          path: build/pdx_unlimiter-linux
           if-no-files-found: ignore
