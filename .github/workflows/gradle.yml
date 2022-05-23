@@ -29,8 +29,12 @@ jobs:
       - name: Execute dist build
         run: ./gradle/gradlew --info clean createDist
 
-      - name: unzip artifact for deployment
-        run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows
+      - name: unzip artifact for windows
+        run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows || true
+      - name: unzip artifact for linux
+        run: unzip build/pdx_unlimiter-linux.zip -d build/pdx_unlimiter-linux || true
+      - name: unzip artifact for mac
+        run: unzip build/pdx_unlimiter-mac.zip -d build/pdx_unlimiter-mac || true
 
       - name: Upload mac dist as an artifact
         uses: actions/upload-artifact@v2
