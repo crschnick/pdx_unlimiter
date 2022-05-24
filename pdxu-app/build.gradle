@@ -2,7 +2,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     id 'java'
-    id "org.moditect.gradleplugin"
+    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
 java {

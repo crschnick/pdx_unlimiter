@@ -1,0 +1,43 @@
+def changelogOut = new File(project.buildDir, 'changelog.md')
+task writeChangelog(type: DefaultTask) {
+    doLast {
+        changelogOut.text = 'abc'
+    }
+}
+
+jreleaser {
+    project {
+        name = 'Pdx-Unlimiter'
+        website = 'https://github.com/crschnick/pdx_unlimiter'
+        authors = ['Christopher Schnick']
+        license = 'GPL3'
+        extraProperties.put('inceptionYear', '2021')
+    }
+
+    release {
+        github {
+            owner = 'crschnick'
+            overwrite = true
+        }
+    }
+    distributions {
+        app {
+            artifact {
+                distributionType = 'BINARY'
+                path = 'build/pdx_unlimiter-windows.zip'
+            }
+        }
+    }
+
+    announce {
+        discord {
+            active = 'ALWAYS'
+
+            extraProperties.put('foo', 'bar')
+
+            message = '🚀 {{projectNameCapitalized}} {{projectVersion}} has been released! {{releaseNotesUrl}}'
+
+            messageTemplate = 'misc/discord.tpl'
+        }
+    }
+}
