@@ -12,11 +12,11 @@ jreleaser {
         website = 'https://github.com/crschnick/pdx_unlimiter'
         authors = ['Christopher Schnick']
         license = 'GPL3'
+        copyright = ''
     }
 
     release {
         github {
-            enabled = false
             owner = 'crschnick'
             overwrite = true
         }
