@@ -8,10 +8,10 @@ task writeChangelog(type: DefaultTask) {
 jreleaser {
     project {
         name = 'Pdx-Unlimiter'
+        description = 'A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games.'
         website = 'https://github.com/crschnick/pdx_unlimiter'
         authors = ['Christopher Schnick']
         license = 'GPL3'
-        extraProperties.put('inceptionYear', '2021')
     }
 
     release {
