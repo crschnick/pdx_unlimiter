@@ -19,6 +19,21 @@ jreleaser {
         github {
             owner = 'crschnick'
             overwrite = true
+            tagName = '{{projectVersion}}'
+
+            files = true
+            artifacts = true
+            checksums = false
+            signatures = false
+
+            prerelease {
+                enabled = true
+                pattern = '.*-pre'
+            }
+
+            changelog {
+                enabled = false
+            }
         }
     }
     distributions {

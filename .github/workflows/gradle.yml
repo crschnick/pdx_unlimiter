@@ -31,10 +31,14 @@ jobs:
       - name: Verify Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Execute dist build
-        run: ./gradle/gradlew --info createDist jreleaserAnnounce
+        run: ./gradle/gradlew --info createDist
+
+      - name: JReleaser
+        run: ./gradle/gradlew --info jreleaserAnnounce jreleaserRelease
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
+        if: matrix.os == 'windows-2022'
 
       - name: unzip artifact for windows
         run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows || true
