@@ -31,7 +31,10 @@ jobs:
       - name: Verify Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Execute dist build
-        run: ./gradle/gradlew --info createDist jReleaserConfig
+        run: ./gradle/gradlew --info jReleaserConfig
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+          JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
 
       - name: unzip artifact for windows
         run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows || true
