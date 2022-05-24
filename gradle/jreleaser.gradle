@@ -16,6 +16,7 @@ jreleaser {
 
     release {
         github {
+            enabled = false
             owner = 'crschnick'
             overwrite = true
         }
