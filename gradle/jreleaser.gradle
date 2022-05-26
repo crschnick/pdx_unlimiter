@@ -25,7 +25,7 @@ jreleaser {
             overwrite = true
             tagName = '{{projectVersion}}'
 
-            token = property("PDXU_GITHUB_WEBHOOK") != null ? property("PDXU_GITHUB_WEBHOOK") : System.getenv("JRELEASER_GITHUB_TOKEN")
+            token = hasProperty("PDXU_GITHUB_WEBHOOK") ? property("PDXU_GITHUB_WEBHOOK") : System.getenv("JRELEASER_GITHUB_TOKEN")
 
             files = true
             artifacts = true
@@ -66,7 +66,7 @@ jreleaser {
         discord {
             active = 'ALWAYS'
 
-            webhook = property("PDXU_DISCORD_WEBHOOK") != null ? property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
+            webhook = hasProperty("PDXU_DISCORD_WEBHOOK") ? property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
 
             messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : (isPreRelease ? 'misc/discord_pre.tpl' : 'misc/discord.tpl')
         }
