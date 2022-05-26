@@ -1,12 +1,13 @@
 def changelogOut = new File(project.buildDir, 'changelog.md')
-task writeChangelog(type: DefaultTask) {
+task writeLatestChangelog(type: DefaultTask) {
     doLast {
-        changelogOut.text = 'abc'
+        changelogOut.text = file('CHANGELOG.md').text + '\n'
     }
 }
 
 def isPreRelease = project.version.endsWith('-pre')
 def isFullRelease = !isPreRelease && project.version.endsWith('-SNAPSHOT')
+def proj = project;
 
 jreleaser {
     project {
@@ -22,10 +23,9 @@ jreleaser {
         github {
             skipRelease = !isFullRelease && !isPreRelease
             owner = 'crschnick'
-            overwrite = true
+            overwrite = false
             tagName = '{{projectVersion}}'
-
-            token = hasProperty("PDXU_GITHUB_WEBHOOK") ? property("PDXU_GITHUB_WEBHOOK") : System.getenv("JRELEASER_GITHUB_TOKEN")
+            token = proj.hasProperty("PDXU_GITHUB_TOKEN") ? proj.property("PDXU_GITHUB_TOKEN") : System.getenv("JRELEASER_GITHUB_TOKEN")
 
             files = true
             artifacts = true
@@ -43,7 +43,8 @@ jreleaser {
             }
 
             changelog {
-                enabled = false
+                enabled = true
+                external = changelogOut
             }
         }
     }
@@ -69,7 +70,7 @@ jreleaser {
         discord {
             active = 'ALWAYS'
 
-            webhook = hasProperty("PDXU_DISCORD_WEBHOOK") ? property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
+            webhook = proj.hasProperty("PDXU_DISCORD_WEBHOOK") ? proj.property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
 
             messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : (isPreRelease ? 'misc/discord_pre.tpl' : 'misc/discord.tpl')
         }
