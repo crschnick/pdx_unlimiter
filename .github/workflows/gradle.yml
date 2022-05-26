@@ -33,10 +33,14 @@ jobs:
       - name: Execute dist build
         run: ./gradle/gradlew --info createDist
 
-      - name: JReleaser
-        run: ./gradle/gradlew --info jreleaserAnnounce jreleaserRelease
+      - name: JReleaser Release
+        run: ./gradle/gradlew jreleaserRelease
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+
+      - name: JReleaser Announce
+        run: ./gradle/gradlew jreleaserAnnounce
+        env:
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
         if: matrix.os == 'windows-2022'
 

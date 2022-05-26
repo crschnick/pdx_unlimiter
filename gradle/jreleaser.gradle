@@ -5,6 +5,9 @@ task writeChangelog(type: DefaultTask) {
     }
 }
 
+def isPreRelease = project.version.endsWith('-pre')
+def isFullRelease = !isPreRelease && project.version.endsWith('-SNAPSHOT')
+
 jreleaser {
     project {
         name = 'Pdx-Unlimiter'
@@ -12,14 +15,17 @@ jreleaser {
         website = 'https://github.com/crschnick/pdx_unlimiter'
         authors = ['Christopher Schnick']
         license = 'GPL3'
-        copyright = ''
+        copyright = ' '
     }
 
     release {
         github {
+            skipRelease = !isFullRelease && !isPreRelease
             owner = 'crschnick'
             overwrite = true
             tagName = '{{projectVersion}}'
+
+            token = property("PDXU_GITHUB_WEBHOOK") != null ? property("PDXU_GITHUB_WEBHOOK") : System.getenv("JRELEASER_GITHUB_TOKEN")
 
             files = true
             artifacts = true
@@ -29,6 +35,11 @@ jreleaser {
             prerelease {
                 enabled = true
                 pattern = '.*-pre'
+            }
+
+            update {
+                enabled = true
+                section('ASSETS')
             }
 
             changelog {
@@ -41,6 +52,12 @@ jreleaser {
             artifact {
                 distributionType = 'BINARY'
                 path = 'build/pdx_unlimiter-windows.zip'
+                platform = 'windows'
+            }
+            artifact {
+                distributionType = 'BINARY'
+                path = 'build/pdx_unlimiter-linux.zip'
+                platform = 'linux'
             }
         }
     }
@@ -49,11 +66,9 @@ jreleaser {
         discord {
             active = 'ALWAYS'
 
-            extraProperties.put('foo', 'bar')
+            webhook = property("PDXU_DISCORD_WEBHOOK") != null ? property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
 
-            message = '🚀 {{projectNameCapitalized}} {{projectVersion}} has been released! {{releaseNotesUrl}}'
-
-            messageTemplate = 'misc/discord.tpl'
+            messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : (isPreRelease ? 'misc/discord_pre.tpl' : 'misc/discord.tpl')
         }
     }
 }
