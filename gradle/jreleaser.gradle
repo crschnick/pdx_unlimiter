@@ -49,15 +49,18 @@ jreleaser {
     }
     distributions {
         app {
-            artifact {
-                distributionType = 'BINARY'
-                path = 'build/pdx_unlimiter-windows.zip'
-                platform = 'windows'
-            }
-            artifact {
-                distributionType = 'BINARY'
-                path = 'build/pdx_unlimiter-linux.zip'
-                platform = 'linux'
+            if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+                artifact {
+                    distributionType = 'BINARY'
+                    path = 'build/pdx_unlimiter-windows.zip'
+                    platform = 'windows'
+                }
+            } else {
+                artifact {
+                    distributionType = 'BINARY'
+                    path = 'build/pdx_unlimiter-linux.zip'
+                    platform = 'linux'
+                }
             }
         }
     }
