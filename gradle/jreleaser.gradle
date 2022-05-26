@@ -40,7 +40,9 @@ jreleaser {
 
             update {
                 enabled = true
-                section(['ASSETS', 'TITLE', 'BODY'])
+                section('ASSETS')
+                section('TITLE')
+                section('BODY ')
             }
 
             changelog {
