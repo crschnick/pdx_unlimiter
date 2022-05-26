@@ -25,6 +25,7 @@ jreleaser {
             owner = 'crschnick'
             overwrite = false
             tagName = '{{projectVersion}}'
+            releaseName = '{{tagName}}'
             token = proj.hasProperty("PDXU_GITHUB_TOKEN") ? proj.property("PDXU_GITHUB_TOKEN") : System.getenv("JRELEASER_GITHUB_TOKEN")
 
             files = true
@@ -39,7 +40,7 @@ jreleaser {
 
             update {
                 enabled = true
-                section('ASSETS')
+                section(['ASSETS', 'TITLE', 'BODY'])
             }
 
             changelog {

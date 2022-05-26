@@ -1,4 +1,3 @@
-## Changes in 2.10.0:
 - Add new branching functionality:
     - This allows you to create separate branches for both normal and Ironman savegames
     - When descendants of these branched savegames are imported again,
