@@ -119,6 +119,7 @@ public class PdxuApp extends Application {
         var title = "Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")";
         var l = PdxuInstallation.getInstance().getLatestVersion();
         if (PdxuInstallation.getInstance().isProduction() &&
+                !PdxuInstallation.getInstance().isStandalone() &&
                 l != null &&
                 !l.equals(PdxuInstallation.getInstance().getVersion())) {
             title = title + "     OUTDATED: " + l + " available";
