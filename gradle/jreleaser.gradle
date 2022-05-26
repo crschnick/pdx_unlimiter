@@ -13,10 +13,19 @@ jreleaser {
     project {
         name = 'Pdx-Unlimiter'
         description = 'A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games.'
+        longDescription = 'The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a ' +
+                'powerful and smart savegame manager to quickly organize and play all of your savegames with ease. ' +
+                'Furthermore, it also comes with an Ironman converter, a powerful savegame editor, some savescumming ' +
+                'tools, integrations for various other great community-made tools for all major Paradox games.'
         website = 'https://github.com/crschnick/pdx_unlimiter'
         authors = ['Christopher Schnick']
         license = 'GPL3'
         copyright = ' '
+
+        snapshot {
+            pattern = '.*-SNAPSHOT'
+            label = 'early-access'
+        }
     }
 
     release {
@@ -42,7 +51,7 @@ jreleaser {
                 enabled = true
                 section('ASSETS')
                 section('TITLE')
-                section('BODY ')
+                section('BODY')
             }
 
             changelog {
