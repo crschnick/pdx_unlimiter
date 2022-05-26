@@ -1,3 +1,4 @@
+@everyone
 🚀 {{projectName}} {{projectVersion}} has been released: {{releaseNotesUrl}}
 
 Note that as this is not a final release, there might still be some small issues with it.

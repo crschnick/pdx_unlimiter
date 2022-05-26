@@ -1,9 +1,8 @@
 package com.crschnick.pdxu.editor;
 
-import com.crschnick.pdxu.editor.node.EditorNode;
-import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.editor.node.EditorNode;
+import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -83,7 +82,7 @@ public class EditorState {
     public void onFileChanged(EditorNode changed) {
         // Rebuild content if either an element in the currently selected nav path is changed
         // or if an editor node of the current nav path is no longer valid
-        if (navigation.getCurrent().path().getPath().contains(changed) || this.navigation.rebaseNavPathsToValid()) {
+        if (navigation.affectsCurrent(changed) || this.navigation.rebaseNavPathsToValid()) {
             this.content.completeContentChange();
         }
         dirtyProperty().set(true);

@@ -34,7 +34,12 @@ public final class EditorSimpleNode extends EditorRealNode {
     }
 
     public void updateText(String text) {
-        ValueNode bn = (ValueNode) getBackingNode();
+        var b = getBackingNode();
+        if (!b.isValue()) {
+            return;
+        }
+
+        ValueNode bn = b.getValueNode();
 
         // Don't let length go to 0
         if (text.length() == 0 && !bn.isQuoted()) {
@@ -45,14 +50,23 @@ public final class EditorSimpleNode extends EditorRealNode {
     }
 
     public void updateColor(Color c) {
-        TaggedNode cn = (TaggedNode) getBackingNode();
+        var b = getBackingNode();
+        if (!b.isTagged()) {
+            return;
+        }
+
+        TaggedNode cn = b.getTaggedNode();
         var newColorNode = ColorHelper.toColorNode(c);
         cn.set(newColorNode);
     }
 
     public void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index) {
-        ArrayNode ar = (ArrayNode) getBackingNode();
+        var b = getBackingNode();
+        if (!b.isArray()) {
+            return;
+        }
 
+        ArrayNode ar = b.getArrayNode();
         var replacement = toInsertKeyName != null ?
                 ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
         var updatedNode = ar.replacePart(replacement, index, 1);
@@ -68,15 +82,21 @@ public final class EditorSimpleNode extends EditorRealNode {
         if (getBackingNode().isArray()) {
             // Update parent node to reflect change
             getParent().updateNodeAtRawIndex(newNode, keyName, getRawIndexInParentNode());
-        } else {
-            if (newNode.getNodeArray().size() != 1) {
-                throw new IllegalArgumentException("Can't assign array with size != 1 to value node");
-            }
+            return;
+        }
 
+        if (newNode.getNodeArray().size() == 0) {
+            throw new IllegalArgumentException("Can't assign empty value to node. Delete the key and value in the parent node instead.");
+        }
+
+        if (newNode.getNodeArray().size() == 1) {
             var nodeToUse = newNode.getNodeArray().get(0);
             // Update parent node to reflect change
             getParent().updateNodeAtRawIndex(nodeToUse, keyName, getRawIndexInParentNode());
+            return;
         }
+
+        throw new IllegalArgumentException("Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead.");
     }
 
     public boolean isValid() {

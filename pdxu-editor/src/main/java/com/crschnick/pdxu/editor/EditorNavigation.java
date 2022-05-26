@@ -72,6 +72,11 @@ public class EditorNavigation {
         }
     }
 
+    public boolean affectsCurrent(EditorNode changed) {
+        return getCurrent().path().getPath().contains(changed) ||
+                (changed.getParent() != null) && getCurrent().path().getPath().contains(changed.getParent());
+    }
+
     public boolean rebaseNavPathsToValid() {
         var currentValid = EditorNavPath.rebaseToValid(this.current.get().path());
         var currentChanged = !currentValid.equals(current.get().path());
