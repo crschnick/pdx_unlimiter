@@ -5,15 +5,17 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * CK3 header format:
+ * CK3 / VIC3 header format:
  * <p>
  * SAV0 <unknown> 0 <type> <8 hex digits of randomness> <8 hex digits of meta data size>
  * <p>
  * unknown:
  * Can either be 0 or 1, don't know the meaning yet
  * type:
- * 3: Compressed + Binary
- * 2: Compressed + Plaintext
+ * 5: Split Compressed + Binary
+ * 4: Split Compressed + Plaintext
+ * 3: Unified Compressed + Binary
+ * 2: Unified Compressed + Plaintext
  * 1: Uncompressed + Binary
  * 0: Uncompressed + Plaintext
  * <p>
