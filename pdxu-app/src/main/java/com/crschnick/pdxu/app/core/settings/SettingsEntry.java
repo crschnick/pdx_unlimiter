@@ -554,7 +554,7 @@ public abstract class SettingsEntry<T> {
             }
 
             // Allow to select any dir if storage is currently empty
-            var oldEmpty = SavegameStorage.ALL.values().stream().anyMatch(s -> s.getCollections().size() > 0);
+            var oldEmpty = SavegameStorage.ALL.values().stream().allMatch(s -> s.getCollections().size() == 0);
             if (oldEmpty) {
                 this.value.set(newPath);
                 return;
