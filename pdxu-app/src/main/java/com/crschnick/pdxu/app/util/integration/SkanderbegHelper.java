@@ -32,11 +32,11 @@ public class SkanderbegHelper {
             try {
                 byte[] body = Files.readAllBytes(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
                 if (entry.getInfo().getData().isIronman()) {
-                    body = RakalyHelper.toPlaintext(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
+                    body = RakalyHelper.toEquivalentPlaintext(SavegameStorage.ALL.get(Game.EU4).getSavegameFile(entry));
                 }
 
                 String saveId = uploadContent(body, SavegameStorage.ALL.get(Game.EU4)
-                        .getCompatibleName(entry, true));
+                        .getValidOutputFileName(entry, true, null).getFileName().toString());
                 ThreadHelper.browse("https://skanderbeg.pm/browse.php?id=" + saveId);
             } catch (Exception e) {
                 GuiErrorReporter.showSimpleErrorMessage(e.getMessage());

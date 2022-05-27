@@ -75,7 +75,7 @@ public class Eu4SeHelper {
             return false;
         }
 
-        if (info.isBinary()) {
+        if (info.getData().isBinary()) {
             return false;
         }
 

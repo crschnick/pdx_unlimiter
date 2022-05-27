@@ -1,12 +1,13 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
-import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
+import com.crschnick.pdxu.app.savegame.SavegameContext;
+import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -19,20 +20,21 @@ import java.util.stream.Collectors;
 
 public class GuiIncompatibleWarning {
 
-    public static boolean showIncompatibleWarning(GameInstallation installation, SavegameInfo<?> info) {
+    public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {
+        var info = SavegameContext.getContext(entry).getInfo();
         StringBuilder builder = new StringBuilder();
         if (SavegameCompatibility.determineForVersion(info.getData().getVersion()) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
                     .append(installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: ")
-                    .append(info.getVersion().toString());
-        } else if (SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.UNKNOWN) {
+                    .append(info.getData().getVersion().toString());
+        } else if (SavegameCompatibility.determineForEntry(entry) == SavegameCompatibility.Compatbility.UNKNOWN) {
             builder.append("Unknown compatibility:\n")
                     .append("- Game version: ")
                     .append("Unknown").append("\n")
                     .append("- Savegame version: ")
-                    .append(info.getVersion().toString());
+                    .append(info.getData().getVersion().toString());
         }
 
         boolean missingMods = info.getData().getMods() != null && info.getData().getMods().stream()
