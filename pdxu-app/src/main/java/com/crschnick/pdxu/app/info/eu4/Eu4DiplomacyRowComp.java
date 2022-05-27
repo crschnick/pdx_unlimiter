@@ -4,7 +4,6 @@ import com.crschnick.pdxu.app.gui.game.Eu4TagRenderer;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.io.node.ArrayNode;
@@ -19,7 +18,7 @@ public abstract class Eu4DiplomacyRowComp extends DiplomacyRowComp<Eu4Tag> {
 
     @Override
     protected Region map(SavegameData<?> data, Eu4Tag tag) {
-        return GameImage.imageNode(Eu4TagRenderer.smallShieldImage(info, tag), CLASS_TAG_ICON);
+        return GameImage.imageNode(Eu4TagRenderer.smallShieldImage(data.eu4(), tag), CLASS_TAG_ICON);
     }
 
     @Override

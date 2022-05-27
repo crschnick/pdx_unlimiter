@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor.target;
 
+import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
@@ -8,7 +9,6 @@ import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
-import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
         this.entry = entry;
         this.target = target;
         // If savegame failed to load, still allow for editing!
-        this.context = entry.getInfo() != null ? GameFileContext.fromData(entry.getInfo()) :
+        this.context = entry.getInfo() != null ? GameFileContext.fromData(entry.getInfo().getData()) :
                 GameFileContext.forGame(SavegameStorage.ALL.inverseBidiMap().get(storage));
     }
 

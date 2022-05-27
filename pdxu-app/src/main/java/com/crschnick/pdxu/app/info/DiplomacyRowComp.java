@@ -35,8 +35,8 @@ public abstract class DiplomacyRowComp<T> extends SavegameInfoComp {
                 imgView,
                 getTooltip(),
                 tags,
-                (T t) -> mapTooltip(t),
-                (T t) -> map(t));
+                (T t) -> mapTooltip(data, t),
+                (T t) -> map(data, t));
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add(getStyleClass());
         return row;

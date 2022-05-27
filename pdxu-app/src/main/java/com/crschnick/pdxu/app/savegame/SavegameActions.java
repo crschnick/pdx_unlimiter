@@ -11,7 +11,6 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;

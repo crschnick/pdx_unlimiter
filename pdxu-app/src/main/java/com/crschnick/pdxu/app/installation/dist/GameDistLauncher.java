@@ -6,10 +6,7 @@ import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.installation.GameDlc;
-import com.crschnick.pdxu.app.installation.GameInstallType;
-import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.installation.GameMod;
+import com.crschnick.pdxu.app.installation.*;
 import com.crschnick.pdxu.app.savegame.FileExportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
@@ -65,7 +62,7 @@ public class GameDistLauncher {
 
             if (SavegameCompatibility.determineForEntry(e) != SavegameCompatibility.Compatbility.COMPATIBLE) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
-                        ctx.getInstallation(), ctx.getInfo());
+                        ctx.getInstallation(), e);
                 if (!startAnyway) {
                     return;
                 }

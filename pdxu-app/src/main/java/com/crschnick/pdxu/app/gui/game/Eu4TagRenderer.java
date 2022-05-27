@@ -1,7 +1,8 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.core.CacheManager;
-import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
@@ -19,7 +20,7 @@ public class Eu4TagRenderer {
     private static final int SMALL_IMG_SIZE = 64;
     private static final int IMG_SIZE = 256;
 
-    private static BufferedImage createBasicFlagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+    private static BufferedImage createBasicFlagImage(SavegameData<Eu4Tag> info, Eu4Tag tag) {
         switch (tag.getType()) {
             case NO_FLAG -> {
                 return ImageHelper.fromFXImage(eu4TagImage(GameImage.getEu4TagPath("REB"), info));
@@ -28,7 +29,7 @@ public class Eu4TagRenderer {
                 return ImageHelper.fromFXImage(eu4TagImage(info, tag));
             }
             case COLONIAL_FLAG -> {
-                var ov = Eu4Tag.getTag(info.getData().getAllTags(), tag.getColonialData().getOverlord());
+                var ov = Eu4Tag.getTag(info.getAllTags(), tag.getColonialData().getOverlord());
                 BufferedImage flagImage = ImageHelper.fromFXImage(eu4TagImage(info, ov));
                 Graphics g = flagImage.getGraphics();
 
@@ -48,7 +49,7 @@ public class Eu4TagRenderer {
         throw new AssertionError();
     }
 
-    public static Image smallShieldImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+    public static Image smallShieldImage(SavegameData<Eu4Tag> info, Eu4Tag tag) {
         var cached = CacheManager.getInstance().get(Eu4TagImageCache.class).smallShieldTagImages;
         if (cached.containsKey(tag.getTag())) {
             return cached.get(tag.getTag());
@@ -81,7 +82,7 @@ public class Eu4TagRenderer {
         return img;
     }
 
-    public static Image shieldImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+    public static Image shieldImage(SavegameData<Eu4Tag> info, Eu4Tag tag) {
         var cached = CacheManager.getInstance().get(Eu4TagImageCache.class).bigShieldTagImages;
         if (cached.containsKey(tag.getTag())) {
             return cached.get(tag.getTag());
@@ -130,12 +131,12 @@ public class Eu4TagRenderer {
         }
     }
 
-    private static Image eu4TagImage(SavegameInfo<Eu4Tag> info, Eu4Tag tag) {
+    private static Image eu4TagImage(SavegameData<Eu4Tag> info, Eu4Tag tag) {
         return eu4TagImage(GameImage.getEu4TagPath(tag.getTag()), info);
     }
 
-    private static Image eu4TagImage(Path path, SavegameInfo<Eu4Tag> info) {
-        var in = CascadeDirectoryHelper.openFile(path, info);
+    private static Image eu4TagImage(Path path, SavegameData<Eu4Tag> info) {
+        var in = CascadeDirectoryHelper.openFile(path, GameFileContext.fromData(info));
         return ImageHelper.loadImage(in.orElse(null), null);
     }
 

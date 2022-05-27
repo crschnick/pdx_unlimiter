@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.SavegameInfoException;
 import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
@@ -25,7 +26,6 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.app.info.SavegameInfoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -37,8 +37,8 @@ import javafx.scene.image.Image;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
+import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -516,7 +516,7 @@ public abstract class SavegameStorage<
             throw new IllegalStateException("Savegame info not available");
         }
 
-        var savegameCampaignId = e.getInfo().getCampaignHeuristic();
+        var savegameCampaignId = e.getInfo().getData().getCampaignHeuristic();
         var storageCampaignId = getSavegameCampaign(e).getUuid();
         return savegameCampaignId.equals(storageCampaignId) ? Optional.empty() : Optional.of(storageCampaignId);
     }
@@ -551,7 +551,7 @@ public abstract class SavegameStorage<
             return;
         }
 
-        if (!e.getInfo().isBinary()) {
+        if (!e.getInfo().getData().isBinary()) {
             return;
         }
 
@@ -563,7 +563,7 @@ public abstract class SavegameStorage<
             var c = succ.content;
             type.generateNewCampaignIdHeuristic(c);
             var targetCollection = type.getCampaignIdHeuristic(c);
-            var info = infoFactory.apply(succ.content, false);
+            var info = infoFactory.apply(succ.combinedNode());
             var name = getSavegameCampaign(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
             addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name);
             saveData();
@@ -617,29 +617,6 @@ public abstract class SavegameStorage<
             c.append(hex);
         }
         return c.toString();
-    }
-
-    private boolean isInternalSavegame(Path file, byte[] bytes, boolean melted) {
-        if (!file.startsWith(getSavegameDataDirectory())) {
-            return false;
-        }
-
-        if (!file.getFileName().toString().equals(getSaveFileName())) {
-            return false;
-        }
-
-        try {
-            var entryId = UUID.fromString(file.getParent().getFileName().toString());
-            var campaignId = UUID.fromString(file.getParent().getParent().getFileName().toString());
-            I info = infoFactory.apply(null);
-            if (getSavegameCollection(campaignId).isEmpty() ||
-                    getSavegameCollection(campaignId).get().getSavegames().stream().noneMatch(entry -> entry.getUuid().equals(entryId))) {
-                addNewEntryToCampaign(campaignId, entryId, null, info, getDefaultEntryName(info), null);
-            }
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private Optional<SavegameParseResult> importSavegameData(
@@ -698,34 +675,6 @@ public abstract class SavegameStorage<
                     return;
                 }
 
-                UUID collectionUuid;
-                if (col == null) {
-                    collectionUuid = info.getData().getCampaignHeuristic();
-                    logger.debug("Campaign UUID is " + collectionUuid.toString());
-                } else {
-                    collectionUuid = col.getUuid();
-                    logger.debug("Folder UUID is " + collectionUuid.toString());
-                }
-                UUID saveUuid = UUID.randomUUID();
-                logger.debug("Generated savegame UUID " + saveUuid.toString());
-
-                synchronized (this) {
-                    Path entryPath = getSavegameDataDirectory().resolve(collectionUuid.toString()).resolve(saveUuid.toString());
-                    try {
-                        FileUtils.forceMkdir(entryPath.toFile());
-                        var file = entryPath.resolve(getSaveFileName());
-                        Files.write(file, bytes);
-                        JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
-
-                        if (col == null) {
-                            addNewEntryToCampaign(collectionUuid, saveUuid, checksum, info, name, sourceFileChecksum);
-                        } else {
-                            addNewEntryToCollection(col, saveUuid, checksum, info, name, sourceFileChecksum);
-                        }
-                    } catch (Exception e) {
-                        ErrorHandler.handleException(e);
-                    }
-                }
                 var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
                 addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null);
             }
@@ -793,7 +742,7 @@ public abstract class SavegameStorage<
 
         UUID targetId;
         FailableConsumer<Path, Exception> writer;
-        if (!e.getInfo().isBinary() && !e.getInfo().isIronman()) {
+        if (!e.getInfo().getData().isBinary() && !e.getInfo().getData().isIronman()) {
             // Update savegame information itself if possible
             struc.getType().generateNewCampaignIdHeuristic(c);
             targetId = struc.getType().getCampaignIdHeuristic(c);
@@ -807,7 +756,7 @@ public abstract class SavegameStorage<
         // Generate new info
         I info;
         try {
-            info = infoFactory.apply(s.content, e.getInfo().isBinary());
+            info = infoFactory.apply(s.combinedNode());
         } catch (SavegameInfoException ex) {
             ErrorHandler.handleException(ex);
             return;

@@ -31,7 +31,7 @@ public class CascadeDirectoryHelper {
     public static Optional<Path> openFile(
             Path file,
             SavegameInfo<?> info) {
-        return openFile(file, getCascadingDirectories(GameFileContext.fromData(info)));
+        return openFile(file, getCascadingDirectories(GameFileContext.fromData(info.getData())));
     }
 
     public static Optional<Path> openFile(
