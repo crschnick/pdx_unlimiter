@@ -33,18 +33,18 @@ jobs:
       - name: Execute dist build
         run: ./gradle/gradlew --info createDist
 
-      - name: JReleaser Release
-        run: ./gradle/gradlew writeLatestChangelog jreleaserRelease
-        env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
-          JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
-
-      - name: JReleaser Announce
-        run: ./gradle/gradlew jreleaserAnnounce
-        env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
-          JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
-        if: matrix.os == 'windows-2022'
+#      - name: JReleaser Release
+#        run: ./gradle/gradlew writeLatestChangelog jreleaserRelease
+#        env:
+#          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+#          JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
+#
+#      - name: JReleaser Announce
+#        run: ./gradle/gradlew jreleaserAnnounce
+#        env:
+#          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+#          JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
+#        if: matrix.os == 'windows-2022'
 
       - name: unzip artifact for windows
         run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows || true

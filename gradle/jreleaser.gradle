@@ -1,15 +1,14 @@
-def changelogOut = new File(project.buildDir, 'changelog.md')
-task writeLatestChangelog(type: DefaultTask) {
-    doLast {
-        changelogOut.text = file('CHANGELOG.md').text + '\n'
-    }
-}
-
 def isPreRelease = project.version.endsWith('-pre')
 def isFullRelease = !isPreRelease && project.version.endsWith('-SNAPSHOT')
 def proj = project;
+def canonicalVersion = file('canonical_version').text
 
 jreleaser {
+    environment {
+        properties.put('rawChangelog', file("changelogs/${canonicalVersion}.txt").exists() ?
+                file("changelogs/${canonicalVersion}.txt").text.replace('\r\n', '\n') : "")
+    }
+
     project {
         name = 'Pdx-Unlimiter'
         description = 'A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games.'
@@ -21,6 +20,12 @@ jreleaser {
         authors = ['Christopher Schnick']
         license = 'GPL3'
         copyright = ' '
+
+        java {
+            groupId = 'com.crschnick.pdxu'
+            version = '17'
+            multiProject = true
+        }
 
         snapshot {
             pattern = '.*-SNAPSHOT'
@@ -44,7 +49,7 @@ jreleaser {
 
             prerelease {
                 enabled = true
-                pattern = '.*-pre'
+                pattern = '.*-pre.'
             }
 
             update {
@@ -56,7 +61,8 @@ jreleaser {
 
             changelog {
                 enabled = true
-                external = changelogOut
+                formatted = 'ALWAYS'
+                contentTemplate = isFullRelease ? file('misc/github_full.tpl') : file('misc/github_pre.tpl')
             }
         }
     }
@@ -84,7 +90,7 @@ jreleaser {
 
             webhook = proj.hasProperty("PDXU_DISCORD_WEBHOOK") ? proj.property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
 
-            messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : (isPreRelease ? 'misc/discord_pre.tpl' : 'misc/discord.tpl')
+            messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : 'misc/discord_pre.tpl'
         }
     }
 }

@@ -5,11 +5,20 @@ plugins {
     id 'org.jreleaser' version '1.0.0'
 }
 
-version '2.10.0-pre'
-def canonicalVersion = '2.10.0'
+version file('version').text
+def canonicalVersion = file('canonical_version').text
 
 apply from: 'gradle/jreleaser.gradle'
 apply from: 'gradle/java.gradle'
+
+clean {
+    setDelete(Set.of())
+    doLast {
+        fileTree(dir: project.buildDir).exclude("jreleaser/**").visit { FileVisitDetails details ->
+            delete details.file
+        }
+    }
+}
 
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/misc/pdxu.properties.default").getText())
