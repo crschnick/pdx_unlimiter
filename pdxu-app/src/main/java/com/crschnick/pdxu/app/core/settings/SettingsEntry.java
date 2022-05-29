@@ -549,7 +549,9 @@ public abstract class SettingsEntry<T> {
                 return;
             }
 
-            if (!showConfirmationDialog(value.get().toString(), newPath.toString())) {
+            // Don't allow subpaths
+            if (newPath.startsWith(value.get())) {
+                showInvalidDialog(newPath.toString());
                 return;
             }
 
@@ -557,6 +559,10 @@ public abstract class SettingsEntry<T> {
             var oldEmpty = SavegameStorage.ALL.values().stream().allMatch(s -> s.getCollections().size() == 0);
             if (oldEmpty) {
                 this.value.set(newPath);
+                return;
+            }
+
+            if (!showConfirmationDialog(value.get().toString(), newPath.toString())) {
                 return;
             }
 

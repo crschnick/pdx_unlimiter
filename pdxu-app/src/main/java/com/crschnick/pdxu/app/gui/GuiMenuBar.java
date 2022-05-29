@@ -34,7 +34,7 @@ public class GuiMenuBar {
         if (PdxuInstallation.getInstance().isStandalone()) {
             MenuItem lr = new MenuItem(PdxuI18n.get("CHECK_UPDATE"));
             lr.setOnAction((a) -> {
-                ThreadHelper.browse(Hyperlinks.LATEST_RELEASE);
+                ThreadHelper.browse(Hyperlinks.RELEASES);
             });
             pdxu.getItems().add(lr);
         }
@@ -68,14 +68,12 @@ public class GuiMenuBar {
         pdxu.getItems().add(export);
 
 
+        Menu about = new Menu(PdxuI18n.get("ABOUT"));
+
         MenuItem tri = new MenuItem(PdxuI18n.get("TRANSLATE"));
         tri.setOnAction((a) -> {
             GuiTranslate.showTranslatationAlert();
         });
-        pdxu.getItems().add(tri);
-
-
-        Menu about = new Menu(PdxuI18n.get("ABOUT"));
 
         MenuItem src = new MenuItem(PdxuI18n.get("CONTRIBUTE"));
         src.setOnAction((a) -> {
@@ -93,6 +91,7 @@ public class GuiMenuBar {
                     PdxuI18n.get("THIRD_PARTY_INFO"),
                     "third_party.txt");
         });
+        about.getItems().add(tri);
         about.getItems().add(src);
         about.getItems().add(lc);
         about.getItems().add(tc);

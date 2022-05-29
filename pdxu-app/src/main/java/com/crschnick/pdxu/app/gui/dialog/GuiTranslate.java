@@ -13,12 +13,10 @@ public class GuiTranslate {
     public static void showTranslatationAlert() {
         ButtonType translate = new ButtonType("Translate", ButtonBar.ButtonData.OK_DONE);
         GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setTitle("Help translating the Pdx-Unlimiter");
+            alert.setTitle("Help translating the Pdx-Unlimiter interface");
             alert.setHeaderText("""
-                    You can now switch the language in the settings menu.
-
-                    However, many strings are not translated yet and therefore still displayed in english.
-                    If you want to help at translating some of them into your language, you can easily do so.""");
+                    You can switch the language in the settings menu. However, many languages are not supported yet.
+                    If you want to help at translating the user interface into your language, you can easily do so.""");
 
             alert.getButtonTypes().add(ButtonType.CANCEL);
             alert.getButtonTypes().add(translate);
