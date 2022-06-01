@@ -47,6 +47,8 @@ jreleaser {
             checksums = false
             signatures = false
 
+            draft = isFullRelease
+
             prerelease {
                 enabled = true
                 pattern = '.*-pre.'
