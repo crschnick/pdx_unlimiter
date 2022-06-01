@@ -1,5 +1,5 @@
 def isPreRelease = project.version.endsWith('-pre')
-def isFullRelease = !isPreRelease && project.version.endsWith('-SNAPSHOT')
+def isFullRelease = !isPreRelease && !project.version.endsWith('-SNAPSHOT')
 def proj = project;
 def canonicalVersion = file('canonical_version').text
 
@@ -28,6 +28,7 @@ jreleaser {
         }
 
         snapshot {
+            enabled = true
             pattern = '.*-SNAPSHOT'
             label = 'early-access'
         }
@@ -47,7 +48,7 @@ jreleaser {
             checksums = false
             signatures = false
 
-            draft = isFullRelease
+            draft = isFullRelease || isPreRelease
 
             prerelease {
                 enabled = true
@@ -87,6 +88,7 @@ jreleaser {
     }
 
     announce {
+        enabled = isFullRelease || isPreRelease
         discord {
             active = 'ALWAYS'
 
