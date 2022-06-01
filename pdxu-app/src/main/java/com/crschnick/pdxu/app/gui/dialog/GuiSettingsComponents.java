@@ -32,6 +32,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -176,11 +177,13 @@ public class GuiSettingsComponents {
 
             var text = textArea.getText().trim();
             if (!text.isEmpty()) {
-                Path p = Path.of(text);
-                if (Files.exists(p)) {
-                    var toOpen = Files.isRegularFile(p) ? p.getParent() : p;
-                    dirChooser.setInitialDirectory(toOpen.toFile());
-                }
+                try {
+                    Path p = Path.of(text);
+                    if (Files.exists(p)) {
+                        var toOpen = Files.isRegularFile(p) ? p.getParent() : p;
+                        dirChooser.setInitialDirectory(toOpen.toFile());
+                    }
+                } catch (InvalidPathException ignored) {}
             }
 
             dirChooser.setTitle(PdxuI18n.get("SELECT_PROGRAM"));
