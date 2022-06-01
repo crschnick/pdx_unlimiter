@@ -49,6 +49,14 @@ public final class NodePointer {
         }
 
         @Override
+        public String getKey(Node root, Node n) {
+            if (n.getNodeArray().size() > index) {
+                return n.getArrayNode().getKeyAt(index);
+            }
+            return null;
+        }
+
+        @Override
         public String toString() {
             return "[" + index + "]";
         }

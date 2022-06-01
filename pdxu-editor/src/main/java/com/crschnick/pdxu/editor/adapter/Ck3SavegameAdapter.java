@@ -154,9 +154,9 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> LIVING_KEYS = List.of(
             "dynasty_head", "head_of_house", "religious_head", "holder", "owner", "character",
             "target", "attacker", "defender", "claimant", "first", "second", "head",
-            "court_owner", "child", "heir", "succession", "vassal_contracts", "claim", "de_jure_vassals",
+            "court_owner", "child", "heir", "succession", "claim", "de_jure_vassals",
             "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
-            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor", "pretender");
+            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor", "pretender", "vassal", "liege");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
@@ -165,6 +165,9 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> SCHEMES_KEYS = List.of("schemes");
     private static final List<String> REGIMENTS_KEYS = List.of("regiments");
     private static final List<String> SECRETS_KEYS = List.of("secret", "secrets", "targeting_secrets");
+    private static final List<String> VASSAL_CONTRACTS_KEYS = List.of("vassal_contracts");
+    private static final List<String> WARS_KEYS = List.of("wars");
+    private static final List<String> UNITS_KEYS = List.of("units");
 
 
     private NodePointer get(String key, String val) {
@@ -201,7 +204,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             return NodePointer.builder().name("provinces").name(val).build();
         }
         if (COUNTY_KEYS.contains(key)) {
-            return NodePointer.builder().name("county_manager").name("counties").name(val).build();
+            return NodePointer.builder().name("county_manager").name("counties").index(Integer.parseInt(val)).build();
         }
         if (ARMY_KEYS.contains(key)) {
             return NodePointer.builder().name("units").name(val).build();
@@ -220,6 +223,15 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
         if (SECRETS_KEYS.contains(key)) {
             return NodePointer.builder().name("secrets").name("secrets").name(val).build();
+        }
+        if (VASSAL_CONTRACTS_KEYS.contains(key)) {
+            return NodePointer.builder().name("vassal_contracts").name("active").name(val).build();
+        }
+        if (WARS_KEYS.contains(key)) {
+            return NodePointer.builder().name("wars").name("active_wars").name(val).build();
+        }
+        if (UNITS_KEYS.contains(key)) {
+            return NodePointer.builder().name("units").name(val).build();
         }
         
         return null;
