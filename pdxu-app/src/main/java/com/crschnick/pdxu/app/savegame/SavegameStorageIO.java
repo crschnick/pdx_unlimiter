@@ -38,7 +38,8 @@ public class SavegameStorageIO {
             FileUtils.forceMkdir(colDir.toFile());
             var writtenEntries = new ArrayList<String>();
             for (SavegameEntry<T, I> e : c.getSavegames()) {
-                var eName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenEntries) +
+                var branchSuffix = " (" + c.getUuid() + ")";
+                var eName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenEntries) + branchSuffix +
                         "." + storage.getType().getFileEnding();
                 writtenEntries.add(eName);
 
