@@ -8,7 +8,10 @@
     - The moving savegames feature is also replaced by the branching feature
 - Add Rakaly Ironman converter support for HOI4 1.11.11
 - Add japanese translations (Thanks to Ikumyon)
+- Add Ironman Melter support for CK3 1.6
+- Make Notepad++ the default text editor program if possible
 - Fix Stellaris 3.4 savegames failing to import
+- Fix some CK3 node jumps not working in the editor
 - Fix various issues with unusupported characters when exporting a savegame
 - Fix wrong display information for CK3 <= 1.4 savegames
 - Fix many other bugs
