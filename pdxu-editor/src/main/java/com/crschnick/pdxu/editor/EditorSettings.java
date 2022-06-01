@@ -7,6 +7,8 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
 public class EditorSettings extends AbstractSettings {
@@ -70,8 +72,7 @@ public class EditorSettings extends AbstractSettings {
     public final SettingsEntry.ProgramEntry externalEditor = new SettingsEntry.ProgramEntry(
             "EXTERNAL_EDITOR",
             "externalEditor",
-            SystemUtils.IS_OS_WINDOWS ? "notepad" : (System.getenv("VISUAL") != null ?
-                    System.getenv("VISUAL") : null)
+            getDefaultEditor()
     );
     public final SettingsEntry.IntegerEntry externalEditorWaitInterval = new SettingsEntry.IntegerEntry(
             "EXTERNAL_EDITOR_WAIT_INTERVAL",
@@ -80,6 +81,20 @@ public class EditorSettings extends AbstractSettings {
             0,
             3000
     );
+
+    private static String getDefaultEditor() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            var npp = Path.of("C:\\Program Files\\Notepad++\\notepad++.exe");
+            if (Files.exists(npp)) {
+                return npp.toString();
+            }
+
+            return "notepad";
+        }
+
+        return System.getenv("VISUAL") != null ?
+                System.getenv("VISUAL") : null;
+    }
 
     private static EditorSettings INSTANCE;
 
