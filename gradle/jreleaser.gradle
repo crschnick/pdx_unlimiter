@@ -48,11 +48,10 @@ jreleaser {
             checksums = false
             signatures = false
 
-            draft = isFullRelease || isPreRelease
-
+            // Always set a pre-release, as drafts do not fully work
             prerelease {
                 enabled = true
-                pattern = '.*-pre.'
+                pattern = '.*'
             }
 
             update {
