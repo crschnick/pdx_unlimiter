@@ -95,12 +95,14 @@ public class SavegameActions {
         if (r == null) {
             return;
         }
+
         r.visit(new SavegameParseResult.Visitor() {
             @Override
             public void success(SavegameParseResult.Success s) {
                 try {
-                    var campaignId = type.getCampaignIdHeuristic(s.content);
-                    SavegameStorage.get(g).getSavegameCampaign(campaignId)
+                    var targetUuuid = savegames.get(0).getCampaignIdOverride()
+                            .orElse(type.getCampaignIdHeuristic(s.content));
+                    SavegameStorage.get(g).getSavegameCampaign(targetUuuid)
                             .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
                         TaskExecutor.getInstance().submitTask(() -> {
                             SavegameStorage.get(g).loadEntry(entry);
