@@ -13,6 +13,6 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-    implementation project(':pdxu-io')
+    compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
+    compileOnly project(':pdxu-io')
 }
