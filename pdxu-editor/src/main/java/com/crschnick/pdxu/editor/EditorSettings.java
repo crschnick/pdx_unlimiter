@@ -89,6 +89,11 @@ public class EditorSettings extends AbstractSettings {
                 return npp.toString();
             }
 
+            var np = Path.of("C:\\Windows\\System32\\notepad.exe");
+            if (Files.exists(np)) {
+                return np.toString();
+            }
+
             return "notepad";
         }
 

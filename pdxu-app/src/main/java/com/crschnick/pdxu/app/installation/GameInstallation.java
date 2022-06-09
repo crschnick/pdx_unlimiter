@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.installation.dist.GameDist;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.io.parser.ParseException;
 import com.crschnick.pdxu.model.GameVersion;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -132,6 +133,9 @@ public final class GameInstallation {
                             " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(path) +
                             ". Legacy: " + m.isLegacyArchive());
                 });
+            } catch (ParseException ex) {
+                // Don't report mod parsing errors
+                logger.error("Could not parse malformed mod file " + f.toString(), ex);
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }

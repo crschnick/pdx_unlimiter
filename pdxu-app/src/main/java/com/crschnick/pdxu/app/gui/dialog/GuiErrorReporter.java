@@ -145,7 +145,7 @@ public class GuiErrorReporter {
 
         Optional<ButtonType> r = alert.showAndWait();
         r.ifPresent(b -> showReportSent());
-        return r.isPresent() && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
+        return r.isPresent() && textArea.getText().length() > 0 && r.get().getButtonData().equals(ButtonBar.ButtonData.APPLY) ?
                 Optional.ofNullable(textArea.getText()) : Optional.empty();
     }
 }
