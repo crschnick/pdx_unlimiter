@@ -147,7 +147,7 @@ public class GuiEditorNavBar {
                 edState.getExternalState().startEdit(edState, (EditorRealNode) edState.getNavigation().getCurrent().getEditorNode());
             });
             edit.disableProperty().bind(Bindings.createBooleanBinding(
-                    () -> edState.getNavigation().getCurrent().getEditorNode() == null ||
+                    () -> !edState.isEditable() || edState.getNavigation().getCurrent().getEditorNode() == null ||
                             !edState.getNavigation().getCurrent().getEditorNode().isReal(),
                     edState.getNavigation().currentProperty()));
             edit.setPadding(new Insets(4, 4, 2, 4));

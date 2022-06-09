@@ -21,7 +21,7 @@ public class GuiEditorMenuBar {
             state.save();
         });
         file.getItems().add(c);
-        if (!state.canSave()) {
+        if (!state.isEditable()) {
             c.setDisable(true);
         }
 

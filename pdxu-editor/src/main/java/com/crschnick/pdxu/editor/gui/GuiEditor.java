@@ -10,6 +10,7 @@ import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+import com.crschnick.pdxu.io.node.NodePointer;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -24,6 +25,7 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class GuiEditor {
 
@@ -174,14 +176,22 @@ public class GuiEditor {
                 if (n.isReal()) {
                     if (EditorSettings.getInstance().enableNodeJumps.getValue()) {
                         try {
-                            var pointer = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
-                                    .createNodeJump(state, (EditorRealNode) n);
-                            if (pointer != null) {
+                            var pointers = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                                    .createNodeJumps(state, (EditorRealNode) n);
+                            if (pointers.size() > 0) {
                                 var b = new JFXButton();
                                 b.setGraphic(new FontIcon());
                                 b.getStyleClass().add("jump-to-def-button");
-                                GuiTooltips.install(b, "Jump to " + pointer);
-                                b.setOnAction(e -> state.getNavigation().navigateTo(pointer));
+                                GuiTooltips.install(b, "Jump to " + pointers.stream()
+                                        .map(NodePointer::toString)
+                                        .collect(Collectors.joining("\nor      ")));
+                                b.setOnAction(e -> {
+                                    for (var p : pointers) {
+                                        if (state.getNavigation().navigateTo(p)) {
+                                            break;
+                                        }
+                                    }
+                                });
                                 actions.getChildren().add(b);
                                 b.prefHeightProperty().bind(actions.heightProperty());
                             }
@@ -193,6 +203,7 @@ public class GuiEditor {
                     Button edit = new JFXButton();
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
+                    edit.setDisable(!state.isEditable());
                     edit.setOnAction(e -> {
                         state.getExternalState().startEdit(state, (EditorRealNode) n);
                     });
@@ -308,6 +319,7 @@ public class GuiEditor {
 
         {
             Button filterDisplay = new JFXButton();
+            filterDisplay.setMnemonicParsing(false);
             edFilter.filterStringProperty().addListener((c, o, n) -> {
                 Platform.runLater(() -> filterDisplay.setText(
                         n.equals("") ? "" : "Showing results for \"" + n + "\""));

@@ -36,6 +36,7 @@ public class GuiEditorNode {
                 ((EditorSimpleNode) n).updateText(ne);
                 state.onTextChanged();
             });
+            tf.setEditable(state.isEditable());
             box.getChildren().add(tf);
             HBox.setHgrow(tf, Priority.ALWAYS);
         } else if (n.isReal() && ((EditorRealNode) n).getBackingNode().isTagged() &&
@@ -46,6 +47,7 @@ public class GuiEditorNode {
                 ((EditorSimpleNode) n).updateColor(ne);
                 state.onColorChanged();
             });
+            picker.setEditable(state.isEditable());
             box.getChildren().add(picker);
             box.setAlignment(Pos.CENTER);
             HBox.setHgrow(picker, Priority.ALWAYS);

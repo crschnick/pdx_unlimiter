@@ -30,16 +30,16 @@ public class EditorState {
     private final ObjectProperty<GameFileContext> fileContext;
     private final EditorNavigation navigation;
     private final boolean savegame;
-    private final boolean canSave;
+    private final boolean editable;
 
-    public EditorState(String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean canSave) {
+    public EditorState(String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean editable) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
 
         this.fileContext = new SimpleObjectProperty<>(fileContext);
         this.savegame = savegame;
-        this.canSave = canSave;
+        this.editable = editable;
         dirty = new SimpleBooleanProperty();
         externalState = new EditorExternalState();
         filter = new EditorFilter(this);
@@ -132,8 +132,8 @@ public class EditorState {
         return savegame;
     }
 
-    public boolean canSave() {
-        return canSave;
+    public boolean isEditable() {
+        return editable;
     }
 
     public boolean isContextGameEnabled() {

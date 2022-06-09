@@ -151,17 +151,18 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> COA_KEYS = List.of("coat_of_arms_id");
     private static final List<String> HOLY_SITE_KEYS = List.of("holy_sites");
     private static final List<String> COUNCIL_KEYS = List.of("council");
-    private static final List<String> LIVING_KEYS = List.of(
+    private static final List<String> CHARACTER_KEYS = List.of(
             "dynasty_head", "head_of_house", "religious_head", "holder", "owner", "character",
             "target", "attacker", "defender", "claimant", "first", "second", "head",
             "court_owner", "child", "heir", "succession", "claim",
             "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
             "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor", "pretender",
-            "vassal", "liege", "employee", "employer");
+            "vassal", "liege", "employee", "employer", "mother", "father", "assumed_father");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
-    private static final List<String> TITLE_KEYS = List.of("targeted_titles", "title", "domain", "de_jure_liege", "de_facto_liege", "de_jure_vassals");
+    private static final List<String> TITLE_KEYS = List.of("targeted_titles", "title", "domain", "de_jure_liege",
+            "de_facto_liege", "de_jure_vassals", "liege_title");
     private static final List<String> STORIES_KEYS = List.of("stories");
     private static final List<String> SCHEMES_KEYS = List.of("schemes");
     private static final List<String> REGIMENTS_KEYS = List.of("regiments");
@@ -200,7 +201,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         if (COUNCIL_KEYS.contains(key)) {
             return NodePointer.builder().name("council_task_manager").name("active").name(val).build();
         }
-        if (LIVING_KEYS.contains(key)) {
+        if (CHARACTER_KEYS.contains(key)) {
             return NodePointer.builder().name("living").name(val).build();
         }
         if (PROVINCE_KEYS.contains(key)) {
@@ -244,6 +245,29 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
         
         return null;
+    }
+
+    @Override
+    public List<NodePointer> createNodeJumps(EditorState state, EditorRealNode node) throws Exception {
+        if (!state.isSavegame()) {
+            return List.of();
+        }
+
+        var keyOpt = node.getKeyName();
+        var parentKey = Optional.ofNullable(node.getParent())
+                .flatMap(p -> p.getKeyName());
+
+        var isDirectJump = keyOpt.isPresent() && CHARACTER_KEYS.contains(keyOpt.get()) && node.getBackingNode().isValue();
+        var isArrayJump = keyOpt.isEmpty() && parentKey.isPresent() && CHARACTER_KEYS.contains(parentKey.get()) && node.getBackingNode().isValue();
+        if (isDirectJump || isArrayJump) {
+            var livingPointer = NodePointer.builder()
+                    .name("living").name(node.getBackingNode().getString()).build();
+            var deadPointer = NodePointer.builder()
+                    .name("dead_unprunable").name(node.getBackingNode().getString()).build();
+            return List.of(livingPointer, deadPointer);
+        }
+
+        return EditorSavegameAdapter.super.createNodeJumps(state, node);
     }
 
     @Override

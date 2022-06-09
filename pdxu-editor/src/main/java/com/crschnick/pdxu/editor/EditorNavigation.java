@@ -114,10 +114,10 @@ public class EditorNavigation {
     }
 
 
-    public void navigateTo(NodePointer pointer) {
-        EditorNavPath.createNavPath(state, pointer).ifPresent(n -> {
-            navigateTo(n);
-        });
+    public boolean navigateTo(NodePointer pointer) {
+        var np = EditorNavPath.createNavPath(state, pointer);
+        np.ifPresent(this::navigateTo);
+        return np.isPresent();
     }
 
     public void navigateToChild(EditorNode newNode) {
