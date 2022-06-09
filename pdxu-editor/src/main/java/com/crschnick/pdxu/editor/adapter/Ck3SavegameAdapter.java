@@ -154,13 +154,14 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> LIVING_KEYS = List.of(
             "dynasty_head", "head_of_house", "religious_head", "holder", "owner", "character",
             "target", "attacker", "defender", "claimant", "first", "second", "head",
-            "court_owner", "child", "heir", "succession", "claim", "de_jure_vassals",
+            "court_owner", "child", "heir", "succession", "claim",
             "currently_played_characters", "knights", "spouse", "primary_spouse", "kills",
-            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor", "pretender", "vassal", "liege");
+            "ruler_designer_characters", "former_spouses", "participants", "last_appointed_councillor", "pretender",
+            "vassal", "liege", "employee", "employer");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
-    private static final List<String> TITLE_KEYS = List.of("targeted_titles", "title", "domain");
+    private static final List<String> TITLE_KEYS = List.of("targeted_titles", "title", "domain", "de_jure_liege", "de_facto_liege", "de_jure_vassals");
     private static final List<String> STORIES_KEYS = List.of("stories");
     private static final List<String> SCHEMES_KEYS = List.of("schemes");
     private static final List<String> REGIMENTS_KEYS = List.of("regiments");
@@ -168,6 +169,8 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> VASSAL_CONTRACTS_KEYS = List.of("vassal_contracts");
     private static final List<String> WARS_KEYS = List.of("wars");
     private static final List<String> UNITS_KEYS = List.of("units");
+    private static final List<String> INSPIRATIONS_KEYS = List.of("sponsored_inspirations");
+    private static final List<String> COURT_POSITIONS_KEYS = List.of("court_positions");
 
 
     private NodePointer get(String key, String val) {
@@ -232,6 +235,12 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
         if (UNITS_KEYS.contains(key)) {
             return NodePointer.builder().name("units").name(val).build();
+        }
+        if (INSPIRATIONS_KEYS.contains(key)) {
+            return NodePointer.builder().name("inspirations_manager").name("inspirations").name(val).build();
+        }
+        if (COURT_POSITIONS_KEYS.contains(key)) {
+            return NodePointer.builder().name("court_positions").name("court_positions").name(val).build();
         }
         
         return null;
