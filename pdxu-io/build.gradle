@@ -16,5 +16,5 @@ repositories {
 apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {
-    implementation files("$rootProject.buildDir/generated-modules/commons-lang3-3.12.0.jar")
+    implementation files("$project.buildDir/generated-modules/commons-lang3-3.12.0.jar")
 }

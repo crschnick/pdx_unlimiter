@@ -34,9 +34,9 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
 
-    implementation files("$rootProject.buildDir/generated-modules/commons-lang3-3.12.0.jar")
-    implementation files("$rootProject.buildDir/generated-modules/commons-io-2.8.0.jar")
-    implementation files("$rootProject.buildDir/generated-modules/commons-collections4-4.4.jar")
+    implementation files("$project.buildDir/generated-modules/commons-lang3-3.12.0.jar")
+    implementation files("$project.buildDir/generated-modules/commons-io-2.8.0.jar")
+    implementation files("$project.buildDir/generated-modules/commons-collections4-4.4.jar")
 
     implementation project(':pdxu-app')
     implementation project(':pdxu-io')

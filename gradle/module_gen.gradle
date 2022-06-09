@@ -12,7 +12,7 @@ repositories {
 addDependenciesModuleInfo {
     overwriteExistingFiles = true
     jdepsExtraArgs = ['-q']
-    outputDirectory = file("$rootProject.buildDir/generated-modules")
+    outputDirectory = file("$project.buildDir/generated-modules")
     modules {
         module {
             artifact 'com.1stleg:jnativehook:2.0.2'
