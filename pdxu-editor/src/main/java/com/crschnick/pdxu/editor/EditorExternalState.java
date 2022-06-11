@@ -132,7 +132,8 @@ public class EditorExternalState {
             return;
         }
 
-        Path file = TEMP.resolve(UUID.randomUUID() + ".pdxt");
+        var name = node.getNavigationName() + " - " + UUID.randomUUID() + ".pdxt";
+        Path file = TEMP.resolve(name);
         try {
             FileUtils.forceMkdirParent(file.toFile());
             try (var out = Files.newOutputStream(file)) {

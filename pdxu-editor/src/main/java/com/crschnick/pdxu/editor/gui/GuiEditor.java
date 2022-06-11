@@ -24,6 +24,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -120,6 +121,12 @@ public class GuiEditor {
         return s;
     }
 
+    public static String getFormattedName(String s) {
+        return Arrays.stream(s.split("_"))
+                .map(p -> p.substring(0, 1).toUpperCase() + p.substring(1))
+                .collect(Collectors.joining(" "));
+    }
+
     private static GridPane createNodeList(EditorState state) {
         GridPane grid = new GridPane();
         grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
@@ -150,7 +157,7 @@ public class GuiEditor {
             int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
             for (int i = offset; i < nodeCount + offset; i++) {
                 var n = nodes.get(i - offset);
-                var kn = createGridElement(new Label(n.getNavigationName()), i);
+                var kn = createGridElement(new Label(getFormattedName(n.getNavigationName())), i);
                 kn.setAlignment(Pos.CENTER_LEFT);
 
                 grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);

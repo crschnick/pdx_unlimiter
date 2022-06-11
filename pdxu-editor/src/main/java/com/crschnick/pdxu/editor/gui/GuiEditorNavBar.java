@@ -80,7 +80,7 @@ public class GuiEditorNavBar {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
                 {
-                    var initBtn = new JFXButton("(root)");
+                    var initBtn = new JFXButton("Root");
                     initBtn.setFocusTraversable(false);
                     initBtn.setOnAction(e -> {
                         edState.getNavigation().navigateToParent(null);
@@ -89,7 +89,7 @@ public class GuiEditorNavBar {
                 }
 
                 l.path().getPath().subList(1, l.path().getPath().size()).forEach(en -> {
-                    var btn = new JFXButton(en.getNavigationName());
+                    var btn = new JFXButton(GuiEditor.getFormattedName(en.getNavigationName()));
                     btn.setFocusTraversable(false);
                     btn.setMnemonicParsing(false);
                     {
