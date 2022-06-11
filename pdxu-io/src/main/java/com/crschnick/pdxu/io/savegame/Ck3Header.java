@@ -42,7 +42,11 @@ public record Ck3Header(boolean unknown, boolean compressed, boolean binary, lon
 
     public static Ck3Header determineHeaderForFile(byte[] data) {
         if (data.length < LENGTH) {
-            throw new IllegalArgumentException();
+            throw new SavegameFormatException("File too short");
+        }
+
+        if (Arrays.equals(data, 0, 4, Ck3CompressedSavegameStructure.ZIP_HEADER, 0, 4)) {
+            throw new SavegameFormatException("Missing CK3 Header. File is just a .zip file");
         }
 
         return fromString(new String(data, 0, LENGTH));
@@ -51,7 +55,7 @@ public record Ck3Header(boolean unknown, boolean compressed, boolean binary, lon
 
     public static Ck3Header fromString(String header) {
         if (!header.startsWith("SAV000") && !header.startsWith("SAV010")) {
-            throw new IllegalArgumentException("Invalid CK3 header start: " + header.substring(0, Math.min(6, header.length())));
+            throw new SavegameFormatException("Invalid CK3 header start: " + header.substring(0, Math.min(6, header.length())));
         }
 
         boolean unknown = Integer.parseInt(header.substring(4, 5)) == 1;

@@ -13,6 +13,7 @@ import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameFormatException;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
@@ -662,6 +663,8 @@ public abstract class SavegameStorage<
             }
             var struc = type.determineStructure(data);
             result[0] = struc.parse(data);
+        } catch (SavegameFormatException ex) {
+            return Optional.of(new SavegameParseResult.Invalid(ex.getMessage()));
         } catch (Exception ex) {
             return Optional.of(new SavegameParseResult.Error(ex));
         }

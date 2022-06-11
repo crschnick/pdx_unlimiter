@@ -19,7 +19,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
     }
 
     private static final int MAX_SEARCH = 150000;
-    private static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
+    public static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
 
     public static int indexOfCompressedGamestateStart(byte[] array) {
         if (array.length < ZIP_HEADER.length) {
