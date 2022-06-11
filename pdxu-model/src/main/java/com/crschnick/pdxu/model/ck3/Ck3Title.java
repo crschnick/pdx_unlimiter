@@ -43,8 +43,11 @@ public class Ck3Title {
             return Optional.empty();
         }
 
-        var name = n.getNodeForKey("name").getString();
-        var key = n.getNodeForKey("key").getString();
+        var name = n.getNodeForKeyIfExistent("name").map(Node::getString).orElse(null);
+        var key = n.getNodeForKeyIfExistent("key").map(Node::getString).orElse(null);
+        if (name == null || key == null) {
+            return Optional.empty();
+        }
 
         var type = Arrays.stream(Type.values())
                 .filter(t -> key.startsWith(t.prefix + "_"))
