@@ -108,7 +108,7 @@ public class GuiEditor {
         });
     }
 
-    private static StackPane createGridElement(Node child, int row) {
+    private static StackPane createGridElement(Node child, int row, boolean highlight) {
         var s = new StackPane();
         s.getStyleClass().add("pane");
         if (row % 2 != 0) {
@@ -117,7 +117,9 @@ public class GuiEditor {
         s.setAlignment(Pos.CENTER);
         if (child != null) {
             s.getChildren().add(child);
+            s.setOpacity(highlight ? 1.0 : 0.6);
         }
+
         return s;
     }
 
@@ -136,6 +138,11 @@ public class GuiEditor {
                 new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
                 new ColumnConstraints(), new ColumnConstraints());
 
+        var alwaysHighlight = true;
+        var keyHighlight = state.getFilter().filterKeysProperty().get();
+        var valueHighlight = state.getFilter().filterValuesProperty().get();
+        var keyValueHighlight = keyHighlight && valueHighlight;
+
         // Execute everything while the content is fixed
         // to avoid multithreading issues
         state.getContent().withFixedContent(c -> {
@@ -147,7 +154,7 @@ public class GuiEditor {
                 });
                 HBox box = new HBox(new FontIcon("mdi-arrow-up"), next, new FontIcon("mdi-arrow-up"));
                 box.setAlignment(Pos.CENTER);
-                grid.add(createGridElement(box, 0), 0, 0, 5, 1);
+                grid.add(createGridElement(box, 0, alwaysHighlight), 0, 0, 5, 1);
                 offset = 1;
             } else {
                 offset = 0;
@@ -157,12 +164,12 @@ public class GuiEditor {
             int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
             for (int i = offset; i < nodeCount + offset; i++) {
                 var n = nodes.get(i - offset);
-                var kn = createGridElement(new Label(getFormattedName(n.getNavigationName())), i);
+                var kn = createGridElement(new Label(getFormattedName(n.getNavigationName())), i, keyHighlight);
                 kn.setAlignment(Pos.CENTER_LEFT);
 
-                grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i), 0, i);
+                grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i, keyHighlight), 0, i);
                 grid.add(kn, 1, i);
-                grid.add(createGridElement(new Label("="), i), 2, i);
+                grid.add(createGridElement(new Label("="), i, keyValueHighlight), 2, i);
 
                 Region valueDisplay = GuiEditorNode.createValueDisplay(n, state);
                 Node tag = null;
@@ -174,8 +181,8 @@ public class GuiEditor {
                         ErrorHandler.handleException(ex);
                     }
                 }
-                grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i), 3, i);
-                grid.add(createGridElement(valueDisplay, i), 4, i);
+                grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i, valueHighlight), 3, i);
+                grid.add(createGridElement(valueDisplay, i, valueHighlight), 4, i);
 
                 HBox actions = new HBox();
                 actions.setFillHeight(true);
@@ -218,9 +225,9 @@ public class GuiEditor {
                     actions.getChildren().add(edit);
                     edit.prefHeightProperty().bind(actions.heightProperty());
                 }
-                grid.add(createGridElement(actions, i), 5, i);
+                grid.add(createGridElement(actions, i, valueHighlight), 5, i);
 
-                grid.add(createGridElement(new Region(), i), 6, i);
+                grid.add(createGridElement(new Region(), i, valueHighlight), 6, i);
             }
 
             if (c.canGoToNextPage()) {
@@ -230,7 +237,7 @@ public class GuiEditor {
                 });
                 HBox box = new HBox(new FontIcon("mdi-arrow-down"), next, new FontIcon("mdi-arrow-down"));
                 box.setAlignment(Pos.CENTER);
-                grid.add(createGridElement(box, nodeCount + offset), 0, nodeCount + offset, 6, 1);
+                grid.add(createGridElement(box, nodeCount + offset, alwaysHighlight), 0, nodeCount + offset, 6, 1);
             }
         });
 
