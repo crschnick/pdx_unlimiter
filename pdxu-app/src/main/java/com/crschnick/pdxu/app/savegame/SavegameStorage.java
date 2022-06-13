@@ -50,10 +50,7 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -97,7 +94,7 @@ public abstract class SavegameStorage<
         var found = ALL.entrySet().stream()
                 .filter(entry -> entry.getValue().type.equals(type))
                 .findAny();
-        return (SavegameStorage<T, I>) found.map(e -> e.getValue()).orElse(null);
+        return (SavegameStorage<T, I>) found.map(Map.Entry::getValue).orElse(null);
     }
 
     public static void init() throws Exception {
@@ -269,10 +266,9 @@ public abstract class SavegameStorage<
 
         ArrayNode c = n.putArray("campaigns");
         getCollections().forEach(col -> {
-            SavegameCampaign<T, I> campaign = (SavegameCampaign<T, I>) col;
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
-            campaign.getSavegames().stream()
+            col.getSavegames().stream()
                     .map(entry -> JsonNodeFactory.instance.objectNode()
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
@@ -286,21 +282,21 @@ public abstract class SavegameStorage<
                     .forEach(entries::add);
 
             ConfigHelper.writeConfig(getSavegameDataDirectory()
-                    .resolve(campaign.getUuid().toString()).resolve("campaign.json"), campaignFileNode);
+                    .resolve(col.getUuid().toString()).resolve("campaign.json"), campaignFileNode);
 
             var imgFile = getSavegameDataDirectory()
-                    .resolve(campaign.getUuid().toString()).resolve("campaign.png");
+                    .resolve(col.getUuid().toString()).resolve("campaign.png");
             try {
-                ImageHelper.writePng(campaign.getImage(), imgFile);
+                ImageHelper.writePng(col.getImage(), imgFile);
             } catch (IOException e) {
                 logger.error("Couldn't write image " + imgFile, e);
             }
 
             ObjectNode campaignNode = JsonNodeFactory.instance.objectNode()
-                    .put("name", campaign.getName())
-                    .put("date", campaign.getDate().toString())
-                    .put("lastPlayed", campaign.getLastPlayed().toString())
-                    .put("uuid", campaign.getUuid().toString());
+                    .put("name", col.getName())
+                    .put("date", col.getDate().toString())
+                    .put("lastPlayed", col.getLastPlayed().toString())
+                    .put("uuid", col.getUuid().toString());
             c.add(campaignNode);
         });
 
@@ -459,14 +455,16 @@ public abstract class SavegameStorage<
 
 
                     // Clear old info files
-                    Files.list(getSavegameDataDirectory(e)).filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
-                        try {
-                            logger.debug("Deleting old info file " + p.toString());
-                            Files.delete(p);
-                        } catch (IOException ioException) {
-                            ErrorHandler.handleException(ioException);
-                        }
-                    });
+                    try (var list = Files.list(getSavegameDataDirectory(e))) {
+                        list.filter(p -> !p.equals(getSavegameFile(e))).forEach(p -> {
+                            try {
+                                logger.debug("Deleting old info file " + p);
+                                Files.delete(p);
+                            } catch (IOException ioException) {
+                                ErrorHandler.handleException(ioException);
+                            }
+                        });
+                    }
 
                     logger.debug("Writing new info to file " + getSavegameInfoFile(e));
                     JsonHelper.writeObject(info, getSavegameInfoFile(e));
@@ -488,12 +486,6 @@ public abstract class SavegameStorage<
                 ErrorHandler.handleException(new IllegalArgumentException(iv.message), null, file);
             }
         });
-    }
-
-    public synchronized Optional<SavegameEntry<T,I>> getEntryForStorageSavegameFile(Path file) {
-        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
-                .filter(ch -> getSavegameFile(ch).equals(file))
-                .findAny();
     }
 
     public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
@@ -610,7 +602,7 @@ public abstract class SavegameStorage<
     }
 
     private String checksum(byte[] content) {
-        MessageDigest d = null;
+        MessageDigest d;
         try {
             d = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
