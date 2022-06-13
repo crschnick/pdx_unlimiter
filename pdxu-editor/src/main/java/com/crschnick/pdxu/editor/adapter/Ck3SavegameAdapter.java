@@ -69,9 +69,9 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             new ImagePreview(
                     Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory(Set.of("meta_data"),
-                    "This node contains the meta data of this savegame that is shown in the main menu. " +
-                            "Editing anything inside of it only changes the main menu display, not the actual data in-game. " +
-                            "Do not edit this node if you want to change something in-game."));
+                    "This node contains basic information and the meta data of this savegame that is shown in the main menu. " +
+                            "Editing anything inside of it, excluding mods and DLCs, only changes the main menu display, not the actual data in-game. " +
+                            "Do not edit this node if you want to change something in-game, except applied mods and DLCs"));
 
     @Override
     public Game getGame() {
@@ -90,6 +90,10 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
 
         var map = new LinkedHashMap<String, NodePointer>();
+        map.put("Mods", NodePointer.builder().name("meta_data").name("mods").build());
+        map.put("DLCs", NodePointer.builder().name("meta_data").name("dlcs").build());
+        map.put("Settings", NodePointer.builder().name("game_rules").name("setting").build());
+        map.put("Ironman Settings", NodePointer.builder().name("ironman_manager").build());
         map.put("All player characters", NodePointer.builder().name("currently_played_characters").build());
         map.put("Player character", NodePointer.builder().name("living").pointerEvaluation(player).build());
         map.put("Player realm", NodePointer.builder().name("living").pointerEvaluation(player)

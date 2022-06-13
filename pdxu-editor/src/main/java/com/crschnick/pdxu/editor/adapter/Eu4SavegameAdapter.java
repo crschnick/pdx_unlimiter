@@ -55,6 +55,10 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
         var map = new LinkedHashMap<String, NodePointer>();
 
+        map.put("Mods", NodePointer.builder().name("enabled_mods").build());
+        map.put("DLCs", NodePointer.builder().name("enabled_dlcs").build());
+        map.put("Settings", NodePointer.builder().name("gameplaysettings").name("setgameplayoptions").build());
+
 
         var country = NodePointer.builder().name("countries")
                 .pointerEvaluation(NodePointer.builder().name("player").build()).build();
