@@ -37,13 +37,14 @@ public class SavegameStorageIO {
             Path colDir = out.resolve(colName);
             FileUtils.forceMkdir(colDir.toFile());
             var writtenEntries = new ArrayList<String>();
-            for (SavegameEntry<T, I> e : c.getSavegames()) {
+            for (SavegameEntry<T, I> e : c.entryStream().toList()) {
                 var branchSuffix = " (" + c.getUuid() + ")";
-                var eName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenEntries) + branchSuffix +
+                var eName = OsHelper.getFileSystemCompatibleName(e.getName());
+                var outName = getUniqueName(eName, writtenEntries) + branchSuffix +
                         "." + storage.getType().getFileEnding();
                 writtenEntries.add(eName);
 
-                Path fileOut = colDir.resolve(OsHelper.getFileSystemCompatibleName(eName));
+                Path fileOut = colDir.resolve(outName);
                 storage.copySavegameTo(e, fileOut);
             }
         }
