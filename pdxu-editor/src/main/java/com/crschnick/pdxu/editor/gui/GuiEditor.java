@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.editor.EditorFilter;
 import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
@@ -51,6 +52,23 @@ public class GuiEditor {
         showMissingGameWarning(state);
         stage.show();
         return stage;
+    }
+
+    public static boolean showCloseConfirmAlert(Stage s) {
+        var r = GuiDialogHelper.showBlockingAlert(alert -> {
+            alert.setTitle(PdxuI18n.get("Unsaved Changes"));
+            alert.setHeaderText(PdxuI18n.get("You are about to close the editor even though there are unsaved changes.\nDo you want to exit anyway?"));
+            alert.setAlertType(Alert.AlertType.WARNING);
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().add(ButtonType.YES);
+            alert.getButtonTypes().add(ButtonType.NO);
+        }).filter(b -> b.getButtonData().isDefaultButton());
+
+        r.ifPresent(t -> {
+            s.close();
+        });
+
+        return r.isPresent();
     }
 
     private static void showMissingGameWarning(EditorState state) {

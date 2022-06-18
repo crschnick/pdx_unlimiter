@@ -11,7 +11,6 @@ import com.crschnick.pdxu.editor.target.EditTarget;
 import com.crschnick.pdxu.editor.target.ExternalEditTarget;
 import com.crschnick.pdxu.editor.target.SavegameEditTarget;
 import com.crschnick.pdxu.editor.target.StorageEditTarget;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.SavegameInfo;
@@ -26,6 +25,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.crschnick.pdxu.editor.gui.GuiEditor.showCloseConfirmAlert;
 
 public class Editor implements EditorProvider {
 
@@ -92,7 +93,15 @@ public class Editor implements EditorProvider {
                 Stage stage = GuiEditor.createStage(state);
                 state.init();
                 editors.put(state, stage);
+
                 stage.setOnCloseRequest(e -> {
+                    if (state.dirtyProperty().get()) {
+                        e.consume();
+                        if (!showCloseConfirmAlert(stage)) {
+                            return;
+                        }
+                    }
+
                     editors.remove(state);
                     state.getExternalState().clearEditorLeftovers(state);
                 });
