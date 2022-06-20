@@ -20,7 +20,7 @@ import com.crschnick.pdxu.app.util.ConfigHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
-import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameFormatException;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
