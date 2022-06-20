@@ -20,6 +20,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Eu4PrestigeComp prestige;
     private Eu4PowersComp powers;
     private Eu4DevelopmentComp development;
+    Eu4AlliesComp allies;
+    Eu4WarMultiComp wars;
 
     public Eu4SavegameInfo() {}
 

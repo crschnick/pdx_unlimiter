@@ -233,7 +233,7 @@ public class GuiSavegameEntry {
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-                if (ctx.getInfo().isBinary()) {
+                if (ctx.getInfo().getData().isBinary()) {
                     Platform.runLater(() -> {
                         dynamicButtons.getChildren().add(melt);
                     });
@@ -317,7 +317,7 @@ public class GuiSavegameEntry {
             public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
                 boolean add = false;
                 if (n.equals(SavegameEntry.State.LOADED)) {
-                    boolean binary = e.getInfo().isBinary();
+                    boolean binary = e.getInfo().getData().isBinary();
                     Platform.runLater(() -> {
                         edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
                     });
