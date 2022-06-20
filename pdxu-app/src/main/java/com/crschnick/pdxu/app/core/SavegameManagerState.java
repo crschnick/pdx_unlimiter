@@ -89,6 +89,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
             if (n != null) {
                 n.getSavegames().addListener(cl);
+                n.entryStream().forEach(SavegameEntry::setActive);
             }
         });
     }
@@ -136,6 +137,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             logger.debug("Unloading collection " + col.getName());
             for (var e : col.getSavegames()) {
                 e.unload();
+                e.setInactive();
             }
         }, false);
     }
@@ -292,7 +294,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     public void selectEntry(SavegameEntry<T, I> e) {
         // Don't do anything if entry is not loaded yet
-        if (e != null && (e.getState() == SavegameEntry.State.LOADING || e.getState() == SavegameEntry.State.UNLOADED)) {
+        if (e != null && (e.getState() == SavegameEntry.State.LOADING || e.getState() == SavegameEntry.State.UNLOADED || e.getState() == SavegameEntry.State.INACTIVE)) {
             return;
         }
 

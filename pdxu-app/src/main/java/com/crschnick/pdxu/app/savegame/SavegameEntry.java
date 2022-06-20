@@ -22,7 +22,7 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     public SavegameEntry(String name, UUID uuid,
                          String contentChecksum, GameDate date, SavegameNotes notes,
                          List<String> sourceFileChecksums) {
-        this.state = new SimpleObjectProperty<>(State.UNLOADED);
+        this.state = new SimpleObjectProperty<>(State.INACTIVE);
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
         this.uuid = uuid;
@@ -30,6 +30,14 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         this.date = date;
         this.notes = notes;
         this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
+    }
+
+    public void setActive() {
+        state.set(State.UNLOADED);
+    }
+
+    public void setInactive() {
+        state.set(State.INACTIVE);
     }
 
     public void startLoading() {
@@ -112,6 +120,7 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     }
 
     public enum State {
+        INACTIVE,
         UNLOADED,
         LOADING,
         LOADED,

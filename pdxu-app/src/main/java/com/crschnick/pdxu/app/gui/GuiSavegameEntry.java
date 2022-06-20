@@ -1,6 +1,9 @@
 package com.crschnick.pdxu.app.gui;
 
-import com.crschnick.pdxu.app.core.*;
+import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.core.PdxuInstallation;
+import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.installation.Game;
@@ -22,8 +25,12 @@ import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -59,11 +66,6 @@ public class GuiSavegameEntry {
             Pane tagPane = new Pane(tagImage.getValue());
             HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
-            tagImage.addListener((change, o, n) -> {
-                Platform.runLater(() -> {
-                    tagPane.getChildren().set(0, n);
-                });
-            });
             tagBar.setAlignment(Pos.CENTER);
             topBar.setLeft(tagBar);
         }
@@ -72,10 +74,15 @@ public class GuiSavegameEntry {
             name.getStyleClass().add(CLASS_TEXT_FIELD);
             name.setAlignment(Pos.CENTER);
             name.setText(e.getName().equals(dateString) ? "" : e.getName());
-            name.textProperty().addListener((c, o, n) -> {
-                e.nameProperty().set(n);
-            });
             topBar.setCenter(name);
+
+            var nameChange = new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    e.nameProperty().set(newValue);
+                }
+            };
+            name.textProperty().addListener(nameChange);
         }
         {
             HBox buttonBar = createButtonBar(e);
@@ -121,6 +128,11 @@ public class GuiSavegameEntry {
 
         Node content = createSavegameInfoNode(e);
         entryNode.getChildren().add(content);
+
+        // For debugging memory leaks
+//        for (int i = 0; i < 1000; i++) {
+//            var c = createSavegameInfoNode(e);
+//        }
 
         return entryNode;
     }
@@ -286,7 +298,7 @@ public class GuiSavegameEntry {
             SavegameActions.editSavegame(e);
         });
         GuiTooltips.install(edit, PdxuI18n.get("EDIT_SAVEGAME"));
-        e.stateProperty().addListener((c,o,n) -> {
+        e.stateProperty().addListener(new WeakChangeListener<>((c,o,n) -> {
             boolean add = false;
             if (n.equals(SavegameEntry.State.LOADED)) {
                 boolean binary = e.getInfo().isBinary();
@@ -310,7 +322,7 @@ public class GuiSavegameEntry {
                     dynamicButtons.getChildren().remove(edit);
                 });
             }
-        });
+        }));
 
         HBox buttonBar = new HBox(dynamicButtons, staticButtons);
         buttonBar.setSpacing(40);
@@ -344,7 +356,7 @@ public class GuiSavegameEntry {
         StackPane.setAlignment(loading, Pos.CENTER);
         stack.getChildren().add(createEmptyContainer());
 
-        Runnable loadEntry = () -> {
+        Runnable createEntryContainer = () -> {
             SavegameContext.withSavegameContext(entry, ctx -> {
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
@@ -360,37 +372,44 @@ public class GuiSavegameEntry {
                 }
             });
         };
-        loadEntry.run();
+        createEntryContainer.run();
 
-        stack.sceneProperty().addListener((c, o, n) -> {
-            if (n != null) {
-                SavegameManagerState.<T, I>get().loadEntryAsync(entry);
+        entry.stateProperty().addListener(new ChangeListener<SavegameEntry.State>() {
+            @Override
+            public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
+                boolean showLoad = n == SavegameEntry.State.LOADING;
+                if (showLoad) {
+                    Platform.runLater(() -> {
+                        loading.setVisible(true);
+                    });
+                }
+
+                boolean loaded = n == SavegameEntry.State.LOADED;
+                if (loaded) {
+                    createEntryContainer.run();
+                }
+
+                boolean failed = n == SavegameEntry.State.LOAD_FAILED;
+                if (failed) {
+                    Platform.runLater(() -> {
+                        loading.setVisible(false);
+                        stack.getChildren().set(1, createEmptyContainer());
+                    });
+                }
+
+                if (n == SavegameEntry.State.INACTIVE) {
+                    entry.stateProperty().removeListener(this);
+                }
             }
         });
 
-        entry.stateProperty().addListener((c, o, n) -> {
-            boolean showLoad = n == SavegameEntry.State.LOADING;
-            if (showLoad) {
-                Platform.runLater(() -> {
-                    loading.setVisible(true);
-                });
-            }
-
-            boolean failed = n == SavegameEntry.State.LOAD_FAILED;
-            if (failed) {
-                Platform.runLater(() -> {
-                    loading.setVisible(false);
-                });
-            }
-        });
-
-        entry.infoProperty().addListener((c, o, n) -> {
-            if (n != null) {
-                loadEntry.run();
-            } else {
-                Platform.runLater(() -> {
-                    stack.getChildren().set(1, createEmptyContainer());
-                });
+        stack.sceneProperty().addListener(new ChangeListener<>() {
+            @Override
+            public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene n) {
+                if (n != null) {
+                    SavegameManagerState.<T, I>get().loadEntryAsync(entry);
+                    stack.sceneProperty().removeListener(this);
+                }
             }
         });
 
