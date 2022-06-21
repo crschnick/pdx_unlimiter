@@ -7,7 +7,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EditorFilter {
@@ -40,6 +42,24 @@ public class EditorFilter {
         }
     }
 
+    private boolean matchesKey(String key) {
+        Function<String, String> map = caseSensitive.get() ? Function.identity() : String::toLowerCase;
+
+        var splitKey = Arrays.stream(key.split("_")).map(map).collect(Collectors.toSet());
+
+        var filterSplitSpaces = Arrays.stream(filterString.get().split(" ")).map(map).toList();
+        if (filterSplitSpaces.stream().allMatch(s -> splitKey.stream().anyMatch(o -> o.contains(s)))) {
+            return true;
+        }
+
+        var filterSplitUnderscores = Arrays.stream(filterString.get().split("_")).map(map).toList();
+        if (filterSplitUnderscores.stream().allMatch(s -> splitKey.stream().anyMatch(o -> o.contains(s)))) {
+            return true;
+        }
+
+        return false;
+    }
+
     public List<EditorNode> filter(List<EditorNode> input) {
         var matcher = caseSensitive.get() ?
                 new NodeMatcher.CaseSenstiveMatcher(filterString.get()) :
@@ -53,7 +73,7 @@ public class EditorFilter {
                 return true;
             }
 
-            if (filterKeys.get() && n.filterKey(this::contains)) {
+            if (filterKeys.get() && n.filterKey(this::matchesKey)) {
                 return true;
             } else {
                 return filterValues.get() && n.filterValue(matcher);
