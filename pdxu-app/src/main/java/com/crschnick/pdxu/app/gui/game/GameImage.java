@@ -190,7 +190,7 @@ public class GameImage {
         CK3_SKILL_PROWESS = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_PROWESS, new Rectangle2D(300, 0, 60, 60));
 
-        CK3_ICON_RULER = ImageHelper.loadImage(i.resolve("flat_icons").resolve("mapmode_kingdom.dds"));
+        CK3_ICON_RULER = ImageHelper.loadImage(i.resolve("flat_icons").resolve("map_modes").resolve("dejure_kingdoms.dds"));
         CK3_ICON_HEIR = ImageHelper.loadImage(i.resolve("flat_icons").resolve("heir.dds"));
         CK3_ICON_TITLES = ImageHelper.loadImage(i.resolve("message_feed").resolve("titles.dds"));
         CK3_ICON_CLAIMS = ImageHelper.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
