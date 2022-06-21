@@ -68,6 +68,10 @@ public class Ck3TagRenderer {
     }
 
     public static BufferedImage renderImage(Ck3CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
+        if (coa == null) {
+            return new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        }
+
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
