@@ -59,7 +59,7 @@ public class GuiSavegameCampaign {
             name.textProperty().bindBidirectional(c.nameProperty());
             top.getChildren().add(name);
 
-            Button del = new JFXButton();
+            Button del = new JFXButton(null, new FontIcon());
             del.setGraphic(new FontIcon());
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {

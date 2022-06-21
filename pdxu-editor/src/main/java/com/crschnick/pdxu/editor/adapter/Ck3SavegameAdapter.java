@@ -34,7 +34,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
         @Override
         public javafx.scene.Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
-            var b = new JFXButton();
+            var b = new JFXButton(null, new FontIcon());
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
             GuiTooltips.install(b, "Open in coat of arms preview window");

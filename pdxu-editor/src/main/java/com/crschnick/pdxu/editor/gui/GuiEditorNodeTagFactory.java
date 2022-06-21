@@ -42,7 +42,7 @@ public abstract class GuiEditorNodeTagFactory {
 
         @Override
         public Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
-            var b = new JFXButton();
+            var b = new JFXButton(null, new FontIcon());
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon(icon));
             b.setOnAction(e -> {
@@ -84,7 +84,7 @@ public abstract class GuiEditorNodeTagFactory {
 
         @Override
         public Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
-            var b = new JFXButton();
+            var b = new JFXButton(null, new FontIcon());
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon("mdi-information-outline"));
             b.setOnMouseEntered(e -> {

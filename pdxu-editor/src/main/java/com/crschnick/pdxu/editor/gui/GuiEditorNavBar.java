@@ -47,7 +47,7 @@ public class GuiEditorNavBar {
         box.setAlignment(Pos.CENTER);
         box.setFillHeight(true);
         {
-            var backButton = new JFXButton();
+            var backButton = new JFXButton(null, new FontIcon());
             GuiTooltips.install(backButton, "Go back");
             backButton.getStyleClass().add("nav-back-button");
             backButton.setGraphic(new FontIcon());
@@ -58,7 +58,7 @@ public class GuiEditorNavBar {
             backButton.setFocusTraversable(false);
         }
         {
-            var forwardButton = new JFXButton();
+            var forwardButton = new JFXButton(null, new FontIcon());
             GuiTooltips.install(forwardButton, "Go forward");
             forwardButton.getStyleClass().add("nav-forward-button");
             forwardButton.setGraphic(new FontIcon());
@@ -138,7 +138,7 @@ public class GuiEditorNavBar {
         });
 
         {
-            Button edit = new JFXButton();
+            Button edit = new JFXButton(null, new FontIcon());
             edit.setFocusTraversable(false);
             edit.setGraphic(new FontIcon());
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);

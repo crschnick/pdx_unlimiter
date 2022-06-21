@@ -211,7 +211,7 @@ public class GuiEditor {
                             var pointers = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
                                     .createNodeJumps(state, (EditorRealNode) n);
                             if (pointers.size() > 0) {
-                                var b = new JFXButton();
+                                var b = new JFXButton(null, new FontIcon());
                                 b.setGraphic(new FontIcon());
                                 b.getStyleClass().add("jump-to-def-button");
                                 GuiTooltips.install(b, "Jump to " + pointers.stream()
@@ -232,7 +232,7 @@ public class GuiEditor {
                         }
                     }
 
-                    Button edit = new JFXButton();
+                    Button edit = new JFXButton(null, new FontIcon());
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
                     edit.setDisable(!state.isEditable());
@@ -350,7 +350,7 @@ public class GuiEditor {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         {
-            Button filterDisplay = new JFXButton();
+            Button filterDisplay = new JFXButton(null, new FontIcon());
             filterDisplay.setMnemonicParsing(false);
             edFilter.filterStringProperty().addListener((c, o, n) -> {
                 Platform.runLater(() -> filterDisplay.setText(

@@ -143,7 +143,7 @@ public class GuiSavegameEntry {
         staticButtons.setAlignment(Pos.CENTER);
         staticButtons.getStyleClass().add(CLASS_BUTTON_BAR);
         {
-            Button export = new JFXButton();
+            Button export = new JFXButton(null, new FontIcon());
             export.setGraphic(new FontIcon());
             export.setOnMouseClicked((m) -> {
                 SavegameActions.exportSavegame(e);
@@ -154,7 +154,7 @@ public class GuiSavegameEntry {
             staticButtons.getChildren().add(export);
         }
         {
-            Button report = new JFXButton();
+            Button report = new JFXButton(null, new FontIcon());
             report.setGraphic(new FontIcon());
             report.setOnMouseClicked((m) -> {
                 ErrorHandler.reportIssue(SavegameContext.getContext(e).getStorage().getSavegameFile(e));
@@ -164,7 +164,7 @@ public class GuiSavegameEntry {
             staticButtons.getChildren().add(report);
         }
         {
-            Button copy = new JFXButton();
+            Button copy = new JFXButton(null, new FontIcon());
             copy.setGraphic(new FontIcon());
             copy.setOnMouseClicked((m) -> {
                 SavegameActions.copySavegame(e);
@@ -174,7 +174,7 @@ public class GuiSavegameEntry {
             staticButtons.getChildren().add(copy);
         }
         {
-            Button notes = new JFXButton();
+            Button notes = new JFXButton(null, new FontIcon());
             notes.setGraphic(new FontIcon());
             notes.setOnMouseClicked((m) -> {
                 GuiSavegameNotes.showSavegameNotesDialog(e.getNotes());
@@ -185,7 +185,7 @@ public class GuiSavegameEntry {
         }
 
         {
-            Button del = new JFXButton();
+            Button del = new JFXButton(null, new FontIcon());
             del.setGraphic(new FontIcon());
             del.setOnMouseClicked((m) -> {
                 if (GuiDialogHelper.showBlockingAlert(alert -> {
@@ -202,7 +202,7 @@ public class GuiSavegameEntry {
         }
 
         if (PdxuInstallation.getInstance().isDeveloperMode()) {
-            Button open = new JFXButton();
+            Button open = new JFXButton(null, new FontIcon());
             open.setGraphic(new FontIcon());
             open.getStyleClass().add("open-button");
             GuiTooltips.install(open, PdxuI18n.get("OPEN_SAVEGAME"));
@@ -217,7 +217,7 @@ public class GuiSavegameEntry {
         dynamicButtons.setAlignment(Pos.CENTER);
         dynamicButtons.getStyleClass().add(CLASS_BUTTON_BAR);
         {
-            Button melt = new JFXButton();
+            Button melt = new JFXButton(null, new FontIcon());
             melt.setGraphic(new FontIcon());
             melt.setOnMouseClicked((m) -> {
                 SavegameActions.meltSavegame(e);
@@ -233,7 +233,7 @@ public class GuiSavegameEntry {
 
         if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(e)) {
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
-            Button upload = new JFXButton();
+            Button upload = new JFXButton(null, new FontIcon());
             upload.setGraphic(new FontIcon());
             upload.setOnMouseClicked((m) -> {
                 PdxToolsWebHelper.uploadSavegame(eu4Entry);
@@ -243,7 +243,7 @@ public class GuiSavegameEntry {
             dynamicButtons.getChildren().add(upload);
 
 
-            Button uploadSkanderbeg = new JFXButton();
+            Button uploadSkanderbeg = new JFXButton(null, new FontIcon());
             uploadSkanderbeg.setGraphic(new FontIcon());
             uploadSkanderbeg.setOnMouseClicked((m) -> {
                 SkanderbegHelper.uploadSavegame(eu4Entry);
@@ -255,7 +255,7 @@ public class GuiSavegameEntry {
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
             if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
-                Button eu4Se = new JFXButton();
+                Button eu4Se = new JFXButton(null, new FontIcon());
                 eu4Se.setGraphic(new FontIcon());
                 eu4Se.setOnMouseClicked((m) -> {
                     Eu4SeHelper.open(e);
@@ -271,7 +271,7 @@ public class GuiSavegameEntry {
                 return;
             }
 
-            Button branch = new JFXButton();
+            Button branch = new JFXButton(null, new FontIcon());
             branch.setGraphic(new FontIcon());
             branch.setOnMouseClicked((m) -> {
                 SavegameActions.branch(e);
@@ -283,7 +283,7 @@ public class GuiSavegameEntry {
 
         if (SavegameStorage.ALL.get(Game.CK3).contains(e) && Game.EU4.isEnabled()) {
             SavegameEntry<Ck3Tag, Ck3SavegameInfo> ck3Entry = (SavegameEntry<Ck3Tag, Ck3SavegameInfo>) e;
-            Button convert = new JFXButton();
+            Button convert = new JFXButton(null, new FontIcon());
             convert.setGraphic(new FontIcon());
             convert.setOnMouseClicked((m) -> {
                 ConverterHelper.convertCk3ToEu4(ck3Entry);
@@ -293,7 +293,7 @@ public class GuiSavegameEntry {
             dynamicButtons.getChildren().add(convert);
         }
 
-        Button edit = new JFXButton();
+        Button edit = new JFXButton(null, new FontIcon());
         edit.setOnMouseClicked((m) -> {
             SavegameActions.editSavegame(e);
         });
