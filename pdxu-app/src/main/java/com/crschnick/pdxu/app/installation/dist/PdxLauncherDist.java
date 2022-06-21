@@ -10,6 +10,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,10 +62,17 @@ public class PdxLauncherDist extends GameDist {
         }
 
         var pb = new ProcessBuilder()
-                .directory(launcherPath.toFile())
-                .command(bootstrapper.get().toString(),
-                        "--pdxlGameDir", launcherPath.toString(),
-                        "--gameDir", launcherPath.toString());
+                .directory(launcherPath.toFile());
+        
+        var cmd = new ArrayList<>(List.of(bootstrapper.get().toString(),
+                "--pdxlGameDir", launcherPath.toString(),
+                "--gameDir", launcherPath.toString()));
+        if (SystemUtils.IS_OS_WINDOWS) {
+            cmd.add(0, "cmd.exe");
+            cmd.add(1, "/c");
+        }
+
+        pb.command(cmd);
         pb.environment().putAll(env);
         pb.start();
     }
