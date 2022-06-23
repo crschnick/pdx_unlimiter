@@ -160,11 +160,13 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         col.getSavegames().forEach(entry -> {
             if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
                 newEntries.add(entry);
+                entry.setActive();
                 return;
             }
 
             if (newEntries.contains(entry) && !filter.shouldShow(entry)) {
                 newEntries.remove(entry);
+                entry.setInactive();
             }
         });
         newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
