@@ -38,14 +38,14 @@ jobs:
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
-        if: github.event_name != 'pull_request'
+        if: ${{ github.event_name != 'pull_request' }}
 
       - name: JReleaser Announce
         run: ./gradle/gradlew jreleaserAnnounce
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
-        if: matrix.os == 'windows-2022' && github.event_name != 'pull_request'
+        if: ${{ matrix.os == 'windows-2022' && github.event_name != 'pull_request' }}
 
       - name: unzip artifact for windows
         run: unzip build/pdx_unlimiter-windows.zip -d build/pdx_unlimiter-windows || true
