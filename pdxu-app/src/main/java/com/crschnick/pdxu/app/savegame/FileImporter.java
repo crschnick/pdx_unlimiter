@@ -77,10 +77,6 @@ public class FileImporter {
     }
 
     public static void onFileDrop(List<File> files) {
-        for (var file : files) {
-            EditorProvider.get().openExternalFileIfNoSavegame(file.toPath());
-        }
-
         var importTargets = files.stream()
                 .map(File::toString)
                 .map(FileImportTarget::createTargets)
