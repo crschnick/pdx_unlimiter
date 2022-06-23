@@ -1,4 +1,4 @@
-﻿l_japanese:
+l_japanese:
  IRONMAN: "鉄人モードのセーブゲーム"
  RNW: "ランダムな新世界を有効"
  CUSTOM_NATION: "世界に存在するカスタム国家"
@@ -56,3 +56,6 @@
  TOTAL_SOLDIERS: "総兵数"
  TITLES: "称号"
  CLAIMS: "請求権"
+ BRANCH_SAVEGAME: "新規キャンペーンブランチの作成"
+ NEW_BRANCH: "新規ブランチ"
+ MELTED: "融解"
