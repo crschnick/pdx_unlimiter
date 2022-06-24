@@ -45,7 +45,10 @@ public class Ck3TagRenderer {
                 Map<String, javafx.scene.paint.Color> map = new HashMap<>();
                 node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
                     n.forEach((k, v) -> {
-                        map.put(k, fromGameColor(GameColor.fromColorNode(v)));
+                        try {
+                            map.put(k, fromGameColor(GameColor.fromColorNode(v)));
+                        } catch (Exception ignored) {
+                        }
                     });
                 });
                 return map;
