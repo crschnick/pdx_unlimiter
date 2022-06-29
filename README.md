@@ -139,9 +139,9 @@ Using the Pdx-Unlimiter editor has the following benefits:
 
 ## Ironman converter
 
-Internally, the Pdx-Unlimiter uses [Rakaly](https://github.com/rakaly) tools to convert
+Internally, the Pdx-Unlimiter uses the [pdx.tools](https://pdx.tools/) melter to convert
 any ironman savegame into a text-based, non-ironman savegame.
-It also provides an easy-to-use frontend for the Rakaly Ironman converter,
+It provides an easy-to-use frontend for the pdx.tools Ironman converter,
 i.e. a graphical user interface to convert your own
 ironman savegames into playable and editable non-ironman savegames.
 
