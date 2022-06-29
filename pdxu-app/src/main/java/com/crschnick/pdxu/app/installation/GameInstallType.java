@@ -152,7 +152,7 @@ public interface GameInstallType {
 
         @Override
         public String getModSavegameId(Path userDir, GameMod mod) {
-            return mod.getName();
+            return mod.getName().orElse("invalid mod");
         }
 
         @Override

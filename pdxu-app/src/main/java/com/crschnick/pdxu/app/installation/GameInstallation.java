@@ -5,7 +5,6 @@ import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.installation.dist.GameDist;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.util.OsHelper;
-import com.crschnick.pdxu.io.parser.ParseException;
 import com.crschnick.pdxu.model.GameVersion;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -122,24 +121,18 @@ public final class GameInstallation {
             return;
         }
 
-        Files.list(getUserDir().resolve("mod")).forEach(f -> {
-            try {
+        try (var list = Files.list(getUserDir().resolve("mod"))) {
+            list.forEach(f -> {
                 GameMod.fromFile(f).ifPresent(m -> {
-                    var path = m.getPath().isAbsolute() ? m.getPath() : getUserDir().resolve(m.getPath());
-                    if (Files.exists(path)) {
-                        mods.add(m);
-                    }
-                    logger.debug("Found mod " + m.getName() +
-                            " at " + m.getModFile().toString() + ". Content exists: " + Files.exists(path) +
+                    mods.add(m);
+
+                    var ex = m.getAbsoluteContentPath(getUserDir()).map(Files::exists).orElse(null);
+                    logger.debug("Found mod " + m.getName().orElse("<no name>") +
+                            " at " + m.getModFile().toString() + ". Content exists: " + ex +
                             ". Legacy: " + m.isLegacyArchive());
                 });
-            } catch (ParseException ex) {
-                // Don't report mod parsing errors
-                logger.error("Could not parse malformed mod file " + f.toString(), ex);
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
+            });
+        }
     }
 
     public Optional<GameDlc> getDlcForName(String name) {

@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.io.parser.ParseException;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -15,25 +15,26 @@ public class GameMod {
     private String supportedVersion;
     private boolean legacyArchive;
 
-    public static Optional<GameMod> fromFile(Path p) throws Exception {
+    public static Optional<GameMod> fromFile(Path p) {
         if (!p.getFileName().toString().endsWith(".mod")) {
             return Optional.empty();
         }
 
+        GameMod mod = new GameMod();
+        mod.modFile = p;
+
         if (!p.toFile().canRead()) {
-            return Optional.empty();
-        }
-
-        Node node = TextFormatParser.text().parse(p);
-
-        // Quick check if mod data seems valid
-        if (node.getNodeForKeyIfExistent("name").isEmpty()) {
-            return Optional.empty();
+            return Optional.of(mod);
         }
 
         try {
-            GameMod mod = new GameMod();
-            mod.modFile = p;
+            Node node = TextFormatParser.text().parse(p);
+
+            // Quick check if mod data seems valid
+            if (node.getNodeForKeyIfExistent("name").isEmpty()) {
+                return Optional.of(mod);
+            }
+
             mod.name = node.getNodeForKey("name").getString();
             var path = node.getNodeForKeyIfExistent("path");
             if (path.isEmpty()) {
@@ -53,24 +54,27 @@ public class GameMod {
             mod.supportedVersion = node.getNodeForKeyIfExistent("supported_version").map(Node::getString).orElse("*");
             return Optional.of(mod);
         } catch (Exception ex) {
-            throw new ParseException("Could not parse malformed mod file " + p.toString() + ":\n" + ex.getMessage(), ex);
+            // Don't report mod parsing errors
+            LoggerFactory.getLogger(GameMod.class).error("Could not parse malformed mod file " + p.toString(), ex);
         }
+
+        return Optional.of(mod);
     }
 
     public Path getModFile() {
         return modFile;
     }
 
-    public Path getPath() {
-        return path;
+    public Optional<Path> getAbsoluteContentPath(Path base) {
+        return getContentPath().map(base::resolve);
     }
 
-    public String getName() {
-        return name;
+    public Optional<Path> getContentPath() {
+        return Optional.ofNullable(path);
     }
 
-    public String getSupportedVersion() {
-        return supportedVersion;
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
     }
 
     public boolean isLegacyArchive() {

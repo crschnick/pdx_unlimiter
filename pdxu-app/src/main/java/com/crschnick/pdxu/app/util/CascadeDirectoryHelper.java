@@ -44,7 +44,8 @@ public class CascadeDirectoryHelper {
             GameFileContext ctx) {
         var mods = ctx.getMods() == null ? ctx.getInstall().queryEnabledMods() : ctx.getMods();
         List<Path> dirs = mods.stream()
-                .map(GameMod::getPath)
+                .map(GameMod::getContentPath)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
         if (ctx.getInstall() != null) {
