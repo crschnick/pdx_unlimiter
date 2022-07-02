@@ -89,7 +89,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
             if (n != null) {
                 n.getSavegames().addListener(cl);
-                n.entryStream().forEach(SavegameEntry::setActive);
             }
         });
     }
@@ -136,7 +135,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         TaskExecutor.getInstance().submitTask(() -> {
             logger.debug("Unloading collection " + col.getName());
             for (var e : col.getSavegames()) {
-                e.unload();
                 e.setInactive();
             }
         }, false);
@@ -154,19 +152,27 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         var newEntries = FXCollections.observableArrayList(shownEntries.get());
 
         // Remove not contained entries
-        newEntries.removeIf(entry -> !globalSelectedCollection.get().getSavegames().contains(entry));
+        newEntries.removeIf(entry -> {
+            var remove = !globalSelectedCollection.get().getSavegames().contains(entry);
+            if (remove) {
+                entry.setInactive();
+            }
+            return remove;
+        });
 
         var col = globalSelectedCollection.get();
         col.getSavegames().forEach(entry -> {
+            if (!newEntries.contains(entry) && entry.getState() == SavegameEntry.State.INACTIVE) {
+                entry.setActive();
+            }
+
             if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
                 newEntries.add(entry);
-                entry.setActive();
                 return;
             }
 
             if (newEntries.contains(entry) && !filter.shouldShow(entry)) {
                 newEntries.remove(entry);
-                entry.setInactive();
             }
         });
         newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
@@ -189,7 +195,15 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         // Work on copy to reduce list updates
         var newCollections = FXCollections.observableArrayList(shownCollections.get());
 
-        newCollections.removeIf(col -> !SavegameStorage.get(current()).getCollections().contains(col));
+        newCollections.removeIf(col -> {
+            var remove = !SavegameStorage.get(current()).getCollections().contains(col);
+            if (remove) {
+                if (globalSelectedCollection.get() != null && globalSelectedCollection.get().equals(col)) {
+                    globalSelectedCollection.set(null);
+                }
+            }
+            return remove;
+        });
 
         SavegameStorage.<T, I>get(current()).getCollections().forEach(col -> {
             if (!newCollections.contains(col) && filter.shouldShow(col)) {
@@ -203,12 +217,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         });
         newCollections.sort(Comparator.comparing(SavegameCampaign::getLastPlayed, Comparator.reverseOrder()));
         shownCollections.set(newCollections);
-
-        if (globalSelectedCollection.isNotNull().get()) {
-            if (!shownCollections.contains(globalSelectedCollection.get())) {
-                unselectCollectionAndEntry();
-            }
-        }
 
         updateStorageEmptyProperty();
     }

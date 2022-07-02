@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.savegame;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.beans.property.*;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,31 +31,57 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         this.date = date;
         this.notes = notes;
         this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
+        this.state.addListener((c,o,n) -> {
+            LoggerFactory.getLogger(getClass()).debug("Changing state of " + this.name.get() + " from " + o + " to " + n);
+        });
     }
 
     public void setActive() {
+        if (state.get() != State.INACTIVE) {
+            return;
+        }
+
         state.set(State.UNLOADED);
     }
 
     public void setInactive() {
+        if (info.get() != null) {
+            unload();
+        }
         state.set(State.INACTIVE);
     }
 
     public void startLoading() {
+        if (state.get() == State.INACTIVE) {
+            return;
+        }
+
         state.set(State.LOADING);
     }
 
     public void fail() {
+        if (state.get() == State.INACTIVE) {
+            return;
+        }
+
         state.set(State.LOAD_FAILED);
     }
 
     public void load(I newInfo) {
+        if (state.get() == State.INACTIVE) {
+            return;
+        }
+
         info.set(newInfo);
         state.set(State.LOADED);
     }
 
     public void unload() {
         info.set(null);
+        if (state.get() == State.INACTIVE) {
+            return;
+        }
+
         state.set(State.UNLOADED);
     }
 

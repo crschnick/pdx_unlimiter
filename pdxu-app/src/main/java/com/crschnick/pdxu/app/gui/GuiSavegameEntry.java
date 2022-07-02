@@ -27,7 +27,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -53,7 +52,9 @@ public class GuiSavegameEntry {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-            topBar.setBackground(ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
+            Platform.runLater(() -> {
+                topBar.setBackground(ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo()));
+            });
         });
 
         var dateString = e.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
@@ -64,6 +65,11 @@ public class GuiSavegameEntry {
             var tagImage = SavegameContext.mapSavegame(e,
                     ctx -> ctx.getGuiFactory().createImage(e));
             Pane tagPane = new Pane(tagImage.getValue());
+            tagImage.addListener((c,o,n) -> {
+                Platform.runLater(() -> {
+                    tagPane.getChildren().set(0, n);
+                });
+            });
             HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
             tagBar.setAlignment(Pos.CENTER);
@@ -226,7 +232,9 @@ public class GuiSavegameEntry {
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
                 if (ctx.getInfo().isBinary()) {
-                    dynamicButtons.getChildren().add(melt);
+                    Platform.runLater(() -> {
+                        dynamicButtons.getChildren().add(melt);
+                    });
                 }
             });
         }
@@ -255,14 +263,16 @@ public class GuiSavegameEntry {
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
             if (Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
-                Button eu4Se = new JFXButton(null, new FontIcon());
-                eu4Se.setGraphic(new FontIcon());
-                eu4Se.setOnMouseClicked((m) -> {
-                    Eu4SeHelper.open(e);
+                Platform.runLater(() -> {
+                    Button eu4Se = new JFXButton(null, new FontIcon());
+                    eu4Se.setGraphic(new FontIcon());
+                    eu4Se.setOnMouseClicked((m) -> {
+                        Eu4SeHelper.open(e);
+                    });
+                    eu4Se.getStyleClass().add("eu4se-button");
+                    GuiTooltips.install(eu4Se, PdxuI18n.get("EDIT_EU4SAVEEDITOR"));
+                    dynamicButtons.getChildren().add(0, eu4Se);
                 });
-                eu4Se.getStyleClass().add("eu4se-button");
-                GuiTooltips.install(eu4Se, PdxuI18n.get("EDIT_EU4SAVEEDITOR"));
-                dynamicButtons.getChildren().add(0, eu4Se);
             }
         });
 
@@ -271,14 +281,16 @@ public class GuiSavegameEntry {
                 return;
             }
 
-            Button branch = new JFXButton(null, new FontIcon());
-            branch.setGraphic(new FontIcon());
-            branch.setOnMouseClicked((m) -> {
-                SavegameActions.branch(e);
+            Platform.runLater(() -> {
+                Button branch = new JFXButton(null, new FontIcon());
+                branch.setGraphic(new FontIcon());
+                branch.setOnMouseClicked((m) -> {
+                    SavegameActions.branch(e);
+                });
+                branch.getStyleClass().add("branch-button");
+                GuiTooltips.install(branch, PdxuI18n.get("BRANCH_SAVEGAME"));
+                dynamicButtons.getChildren().add(0, branch);
             });
-            branch.getStyleClass().add("branch-button");
-            GuiTooltips.install(branch, PdxuI18n.get("BRANCH_SAVEGAME"));
-            dynamicButtons.getChildren().add(0, branch);
         });
 
         if (SavegameStorage.ALL.get(Game.CK3).contains(e) && Game.EU4.isEnabled()) {
@@ -298,31 +310,41 @@ public class GuiSavegameEntry {
             SavegameActions.editSavegame(e);
         });
         GuiTooltips.install(edit, PdxuI18n.get("EDIT_SAVEGAME"));
-        e.stateProperty().addListener(new WeakChangeListener<>((c,o,n) -> {
-            boolean add = false;
-            if (n.equals(SavegameEntry.State.LOADED)) {
-                boolean binary = e.getInfo().isBinary();
-                Platform.runLater(() -> {
-                            edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
-                        });
-                add = true;
+
+        ChangeListener<SavegameEntry.State> stateChange = new ChangeListener<>() {
+            @Override
+            public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
+                boolean add = false;
+                if (n.equals(SavegameEntry.State.LOADED)) {
+                    boolean binary = e.getInfo().isBinary();
+                    Platform.runLater(() -> {
+                        edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
+                    });
+                    add = true;
+                }
+                if (n.equals(SavegameEntry.State.LOAD_FAILED)) {
+                    Platform.runLater(() -> {
+                        edit.setGraphic(new FontIcon("mdi-pencil"));
+                    });
+                    add = true;
+                }
+                if (add) {
+                    Platform.runLater(() -> {
+                        dynamicButtons.getChildren().add(0, edit);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        dynamicButtons.getChildren().remove(edit);
+                    });
+                }
+
+                if (n.equals(SavegameEntry.State.INACTIVE)) {
+                    e.stateProperty().removeListener(this);
+                }
             }
-            if (n.equals(SavegameEntry.State.LOAD_FAILED)) {
-                Platform.runLater(() -> {
-                            edit.setGraphic(new FontIcon("mdi-pencil"));
-                        });
-                add = true;
-            }
-            if (add) {
-                Platform.runLater(() -> {
-                    dynamicButtons.getChildren().add(0, edit);
-                });
-            } else {
-                Platform.runLater(() -> {
-                    dynamicButtons.getChildren().remove(edit);
-                });
-            }
-        }));
+        };
+        stateChange.changed(null, null, e.getState());
+        e.stateProperty().addListener(stateChange);
 
         HBox buttonBar = new HBox(dynamicButtons, staticButtons);
         buttonBar.setSpacing(40);

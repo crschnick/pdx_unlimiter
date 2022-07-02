@@ -4,7 +4,6 @@ import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.model.SavegameInfo;
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 
 import java.util.Optional;
@@ -77,9 +76,8 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
                         }
 
                         ctx.get().info = newValue;
-                        Platform.runLater(() -> {
-                            con.accept(ctx.get());
-                        });
+                        con.accept(ctx.get());
+                        e.infoProperty().removeListener(this);
                     } else {
                         // Remove listener if info is unloaded
                         e.infoProperty().removeListener(this);

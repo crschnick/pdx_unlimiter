@@ -41,14 +41,24 @@ public class GuiListView {
 
                 JFXListView<Node> listView = new JFXListView<>();
                 var newItems = n.stream()
-                        .map(li -> map.getOrDefault(li, createForItem(li, nodeFactory)))
+                        .map(li -> {
+                            var def = map.get(li);
+                            if (def == null) {
+                                def = createForItem(li, nodeFactory);
+                            }
+                            return def;
+                        })
                         .collect(Collectors.toList());
+
+                map.clear();
 
                 listView.getItems().setAll(newItems);
                 listView.prefWidthProperty().bind(pane.widthProperty());
                 listView.prefHeightProperty().bind(pane.heightProperty());
                 listView.setExpanded(true);
 
+                var old = (JFXListView<?>) pane.getChildren().get(0);
+                old.getItems().clear();
                 pane.getChildren().setAll(listView);
             });
         });

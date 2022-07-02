@@ -80,15 +80,12 @@ public class GuiSavegameCampaign {
         {
             HBox bottom = new HBox();
 
-            if (c instanceof SavegameCampaign) {
-                SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
-                Label date = new Label();
-                SavegameContext.withCollectionContext(c, gi -> {
-                    date.textProperty().bind(gi.getGuiFactory().createInfoString(ca));
-                });
-                date.getStyleClass().add(CLASS_DATE);
-                bottom.getChildren().add(date);
-            }
+            Label date = new Label();
+            SavegameContext.withCollectionContext(c, gi -> {
+                date.textProperty().bind(gi.getGuiFactory().createInfoString(c));
+            });
+            date.getStyleClass().add(CLASS_DATE);
+            bottom.getChildren().add(date);
 
             Region spacer = new Region();
             bottom.getChildren().add(spacer);
