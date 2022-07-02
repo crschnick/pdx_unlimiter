@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -105,6 +106,7 @@ public class GuiSavegameCampaign {
             info.getChildren().add(bottom);
         }
         btn.getChildren().add(info);
+        btn.setCursor(Cursor.HAND);
         return btn;
     }
 }

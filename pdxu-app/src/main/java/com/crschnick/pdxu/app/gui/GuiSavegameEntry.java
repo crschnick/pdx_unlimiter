@@ -28,6 +28,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -140,6 +141,7 @@ public class GuiSavegameEntry {
 //            var c = createSavegameInfoNode(e);
 //        }
 
+        content.setCursor(Cursor.HAND);
         return entryNode;
     }
 
