@@ -18,7 +18,7 @@ public interface SavegameType {
     SavegameType EU4 = new SavegameType() {
         @Override
         public boolean matchesInput(byte[] input) {
-            var header = ZipSavegameStructure.getFirstHeader(input, "meta", 6);
+            var header = ZipSavegameStructure.getFirstHeader(input, 6);
             return Arrays.equals("EU4txt".getBytes(), header) ||
                     Arrays.equals("EU4bin".getBytes(), header);
         }
@@ -82,7 +82,7 @@ public interface SavegameType {
 
         @Override
         public boolean matchesInput(byte[] input) {
-            var header = ZipSavegameStructure.getFirstHeader(input, "meta", 7);
+            var header = ZipSavegameStructure.getFirstHeader(input, 7);
             return Arrays.equals("HOI4txt".getBytes(), header) ||
                     Arrays.equals("HOI4bin".getBytes(), header);
         }
@@ -244,7 +244,7 @@ public interface SavegameType {
 
         @Override
         public boolean matchesInput(byte[] input) {
-            var header = ZipSavegameStructure.getFirstHeader(input, "meta", 6);
+            var header = ZipSavegameStructure.getFirstHeader(input, 6);
             return Arrays.equals("CK2txt".getBytes(), header);
         }
 

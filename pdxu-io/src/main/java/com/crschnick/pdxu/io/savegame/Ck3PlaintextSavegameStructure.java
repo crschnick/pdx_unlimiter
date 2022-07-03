@@ -45,6 +45,10 @@ public class Ck3PlaintextSavegameStructure implements SavegameStructure {
         }
         try {
             var node = getType().getParser().parse("gamestate", input, metaStart);
+            if (node.size() == 0) {
+                return new SavegameParseResult.Invalid("File gamestate is empty");
+            }
+
             return new SavegameParseResult.Success(new SavegameContent(Map.of("gamestate", node)));
         } catch (Exception t) {
             return new SavegameParseResult.Error(t);

@@ -17,7 +17,7 @@ import java.util.zip.ZipInputStream;
 
 public class ZipSavegameStructure implements SavegameStructure {
 
-    public static byte[] getFirstHeader(byte[] input, String zipFile, int maxLength) {
+    public static byte[] getFirstHeader(byte[] input, int maxLength) {
         try {
             var zipIn = new ZipInputStream(new ByteArrayInputStream(input));
             if (zipIn.getNextEntry() != null) {
@@ -73,11 +73,15 @@ public class ZipSavegameStructure implements SavegameStructure {
                     }
 
                     var node = type.getParser().parse(part.get().name, bytes, header != null ? header.length + 1 : 0);
+                    if (node.size() == 0) {
+                        return new SavegameParseResult.Invalid("File " + entry.getName() + " is empty");
+                    }
+
                     nodes.put(part.get().name(), node);
                 }
 
                 var missingParts = parts.stream()
-                        .map(part -> part.name())
+                        .map(SavegamePart::name)
                         .filter(s -> !nodes.containsKey(s))
                         .toList();
                 if (missingParts.size() > 0) {
