@@ -67,6 +67,33 @@ public abstract class GuiEditorNodeTagFactory {
         }
     }
 
+
+    public static class CacheTagFactory extends GuiEditorNodeTagFactory {
+        private final Set<String> keyNames;
+
+        public CacheTagFactory(Set<String> keyNames) {
+            this.keyNames = keyNames;
+        }
+
+        @Override
+        public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
+            return node.getKeyName().map(k -> keyNames.contains(k)).orElse(false);
+        }
+
+        @Override
+        public Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
+            var b = new JFXButton(null, new FontIcon());
+            b.setAlignment(Pos.CENTER);
+            b.setGraphic(new FontIcon("mdi-information-outline"));
+
+            var tt = GuiTooltips.createTooltip("The contents of this value are recalculated every time you launch your game. " +
+                    "Therefore, any changes made to this value will not apply to your game.");
+            tt.setShowDelay(Duration.ZERO);
+            Tooltip.install(b, tt);
+            return b;
+        }
+    }
+
     public static class InfoNodeTagFactory extends GuiEditorNodeTagFactory {
 
         private final Set<String> keyNames;

@@ -61,9 +61,12 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             return state.isContextGameEnabled() && node.getKeyName().map(k -> k.equals(nodeName)).orElse(false);
         }
     }
+    
+    private static final Set<String> CACHED_KEYS = Set.of("domain_limit");
 
     private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(
             new CoaPreview(),
+            new GuiEditorNodeTagFactory.CacheTagFactory(CACHED_KEYS),
             new ImagePreview(
                     Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
             new ImagePreview(
@@ -176,6 +179,8 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> UNITS_KEYS = List.of("units");
     private static final List<String> INSPIRATIONS_KEYS = List.of("sponsored_inspirations");
     private static final List<String> COURT_POSITIONS_KEYS = List.of("court_positions");
+
+
 
 
     private NodePointer get(String key, String val) {
