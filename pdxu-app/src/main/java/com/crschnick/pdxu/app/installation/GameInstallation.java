@@ -80,6 +80,7 @@ public final class GameInstallation {
                 i.initOptional();
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
+                ALL.remove(g);
             }
         }
     }
