@@ -1,0 +1,8 @@
+- Highlight filter selection in editor
+- Format editor keys in a nicer way
+- Improve editor filter functionality to match more results
+- Make mod loading more robust
+- Reduce save game loading speed slightly
+- Fix export storage functionality not working
+- Fix various small memory leaks
+- Fix various small bugs
