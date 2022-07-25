@@ -1,4 +1,5 @@
 - Highlight filter selection in editor
+- Make read-only savegames not editable in the editor to avoid confusion
 - Format editor keys in a nicer way
 - Improve editor filter functionality to match more results
 - Make mod loading more robust
