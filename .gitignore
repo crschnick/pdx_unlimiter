@@ -2,3 +2,5 @@
 build/
 .idea
 pdxu.properties
+bin
+.vscode

@@ -131,7 +131,7 @@ public class SteamDist extends GameDist {
         return ProcessHandle.allProcesses()
                 .map(p -> p.info().command())
                 .flatMap(Optional::stream)
-                .anyMatch(c -> c.contains("steam") && c.contains("Steam"));
+                .anyMatch(c -> c.contains("steam") || c.contains("Steam"));
     }
 
 
