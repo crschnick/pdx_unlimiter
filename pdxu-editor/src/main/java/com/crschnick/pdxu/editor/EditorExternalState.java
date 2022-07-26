@@ -163,7 +163,7 @@ public class EditorExternalState {
         try {
             // Linux editors do not like quotes around file paths
             var fileName = SystemUtils.IS_OS_WINDOWS ? " \"" + file + "\"" : file;
-            var cmd = editor + " " + fileName;
+            var cmd = "\"" + editor + "\"" + " " + fileName;
             logger.trace("Executing command: " + cmd);
             Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
