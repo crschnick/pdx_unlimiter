@@ -212,9 +212,14 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 To build this project, [JDK 17](https://openjdk.java.net/projects/jdk/17/) is required.
 You can build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
 For running, you can use `gradle/gradlew run`.
-Note here that the gradle wrapper has been moved into the `gradle` subdirectory
+Note here that the gradle wrapper has been moved into the `gradle` subdirectory.
 You can use the automatically generated file `pdxu.properties`, which is created when gradle is run the first time,
 to set some useful development options when needed.
+
+Further, note that as this is a pretty complicated Java project that fully utilizes modularity,
+many IDEs still have problems building this project properly.
+For example, you can't build this project in eclipse or vscode as it will complain about missing modules.
+The tested and recommended IDE is intellij.
 
 Any contribution is welcomed!
 There are no real formal contribution guidelines right now, they will maybe come later.
