@@ -24,10 +24,10 @@ if (currentOS.isWindows()) {
 apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {
-    compileOnly "org.openjfx:javafx-base:16:${platform}"
-    compileOnly "org.openjfx:javafx-controls:16:${platform}"
-    compileOnly "org.openjfx:javafx-graphics:16:${platform}"
-    compileOnly "org.openjfx:javafx-media:16:${platform}"
+    compileOnly "org.openjfx:javafx-base:18:${platform}"
+    compileOnly "org.openjfx:javafx-controls:18:${platform}"
+    compileOnly "org.openjfx:javafx-graphics:18:${platform}"
+    compileOnly "org.openjfx:javafx-media:18:${platform}"
     compileOnly 'com.jfoenix:jfoenix:9.0.10'
     compileOnly group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
 
