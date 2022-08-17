@@ -12,6 +12,7 @@ java {
 }
 
 def currentOS = DefaultNativePlatform.currentOperatingSystem;
+def suffix = ''
 def platform
 if (currentOS.isWindows()) {
     platform = 'win'
@@ -19,15 +20,19 @@ if (currentOS.isWindows()) {
     platform = 'linux'
 } else if (currentOS.isMacOsX()) {
     platform = 'mac'
+    def macArch = System.getProperty ("os.arch");
+    if (macArch == 'aarch64') {
+        suffix = '-aarch64'
+    }
 }
 
 apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {
-    compileOnly "org.openjfx:javafx-base:18:${platform}"
-    compileOnly "org.openjfx:javafx-controls:18:${platform}"
-    compileOnly "org.openjfx:javafx-graphics:18:${platform}"
-    compileOnly "org.openjfx:javafx-media:18:${platform}"
+    compileOnly "org.openjfx:javafx-base:18:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-controls:18:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-graphics:18:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-media:18:${platform}${suffix}"
     compileOnly 'com.jfoenix:jfoenix:9.0.10'
     compileOnly group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
 
