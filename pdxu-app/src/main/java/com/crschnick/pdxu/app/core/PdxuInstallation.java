@@ -48,10 +48,9 @@ public class PdxuInstallation {
     }
 
     public static void checkCorrectExtraction() {
-        Path appPath = getAppPath();
         boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
-        boolean invalid = image && (!Files.exists(appPath.resolve("lang"))
-                || !Files.exists(appPath.resolve("resources")));
+        boolean invalid = image && (!Files.exists(getLanguageDirectory())
+                || !Files.exists(getResourcesDirectory()));
         if (invalid) {
             ErrorHandler.handleTerminalException(new IOException("Required files not found. " +
                     "If you use the standalone distribution, please check whether you extracted the archive correctly."));
@@ -65,7 +64,7 @@ public class PdxuInstallation {
 
     private static Path getLanguageDirectory() {
         Path appPath = getAppPath();
-        var image = Files.exists(getVersionFile());
+        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
         if (image) {
             return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve(
                     "lang");
@@ -76,7 +75,7 @@ public class PdxuInstallation {
 
     private static Path getResourcesDirectory() {
         Path appPath = getAppPath();
-        var image = Files.exists(getVersionFile());
+        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
         if (image) {
             return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") : appPath.resolve(
                     "resources");
@@ -161,8 +160,6 @@ public class PdxuInstallation {
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
-
-            i.languageDir = Path.of("lang");
 
             var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
