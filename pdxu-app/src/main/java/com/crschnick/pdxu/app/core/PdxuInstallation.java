@@ -63,23 +63,37 @@ public class PdxuInstallation {
         return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("version") : appPath.resolve("version");
     }
 
+    private static Path getLanguageDirectory() {
+        Path appPath = getAppPath();
+        var image = Files.exists(getVersionFile());
+        if (image) {
+            return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve(
+                    "lang");
+        } else {
+            return Path.of("lang");
+        }
+    }
+
+    private static Path getResourcesDirectory() {
+        Path appPath = getAppPath();
+        var image = Files.exists(getVersionFile());
+        if (image) {
+            return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") : appPath.resolve(
+                    "resources");
+        } else {
+            return Path.of("resources");
+        }
+    }
+
     public static void init() {
         var i = new PdxuInstallation();
 
         Path appPath = getAppPath();
-        i.image = Files.exists(appPath.resolve("version"));
+        i.image = Files.exists(getVersionFile());
         i.production = i.image;
         i.version = "unknown";
-
-        if (i.image) {
-            i.languageDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve(
-                    "lang");
-            i.resourceDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") :
-                    appPath.resolve("resources");
-        } else {
-            i.languageDir = Path.of("lang");
-            i.resourceDir = Path.of("resources");
-        }
+        i.languageDir = getLanguageDirectory();
+        i.resourceDir = getResourcesDirectory();
 
         // Legacy support
         var legacyDataDir = Path.of(System.getProperty("user.home"),
