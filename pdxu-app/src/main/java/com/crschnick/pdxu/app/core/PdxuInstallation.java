@@ -58,6 +58,11 @@ public class PdxuInstallation {
         }
     }
 
+    private static Path getVersionFile() {
+        Path appPath = getAppPath();
+        return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("version") : appPath.resolve("version");
+    }
+
     public static void init() {
         var i = new PdxuInstallation();
 
@@ -67,8 +72,10 @@ public class PdxuInstallation {
         i.version = "unknown";
 
         if (i.image) {
-            i.languageDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve("lang");
-            i.resourceDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") : appPath.resolve("resources");
+            i.languageDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve(
+                    "lang");
+            i.resourceDir = SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") :
+                    appPath.resolve("resources");
         } else {
             i.languageDir = Path.of("lang");
             i.resourceDir = Path.of("resources");
@@ -114,7 +121,7 @@ public class PdxuInstallation {
             i.standalone = !appPath.equals(defaultAppInstallPath);
 
             try {
-                i.version = Files.readString(appPath.resolve("version"));
+                i.version = Files.readString(getVersionFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

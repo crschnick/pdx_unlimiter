@@ -137,12 +137,12 @@ task writeVersion(type: DefaultTask) {
 }
 
 task copyResources(type: Copy) {
-    into getResourcesDir() + 'resources'
+    into getResourcesDir() + '/resources'
     from "${projectDir}/resources"
 }
 
 task copyLang(type: Copy) {
-    into getResourcesDir() + 'lang'
+    into getResourcesDir() + '/lang'
     from "${projectDir}/lang"
 }
 
