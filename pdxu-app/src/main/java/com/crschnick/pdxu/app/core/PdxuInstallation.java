@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
@@ -31,21 +32,55 @@ public class PdxuInstallation {
 
     private static Path getAppPath() {
         Path path = Path.of(System.getProperty("java.home"));
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return path.getParent();
-        } else {
-            return path.getParent().getParent();
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return path.getParent();
+            }
+            case LINUX -> {
+                return path.getParent().getParent();
+            }
+            case MAC -> {
+                return path.getParent().getParent().getParent().getParent();
+            }
         }
+
+        throw new AssertionError();
     }
 
     public static void checkCorrectExtraction() {
-        Path appPath = getAppPath();
         boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
-        boolean invalid = image && (!Files.exists(appPath.resolve("lang"))
-                || !Files.exists(appPath.resolve("resources")));
+        boolean invalid = image && (!Files.exists(getLanguageDirectory())
+                || !Files.exists(getResourcesDirectory()));
         if (invalid) {
             ErrorHandler.handleTerminalException(new IOException("Required files not found. " +
                     "If you use the standalone distribution, please check whether you extracted the archive correctly."));
+        }
+    }
+
+    private static Path getVersionFile() {
+        Path appPath = getAppPath();
+        return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("version") : appPath.resolve("version");
+    }
+
+    private static Path getLanguageDirectory() {
+        Path appPath = getAppPath();
+        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
+        if (image) {
+            return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("lang") : appPath.resolve(
+                    "lang");
+        } else {
+            return Path.of("lang");
+        }
+    }
+
+    private static Path getResourcesDirectory() {
+        Path appPath = getAppPath();
+        boolean image = PdxuInstallation.class.getProtectionDomain().getCodeSource().getLocation().getProtocol().equals("jrt");
+        if (image) {
+            return SystemUtils.IS_OS_MAC ? appPath.resolve("Contents").resolve("Resources").resolve("resources") : appPath.resolve(
+                    "resources");
+        } else {
+            return Path.of("resources");
         }
     }
 
@@ -53,17 +88,11 @@ public class PdxuInstallation {
         var i = new PdxuInstallation();
 
         Path appPath = getAppPath();
-        i.image = Files.exists(appPath.resolve("version"));
+        i.image = Files.exists(getVersionFile());
         i.production = i.image;
         i.version = "unknown";
-
-        if (i.image) {
-            i.languageDir = appPath.resolve("lang");
-            i.resourceDir = appPath.resolve("resources");
-        } else {
-            i.languageDir = Path.of("lang");
-            i.resourceDir = Path.of("resources");
-        }
+        i.languageDir = getLanguageDirectory();
+        i.resourceDir = getResourcesDirectory();
 
         // Legacy support
         var legacyDataDir = Path.of(System.getProperty("user.home"),
@@ -74,12 +103,15 @@ public class PdxuInstallation {
             i.dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
         }
 
-        Path appInstallPath;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
-                    .resolve("Programs").resolve("Pdx-Unlimiter");
-        } else {
-            appInstallPath = i.dataDir;
+        Path appInstallPath = null;
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                appInstallPath = Path.of(System.getenv("LOCALAPPDATA"))
+                        .resolve("Programs").resolve("Pdx-Unlimiter");
+            }
+            case LINUX, MAC -> {
+                appInstallPath = i.dataDir;
+            }
         }
 
         Path defaultAppInstallPath = appInstallPath.resolve("app");
@@ -102,7 +134,7 @@ public class PdxuInstallation {
             i.standalone = !appPath.equals(defaultAppInstallPath);
 
             try {
-                i.version = Files.readString(appPath.resolve("version"));
+                i.version = Files.readString(getVersionFile());
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -129,8 +161,6 @@ public class PdxuInstallation {
                 ErrorHandler.handleException(e);
             }
 
-            i.languageDir = Path.of("lang");
-
             var customDir = Optional.ofNullable(props.get("dataDir"))
                     .map(val -> Path.of(val.toString()))
                     .filter(Path::isAbsolute);
@@ -146,7 +176,7 @@ public class PdxuInstallation {
         }
 
         i.logLevel = Optional.ofNullable(props.get("logLevel"))
-                .map(val -> val.toString())
+                .map(Object::toString)
                 .orElse("debug");
 
         i.developerMode = Optional.ofNullable(props.get("developerMode"))
@@ -197,10 +227,19 @@ public class PdxuInstallation {
 
     public Path getExecutableLocation() {
         Path appPath = getAppPath();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return appPath.resolve("Pdx-Unlimiter.exe");
-        } else {
-            return appPath.resolve("bin").resolve("Pdx-Unlimiter");
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return appPath.resolve("Pdx-Unlimiter.exe");
+            }
+            case LINUX -> {
+                return appPath.resolve("bin").resolve("Pdx-Unlimiter");
+            }
+            case MAC -> {
+                return appPath.resolve("Contents").resolve("MacOS").resolve("Pdx-Unlimiter");
+            }
+            default -> {
+                return null;
+            }
         }
     }
 
@@ -214,12 +253,19 @@ public class PdxuInstallation {
 
     public Path getRakalyExecutable() {
         Path dir = getResourceDir();
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return dir.resolve("bin").resolve("rakaly_windows.exe");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            return dir.resolve("bin").resolve("rakaly_linux");
-        } else {
-            return dir.resolve("bin").resolve("rakaly_mac");
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return dir.resolve("bin").resolve("rakaly_windows.exe");
+            }
+            case LINUX -> {
+                return dir.resolve("bin").resolve("rakaly_linux");
+            }
+            case MAC -> {
+                return dir.resolve("bin").resolve("rakaly_mac");
+            }
+            default -> {
+                return null;
+            }
         }
     }
 

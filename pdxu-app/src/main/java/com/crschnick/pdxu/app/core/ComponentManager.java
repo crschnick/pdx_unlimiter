@@ -12,9 +12,9 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.savegame.SavegameWatcher;
-import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
 import javafx.application.Platform;
+import org.apache.commons.lang3.SystemUtils;
 import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +101,7 @@ public class ComponentManager {
 
     private static void registerNativeHook() {
         try {
-            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+            if (PdxuInstallation.getInstance().isNativeHookEnabled() && !SystemUtils.IS_OS_MAC) {
                 GlobalScreen.registerNativeHook();
             }
         } catch (Exception ex) {
@@ -114,7 +114,7 @@ public class ComponentManager {
 
     private static void unregisterNativeHook() {
         try {
-            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+            if (PdxuInstallation.getInstance().isNativeHookEnabled() && !SystemUtils.IS_OS_MAC) {
                 GlobalScreen.unregisterNativeHook();
             }
         } catch (Exception ex) {
@@ -156,7 +156,7 @@ public class ComponentManager {
             SavegameManagerState.reset();
 
             logger.debug("Waiting for platform thread");
-            // Sync with platform thread after GameIntegration reset
+            // Sync with platform thread
             CountDownLatch latch = new CountDownLatch(1);
             Platform.runLater(latch::countDown);
             latch.await();

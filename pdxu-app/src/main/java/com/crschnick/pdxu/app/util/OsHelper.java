@@ -13,17 +13,25 @@ public class OsHelper {
     }
 
     public static Path getUserDocumentsPath() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            var dir = FileSystemView.getFileSystemView().getDefaultDirectory();
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                var dir = FileSystemView.getFileSystemView().getDefaultDirectory();
 
-            // Sometimes this is null. Why?
-            if (dir == null) {
-                return Paths.get(System.getProperty("user.home"));
+                // Sometimes this is null. Why?
+                if (dir == null) {
+                    return Paths.get(System.getProperty("user.home"));
+                }
+
+                return dir.toPath();
             }
-
-            return dir.toPath();
-        } else {
-            return Paths.get(System.getProperty("user.home"), ".local", "share");
+            case LINUX -> {
+                return Paths.get(System.getProperty("user.home"), ".local", "share");
+            }
+            case MAC -> {
+                return Paths.get(System.getProperty("user.home"), "Library", "Application Support");
+            }
         }
+
+        throw new AssertionError();
     }
 }

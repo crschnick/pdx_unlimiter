@@ -3,4 +3,5 @@ build/
 .idea
 pdxu.properties
 bin
+!resources/bin
 .vscode

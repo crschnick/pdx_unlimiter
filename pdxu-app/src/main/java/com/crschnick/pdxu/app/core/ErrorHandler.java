@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import io.sentry.Attachment;
 import io.sentry.Sentry;
@@ -31,10 +32,19 @@ public class ErrorHandler {
     private static boolean platformShutdown = false;
 
     private static String replaceUserPaths(String msg) {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return msg.replaceAll("\\\\Users\\\\.+?\\\\", "\\\\<UserDir>\\\\");
-        } else {
-            return msg.replaceAll("/home/.+?/", "/<UserDir>/");
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return msg.replaceAll("\\\\Users\\\\.+?\\\\", "\\\\<UserDir>\\\\");
+            }
+            case LINUX -> {
+                return msg.replaceAll("/home/.+?/", "/<UserDir>/");
+            }
+            case MAC -> {
+                return msg.replaceAll("/Users/.+?/", "/<UserDir>/");
+            }
+            default -> {
+                return msg;
+            }
         }
     }
 

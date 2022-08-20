@@ -71,7 +71,7 @@ public class GuiEditorMenuBar {
         });
 
         MenuBar menuBar = new MenuBar();
-        menuBar.setUseSystemMenuBar(true);
+        menuBar.setUseSystemMenuBar(false);
         menuBar.getMenus().add(file);
         menuBar.getMenus().add(editor);
         menuBar.getMenus().add(jump);

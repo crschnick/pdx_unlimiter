@@ -12,6 +12,7 @@ java {
 }
 
 def currentOS = DefaultNativePlatform.currentOperatingSystem;
+def suffix = ''
 def platform
 if (currentOS.isWindows()) {
     platform = 'win'
@@ -19,15 +20,19 @@ if (currentOS.isWindows()) {
     platform = 'linux'
 } else if (currentOS.isMacOsX()) {
     platform = 'mac'
+    def macArch = System.getProperty ("os.arch");
+    if (macArch == 'aarch64') {
+        suffix = '-aarch64'
+    }
 }
 
 apply from: "$rootDir/gradle/module_gen.gradle"
 
 dependencies {
-    implementation "org.openjfx:javafx-base:16:${platform}"
-    implementation "org.openjfx:javafx-controls:16:${platform}"
-    implementation "org.openjfx:javafx-graphics:16:${platform}"
-    implementation "org.openjfx:javafx-media:16:${platform}"
+    implementation "org.openjfx:javafx-base:18:${platform}${suffix}"
+    implementation "org.openjfx:javafx-controls:18:${platform}${suffix}"
+    implementation "org.openjfx:javafx-graphics:18:${platform}${suffix}"
+    implementation "org.openjfx:javafx-media:18:${platform}${suffix}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation 'com.google.code.gson:gson:2.8.9'

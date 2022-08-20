@@ -14,7 +14,7 @@ public class GameKeyListener implements NativeKeyListener {
     }
 
     public void nativeKeyPressed(NativeKeyEvent e) {
-        if ((e.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0 && (e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0) {
+        if ((e.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0 && ((e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0 || (e.getModifiers() & NativeKeyEvent.META_MASK) != 0)) {
             if (e.getKeyCode() == NativeKeyEvent.VC_K) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Kill key pressed");
                 handle.kill();
