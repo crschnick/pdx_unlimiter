@@ -146,7 +146,7 @@ public class GuiMenuBar {
 
 
         MenuBar menuBar = new MenuBar();
-        menuBar.setUseSystemMenuBar(true);
+        menuBar.setUseSystemMenuBar(false);
         menuBar.getMenus().add(pdxu);
         menuBar.getMenus().add(about);
         menuBar.getMenus().add(help);

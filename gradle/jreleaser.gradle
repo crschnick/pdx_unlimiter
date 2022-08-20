@@ -77,11 +77,25 @@ jreleaser {
                     path = 'build/pdx_unlimiter-windows.zip'
                     platform = 'windows'
                 }
-            } else {
+            } else if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
                 artifact {
                     distributionType = 'BINARY'
                     path = 'build/pdx_unlimiter-linux.zip'
                     platform = 'linux'
+                }
+            } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX() && System.getProperty ("os.arch") == 'aarch64') {
+                artifact {
+                    distributionType = 'BINARY'
+                    path = 'build/pdx_unlimiter-mac.zip'
+                    transform = 'pdx_unlimiter-mac-arm64.zip'
+                    platform = 'osx'
+                }
+            } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+                artifact {
+                    distributionType = 'BINARY'
+                    path = 'build/pdx_unlimiter-mac.zip'
+                    transform = 'build/pdx_unlimiter-mac-x64.zip'
+                    platform = 'osx'
                 }
             }
         }

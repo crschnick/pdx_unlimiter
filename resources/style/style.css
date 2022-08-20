@@ -61,3 +61,8 @@
     -fx-focus-color: transparent;
 }
 
+.jfx-button {
+-fx-padding: 0.17em 0.35em 0.17em 0.35em;
+
+}
+

@@ -21,7 +21,7 @@ public final class TextFormatParser {
 
     public static TextFormatParser eu4() {
         return new TextFormatParser(
-                SystemUtils.IS_OS_MAC ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
+                Charset.forName("windows-1252"),
                 TaggedNode.NO_TAGS,
                 s -> s.equals("map_area_data"));
     }
@@ -90,12 +90,18 @@ public final class TextFormatParser {
     private void verifyTextFormat(byte[] input) throws ParseException {
         // People still try to open zip or rar files as text files
 
-        if (input.length >= 4 && Arrays.equals(input, 0, 2, new byte[] {0x50, 0x4B, 0x03, 0x04}, 0, 2)) {
+        if (input.length >= 4 && Arrays.equals(input, 0, 4, new byte[] {0x50, 0x4B, 0x03, 0x04}, 0, 4)) {
             throw new ParseException("Input is a zip file, not a text file");
         }
 
-        if (input.length >= 8 && Arrays.equals(input, 0, 2, new byte[] {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x01, 0x00}, 0, 2)) {
+        if (input.length >= 8 && Arrays.equals(input, 0, 8, new byte[] {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x01, 0x00}, 0, 8)) {
             throw new ParseException("Input is a rar file, not a text file");
+        }
+    }
+
+    private void verifySize(byte[] input) throws ParseException {
+        if (input.length > 400_000_000) {
+            throw new ParseException("Input is too large");
         }
     }
 
@@ -114,6 +120,7 @@ public final class TextFormatParser {
     public final synchronized ArrayNode parse(String name, byte[] input, int start, boolean strict) throws ParseException {
         try {
             verifyTextFormat(input);
+            verifySize(input);
 
             this.tokenizer = new TextFormatTokenizer(name, input, start, strict);
 
