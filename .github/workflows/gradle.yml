@@ -34,7 +34,7 @@ jobs:
         run: ./gradle/gradlew --info createDist
 
       - name: JReleaser Release
-        run: ./gradle/gradlew jreleaserRelease
+        run: ./gradle/gradlew jreleaserRelease --stacktrace
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
