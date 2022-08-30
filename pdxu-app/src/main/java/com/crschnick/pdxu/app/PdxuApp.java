@@ -59,17 +59,25 @@ public class PdxuApp extends Application {
                     s.getWindowX() + 20,
                     s.getWindowY() + 20,
                     s.getWindowWidth() - 40,
-                    s.getWindowHeight() - 40))) {
+                    s.getWindowHeight() - 40
+            ))) {
                 inBounds = true;
                 break;
             }
         }
         if (inBounds) {
-            if (s.getWindowX() != SavedState.INVALID) w.setX(s.getWindowX());
-            if (s.getWindowY() != SavedState.INVALID) w.setY(s.getWindowY());
-            if (s.getWindowWidth() != SavedState.INVALID) w.setWidth(s.getWindowWidth());
-            if (s.getWindowHeight() != SavedState.INVALID) w.setHeight(s.getWindowHeight());
-            if (s.isMaximized()) w.setMaximized(true);
+            if (s.getWindowX() != SavedState.INVALID) {
+                w.setX(s.getWindowX());
+            }
+            if (s.getWindowY() != SavedState.INVALID) {
+                w.setY(s.getWindowY());
+            }
+            if (s.getWindowWidth() != SavedState.INVALID) {
+                w.setWidth(s.getWindowWidth());
+            }
+            if (s.getWindowHeight() != SavedState.INVALID) {
+                w.setHeight(s.getWindowHeight());
+            }
         } else {
             logger.warn("Saved window was out of bounds");
         }
@@ -111,6 +119,10 @@ public class PdxuApp extends Application {
         // Fix bug with DPI scaling.
         // Window only calculates its right content size when resized AFTER being shown
         w.setWidth(w.getWidth() + 1);
+        // Set maximize only after fixing the DPI scaling
+        if (s.isMaximized()) {
+            w.setMaximized(true);
+        }
     }
 
     public void setupBasicWindowContent() {
