@@ -119,9 +119,11 @@ public class PdxuApp extends Application {
         // Fix bug with DPI scaling.
         // Window only calculates its right content size when resized AFTER being shown
         w.setWidth(w.getWidth() + 1);
+
         // Set maximize only after fixing the DPI scaling
         if (s.isMaximized()) {
-            w.setMaximized(true);
+            // This is a bug in JavaFX, maximizing the window breaks the DPI scaling
+            // w.setMaximized(true);
         }
     }
 
