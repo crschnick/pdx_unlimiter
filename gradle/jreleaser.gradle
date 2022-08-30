@@ -19,7 +19,7 @@ jreleaser {
         website = 'https://github.com/crschnick/pdx_unlimiter'
         authors = ['Christopher Schnick']
         license = 'GPL3'
-        copyright = ' '
+        copyright = 'Christopher Schnick, 2022'
 
         java {
             groupId = 'com.crschnick.pdxu'
