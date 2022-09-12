@@ -1,0 +1,12 @@
+- Add support for CK3 1.7
+- Add support for EU4 1.34
+- Make mod loading more robust
+- Improve save game loading performance (Thanks to Thradius)
+- Highlight filter selection in editor
+- Make read-only savegames not editable in the editor to avoid confusion
+- Format editor keys in a nicer way
+- Improve editor filter functionality to match more results
+- Fix DPI scaling issues
+- Fix export storage functionality not working
+- Fix various small memory leaks
+- Fix various small bugs

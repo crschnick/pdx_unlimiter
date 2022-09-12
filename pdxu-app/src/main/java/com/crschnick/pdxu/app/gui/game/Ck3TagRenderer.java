@@ -1,13 +1,9 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.io.parser.TextFormatParser;
-import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
 import javafx.scene.image.Image;
 
@@ -16,11 +12,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.crschnick.pdxu.app.gui.game.Ck3TagCache.getPredefinedColors;
 import static com.crschnick.pdxu.app.util.ColorHelper.*;
 
 public class Ck3TagRenderer {
@@ -34,31 +30,6 @@ public class Ck3TagRenderer {
     private static final int EMBLEM_COLOR_1 = 0x000080;
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
-
-    private static Map<String, javafx.scene.paint.Color> loadPredefinedColors(GameFileContext ctx) {
-        var file = CascadeDirectoryHelper.openFile(
-                Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
-                ctx);
-        if (file.isPresent()) {
-            try {
-                Node node = TextFormatParser.text().parse(file.get());
-                Map<String, javafx.scene.paint.Color> map = new HashMap<>();
-                node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
-                    n.forEach((k, v) -> {
-                        try {
-                            map.put(k, fromGameColor(GameColor.fromColorNode(v)));
-                        } catch (Exception ignored) {
-                        }
-                    });
-                });
-                return map;
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
-            }
-        }
-
-        return Map.of();
-    }
 
     private static void renderImage(Graphics g, java.awt.Image img, double x, double y, double w, double h) {
         g.drawImage(img,
@@ -228,7 +199,7 @@ public class Ck3TagRenderer {
 
     private static BufferedImage pattern(Graphics g, Ck3CoatOfArms.Sub sub, GameFileContext ctx, int size) {
         ensureImagesLoaded();
-        var colors = loadPredefinedColors(ctx);
+        var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
             int pColor1 = sub.getColors().size() > 0 ? ColorHelper.intFromColor(colors
                     .getOrDefault(sub.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
@@ -263,7 +234,7 @@ public class Ck3TagRenderer {
                                GameFileContext ctx,
                                int size) {
         ensureImagesLoaded();
-        var colors = loadPredefinedColors(ctx);
+        var colors = getPredefinedColors(ctx);
         int eColor1 = emblem.getColors().size() > 0 ? ColorHelper.intFromColor(colors
                 .getOrDefault(emblem.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)) : 0;
         int eColor2 = emblem.getColors().size() > 1 ? ColorHelper.intFromColor(colors
