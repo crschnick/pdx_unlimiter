@@ -12,7 +12,6 @@ import com.crschnick.pdxu.model.GameVersion;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +37,11 @@ public interface GameInstallType {
     }
 
     GameInstallType EU4 = new StandardInstallType("eu4") {
+
+        public Path getSteamSpecificFile(Path p) {
+            return p.resolve("EmptySteamDepot");
+        }
+
         @Override
         public Path getWindowsStoreLauncherDataPath(Path p) {
             return p.resolve("launcher");
