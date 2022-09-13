@@ -57,7 +57,8 @@ public class GuiEditor {
     public static boolean showCloseConfirmAlert(Stage s) {
         var r = GuiDialogHelper.showBlockingAlert(alert -> {
             alert.setTitle(PdxuI18n.get("Unsaved Changes"));
-            alert.setHeaderText(PdxuI18n.get("You are about to close the editor even though there are unsaved changes.\nDo you want to exit anyway?"));
+            alert.setHeaderText(
+                    PdxuI18n.get("You are about to close the editor even though there are unsaved changes.\nDo you want to exit anyway?"));
             alert.setAlertType(Alert.AlertType.WARNING);
             alert.getButtonTypes().clear();
             alert.getButtonTypes().add(ButtonType.YES);
@@ -78,7 +79,9 @@ public class GuiEditor {
                 alert.getDialogPane().setMaxWidth(500);
                 alert.setTitle("Missing game installation");
                 alert.setHeaderText("No installation has been set for " + state.getFileContext().getGame().getInstallationName() +
-                        ". You can still use the editor to edit " + state.getFileContext().getGame().getInstallationName() + " savegames, but many useful features will be disabled until a valid game installation has been set in the settings menu.");
+                                            ". You can still use the editor to edit " + state.getFileContext().getGame().getInstallationName() +
+                                            " savegames, but many useful features will be disabled until a valid game installation has been set in " +
+                                            "the settings menu.");
             });
         }
     }
@@ -91,10 +94,19 @@ public class GuiEditor {
         v.setPadding(new Insets(20, 20, 20, 20));
         v.getStyleClass().add("editor-nav-bar-container");
         v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
+
+        var melterInformation = new Label("To edit this file, use the melter functionality with the savegame first.");
+        melterInformation.setAlignment(Pos.CENTER);
+        melterInformation.setPadding(new Insets(5, 5, 5, 5));
         var topBars = new VBox(
                 GuiEditorMenuBar.createMenuBar(state),
-                v);
+                v
+        );
+        if (!state.isEditable()) {
+            topBars.getChildren().add(melterInformation);
+        }
         topBars.setFillWidth(true);
+        melterInformation.prefWidthProperty().bind(topBars.widthProperty());
         layout.setTop(topBars);
         createNodeList(layout, state);
         layout.setBottom(createFilterBar(state.getFilter()));
@@ -154,7 +166,8 @@ public class GuiEditor {
         cc.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(
                 new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
-                new ColumnConstraints(), new ColumnConstraints());
+                new ColumnConstraints(), new ColumnConstraints()
+        );
 
         var alwaysHighlight = true;
         var keyHighlight = state.getFilter().filterKeysProperty().get();
