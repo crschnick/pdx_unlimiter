@@ -171,7 +171,7 @@ public final class GameInstallation {
         if (debug) {
             args.add(type.debugModeSwitch().get());
         }
-        dist.startDirectly(type.getExecutable(getInstallDir()), args, Map.of());
+        dist.startDirectly(dist.getExecutable(), args, Map.of());
     }
 
     public void loadData() throws InvalidInstallationException {
@@ -182,8 +182,8 @@ public final class GameInstallation {
             throw new InvalidInstallationException("INSTALL_DIR_IS_USER_DIR", g.getInstallationName(), g.getInstallationName());
         }
 
-        if (!Files.isRegularFile(type.getExecutable(getInstallDir()))) {
-            var exec = getInstallDir().relativize(type.getExecutable(getInstallDir()));
+        if (!Files.isRegularFile(dist.getExecutable())) {
+            var exec = getInstallDir().relativize(dist.getExecutable());
             throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getInstallationName(), exec.toString(), getInstallDir().toString());
         }
 

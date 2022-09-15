@@ -37,11 +37,16 @@ public abstract class GameDist {
     }
 
     public boolean isGameInstance(String cmd) {
-        return cmd.contains(getGame().getInstallType().getExecutable(getInstallLocation()).toString());
+        return cmd.contains(getExecutable().toString());
     }
 
     public Path getIcon() {
         return getGame().getInstallType().getIcon(getInstallLocation());
+    }
+
+
+    public Path getExecutable() {
+        return getGame().getInstallType().getExecutable(getInstallLocation());
     }
 
     public abstract boolean supportsLauncher();

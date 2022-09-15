@@ -5,7 +5,6 @@ import com.crschnick.pdxu.app.util.OsHelper;
 import com.crschnick.pdxu.app.util.SupportedOs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,8 @@ public class GameDists {
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = List.of(
             PdxLauncherDist::getDist,
             LegacyLauncherDist::getDist,
-            NoLauncherDist::getDist
+            NoLauncherDist::getDist,
+            ProtonDist::getDist
     );
 
     private static final Logger logger = LoggerFactory.getLogger(GameDists.class);
