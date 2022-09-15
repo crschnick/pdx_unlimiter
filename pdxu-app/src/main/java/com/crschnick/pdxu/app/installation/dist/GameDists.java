@@ -26,10 +26,10 @@ public class GameDists {
             WindowsStoreDist::getDist);
 
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = List.of(
+            ProtonDist::getDist,
             PdxLauncherDist::getDist,
             LegacyLauncherDist::getDist,
-            NoLauncherDist::getDist,
-            ProtonDist::getDist
+            NoLauncherDist::getDist
     );
 
     private static final Logger logger = LoggerFactory.getLogger(GameDists.class);
