@@ -27,6 +27,11 @@ public class SteamDist extends GameDist {
         this.dist = dist;
     }
 
+    @Override
+    public Path getExecutable() {
+        return dist.getExecutable();
+    }
+
     private static Optional<Path> getSteamPath() {
         Optional<String> steamDir = Optional.empty();
         switch (SupportedOs.get()) {
