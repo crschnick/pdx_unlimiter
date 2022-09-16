@@ -43,7 +43,12 @@ public enum Game {
     VIC2("vic2", "VIC2", "Victoria 2",
             null, 42960, null,
             null, List.of("Victoria II", "Victoria 2"),
-            GameInstallType.VIC2);
+            GameInstallType.VIC2),
+
+    VIC3("vic3", "VIC3", "Victoria 3",
+                 null, 1647590, null,
+                 null, List.of("Victoria III", "Victoria 3"),
+    GameInstallType.VIC3);
 
     private final String id;
     private final String abbreviation;

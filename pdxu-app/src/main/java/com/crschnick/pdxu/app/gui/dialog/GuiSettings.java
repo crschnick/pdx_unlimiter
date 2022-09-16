@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
 import com.crschnick.pdxu.app.core.ComponentManager;
-import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
@@ -26,7 +25,7 @@ public class GuiSettings {
         Settings s = Settings.getInstance();
         Set<Runnable> applyFuncs = new HashSet<>();
         VBox vbox = new VBox(
-                GuiSettingsComponents.section("GAME_DIRS", applyFuncs, s.eu4, s.ck3, s.hoi4, s.stellaris, s.ck2, s.vic2),
+                GuiSettingsComponents.section("GAME_DIRS", applyFuncs, s.vic3, s.eu4, s.ck3, s.hoi4, s.stellaris, s.ck2, s.vic2),
                 new Separator(),
                 GuiSettingsComponents.section("GENERAL", applyFuncs, s.enableAutoUpdate, s.storageDirectory),
                 new Separator(),

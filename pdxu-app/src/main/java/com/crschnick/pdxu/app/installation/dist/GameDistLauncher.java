@@ -92,7 +92,8 @@ public class GameDistLauncher {
                 ctx.getInstallation().getUserDir(),
                 ctx.getStorage().getEntryName(e),
                 ctx.getCollection().getLastPlayed(),
-                path);
+                path, ctx.getInfo().getVersion()
+        );
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
         var dlcs = ctx.getInfo().getData().getDlcs().stream()
@@ -156,7 +157,8 @@ public class GameDistLauncher {
     }
 
     private static void writeDlcLoadFileWithEnabledMods(
-            GameInstallation installation, List<GameDlc> dlcs) throws Exception {
+            GameInstallation installation, List<GameDlc> dlcs
+    ) throws Exception {
         var existingMods = installation.queryEnabledMods();
         writeDlcLoadFile(installation, existingMods, dlcs);
     }
@@ -165,16 +167,16 @@ public class GameDistLauncher {
         var file = installation.getUserDir().resolve("dlc_load.json");
         ObjectNode n = JsonNodeFactory.instance.objectNode();
         n.putArray("enabled_mods").addAll(mods.stream()
-                .map(d -> FilenameUtils.separatorsToUnix
-                        (installation.getUserDir().relativize(d.getModFile()).toString()))
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
+                                                  .map(d -> FilenameUtils.separatorsToUnix
+                                                          (installation.getUserDir().relativize(d.getModFile()).toString()))
+                                                  .map(JsonNodeFactory.instance::textNode)
+                                                  .collect(Collectors.toList()));
         n.putArray("disabled_dlcs").addAll(installation.getDlcs().stream()
-                .filter(d -> d.isExpansion() && !dlcs.contains(d))
-                .map(d -> FilenameUtils.separatorsToUnix(
-                        installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
+                                                   .filter(d -> d.isExpansion() && !dlcs.contains(d))
+                                                   .map(d -> FilenameUtils.separatorsToUnix(
+                                                           installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
+                                                   .map(JsonNodeFactory.instance::textNode)
+                                                   .collect(Collectors.toList()));
         JsonHelper.write(n, file);
     }
 }

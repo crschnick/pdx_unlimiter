@@ -85,7 +85,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
             var sgPath = FilenameUtils.separatorsToUnix(userDir.relativize(path).toString());
             ObjectNode n = JsonNodeFactory.instance.objectNode()
                     .put("title", name)
@@ -139,7 +139,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
             SimpleDateFormat d = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
             ObjectNode n = JsonNodeFactory.instance.objectNode()
                     .put("title", name)
@@ -218,7 +218,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
             var sgPath = FilenameUtils.getBaseName(
                     FilenameUtils.separatorsToUnix(userDir.relativize(path).toString()));
             ObjectNode n = JsonNodeFactory.instance.objectNode()
@@ -301,7 +301,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
             SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             var date = d.format(new Date(lastPlayed.toEpochMilli()));
             var sgPath = FilenameUtils.getBaseName(
@@ -343,7 +343,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
 
         }
 
@@ -431,7 +431,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
 
         }
 
@@ -476,6 +476,94 @@ public interface GameInstallType {
         }
     };
 
+    GameInstallType VIC3 = new StandardInstallType("binaries/victoria3") {
+        @Override
+        public Path chooseBackgroundImage(Path p) {
+            int i = new Random().nextInt(9);
+            return p.resolve("game").resolve("gfx").resolve("loadingscreens")
+                    .resolve("victoria3_load_" + i + ".dds");
+        }
+
+        @Override
+        public Optional<String> debugModeSwitch() {
+            return Optional.of("-debug_mode");
+        }
+
+        @Override
+        public List<String> getLaunchArguments() {
+            return List.of("-gdpr-compliant", "--continuelastsave");
+        }
+
+        @Override
+        public Optional<GameVersion> getVersion(String versionString) {
+            Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)(?:\\.(\\d+))?\\s+\\((.+)\\)").matcher(versionString);
+            if (m.find()) {
+                var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
+                var name = m.group(5);
+                return Optional.of(new GameNamedVersion(
+                        Integer.parseInt(m.group(1)),
+                        Integer.parseInt(m.group(2)),
+                        Integer.parseInt(m.group(3)),
+                        fourth,
+                        name));
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        @Override
+        public Path getDlcPath(Path p) {
+            return p.resolve("game").resolve("dlc");
+        }
+
+        @Override
+        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+            var sf = userDir.resolve("pdx_settings.txt");
+            if (!Files.exists(sf)) {
+                return Optional.empty();
+            }
+
+            var node = TextFormatParser.text().parse(sf);
+            var langId = node
+                    .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
+                    .map(Node::getString);
+            return langId.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l)));
+        }
+
+        public Path getSteamSpecificFile(Path p) {
+            return p.resolve("binaries").resolve("steam_appid.txt");
+        }
+
+        public Path getLauncherDataPath(Path p) {
+            return p.resolve("launcher");
+        }
+
+        @Override
+        public Path getIcon(Path p) {
+            return p.resolve("game").resolve("gfx").resolve("exe_icon.bmp");
+        }
+
+        public Path getModBasePath(Path p) {
+            return p.resolve("game");
+        }
+
+        @Override
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
+            SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            var date = d.format(new Date(lastPlayed.toEpochMilli()));
+            var sgPath = FilenameUtils.getBaseName(
+                    FilenameUtils.separatorsToUnix(userDir.resolve("save games").relativize(path).toString()));
+            var rawVersion = String.format("%s.%s.%s", version.getFirst(), version.getSecond(), version.getThird());
+            ObjectNode n = JsonNodeFactory.instance.objectNode()
+                    .put("title", sgPath)
+                    .put("desc", "")
+                    .put("date", date)
+                    .put("rawVersion", rawVersion);
+            JsonHelper.write(n, userDir.resolve("continue_game.json"));
+        }
+    };
+
+
     Path chooseBackgroundImage(Path p);
 
     default Optional<GameVersion> determineVersionFromInstallation(Path p) {
@@ -508,7 +596,7 @@ public interface GameInstallType {
         return getModFileName(userDir, mod);
     }
 
-    void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path) throws IOException;
+    void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException;
 
     default ModInfoStorageType getModInfoStorageType() {
         return ModInfoStorageType.STORES_INFO;
