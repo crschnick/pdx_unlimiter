@@ -485,6 +485,7 @@ public interface GameInstallType {
     List<String> getLaunchArguments();
 
     Path getExecutable(Path p);
+    Path getProtonExecutable(Path p);
 
     default Optional<GameVersion> getVersion(String versionString) {
         throw new UnsupportedOperationException();
@@ -585,6 +586,11 @@ public interface GameInstallType {
             }
 
             throw new AssertionError();
+        }
+
+        @Override
+        public Path getProtonExecutable(Path p) {
+            return p.resolve(executableName + ".exe");
         }
 
         @Override
