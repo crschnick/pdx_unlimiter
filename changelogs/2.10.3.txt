@@ -1,0 +1,3 @@
+- Add very basic proton support on Linux (More to come)
+- Fix parts of the interface being cut of on the right due to scaling issues (Again)
+- Fix spaces in external editor program path causing it to not work correctly (Hopefully for real this time)
