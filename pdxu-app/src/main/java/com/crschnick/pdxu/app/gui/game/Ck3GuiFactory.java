@@ -115,7 +115,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
         var row = TagRows.createTagRow(
                 icon,
                 tooltip,
-                titles.stream().filter(t -> !t.getType().equals(Ck3Title.Type.BARONY)).collect(Collectors.toList()),
+                titles.stream().filter(t -> t != null && !t.getType().equals(Ck3Title.Type.BARONY)).collect(Collectors.toList()),
                 t -> t.getName(),
                 t -> GameImage.imageNode(Ck3TagCache.titleImage(t, GameFileContext.fromInfo(info)), CLASS_TAG_ICON));
 
