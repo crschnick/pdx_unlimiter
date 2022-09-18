@@ -160,6 +160,11 @@ public class EditorExternalState {
             return;
         }
 
+        // Compatibility fix for quoted values!
+        if (editor.startsWith("\"") && editor.endsWith("\"") && editor.length() >= 2) {
+            editor = editor.substring(1, editor.length() - 1);
+        }
+
         try {
             // Linux editors do not like quotes around file paths
             var fileName = SystemUtils.IS_OS_WINDOWS ? "\"" + file + "\"" : file;
