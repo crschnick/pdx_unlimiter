@@ -68,8 +68,13 @@ public class SteamDist extends GameDist {
     private static final Pattern STEAM_LIBRARY_DIR_OLD = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
     private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");
 
-    private static Path getSteamAppsCommonDir(Path base) {
-        return base.resolve("steamapps").resolve("common");
+    private static Path getSteamAppsCommonDir(Path base)  {
+        var common =  base.resolve("steamapps").resolve("common");
+        try {
+            return common.toRealPath();
+        } catch (IOException e) {
+            return common;
+        }
     }
 
     private static List<Path> getSteamLibraryPaths() {
@@ -103,7 +108,13 @@ public class SteamDist extends GameDist {
     }
 
     private static boolean isInSteamLibraryDir(Path dir) {
-        boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> dir.startsWith(ld));
+        try {
+            dir = dir.toRealPath();
+        } catch (IOException ignored) {
+        }
+
+        Path finalDir = dir;
+        boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> finalDir.startsWith(ld));
         boolean looksLikeSteamLibDir = dir.getNameCount() > 3 && Files.exists(
                 dir.getParent().getParent().getParent().resolve("libraryfolder.vdf"));
         return inSteamLibraryDir || looksLikeSteamLibDir;
