@@ -154,6 +154,10 @@ public class GuiEditor {
     }
 
     public static String getFormattedName(String s) {
+        if (s.length() == 0) {
+            return s;
+        }
+
         return Arrays.stream(s.split("_"))
                 .map(p -> p.substring(0, 1).toUpperCase() + p.substring(1))
                 .collect(Collectors.joining(" "));
