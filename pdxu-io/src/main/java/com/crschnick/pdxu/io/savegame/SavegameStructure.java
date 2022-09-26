@@ -25,9 +25,13 @@ public interface SavegameStructure {
             "rnw.zip");
 
 
-    SavegameStructure CK3_PLAINTEXT = new Ck3PlaintextSavegameStructure();
+    SavegameStructure CK3_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.CK3);
+    SavegameStructure CK3_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.CK3);
 
-    SavegameStructure CK3_COMPRESSED = new Ck3CompressedSavegameStructure();
+
+    SavegameStructure VIC3_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.VIC3);
+    SavegameStructure VIC3_UNIFIED_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.VIC3);
+    SavegameStructure VIC3_SPLIT_COMPRESSED = new ModernSplitCompressedSavegameStructure(SavegameType.VIC3);
 
 
     SavegameStructure HOI4 = new PlaintextSavegameStructure(

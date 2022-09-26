@@ -12,10 +12,10 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
+public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructure {
 
-    public Ck3CompressedSavegameStructure() {
-        super(null, SavegameType.CK3, Set.of(new SavegamePart("gamestate", "gamestate")));
+    public ModernHeaderCompressedSavegameStructure(SavegameType type) {
+        super(null, type, Set.of(new SavegamePart("gamestate", "gamestate")));
     }
 
     private static final int MAX_SEARCH = 150000;
@@ -52,7 +52,7 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
 
             // Exclude trailing new line in meta length!
-            String header = new Ck3Header(true, true, false, metaBytes.length).toString();
+            String header = new ModernHeader(true, 1, false, metaBytes.length).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
@@ -66,14 +66,14 @@ public class Ck3CompressedSavegameStructure extends ZipSavegameStructure {
     @Override
     public SavegameParseResult parse(byte[] input) {
         int contentStart;
-        if (Ck3Header.skipsHeader(input)) {
+        if (ModernHeader.skipsHeader(input)) {
             contentStart = indexOfCompressedGamestateStart(input);
         } else {
-            var header = Ck3Header.determineHeaderForFile(input);
+            var header = ModernHeader.determineHeaderForFile(input);
             if (header.binary()) {
                 throw new IllegalArgumentException("Binary savegames are not supported");
             }
-            if (!header.compressed()) {
+            if (!header.isUnifiedCompressed()) {
                 throw new IllegalArgumentException("Uncompressed savegames are not supported");
             }
 

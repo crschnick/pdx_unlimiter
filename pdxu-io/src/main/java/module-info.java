@@ -4,4 +4,5 @@ module com.crschnick.pdxu.io {
     exports com.crschnick.pdxu.io.node;
 
     requires org.apache.commons.lang;
+    requires static lombok;
 }

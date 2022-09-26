@@ -92,7 +92,7 @@ public class GameDistLauncher {
                 ctx.getInstallation().getUserDir(),
                 ctx.getStorage().getEntryName(e),
                 ctx.getCollection().getLastPlayed(),
-                path, ctx.getInfo().getVersion()
+                path, ctx.getInfo().getData().getVersion()
         );
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 

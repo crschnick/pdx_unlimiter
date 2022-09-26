@@ -47,6 +47,7 @@ public abstract class GameDateType {
     public static final GameDateType CK3 = EU4;
     public static final GameDateType CK2 = EU4;
     public static final GameDateType VIC2 = EU4;
+    public static final GameDateType VIC3 = EU4;
     public static final GameDateType STELLARIS = new GameDateType() {
         @Override
         @JsonValue

@@ -16,12 +16,6 @@ import java.util.zip.ZipInputStream;
 public interface SavegameType {
 
     SavegameType EU4 = new SavegameType() {
-        @Override
-        public boolean matchesInput(byte[] input) {
-            var header = ZipSavegameStructure.getFirstHeader(input, 6);
-            return Arrays.equals("EU4txt".getBytes(), header) ||
-                    Arrays.equals("EU4bin".getBytes(), header);
-        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -66,7 +60,7 @@ public interface SavegameType {
 
         public UUID getCampaignIdHeuristic(SavegameContent c) {
             return UUID.nameUUIDFromBytes(c.get().getNodeForKey("countries")
-                    .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
+                                                  .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
         }
 
         @Override
@@ -79,13 +73,6 @@ public interface SavegameType {
     };
 
     SavegameType HOI4 = new SavegameType() {
-
-        @Override
-        public boolean matchesInput(byte[] input) {
-            var header = ZipSavegameStructure.getFirstHeader(input, 7);
-            return Arrays.equals("HOI4txt".getBytes(), header) ||
-                    Arrays.equals("HOI4bin".getBytes(), header);
-        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -124,18 +111,83 @@ public interface SavegameType {
         }
     };
 
-    SavegameType CK3 = new SavegameType() {
+    SavegameType VIC3 = new SavegameType() {
 
         @Override
-        public boolean matchesInput(byte[] input) {
-            // Slow, but acceptable
-            try {
-                Ck3Header.determineHeaderForFile(input);
-                return true;
-            } catch (Exception e) {
-                return false;
+        public SavegameStructure determineStructure(byte[] input) {
+            if (isSplitCompressed(input)) {
+                return SavegameStructure.VIC3_SPLIT_COMPRESSED;
+            } else if (isUnifiedCompressed(input)) {
+                return SavegameStructure.VIC3_UNIFIED_COMPRESSED;
+            } else {
+                return SavegameStructure.VIC3_PLAINTEXT;
             }
         }
+
+        @Override
+        public boolean isCompressed(byte[] input) {
+            if (ModernHeader.skipsHeader(input)) {
+                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            }
+
+            var header = ModernHeader.determineHeaderForFile(input);
+            return header.isCompressed();
+        }
+
+        public boolean isUnifiedCompressed(byte[] input) {
+            if (ModernHeader.skipsHeader(input)) {
+                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            }
+
+            var header = ModernHeader.determineHeaderForFile(input);
+            return header.isUnifiedCompressed();
+        }
+
+        public boolean isSplitCompressed(byte[] input) {
+            if (ModernHeader.skipsHeader(input)) {
+                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            }
+
+            var header = ModernHeader.determineHeaderForFile(input);
+            return header.isSplitCompressed();
+        }
+
+        @Override
+        public String getFileEnding() {
+            return "v3";
+        }
+
+        @Override
+        public boolean isBinary(byte[] input) {
+            if (ModernHeader.skipsHeader(input)) {
+                return false;
+            }
+
+            return ModernHeader.determineHeaderForFile(input).binary();
+        }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.vic3();
+        }
+
+        @Override
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            long seed = c.get().getNodeForKey("random_seed").getLong();
+            byte[] b = new byte[20];
+            new Random(seed).nextBytes(b);
+            return UUID.nameUUIDFromBytes(b);
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            int rand = new Random().nextInt(Integer.MAX_VALUE);
+            c.get().getNodeForKey("random_seed").getValueNode().set(
+                    new ValueNode(String.valueOf(rand), false));
+        }
+    };
+
+    SavegameType CK3 = new SavegameType() {
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -148,12 +200,12 @@ public interface SavegameType {
 
         @Override
         public boolean isCompressed(byte[] input) {
-            if (Ck3Header.skipsHeader(input)) {
-                return Ck3CompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            if (ModernHeader.skipsHeader(input)) {
+                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
             }
 
-            var header = Ck3Header.determineHeaderForFile(input);
-            return header.compressed();
+            var header = ModernHeader.determineHeaderForFile(input);
+            return header.isCompressed();
         }
 
         @Override
@@ -163,11 +215,11 @@ public interface SavegameType {
 
         @Override
         public boolean isBinary(byte[] input) {
-            if (Ck3Header.skipsHeader(input)) {
+            if (ModernHeader.skipsHeader(input)) {
                 return false;
             }
 
-            return Ck3Header.determineHeaderForFile(input).binary();
+            return ModernHeader.determineHeaderForFile(input).binary();
         }
 
         @Override
@@ -193,12 +245,6 @@ public interface SavegameType {
 
 
     SavegameType STELLARIS = new SavegameType() {
-
-        @Override
-        public boolean matchesInput(byte[] input) {
-            // Stellaris has no identifier to help with detection
-            return false;
-        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -241,12 +287,6 @@ public interface SavegameType {
     };
 
     SavegameType CK2 = new SavegameType() {
-
-        @Override
-        public boolean matchesInput(byte[] input) {
-            var header = ZipSavegameStructure.getFirstHeader(input, 6);
-            return Arrays.equals("CK2txt".getBytes(), header);
-        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -293,12 +333,6 @@ public interface SavegameType {
     };
 
     SavegameType VIC2 = new SavegameType() {
-
-        @Override
-        public boolean matchesInput(byte[] input) {
-            // Vic2 has no identifier to help with detection
-            return false;
-        }
 
         @Override
         public SavegameStructure determineStructure(byte[] input) {
@@ -349,8 +383,6 @@ public interface SavegameType {
         }
         return null;
     }
-
-    boolean matchesInput(byte[] input);
 
     SavegameStructure determineStructure(byte[] input);
 

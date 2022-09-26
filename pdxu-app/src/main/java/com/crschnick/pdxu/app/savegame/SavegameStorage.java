@@ -12,6 +12,7 @@ import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
+import com.crschnick.pdxu.app.info.vic3.Vic3SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
@@ -143,6 +144,25 @@ public abstract class SavegameStorage<
                 }
 
                 return info.getData().getTag().getName();
+            }
+        });
+        ALL.put(Game.VIC3, new SavegameStorage<>(
+                "vic3",
+                GameDateType.VIC3,
+                SavegameType.VIC3,
+                Vic3SavegameInfo.class
+        ) {
+            @Override
+            protected String getDefaultCampaignName(Vic3SavegameInfo info) {
+                if (info.getData().isObserver()) {
+                    return "Observer";
+                }
+
+                if (!info.getData().hasOnePlayerTag()) {
+                    return "Unknown";
+                }
+
+                return "Test";// info.getData().getTag().getName();
             }
         });
         ALL.put(Game.STELLARIS, new SavegameStorage<>(
