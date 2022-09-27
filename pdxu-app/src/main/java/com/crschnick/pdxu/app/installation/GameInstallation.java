@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public final class GameInstallation {
@@ -69,6 +68,8 @@ public final class GameInstallation {
                 p -> ALL.put(Game.CK2, new GameInstallation(Game.CK2.getInstallType(), p)));
         Optional.ofNullable(s.vic2.getValue()).ifPresent(
                 p -> ALL.put(Game.VIC2, new GameInstallation(Game.VIC2.getInstallType(), p)));
+        Optional.ofNullable(s.vic3.getValue()).ifPresent(
+                p -> ALL.put(Game.VIC3, new GameInstallation(Game.VIC3.getInstallType(), p)));
         for (Game g : Game.values()) {
             if (!ALL.containsKey(g)) {
                 continue;
@@ -171,7 +172,7 @@ public final class GameInstallation {
         if (debug) {
             args.add(type.debugModeSwitch().get());
         }
-        dist.startDirectly(dist.getExecutable(), args, Map.of());
+        // dist.startDirectly(dist.getExecutable(), args, Map.of());
     }
 
     public void loadData() throws InvalidInstallationException {

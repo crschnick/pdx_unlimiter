@@ -171,19 +171,15 @@ public interface SavegameType {
             return TextFormatParser.vic3();
         }
 
-        @Override
         public UUID getCampaignIdHeuristic(SavegameContent c) {
-            long seed = c.get().getNodeForKey("random_seed").getLong();
-            byte[] b = new byte[20];
-            new Random(seed).nextBytes(b);
-            return UUID.nameUUIDFromBytes(b);
+            var seed = UUID.fromString(c.get().getNodeForKey("playthrough_id").getString());
+            return seed;
         }
 
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
-            int rand = new Random().nextInt(Integer.MAX_VALUE);
-            c.get().getNodeForKey("random_seed").getValueNode().set(
-                    new ValueNode(String.valueOf(rand), false));
+            c.get("gamestate").getNodeForKey("playthrough_id").getValueNode().set(
+                    new ValueNode(UUID.randomUUID().toString(), true));
         }
     };
 

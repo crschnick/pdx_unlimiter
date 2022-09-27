@@ -15,7 +15,11 @@ public class TextFormatTokenizer {
     private static final byte SPACE_CHAR = 32;
     private static final byte EQUALS_CHAR = 61;
 
-    private static final byte[] UTF_8_BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+    private static final byte[] UTF_8_BOM = new byte[]{
+            (byte) 0xEF,
+            (byte) 0xBB,
+            (byte) 0xBF
+    };
 
     private final String name;
     private final boolean strict;
@@ -26,6 +30,8 @@ public class TextFormatTokenizer {
     private final Stack<Integer> arraySizeStack;
     private int[] arraySizes;
     private boolean isInQuotes;
+    private boolean isInVariable;
+    private boolean hasSeenAtSin;
     private boolean isInComment;
     private int nextScalarStart;
     private int i;
@@ -136,7 +142,7 @@ public class TextFormatTokenizer {
     }
 
     private boolean checkCommentCase(char c) throws ParseException {
-        if (isInQuotes) {
+        if (isInQuotes || isInVariable) {
             return false;
         }
 
@@ -185,6 +191,42 @@ public class TextFormatTokenizer {
         return true;
     }
 
+    private boolean checkInlineMath(char c) throws ParseException {
+        if (!isInVariable) {
+            if (hasSeenAtSin) {
+                if (c == '[') {
+                    isInVariable = true;
+                    return true;
+                }else {
+
+                }
+            }
+            if (c == '"') {
+                isInQuotes = true;
+                finishCurrentToken();
+                return true;
+            }
+
+            return false;
+        }
+
+        boolean hasSeenEscapeChar = escapeChar;
+        if (hasSeenEscapeChar) {
+            escapeChar = false;
+            if (c == '"' || c == '\\') {
+                return true;
+            }
+        } else {
+            escapeChar = c == '\\';
+            if (c == '"') {
+                isInQuotes = false;
+                finishCurrentToken(i + 1);
+            }
+        }
+
+        return true;
+    }
+
     private void finishCurrentToken() throws ParseException {
         finishCurrentToken(i);
     }
@@ -200,7 +242,9 @@ public class TextFormatTokenizer {
         // Check for length overflow
         if (length < 0) {
             throw ParseException.createFromOffset(name,
-                    "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) + ", which is too big", nextScalarStart, bytes);
+                                                  "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) +
+                                                          ", which is too big", nextScalarStart, bytes
+            );
         }
 
         assert length > 0 : "Scalar must be of length at least 1";
@@ -319,8 +363,12 @@ public class TextFormatTokenizer {
         // Add extra new line at the end to simulate end of token
         char c = i == bytes.length ? '\n' : (char) bytes[i];
 
-        if (checkCommentCase(c)) return;
-        if (checkQuoteCase(c)) return;
+        if (checkCommentCase(c)) {
+            return;
+        }
+        if (checkQuoteCase(c)) {
+            return;
+        }
 
         checkResize();
 

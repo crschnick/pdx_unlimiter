@@ -36,6 +36,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         ALL.put(Game.STELLARIS, new StellarisGuiFactory());
         ALL.put(Game.CK2, new Ck2GuiFactory());
         ALL.put(Game.VIC2, new Vic2GuiFactory());
+        ALL.put(Game.VIC3, new Vic3GuiFactory());
     }
 
     @SuppressWarnings("unchecked")
