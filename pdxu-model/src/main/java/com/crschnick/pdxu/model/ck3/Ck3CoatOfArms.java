@@ -25,6 +25,10 @@ public final class Ck3CoatOfArms {
 
     public static Map<Long, Ck3CoatOfArms> createCoaMap(Node node) {
         Map<Long, Ck3CoatOfArms> map = new HashMap<>();
+        if (node == null) {
+            return map;
+        }
+
         node.forEach((k, v) -> {
             var coa = fromNode(v);
             map.put(Long.parseLong(k), coa);

@@ -29,10 +29,13 @@ public class Ck3Title {
         var tts = node.getNodeForKey("landed_titles").getNodeForKey("landed_titles");
         var map = new HashMap<Long, Ck3Title>();
         tts.forEach((k, v) -> {
-            var id = Long.parseLong(k);
-            fromNode(id, v, coaMap).ifPresent(t -> {
-                map.put(id, t);
-            });
+            try {
+                var id = Long.parseLong(k);
+                fromNode(id, v, coaMap).ifPresent(t -> {
+                    map.put(id, t);
+                });
+            } catch (NumberFormatException ignored) {
+            }
         });
         return map;
     }

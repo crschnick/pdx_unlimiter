@@ -104,8 +104,7 @@ public class Ck3Tag {
     }
 
     public static List<Ck3Tag> fromNode(Node n) {
-        var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
-                .getNodeForKey("coat_of_arms_manager_database"));
+        var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKeys("coat_of_arms", "coat_of_arms_manager_database"));
         Map<Long, Ck3Title> titleIds = Ck3Title.createTitleMap(n, coaMap);
 
         var living = n.getNodeForKey("living");
