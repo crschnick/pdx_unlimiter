@@ -159,6 +159,7 @@ public class GuiEditor {
         }
 
         return Arrays.stream(s.split("_"))
+                .filter(p -> p.length() > 0)
                 .map(p -> p.substring(0, 1).toUpperCase() + p.substring(1))
                 .collect(Collectors.joining(" "));
     }
