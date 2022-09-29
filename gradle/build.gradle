@@ -58,8 +58,7 @@ List<String> runArgs = [
         "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.stellaris=com.fasterxml.jackson.databind",
         "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.ck2=com.fasterxml.jackson.databind",
         "--add-opens", "com.crschnick.pdxu.model/com.crschnick.pdxu.model.vic2=com.fasterxml.jackson.databind",
-        "-Xmx4g",
-        "-XX:+ExitOnOutOfMemoryError"]
+        "-Xmx4g"]
 
 application {
     mainModule = 'com.crschnick.pdxu.app'

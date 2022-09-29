@@ -182,7 +182,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
                             info.getMods().stream()
                                     .map(s -> {
                                         var m = installation.getModForSavegameId(s);
-                                        return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
+                                        return "- " + (m.isPresent() ? m.get().getName().orElse("Unnamed") : s + " (" + PdxuI18n.get("MISSING") + ")");
                                     })
                                     .collect(Collectors.joining("\n")));
 
