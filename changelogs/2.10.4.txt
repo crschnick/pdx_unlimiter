@@ -1,0 +1,4 @@
+- Update melter to HOI4 1.12
+- Fix certain CK3 save game values not being melted correctly
+- Fix out of bounds exception in editor
+- Fix steam installation detection on Linux when symbolic links were used
