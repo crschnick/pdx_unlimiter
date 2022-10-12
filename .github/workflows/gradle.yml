@@ -1,9 +1,7 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - master
+  push: {}
   pull_request: {}
 
 jobs:
@@ -38,14 +36,14 @@ jobs:
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
 
       - name: JReleaser Announce
         run: ./gradle/gradlew jreleaserAnnounce
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
-        if: ${{ matrix.os == 'windows-2022' && github.event_name != 'pull_request' }}
+        if: ${{ matrix.os == 'windows-2022' && github.ref == 'refs/heads/master' }}
 
       - name: Upload mac dist as an artifact
         uses: actions/upload-artifact@v2

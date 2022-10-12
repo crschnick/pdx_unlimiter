@@ -5,3 +5,4 @@ pdxu.properties
 bin
 !resources/bin
 .vscode
+out
