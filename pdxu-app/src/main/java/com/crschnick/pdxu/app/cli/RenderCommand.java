@@ -52,7 +52,6 @@ public class RenderCommand implements Runnable {
     )
     Path output;
 
-
     @SneakyThrows
     @Override
     public void run() {
@@ -77,7 +76,6 @@ public class RenderCommand implements Runnable {
         };
         
         switch (game) {
-
             case EU4 -> {
             }
             case HOI4 -> {
