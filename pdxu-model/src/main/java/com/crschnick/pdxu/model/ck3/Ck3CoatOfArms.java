@@ -240,6 +240,7 @@ public final class Ck3CoatOfArms {
             // Even color1 can sometimes be missing
             n.getNodeForKeyIfExistent("color1").filter(Node::isValue).map(Node::getString).ifPresent(c.colors::add);
             n.getNodeForKeyIfExistent("color2").filter(Node::isValue).map(Node::getString).ifPresent(c.colors::add);
+            n.getNodeForKeyIfExistent("color3").filter(Node::isValue).map(Node::getString).ifPresent(c.colors::add);
 
             n.getNodeForKeyIfExistent("mask").ifPresentOrElse(r -> {
                 c.mask = r.getNodeArray().stream().map(Node::getInteger).collect(Collectors.toList());
