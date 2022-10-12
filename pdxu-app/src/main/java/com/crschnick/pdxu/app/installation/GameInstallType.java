@@ -581,7 +581,7 @@ public interface GameInstallType {
                 }
                 case MAC -> {
                     return p.resolve(p.resolve(executableName + ".app")
-                            .resolve("Contents").resolve("MacOS").resolve(executableName));
+                            .resolve("Contents").resolve("MacOS").resolve(Path.of(executableName).getFileName()));
                 }
             }
 
