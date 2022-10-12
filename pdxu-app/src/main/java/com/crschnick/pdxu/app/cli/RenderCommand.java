@@ -13,6 +13,7 @@ import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import picocli.CommandLine;
 
@@ -67,11 +68,14 @@ public class RenderCommand implements Runnable {
             throw new IllegalArgumentException("Game is not set up yet");
         }
 
+        Files.createDirectories(output);
+        FileUtils.cleanDirectory(output.toFile());
+
         FailableBiConsumer<String, BufferedImage, Exception> map = (s, bufferedImage) -> {
-            Files.createDirectories(output);
             var target = output.resolve(s + ".png");
             ImageIO.write(bufferedImage, "png", target.toFile());
         };
+        
         switch (game) {
 
             case EU4 -> {
