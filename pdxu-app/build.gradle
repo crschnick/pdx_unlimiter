@@ -11,6 +11,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.name}"]
+}
+
 def currentOS = DefaultNativePlatform.currentOperatingSystem;
 def suffix = ''
 def platform
@@ -52,4 +56,13 @@ dependencies {
 
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
+
+    implementation 'info.picocli:picocli:4.6.3'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+    testImplementation 'info.picocli:picocli:4.6.3'
+    testAnnotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
+

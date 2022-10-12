@@ -62,7 +62,7 @@ List<String> runArgs = [
 
 application {
     mainModule = 'com.crschnick.pdxu.app'
-    mainClass = 'com.crschnick.pdxu.app.Main'
+    mainClass = 'com.crschnick.pdxu.app.cli.MainCommand'
     applicationDefaultJvmArgs = runArgs + ["-ea"]
 }
 
@@ -79,7 +79,7 @@ jlink {
 
     launcher {
         moduleName = 'com.crschnick.pdxu.app'
-        mainClassName = 'com.crschnick.pdxu.app.Main'
+        mainClassName = 'com.crschnick.pdxu.app.cli.MainCommand'
         name = 'pdxu'
         jvmArgs = runArgs
     }

@@ -37,8 +37,8 @@ public class PdxuApp extends Application {
         return APP;
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public static void main() {
+        launch();
     }
 
     public void setupWindowState() {

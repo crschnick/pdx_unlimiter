@@ -6,7 +6,6 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
-import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -28,7 +27,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     }
 
     public String getTagName() {
-        return tag.getTag();
+        return null;// tag.getTag();
     }
 
     public Vic3Tag getTag() {
@@ -59,13 +58,13 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
 
     @Override
     protected void init(ArrayNode node) {
-        allTags = new ArrayList<>();
-        node.getNodeForKey("countries").forEach((k, v) -> {
-            allTags.add(Vic3Tag.fromNode(k, v));
-        });
-
-        String player = node.getNodeForKey("player").getString();
-        tag = Eu4Tag.getTag(allTags, player);
+//        allTags = new ArrayList<>();
+//        node.getNodeForKey("countries").forEach((k, v) -> {
+//            allTags.add(Vic3Tag.fromNode(k, v));
+//        });
+//
+//        String player = node.getNodeForKey("player").getString();
+//        tag = Eu4Tag.getTag(allTags, player);
 
 
         date = GameDateType.VIC3.fromString(node.getNodeForKey("date").getString());
