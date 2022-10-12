@@ -7,7 +7,6 @@ import java.util.List;
 
 public abstract class ArrayNode extends Node {
 
-    @Override
     public void evaluate(NodeEnvironment environment) {
         final NodeEnvironment[] currentEnvironment = {environment};
         forEach((s, node) -> {
