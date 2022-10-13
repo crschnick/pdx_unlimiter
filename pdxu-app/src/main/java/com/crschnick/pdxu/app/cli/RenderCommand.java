@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.core.ComponentManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
+import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
@@ -75,7 +76,7 @@ public class RenderCommand implements Runnable {
             var target = output.resolve(s + ".png");
             ImageIO.write(bufferedImage, "png", target.toFile());
         };
-        
+
         switch (game) {
             case EU4 -> {
             }
@@ -134,20 +135,23 @@ public class RenderCommand implements Runnable {
         try (Stream<Path> list = Files.list(directory)) {
             for (Path path : list.toList()) {
                 var content = TextFormatParser.vic3().parse(path);
+                if (content.size() == 1) {
+                    content = content.getNodeArray().get(0).getArrayNode();
+                }
                 NodeEvaluator.evaluateArrayNode(content);
                 content.forEach((s, node) -> {
                     if (!node.isArray()) {
                         return;
                     }
 
-//                    try {
-//                        var coa = Ck3CoatOfArms.fromNode(node);
-//                        var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), 512, false);
-//                        consumer.accept(s, image);
-//                    } catch (Exception exception) {
-//                        System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
-//                        exception.printStackTrace();
-//                    }
+                    try {
+                        var coa = CoatOfArms.fromNode(node);
+                        var image = Vic3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.VIC3), 512);
+                        consumer.accept(s, image);
+                    } catch (Exception exception) {
+                        System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
+                        exception.printStackTrace();
+                    }
                 }, false);
             }
         }
