@@ -13,8 +13,6 @@ public class GameDlc {
     private Path filePath;
     private Path dataPath;
     private String name;
-    private boolean affectsChecksum;
-    private boolean affectsCompatability;
 
     public static Optional<GameDlc> fromDirectory(Path p) throws Exception {
         if (!Files.isDirectory(p)) {
@@ -38,10 +36,6 @@ public class GameDlc {
         dlc.filePath = filePath;
         dlc.dataPath = dataPath;
         dlc.name = node.getNodeForKey("name").getString();
-        dlc.affectsChecksum = node.getNodeForKey("affects_checksum").getBoolean();
-        dlc.affectsCompatability = node.getNodeForKeyIfExistent("affects_compatability")
-                .map(Node::getBoolean)
-                .orElse(false);
         return Optional.of(dlc);
     }
 

@@ -1,10 +1,6 @@
 package com.crschnick.pdxu.io.node;
 
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Value;
-
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -149,23 +145,5 @@ public final class ValueNode extends Node {
         }
 
         return Optional.empty();
-    }
-
-    public double evaluateValue(NodeEnvironment environment) {
-        var expression = getInlineMathExpression();
-        if (expression.isPresent()) {
-            var string = expression.get();
-            for (Map.Entry<String, Double> entry : environment.getVariables().entrySet()) {
-                string = string.replaceAll("@" + entry.getKey(), entry.getValue().toString());
-            }
-
-            try (Context polyglot = Context.create()) {
-                Value eval = polyglot.eval("js", string);
-                double result = eval.asDouble();
-                return result;
-            }
-        }
-
-        return Double.parseDouble(getString());
     }
 }

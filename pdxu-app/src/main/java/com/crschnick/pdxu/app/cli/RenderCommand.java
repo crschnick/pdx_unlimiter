@@ -10,6 +10,7 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
 import lombok.SneakyThrows;
@@ -90,6 +91,7 @@ public class RenderCommand implements Runnable {
             case VIC2 -> {
             }
             case VIC3 -> {
+                vic3(map);
             }
         }
     }
@@ -117,6 +119,35 @@ public class RenderCommand implements Runnable {
                         System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
                         exception.printStackTrace();
                     }
+                }, false);
+            }
+        }
+    }
+
+    private void vic3(FailableBiConsumer<String, BufferedImage, Exception> consumer) throws Exception {
+        var directory = GameInstallation.ALL.get(Game.VIC3)
+                .getInstallDir()
+                .resolve("game")
+                .resolve("common")
+                .resolve("coat_of_arms")
+                .resolve("coat_of_arms");
+        try (Stream<Path> list = Files.list(directory)) {
+            for (Path path : list.toList()) {
+                var content = TextFormatParser.vic3().parse(path);
+                NodeEvaluator.evaluateArrayNode(content);
+                content.forEach((s, node) -> {
+                    if (!node.isArray()) {
+                        return;
+                    }
+
+//                    try {
+//                        var coa = Ck3CoatOfArms.fromNode(node);
+//                        var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), 512, false);
+//                        consumer.accept(s, image);
+//                    } catch (Exception exception) {
+//                        System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
+//                        exception.printStackTrace();
+//                    }
                 }, false);
             }
         }

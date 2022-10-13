@@ -30,8 +30,7 @@ public class TextFormatTokenizer {
     private final Stack<Integer> arraySizeStack;
     private int[] arraySizes;
     private boolean isInQuotes;
-    private boolean isInVariable;
-    private boolean hasSeenAtSin;
+    private boolean isInBlock;
     private boolean isInComment;
     private int nextScalarStart;
     private int i;
@@ -142,7 +141,7 @@ public class TextFormatTokenizer {
     }
 
     private boolean checkCommentCase(char c) throws ParseException {
-        if (isInQuotes || isInVariable) {
+        if (isInQuotes || isInBlock) {
             return false;
         }
 
@@ -191,40 +190,29 @@ public class TextFormatTokenizer {
         return true;
     }
 
-    private boolean checkInlineMath(char c) throws ParseException {
-        if (!isInVariable) {
-            if (hasSeenAtSin) {
+    private boolean checkBlock(char c) throws ParseException {
+        if (!isInBlock) {
+            boolean hasSeenAtSign = i > 0 && bytes[i - 1] == 64;
+            if (hasSeenAtSign) {
                 if (c == '[') {
-                    isInVariable = true;
+                    isInBlock = true;
                     return true;
-                }else {
-
                 }
-            }
-            if (c == '"') {
-                isInQuotes = true;
-                finishCurrentToken();
+            } else if (c == '[') {
+                finishCurrentToken(i );
+                isInBlock = true;
                 return true;
             }
 
             return false;
-        }
-
-        boolean hasSeenEscapeChar = escapeChar;
-        if (hasSeenEscapeChar) {
-            escapeChar = false;
-            if (c == '"' || c == '\\') {
-                return true;
-            }
         } else {
-            escapeChar = c == '\\';
-            if (c == '"') {
-                isInQuotes = false;
+            if (c == ']') {
+                isInBlock = false;
                 finishCurrentToken(i + 1);
             }
+            return true;
         }
 
-        return true;
     }
 
     private void finishCurrentToken() throws ParseException {
@@ -367,6 +355,9 @@ public class TextFormatTokenizer {
             return;
         }
         if (checkQuoteCase(c)) {
+            return;
+        }
+        if (checkBlock(c)) {
             return;
         }
 

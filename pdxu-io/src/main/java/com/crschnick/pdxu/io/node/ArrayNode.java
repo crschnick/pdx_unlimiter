@@ -7,17 +7,6 @@ import java.util.List;
 
 public abstract class ArrayNode extends Node {
 
-    public void evaluate(NodeEnvironment environment) {
-        final NodeEnvironment[] currentEnvironment = {environment};
-        forEach((s, node) -> {
-            if (s.startsWith("@") && node.isValue()) {
-                var value = node.getValueNode().evaluateValue(currentEnvironment[0]);
-            }else {
-                currentEnvironment[0] = currentEnvironment[0].copy();
-                node.getArrayNode().evaluate(currentEnvironment[0]);
-            }
-        }, false);
-    }
 
     public static ArrayNode array(List<Node> values) {
         // Defensive copy of values

@@ -4,6 +4,6 @@ module com.crschnick.pdxu.io {
     exports com.crschnick.pdxu.io.node;
 
     requires org.apache.commons.lang;
-    requires static org.graalvm.js.scriptengine;
+    requires org.graalvm.sdk;
     requires static lombok;
 }
