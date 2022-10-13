@@ -12,7 +12,7 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
-import com.crschnick.pdxu.model.ck3.Ck3CoatOfArms;
+import com.crschnick.pdxu.model.CoatOfArms;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiConsumer;
@@ -112,7 +112,7 @@ public class RenderCommand implements Runnable {
                     }
 
                     try {
-                        var coa = Ck3CoatOfArms.fromNode(node);
+                        var coa = CoatOfArms.fromNode(node);
                         var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), 512, false);
                         consumer.accept(s, image);
                     } catch (Exception exception) {

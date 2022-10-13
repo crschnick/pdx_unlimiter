@@ -5,6 +5,7 @@ module com.crschnick.pdxu.model {
     requires com.fasterxml.jackson.databind;
 
     requires com.crschnick.pdxu.io;
+    requires static lombok;
 
     exports com.crschnick.pdxu.model;
     exports com.crschnick.pdxu.model.ck3;

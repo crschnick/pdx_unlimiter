@@ -46,7 +46,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        return Ck3TagCache.realmImage(info, tag);
+        return Ck3CoatOfArmsCache.realmImage(info, tag);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 titles.stream().filter(t -> t != null && !t.getType().equals(Ck3Title.Type.BARONY)).collect(Collectors.toList()),
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagCache.titleImage(t, GameFileContext.fromData(info.getData())), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3CoatOfArmsCache.titleImage(t, GameFileContext.fromData(info.getData())), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("title-row");
@@ -123,7 +123,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
                 tooltip,
                 tags,
                 t -> t.getName(),
-                t -> GameImage.imageNode(Ck3TagCache.realmImage(info, t), CLASS_TAG_ICON));
+                t -> GameImage.imageNode(Ck3CoatOfArmsCache.realmImage(info, t), CLASS_TAG_ICON));
 
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add("realm-row");

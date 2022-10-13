@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.model.ck3;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.model.CoatOfArms;
 import com.crschnick.pdxu.model.GameColor;
 
 import java.util.*;
@@ -11,12 +12,12 @@ public class Ck3Title {
     private String key;
     private String name;
     private GameColor color;
-    private Ck3CoatOfArms coatOfArms;
+    private CoatOfArms coatOfArms;
     private Type type;
     public Ck3Title() {
     }
 
-    public Ck3Title(long id, String key, String name, GameColor color, Ck3CoatOfArms coatOfArms, Type type) {
+    public Ck3Title(long id, String key, String name, GameColor color, CoatOfArms coatOfArms, Type type) {
         this.id = id;
         this.key = key;
         this.name = name;
@@ -25,7 +26,7 @@ public class Ck3Title {
         this.type = type;
     }
 
-    public static Map<Long, Ck3Title> createTitleMap(Node node, Map<Long, Ck3CoatOfArms> coaMap) {
+    public static Map<Long, Ck3Title> createTitleMap(Node node, Map<Long, CoatOfArms> coaMap) {
         var tts = node.getNodeForKey("landed_titles").getNodeForKey("landed_titles");
         var map = new HashMap<Long, Ck3Title>();
         tts.forEach((k, v) -> {
@@ -40,7 +41,7 @@ public class Ck3Title {
         return map;
     }
 
-    private static Optional<Ck3Title> fromNode(long id, Node n, Map<Long, Ck3CoatOfArms> coaMap) {
+    private static Optional<Ck3Title> fromNode(long id, Node n, Map<Long, CoatOfArms> coaMap) {
         // If node is "none"
         if (n.isValue()) {
             return Optional.empty();
@@ -60,12 +61,12 @@ public class Ck3Title {
             return Optional.empty();
         }
 
-        Ck3CoatOfArms coatOfArms;
+        CoatOfArms coatOfArms;
         if (n.hasKey("coat_of_arms_id")) {
             var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
             coatOfArms = coaMap.get(coaId);
         } else {
-            coatOfArms = Ck3CoatOfArms.empty();
+            coatOfArms = CoatOfArms.empty();
         }
 
         var color = n.getNodeForKeyIfExistent("color")
@@ -97,7 +98,7 @@ public class Ck3Title {
         return name;
     }
 
-    public Ck3CoatOfArms getCoatOfArms() {
+    public CoatOfArms getCoatOfArms() {
         return coatOfArms;
     }
 

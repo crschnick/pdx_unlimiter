@@ -4,8 +4,6 @@ import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.editor.EditorState;
-import com.crschnick.pdxu.editor.node.EditorRealNode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,13 +19,14 @@ import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 
-public class GuiCk3CoaViewer {
+public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
-    private final GuiCk3CoaViewerState state;
+    private final GuiCoaViewerState<T> state;
 
-    public GuiCk3CoaViewer(EditorState edState, EditorRealNode editorNode) {
-        this.state = new GuiCk3CoaViewerState(edState, editorNode);
+    public GuiCoaViewer(GuiCoaViewerState<T> state) {
+        this.state = state;
     }
+
 
     public void createStage() {
         Stage stage = new Stage();

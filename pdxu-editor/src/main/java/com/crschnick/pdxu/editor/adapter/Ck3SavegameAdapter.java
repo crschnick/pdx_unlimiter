@@ -4,7 +4,8 @@ import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.editor.EditorState;
-import com.crschnick.pdxu.editor.gui.GuiCk3CoaViewer;
+import com.crschnick.pdxu.editor.gui.GuiCoaViewer;
+import com.crschnick.pdxu.editor.gui.GuiCoaViewerState;
 import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
@@ -39,7 +40,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             b.getStyleClass().add("coa-button");
             GuiTooltips.install(b, "Open in coat of arms preview window");
             b.setOnAction(e -> {
-                var viewer = new GuiCk3CoaViewer(state, node);
+                var viewer = new GuiCoaViewer<>(new GuiCoaViewerState.Ck3GuiCoaViewerState(state, node));
                 viewer.createStage();
             });
             return b;

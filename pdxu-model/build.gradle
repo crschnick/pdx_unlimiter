@@ -16,4 +16,7 @@ apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
     implementation project(':pdxu-io')
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }

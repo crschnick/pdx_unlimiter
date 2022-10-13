@@ -1,4 +1,4 @@
-package com.crschnick.pdxu.model.ck3;
+package com.crschnick.pdxu.model;
 
 import com.crschnick.pdxu.io.node.Node;
 
@@ -8,22 +8,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class Ck3CoatOfArms {
+public final class CoatOfArms {
 
     private List<Sub> subs;
 
-    public Ck3CoatOfArms() {}
+    public CoatOfArms() {}
 
-    public Ck3CoatOfArms(List<Sub> subs) {
+    public CoatOfArms(List<Sub> subs) {
         this.subs = subs;
     }
 
-    static Ck3CoatOfArms empty() {
-        return new Ck3CoatOfArms(List.of(Sub.empty()));
+    public static CoatOfArms empty() {
+        return new CoatOfArms(List.of(Sub.empty()));
     }
 
-    public static Map<Long, Ck3CoatOfArms> createCoaMap(Node node) {
-        Map<Long, Ck3CoatOfArms> map = new HashMap<>();
+    public static Map<Long, CoatOfArms> createCoaMap(Node node) {
+        Map<Long, CoatOfArms> map = new HashMap<>();
         if (node == null) {
             return map;
         }
@@ -35,13 +35,13 @@ public final class Ck3CoatOfArms {
         return map;
     }
 
-    public static Ck3CoatOfArms fromNode(Node n) {
+    public static CoatOfArms fromNode(Node n) {
         List<Sub> subs = new ArrayList<>();
         subs.addAll(Sub.fromNode(n));
         for (var subNode : n.getNodesForKey("sub")) {
             subs.addAll(Sub.fromNode(subNode));
         }
-        return new Ck3CoatOfArms(subs);
+        return new CoatOfArms(subs);
     }
 
     public List<Sub> getSubs() {
