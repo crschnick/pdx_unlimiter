@@ -20,14 +20,14 @@ public class Ck3TagRenderer {
         Graphics g = i.getGraphics();
 
         for (var sub : coa.getSubs()) {
-            var rawPatternImg = CoatOfArmsRenderer.pattern(g, sub, ctx, size);
+            var rawPatternImg = CoatOfArmsRenderer.CK3.pattern(g, sub, ctx, size);
             for (var emblem : sub.getEmblems()) {
-                CoatOfArmsRenderer.emblem(i, rawPatternImg, sub, emblem, ctx, size);
+                CoatOfArmsRenderer.CK3.emblem(i, rawPatternImg, sub, emblem, ctx, size);
             }
         }
         if (cloth) {
-            CoatOfArmsRenderer.applyMask(i, GameImage.CK3_COA_OVERLAY);
-            CoatOfArmsRenderer.brighten(i);
+            CoatOfArmsRenderer.CK3.applyMask(i, GameImage.CK3_COA_OVERLAY);
+            CoatOfArmsRenderer.CK3.brighten(i);
         }
 
         return i;
@@ -43,14 +43,14 @@ public class Ck3TagRenderer {
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_MASK,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_MASK);
         var useMask = masks.getOrDefault(governmentShape, GameImage.CK3_REALM_MASK);
-        CoatOfArmsRenderer.applyMask(realmImg, useMask);
-        CoatOfArmsRenderer.brighten(realmImg);
+        CoatOfArmsRenderer.CK3.applyMask(realmImg, useMask);
+        CoatOfArmsRenderer.CK3.brighten(realmImg);
 
-        double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
+        double scaleFactor = (double) size / CoatOfArmsRenderer.CK3.REF_IMG_SIZE;
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        CoatOfArmsRenderer.renderImage(
+        CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 realmImg,
                 scaleFactor,
@@ -64,7 +64,7 @@ public class Ck3TagRenderer {
                 "theocracy_government", GameImage.CK3_REALM_THEOCRACY_FRAME,
                 "tribal_government", GameImage.CK3_REALM_TRIBAL_FRAME);
         var useFrame = frames.getOrDefault(governmentShape, GameImage.CK3_REALM_FRAME);
-        CoatOfArmsRenderer.renderImage(
+        CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 ImageHelper.fromFXImage(useFrame),
                 3 * scaleFactor,
@@ -77,14 +77,14 @@ public class Ck3TagRenderer {
 
     public static Image renderHouseImage(CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
         var houseImg = renderImage(coa, ctx, size, cloth);
-        CoatOfArmsRenderer.applyMask(houseImg, GameImage.CK3_HOUSE_MASK);
+        CoatOfArmsRenderer.CK3.applyMask(houseImg, GameImage.CK3_HOUSE_MASK);
 
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
-        CoatOfArmsRenderer.renderImage(
+        double scaleFactor = (double) size / CoatOfArmsRenderer.CK3.REF_IMG_SIZE;
+        CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 houseImg,
                 20 * scaleFactor,
@@ -92,7 +92,7 @@ public class Ck3TagRenderer {
                 i.getWidth() - (40 * scaleFactor),
                 i.getHeight() - (40 * scaleFactor));
 
-        CoatOfArmsRenderer.renderImage(
+        CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 ImageHelper.fromFXImage(GameImage.CK3_HOUSE_FRAME),
                 -25 * scaleFactor,
@@ -105,14 +105,14 @@ public class Ck3TagRenderer {
 
     public static Image renderTitleImage(CoatOfArms coa, GameFileContext ctx, int size, boolean cloth) {
         var titleImg = renderImage(coa, ctx, size, cloth);
-        CoatOfArmsRenderer.applyMask(titleImg, GameImage.CK3_TITLE_MASK);
+        CoatOfArmsRenderer.CK3.applyMask(titleImg, GameImage.CK3_TITLE_MASK);
 
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
-        CoatOfArmsRenderer.renderImage(
+        double scaleFactor = (double) size / CoatOfArmsRenderer.CK3.REF_IMG_SIZE;
+        CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 titleImg,
                 13 * scaleFactor,
@@ -120,7 +120,7 @@ public class Ck3TagRenderer {
                 i.getWidth() - (28 * scaleFactor),
                 i.getHeight() - (28 * scaleFactor));
 
-        CoatOfArmsRenderer.renderImage(
+        CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 ImageHelper.fromFXImage(GameImage.CK3_TITLE_FRAME),
                 -6 * scaleFactor,

@@ -30,7 +30,7 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
         }
 
         var file = CascadeDirectoryHelper.openFile(
-                Path.of("common").resolve("named_colors").resolve("coa_colors.txt"),
+                Path.of("common").resolve("named_colors").resolve("00_coa_colors.txt"),
                 ctx
         );
         if (file.isPresent()) {

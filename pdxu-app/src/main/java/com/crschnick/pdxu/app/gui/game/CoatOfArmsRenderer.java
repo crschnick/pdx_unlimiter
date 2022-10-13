@@ -13,12 +13,33 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
-import static com.crschnick.pdxu.app.gui.game.Ck3CoatOfArmsCache.getPredefinedColors;
 import static com.crschnick.pdxu.app.util.ColorHelper.*;
 
-public class CoatOfArmsRenderer {
+public abstract class CoatOfArmsRenderer {
+
+    public static class Ck3Renderer extends CoatOfArmsRenderer {
+
+        @Override
+        protected Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext context) {
+            return Ck3CoatOfArmsCache.getPredefinedColors(context);
+        }
+    }
+
+    public static final Ck3Renderer CK3 = new Ck3Renderer();
+
+    public static class Vic3Renderer extends CoatOfArmsRenderer {
+
+        @Override
+        protected Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext context) {
+            return Vic3CoatOfArmsCache.getPredefinedColors(context);
+        }
+    }
+
+    public static final Vic3Renderer VIC3 = new Vic3Renderer();
+
 
     static final int REF_IMG_SIZE = 256;
     private static final int PATTERN_COLOR_1 = 0x00FF0000;
@@ -28,7 +49,9 @@ public class CoatOfArmsRenderer {
     private static final int EMBLEM_COLOR_2 = 0x00FF00;
     private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
-    static void brighten(BufferedImage awtImage) {
+    protected abstract Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext context);
+
+    public  void brighten(BufferedImage awtImage) {
         for (int x = 0; x < awtImage.getWidth(); x++) {
             for (int y = 0; y < awtImage.getHeight(); y++) {
                 int argb = awtImage.getRGB(x, y);
@@ -41,7 +64,7 @@ public class CoatOfArmsRenderer {
         }
     }
 
-    private static void applyCullingMask(BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
+    private  void applyCullingMask(BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
         double xF = (double) patternImage.getWidth() / emblemImage.getWidth();
         double yF = (double) patternImage.getHeight() / emblemImage.getHeight();
         for (int x = 0; x < emblemImage.getWidth(); x++) {
@@ -57,7 +80,7 @@ public class CoatOfArmsRenderer {
         }
     }
 
-    static void applyMask(BufferedImage awtImage, Image mask) {
+    public  void applyMask(BufferedImage awtImage, Image mask) {
         double xF = mask.getWidth() / awtImage.getWidth();
         double yF = mask.getHeight() / awtImage.getHeight();
         for (int x = 0; x < awtImage.getWidth(); x++) {
@@ -74,7 +97,7 @@ public class CoatOfArmsRenderer {
         }
     }
 
-    static BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int size) {
+    public  BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int size) {
         ensureImagesLoaded();
         var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
@@ -114,7 +137,7 @@ public class CoatOfArmsRenderer {
         }
     }
 
-    static void emblem(
+    public  void emblem(
             BufferedImage currentImage,
             BufferedImage rawPatternImage,
             CoatOfArms.Sub sub,
@@ -195,14 +218,14 @@ public class CoatOfArmsRenderer {
         });
     }
 
-    private static void ensureImagesLoaded() {
+    private  void ensureImagesLoaded() {
         // Ugly hack to ensure that all needed images are loaded!
         if (GameImage.CK3_HOUSE_FRAME == ImageHelper.DEFAULT_IMAGE) {
             GameImage.loadCk3Images();
         }
     }
 
-    static void renderImage(Graphics g, java.awt.Image img, double x, double y, double w, double h) {
+    void renderImage(Graphics g, java.awt.Image img, double x, double y, double w, double h) {
         g.drawImage(
                 img,
                 (int) Math.round(x),

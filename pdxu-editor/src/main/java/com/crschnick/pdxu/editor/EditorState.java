@@ -5,6 +5,7 @@ import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.beans.property.BooleanProperty;
@@ -32,7 +33,10 @@ public class EditorState {
     private final boolean savegame;
     private final boolean editable;
 
-    public EditorState(String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean editable) {
+    public EditorState(
+            String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc,
+            boolean savegame, boolean editable
+    ) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
@@ -48,6 +52,10 @@ public class EditorState {
         rootNodes = new HashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
+            /*
+            TODO:
+             */
+            NodeEvaluator.evaluateArrayNode(e.getValue().getArrayNode());
             rootNodes.put(e.getKey(), new EditorRootNode(e.getKey(), counter, this, e.getValue()));
         }
         this.navigation = new EditorNavigation(this);

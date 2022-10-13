@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.editor.gui;
 
-import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
+import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.CoatOfArms;
@@ -16,7 +16,7 @@ public abstract class GuiVic3CoaDisplayType extends GuiCoaDisplayType {
         @Override
         public Image render(CoatOfArms coa, GameFileContext ctx) {
             return ImageHelper.toFXImage(
-                    Ck3TagRenderer.renderImage(coa, ctx, size.get(), false));
+                    Vic3TagRenderer.renderImage(coa, ctx, size.get()));
         }
     };
 
@@ -34,10 +34,6 @@ public abstract class GuiVic3CoaDisplayType extends GuiCoaDisplayType {
             state.updateImage();
         }));
         state.getDisplayType().size.set(256);
-
-
-        var types = new LinkedHashMap<String, GuiVic3CoaDisplayType>();
-        types.put("None", NONE);
 
         box.getChildren().add(options);
     }

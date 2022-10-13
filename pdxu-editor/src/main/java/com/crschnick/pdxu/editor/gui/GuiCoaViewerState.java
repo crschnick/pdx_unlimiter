@@ -52,6 +52,7 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
     }
 
     void init(HBox box) {
+        setup(box);
         refresh();
     }
 
