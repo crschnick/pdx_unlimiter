@@ -12,8 +12,7 @@ public final class Ck3CoatOfArms {
 
     private List<Sub> subs;
 
-    public Ck3CoatOfArms() {
-    }
+    public Ck3CoatOfArms() {}
 
     public Ck3CoatOfArms(List<Sub> subs) {
         this.subs = subs;
@@ -58,10 +57,17 @@ public final class Ck3CoatOfArms {
         private String patternFile;
         private List<String> colors;
         private List<Emblem> emblems;
-        public Sub() {
-        }
 
-        public Sub(double x, double y, double scaleX, double scaleY, String patternFile, List<String> colors, List<Emblem> emblems) {
+        public Sub() {}
+
+        public Sub(
+                double x,
+                double y,
+                double scaleX,
+                double scaleY,
+                String patternFile,
+                List<String> colors,
+                List<Emblem> emblems) {
             this.x = x;
             this.y = y;
             this.scaleX = scaleX;
@@ -93,13 +99,26 @@ public final class Ck3CoatOfArms {
         }
 
         public static Sub subInstance(Node n, Node instanceNode) {
-            var patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
+            var patternFile =
+                    n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
 
             List<String> colors = new ArrayList<>();
-            n.getNodeForKeyIfExistent("color1").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-            n.getNodeForKeyIfExistent("color2").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-            n.getNodeForKeyIfExistent("color3").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
-            n.getNodeForKeyIfExistent("color4").filter(Node::isValue).map(Node::getString).ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color1")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color2")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color3")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(colors::add);
+            n.getNodeForKeyIfExistent("color4")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(colors::add);
 
             List<Emblem> emblems = new ArrayList<>();
             emblems.addAll(n.getNodesForKey("colored_emblem").stream()
@@ -217,57 +236,112 @@ public final class Ck3CoatOfArms {
 
         private static Emblem fromTexturedEmblemNode(Node n) {
             Emblem c = new Emblem();
-            n.getNodeForKeyIfExistent("texture").ifPresentOrElse(tex -> {
-                c.file = tex.getString();
-            }, () -> c.file = "_default.dds");
+            n.getNodeForKeyIfExistent("texture")
+                    .ifPresentOrElse(
+                            tex -> {
+                                c.file = tex.getString();
+                            },
+                            () -> c.file = "_default.dds");
             c.colors = new ArrayList<>();
-            c.instances = List.of(new Instance());
 
-            n.getNodeForKeyIfExistent("mask").ifPresentOrElse(r -> {
-                c.mask = r.getNodeArray().stream().map(Node::getInteger).collect(Collectors.toList());
-            }, () -> c.mask = new ArrayList<>());
+            n.getNodeForKeyIfExistent("mask")
+                    .ifPresentOrElse(
+                            r -> {
+                                c.mask = r.getNodeArray().stream()
+                                        .map(Node::getInteger)
+                                        .collect(Collectors.toList());
+                            },
+                            () -> c.mask = new ArrayList<>());
+
+            c.instances = n.getNodesForKey("instance").stream()
+                    .map(i -> {
+                        Instance instance = new Instance();
+                        i.getNodeForKeyIfExistent("position").ifPresent(p -> {
+                            if (p.isArray()) {
+                                instance.x = p.getNodeArray().get(0).getDouble();
+                                instance.y = p.getNodeArray().get(1).getDouble();
+                            }
+                        });
+                        i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
+                            if (s.isArray()) {
+                                instance.scaleX = s.getNodeArray().get(0).getDouble();
+                                instance.scaleY = s.getNodeArray().get(1).getDouble();
+                            }
+                        });
+                        i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
+                            instance.rotation = r.getDouble();
+                        });
+                        i.getNodeForKeyIfExistent("depth").ifPresent(r -> {
+                            instance.depth = r.getDouble();
+                        });
+                        return instance;
+                    })
+                    .collect(Collectors.toList());
+
+            if (c.instances.size() == 0) {
+                c.instances.add(new Instance());
+            }
 
             return c;
         }
 
         private static Emblem fromColoredEmblemNode(Node n) {
             Emblem c = new Emblem();
-            n.getNodeForKeyIfExistent("texture").ifPresentOrElse(tex -> {
-                c.file = tex.getString();
-            }, () -> c.file = "_default.dds");
+            n.getNodeForKeyIfExistent("texture")
+                    .ifPresentOrElse(
+                            tex -> {
+                                c.file = tex.getString();
+                            },
+                            () -> c.file = "_default.dds");
 
             c.colors = new ArrayList<>();
             // Even color1 can sometimes be missing
-            n.getNodeForKeyIfExistent("color1").filter(Node::isValue).map(Node::getString).ifPresent(c.colors::add);
-            n.getNodeForKeyIfExistent("color2").filter(Node::isValue).map(Node::getString).ifPresent(c.colors::add);
-            n.getNodeForKeyIfExistent("color3").filter(Node::isValue).map(Node::getString).ifPresent(c.colors::add);
+            n.getNodeForKeyIfExistent("color1")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(c.colors::add);
+            n.getNodeForKeyIfExistent("color2")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(c.colors::add);
+            n.getNodeForKeyIfExistent("color3")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .ifPresent(c.colors::add);
 
-            n.getNodeForKeyIfExistent("mask").ifPresentOrElse(r -> {
-                c.mask = r.getNodeArray().stream().map(Node::getInteger).collect(Collectors.toList());
-            }, () -> c.mask = new ArrayList<>());
+            n.getNodeForKeyIfExistent("mask")
+                    .ifPresentOrElse(
+                            r -> {
+                                c.mask = r.getNodeArray().stream()
+                                        .map(Node::getInteger)
+                                        .collect(Collectors.toList());
+                            },
+                            () -> c.mask = new ArrayList<>());
 
-            c.instances = n.getNodesForKey("instance").stream().map(i -> {
-                Instance instance = new Instance();
-                i.getNodeForKeyIfExistent("position").ifPresent(p -> {
-                    if (p.isArray()) {
-                        instance.x = p.getNodeArray().get(0).getDouble();
-                        instance.y = p.getNodeArray().get(1).getDouble();
-                    }
-                });
-                i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
-                    if (s.isArray()) {
-                        instance.scaleX = s.getNodeArray().get(0).getDouble();
-                        instance.scaleY = s.getNodeArray().get(1).getDouble();
-                    }
-                });
-                i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
-                    instance.rotation = r.getDouble();
-                });
-                i.getNodeForKeyIfExistent("depth").ifPresent(r -> {
-                    instance.depth = r.getDouble();
-                });
-                return instance;
-            }).collect(Collectors.toList());
+            c.instances = n.getNodesForKey("instance").stream()
+                    .map(i -> {
+                        Instance instance = new Instance();
+                        i.getNodeForKeyIfExistent("position").ifPresent(p -> {
+                            if (p.isArray()) {
+                                instance.x = p.getNodeArray().get(0).getDouble();
+                                instance.y = p.getNodeArray().get(1).getDouble();
+                            }
+                        });
+                        i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
+                            if (s.isArray()) {
+                                instance.scaleX = s.getNodeArray().get(0).getDouble();
+                                instance.scaleY = s.getNodeArray().get(1).getDouble();
+                            }
+                        });
+                        i.getNodeForKeyIfExistent("rotation").ifPresent(r -> {
+                            instance.rotation = r.getDouble();
+                        });
+                        i.getNodeForKeyIfExistent("depth").ifPresent(r -> {
+                            instance.depth = r.getDouble();
+                        });
+                        return instance;
+                    })
+                    .collect(Collectors.toList());
             if (c.instances.size() == 0) {
                 c.instances.add(new Instance());
             }
