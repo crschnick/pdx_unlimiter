@@ -12,7 +12,8 @@ public final class CoatOfArms {
 
     private List<Sub> subs;
 
-    public CoatOfArms() {}
+    public CoatOfArms() {
+    }
 
     public CoatOfArms(List<Sub> subs) {
         this.subs = subs;
@@ -58,7 +59,8 @@ public final class CoatOfArms {
         private List<String> colors;
         private List<Emblem> emblems;
 
-        public Sub() {}
+        public Sub() {
+        }
 
         public Sub(
                 double x,
@@ -67,7 +69,8 @@ public final class CoatOfArms {
                 double scaleY,
                 String patternFile,
                 List<String> colors,
-                List<Emblem> emblems) {
+                List<Emblem> emblems
+        ) {
             this.x = x;
             this.y = y;
             this.scaleX = scaleX;
@@ -122,12 +125,12 @@ public final class CoatOfArms {
 
             List<Emblem> emblems = new ArrayList<>();
             emblems.addAll(n.getNodesForKey("colored_emblem").stream()
-                    .map(Emblem::fromColoredEmblemNode)
-                    .collect(Collectors.toList()));
+                                   .map(Emblem::fromColoredEmblemNode)
+                                   .collect(Collectors.toList()));
 
             emblems.addAll(n.getNodesForKey("textured_emblem").stream()
-                    .map(Emblem::fromTexturedEmblemNode)
-                    .collect(Collectors.toList()));
+                                   .map(Emblem::fromTexturedEmblemNode)
+                                   .collect(Collectors.toList()));
 
             double x = 0;
             double y = 0;
@@ -241,7 +244,8 @@ public final class CoatOfArms {
                             tex -> {
                                 c.file = tex.getString();
                             },
-                            () -> c.file = "_default.dds");
+                            () -> c.file = "_default.dds"
+                    );
             c.colors = new ArrayList<>();
 
             n.getNodeForKeyIfExistent("mask")
@@ -251,7 +255,8 @@ public final class CoatOfArms {
                                         .map(Node::getInteger)
                                         .collect(Collectors.toList());
                             },
-                            () -> c.mask = new ArrayList<>());
+                            () -> c.mask = new ArrayList<>()
+                    );
 
             c.instances = n.getNodesForKey("instance").stream()
                     .map(i -> {
@@ -292,7 +297,8 @@ public final class CoatOfArms {
                             tex -> {
                                 c.file = tex.getString();
                             },
-                            () -> c.file = "_default.dds");
+                            () -> c.file = "_default.dds"
+                    );
 
             c.colors = new ArrayList<>();
             // Even color1 can sometimes be missing
@@ -316,7 +322,8 @@ public final class CoatOfArms {
                                         .map(Node::getInteger)
                                         .collect(Collectors.toList());
                             },
-                            () -> c.mask = new ArrayList<>());
+                            () -> c.mask = new ArrayList<>()
+                    );
 
             c.instances = n.getNodesForKey("instance").stream()
                     .map(i -> {
@@ -328,7 +335,10 @@ public final class CoatOfArms {
                             }
                         });
                         i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
-                            if (s.isArray()) {
+                            if (s.isArray() && s.getArrayNode().size() == 1) {
+                                instance.scaleX = s.getNodeArray().get(0).getDouble();
+                                instance.scaleY = s.getNodeArray().get(0).getDouble();
+                            } else if (s.isArray()) {
                                 instance.scaleX = s.getNodeArray().get(0).getDouble();
                                 instance.scaleY = s.getNodeArray().get(1).getDouble();
                             }

@@ -135,8 +135,10 @@ public class RenderCommand implements Runnable {
         try (Stream<Path> list = Files.list(directory)) {
             for (Path path : list.toList()) {
                 var content = TextFormatParser.vic3().parse(path);
+
+                // Skip templates
                 if (content.size() == 1) {
-                    content = content.getNodeArray().get(0).getArrayNode();
+                    continue;
                 }
                 NodeEvaluator.evaluateArrayNode(content);
                 content.forEach((s, node) -> {

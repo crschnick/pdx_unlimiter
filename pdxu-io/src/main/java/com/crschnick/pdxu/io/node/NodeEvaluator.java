@@ -5,6 +5,7 @@ import org.graalvm.polyglot.Value;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.Map;
 
 public class NodeEvaluator {
@@ -22,7 +23,9 @@ public class NodeEvaluator {
                 (s, node) -> {
                     if (node.isValue()) {
                         var evaluated = evaluateValueNode(node.getValueNode(), currentEnvironment[0]);
-                        if (evaluated.isValue() && evaluated != node) node.getValueNode().set(evaluated.getValueNode());
+                        if (evaluated.isValue() && evaluated != node) {
+                            node.getValueNode().set(evaluated.getValueNode());
+                        }
                         if (s != null && s.startsWith("@")) {
                             currentEnvironment[0].put(s.substring(1), evaluated);
                         }
@@ -31,14 +34,21 @@ public class NodeEvaluator {
                         evaluateArrayNode(node.getArrayNode(), currentEnvironment[0]);
                     }
                 },
-                true);
+                true
+        );
     }
 
     public static Node evaluateValueNode(ValueNode node, NodeEnvironment environment) {
         var expression = node.getInlineMathExpression();
         if (expression.isPresent()) {
             var string = expression.get();
-            for (Map.Entry<String, Node> entry : environment.getVariables().entrySet()) {
+            // Prevent cases of replacing a variable which is a sub string of another
+            // by ordering them by length descending
+            for (Map.Entry<String, Node> entry : environment.getVariables()
+                    .entrySet()
+                    .stream()
+                    .sorted(Comparator.<Map.Entry<String, Node>>comparingInt(e -> e.getKey().length()).reversed())
+                    .toList()) {
                 if (!entry.getValue().isValue()) {
                     continue;
                 }
@@ -46,7 +56,7 @@ public class NodeEvaluator {
                 string = string.replaceAll(entry.getKey(), entry.getValue().getValueNode().getString());
             }
 
-            try  {
+            try {
                 Value eval = JAVASCRIPT_CONTEXT.eval("js", string);
                 double result = eval.asDouble();
                 return new ValueNode(FORMATTER.format(result), false);
