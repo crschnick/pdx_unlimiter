@@ -16,7 +16,7 @@ public abstract class GuiVic3CoaDisplayType extends GuiCoaDisplayType {
         @Override
         public Image render(CoatOfArms coa, GameFileContext ctx) {
             return ImageHelper.toFXImage(
-                    Vic3TagRenderer.renderImage(coa, ctx, size.get()));
+                    Vic3TagRenderer.renderImage(coa, ctx, (int) (size.get() * 1.5), size.get()));
         }
     };
 

@@ -97,7 +97,7 @@ public abstract class CoatOfArmsRenderer {
         }
     }
 
-    public  BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int size) {
+    public  BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int width, int height) {
         ensureImagesLoaded();
         var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
@@ -125,10 +125,10 @@ public abstract class CoatOfArmsRenderer {
             patternFile.map(p -> ImageHelper.loadAwtImage(p, patternFunction)).ifPresent(img -> {
                 g.drawImage(
                         img,
-                        (int) (sub.getX() * size),
-                        (int) (sub.getY() * size),
-                        (int) (sub.getScaleX() * size),
-                        (int) (sub.getScaleY() * size),
+                        (int) (sub.getX() * width),
+                        (int) (sub.getY() * height),
+                        (int) (sub.getScaleX() * width),
+                        (int) (sub.getScaleY() * height),
                         null);
             });
             return patternFile.map(p -> ImageHelper.loadAwtImage(p, null)).orElse(null);
@@ -143,7 +143,7 @@ public abstract class CoatOfArmsRenderer {
             CoatOfArms.Sub sub,
             CoatOfArms.Emblem emblem,
             GameFileContext ctx,
-            int size
+            int width, int height
     ) {
         ensureImagesLoaded();
         var colors = getPredefinedColors(ctx);
@@ -181,7 +181,7 @@ public abstract class CoatOfArmsRenderer {
             boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
             BufferedImage emblemToCullImage = null;
             if (hasMask) {
-                emblemToCullImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                emblemToCullImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             }
             Graphics2D usedGraphics =
                     hasMask ? (Graphics2D) emblemToCullImage.getGraphics() : (Graphics2D) currentImage.getGraphics();
@@ -189,11 +189,11 @@ public abstract class CoatOfArmsRenderer {
             emblem.getInstances().stream()
                     .sorted(Comparator.comparingDouble(CoatOfArms.Instance::getDepth))
                     .forEach(instance -> {
-                        var scaleX = ((double) size / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
-                        var scaleY = ((double) size / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
+                        var scaleX = ((double) width / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
+                        var scaleY = ((double) height / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
 
-                        var x = size * (sub.getX() + (sub.getScaleX() * instance.getX()));
-                        var y = size * (sub.getY() + (sub.getScaleY() * instance.getY()));
+                        var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
+                        var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
 
                         AffineTransform trans = new AffineTransform();
 

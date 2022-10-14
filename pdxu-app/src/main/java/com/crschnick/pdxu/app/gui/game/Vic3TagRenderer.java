@@ -9,18 +9,18 @@ import java.awt.image.BufferedImage;
 public class Vic3TagRenderer {
 
 
-    public static BufferedImage renderImage(CoatOfArms coa, GameFileContext ctx, int size) {
+    public static BufferedImage renderImage(CoatOfArms coa, GameFileContext ctx, int width, int height) {
         if (coa == null) {
-            return new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         }
 
-        BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage i = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
         for (var sub : coa.getSubs()) {
-            var rawPatternImg = CoatOfArmsRenderer.VIC3.pattern(g, sub, ctx, size);
+            var rawPatternImg = CoatOfArmsRenderer.VIC3.pattern(g, sub, ctx, width, height);
             for (var emblem : sub.getEmblems()) {
-                CoatOfArmsRenderer.VIC3.emblem(i, rawPatternImg, sub, emblem, ctx, size);
+                CoatOfArmsRenderer.VIC3.emblem(i, rawPatternImg, sub, emblem, ctx, width, height);
             }
         }
 

@@ -20,9 +20,9 @@ public class Ck3TagRenderer {
         Graphics g = i.getGraphics();
 
         for (var sub : coa.getSubs()) {
-            var rawPatternImg = CoatOfArmsRenderer.CK3.pattern(g, sub, ctx, size);
+            var rawPatternImg = CoatOfArmsRenderer.CK3.pattern(g, sub, ctx, size, size);
             for (var emblem : sub.getEmblems()) {
-                CoatOfArmsRenderer.CK3.emblem(i, rawPatternImg, sub, emblem, ctx, size);
+                CoatOfArmsRenderer.CK3.emblem(i, rawPatternImg, sub, emblem, ctx, size, size);
             }
         }
         if (cloth) {

@@ -53,6 +53,15 @@ public class RenderCommand implements Runnable {
             paramLabel = "<output>"
     )
     Path output;
+    @CommandLine.Option(
+            names = {
+                    "-s",
+                    "--size"
+            },
+            description = "The image size",
+            paramLabel = "<size>"
+    )
+    int size = 256;
 
     @SneakyThrows
     @Override
@@ -114,7 +123,7 @@ public class RenderCommand implements Runnable {
 
                     try {
                         var coa = CoatOfArms.fromNode(node);
-                        var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), 512, false);
+                        var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), size, false);
                         consumer.accept(s, image);
                     } catch (Exception exception) {
                         System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
@@ -148,7 +157,7 @@ public class RenderCommand implements Runnable {
 
                     try {
                         var coa = CoatOfArms.fromNode(node);
-                        var image = Vic3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.VIC3), 512);
+                        var image = Vic3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.VIC3), (int) (1.5 * size), size);
                         consumer.accept(s, image);
                     } catch (Exception exception) {
                         System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
