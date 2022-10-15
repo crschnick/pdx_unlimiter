@@ -11,6 +11,8 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.CoatOfArms;
@@ -24,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @CommandLine.Command(
@@ -122,7 +125,7 @@ public class RenderCommand implements Runnable {
                     }
 
                     try {
-                        var coa = CoatOfArms.fromNode(node);
+                        var coa = CoatOfArms.fromNode(node, null);
                         var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), size, false);
                         consumer.accept(s, image);
                     } catch (Exception exception) {
@@ -142,29 +145,38 @@ public class RenderCommand implements Runnable {
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
         try (Stream<Path> list = Files.list(directory)) {
-            for (Path path : list.toList()) {
-                var content = TextFormatParser.vic3().parse(path);
+            var all = new LinkedArrayNode(list.map(path -> {
+                ArrayNode content = null;
+                try {
+                    content = TextFormatParser.vic3().parse(path);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return Optional.<ArrayNode>empty();
+                }
 
                 // Skip templates
                 if (content.size() == 1) {
-                    continue;
+                    return Optional.<ArrayNode>empty();
                 }
-                NodeEvaluator.evaluateArrayNode(content);
-                content.forEach((s, node) -> {
-                    if (!node.isArray()) {
-                        return;
-                    }
 
-                    try {
-                        var coa = CoatOfArms.fromNode(node);
-                        var image = Vic3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.VIC3), (int) (1.5 * size), size);
-                        consumer.accept(s, image);
-                    } catch (Exception exception) {
-                        System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
-                        exception.printStackTrace();
-                    }
-                }, false);
-            }
+                NodeEvaluator.evaluateArrayNode(content);
+                return Optional.of(content);
+            }).flatMap(Optional::stream).toList());
+
+            all.forEach((s, node) -> {
+                if (!node.isArray()) {
+                    return;
+                }
+
+                try {
+                    var coa = CoatOfArms.fromNode(node, parent -> all.getNodeForKeyIfExistent(parent).orElse(null));
+                    var image = Vic3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.VIC3), (int) (1.5 * size), size);
+                    consumer.accept(s, image);
+                } catch (Exception exception) {
+                    System.err.println(String.format("Error for %s:", s));
+                    exception.printStackTrace();
+                }
+            }, false);
         }
     }
 }

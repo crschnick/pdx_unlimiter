@@ -48,7 +48,7 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         this.editorNode = editorNode;
         this.displayType = new SimpleObjectProperty<>(initial);
         this.image = new SimpleObjectProperty<>(ImageHelper.DEFAULT_IMAGE);
-        this.parsedCoa = new SimpleObjectProperty<>(CoatOfArms.fromNode(editorNode.getBackingNode()));
+        this.parsedCoa = new SimpleObjectProperty<>(CoatOfArms.fromNode(editorNode.getBackingNode(), null));
     }
 
     void init(HBox box) {
@@ -64,7 +64,7 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             return;
         }
 
-        parsedCoa.set(CoatOfArms.fromNode(editorNode.getBackingNode()));
+        parsedCoa.set(CoatOfArms.fromNode(editorNode.getBackingNode(), null));
         updateImage();
     }
 

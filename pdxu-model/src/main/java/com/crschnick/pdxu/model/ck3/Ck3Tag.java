@@ -68,7 +68,7 @@ public class Ck3Tag {
 
         var house = new Ck3House(
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString()),
-                CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms")));
+                CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null));
         var person = Ck3Person.fromNode(personNode, house);
         var coaMap = CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
                 .getNodeForKey("coat_of_arms_manager_database"));
@@ -89,7 +89,7 @@ public class Ck3Tag {
 
 
         var coa = CoatOfArms.fromNode(
-                n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"));
+                n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"), null);
         var name = n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
         var landedNode = personNode.getNodeForKey("landed_data");

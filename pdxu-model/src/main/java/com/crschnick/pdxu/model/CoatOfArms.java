@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class CoatOfArms {
@@ -30,17 +31,17 @@ public final class CoatOfArms {
         }
 
         node.forEach((k, v) -> {
-            var coa = fromNode(v);
+            var coa = fromNode(v, null);
             map.put(Long.parseLong(k), coa);
         });
         return map;
     }
 
-    public static CoatOfArms fromNode(Node n) {
+    public static CoatOfArms fromNode(Node n, Function<String, Node> parentResolver) {
         List<Sub> subs = new ArrayList<>();
-        subs.addAll(Sub.fromNode(n));
+        subs.addAll(Sub.fromNode(n, parentResolver));
         for (var subNode : n.getNodesForKey("sub")) {
-            subs.addAll(Sub.fromNode(subNode));
+            subs.addAll(Sub.fromNode(subNode, parentResolver));
         }
         return new CoatOfArms(subs);
     }
@@ -84,24 +85,33 @@ public final class CoatOfArms {
             return new Sub(0, 0, 1, 1, "pattern_solid.dds", List.of("black", "black"), List.of(Emblem.empty()));
         }
 
-        public static List<Sub> fromNode(Node n) {
+        public static List<Sub> fromNode(Node n, Function<String, Node> parentResolver) {
             // A sub entry must be an array
             if (!n.isArray()) {
                 return List.of();
             }
 
+            var parentNode = n.getNodeForKeyIfExistent("parent")
+                    .filter(node -> parentResolver != null)
+                    .map(node -> parentResolver.apply(node.getString()))
+                    .orElse(null);
+
             List<Sub> subs = new ArrayList<>();
             if (!n.hasKey("instance")) {
-                subs.add(subInstance(n, null));
+                subs.add(subInstance(n, null, parentResolver));
             } else {
                 for (var in : n.getNodesForKey("instance")) {
-                    subs.add(subInstance(n, in));
+                    subs.add(subInstance(n, in, parentResolver));
                 }
             }
             return subs;
         }
 
-        public static Sub subInstance(Node n, Node instanceNode) {
+        public static Sub subInstance(Node n, Node instanceNode, Function<String, Node> parentResolver) {
+            var parentNode = n.getNodeForKeyIfExistent("parent")
+                    .filter(node -> parentResolver != null)
+                    .map(node -> parentResolver.apply(node.getString()))
+                    .orElse(null);
             var patternFile =
                     n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
 
