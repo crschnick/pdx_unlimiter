@@ -52,24 +52,24 @@ public final class CoatOfArms {
 
     public static final class Sub {
 
-        private double x = 0.5;
-        private double y = 0.5;
+        private double x = 0.0;
+        private double y = 0.0;
         private double scaleX = 1.0;
         private double scaleY = 1.0;
         private String patternFile;
-        private List<String> colors;
-        private List<Emblem> emblems;
+        private String[] colors = new String[4];
+        private List<Emblem> emblems = new ArrayList<>();
 
         public Sub() {
         }
 
-        public Sub(
+        private  Sub(
                 double x,
                 double y,
                 double scaleX,
                 double scaleY,
                 String patternFile,
-                List<String> colors,
+                String[] colors,
                 List<Emblem> emblems
         ) {
             this.x = x;
@@ -82,7 +82,7 @@ public final class CoatOfArms {
         }
 
         static Sub empty() {
-            return new Sub(0, 0, 1, 1, "pattern_solid.dds", List.of("black", "black"), List.of(Emblem.empty()));
+            return new Sub(0, 0, 1, 1, "pattern_solid.dds", new String[] {"black", "black"}, List.of(Emblem.empty()));
         }
 
         public static List<Sub> fromNode(Node n, Function<String, Node> parentResolver) {
@@ -112,57 +112,50 @@ public final class CoatOfArms {
                     .filter(node -> parentResolver != null)
                     .map(node -> parentResolver.apply(node.getString()))
                     .orElse(null);
-            var patternFile =
-                    n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
+            var sub = parentNode != null ? subInstance(parentNode, null, parentResolver) : new Sub();
 
-            List<String> colors = new ArrayList<>();
             n.getNodeForKeyIfExistent("color1")
                     .filter(Node::isValue)
                     .map(Node::getString)
-                    .ifPresent(colors::add);
+                    .ifPresent(s -> sub.colors[0] = s);
             n.getNodeForKeyIfExistent("color2")
                     .filter(Node::isValue)
                     .map(Node::getString)
-                    .ifPresent(colors::add);
+                    .ifPresent(s -> sub.colors[1] = s);
             n.getNodeForKeyIfExistent("color3")
                     .filter(Node::isValue)
                     .map(Node::getString)
-                    .ifPresent(colors::add);
+                    .ifPresent(s -> sub.colors[2] = s);
             n.getNodeForKeyIfExistent("color4")
                     .filter(Node::isValue)
                     .map(Node::getString)
-                    .ifPresent(colors::add);
+                    .ifPresent(s -> sub.colors[3] = s);
 
-            List<Emblem> emblems = new ArrayList<>();
-            emblems.addAll(n.getNodesForKey("colored_emblem").stream()
-                                   .map(Emblem::fromColoredEmblemNode)
-                                   .collect(Collectors.toList()));
+            sub.patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
 
-            emblems.addAll(n.getNodesForKey("textured_emblem").stream()
-                                   .map(Emblem::fromTexturedEmblemNode)
-                                   .collect(Collectors.toList()));
+            sub.emblems.addAll(n.getNodesForKey("colored_emblem").stream()
+                                   .map(Emblem::fromColoredEmblemNode).toList());
 
-            double x = 0;
-            double y = 0;
+            sub.emblems.addAll(n.getNodesForKey("textured_emblem").stream()
+                                   .map(Emblem::fromTexturedEmblemNode).toList());
+
             if (instanceNode != null) {
                 var offset = instanceNode.getNodeForKeyIfExistent("offset").orElse(null);
                 if (offset != null) {
-                    x = offset.getNodeArray().get(0).getDouble();
-                    y = offset.getNodeArray().get(1).getDouble();
+                    sub.x = offset.getNodeArray().get(0).getDouble();
+                    sub.y = offset.getNodeArray().get(1).getDouble();
                 }
             }
 
-            double sx = 1;
-            double sy = 1;
             if (instanceNode != null) {
                 var scale = instanceNode.getNodeForKeyIfExistent("scale").orElse(null);
                 if (scale != null) {
-                    sx = scale.getNodeArray().get(0).getDouble();
-                    sy = scale.getNodeArray().get(1).getDouble();
+                    sub.scaleX = scale.getNodeArray().get(0).getDouble();
+                    sub.scaleY = scale.getNodeArray().get(1).getDouble();
                 }
             }
 
-            return new Sub(x, y, sx, sy, patternFile, colors, emblems);
+            return sub;
         }
 
         public double getX() {
@@ -185,7 +178,7 @@ public final class CoatOfArms {
             return patternFile;
         }
 
-        public List<String> getColors() {
+        public String[] getColors() {
             return colors;
         }
 

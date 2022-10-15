@@ -101,17 +101,17 @@ public abstract class CoatOfArmsRenderer {
         ensureImagesLoaded();
         var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
-            int pColor1 = sub.getColors().size() > 0
+            int pColor1 = sub.getColors()[0] != null
                     ? ColorHelper.intFromColor(
-                            colors.getOrDefault(sub.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT))
+                            colors.getOrDefault(sub.getColors()[0], javafx.scene.paint.Color.TRANSPARENT))
                     : 0;
-            int pColor2 = sub.getColors().size() > 1
+            int pColor2 = sub.getColors()[1] != null
                     ? ColorHelper.intFromColor(
-                            colors.getOrDefault(sub.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT))
+                            colors.getOrDefault(sub.getColors()[1], javafx.scene.paint.Color.TRANSPARENT))
                     : 0;
-            int pColor3 = sub.getColors().size() > 2
+            int pColor3 = sub.getColors()[2] != null
                     ? ColorHelper.intFromColor(
-                            colors.getOrDefault(sub.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT))
+                            colors.getOrDefault(sub.getColors()[2], javafx.scene.paint.Color.TRANSPARENT))
                     : 0;
             Function<Integer, Integer> patternFunction = (Integer rgb) -> {
                 int alpha = rgb & 0xFF000000;
