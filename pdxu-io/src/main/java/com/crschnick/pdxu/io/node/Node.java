@@ -97,6 +97,8 @@ public abstract class Node {
         throw new UnsupportedOperationException();
     }
 
+    public abstract Node copy();
+
     public List<Node> getNodesForKey(String key) {
         throw new UnsupportedOperationException();
     }

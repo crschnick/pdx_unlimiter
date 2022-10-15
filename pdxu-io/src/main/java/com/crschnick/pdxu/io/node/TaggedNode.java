@@ -133,6 +133,11 @@ public final class TaggedNode extends Node {
         return matcher.matchesScalar(new NodeContext(type.getId(), false), 0);
     }
 
+    @Override
+    public Node copy() {
+        return new TaggedNode(type, values.stream().map(valueNode -> valueNode.copy().getValueNode()).toList());
+    }
+
     public enum TagType {
         RGB("rgb"),
         HSV("hsv"),

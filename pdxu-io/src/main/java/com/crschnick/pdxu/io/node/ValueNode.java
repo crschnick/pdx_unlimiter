@@ -139,6 +139,11 @@ public final class ValueNode extends Node {
         return matcher.matchesScalar(context, scalarIndex);
     }
 
+    @Override
+    public Node copy() {
+        return new ValueNode(context, scalarIndex);
+    }
+
     public Optional<String> getInlineMathExpression() {
         if (getString().startsWith("@[") && getString().endsWith("]")) {
             return Optional.of(getString().substring(2, getString().length() - 1));

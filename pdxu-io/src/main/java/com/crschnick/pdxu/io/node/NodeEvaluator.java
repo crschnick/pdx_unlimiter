@@ -64,7 +64,7 @@ public class NodeEvaluator {
                 var test = 0;
             }
         } else if (node.getString().startsWith("@")) {
-            return environment.getVariables().get(node.getString().substring(1));
+            return environment.getVariables().getOrDefault(node.getString().substring(1), node);
         }
 
         return node;

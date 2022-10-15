@@ -4,6 +4,8 @@ package com.crschnick.pdxu.editor.gui;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+import com.crschnick.pdxu.io.node.LinkedArrayNode;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.model.CoatOfArms;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,7 +15,7 @@ import javafx.scene.layout.HBox;
 
 public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
-    public static class Ck3GuiCoaViewerState  extends GuiCoaViewerState<GuiCk3CoaDisplayType> {
+    public static class Ck3GuiCoaViewerState extends GuiCoaViewerState<GuiCk3CoaDisplayType> {
 
         public Ck3GuiCoaViewerState(EditorState state, EditorRealNode editorNode) {
             super(state, editorNode, GuiCk3CoaDisplayType.REALM);
@@ -25,7 +27,7 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         }
     }
 
-    public static class Vic3GuiCoaViewerState  extends GuiCoaViewerState<GuiVic3CoaDisplayType> {
+    public static class Vic3GuiCoaViewerState extends GuiCoaViewerState<GuiVic3CoaDisplayType> {
 
         public Vic3GuiCoaViewerState(EditorState state, EditorRealNode editorNode) {
             super(state, editorNode, GuiVic3CoaDisplayType.NONE);
@@ -38,17 +40,17 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
     }
 
     private ObjectProperty<T> displayType;
-    protected  EditorState state;
+    protected EditorState state;
     private EditorRealNode editorNode;
     private ObjectProperty<CoatOfArms> parsedCoa;
     private ObjectProperty<Image> image;
 
-    GuiCoaViewerState(EditorState state, EditorRealNode editorNode, T  initial) {
+    GuiCoaViewerState(EditorState state, EditorRealNode editorNode, T initial) {
         this.state = state;
         this.editorNode = editorNode;
         this.displayType = new SimpleObjectProperty<>(initial);
         this.image = new SimpleObjectProperty<>(ImageHelper.DEFAULT_IMAGE);
-        this.parsedCoa = new SimpleObjectProperty<>(CoatOfArms.fromNode(editorNode.getBackingNode(), null));
+        this.parsedCoa = new SimpleObjectProperty<>(createCoatOfArms());
     }
 
     void init(HBox box) {
@@ -58,13 +60,22 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
     protected abstract void setup(HBox box);
 
+    private CoatOfArms createCoatOfArms() {
+        var node = new LinkedArrayNode(
+                state.getRootNodes().values().stream().map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode()).peek(
+                        NodeEvaluator::evaluateArrayNode).toList());
+        var coatOfArmsNode = editorNode.getBackingNode().copy();
+        NodeEvaluator.evaluateArrayNode(coatOfArmsNode.getArrayNode());
+        return CoatOfArms.fromNode(coatOfArmsNode, s -> node.getNodeForKeyIfExistent(s).orElse(null));
+    }
+
     void refresh() {
         // The data might not be valid anymore
         if (!editorNode.isValid()) {
             return;
         }
 
-        parsedCoa.set(CoatOfArms.fromNode(editorNode.getBackingNode(), null));
+        parsedCoa.set(createCoatOfArms());
         updateImage();
     }
 
