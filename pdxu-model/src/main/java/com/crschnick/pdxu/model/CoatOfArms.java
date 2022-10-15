@@ -63,7 +63,7 @@ public final class CoatOfArms {
         public Sub() {
         }
 
-        private  Sub(
+        private Sub(
                 double x,
                 double y,
                 double scaleX,
@@ -82,7 +82,10 @@ public final class CoatOfArms {
         }
 
         static Sub empty() {
-            return new Sub(0, 0, 1, 1, "pattern_solid.dds", new String[] {"black", "black"}, List.of(Emblem.empty()));
+            return new Sub(0, 0, 1, 1, "pattern_solid.dds", new String[]{
+                    "black",
+                    "black"
+            }, List.of(Emblem.empty()));
         }
 
         public static List<Sub> fromNode(Node n, Function<String, Node> parentResolver) {
@@ -133,11 +136,14 @@ public final class CoatOfArms {
 
             sub.patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
 
-            sub.emblems.addAll(n.getNodesForKey("colored_emblem").stream()
-                                   .map(Emblem::fromColoredEmblemNode).toList());
-
-            sub.emblems.addAll(n.getNodesForKey("textured_emblem").stream()
-                                   .map(Emblem::fromTexturedEmblemNode).toList());
+            var emblemList = new ArrayList<>(n.getNodesForKey("colored_emblem").stream()
+                                                     .map(Emblem::fromColoredEmblemNode).toList());
+            emblemList.addAll(n.getNodesForKey("textured_emblem").stream()
+                                      .map(Emblem::fromTexturedEmblemNode).toList());
+            if (emblemList.size() > 0) {
+                sub.emblems.clear();
+                sub.emblems.addAll(emblemList);
+            }
 
             if (instanceNode != null) {
                 var offset = instanceNode.getNodeForKeyIfExistent("offset").orElse(null);
