@@ -4,7 +4,10 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
+import com.crschnick.pdxu.io.node.TaggedNode;
+import com.crschnick.pdxu.io.node.ValueNode;
 import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.GameColor;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -12,6 +15,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +163,23 @@ public abstract class CoatOfArmsRenderer {
         );
     }
 
+    private javafx.scene.paint.Color evaluateColor(String color, GameFileContext ctx) {
+        var tagged = Arrays.stream(TaggedNode.COLORS)
+                .filter(tagType -> color != null && color.startsWith(tagType.getId()))
+                .findAny()
+                .map(tagType -> new TaggedNode(tagType, Arrays.stream(color.substring(tagType.getId().length() + 2, color.length() - 1).split(" "))
+                        .filter(s -> s.length() > 0)
+                        .map(s -> new ValueNode(s, false)).toList()));
+        if (tagged.isPresent()) {
+            return ColorHelper.fromGameColor(GameColor.fromColorNode(tagged.get()));
+        }
+
+        var colors = getPredefinedColors(ctx);
+        return color != null
+                ? colors.getOrDefault(color, javafx.scene.paint.Color.TRANSPARENT)
+                : javafx.scene.paint.Color.TRANSPARENT;
+    }
+
     public void emblem(
             BufferedImage currentImage,
             BufferedImage rawPatternImage,
@@ -172,16 +193,9 @@ public abstract class CoatOfArmsRenderer {
         Function<Integer, Integer> customFilter;
         boolean hasColor = emblem.getColors() != null;
         if (emblem.getColors() != null) {
-            var colors = getPredefinedColors(ctx);
-            javafx.scene.paint.Color eColor1 = emblem.getColors()[0] != null
-                    ? colors.getOrDefault(emblem.getColors()[0], javafx.scene.paint.Color.TRANSPARENT)
-                    : javafx.scene.paint.Color.TRANSPARENT;
-            javafx.scene.paint.Color eColor2 = emblem.getColors()[1] != null
-                    ? colors.getOrDefault(emblem.getColors()[1], javafx.scene.paint.Color.TRANSPARENT)
-                    : javafx.scene.paint.Color.TRANSPARENT;
-            javafx.scene.paint.Color eColor3 = emblem.getColors()[2] != null
-                    ? colors.getOrDefault(emblem.getColors()[2], javafx.scene.paint.Color.TRANSPARENT)
-                    : javafx.scene.paint.Color.TRANSPARENT;
+            javafx.scene.paint.Color eColor1 = evaluateColor(emblem.getColors()[0], ctx);
+            javafx.scene.paint.Color eColor2 = evaluateColor(emblem.getColors()[1], ctx);
+            javafx.scene.paint.Color eColor3 = evaluateColor(emblem.getColors()[2], ctx);
 
             customFilter = (Integer rgb) -> {
                 javafx.scene.paint.Color newColor = this.applyMaskPixel(eColor1, 1);

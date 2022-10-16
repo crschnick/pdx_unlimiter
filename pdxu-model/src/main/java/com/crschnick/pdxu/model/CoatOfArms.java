@@ -50,7 +50,7 @@ public final class CoatOfArms {
         return subs;
     }
 
-    public  static final List<String> COLOR_NAMES = List.of("color1", "color2", "color3", "color4");
+    public static final List<String> COLOR_NAMES = List.of("color1", "color2", "color3", "color4", "color5");
 
     public static final class Sub {
 
@@ -59,7 +59,7 @@ public final class CoatOfArms {
         private double scaleX = 1.0;
         private double scaleY = 1.0;
         private String patternFile;
-        private String[] colors = new String[4];
+        private String[] colors = new String[COLOR_NAMES.size()];
         private List<Emblem> emblems = new ArrayList<>();
 
         public Sub() {
@@ -86,7 +86,10 @@ public final class CoatOfArms {
         static Sub empty() {
             return new Sub(0, 0, 1, 1, "pattern_solid.dds", new String[]{
                     "black",
-                    "black"
+                    "black",
+                    null,
+                    null,
+                    null
             }, List.of(Emblem.empty()));
         }
 
@@ -95,11 +98,6 @@ public final class CoatOfArms {
             if (!n.isArray()) {
                 return List.of();
             }
-
-            var parentNode = n.getNodeForKeyIfExistent("parent")
-                    .filter(node -> parentResolver != null)
-                    .map(node -> parentResolver.apply(node.getString()))
-                    .orElse(null);
 
             List<Sub> subs = new ArrayList<>();
             if (!n.hasKey("instance")) {
@@ -120,16 +118,16 @@ public final class CoatOfArms {
             var sub = parentNode != null ? subInstance(parentNode, null, parentResolver) : new Sub();
 
             // Color Values
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
-                        .filter(node -> node.isValue() && !COLOR_NAMES.contains(node.getString()))
+                        .filter(node -> (node.isValue() || node.isTagged()) && !COLOR_NAMES.contains(node.getString()))
                         .map(Node::getString)
                         .ifPresent(s -> sub.colors[finalI] = s);
             }
 
             // Color References
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
                         .filter(node -> node.isValue() && COLOR_NAMES.contains(node.getString()))
@@ -316,7 +314,7 @@ public final class CoatOfArms {
             for (int i = 0; i < 3; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
-                        .filter(node -> node.isValue() && !COLOR_NAMES.contains(node.getString()))
+                        .filter(node -> (node.isValue() || node.isTagged()) && !COLOR_NAMES.contains(node.getString()))
                         .map(Node::getString)
                         .ifPresent(s -> c.colors[finalI] = s);
             }

@@ -63,6 +63,11 @@ public final class TaggedNode extends Node {
         return null;
     }
 
+    @Override
+    public String getString() {
+        return toString();
+    }
+
     public void set(TaggedNode other) {
         this.type = other.getType();
         this.values = Collections.unmodifiableList(other.getValues());
