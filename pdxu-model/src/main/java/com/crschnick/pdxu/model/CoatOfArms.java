@@ -123,7 +123,7 @@ public final class CoatOfArms {
             for (int i = 0; i < 4; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
-                        .filter(node -> node.isValue() && node.getValueNode().isQuoted())
+                        .filter(node -> node.isValue() && !COLOR_NAMES.contains(node.getString()))
                         .map(Node::getString)
                         .ifPresent(s -> sub.colors[finalI] = s);
             }
@@ -132,9 +132,8 @@ public final class CoatOfArms {
             for (int i = 0; i < 4; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
-                        .filter(node -> node.isValue() && !node.getValueNode().isQuoted())
+                        .filter(node -> node.isValue() && COLOR_NAMES.contains(node.getString()))
                         .map(node -> COLOR_NAMES.indexOf(node.getString()))
-                        .filter(referenceIndex -> referenceIndex != -1)
                         .ifPresent(referenceIndex -> sub.colors[finalI] = sub.colors[referenceIndex]);
             }
 
@@ -317,7 +316,7 @@ public final class CoatOfArms {
             for (int i = 0; i < 3; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
-                        .filter(node -> node.isValue() && node.getValueNode().isQuoted())
+                        .filter(node -> node.isValue() && !COLOR_NAMES.contains(node.getString()))
                         .map(Node::getString)
                         .ifPresent(s -> c.colors[finalI] = s);
             }
@@ -326,9 +325,8 @@ public final class CoatOfArms {
             for (int i = 0; i < 3; i++) {
                 int finalI = i;
                 n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
-                        .filter(node -> node.isValue() && !node.getValueNode().isQuoted())
+                        .filter(node -> node.isValue() && COLOR_NAMES.contains(node.getString()))
                         .map(node -> COLOR_NAMES.indexOf(node.getString()))
-                        .filter(referenceIndex -> referenceIndex != -1)
                         .ifPresent(referenceIndex -> c.colors[finalI] = sub.colors[referenceIndex]);
             }
 
