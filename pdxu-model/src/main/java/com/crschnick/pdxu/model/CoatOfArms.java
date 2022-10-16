@@ -110,6 +110,8 @@ public final class CoatOfArms {
             return subs;
         }
 
+        private static List<String> COLOR_NAMES = List.of("color1", "color2", "color3", "color4");
+
         public static Sub subInstance(Node n, Node instanceNode, Function<String, Node> parentResolver) {
             var parentNode = n.getNodeForKeyIfExistent("parent")
                     .filter(node -> parentResolver != null)
@@ -117,22 +119,24 @@ public final class CoatOfArms {
                     .orElse(null);
             var sub = parentNode != null ? subInstance(parentNode, null, parentResolver) : new Sub();
 
-            n.getNodeForKeyIfExistent("color1")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(s -> sub.colors[0] = s);
-            n.getNodeForKeyIfExistent("color2")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(s -> sub.colors[1] = s);
-            n.getNodeForKeyIfExistent("color3")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(s -> sub.colors[2] = s);
-            n.getNodeForKeyIfExistent("color4")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(s -> sub.colors[3] = s);
+            // Color Values
+            for (int i = 0; i < 4; i++) {
+                int finalI = i;
+                n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
+                        .filter(node -> node.isValue() && node.getValueNode().isQuoted())
+                        .map(Node::getString)
+                        .ifPresent(s -> sub.colors[finalI] = s);
+            }
+
+            // Color References
+            for (int i = 0; i < 4; i++) {
+                int finalI = i;
+                n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
+                        .filter(node -> node.isValue() && !node.getValueNode().isQuoted())
+                        .map(node -> COLOR_NAMES.indexOf(node.getString()))
+                        .filter(referenceIndex -> referenceIndex != -1)
+                        .ifPresent(referenceIndex -> sub.colors[finalI] = sub.colors[referenceIndex]);
+            }
 
             n.getNodeForKeyIfExistent("pattern").map(Node::getString).ifPresent(s -> sub.patternFile = s);
 
