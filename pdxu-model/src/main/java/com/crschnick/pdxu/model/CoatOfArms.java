@@ -134,7 +134,7 @@ public final class CoatOfArms {
                     .map(Node::getString)
                     .ifPresent(s -> sub.colors[3] = s);
 
-            sub.patternFile = n.getNodeForKeyIfExistent("pattern").map(Node::getString).orElse(null);
+            n.getNodeForKeyIfExistent("pattern").map(Node::getString).ifPresent(s -> sub.patternFile = s);
 
             var emblemList = new ArrayList<>(n.getNodesForKey("colored_emblem").stream()
                                                      .map(Emblem::fromColoredEmblemNode).toList());

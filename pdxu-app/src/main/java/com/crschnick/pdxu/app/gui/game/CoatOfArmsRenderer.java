@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -45,9 +46,6 @@ public abstract class CoatOfArmsRenderer {
     private static final int PATTERN_COLOR_1 = 0x00FF0000;
     private static final int PATTERN_COLOR_2 = 0x00FFFF00;
     private static final int PATTERN_COLOR_3 = 0x00FFFFFF;
-    private static final int EMBLEM_COLOR_1 = 0x000080;
-    private static final int EMBLEM_COLOR_2 = 0x00FF00;
-    private static final int EMBLEM_COLOR_3 = 0xFF0080;
 
     protected abstract Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext context);
 
@@ -137,6 +135,23 @@ public abstract class CoatOfArmsRenderer {
         }
     }
 
+    public javafx.scene.paint.Color applyMaskPixel(javafx.scene.paint.Color colour, double maskValue) {
+        return new javafx.scene.paint.Color(
+                colour.getRed() * maskValue,
+                colour.getGreen() * maskValue,
+                colour.getBlue() * maskValue,
+                maskValue);
+    }
+
+    public javafx.scene.paint.Color overlayColors(javafx.scene.paint.Color bottom, javafx.scene.paint.Color top) {
+        double alpha = top.getOpacity() + bottom.getOpacity() * (1 - top.getOpacity());
+        return new javafx.scene.paint.Color(
+                (top.getRed() * top.getOpacity() + bottom.getRed() * bottom.getOpacity() *(1-top.getOpacity())) / alpha,
+                (top.getGreen() * top.getOpacity() + bottom.getGreen() * bottom.getOpacity() *(1-top.getOpacity())) / alpha,
+                (top.getBlue() * top.getOpacity() + bottom.getBlue() * bottom.getOpacity() *(1-top.getOpacity())) / alpha,
+                alpha);
+    }
+
     public  void emblem(
             BufferedImage currentImage,
             BufferedImage rawPatternImage,
@@ -147,18 +162,15 @@ public abstract class CoatOfArmsRenderer {
     ) {
         ensureImagesLoaded();
         var colors = getPredefinedColors(ctx);
-        int eColor1 = emblem.getColors().size() > 0
-                ? ColorHelper.intFromColor(
-                        colors.getOrDefault(emblem.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT))
-                : 0;
-        int eColor2 = emblem.getColors().size() > 1
-                ? ColorHelper.intFromColor(
-                        colors.getOrDefault(emblem.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT))
-                : 0;
-        int eColor3 = emblem.getColors().size() > 2
-                ? ColorHelper.intFromColor(
-                        colors.getOrDefault(emblem.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT))
-                : 0;
+        javafx.scene.paint.Color eColor1 = emblem.getColors().size() > 0
+                ? colors.getOrDefault(emblem.getColors().get(0), javafx.scene.paint.Color.TRANSPARENT)
+                : javafx.scene.paint.Color.TRANSPARENT;
+        javafx.scene.paint.Color eColor2 = emblem.getColors().size() > 1
+                ? colors.getOrDefault(emblem.getColors().get(1), javafx.scene.paint.Color.TRANSPARENT)
+                : javafx.scene.paint.Color.TRANSPARENT;
+        javafx.scene.paint.Color eColor3 = emblem.getColors().size() > 2
+                ? colors.getOrDefault(emblem.getColors().get(2), javafx.scene.paint.Color.TRANSPARENT)
+                : javafx.scene.paint.Color.TRANSPARENT;
 
         boolean hasColor = emblem.getColors().size() > 0;
         Function<Integer, Integer> customFilter = (Integer rgb) -> {
@@ -166,10 +178,16 @@ public abstract class CoatOfArmsRenderer {
                 return rgb;
             }
 
+            javafx.scene.paint.Color newColor = this.applyMaskPixel(eColor1, 1);
+            newColor = this.overlayColors(newColor, this.applyMaskPixel(eColor2, getGreen(rgb) / 255.0));
+            newColor = this.overlayColors(newColor, this.applyMaskPixel(eColor3, getRed(rgb) / 255.0));
+            int darkShadingA = 255 - Math.min(getBlue(rgb) * 2, 255);
+            newColor = this.overlayColors(newColor, javafx.scene.paint.Color.color(0, 0, 0, darkShadingA / 255.0));
+            int lightShadingA = Math.round(Math.max(Math.min((getBlue(rgb) - 127) * 2, 255), 0));
+            newColor = this.overlayColors(newColor, javafx.scene.paint.Color.color(1, 1, 1, lightShadingA / 255.0));
+            int usedColor = intFromColor(newColor) & 0x00FFFFFF;
+
             int alpha = rgb & 0xFF000000;
-            int color = rgb & 0x00FFFFFF;
-            int colorIndex = pickClosestColor(color, EMBLEM_COLOR_1, EMBLEM_COLOR_2, EMBLEM_COLOR_3);
-            int usedColor = new int[] {eColor1, eColor2, eColor3}[colorIndex] & 0x00FFFFFF;
             return alpha + usedColor;
         };
 
@@ -196,7 +214,6 @@ public abstract class CoatOfArmsRenderer {
                         var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
 
                         AffineTransform trans = new AffineTransform();
-
                         trans.translate(x, y);
                         trans.scale(scaleX, scaleY);
                         trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
@@ -208,7 +225,7 @@ public abstract class CoatOfArmsRenderer {
                             trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
                         }
 
-                        usedGraphics.drawImage(img, trans, null);
+                        usedGraphics.drawImage(img, new AffineTransformOp(trans, AffineTransformOp.TYPE_BICUBIC), 0, 0);
                     });
 
             if (hasMask) {
