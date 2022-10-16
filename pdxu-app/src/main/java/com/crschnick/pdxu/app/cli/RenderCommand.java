@@ -119,6 +119,7 @@ public class RenderCommand implements Runnable {
         try (Stream<Path> list = Files.list(directory)) {
             for (Path path : list.toList()) {
                 var content = TextFormatParser.ck3().parse(path);
+                NodeEvaluator.evaluateArrayNode(content);
                 content.forEach((s, node) -> {
                     if (!node.isArray()) {
                         return;

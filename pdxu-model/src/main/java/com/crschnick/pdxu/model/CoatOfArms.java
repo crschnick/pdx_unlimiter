@@ -50,6 +50,8 @@ public final class CoatOfArms {
         return subs;
     }
 
+    public  static final List<String> COLOR_NAMES = List.of("color1", "color2", "color3", "color4");
+
     public static final class Sub {
 
         private double x = 0.0;
@@ -110,8 +112,6 @@ public final class CoatOfArms {
             return subs;
         }
 
-        private static List<String> COLOR_NAMES = List.of("color1", "color2", "color3", "color4");
-
         public static Sub subInstance(Node n, Node instanceNode, Function<String, Node> parentResolver) {
             var parentNode = n.getNodeForKeyIfExistent("parent")
                     .filter(node -> parentResolver != null)
@@ -141,7 +141,7 @@ public final class CoatOfArms {
             n.getNodeForKeyIfExistent("pattern").map(Node::getString).ifPresent(s -> sub.patternFile = s);
 
             var emblemList = new ArrayList<>(n.getNodesForKey("colored_emblem").stream()
-                                                     .map(Emblem::fromColoredEmblemNode).toList());
+                                                     .map(node -> Emblem.fromColoredEmblemNode(node, sub)).toList());
             emblemList.addAll(n.getNodesForKey("textured_emblem").stream()
                                       .map(Emblem::fromTexturedEmblemNode).toList());
             if (emblemList.size() > 0) {
@@ -155,9 +155,7 @@ public final class CoatOfArms {
                     sub.x = offset.getNodeArray().get(0).getDouble();
                     sub.y = offset.getNodeArray().get(1).getDouble();
                 }
-            }
 
-            if (instanceNode != null) {
                 var scale = instanceNode.getNodeForKeyIfExistent("scale").orElse(null);
                 if (scale != null) {
                     sub.scaleX = scale.getNodeArray().get(0).getDouble();
@@ -238,14 +236,14 @@ public final class CoatOfArms {
 
         private String file;
         private List<Integer> mask;
-        private List<String> colors;
+        private String[] colors;
         private List<Instance> instances;
 
         private static Emblem empty() {
             Emblem c = new Emblem();
             c.file = "_default.dds";
             c.mask = new ArrayList<>();
-            c.colors = List.of();
+            c.colors = new String[3];
             c.instances = List.of(new Instance());
             return c;
         }
@@ -259,7 +257,7 @@ public final class CoatOfArms {
                             },
                             () -> c.file = "_default.dds"
                     );
-            c.colors = new ArrayList<>();
+            c.colors = null;
 
             n.getNodeForKeyIfExistent("mask")
                     .ifPresentOrElse(
@@ -303,7 +301,7 @@ public final class CoatOfArms {
             return c;
         }
 
-        private static Emblem fromColoredEmblemNode(Node n) {
+        private static Emblem fromColoredEmblemNode(Node n, Sub sub) {
             Emblem c = new Emblem();
             n.getNodeForKeyIfExistent("texture")
                     .ifPresentOrElse(
@@ -313,20 +311,26 @@ public final class CoatOfArms {
                             () -> c.file = "_default.dds"
                     );
 
-            c.colors = new ArrayList<>();
-            // Even color1 can sometimes be missing
-            n.getNodeForKeyIfExistent("color1")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(c.colors::add);
-            n.getNodeForKeyIfExistent("color2")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(c.colors::add);
-            n.getNodeForKeyIfExistent("color3")
-                    .filter(Node::isValue)
-                    .map(Node::getString)
-                    .ifPresent(c.colors::add);
+            c.colors = new String[3];
+
+            // Color Values
+            for (int i = 0; i < 3; i++) {
+                int finalI = i;
+                n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
+                        .filter(node -> node.isValue() && node.getValueNode().isQuoted())
+                        .map(Node::getString)
+                        .ifPresent(s -> c.colors[finalI] = s);
+            }
+
+            // Instance Color References
+            for (int i = 0; i < 3; i++) {
+                int finalI = i;
+                n.getNodeForKeyIfExistent(COLOR_NAMES.get(i))
+                        .filter(node -> node.isValue() && !node.getValueNode().isQuoted())
+                        .map(node -> COLOR_NAMES.indexOf(node.getString()))
+                        .filter(referenceIndex -> referenceIndex != -1)
+                        .ifPresent(referenceIndex -> c.colors[finalI] = sub.colors[referenceIndex]);
+            }
 
             n.getNodeForKeyIfExistent("mask")
                     .ifPresentOrElse(
@@ -375,7 +379,7 @@ public final class CoatOfArms {
             return file;
         }
 
-        public List<String> getColors() {
+        public String[] getColors() {
             return colors;
         }
 
