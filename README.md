@@ -49,8 +49,8 @@ They are also now mac builds available, although they are very experimental.
 They are not signed at all, so they will be untrusted and you manually have to remove the quarantine by executing the following command:
 `xattr -d com.apple.quarantine Pdx-Unlimiter*.dmg`
 
-- [Apple Silicon](https://github.com/crschnick/pdx_unlimiter/releases/download/2.10.2/Pdx-Unlimiter-AppleSilicon.dmg)
-- [Apple Intel](https://github.com/crschnick/pdx_unlimiter/releases/download/2.10.2/Pdx-Unlimiter-Intel.dmg)
+- [Apple Silicon](https://github.com/crschnick/pdx_unlimiter/releases/download/2.10.4/Pdx-Unlimiter-AppleSilicon.dmg)
+- [Apple Intel](https://github.com/crschnick/pdx_unlimiter/releases/download/2.10.4/Pdx-Unlimiter-Intel.dmg)
 
 # Features
 
