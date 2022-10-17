@@ -135,6 +135,11 @@ public final class CoatOfArms {
                         .ifPresent(referenceIndex -> sub.colors[finalI] = sub.colors[referenceIndex]);
             }
 
+            // Ugly fix to override colored emblem colors of parent
+            var parentEmblemList = new ArrayList<>(parentNode != null ? parentNode.getNodesForKey("colored_emblem").stream()
+                    .map(node -> Emblem.fromColoredEmblemNode(node, sub)).toList() : List.of());
+            sub.emblems = parentEmblemList;
+
             n.getNodeForKeyIfExistent("pattern").map(Node::getString).ifPresent(s -> sub.patternFile = s);
 
             var emblemList = new ArrayList<>(n.getNodesForKey("colored_emblem").stream()
