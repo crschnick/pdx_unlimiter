@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 @CommandLine.Command(
         name = "render",
+        header = "Renders all coat of arms images for a given game and saves them into a directory.",
         sortOptions = false
 )
 public class RenderCommand implements Runnable {
@@ -56,12 +57,23 @@ public class RenderCommand implements Runnable {
             paramLabel = "<output>"
     )
     Path output;
+
+    @CommandLine.Option(
+            names = {
+                    "-l",
+                    "--selector"
+            },
+            description = "An optional selector. If set, only the selected coat of arms is rendered and outputted.",
+            paramLabel = "<selector>"
+    )
+    String selector;
+
     @CommandLine.Option(
             names = {
                     "-s",
                     "--size"
             },
-            description = "The image size",
+            description = "The output image size",
             paramLabel = "<size>"
     )
     int size = 256;
@@ -90,18 +102,11 @@ public class RenderCommand implements Runnable {
         };
 
         switch (game) {
-            case EU4 -> {
-            }
-            case HOI4 -> {
+            case EU4, VIC2, CK2, HOI4, STELLARIS -> {
+                throw new IllegalArgumentException("Unsupported game");
             }
             case CK3 -> {
                 ck3(map);
-            }
-            case STELLARIS -> {
-            }
-            case CK2 -> {
-            }
-            case VIC2 -> {
             }
             case VIC3 -> {
                 vic3(map);
@@ -116,25 +121,44 @@ public class RenderCommand implements Runnable {
                 .resolve("common")
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
-        try (Stream<Path> list = Files.list(directory)) {
-            for (Path path : list.toList()) {
-                var content = TextFormatParser.ck3().parse(path);
-                NodeEvaluator.evaluateArrayNode(content);
-                content.forEach((s, node) -> {
-                    if (!node.isArray()) {
-                        return;
-                    }
 
-                    try {
-                        var coa = CoatOfArms.fromNode(node, null);
-                        var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), size, false);
-                        consumer.accept(s, image);
-                    } catch (Exception exception) {
-                        System.err.println(String.format("Error for %s@%s:", s, directory.relativize(path)));
-                        exception.printStackTrace();
-                    }
-                }, false);
-            }
+        try (Stream<Path> list = Files.list(directory)) {
+            var all = new LinkedArrayNode(list.map(path -> {
+                ArrayNode content = null;
+                try {
+                    content = TextFormatParser.ck3().parse(path);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return Optional.<ArrayNode>empty();
+                }
+
+                // Skip templates
+                if (content.size() == 1) {
+                    return Optional.<ArrayNode>empty();
+                }
+
+                NodeEvaluator.evaluateArrayNode(content);
+                return Optional.of(content);
+            }).flatMap(Optional::stream).toList());
+
+            all.forEach((s, node) -> {
+                if (!node.isArray()) {
+                    return;
+                }
+
+                if (selector != null && !s.equalsIgnoreCase(selector)) {
+                    return;
+                }
+
+                try {
+                    var coa = CoatOfArms.fromNode(node, null);
+                    var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), size, false);
+                    consumer.accept(s, image);
+                } catch (Exception exception) {
+                    System.err.println(String.format("Error for %s:", s));
+                    exception.printStackTrace();
+                }
+            }, false);
         }
     }
 
@@ -166,6 +190,10 @@ public class RenderCommand implements Runnable {
 
             all.forEach((s, node) -> {
                 if (!node.isArray()) {
+                    return;
+                }
+
+                if (selector != null && !s.equalsIgnoreCase(selector)) {
                     return;
                 }
 

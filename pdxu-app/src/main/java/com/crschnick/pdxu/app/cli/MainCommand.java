@@ -6,12 +6,18 @@ import picocli.CommandLine;
 
 import java.util.List;
 
-@CommandLine.Command(subcommands = {RenderCommand.class})
+@CommandLine.Command(
+        subcommands = {
+                CommandLine.HelpCommand.class,
+                RenderCommand.class
+        },
+        header = "Starts up the Pdx-Unlimiter desktop application."
+)
 class MainCommand implements Runnable {
 
 
     @CommandLine.Parameters(
-            description = "Optional input files",
+            description = "Optional input files to import",
             paramLabel = "<inputs>"
     )
     List<String> inputs = List.of();

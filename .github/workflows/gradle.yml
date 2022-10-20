@@ -29,6 +29,11 @@ jobs:
         run: echo $JAVA_HOME
       - name: Verify Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
+        
+      - name: Install create-dmg for macOS
+        run: ${{ !startsWith(matrix.os, 'mac') }} || brew install create-dmg
+        shell: bash
+
       - name: Execute dist build
         run: ./gradle/gradlew --info createDist
 
