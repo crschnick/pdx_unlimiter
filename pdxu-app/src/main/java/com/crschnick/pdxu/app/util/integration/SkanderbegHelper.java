@@ -22,7 +22,7 @@ import java.nio.file.Files;
 public class SkanderbegHelper {
 
     public static <T, I extends SavegameInfo<T>> void uploadSavegame(SavegameEntry<T, I> entry) {
-        if (Settings.getInstance().skanderbegApiKey.getValue() != null) {
+        if (Settings.getInstance().skanderbegApiKey.getValue() == null) {
             GuiErrorReporter.showSimpleErrorMessage("Missing skanderbeg.pm API key. " +
                     "To use this functionality, set it in the settings menu.");
             return;
