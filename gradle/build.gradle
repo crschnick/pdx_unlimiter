@@ -1,5 +1,7 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
+import java.util.concurrent.TimeUnit
+
 plugins {
     id 'org.beryx.jlink' version '2.24.4'
     id 'org.jreleaser' version '1.0.0'
@@ -168,7 +170,7 @@ task createDist(type: Zip, dependsOn: jpackage) {
 
     doLast {
         if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-            exec "$projectDir/misc/mac_intel_dmg.sh"
+           Runtime.getRuntime().exec("$projectDir/misc/mac_intel_dmg.sh").waitFor(10, TimeUnit.MINUTES)
         }
     }
 }

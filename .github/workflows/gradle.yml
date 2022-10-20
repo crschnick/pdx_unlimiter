@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: pdx_unlimiter-mac-dev
-          path: build/pdx_unlimiter-mac.zip
+          path: build/pdx_unlimiter-mac_intel.dmg
           if-no-files-found: ignore
 
       - name: Upload Windows dist as an artifact
