@@ -10,6 +10,7 @@ def canonicalVersion = file('canonical_version').text
 
 apply from: 'gradle/jreleaser.gradle'
 apply from: 'gradle/java.gradle'
+apply from: 'gradle/mods.gradle'
 
 clean {
     setDelete(Set.of())

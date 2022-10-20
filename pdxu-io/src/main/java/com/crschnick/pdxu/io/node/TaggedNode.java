@@ -49,7 +49,7 @@ public final class TaggedNode extends Node {
                 return null;
             }
 
-            if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h' && ctx.getData()[begin] != 'L') {
+            if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h' && ctx.getData()[begin] != 'l' && ctx.getData()[begin] != 'L') {
                 return null;
             }
 
@@ -148,7 +148,8 @@ public final class TaggedNode extends Node {
         HSV("hsv"),
         HSV360("hsv360"),
         HEX("hex"),
-        LIST("LIST");
+        LIST("list"),
+        UPPERCASE_LIST("LIST");
 
         private final String id;
         private final byte[] bytes;

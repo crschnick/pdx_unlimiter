@@ -36,7 +36,7 @@ public final class TextFormatParser {
     public static TextFormatParser vic3() {
         return new TextFormatParser(
                 StandardCharsets.UTF_8,
-                TaggedNode.COLORS,
+                TaggedNode.ALL,
                 s -> false);
     }
 

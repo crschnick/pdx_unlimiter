@@ -3,4 +3,5 @@ tags={
 	"Utilities"
 }
 name="Pdx-Unlimiter"
-supported_version="1.7.*"
+supported_version="1.34.*.*"
+path="mod/pdxu"

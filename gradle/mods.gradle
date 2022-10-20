@@ -1,0 +1,19 @@
+task exportMods(type: DefaultTask) {
+    doLast {
+        def ck3Dir = "${System.getProperty('user.home')}/Documents/Paradox Interactive/Crusader Kings III/mod"
+        file("$ck3Dir/pdxu.mod").delete()
+        file("$ck3Dir/pdxu").delete()
+        copy {
+            from file("$projectDir/misc/mod/ck3/")
+            into ck3Dir
+        }
+
+        def eu4Dir = "${System.getProperty('user.home')}/Documents/Paradox Interactive/Europa Universalis IV/mod"
+        file("$eu4Dir/pdxu.mod").delete()
+        file("$eu4Dir/pdxu").delete()
+        copy {
+            from file("$projectDir/misc/mod/eu4/")
+            into eu4Dir
+        }
+    }
+}
