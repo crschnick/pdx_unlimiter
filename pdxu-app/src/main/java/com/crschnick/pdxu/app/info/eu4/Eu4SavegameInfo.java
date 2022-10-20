@@ -2,7 +2,8 @@ package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.app.info.SavegameInfoException;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
@@ -25,8 +26,8 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public Eu4SavegameInfo() {}
 
-    public Eu4SavegameInfo(ArrayNode node) throws Exception {
-        super(node);
+    public Eu4SavegameInfo(SavegameContent content) throws SavegameInfoException {
+        super(content);
     }
 
     @Override

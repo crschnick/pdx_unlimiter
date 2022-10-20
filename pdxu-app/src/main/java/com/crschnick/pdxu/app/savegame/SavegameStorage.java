@@ -21,7 +21,7 @@ import com.crschnick.pdxu.app.util.ConfigHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
-import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameFormatException;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
@@ -38,8 +38,8 @@ import javafx.scene.image.Image;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
-import org.apache.commons.lang3.function.FailableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger;
     private final Class<I> infoClass;
-    private final FailableFunction<Node, I, SavegameInfoException> infoFactory;
+    private final FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -76,9 +76,11 @@ public abstract class SavegameStorage<
             GameDateType dateType,
             SavegameType type,
             Class<I> infoClass) {
-        this.infoFactory = node -> {
+        this.infoFactory = (node, melted) -> {
             try {
-                return (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
+                var created = (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
+                created.getData().setBinary(melted);
+                return created;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 ErrorHandler.handleTerminalException(e);
                 return null;
@@ -470,7 +472,7 @@ public abstract class SavegameStorage<
             public void success(SavegameParseResult.Success s) {
                 try {
                     logger.debug("Parsing was successful. Loading info ...");
-                    I info = infoFactory.apply(s.combinedNode());
+                    I info = infoFactory.apply(s.content, melted);
                     e.load(info);
                     getSavegameCampaign(e).onSavegameLoad(e);
 
@@ -583,7 +585,7 @@ public abstract class SavegameStorage<
             var c = succ.content;
             type.generateNewCampaignIdHeuristic(c);
             var targetCollection = type.getCampaignIdHeuristic(c);
-            var info = infoFactory.apply(succ.combinedNode());
+            var info = infoFactory.apply(succ.content, false);
             var name = getSavegameCampaign(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
             addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name);
             saveData();
@@ -689,7 +691,7 @@ public abstract class SavegameStorage<
                 logger.debug("Parsing was successful. Loading info ...");
                 I info = null;
                 try {
-                    info = infoFactory.apply(s.combinedNode());
+                    info = infoFactory.apply(s.content, melted);
                 } catch (SavegameInfoException e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;
@@ -740,10 +742,12 @@ public abstract class SavegameStorage<
 
         byte[] bytes;
         String checksum;
+        boolean melted = false;
         try {
             bytes = Files.readAllBytes(getSavegameFile(e));
             checksum = checksum(bytes);
             if (type.isBinary(bytes)) {
+                melted = true;
                 bytes = RakalyHelper.toEquivalentPlaintext(getSavegameFile(e));
             }
         } catch (Exception ex) {
@@ -776,7 +780,7 @@ public abstract class SavegameStorage<
         // Generate new info
         I info;
         try {
-            info = infoFactory.apply(s.combinedNode());
+            info = infoFactory.apply(s.content, melted);
         } catch (SavegameInfoException ex) {
             ErrorHandler.handleException(ex);
             return;

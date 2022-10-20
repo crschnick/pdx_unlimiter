@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -19,10 +19,10 @@ public abstract class SavegameInfo<T> {
 
     protected SavegameInfo() {}
 
-    protected SavegameInfo(ArrayNode node) throws SavegameInfoException {
+    protected SavegameInfo(SavegameContent content) throws SavegameInfoException {
         try {
             this.data = (SavegameData<T>) getDataClass().getDeclaredConstructors()[0].newInstance();
-            this.data.init(node);
+            this.data.init(content);
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             ErrorHandler.handleTerminalException(e);
         }
@@ -42,7 +42,7 @@ public abstract class SavegameInfo<T> {
                 return;
             }
 
-            c.init(node, this.data);
+            c.init(content.get(), this.data);
         }
     }
 

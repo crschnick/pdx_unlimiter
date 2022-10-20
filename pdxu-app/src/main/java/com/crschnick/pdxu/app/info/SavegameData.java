@@ -1,18 +1,20 @@
 package com.crschnick.pdxu.app.info;
 
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
 import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameVersion;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({@JsonSubTypes.Type(value = Eu4SavegameData.class)})
+@JsonSubTypes({@JsonSubTypes.Type(value = Eu4SavegameData.class), @JsonSubTypes.Type(value = Ck3SavegameData.class)})
 public abstract class SavegameData<T> {
 
     protected GameDate date;
@@ -20,6 +22,7 @@ public abstract class SavegameData<T> {
     protected List<String> mods;
     protected List<String> dlcs;
     protected boolean ironman;
+    @Setter
     protected boolean binary;
     protected boolean observer;
 
@@ -36,7 +39,7 @@ public abstract class SavegameData<T> {
         return getTag() != null;
     }
 
-    protected abstract void init(ArrayNode node);
+    protected abstract void init(SavegameContent content);
 
     public Eu4SavegameData eu4() {
         return (Eu4SavegameData) this;

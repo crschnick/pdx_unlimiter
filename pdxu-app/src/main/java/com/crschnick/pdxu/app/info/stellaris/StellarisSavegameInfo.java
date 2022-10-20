@@ -2,13 +2,14 @@ package com.crschnick.pdxu.app.info.stellaris;
 
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.app.info.SavegameInfoException;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
-    protected StellarisSavegameInfo(ArrayNode node) throws Exception {
-        super(node);
+    public StellarisSavegameInfo(SavegameContent content) throws SavegameInfoException {
+        super(content);
     }
 
     @Override

@@ -2,13 +2,14 @@ package com.crschnick.pdxu.app.info.ck2;
 
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.app.info.SavegameInfoException;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck2.Ck2Tag;
 
 public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
 
-    protected Ck2SavegameInfo(ArrayNode node) throws Exception {
-        super(node);
+    public Ck2SavegameInfo(SavegameContent content) throws SavegameInfoException {
+        super(content);
     }
 
     @Override

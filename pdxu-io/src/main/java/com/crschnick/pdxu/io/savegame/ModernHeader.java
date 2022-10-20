@@ -73,8 +73,8 @@ public record ModernHeader(boolean unknown, int compressionType, boolean binary,
 
         boolean unknown = Integer.parseInt(header.substring(4, 5)) == 1;
         int type = Integer.parseInt(header.substring(6, 7));
-        int compressedType = (type % 2);
-        boolean binary = (type & 1) != 0;
+        int compressedType = (type / 2);
+        boolean binary = (type % 2) != 0;
         long randomness = Long.parseLong(header.substring(7, 15).toUpperCase(), 16);
         long metaLength = Long.parseLong(header.substring(15, 23).toUpperCase(), 16);
         return new ModernHeader(unknown, compressedType, binary, randomness, metaLength);

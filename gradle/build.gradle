@@ -1,7 +1,5 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-import java.util.concurrent.TimeUnit
-
 plugins {
     id 'org.beryx.jlink' version '2.24.4'
     id 'org.jreleaser' version '1.0.0'
@@ -68,8 +66,6 @@ application {
     mainClass = 'com.crschnick.pdxu.app.cli.MainCommand'
     applicationDefaultJvmArgs = runArgs + ["-ea"]
 }
-
-
 
 
 jlink {
@@ -167,10 +163,13 @@ task createDist(type: Zip, dependsOn: jpackage) {
     archiveAppendix = DefaultNativePlatform.currentOperatingSystem.windows ? "windows" : DefaultNativePlatform.currentOperatingSystem.linux ? "linux" : "mac"
     archiveVersion = ""
     from getDistDir()
-
-    doLast {
-        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-           Runtime.getRuntime().exec("$projectDir/misc/mac_intel_dmg.sh").waitFor(10, TimeUnit.MINUTES)
-        }
-    }
 }
+
+
+task bundleDmg(type: Exec) {
+    commandLine "$projectDir/misc/mac_intel_dmg.sh"
+}
+if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+    createDist.finalizedBy(bundleDmg)
+}
+

@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.info.vic3;
 
 import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
@@ -57,7 +57,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     }
 
     @Override
-    protected void init(ArrayNode node) {
+    protected void init(SavegameContent content) {
 //        allTags = new ArrayList<>();
 //        node.getNodeForKey("countries").forEach((k, v) -> {
 //            allTags.add(Vic3Tag.fromNode(k, v));
@@ -67,10 +67,10 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
 //        tag = Eu4Tag.getTag(allTags, player);
 
 
-        date = GameDateType.VIC3.fromString(node.getNodeForKey("date").getString());
+        date = GameDateType.VIC3.fromString(content.get().getNodeForKey("date").getString());
 
 
-        Node ver = node.getNodeForKey("savegame_version");
+        Node ver = content.get().getNodeForKey("savegame_version");
         version = new GameNamedVersion(
                 ver.getNodeForKey("first").getInteger(),
                 ver.getNodeForKey("second").getInteger(),
@@ -79,17 +79,17 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
                 ver.getNodeForKey("name").getString());
 
 
-        mods = node.getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
+        mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
                 .collect(Collectors.toList());
-        dlcs = node.getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
+        dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
                 .collect(Collectors.toList());
 
 
-        campaignHeuristic = UUID.nameUUIDFromBytes(node.getNodeForKey("countries")
+        campaignHeuristic = UUID.nameUUIDFromBytes(content.get().getNodeForKey("countries")
                 .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
     }
 

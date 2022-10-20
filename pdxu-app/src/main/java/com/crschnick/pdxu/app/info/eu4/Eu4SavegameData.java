@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
@@ -38,20 +38,20 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
     }
 
     @Override
-    protected void init(ArrayNode node) {
+    protected void init(SavegameContent content) {
         allTags = new ArrayList<>();
-        node.getNodeForKey("countries").forEach((k, v) -> {
+        content.get().getNodeForKey("countries").forEach((k, v) -> {
             allTags.add(Eu4Tag.fromNode(k, v));
         });
 
-        String player = node.getNodeForKey("player").getString();
+        String player = content.get().getNodeForKey("player").getString();
         tag = Eu4Tag.getTag(allTags, player);
 
 
-        date = GameDateType.EU4.fromString(node.getNodeForKey("date").getString());
+        date = GameDateType.EU4.fromString(content.get().getNodeForKey("date").getString());
 
 
-        Node ver = node.getNodeForKey("savegame_version");
+        Node ver = content.get().getNodeForKey("savegame_version");
         version = new GameNamedVersion(
                 ver.getNodeForKey("first").getInteger(),
                 ver.getNodeForKey("second").getInteger(),
@@ -60,13 +60,13 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
                 ver.getNodeForKey("name").getString());
 
 
-        queryMods(node);
-        dlcs = node.getNodeForKeyIfExistent("dlc_enabled").map(Node::getNodeArray).orElse(List.of())
+        queryMods(content.get());
+        dlcs = content.get().getNodeForKeyIfExistent("dlc_enabled").map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
                 .collect(Collectors.toList());
 
 
-        campaignHeuristic = UUID.nameUUIDFromBytes(node.getNodeForKey("countries")
+        campaignHeuristic = UUID.nameUUIDFromBytes(content.get().getNodeForKey("countries")
                 .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
     }
 

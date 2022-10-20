@@ -1,7 +1,9 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
@@ -19,10 +21,14 @@ public class GameFileContext {
             SavegameType.HOI4, Game.HOI4,
             SavegameType.STELLARIS, Game.STELLARIS,
             SavegameType.CK2, Game.CK2,
-            SavegameType.VIC2, Game.VIC2);
+            SavegameType.VIC2, Game.VIC2,
+            SavegameType.VIC3, Game.VIC3
+    );
 
     private static final Map<Class<? extends SavegameData<?>>, Game> INFO_MAP = Map.of(
-            Eu4SavegameData.class, Game.EU4);
+            Eu4SavegameData.class, Game.EU4,
+            Hoi4SavegameData.class, Game.HOI4,
+            Ck3SavegameData .class, Game.CK3);
 
     private final Game game;
     private final List<GameMod> mods;
