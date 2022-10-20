@@ -165,4 +165,10 @@ task createDist(type: Zip, dependsOn: jpackage) {
     archiveAppendix = DefaultNativePlatform.currentOperatingSystem.windows ? "windows" : DefaultNativePlatform.currentOperatingSystem.linux ? "linux" : "mac"
     archiveVersion = ""
     from getDistDir()
+
+    doLast {
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            exec "$projectDir/misc/mac_intel_dmg.sh"
+        }
+    }
 }
