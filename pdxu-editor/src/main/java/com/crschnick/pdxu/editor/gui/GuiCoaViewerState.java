@@ -61,9 +61,12 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
     protected abstract void setup(HBox box);
 
     private CoatOfArms createCoatOfArms() {
+        // Only evaluate for game date are files
         var node = new LinkedArrayNode(
-                state.getRootNodes().values().stream().map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode()).peek(
-                        NodeEvaluator::evaluateArrayNode).toList());
+                state.isSavegame() ?
+                        state.getRootNodes().values().stream().map(editorRootNode -> editorRootNode.getBackingNode().getArrayNode()).toList() :
+                        state.getRootNodes().values().stream().map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode()).peek(
+                                NodeEvaluator::evaluateArrayNode).toList());
         var coatOfArmsNode = editorNode.getBackingNode().copy();
         NodeEvaluator.evaluateArrayNode(coatOfArmsNode.getArrayNode());
         return CoatOfArms.fromNode(coatOfArmsNode, s -> node.getNodeForKeyIfExistent(s).orElse(null));
