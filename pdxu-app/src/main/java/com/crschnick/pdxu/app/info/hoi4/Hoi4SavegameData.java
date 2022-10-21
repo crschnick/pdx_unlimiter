@@ -6,7 +6,6 @@ import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
-import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -20,7 +19,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
 
     protected Hoi4Tag tag;
     protected List<Hoi4Tag> allTags;
-    private GameVersion version;
+    private GameNamedVersion version;
 
     @Override
     public Hoi4Tag getTag() {
@@ -28,7 +27,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
     }
 
     @Override
-    public GameVersion getVersion() {
+    public GameNamedVersion getVersion() {
         return version;
     }
 
@@ -48,7 +47,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
                 .collect(Collectors.toList());
-        dlcs = List.of();
+        dlcs = null;
         initVersion(content.get());
     }
 

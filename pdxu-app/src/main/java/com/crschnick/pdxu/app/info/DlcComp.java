@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import javafx.geometry.Pos;
@@ -19,16 +18,13 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 public class DlcComp extends SavegameInfoComp {
 
     private List<String> dlcs;
-    private GameInstallation installation;
 
     @Override
-    protected void init(ArrayNode node, SavegameData data) {
+    protected void init(ArrayNode node, SavegameData<?> data) {
         this.dlcs = new ArrayList<>();
         if (data.getDlcs() != null && data.getDlcs().size() > 0) {
             this.dlcs.addAll(data.getDlcs());
         }
-
-        this.installation = data.installation();
     }
 
     @Override
@@ -40,22 +36,21 @@ public class DlcComp extends SavegameInfoComp {
         Label label = new Label(PdxuI18n.get("DLCS") + " (" + this.dlcs.size() + ")");
         label.setGraphic(new FontIcon());
         label.getStyleClass().add(CLASS_CONTENT);
-        GuiTooltips.install(label, getTooltip());
+
+        var tooltip = PdxuI18n.get("DLCS_REQUIRED") + ":\n" +
+                dlcs.stream()
+                        .map(s -> {
+                            var m = data.installation().getDlcForName(s);
+                            return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
+                        })
+                        .collect(Collectors.joining("\n"));
+        GuiTooltips.install(label, tooltip);
+
         boolean missing = this.dlcs.stream()
-                .map(m -> installation.getModForSavegameId(m))
+                .map(m -> data.installation().getDlcForName(m))
                 .anyMatch(Optional::isEmpty);
         label.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
         label.setAlignment(Pos.CENTER);
         return label;
-    }
-
-    private String getTooltip() {
-        return PdxuI18n.get("DLCS_REQUIRED") + ":\n" +
-                dlcs.stream()
-                        .map(s -> {
-                            var m = installation.getModForSavegameId(s);
-                            return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
-                        })
-                        .collect(Collectors.joining("\n"));
     }
 }

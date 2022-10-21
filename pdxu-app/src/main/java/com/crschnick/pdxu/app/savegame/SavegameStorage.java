@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -81,7 +80,7 @@ public abstract class SavegameStorage<
                 var created = (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
                 created.getData().setBinary(melted);
                 return created;
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            } catch (Exception e) {
                 ErrorHandler.handleTerminalException(e);
                 return null;
             }

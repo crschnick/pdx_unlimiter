@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.core;
 
+import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.ThreadHelper;
@@ -10,7 +11,6 @@ import io.sentry.UserFeedback;
 import io.sentry.protocol.SentryId;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -199,7 +199,12 @@ public class ErrorHandler {
             // Wait to send error report
             ThreadHelper.sleep(1000);
 
-            System.exit(1);
+            Platform.runLater(() -> {
+                PdxuApp.getApp().getStage().close();
+                Platform.exit();
+                System.exit(1);
+            });
+            ThreadHelper.sleep(10000);
         }
     }
 

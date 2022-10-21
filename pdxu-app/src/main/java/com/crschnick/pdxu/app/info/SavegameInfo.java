@@ -23,7 +23,7 @@ public abstract class SavegameInfo<T> {
         try {
             this.data = (SavegameData<T>) getDataClass().getDeclaredConstructors()[0].newInstance();
             this.data.init(content);
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+        } catch (Exception e) {
             ErrorHandler.handleTerminalException(e);
         }
 

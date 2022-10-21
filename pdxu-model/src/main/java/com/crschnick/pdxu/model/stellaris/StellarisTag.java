@@ -1,9 +1,11 @@
 package com.crschnick.pdxu.model.stellaris;
 
 import com.crschnick.pdxu.io.node.Node;
+import lombok.Setter;
 
 public class StellarisTag {
 
+    @Setter
     private String name;
 
     private String iconCategory;
@@ -30,7 +32,7 @@ public class StellarisTag {
     public static StellarisTag fromNode(Node node) {
         Node flagNode = node.getNodeForKey("flag");
         StellarisTag tag = new StellarisTag();
-        tag.name = node.getNodeForKey("name").getString();
+        tag.name = "Unknown";
 
         Node icon = flagNode.getNodeForKey("icon");
         tag.iconCategory = icon.getNodeForKey("category").getString();

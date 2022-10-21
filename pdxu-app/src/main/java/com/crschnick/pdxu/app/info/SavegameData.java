@@ -3,6 +3,8 @@ package com.crschnick.pdxu.app.info;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
@@ -22,6 +24,7 @@ import java.util.UUID;
         {
                 @JsonSubTypes.Type(value = Eu4SavegameData.class),
                 @JsonSubTypes.Type(value = Ck3SavegameData.class),
+                @JsonSubTypes.Type(value = StellarisSavegameData.class),
                 @JsonSubTypes.Type(value = Hoi4SavegameData.class)
         }
 )
@@ -56,7 +59,7 @@ public abstract class SavegameData<T> {
     }
 
     public GameInstallation installation() {
-        return null;
+        return GameInstallation.ALL.get(GameFileContext.INFO_MAP.get(getClass()));
     }
 
     public boolean isIronman() {
