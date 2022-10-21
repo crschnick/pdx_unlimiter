@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
@@ -13,8 +14,17 @@ import lombok.Setter;
 import java.util.List;
 import java.util.UUID;
 
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({@JsonSubTypes.Type(value = Eu4SavegameData.class), @JsonSubTypes.Type(value = Ck3SavegameData.class)})
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "type"
+)
+@JsonSubTypes(
+        {
+                @JsonSubTypes.Type(value = Eu4SavegameData.class),
+                @JsonSubTypes.Type(value = Ck3SavegameData.class),
+                @JsonSubTypes.Type(value = Hoi4SavegameData.class)
+        }
+)
 public abstract class SavegameData<T> {
 
     protected GameDate date;

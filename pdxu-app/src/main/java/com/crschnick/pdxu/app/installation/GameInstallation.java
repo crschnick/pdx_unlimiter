@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public final class GameInstallation {
@@ -28,7 +29,6 @@ public final class GameInstallation {
 
     private final List<GameDlc> dlcs = new ArrayList<>();
     private final List<GameMod> mods = new ArrayList<>();
-    private final List<GameMod> enabledMods = new ArrayList<>();
 
     private Path userDir;
     private GameVersion version;
@@ -153,26 +153,12 @@ public final class GameInstallation {
         return getMods().stream().filter(m -> type.getModSavegameId(userDir, m).equals(id)).findAny();
     }
 
-    private void loadEnabledMods() throws Exception {
-        logger.debug("Loading enabled mods ...");
-        enabledMods.clear();
-        type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
-            var mod = getModForFileName(s);
-            mod.ifPresentOrElse(m -> {
-                enabledMods.add(m);
-                logger.debug("Detected enabled mod " + m.getName());
-            }, () -> {
-                logger.warn("Detected enabled but unrecognized mod " + s);
-            });
-        });
-    }
-
     public void startDirectly(boolean debug) throws IOException {
         var args = new ArrayList<>(type.getLaunchArguments());
         if (debug) {
             args.add(type.debugModeSwitch().get());
         }
-        // dist.startDirectly(dist.getExecutable(), args, Map.of());
+        dist.startDirectly(dist.getExecutable(), args, Map.of());
     }
 
     public void loadData() throws InvalidInstallationException {
@@ -245,12 +231,33 @@ public final class GameInstallation {
         return type;
     }
 
-    public List<GameMod> queryEnabledMods() {
-        try {
-            loadEnabledMods();
-        } catch (Exception e) {
-            ErrorHandler.handleException(e);
-        }
+    public List<GameMod> queryEnabledMods() throws Exception {
+        logger.debug("Loading enabled mods ...");
+        var enabledMods = new ArrayList<GameMod>();
+        type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
+            var mod = getModForFileName(s);
+            mod.ifPresentOrElse(m -> {
+                enabledMods.add(m);
+                logger.debug("Detected enabled mod " + m.getName());
+            }, () -> {
+                logger.warn("Detected enabled but unrecognized mod " + s);
+            });
+        });
         return enabledMods;
+    }
+
+    public List<GameDlc> queryDisabledDlcs() throws Exception {
+        logger.debug("Loading disabled dlcs ...");
+        var enabledDlcs = new ArrayList<GameDlc>();
+        type.getDisabledDlcs(getInstallDir(), userDir).forEach(s -> {
+            var mod = getDlcForName(s);
+            mod.ifPresentOrElse(m -> {
+                enabledDlcs.add(m);
+                logger.debug("Detected disabled dlc " + m.getName());
+            }, () -> {
+                logger.warn("Detected disabled but unrecognized dlc " + s);
+            });
+        });
+        return enabledDlcs;
     }
 }

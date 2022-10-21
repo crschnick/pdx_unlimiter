@@ -106,12 +106,8 @@ public class GameDistLauncher {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()) : List.<GameMod>of();
-        if (ctx.getGame().getInstallType().getModInfoStorageType() ==
-                GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
-            writeDlcLoadFileWithEnabledMods(ctx.getInstallation(), dlcs);
-        } else {
-            writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
-        }
+
+        writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
     }
 
     public static boolean canChangeMods(Game game) {
@@ -156,27 +152,25 @@ public class GameDistLauncher {
         }
     }
 
-    private static void writeDlcLoadFileWithEnabledMods(
-            GameInstallation installation, List<GameDlc> dlcs
-    ) throws Exception {
-        var existingMods = installation.queryEnabledMods();
-        writeDlcLoadFile(installation, existingMods, dlcs);
-    }
 
-    private static void writeDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
+    private static void writeDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws Exception {
         var file = installation.getUserDir().resolve("dlc_load.json");
         ObjectNode n = JsonNodeFactory.instance.objectNode();
-        n.putArray("enabled_mods").addAll(mods.stream()
+
+        var modsToUse = (installation.getType().getModInfoStorageType() ==
+                GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
+        n.putArray("enabled_mods").addAll(modsToUse.stream()
                                                   .map(d -> FilenameUtils.separatorsToUnix
                                                           (installation.getUserDir().relativize(d.getModFile()).toString()))
-                                                  .map(JsonNodeFactory.instance::textNode)
-                                                  .collect(Collectors.toList()));
-        n.putArray("disabled_dlcs").addAll(installation.getDlcs().stream()
+                                                  .map(JsonNodeFactory.instance::textNode).toList());
+
+        var dlcsToDisable = installation.getType().getDlcInfoStorageType() ==
+                GameInstallType.DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryDisabledDlcs() : installation.getDlcs();
+        n.putArray("disabled_dlcs").addAll(dlcsToDisable.stream()
                                                    .filter(d -> d.isExpansion() && !dlcs.contains(d))
                                                    .map(d -> FilenameUtils.separatorsToUnix(
                                                            installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
-                                                   .map(JsonNodeFactory.instance::textNode)
-                                                   .collect(Collectors.toList()));
+                                                   .map(JsonNodeFactory.instance::textNode).toList());
         JsonHelper.write(n, file);
     }
 }

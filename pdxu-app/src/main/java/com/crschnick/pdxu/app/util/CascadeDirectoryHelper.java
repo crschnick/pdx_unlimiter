@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.util;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameMod;
@@ -42,7 +43,13 @@ public class CascadeDirectoryHelper {
 
     private static List<Path> getCascadingDirectories(
             GameFileContext ctx) {
-        var mods = ctx.getMods() == null ? ctx.getInstall().queryEnabledMods() : ctx.getMods();
+        List<GameMod> mods = List.of();
+        try {
+            mods = ctx.getMods() == null ? ctx.getInstall().queryEnabledMods() : ctx.getMods();
+        } catch (Exception e) {
+            ErrorHandler.handleException(e);
+        }
+
         List<Path> dirs = mods.stream()
                 .map(GameMod::getContentPath)
                 .flatMap(Optional::stream)

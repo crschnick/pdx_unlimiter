@@ -36,6 +36,11 @@ public interface GameInstallType {
         SAVEGAMES_AND_GAME_DONT_STORE_INFO
     }
 
+    public static enum DlcInfoStorageType {
+        STORES_INFO,
+        SAVEGAME_DOESNT_STORE_INFO
+    }
+
     GameInstallType EU4 = new StandardInstallType("eu4") {
 
         public Path getSteamSpecificFile(Path p) {
@@ -105,6 +110,11 @@ public interface GameInstallType {
         @Override
         public Path getWindowsStoreLauncherDataPath(Path p) {
             return p.resolve("launcher");
+        }
+
+        @Override
+        public DlcInfoStorageType getDlcInfoStorageType() {
+            return DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO;
         }
 
         @Override
@@ -602,6 +612,10 @@ public interface GameInstallType {
         return ModInfoStorageType.STORES_INFO;
     }
 
+    default DlcInfoStorageType getDlcInfoStorageType() {
+        return DlcInfoStorageType.STORES_INFO;
+    }
+
     default Path getSteamSpecificFile(Path p) {
         return p.resolve("steam_appid.txt");
     }
@@ -637,6 +651,8 @@ public interface GameInstallType {
     }
 
     public List<String> getEnabledMods(Path dir, Path userDir) throws Exception;
+
+    public List<String> getDisabledDlcs(Path dir, Path userDir) throws Exception;
 
     default Path determineUserDir(Path p, String name) throws IOException {
         var userDirFile = p.resolve("userdir.txt");
@@ -709,5 +725,20 @@ public interface GameInstallType {
                     .collect(Collectors.toList());
         }
 
+        public List<String> getDisabledDlcs(Path dir, Path userDir) throws Exception {
+            var file = userDir.resolve("dlc_load.json");
+            if (!Files.exists(file)) {
+                return List.of();
+            }
+
+            var node = JsonHelper.read(file);
+            if (node.get("disabled_dlcs") == null) {
+                return List.of();
+            }
+
+            return StreamSupport.stream(node.required("disabled_dlcs").spliterator(), false)
+                    .map(n -> n.textValue())
+                    .collect(Collectors.toList());
+        }
     }
 }
