@@ -3,6 +3,7 @@ package com.crschnick.pdxu.editor;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.FileWatchManager;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
+import com.crschnick.pdxu.app.util.OsHelper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.gui.GuiEditorSettings;
 import com.crschnick.pdxu.editor.node.EditorNode;
@@ -132,7 +133,7 @@ public class EditorExternalState {
             return;
         }
 
-        var name = node.getNavigationName() + " - " + UUID.randomUUID() + ".pdxt";
+        var name = OsHelper.getFileSystemCompatibleName(node.getNavigationName()) + " - " + UUID.randomUUID() + ".pdxt";
         Path file = TEMP.resolve(name);
         try {
             FileUtils.forceMkdirParent(file.toFile());
