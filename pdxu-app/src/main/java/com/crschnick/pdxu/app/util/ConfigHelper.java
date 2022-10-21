@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.util;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -30,7 +29,7 @@ public class ConfigHelper {
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
-        if (node != null) {
+        if (node != null && !node.isMissingNode()) {
             return node;
         }
 
@@ -78,15 +77,16 @@ public class ConfigHelper {
 
         JsonFactory f = new JsonFactory();
         var writer = new StringWriter();
-        try (JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
+        try (JsonGenerator g = f.createGenerator(writer)
                 .setPrettyPrinter(new DefaultPrettyPrinter())) {
             new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
                     .writeTree(g, node);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
+            return;
         }
-        var newContent = writer.toString();
 
+        var newContent = writer.toString();
         try {
             if (!newContent.equals(currentContent)) {
                 var backupFile = out.resolveSibling(
