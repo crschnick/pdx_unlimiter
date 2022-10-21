@@ -5,7 +5,7 @@ BASE=$(dirname "$0")
 mkdir -p "$BASE/../build/dist/"
 rm "$BASE/../build/dist/pdx_unlimiter-mac_intel.dmg"
 
-./create-dmg \
+create-dmg \
   --volname "Pdx-Unlimiter" \
   --volicon "$BASE/logo.icns" \
   --window-pos 200 120 \
