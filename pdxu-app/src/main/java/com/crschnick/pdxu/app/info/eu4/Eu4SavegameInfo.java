@@ -6,9 +6,6 @@ import com.crschnick.pdxu.model.eu4.Eu4Tag;
 
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
-    ModComp mods;
-    DlcComp dlcs;
-
     private Eu4RulerComp ruler;
     private Eu4HeirComp heir;
     private Eu4IronmanComp ironman;
@@ -24,6 +21,10 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     private Eu4DevelopmentComp development;
     Eu4AlliesComp allies;
     Eu4WarMultiComp wars;
+
+    ModComp mods;
+    DlcComp dlcs;
+    VersionComp version;
 
     public Eu4SavegameInfo() {}
 

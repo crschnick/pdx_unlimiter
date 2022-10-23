@@ -65,19 +65,21 @@ public class GuiSavegameEntry {
 
             var tagImage = SavegameContext.mapSavegame(e,
                     ctx -> ctx.getGuiFactory().createImage(e));
-            Pane tagPane = new Pane(tagImage.getValue());
+            HBox tagBar = new HBox(tagImage.getValue(), l);
             tagImage.addListener((c,o,n) -> {
                 Platform.runLater(() -> {
-                    tagPane.getChildren().set(0, n);
+                    tagBar.getChildren().set(0, n);
                 });
             });
-            HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
             tagBar.setAlignment(Pos.CENTER);
+            tagBar.setFillHeight(true);
             topBar.setLeft(tagBar);
         }
         {
             JFXTextField name = new JFXTextField();
+            name.setMinWidth(50);
+            name.setPrefWidth(50);
             name.getStyleClass().add(CLASS_TEXT_FIELD);
             name.setAlignment(Pos.CENTER);
             name.setText(e.getName().equals(dateString) ? "" : e.getName());
@@ -250,7 +252,7 @@ public class GuiSavegameEntry {
             });
             upload.getStyleClass().add(CLASS_ANALYZE);
             GuiTooltips.install(upload, PdxuI18n.get("ANALYZE_RAKALY"));
-            dynamicButtons.getChildren().add(upload);
+            // dynamicButtons.getChildren().add(upload);
 
 
             Button uploadSkanderbeg = new JFXButton(null, new FontIcon());
@@ -260,7 +262,7 @@ public class GuiSavegameEntry {
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
             GuiTooltips.install(uploadSkanderbeg, PdxuI18n.get("UPLOAD_SKANDERBEG"));
-            dynamicButtons.getChildren().add(uploadSkanderbeg);
+            // dynamicButtons.getChildren().add(uploadSkanderbeg);
         }
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {

@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.core;
 
-import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.ThreadHelper;
@@ -200,11 +199,10 @@ public class ErrorHandler {
             ThreadHelper.sleep(1000);
 
             Platform.runLater(() -> {
-                PdxuApp.getApp().getStage().close();
                 Platform.exit();
                 System.exit(1);
             });
-            ThreadHelper.sleep(10000);
+            ThreadHelper.sleep(1000);
         }
     }
 

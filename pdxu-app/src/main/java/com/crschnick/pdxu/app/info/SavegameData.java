@@ -1,9 +1,12 @@
 package com.crschnick.pdxu.app.info;
 
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameData;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
+import com.crschnick.pdxu.app.info.vic3.Vic3SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
@@ -25,7 +28,10 @@ import java.util.UUID;
                 @JsonSubTypes.Type(value = Eu4SavegameData.class),
                 @JsonSubTypes.Type(value = Ck3SavegameData.class),
                 @JsonSubTypes.Type(value = StellarisSavegameData.class),
-                @JsonSubTypes.Type(value = Hoi4SavegameData.class)
+                @JsonSubTypes.Type(value = Hoi4SavegameData.class),
+                @JsonSubTypes.Type(value = Vic2SavegameData.class),
+                @JsonSubTypes.Type(value = Vic3SavegameData.class),
+                @JsonSubTypes.Type(value = Ck2SavegameData.class)
         }
 )
 public abstract class SavegameData<T> {
@@ -52,7 +58,7 @@ public abstract class SavegameData<T> {
         return getTag() != null;
     }
 
-    protected abstract void init(SavegameContent content);
+    protected abstract void init(SavegameContent content) throws Exception;
 
     public Eu4SavegameData eu4() {
         return (Eu4SavegameData) this;

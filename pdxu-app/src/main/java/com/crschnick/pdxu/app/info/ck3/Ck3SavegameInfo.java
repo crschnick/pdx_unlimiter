@@ -8,6 +8,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
     ModComp mods;
     DlcComp dlcs;
+    VersionComp version;
 
     public Ck3SavegameInfo() {
     }

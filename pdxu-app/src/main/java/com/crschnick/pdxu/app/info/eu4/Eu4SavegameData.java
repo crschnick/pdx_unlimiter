@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @JsonTypeName("eu4")
 public class Eu4SavegameData extends SavegameData<Eu4Tag> {
 
-    private GameNamedVersion version;
+    private GameVersion version;
     private Eu4Tag tag;
     private List<Eu4Tag> allTags;
 

@@ -1,10 +1,13 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameData;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
+import com.crschnick.pdxu.app.info.vic3.Vic3SavegameData;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
@@ -29,6 +32,9 @@ public class GameFileContext {
     public  static final Map<Class<? extends SavegameData<?>>, Game> INFO_MAP = Map.of(
             Eu4SavegameData.class, Game.EU4,
             Hoi4SavegameData.class, Game.HOI4,
+            Ck2SavegameData.class, Game.CK2,
+            Vic2SavegameData.class, Game.VIC2,
+            Vic3SavegameData.class, Game.VIC3,
             StellarisSavegameData.class, Game.STELLARIS,
             Ck3SavegameData .class, Game.CK3);
 

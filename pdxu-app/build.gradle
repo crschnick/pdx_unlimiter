@@ -34,10 +34,10 @@ apply from: "$rootDir/gradle/module_gen.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
-    implementation "org.openjfx:javafx-base:18:${platform}${suffix}"
-    implementation "org.openjfx:javafx-controls:18:${platform}${suffix}"
-    implementation "org.openjfx:javafx-graphics:18:${platform}${suffix}"
-    implementation "org.openjfx:javafx-media:18:${platform}${suffix}"
+    implementation "org.openjfx:javafx-base:19:${platform}"
+    implementation "org.openjfx:javafx-controls:19:${platform}"
+    implementation "org.openjfx:javafx-graphics:19:${platform}"
+    implementation "org.openjfx:javafx-media:19:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation 'com.google.code.gson:gson:2.8.9'

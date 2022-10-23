@@ -30,10 +30,10 @@ apply from: "$rootDir/gradle/module_gen.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
-    compileOnly "org.openjfx:javafx-base:18:${platform}${suffix}"
-    compileOnly "org.openjfx:javafx-controls:18:${platform}${suffix}"
-    compileOnly "org.openjfx:javafx-graphics:18:${platform}${suffix}"
-    compileOnly "org.openjfx:javafx-media:18:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-base:19:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-controls:19:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-graphics:19:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-media:19:${platform}${suffix}"
     compileOnly 'com.jfoenix:jfoenix:9.0.10'
     compileOnly group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
 

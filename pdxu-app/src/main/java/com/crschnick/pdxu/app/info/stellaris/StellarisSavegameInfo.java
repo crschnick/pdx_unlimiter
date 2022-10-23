@@ -1,15 +1,13 @@
 package com.crschnick.pdxu.app.info.stellaris;
 
-import com.crschnick.pdxu.app.info.DlcComp;
-import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.info.SavegameInfoException;
+import com.crschnick.pdxu.app.info.*;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
     DlcComp dlcs;
+    VersionComp version;
 
     public StellarisSavegameInfo() {
     }
