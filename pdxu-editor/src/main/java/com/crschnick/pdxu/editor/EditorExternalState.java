@@ -169,7 +169,7 @@ public class EditorExternalState {
             // Linux editors do not like quotes around file paths
             var fileName = SystemUtils.IS_OS_WINDOWS ? "\"" + file + "\"" : file;
             // Use this start command on windows to properly handle spaces in file paths
-            var editorProgramCommand = SystemUtils.IS_OS_WINDOWS ? "cmd.exe /c start \"\" \"" + editor + "\"" : "\"" + editor + "\"";
+            var editorProgramCommand = SystemUtils.IS_OS_WINDOWS ? "cmd.exe /c start \"\" \"" + editor + "\"" : "sh -c \"" + editor + "\"";
             var cmd = editorProgramCommand + " " + fileName;
             logger.trace("Executing command: " + cmd);
             Runtime.getRuntime().exec(cmd);
