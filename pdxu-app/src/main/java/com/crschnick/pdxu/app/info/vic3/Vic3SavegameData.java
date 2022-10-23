@@ -3,15 +3,13 @@ package com.crschnick.pdxu.app.info.vic3;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,10 +24,6 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     public Vic3SavegameData() {
     }
 
-    public String getTagName() {
-        return null;// tag.getTag();
-    }
-
     public Vic3Tag getTag() {
         return tag;
     }
@@ -39,6 +33,31 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         return version;
     }
 
+    @Override
+    protected void init(SavegameContent content) {
+        campaignHeuristic = SavegameType.VIC3.getCampaignIdHeuristic(content);
+
+        var meta = content.get().getNodeForKey("meta_data");
+        ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
+        date = GameDateType.VIC3.fromString(content.get().getNodeForKeys("meta_data", "game_date").getString());
+
+        var countryId = content.get().getNodeForKey("previous_played").getNodeArray().get(0).getNodeForKey("idtype").getValueNode().getString();
+        var country = content.get().getNodeForKey("country_manager").getNodeForKey("database").getNodeForKey(countryId);
+        tag = new Vic3Tag(country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString());
+        allTags = List.of(tag);
+        observer = false;
+
+        mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
+                .map(Node::getNodeArray).orElse(List.of())
+                .stream().map(Node::getString)
+                .collect(Collectors.toList());
+        dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
+                .map(Node::getNodeArray).orElse(List.of())
+                .stream().map(Node::getString)
+                .collect(Collectors.toList());
+
+        initVersion(content.get());
+    }
 
     private void initVersion(Node n) {
         Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
@@ -50,61 +69,10 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
                     Integer.parseInt(m.group(1)),
                     Integer.parseInt(m.group(2)),
                     Integer.parseInt(m.group(3)),
-                    fourth);
+                    fourth
+            );
         } else {
-            throw new IllegalArgumentException("Could not parse CK3 version string: "+ v);
-        }
-    }
-
-    @Override
-    protected void init(SavegameContent content) {
-//        allTags = new ArrayList<>();
-//        node.getNodeForKey("countries").forEach((k, v) -> {
-//            allTags.add(Vic3Tag.fromNode(k, v));
-//        });
-//
-//        String player = node.getNodeForKey("player").getString();
-//        tag = Eu4Tag.getTag(allTags, player);
-
-
-        date = GameDateType.VIC3.fromString(content.get().getNodeForKey("date").getString());
-
-
-        Node ver = content.get().getNodeForKey("savegame_version");
-        version = new GameNamedVersion(
-                ver.getNodeForKey("first").getInteger(),
-                ver.getNodeForKey("second").getInteger(),
-                ver.getNodeForKey("third").getInteger(),
-                ver.getNodeForKey("forth").getInteger(),
-                ver.getNodeForKey("name").getString());
-
-
-        mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
-                .collect(Collectors.toList());
-        dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
-                .collect(Collectors.toList());
-
-
-        campaignHeuristic = UUID.nameUUIDFromBytes(content.get().getNodeForKey("countries")
-                .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
-    }
-
-    private void queryMods(Node n) {
-        // Mod data has changed in 1.31
-        if (version.compareTo(new GameVersion(1, 31, 0, 0)) >= 0) {
-            var list = new ArrayList<String>();
-            n.getNodeForKeyIfExistent("mods_enabled_names").ifPresent(me -> me.forEach((k, v) -> {
-                list.add(v.getNodeForKey("filename").getString());
-            }, true));
-            mods = list;
-        } else {
-            mods = n.getNodeForKeyIfExistent("mod_enabled").map(Node::getNodeArray).orElse(List.of())
-                    .stream().map(Node::getString)
-                    .collect(Collectors.toList());
+            throw new IllegalArgumentException("Could not parse VIC3 version string: " + v);
         }
     }
 

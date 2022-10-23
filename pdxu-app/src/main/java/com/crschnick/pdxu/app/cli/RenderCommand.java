@@ -31,8 +31,9 @@ import java.util.stream.Stream;
 
 @CommandLine.Command(
         name = "render",
-        header = "Renders all coat of arms images for a given game and saves them into a directory.",
-        sortOptions = false
+        header = "Renders coat of arms images for a given game and saves them into a directory.",
+        sortOptions = false,
+        showDefaultValues = true
 )
 public class RenderCommand implements Runnable {
 
@@ -41,7 +42,7 @@ public class RenderCommand implements Runnable {
                     "-g",
                     "--game"
             },
-            description = "The game id",
+            description = "The game id (ck3 or vic3)",
             paramLabel = "<game>",
             required = true,
             converter = GameConverter.class
@@ -63,18 +64,18 @@ public class RenderCommand implements Runnable {
                     "-l",
                     "--selector"
             },
-            description = "An optional selector. If set, only the selected coat of arms is rendered and outputted.",
+            description = "An optional selector. If set, only the selected coat of arms by name is rendered and outputted.",
             paramLabel = "<selector>"
     )
     String selector;
 
     @CommandLine.Option(
             names = {
-                    "-s",
-                    "--size"
+                    "-h",
+                    "--height"
             },
-            description = "The output image size",
-            paramLabel = "<size>"
+            description = "The output image height. The image width is calculated by multiplying the aspect ratio with this value.",
+            paramLabel = "<height>"
     )
     int size = 256;
 

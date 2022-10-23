@@ -1,9 +1,12 @@
 package com.crschnick.pdxu.model.vic3;
 
-import com.crschnick.pdxu.model.CoatOfArms;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class Vic3Tag {
-    private CoatOfArms coatOfArms;
+
+    private String tag;
+    private String government;
 }

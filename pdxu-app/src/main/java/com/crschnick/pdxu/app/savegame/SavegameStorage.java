@@ -81,7 +81,7 @@ public abstract class SavegameStorage<
                 created.getData().setBinary(melted);
                 return created;
             } catch (Exception e) {
-                ErrorHandler.handleTerminalException(e);
+                ErrorHandler.handleException(e);
                 return null;
             }
         };

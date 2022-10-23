@@ -83,12 +83,65 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception {
-        return Map.of();
+    public Map<String, NodePointer> createCommonJumps(EditorState state) {
+        var player = NodePointer.builder().name("currently_played_characters").index(0).build();
+
+        var map = new LinkedHashMap<String, NodePointer>();
+        map.put("Mods", NodePointer.builder().name("meta_data").name("mods").build());
+        map.put("DLCs", NodePointer.builder().name("meta_data").name("dlcs").build());
+        map.put("Settings", NodePointer.builder().name("game_rules").name("setting").build());
+        map.put("Ironman Settings", NodePointer.builder().name("ironman").build());
+        // map.put("Player country", NodePointer.builder().name("country_manager").name("database").pointerEvaluation(player).build());
+        return map;
     }
 
     @Override
     public NodePointer createNodeJump(EditorState state, EditorRealNode node) throws Exception {
+        if (!state.isSavegame()) {
+            return null;
+        }
+
+        var keyOpt = node.getKeyName();
+        var parentKey = Optional.ofNullable(node.getParent())
+                .flatMap(p -> p.getKeyName());
+
+        if (keyOpt.isPresent() && node.getBackingNode().isValue()) {
+            return get(keyOpt.get(), node.getBackingNode().getString());
+        }
+
+        if (keyOpt.isPresent() && node.getBackingNode().isArray() && node.getBackingNode().getArrayNode().size() == 1
+                && node.getBackingNode().getNodeArray().get(0).isValue()) {
+            return get(keyOpt.get(), node.getBackingNode().getNodeArray().get(0).getString());
+        }
+
+        if (parentKey.isPresent() && node.getBackingNode().isValue()) {
+            return get(parentKey.get(), node.getBackingNode().getString());
+        }
+
+        return null;
+    }
+
+    private static final List<String> STATE_KEYS = List.of("state");
+    private static final List<String> CULTURE_KEYS = List.of("culture");
+    private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "provinces");
+    private static final List<String> COUNTRY_KEYS = List.of("country");
+
+    private NodePointer get(String key, String val) {
+        if (STATE_KEYS.contains(key)) {
+            return NodePointer.builder().name("states").name("database")
+                    .name(val).build();
+        }
+        if (CULTURE_KEYS.contains(key)) {
+            return NodePointer.builder().name("cultures").name("database")
+                    .name(val).build();
+        }
+        if (PROVINCE_KEYS.contains(key)) {
+            return NodePointer.builder().name("provinces").name(val).build();
+        }
+        if (COUNTRY_KEYS.contains(key)) {
+            return NodePointer.builder().name("country_manager").name("database").name(val).build();
+        }
+
         return null;
     }
 

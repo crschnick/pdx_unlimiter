@@ -23,7 +23,7 @@ public class Vic3GuiFactory extends GameGuiFactory<Vic3Tag, Vic3SavegameInfo> {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        return ImageHelper.DEFAULT_IMAGE;// Ck3TagCache.realmImage(info, tag);
+        return Vic3CoatOfArmsCache.tagFlag(info, tag);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Vic3GuiFactory extends GameGuiFactory<Vic3Tag, Vic3SavegameInfo> {
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Vic3Tag> info) {
         return new Background(new BackgroundFill(
-                Color.ORCHID,// Ck3Backgrounds.getBackgroundColor(info),
+                Color.LIGHTGRAY,// Ck3Backgrounds.getBackgroundColor(info),
                 CornerRadii.EMPTY, Insets.EMPTY));
     }
 }

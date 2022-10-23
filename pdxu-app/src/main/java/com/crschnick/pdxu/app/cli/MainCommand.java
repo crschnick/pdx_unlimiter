@@ -7,11 +7,12 @@ import picocli.CommandLine;
 import java.util.List;
 
 @CommandLine.Command(
+        name = "Pdx-Unlimiter",
         subcommands = {
                 CommandLine.HelpCommand.class,
                 RenderCommand.class
         },
-        header = "Starts up the Pdx-Unlimiter desktop application."
+        header = "Runsthe Pdx-Unlimiter application."
 )
 class MainCommand implements Runnable {
 

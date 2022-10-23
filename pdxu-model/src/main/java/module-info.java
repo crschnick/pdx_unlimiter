@@ -1,4 +1,4 @@
-module com.crschnick.pdxu.model {
+open module com.crschnick.pdxu.model {
     requires java.se;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
