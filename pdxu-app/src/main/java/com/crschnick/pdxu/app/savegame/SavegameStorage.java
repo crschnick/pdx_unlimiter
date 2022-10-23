@@ -163,7 +163,7 @@ public abstract class SavegameStorage<
                     return "Unknown";
                 }
 
-                return "Test";// info.getData().getTag().getName();
+                return "Unknown";// info.getData().getTag().getName();
             }
         });
         ALL.put(Game.STELLARIS, new SavegameStorage<>(
