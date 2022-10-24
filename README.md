@@ -10,12 +10,30 @@ Furthermore, it also comes with an Ironman converter,
 a powerful savegame editor, some savescumming tools, integrations for various other
 great community-made tools, and full support for the following games:
 
+* Victoria III
 * Europa Universalis IV
 * Crusader Kings III
 * Hearts of Iron IV
 * Stellaris
+* Crusader Kings II
+* Victoria II
+
+# Pre-Releases for Victoria III
+
+The Pdx-Unlimiter already supports Victoria III.
+However, the version with Victoria 3 support comes with many other necessary internal changes
+that have not been tested yet.
+Therefore, this version is only available as a pre-release:
+
+- [Windows](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0/pdx_unlimiter-windows.zip)
+- [Linux](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0/pdx_unlimiter-linux.zip)
+
+In case you already use the installation distribution with the update function and want to try out this latest version,
+you can still download the release and run it interchangeably with your existing installation without problems.
 
 # Download
+
+Note: The regular downloads do not contain Victoria III support yet. (See above)
 
 Note that there might be some issues with Windows SmartScreen blocking the executable after downloading.
 If you are facing these issues, click on "More info" and then "Run anyway".
