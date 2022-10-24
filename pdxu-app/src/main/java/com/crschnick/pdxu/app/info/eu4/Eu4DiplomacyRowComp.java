@@ -6,7 +6,7 @@ import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import javafx.scene.layout.Region;
 
@@ -28,9 +28,9 @@ public abstract class Eu4DiplomacyRowComp extends DiplomacyRowComp<Eu4Tag> {
     }
 
     @Override
-    protected final void init(ArrayNode node, SavegameData<?> data) {
-        this.tags = getTags(node, data);
+    protected final void init(SavegameContent content, SavegameData<?> data) {
+        this.tags = getTags(content, data);
     }
 
-    protected abstract List<Eu4Tag> getTags(ArrayNode node, SavegameData<?> data);
+    protected abstract List<Eu4Tag> getTags(SavegameContent content, SavegameData<?> data);
 }

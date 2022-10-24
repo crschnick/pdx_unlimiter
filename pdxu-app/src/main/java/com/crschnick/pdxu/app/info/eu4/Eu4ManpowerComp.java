@@ -4,7 +4,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
 public class Eu4ManpowerComp extends SimpleInfoComp {
@@ -13,9 +13,9 @@ public class Eu4ManpowerComp extends SimpleInfoComp {
     private int max;
 
     @Override
-    protected void init(ArrayNode node, SavegameData<?> data) {
-        value = (int) node.getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("manpower").getDouble();
-        max = (int) node.getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("max_manpower").getDouble();
+    protected void init(SavegameContent content, SavegameData<?> data) {
+        value = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("manpower").getDouble();
+        max = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("max_manpower").getDouble();
     }
 
     @Override

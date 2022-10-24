@@ -2,7 +2,7 @@ package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
@@ -20,7 +20,7 @@ public class ModComp extends SavegameInfoComp {
     private List<String> mods;
 
     @Override
-    protected void init(ArrayNode node, SavegameData<?> data) {
+    protected void init(SavegameContent content, SavegameData<?> data) {
         this.mods = new ArrayList<>();
         if (data.getMods() != null && data.getMods().size() > 0) {
             this.mods.addAll(data.getMods());

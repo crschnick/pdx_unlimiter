@@ -3,9 +3,9 @@ package com.crschnick.pdxu.app.info.eu4;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDateType;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -25,11 +25,11 @@ public class Eu4RulerComp extends SavegameInfoComp {
     private Ruler ruler;
 
     @Override
-    protected void init(ArrayNode node, SavegameData data) {
+    protected void init(SavegameContent content, SavegameData data) {
         var rulerNode = NodePointer.builder()
                 .name("countries")
                 .name(data.eu4().getTag().getTag())
-                .build().getIfPresent(node);
+                .build().getIfPresent(content.get());
         ruler = rulerNode.flatMap(rn -> Ruler.fromCountryNode(rn, getRulerKey())).orElse(getDefault());
     }
 

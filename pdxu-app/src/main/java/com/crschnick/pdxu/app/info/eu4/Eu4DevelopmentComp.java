@@ -5,7 +5,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
@@ -20,9 +20,9 @@ public class Eu4DevelopmentComp extends SavegameInfoComp {
     private int totalDev;
 
     @Override
-    protected void init(ArrayNode node, SavegameData<?> data) {
-        totalDev = (int) node.getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("raw_development").getDouble();
-        autonomyDev = (int) node.getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("development").getDouble();
+    protected void init(SavegameContent content, SavegameData<?> data) {
+        totalDev = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("raw_development").getDouble();
+        autonomyDev = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("development").getDouble();
     }
 
     @Override

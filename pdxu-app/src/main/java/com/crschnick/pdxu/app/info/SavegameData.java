@@ -64,6 +64,10 @@ public abstract class SavegameData<T> {
         return (Eu4SavegameData) this;
     }
 
+    public Ck3SavegameData ck3() {
+        return (Ck3SavegameData) this;
+    }
+
     public GameInstallation installation() {
         return GameInstallation.ALL.get(GameFileContext.INFO_MAP.get(getClass()));
     }

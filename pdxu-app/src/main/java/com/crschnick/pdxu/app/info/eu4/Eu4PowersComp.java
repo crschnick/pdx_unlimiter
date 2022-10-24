@@ -2,7 +2,7 @@ package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -18,11 +18,11 @@ public class Eu4PowersComp extends SavegameInfoComp {
     private int mil;
 
     @Override
-    protected void init(ArrayNode node, SavegameData<?> data) {
+    protected void init(SavegameContent content, SavegameData<?> data) {
         var tag = data.eu4().getTagName();
-        adm = node.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(0).getInteger();
-        dip = node.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(1).getInteger();
-        mil = node.getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(2).getInteger();
+        adm = content.get().getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(0).getInteger();
+        dip = content.get().getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(1).getInteger();
+        mil = content.get().getNodeForKey("countries").getNodeForKey(tag).getNodeForKey("powers").getNodeArray().get(2).getInteger();
     }
 
     @Override

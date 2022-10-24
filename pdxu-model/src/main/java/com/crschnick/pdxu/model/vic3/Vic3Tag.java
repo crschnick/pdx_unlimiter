@@ -3,7 +3,9 @@ package com.crschnick.pdxu.model.vic3;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode

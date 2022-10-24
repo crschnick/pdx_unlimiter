@@ -6,6 +6,11 @@ import com.crschnick.pdxu.model.ck3.Ck3Tag;
 
 public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
 
+    Ck3PrestigeComp prestige;
+    Ck3PietyComp piety;
+    Ck3SoldiersComp soldiers;
+    Ck3TitlesComp titles;
+    Ck3ClaimsComp claims;
     ModComp mods;
     DlcComp dlcs;
     VersionComp version;

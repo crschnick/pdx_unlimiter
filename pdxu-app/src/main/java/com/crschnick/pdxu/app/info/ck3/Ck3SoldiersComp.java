@@ -1,33 +1,34 @@
-package com.crschnick.pdxu.app.info.eu4;
+package com.crschnick.pdxu.app.info.ck3;
 
-import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
-public class Eu4PrestigeComp extends SimpleInfoComp {
+import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_SOLDIERS;
 
-    private int prestige;
+public class Ck3SoldiersComp extends SimpleInfoComp {
+
+    private int soldiers;
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        prestige = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("prestige").getDouble();
+        soldiers = data.ck3().getTag().getStrength();
     }
 
     @Override
     protected String getDisplayValue() {
-        return String.valueOf(prestige);
+        return String.valueOf(soldiers);
     }
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_PRESTIGE;
+        return CK3_ICON_SOLDIERS;
     }
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("PRESTIGE");
+        return PdxuI18n.get("TOTAL_SOLDIERS");
     }
 }

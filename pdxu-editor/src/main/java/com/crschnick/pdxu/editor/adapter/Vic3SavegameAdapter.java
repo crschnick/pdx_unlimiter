@@ -84,14 +84,15 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
-        var player = NodePointer.builder().name("currently_played_characters").index(0).build();
+        var countryId = NodePointer.builder().name("previous_played").index(0).name("idtype").build();
+        var country = NodePointer.builder().name("country_manager").name("database").pointerEvaluation(countryId).build();
 
         var map = new LinkedHashMap<String, NodePointer>();
         map.put("Mods", NodePointer.builder().name("meta_data").name("mods").build());
         map.put("DLCs", NodePointer.builder().name("meta_data").name("dlcs").build());
         map.put("Settings", NodePointer.builder().name("game_rules").name("setting").build());
         map.put("Ironman Settings", NodePointer.builder().name("ironman").build());
-        // map.put("Player country", NodePointer.builder().name("country_manager").name("database").pointerEvaluation(player).build());
+        map.put("Player country", country);
         return map;
     }
 

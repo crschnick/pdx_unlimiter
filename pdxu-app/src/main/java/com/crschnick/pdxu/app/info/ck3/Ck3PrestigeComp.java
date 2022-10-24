@@ -1,19 +1,20 @@
-package com.crschnick.pdxu.app.info.eu4;
+package com.crschnick.pdxu.app.info.ck3;
 
-import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
-public class Eu4PrestigeComp extends SimpleInfoComp {
+import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_PRESTIGE;
+
+public class Ck3PrestigeComp extends SimpleInfoComp {
 
     private int prestige;
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        prestige = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("prestige").getDouble();
+        prestige = data.ck3().getTag().getPrestige();
     }
 
     @Override
@@ -23,7 +24,7 @@ public class Eu4PrestigeComp extends SimpleInfoComp {
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_PRESTIGE;
+        return CK3_ICON_PRESTIGE;
     }
 
     @Override

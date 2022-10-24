@@ -4,7 +4,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
 public class Eu4IronmanComp extends SimpleInfoComp {
@@ -27,7 +27,7 @@ public class Eu4IronmanComp extends SimpleInfoComp {
     }
 
     @Override
-    protected void init(ArrayNode node, SavegameData data) {
+    protected void init(SavegameContent content, SavegameData data) {
         this.ironman = data.isIronman();
     }
 

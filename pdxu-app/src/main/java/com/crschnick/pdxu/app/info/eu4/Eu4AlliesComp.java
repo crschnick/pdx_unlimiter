@@ -4,8 +4,8 @@ import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import javafx.scene.image.Image;
 
@@ -30,9 +30,9 @@ public class Eu4AlliesComp extends Eu4DiplomacyRowComp {
     }
 
     @Override
-    protected List<Eu4Tag> getTags(ArrayNode node, SavegameData<?> data) {
+    protected List<Eu4Tag> getTags(SavegameContent content, SavegameData<?> data) {
         var list = new ArrayList<Eu4Tag>();
-        for (Node alli : node.getNodeForKey("diplomacy").getNodesForKey("alliance")) {
+        for (Node alli : content.get().getNodeForKey("diplomacy").getNodesForKey("alliance")) {
             String first = alli.getNodeForKey("first").getString();
             String second = alli.getNodeForKey("second").getString();
             if (first.equals(data.eu4().getTagName())) {

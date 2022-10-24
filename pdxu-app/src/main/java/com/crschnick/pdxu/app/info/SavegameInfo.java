@@ -42,7 +42,7 @@ public abstract class SavegameInfo<T> {
                 return;
             }
 
-            c.init(content.get(), this.data);
+            c.init(content, this.data);
         }
     }
 

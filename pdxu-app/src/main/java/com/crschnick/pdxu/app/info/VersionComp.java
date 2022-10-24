@@ -3,7 +3,7 @@ package com.crschnick.pdxu.app.info;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameVersion;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -17,7 +17,7 @@ public class VersionComp extends SavegameInfoComp {
     private GameVersion version;
 
     @Override
-    protected void init(ArrayNode node, SavegameData data) {
+    protected void init(SavegameContent content, SavegameData data) {
         this.version = data.getVersion();
     }
 

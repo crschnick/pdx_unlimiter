@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.info.SavegameInfoMultiComp;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -43,7 +44,7 @@ public class Eu4WarMultiComp extends SavegameInfoMultiComp {
         }
 
         @Override
-        protected List<Eu4Tag> getTags(ArrayNode node, SavegameData<?> data) {
+        protected List<Eu4Tag> getTags(SavegameContent content, SavegameData<?> data) {
             return war.isAttacker(data.eu4().getTag()) ? war.getDefenders() : war.getAttackers();
         }
     }

@@ -4,7 +4,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,16 +15,16 @@ public class Eu4DucatsComp extends SimpleInfoComp {
     private int loans;
 
     @Override
-    protected void init(ArrayNode node, SavegameData<?> data) {
+    protected void init(SavegameContent content, SavegameData<?> data) {
         AtomicInteger loansV = new AtomicInteger();
-        node.getNodeForKey("countries").getNodeForKey(data.eu4().getTag().getTag()).forEach((k, v) -> {
+        content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTag().getTag()).forEach((k, v) -> {
             if (k.equals("loan")) {
                 loansV.addAndGet((int) v.getNodeForKey("amount").getDouble());
             }
         });
         loans = loansV.get();
 
-        value = (int) node.getNodeForKey("countries").getNodeForKey(data.eu4().getTag().getTag()).getNodeForKey("treasury").getDouble();
+        value = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTag().getTag()).getNodeForKey("treasury").getDouble();
     }
 
     @Override
