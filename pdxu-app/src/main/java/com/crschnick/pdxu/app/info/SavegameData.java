@@ -68,6 +68,10 @@ public abstract class SavegameData<T> {
         return (Ck3SavegameData) this;
     }
 
+    public Vic3SavegameData vic3() {
+        return (Vic3SavegameData) this;
+    }
+
     public GameInstallation installation() {
         return GameInstallation.ALL.get(GameFileContext.INFO_MAP.get(getClass()));
     }

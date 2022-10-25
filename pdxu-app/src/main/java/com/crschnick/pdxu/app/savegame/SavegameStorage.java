@@ -163,7 +163,7 @@ public abstract class SavegameStorage<
                     return "Unknown";
                 }
 
-                return "Unknown";// info.getData().getTag().getName();
+                return info.getData().vic3().getCampaignName();
             }
         });
         ALL.put(Game.STELLARIS, new SavegameStorage<>(

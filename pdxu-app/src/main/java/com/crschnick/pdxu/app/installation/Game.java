@@ -46,7 +46,7 @@ public enum Game {
             GameInstallType.VIC2),
 
     VIC3("vic3", "VIC3", "Victoria 3",
-                 null, 1647590, null,
+                 null, 529340, null,
                  null, List.of("Victoria III", "Victoria 3"),
     GameInstallType.VIC3);
 

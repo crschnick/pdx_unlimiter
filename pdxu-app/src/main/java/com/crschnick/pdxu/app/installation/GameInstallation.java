@@ -248,16 +248,16 @@ public final class GameInstallation {
 
     public List<GameDlc> queryDisabledDlcs() throws Exception {
         logger.debug("Loading disabled dlcs ...");
-        var enabledDlcs = new ArrayList<GameDlc>();
+        var disabledDlcs = new ArrayList<GameDlc>();
         type.getDisabledDlcs(getInstallDir(), userDir).forEach(s -> {
-            var mod = getDlcForName(s);
-            mod.ifPresentOrElse(m -> {
-                enabledDlcs.add(m);
+            var dlc = getDlcForName(s);
+            dlc.ifPresentOrElse(m -> {
+                disabledDlcs.add(m);
                 logger.debug("Detected disabled dlc " + m.getName());
             }, () -> {
                 logger.warn("Detected disabled but unrecognized dlc " + s);
             });
         });
-        return enabledDlcs;
+        return disabledDlcs;
     }
 }

@@ -8,6 +8,7 @@ import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,8 +16,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @JsonTypeName("vic3")
+@Getter
 public class Vic3SavegameData extends SavegameData<Vic3Tag> {
 
+    private String campaignName;
     private GameVersion version;
     private Vic3Tag tag;
     private List<Vic3Tag> allTags;
@@ -38,6 +41,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         campaignHeuristic = SavegameType.VIC3.getCampaignIdHeuristic(content);
 
         var meta = content.get().getNodeForKey("meta_data");
+        campaignName = meta.getNodeForKey("name").getString();
         ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
         date = GameDateType.VIC3.fromString(content.get().getNodeForKeys("meta_data", "game_date").getString());
 

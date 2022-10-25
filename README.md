@@ -236,7 +236,8 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 # Development
 
-To build this project, [JDK 17](https://openjdk.java.net/projects/jdk/17/) is required.
+To build this project, [GraalVM for Java 17](https://github.com/graalvm/graalvm-ce-builds/releases/tag/vm-22.2.0) is required to be the JVM.
+You can't use any other JVM distribution as the Pdx-Unlimiter uses GraalVM specific features.
 You can build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
 For running, you can use `gradle/gradlew run`.
 Note here that the gradle wrapper has been moved into the `gradle` subdirectory.

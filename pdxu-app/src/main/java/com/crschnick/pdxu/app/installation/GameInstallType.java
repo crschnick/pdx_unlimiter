@@ -528,20 +528,18 @@ public interface GameInstallType {
 
         @Override
         public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
-            var sf = userDir.resolve("pdx_settings.txt");
+            var sf = userDir.resolve("pdx_settings.json");
             if (!Files.exists(sf)) {
                 return Optional.empty();
             }
 
-            var node = TextFormatParser.text().parse(sf);
-            var langId = node
-                    .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
-                    .map(Node::getString);
-            return langId.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l)));
+            var node = JsonHelper.read(sf);
+            var id = Optional.ofNullable(node.get("System")).flatMap(n -> Optional.ofNullable(n.get("language")));
+            return id.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l.asText())));
         }
 
         public Path getSteamSpecificFile(Path p) {
-            return p.resolve("binaries").resolve("steam_appid.txt");
+            return null;
         }
 
         public Path getLauncherDataPath(Path p) {
@@ -570,6 +568,60 @@ public interface GameInstallType {
                     .put("date", date)
                     .put("rawVersion", rawVersion);
             JsonHelper.write(n, userDir.resolve("continue_game.json"));
+        }
+
+        public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
+            var file = userDir.resolve("content_load.json");
+            if (!Files.exists(file)) {
+                return List.of();
+            }
+
+            var node = JsonHelper.read(file);
+            if (node.get("enabledMods") == null) {
+                return List.of();
+            }
+
+            return StreamSupport.stream(node.required("enabledMods").spliterator(), false)
+                    .map(n -> n.required("path").textValue())
+                    .collect(Collectors.toList());
+        }
+
+        public List<String> getDisabledDlcs(Path dir, Path userDir) throws Exception {
+            var file = userDir.resolve("content_load.json");
+            if (!Files.exists(file)) {
+                return List.of();
+            }
+
+            var node = JsonHelper.read(file);
+            if (node.get("disabledDLC") == null) {
+                return List.of();
+            }
+
+            return StreamSupport.stream(node.required("disabledDLC").spliterator(), false)
+                    .map(n -> n.required("path").textValue())
+                    .collect(Collectors.toList());
+        }
+
+
+        public void writeModAndDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws Exception {
+            var file = installation.getUserDir().resolve("content_load.json");
+            ObjectNode n = JsonNodeFactory.instance.objectNode();
+
+            var modsToUse = (getModInfoStorageType() ==
+                    GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
+            n.putArray("enabledMods").addAll(modsToUse.stream()
+                                                      .map(d -> FilenameUtils.separatorsToUnix
+                                                              (installation.getUserDir().relativize(d.getModFile()).toString()))
+                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path",s)).toList());
+
+            var dlcsToDisable = getDlcInfoStorageType() ==
+                    GameInstallType.DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryDisabledDlcs() : installation.getDlcs();
+            n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
+                                                       .filter(d -> d.isExpansion() && !dlcs.contains(d))
+                                                       .map(d -> FilenameUtils.separatorsToUnix(
+                                                               installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
+                                                     .map(s -> JsonNodeFactory.instance.objectNode().put("path",s)).toList());
+            JsonHelper.write(n, file);
         }
     };
 
@@ -653,6 +705,8 @@ public interface GameInstallType {
     public List<String> getEnabledMods(Path dir, Path userDir) throws Exception;
 
     public List<String> getDisabledDlcs(Path dir, Path userDir) throws Exception;
+
+    public void writeModAndDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws Exception;
 
     default Path determineUserDir(Path p, String name) throws IOException {
         var userDirFile = p.resolve("userdir.txt");
@@ -739,6 +793,27 @@ public interface GameInstallType {
             return StreamSupport.stream(node.required("disabled_dlcs").spliterator(), false)
                     .map(n -> n.textValue())
                     .collect(Collectors.toList());
+        }
+
+        public void writeModAndDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws Exception {
+            var file = installation.getUserDir().resolve("dlc_load.json");
+            ObjectNode n = JsonNodeFactory.instance.objectNode();
+
+            var modsToUse = (getModInfoStorageType() ==
+                    GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
+            n.putArray("enabled_mods").addAll(modsToUse.stream()
+                                                      .map(d -> FilenameUtils.separatorsToUnix
+                                                              (installation.getUserDir().relativize(d.getModFile()).toString()))
+                                                      .map(JsonNodeFactory.instance::textNode).toList());
+
+            var dlcsToDisable = getDlcInfoStorageType() ==
+                    GameInstallType.DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryDisabledDlcs() : installation.getDlcs();
+            n.putArray("disabled_dlcs").addAll(dlcsToDisable.stream()
+                                                       .filter(d -> d.isExpansion() && !dlcs.contains(d))
+                                                       .map(d -> FilenameUtils.separatorsToUnix(
+                                                               installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
+                                                       .map(JsonNodeFactory.instance::textNode).toList());
+            JsonHelper.write(n, file);
         }
     }
 }
