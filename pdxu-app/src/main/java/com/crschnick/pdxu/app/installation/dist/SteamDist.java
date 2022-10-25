@@ -32,6 +32,12 @@ public class SteamDist extends GameDist {
         return dist.getExecutable();
     }
 
+    @Override
+    public Optional<Path> getWorkshopDir() {
+        var p = getSteamPath().orElseThrow();
+        return Optional.of(p.resolve("workshop").resolve("content").resolve(String.valueOf(getGame().getSteamAppId())));
+    }
+
     private static Optional<Path> getSteamPath() {
         Optional<String> steamDir = Optional.empty();
         switch (SupportedOs.get()) {

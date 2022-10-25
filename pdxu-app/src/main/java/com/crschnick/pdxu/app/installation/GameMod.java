@@ -1,9 +1,11 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -12,8 +14,38 @@ public class GameMod {
     private Path modFile;
     private Path path;
     private String name;
-    private String supportedVersion;
     private boolean legacyArchive;
+
+    public static Optional<GameMod> fromVictoria3Directory(Path p) {
+        if (!Files.exists(p.resolve(".metadata").resolve("metadata.json"))) {
+            return Optional.empty();
+        }
+
+        GameMod mod = new GameMod();
+        mod.modFile = p.resolve(".metadata").resolve("metadata.json");
+
+        if (!p.toFile().canRead()) {
+            return Optional.of(mod);
+        }
+
+        try {
+            var content = JsonHelper.read(mod.modFile);
+
+            // Quick check if mod data seems valid
+            if (content.get("name") == null) {
+                return Optional.of(mod);
+            }
+
+            mod.name = content.get("name").asText();
+            mod.path = p;
+            return Optional.of(mod);
+        } catch (Exception ex) {
+            // Don't report mod parsing errors
+            LoggerFactory.getLogger(GameMod.class).error("Could not parse malformed mod file " + p.toString(), ex);
+        }
+
+        return Optional.of(mod);
+    }
 
     public static Optional<GameMod> fromFile(Path p) {
         if (!p.getFileName().toString().endsWith(".mod")) {
@@ -51,7 +83,6 @@ public class GameMod {
                 mod.path = Path.of(path.get().getString().trim().replace("\"", ""));
             }
 
-            mod.supportedVersion = node.getNodeForKeyIfExistent("supported_version").map(Node::getString).orElse("*");
             return Optional.of(mod);
         } catch (Exception ex) {
             // Don't report mod parsing errors

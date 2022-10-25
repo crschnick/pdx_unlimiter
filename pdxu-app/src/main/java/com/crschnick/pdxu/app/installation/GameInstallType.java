@@ -12,6 +12,7 @@ import com.crschnick.pdxu.model.GameVersion;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,10 +20,7 @@ import java.nio.file.Path;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -623,6 +621,25 @@ public interface GameInstallType {
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path",s)).toList());
             JsonHelper.write(n, file);
         }
+
+        public  List<GameMod> loadMods(GameInstallation installation) throws IOException {
+            var directory = installation.getDist().getWorkshopDir().orElseThrow();
+            if (!Files.isDirectory(directory) ){
+                return List.of();
+            }
+
+            var mods = new ArrayList<GameMod>();
+            try (var list = Files.list(directory) ){
+                list.forEach(f -> {
+                    GameMod.fromVictoria3Directory(f).ifPresent(m -> {
+                        mods.add(m);
+                        LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("<no name>") +
+                                                                                     " at " + m.getContentPath() + ".");
+                    });
+                });
+            }
+            return mods;
+        }
     };
 
 
@@ -814,6 +831,27 @@ public interface GameInstallType {
                                                                installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
                                                        .map(JsonNodeFactory.instance::textNode).toList());
             JsonHelper.write(n, file);
+        }
+
+        public  List<GameMod> loadMods(GameInstallation installation) throws IOException {
+            if (!Files.isDirectory(installation.getUserDir().resolve("mod"))) {
+                return List.of();
+            }
+
+            var mods = new ArrayList<GameMod>();
+            try (var list = Files.list(installation.getUserDir().resolve("mod"))) {
+                list.forEach(f -> {
+                    GameMod.fromFile(f).ifPresent(m -> {
+                        mods.add(m);
+
+                        var ex = m.getAbsoluteContentPath(installation.getUserDir()).map(Files::exists).orElse(null);
+                        LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("<no name>") +
+                                             " at " + m.getModFile().toString() + ". Content exists: " + ex +
+                                             ". Legacy: " + m.isLegacyArchive());
+                    });
+                });
+            }
+            return mods;
         }
     }
 }
