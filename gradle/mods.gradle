@@ -1,19 +1,22 @@
+def games = Map.of(
+        'eu4', "${System.getProperty('user.home')}/Documents/Paradox Interactive/Europa Universalis IV/mod",
+        'ck3', "${System.getProperty('user.home')}/Documents/Paradox Interactive/Crusader Kings III/mod",
+        'vic3', "${System.getProperty('user.home')}/Documents/Paradox Interactive/Victoria 3/mod"
+)
+
 task exportMods(type: DefaultTask) {
     doLast {
-        def ck3Dir = "${System.getProperty('user.home')}/Documents/Paradox Interactive/Crusader Kings III/mod"
-        file("$ck3Dir/pdxu.mod").delete()
-        file("$ck3Dir/pdxu").delete()
-        copy {
-            from file("$projectDir/misc/mod/ck3/")
-            into ck3Dir
-        }
-
-        def eu4Dir = "${System.getProperty('user.home')}/Documents/Paradox Interactive/Europa Universalis IV/mod"
-        file("$eu4Dir/pdxu.mod").delete()
-        file("$eu4Dir/pdxu").delete()
-        copy {
-            from file("$projectDir/misc/mod/eu4/")
-            into eu4Dir
+        for (def e : games.entrySet()) {
+            def dir = e.getValue()
+            file("$dir/pdxu.mod").delete()
+            file("$dir/pdxu").delete()
+            copy {
+                from file("$projectDir/misc/mod/${e.getKey()}/")
+                into dir
+                filter(line -> {
+                    return line.replaceAll('\\$version', version)
+                })
+            }
         }
     }
 }

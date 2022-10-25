@@ -1,7 +1,7 @@
-version="2.10.4"
+version="$version"
 tags={
 	"Utilities"
 }
-name="Pdx-Unlimiter"
+name="Pdx-Unlimiter (NOT A MOD)"
 supported_version="1.7.*"
 path="mod/pdxu"
