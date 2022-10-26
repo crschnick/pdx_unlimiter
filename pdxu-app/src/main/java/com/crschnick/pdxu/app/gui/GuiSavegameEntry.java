@@ -6,6 +6,9 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
@@ -14,10 +17,7 @@ import com.crschnick.pdxu.app.util.integration.ConverterHelper;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
 import com.crschnick.pdxu.app.util.integration.SkanderbegHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
@@ -65,19 +65,21 @@ public class GuiSavegameEntry {
 
             var tagImage = SavegameContext.mapSavegame(e,
                     ctx -> ctx.getGuiFactory().createImage(e));
-            Pane tagPane = new Pane(tagImage.getValue());
+            HBox tagBar = new HBox(tagImage.getValue(), l);
             tagImage.addListener((c,o,n) -> {
                 Platform.runLater(() -> {
-                    tagPane.getChildren().set(0, n);
+                    tagBar.getChildren().set(0, n);
                 });
             });
-            HBox tagBar = new HBox(tagPane, l);
             tagBar.getStyleClass().add(CLASS_TAG_BAR);
             tagBar.setAlignment(Pos.CENTER);
+            tagBar.setFillHeight(true);
             topBar.setLeft(tagBar);
         }
         {
             JFXTextField name = new JFXTextField();
+            name.setMinWidth(50);
+            name.setPrefWidth(50);
             name.getStyleClass().add(CLASS_TEXT_FIELD);
             name.setAlignment(Pos.CENTER);
             name.setText(e.getName().equals(dateString) ? "" : e.getName());
@@ -233,7 +235,7 @@ public class GuiSavegameEntry {
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-                if (ctx.getInfo().isBinary()) {
+                if (ctx.getInfo().getData().isBinary()) {
                     Platform.runLater(() -> {
                         dynamicButtons.getChildren().add(melt);
                     });
@@ -250,7 +252,7 @@ public class GuiSavegameEntry {
             });
             upload.getStyleClass().add(CLASS_ANALYZE);
             GuiTooltips.install(upload, PdxuI18n.get("ANALYZE_RAKALY"));
-            dynamicButtons.getChildren().add(upload);
+            // dynamicButtons.getChildren().add(upload);
 
 
             Button uploadSkanderbeg = new JFXButton(null, new FontIcon());
@@ -260,7 +262,7 @@ public class GuiSavegameEntry {
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
             GuiTooltips.install(uploadSkanderbeg, PdxuI18n.get("UPLOAD_SKANDERBEG"));
-            dynamicButtons.getChildren().add(uploadSkanderbeg);
+            // dynamicButtons.getChildren().add(uploadSkanderbeg);
         }
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
@@ -312,13 +314,12 @@ public class GuiSavegameEntry {
             SavegameActions.editSavegame(e);
         });
         GuiTooltips.install(edit, PdxuI18n.get("EDIT_SAVEGAME"));
-
         ChangeListener<SavegameEntry.State> stateChange = new ChangeListener<>() {
             @Override
             public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
                 boolean add = false;
                 if (n.equals(SavegameEntry.State.LOADED)) {
-                    boolean binary = e.getInfo().isBinary();
+                    boolean binary = e.getInfo().getData().isBinary();
                     Platform.runLater(() -> {
                         edit.setGraphic(new FontIcon(binary ? "mdi-pencil-lock" : "mdi-pencil"));
                     });
@@ -384,8 +385,8 @@ public class GuiSavegameEntry {
             SavegameContext.withSavegameContext(entry, ctx -> {
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
-                        var container = createEmptyContainer();
-                        ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+                        var container = ctx.getInfo().createContainer();
+                        //ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
 
                         Platform.runLater(() -> {
                             loading.setVisible(false);

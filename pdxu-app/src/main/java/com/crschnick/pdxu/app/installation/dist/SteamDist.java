@@ -32,6 +32,12 @@ public class SteamDist extends GameDist {
         return dist.getExecutable();
     }
 
+    @Override
+    public Optional<Path> getWorkshopDir() {
+        var s = getSteamPath();
+        return s.map(p -> getSteamAppsCommonDir(p).getParent().resolve("workshop").resolve("content").resolve(String.valueOf(getGame().getSteamAppId())));
+    }
+
     private static Optional<Path> getSteamPath() {
         Optional<String> steamDir = Optional.empty();
         switch (SupportedOs.get()) {
@@ -68,8 +74,8 @@ public class SteamDist extends GameDist {
     private static final Pattern STEAM_LIBRARY_DIR_OLD = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
     private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");
 
-    private static Path getSteamAppsCommonDir(Path base)  {
-        var common =  base.resolve("steamapps").resolve("common");
+    private static Path getSteamAppsCommonDir(Path base) {
+        var common = base.resolve("steamapps").resolve("common");
         try {
             return common.toRealPath();
         } catch (IOException e) {
@@ -98,7 +104,8 @@ public class SteamDist extends GameDist {
                     if (m.find()) {
                         list.add(getSteamAppsCommonDir(Path.of(m.group(1))));
                     }
-                } catch (InvalidPathException ignored) {}
+                } catch (InvalidPathException ignored) {
+                }
             });
         } catch (Exception e) {
             return list;
@@ -132,7 +139,7 @@ public class SteamDist extends GameDist {
         } else {
             boolean inSteamLibraryDir = isInSteamLibraryDir(dir);
             var steamFile = g.getInstallType().getSteamSpecificFile(dir);
-            if (inSteamLibraryDir && Files.exists(steamFile)) {
+            if (inSteamLibraryDir && (steamFile == null || Files.exists(steamFile))) {
                 var basicDist = GameDists.getBasicDistFromDirectory(g, dir);
                 if (basicDist.isPresent()) {
                     return Optional.of(new SteamDist(g, dir, basicDist.get()));
@@ -169,7 +176,7 @@ public class SteamDist extends GameDist {
         if (SystemUtils.IS_OS_LINUX) {
             if (!isSteamRunning()) {
                 GuiErrorReporter.showSimpleErrorMessage("Steam is not started. " +
-                        "Please start Steam first before launching the game");
+                                                                "Please start Steam first before launching the game");
             } else {
                 TaskExecutor.getInstance().submitTask(() -> {
                     try {
@@ -186,14 +193,14 @@ public class SteamDist extends GameDist {
     }
 
     @Override
-    public void startDirectly(Path executable, List<String> args, Map<String,String> env) throws IOException {
+    public void startDirectly(Path executable, List<String> args, Map<String, String> env) throws IOException {
         if (!isSteamRunning()) {
             GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
-                    "Please start Steam first before launching the game");
+                                                            "Please start Steam first before launching the game");
             return;
         }
 
-        var completeEnv = new HashMap<String,String>();
+        var completeEnv = new HashMap<String, String>();
         completeEnv.putAll(env);
         completeEnv.putAll(createSteamEnv());
         dist.startDirectly(executable, args, completeEnv);
@@ -209,15 +216,16 @@ public class SteamDist extends GameDist {
         return dist.supportsDirectLaunch();
     }
 
-    private Map<String,String> createSteamEnv() {
+    private Map<String, String> createSteamEnv() {
         return Map.of(
                 "SteamAppId", String.valueOf(getGame().getSteamAppId()),
                 "SteamGameId", String.valueOf(getGame().getSteamAppId()),
-                    "SteamOverlayGameId", String.valueOf(getGame().getSteamAppId()));
+                "SteamOverlayGameId", String.valueOf(getGame().getSteamAppId())
+        );
     }
 
     @Override
-    public void startLauncher(Map<String,String> env) throws IOException {
+    public void startLauncher(Map<String, String> env) throws IOException {
         openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
     }
 

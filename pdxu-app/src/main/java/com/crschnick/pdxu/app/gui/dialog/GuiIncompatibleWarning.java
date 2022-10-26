@@ -6,7 +6,8 @@ import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
-import com.crschnick.pdxu.model.SavegameInfo;
+import com.crschnick.pdxu.app.savegame.SavegameContext;
+import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -19,27 +20,28 @@ import java.util.stream.Collectors;
 
 public class GuiIncompatibleWarning {
 
-    public static boolean showIncompatibleWarning(GameInstallation installation, SavegameInfo<?> info) {
+    public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {
+        var info = SavegameContext.getContext(entry).getInfo();
         StringBuilder builder = new StringBuilder();
-        if (SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
+        if (SavegameCompatibility.determineForVersion(info.getData().getVersion()) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
                     .append(installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: ")
-                    .append(info.getVersion().toString());
-        } else if (SavegameCompatibility.determineForInfo(info) == SavegameCompatibility.Compatbility.UNKNOWN) {
+                    .append(info.getData().getVersion().toString());
+        } else if (SavegameCompatibility.determineForEntry(entry) == SavegameCompatibility.Compatbility.UNKNOWN) {
             builder.append("Unknown compatibility:\n")
                     .append("- Game version: ")
                     .append("Unknown").append("\n")
                     .append("- Savegame version: ")
-                    .append(info.getVersion().toString());
+                    .append(info.getData().getVersion().toString());
         }
 
-        boolean missingMods = info.getMods() != null && info.getMods().stream()
+        boolean missingMods = info.getData().getMods() != null && info.getData().getMods().stream()
                 .map(m -> installation.getModForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingMods) {
-            builder.append("The following Mods are missing:\n").append(info.getMods().stream()
+            builder.append("The following Mods are missing:\n").append(info.getData().getMods().stream()
                     .map(s -> {
                         var m = installation.getModForSavegameId(s);
                         return (m.isPresent() ? null : "- " + s);
@@ -48,11 +50,11 @@ public class GuiIncompatibleWarning {
                     .collect(Collectors.joining("\n")));
         }
 
-        boolean missingDlc = info.getDlcs().stream()
+        boolean missingDlc = info.getData().getDlcs().stream()
                 .map(m -> installation.getDlcForName(m))
                 .anyMatch(Optional::isEmpty);
         if (missingDlc) {
-            builder.append("\n\nThe following DLCs are missing:\n").append(info.getDlcs().stream()
+            builder.append("\n\nThe following DLCs are missing:\n").append(info.getData().getDlcs().stream()
                     .map(s -> {
                         var m = installation.getDlcForName(s);
                         return (m.isPresent() ? null : "- " + s);

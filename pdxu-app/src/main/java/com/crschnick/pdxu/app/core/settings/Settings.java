@@ -37,6 +37,10 @@ public final class Settings extends AbstractSettings {
     public final SettingsEntry.GameDirectory vic2 = new SettingsEntry.GameDirectory(
             "vic2",
             Game.VIC2);
+    public final SettingsEntry.GameDirectory vic3 = new SettingsEntry.GameDirectory(
+            "vic3",
+            Game.VIC3);
+
     public final SettingsEntry.IntegerEntry fontSize = new SettingsEntry.IntegerEntry(
             "FONT_SIZE",
             "fontSize",
@@ -182,7 +186,7 @@ public final class Settings extends AbstractSettings {
         boolean hasNoValidInstallation =
                 eu4.getValue() == null && ck3.getValue() == null &&
                         hoi4.getValue() == null && stellaris.getValue() == null &&
-                        ck2.getValue() == null && vic2.getValue() == null;
+                        ck2.getValue() == null && vic2.getValue() == null && vic3.getValue() == null;
         if (hasNoValidInstallation) {
             var res = GuiErrorReporter.showSimpleErrorMessage("""
                     Welcome to the Pdx-Unlimiter!

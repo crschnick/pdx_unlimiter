@@ -4,6 +4,14 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
+import com.crschnick.pdxu.app.info.vic3.Vic3SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.GameLocalisation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
@@ -18,14 +26,6 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.SavegameInfoException;
-import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
-import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -62,7 +62,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger;
     private final Class<I> infoClass;
-    private final FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory;
+    private final FailableBiFunction<SavegameContent, Boolean, I, Exception> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -70,12 +70,15 @@ public abstract class SavegameStorage<
     private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
     public SavegameStorage(
-            FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory,
             String name,
             GameDateType dateType,
             SavegameType type,
             Class<I> infoClass) {
-        this.infoFactory = infoFactory;
+        this.infoFactory = (node, melted) -> {
+                var created = (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
+                created.getData().setBinary(melted);
+                return created;
+        };
         this.name = name;
         this.type = type;
         this.dateType = dateType;
@@ -99,18 +102,16 @@ public abstract class SavegameStorage<
 
     public static void init() throws Exception {
         ALL.put(Game.EU4, new SavegameStorage<>(
-                (node, melted) -> Eu4SavegameInfo.fromSavegame(melted, node),
                 "eu4",
                 GameDateType.EU4,
                 SavegameType.EU4,
                 Eu4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Eu4SavegameInfo info) {
-                return GameLocalisation.getLocalisedValue(info.getTag().getTag(), info);
+                return GameLocalisation.getLocalisedValue(info.getData().getTag().getTag(), info);
             }
         });
         ALL.put(Game.HOI4, new SavegameStorage<>(
-                (node, melted) -> Hoi4SavegameInfo.fromSavegame(melted, node),
                 "hoi4",
                 GameDateType.HOI4,
                 SavegameType.HOI4,
@@ -122,7 +123,6 @@ public abstract class SavegameStorage<
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>(
-                (node, melted) -> Ck3SavegameInfo.fromSavegame(melted, node),
                 "ck3",
                 GameDateType.CK3,
                 SavegameType.CK3,
@@ -130,19 +130,37 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(Ck3SavegameInfo info) {
-                if (info.isObserver()) {
+                if (info.getData().isObserver()) {
                     return "Observer";
                 }
 
-                if (!info.hasOnePlayerTag()) {
+                if (!info.getData().hasOnePlayerTag()) {
                     return "Unknown";
                 }
 
-                return info.getTag().getName();
+                return info.getData().getTag().getName();
+            }
+        });
+        ALL.put(Game.VIC3, new SavegameStorage<>(
+                "vic3",
+                GameDateType.VIC3,
+                SavegameType.VIC3,
+                Vic3SavegameInfo.class
+        ) {
+            @Override
+            protected String getDefaultCampaignName(Vic3SavegameInfo info) {
+                if (info.getData().isObserver()) {
+                    return "Observer";
+                }
+
+                if (!info.getData().hasOnePlayerTag()) {
+                    return "Unknown";
+                }
+
+                return info.getData().vic3().getCampaignName();
             }
         });
         ALL.put(Game.STELLARIS, new SavegameStorage<>(
-                (node, melted) -> StellarisSavegameInfo.fromSavegame(node),
                 "stellaris",
                 GameDateType.STELLARIS,
                 SavegameType.STELLARIS,
@@ -150,11 +168,10 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(StellarisSavegameInfo info) {
-                return info.getTag().getName();
+                return info.getData().getTag().getName();
             }
         });
         ALL.put(Game.CK2, new SavegameStorage<>(
-                (node, melted) -> new Ck2SavegameInfo(node),
                 "ck2",
                 GameDateType.CK2,
                 SavegameType.CK2,
@@ -162,11 +179,10 @@ public abstract class SavegameStorage<
         ) {
             @Override
             protected String getDefaultCampaignName(Ck2SavegameInfo info) {
-                return info.getTag().getRulerName();
+                return info.getData().getTag().getRulerName();
             }
         });
         ALL.put(Game.VIC2, new SavegameStorage<>(
-                (node, melted) -> new Vic2SavegameInfo(node),
                 "vic2",
                 GameDateType.VIC2,
                 SavegameType.VIC2,
@@ -315,13 +331,13 @@ public abstract class SavegameStorage<
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 checksum,
-                info.getDate(),
+                info.getData().getDate(),
                 SavegameNotes.empty(),
                 sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
         if (this.getSavegameCampaign(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
-                    .tagImage(info, info.getTag());
+                    .tagImage(info, info.getData().getTag());
             SavegameCampaign<T, I> newCampaign = new SavegameCampaign<>(
                     Instant.now(),
                     defaultCampaignName != null ? defaultCampaignName : getDefaultCampaignName(info),
@@ -338,7 +354,7 @@ public abstract class SavegameStorage<
     }
 
     private String getDefaultEntryName(I info) {
-        return info.getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
+        return info.getData().getDate().toDisplayString(LanguageManager.getInstance().getActiveLanguage().getLocale());
     }
 
     protected abstract String getDefaultCampaignName(I info);
@@ -515,7 +531,7 @@ public abstract class SavegameStorage<
             throw new IllegalStateException("Savegame info not available");
         }
 
-        var savegameCampaignId = e.getInfo().getCampaignHeuristic();
+        var savegameCampaignId = e.getInfo().getData().getCampaignHeuristic();
         var storageCampaignId = getSavegameCampaign(e).getUuid();
         return savegameCampaignId.equals(storageCampaignId) ? Optional.empty() : Optional.of(storageCampaignId);
     }
@@ -550,7 +566,7 @@ public abstract class SavegameStorage<
             return;
         }
 
-        if (!e.getInfo().isBinary()) {
+        if (!e.getInfo().getData().isBinary()) {
             return;
         }
 
@@ -669,14 +685,11 @@ public abstract class SavegameStorage<
                 I info = null;
                 try {
                     info = infoFactory.apply(s.content, melted);
-                } catch (SavegameInfoException e) {
+                } catch (Exception e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;
                 }
 
-                if (customCampaignId != null) {
-                    logger.debug("Using custom campaign id: " + customCampaignId);
-                }
                 var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
                 addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null);
             }
@@ -722,10 +735,12 @@ public abstract class SavegameStorage<
 
         byte[] bytes;
         String checksum;
+        boolean melted = false;
         try {
             bytes = Files.readAllBytes(getSavegameFile(e));
             checksum = checksum(bytes);
             if (type.isBinary(bytes)) {
+                melted = true;
                 bytes = RakalyHelper.toEquivalentPlaintext(getSavegameFile(e));
             }
         } catch (Exception ex) {
@@ -744,7 +759,7 @@ public abstract class SavegameStorage<
 
         UUID targetId;
         FailableConsumer<Path, Exception> writer;
-        if (!e.getInfo().isBinary() && !e.getInfo().isIronman()) {
+        if (!e.getInfo().getData().isBinary() && !e.getInfo().getData().isIronman()) {
             // Update savegame information itself if possible
             struc.getType().generateNewCampaignIdHeuristic(c);
             targetId = struc.getType().getCampaignIdHeuristic(c);
@@ -758,8 +773,8 @@ public abstract class SavegameStorage<
         // Generate new info
         I info;
         try {
-            info = infoFactory.apply(s.content, e.getInfo().isBinary());
-        } catch (SavegameInfoException ex) {
+            info = infoFactory.apply(s.content, melted);
+        } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return;
         }

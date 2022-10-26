@@ -1,16 +1,18 @@
 package com.crschnick.pdxu.model.ck3;
 
+import com.crschnick.pdxu.model.CoatOfArms;
+
 import java.util.Objects;
 
 public class Ck3House {
 
     private String name;
-    private Ck3CoatOfArms coa;
+    private CoatOfArms coa;
 
     public Ck3House() {
     }
 
-    public Ck3House(String name, Ck3CoatOfArms coa) {
+    public Ck3House(String name, CoatOfArms coa) {
         this.name = name;
         this.coa = coa;
     }
@@ -32,7 +34,7 @@ public class Ck3House {
         return name;
     }
 
-    public Ck3CoatOfArms getCoatOfArms() {
+    public CoatOfArms getCoatOfArms() {
         return coa;
     }
 }

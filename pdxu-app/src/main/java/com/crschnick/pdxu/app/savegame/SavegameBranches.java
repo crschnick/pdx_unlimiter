@@ -9,7 +9,7 @@ public class SavegameBranches {
 
         // VIC2 does not support rewriting yet for non-ironman
         if (ctx.getGame() == Game.VIC2) {
-            return ctx.getInfo().isIronman();
+            return ctx.getInfo().getData().isIronman();
         }
 
         // Stellaris branching is pointless as campaigns can't be recognized across game sessions
@@ -21,6 +21,6 @@ public class SavegameBranches {
     }
 
     public static boolean supportsRewrite(SavegameEntry<?,?> e) {
-        return !e.getInfo().isIronman() && !e.getInfo().isBinary();
+        return !e.getInfo().getData().isIronman() && !e.getInfo().getData().isBinary();
     }
 }

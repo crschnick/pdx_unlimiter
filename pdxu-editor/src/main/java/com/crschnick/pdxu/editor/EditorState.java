@@ -32,7 +32,10 @@ public class EditorState {
     private final boolean savegame;
     private final boolean editable;
 
-    public EditorState(String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc, boolean savegame, boolean editable) {
+    public EditorState(
+            String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc,
+            boolean savegame, boolean editable
+    ) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;

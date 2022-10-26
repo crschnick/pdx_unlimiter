@@ -5,17 +5,16 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
-import com.crschnick.pdxu.app.installation.*;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameInstallType;
+import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.savegame.FileExportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
-import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.integration.IronyHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -62,7 +61,7 @@ public class GameDistLauncher {
 
             if (SavegameCompatibility.determineForEntry(e) != SavegameCompatibility.Compatbility.COMPATIBLE) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
-                        ctx.getInstallation(), ctx.getInfo());
+                        ctx.getInstallation(), e);
                 if (!startAnyway) {
                     return;
                 }
@@ -92,25 +91,22 @@ public class GameDistLauncher {
                 ctx.getInstallation().getUserDir(),
                 ctx.getStorage().getEntryName(e),
                 ctx.getCollection().getLastPlayed(),
-                path);
+                path, ctx.getInfo().getData().getVersion()
+        );
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
-        var dlcs = ctx.getInfo().getDlcs().stream()
+        var dlcs = ctx.getInfo().getData().getDlcs().stream()
                 .map(d -> ctx.getInstallation().getDlcForName(d))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-        var mods = ctx.getInfo().getMods() != null ? ctx.getInfo().getMods().stream()
+        var mods = ctx.getInfo().getData().getMods() != null ? ctx.getInfo().getData().getMods().stream()
                 .map(m -> ctx.getInstallation().getModForSavegameId(m))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()) : List.<GameMod>of();
-        if (ctx.getGame().getInstallType().getModInfoStorageType() ==
-                GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
-            writeDlcLoadFileWithEnabledMods(ctx.getInstallation(), dlcs);
-        } else {
-            writeDlcLoadFile(ctx.getInstallation(), mods, dlcs);
-        }
+
+        ctx.getInstallation().getType().writeModAndDlcLoadFile(ctx.getInstallation(), mods, dlcs);
     }
 
     public static boolean canChangeMods(Game game) {
@@ -153,28 +149,5 @@ public class GameDistLauncher {
         } else {
             ctx.getInstallation().startDirectly(debug);
         }
-    }
-
-    private static void writeDlcLoadFileWithEnabledMods(
-            GameInstallation installation, List<GameDlc> dlcs) throws Exception {
-        var existingMods = installation.queryEnabledMods();
-        writeDlcLoadFile(installation, existingMods, dlcs);
-    }
-
-    private static void writeDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws IOException {
-        var file = installation.getUserDir().resolve("dlc_load.json");
-        ObjectNode n = JsonNodeFactory.instance.objectNode();
-        n.putArray("enabled_mods").addAll(mods.stream()
-                .map(d -> FilenameUtils.separatorsToUnix
-                        (installation.getUserDir().relativize(d.getModFile()).toString()))
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
-        n.putArray("disabled_dlcs").addAll(installation.getDlcs().stream()
-                .filter(d -> d.isExpansion() && !dlcs.contains(d))
-                .map(d -> FilenameUtils.separatorsToUnix(
-                        installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
-                .map(JsonNodeFactory.instance::textNode)
-                .collect(Collectors.toList()));
-        JsonHelper.write(n, file);
     }
 }

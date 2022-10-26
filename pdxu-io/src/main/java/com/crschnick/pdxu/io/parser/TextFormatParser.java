@@ -33,6 +33,13 @@ public final class TextFormatParser {
                 s -> false);
     }
 
+    public static TextFormatParser vic3() {
+        return new TextFormatParser(
+                StandardCharsets.UTF_8,
+                TaggedNode.ALL,
+                s -> false);
+    }
+
     public static TextFormatParser hoi4() {
         return new TextFormatParser(
                 StandardCharsets.UTF_8,

@@ -174,6 +174,11 @@ public final class LinkedArrayNode extends ArrayNode {
     }
 
     @Override
+    public Node copy() {
+        return new LinkedArrayNode(arrayNodes.stream().map(arrayNode -> arrayNode.copy().getArrayNode()).toList());
+    }
+
+    @Override
     public boolean forEach(BiPredicate<String, Node> c, boolean includeNullKeys) {
         for (var ar : arrayNodes) {
             if (!ar.forEach(c, includeNullKeys)) {

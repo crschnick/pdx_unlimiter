@@ -1,12 +1,11 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
-import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -53,10 +52,5 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
             Platform.runLater(() -> prop.set(n.toString()));
         });
         return prop;
-    }
-
-    @Override
-    public void fillNodeContainer(SavegameInfo<Hoi4Tag> info, JFXMasonryPane grid) {
-        super.fillNodeContainer(info, grid);
     }
 }

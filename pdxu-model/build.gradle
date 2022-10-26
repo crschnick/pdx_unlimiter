@@ -12,7 +12,11 @@ repositories {
     mavenCentral()
 }
 
+apply from: "$rootDir/gradle/jackson.gradle"
+
 dependencies {
-    compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.11.3"
-    compileOnly project(':pdxu-io')
+    implementation project(':pdxu-io')
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }

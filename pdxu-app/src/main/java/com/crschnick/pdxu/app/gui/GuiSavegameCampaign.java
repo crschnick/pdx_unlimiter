@@ -2,9 +2,9 @@ package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.*;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
@@ -34,9 +34,8 @@ public class GuiSavegameCampaign {
         btn.getStyleClass().add(CLASS_CAMPAIGN_LIST_ENTRY);
 
         {
-            SavegameCampaign<T, I> ca = (SavegameCampaign<T, I>) c;
             SavegameContext.withCollectionContext(c, gi -> {
-                ObservableValue<Node> prop = gi.getGuiFactory().createImage(ca);
+                ObservableValue<Node> prop = gi.getGuiFactory().createImage(c);
                 prop.addListener((change, o, n) -> {
                     Platform.runLater(() -> {
                         btn.getChildren().set(0, prop.getValue());
@@ -61,7 +60,6 @@ public class GuiSavegameCampaign {
             top.getChildren().add(name);
 
             Button del = new JFXButton(null, new FontIcon());
-            del.setGraphic(new FontIcon());
             del.getStyleClass().add("delete-button");
             del.setOnMouseClicked((m) -> {
                 if (GuiDialogHelper.showBlockingAlert(alert -> {

@@ -115,6 +115,9 @@ public class GameImage {
 
     public static Image VIC2_BACKGROUND;
 
+    public static Image VIC3_BACKGROUND;
+    public static Image VIC3_ICON_IRONMAN;
+
     private static void resetImages() {
         for (var field : GameImage.class.getFields()) {
             if (field.getType().equals(Image.class)) {
@@ -135,7 +138,8 @@ public class GameImage {
                 Game.HOI4, GameImage::loadHoi4Images,
                 Game.STELLARIS, GameImage::loadStellarisImages,
                 Game.CK2, GameImage::loadCk2Images,
-                Game.VIC2, GameImage::loadVic2Images);
+                Game.VIC2, GameImage::loadVic2Images,
+                Game.VIC3, GameImage::loadVic3Images);
 
         if (g != null) {
             loadFuncs.get(g).run();
@@ -145,6 +149,16 @@ public class GameImage {
     public static Image getGameIcon(Game g) {
         var iconFile = GameInstallation.ALL.get(g).getDist().getIcon();
         return ImageHelper.loadImage(iconFile);
+    }
+
+    public static void loadVic3Images() {
+        var installPath = GameInstallation.ALL.get(Game.VIC3).getInstallDir();
+        Path p = installPath.resolve("game");
+        Path i = p.resolve("gfx").resolve("frontend").resolve("interface").resolve("icons");
+
+        VIC3_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.VIC3)
+                                                       .getType().chooseBackgroundImage(installPath));
+        VIC3_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
     }
 
     public static void loadCk3Images() {

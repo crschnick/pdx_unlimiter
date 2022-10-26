@@ -1,15 +1,16 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameData;
+import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
+import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
+import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
+import com.crschnick.pdxu.app.info.vic3.Vic3SavegameData;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.ck2.Ck2SavegameInfo;
-import com.crschnick.pdxu.model.ck3.Ck3SavegameInfo;
-import com.crschnick.pdxu.model.eu4.Eu4SavegameInfo;
-import com.crschnick.pdxu.model.hoi4.Hoi4SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
-import com.crschnick.pdxu.model.vic2.Vic2SavegameInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -24,15 +25,18 @@ public class GameFileContext {
             SavegameType.HOI4, Game.HOI4,
             SavegameType.STELLARIS, Game.STELLARIS,
             SavegameType.CK2, Game.CK2,
-            SavegameType.VIC2, Game.VIC2);
+            SavegameType.VIC2, Game.VIC2,
+            SavegameType.VIC3, Game.VIC3
+    );
 
-    private static final Map<Class<? extends SavegameInfo<?>>, Game> INFO_MAP = Map.of(
-            Eu4SavegameInfo.class, Game.EU4,
-            Ck3SavegameInfo.class, Game.CK3,
-            Hoi4SavegameInfo.class, Game.HOI4,
-            StellarisSavegameInfo.class, Game.STELLARIS,
-            Ck2SavegameInfo.class, Game.CK2,
-            Vic2SavegameInfo.class, Game.VIC2);
+    public  static final Map<Class<? extends SavegameData<?>>, Game> INFO_MAP = Map.of(
+            Eu4SavegameData.class, Game.EU4,
+            Hoi4SavegameData.class, Game.HOI4,
+            Ck2SavegameData.class, Game.CK2,
+            Vic2SavegameData.class, Game.VIC2,
+            Vic3SavegameData.class, Game.VIC3,
+            StellarisSavegameData.class, Game.STELLARIS,
+            Ck3SavegameData .class, Game.CK3);
 
     private final Game game;
     private final List<GameMod> mods;
@@ -54,9 +58,17 @@ public class GameFileContext {
         this.mods = mods;
     }
 
-    public static GameFileContext fromInfo(SavegameInfo<?> info) {
-        var g = INFO_MAP.get(info.getClass());
-        List<GameMod> mods = info.getMods() != null ? info.getMods().stream()
+    public static GameFileContext fromData(SavegameData<?> sgData) {
+        var g = INFO_MAP.get(sgData.getClass());
+        List<GameMod> mods = sgData.getMods() != null ? sgData.getMods().stream()
+                .map(GameInstallation.ALL.get(g)::getModForFileName)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()) : List.of();
+        return new GameFileContext(g, mods);
+    }
+
+    public static GameFileContext fromMods(Game g, List<String> modsStrings) {
+        List<GameMod> mods = modsStrings != null ? modsStrings.stream()
                 .map(GameInstallation.ALL.get(g)::getModForFileName)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList()) : List.of();

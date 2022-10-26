@@ -2,6 +2,7 @@ package com.crschnick.pdxu.io.node;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public final class ValueNode extends Node {
@@ -136,5 +137,18 @@ public final class ValueNode extends Node {
     @Override
     public boolean matches(NodeMatcher matcher) {
         return matcher.matchesScalar(context, scalarIndex);
+    }
+
+    @Override
+    public Node copy() {
+        return new ValueNode(context, scalarIndex);
+    }
+
+    public Optional<String> getInlineMathExpression() {
+        if (getString().startsWith("@[") && getString().endsWith("]")) {
+            return Optional.of(getString().substring(2, getString().length() - 1));
+        }
+
+        return Optional.empty();
     }
 }

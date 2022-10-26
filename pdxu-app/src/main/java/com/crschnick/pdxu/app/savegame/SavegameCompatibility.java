@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.savegame;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.model.GameVersion;
-import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.util.Optional;
 
@@ -17,11 +16,11 @@ public class SavegameCompatibility {
             }
 
             var ins = ctx.getInstallation();
-            boolean missingMods = info.getMods() != null && info.getMods().stream()
+            boolean missingMods = info.getData().getMods() != null && info.getData().getMods().stream()
                     .map(ins::getModForSavegameId)
                     .anyMatch(Optional::isEmpty);
 
-            boolean missingDlc = info.getDlcs().stream()
+            boolean missingDlc = info.getData().getDlcs().stream()
                     .map(ins::getDlcForName)
                     .anyMatch(Optional::isEmpty);
 
@@ -37,7 +36,7 @@ public class SavegameCompatibility {
         });
     }
 
-    public static Compatbility determineForInfo(SavegameInfo<?> info) {
+    public static Compatbility determineForVersion(GameVersion version) {
         var i = GameInstallation.ALL.get(SavegameManagerState.get().current());
         if (i.getVersion() == null) {
             return Compatbility.UNKNOWN;
@@ -45,7 +44,7 @@ public class SavegameCompatibility {
 
         return areCompatible(
                 GameInstallation.ALL.get(SavegameManagerState.get().current()).getVersion(),
-                info.getVersion()) ? Compatbility.COMPATIBLE : Compatbility.INCOMPATIBLE;
+                version) ? Compatbility.COMPATIBLE : Compatbility.INCOMPATIBLE;
     }
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {

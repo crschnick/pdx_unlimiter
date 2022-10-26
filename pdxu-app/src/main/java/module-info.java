@@ -1,4 +1,4 @@
-module com.crschnick.pdxu.app {
+open module com.crschnick.pdxu.app {
     uses com.crschnick.pdxu.app.core.EditorProvider;
     requires com.realityinteractive.imageio.tga;
     requires org.apache.commons.lang;
@@ -10,6 +10,7 @@ module com.crschnick.pdxu.app {
     requires javafx.graphics;
     requires javafx.controls;
     requires javafx.media;
+    requires info.picocli;
     requires org.jnativehook;
     requires jdk.localedata;
     requires org.kordamp.iconli.core;
@@ -26,6 +27,7 @@ module com.crschnick.pdxu.app {
     requires com.crschnick.pdxu.model;
     requires com.crschnick.pdxu.io;
     requires jdk.httpserver;
+    requires static lombok;
 
     exports com.crschnick.pdxu.app;
     exports com.crschnick.pdxu.app.installation;
@@ -39,4 +41,5 @@ module com.crschnick.pdxu.app {
     exports com.crschnick.pdxu.app.core.settings;
     exports com.crschnick.pdxu.app.gui.dialog;
     exports com.crschnick.pdxu.app.installation.dist;
+    exports com.crschnick.pdxu.app.info;
 }

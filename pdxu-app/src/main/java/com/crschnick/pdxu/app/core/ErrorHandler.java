@@ -10,7 +10,6 @@ import io.sentry.UserFeedback;
 import io.sentry.protocol.SentryId;
 import javafx.application.Platform;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -199,7 +198,11 @@ public class ErrorHandler {
             // Wait to send error report
             ThreadHelper.sleep(1000);
 
-            System.exit(1);
+            Platform.runLater(() -> {
+                Platform.exit();
+                System.exit(1);
+            });
+            ThreadHelper.sleep(1000);
         }
     }
 

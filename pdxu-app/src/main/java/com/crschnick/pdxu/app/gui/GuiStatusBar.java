@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
@@ -9,7 +10,6 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.model.SavegameInfo;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;

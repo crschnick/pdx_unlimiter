@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.model.SavegameInfo;
-import com.crschnick.pdxu.model.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import org.apache.commons.io.FilenameUtils;
 
@@ -54,7 +54,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         private Path getOutputFile() {
             var customId = storage.getCustomCampaignId(entry);
             // Only try to add id suffix in case for ironman or binary ones
-            var suffix = entry.getInfo().isIronman() || entry.getInfo().isBinary() ?
+            var suffix = entry.getInfo().getData().isIronman() || entry.getInfo().getData().isBinary() ?
                     customId.map(u -> " (" + u + ")").orElse(null) : null;
             var baseName = storage.getValidOutputFileName(entry, includeEntryName, suffix);
             return targetDir.resolve(baseName);
@@ -85,7 +85,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
             Path file;
             Path dir = targetDir.resolve(baseName);
-            if (entry.getInfo().isIronman()) {
+            if (entry.getInfo().getData().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {
                 file = dir.resolve(entry.getDate().toString() + ".sav");

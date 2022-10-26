@@ -81,8 +81,8 @@ public class ColorHelper {
                         d2);
                 case HSV360 -> Color.hsb(
                         d0,
-                        d1 / 360.0,
-                        d2 / 360.0);
+                        d1 / 100.0,
+                        d2 / 100.0);
                 case RGB -> Color.color(
                         d0 / 255.0,
                         d1 / 255.0,

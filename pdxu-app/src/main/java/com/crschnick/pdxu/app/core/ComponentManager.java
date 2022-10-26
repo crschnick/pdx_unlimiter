@@ -19,14 +19,14 @@ import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class ComponentManager {
 
     private static Logger logger;
 
-    public static void initialSetup(String[] args) {
+    public static void initialSetup(List<String> inputs) {
         try {
             PdxuInstallation.init();
 
@@ -37,8 +37,7 @@ public class ComponentManager {
             ErrorHandler.init();
             IntegrityManager.init();
 
-            logger.info("Running pdxu with arguments: " + Arrays.toString(args));
-            Arrays.stream(args).forEach(FileImporter::addToImportQueue);
+            inputs.forEach(FileImporter::addToImportQueue);
             PdxuInstallation.checkCorrectExtraction();
             if (!PdxuInstallation.shouldStart()) {
                 System.exit(0);

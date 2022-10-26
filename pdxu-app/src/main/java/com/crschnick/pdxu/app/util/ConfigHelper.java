@@ -29,7 +29,7 @@ public class ConfigHelper {
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
-        if (node != null) {
+        if (node != null && !node.isMissingNode()) {
             return node;
         }
 
@@ -75,15 +75,19 @@ public class ConfigHelper {
             }
         }
 
-        try {
-            var writer = new StringWriter();
-            JsonFactory f = new JsonFactory();
-            JsonGenerator g = f.createGenerator(writer)
-                    .setPrettyPrinter(new DefaultPrettyPrinter());
+        JsonFactory f = new JsonFactory();
+        var writer = new StringWriter();
+        try (JsonGenerator g = f.createGenerator(writer)
+                .setPrettyPrinter(new DefaultPrettyPrinter())) {
             new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
                     .writeTree(g, node);
-            var newContent = writer.toString();
+        } catch (IOException e) {
+            ErrorHandler.handleException(e);
+            return;
+        }
 
+        var newContent = writer.toString();
+        try {
             if (!newContent.equals(currentContent)) {
                 var backupFile = out.resolveSibling(
                         FilenameUtils.getBaseName(out.toString()) + "_old." + FilenameUtils.getExtension(out.toString()));

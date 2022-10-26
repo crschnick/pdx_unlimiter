@@ -29,7 +29,6 @@ public final class GameInstallation {
 
     private final List<GameDlc> dlcs = new ArrayList<>();
     private final List<GameMod> mods = new ArrayList<>();
-    private final List<GameMod> enabledMods = new ArrayList<>();
 
     private Path userDir;
     private GameVersion version;
@@ -69,6 +68,8 @@ public final class GameInstallation {
                 p -> ALL.put(Game.CK2, new GameInstallation(Game.CK2.getInstallType(), p)));
         Optional.ofNullable(s.vic2.getValue()).ifPresent(
                 p -> ALL.put(Game.VIC2, new GameInstallation(Game.VIC2.getInstallType(), p)));
+        Optional.ofNullable(s.vic3.getValue()).ifPresent(
+                p -> ALL.put(Game.VIC3, new GameInstallation(Game.VIC3.getInstallType(), p)));
         for (Game g : Game.values()) {
             if (!ALL.containsKey(g)) {
                 continue;
@@ -99,7 +100,7 @@ public final class GameInstallation {
     public void initOptional() throws Exception {
         LoggerFactory.getLogger(getClass()).debug("Initializing optional data ...");
         loadDlcs();
-        loadMods();
+        this.mods.addAll(type.loadMods(this));
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
@@ -117,25 +118,6 @@ public final class GameInstallation {
         });
     }
 
-    private void loadMods() throws IOException {
-        if (!Files.isDirectory(getUserDir().resolve("mod"))) {
-            return;
-        }
-
-        try (var list = Files.list(getUserDir().resolve("mod"))) {
-            list.forEach(f -> {
-                GameMod.fromFile(f).ifPresent(m -> {
-                    mods.add(m);
-
-                    var ex = m.getAbsoluteContentPath(getUserDir()).map(Files::exists).orElse(null);
-                    logger.debug("Found mod " + m.getName().orElse("<no name>") +
-                            " at " + m.getModFile().toString() + ". Content exists: " + ex +
-                            ". Legacy: " + m.isLegacyArchive());
-                });
-            });
-        }
-    }
-
     public Optional<GameDlc> getDlcForName(String name) {
         return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
     }
@@ -150,20 +132,6 @@ public final class GameInstallation {
 
     public Optional<GameMod> getModForSavegameId(String id) {
         return getMods().stream().filter(m -> type.getModSavegameId(userDir, m).equals(id)).findAny();
-    }
-
-    private void loadEnabledMods() throws Exception {
-        logger.debug("Loading enabled mods ...");
-        enabledMods.clear();
-        type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
-            var mod = getModForFileName(s);
-            mod.ifPresentOrElse(m -> {
-                enabledMods.add(m);
-                logger.debug("Detected enabled mod " + m.getName());
-            }, () -> {
-                logger.warn("Detected enabled but unrecognized mod " + s);
-            });
-        });
     }
 
     public void startDirectly(boolean debug) throws IOException {
@@ -244,12 +212,33 @@ public final class GameInstallation {
         return type;
     }
 
-    public List<GameMod> queryEnabledMods() {
-        try {
-            loadEnabledMods();
-        } catch (Exception e) {
-            ErrorHandler.handleException(e);
-        }
+    public List<GameMod> queryEnabledMods() throws Exception {
+        logger.debug("Loading enabled mods ...");
+        var enabledMods = new ArrayList<GameMod>();
+        type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
+            var mod = getModForFileName(s);
+            mod.ifPresentOrElse(m -> {
+                enabledMods.add(m);
+                logger.debug("Detected enabled mod " + m.getName());
+            }, () -> {
+                logger.warn("Detected enabled but unrecognized mod " + s);
+            });
+        });
         return enabledMods;
+    }
+
+    public List<GameDlc> queryDisabledDlcs() throws Exception {
+        logger.debug("Loading disabled dlcs ...");
+        var disabledDlcs = new ArrayList<GameDlc>();
+        type.getDisabledDlcs(getInstallDir(), userDir).forEach(s -> {
+            var dlc = getDlcForName(s);
+            dlc.ifPresentOrElse(m -> {
+                disabledDlcs.add(m);
+                logger.debug("Detected disabled dlc " + m.getName());
+            }, () -> {
+                logger.warn("Detected disabled but unrecognized dlc " + s);
+            });
+        });
+        return disabledDlcs;
     }
 }

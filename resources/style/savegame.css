@@ -57,7 +57,7 @@
 
 .entry-bar .date {
 -fx-font-size: 1.15em;
--fx-padding: 0.3em 0.3em 0.3em 0.3em;
+-fx-padding: 0.3em 0.3em 0.3em 0.1em;
 -fx-background-radius: 0.15em;
 }
 

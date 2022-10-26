@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 public final class SimpleArrayNode extends ArrayNode {
 
@@ -275,6 +276,12 @@ public final class SimpleArrayNode extends ArrayNode {
     @Override
     public Optional<Node> getNodeForKeyIfExistent(String key) {
         return Optional.ofNullable(getNodeForKeyInternal(key));
+    }
+
+    @Override
+    public Node copy() {
+        return new SimpleArrayNode(context, keyScalars, valueScalars, values.stream().map(node -> node != null ? node.copy() : null).collect(
+                Collectors.toCollection(ArrayList::new)));
     }
 
     @Override

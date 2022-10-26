@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.model.ck3;
 
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.model.CoatOfArms;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ public class Ck3Tag {
     private List<Ck3Title> titles;
     private List<Ck3Title> claims;
     private String governmentName;
-    private Ck3CoatOfArms coatOfArms;
+    private CoatOfArms coatOfArms;
     private String name;
     private int balance;
     private int strength;
@@ -24,7 +25,7 @@ public class Ck3Tag {
     public Ck3Tag() {
     }
 
-    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, Ck3CoatOfArms coatOfArms, String name, int balance, int strength, int gold, int income, int piety, int prestige) {
+    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, CoatOfArms coatOfArms, String name, int balance, int strength, int gold, int income, int piety, int prestige) {
         this.id = id;
         this.ruler = ruler;
         this.titles = titles;
@@ -67,9 +68,9 @@ public class Ck3Tag {
 
         var house = new Ck3House(
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString()),
-                Ck3CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms")));
+                CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null));
         var person = Ck3Person.fromNode(personNode, house);
-        var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
+        var coaMap = CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
                 .getNodeForKey("coat_of_arms_manager_database"));
         var titles = Ck3Title.createTitleMap(n, coaMap);
 
@@ -87,8 +88,8 @@ public class Ck3Tag {
         });
 
 
-        var coa = Ck3CoatOfArms.fromNode(
-                n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"));
+        var coa = CoatOfArms.fromNode(
+                n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"), null);
         var name = n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
         var landedNode = personNode.getNodeForKey("landed_data");
@@ -104,7 +105,7 @@ public class Ck3Tag {
     }
 
     public static List<Ck3Tag> fromNode(Node n) {
-        var coaMap = Ck3CoatOfArms.createCoaMap(n.getNodeForKeys("coat_of_arms", "coat_of_arms_manager_database"));
+        var coaMap = CoatOfArms.createCoaMap(n.getNodeForKeys("coat_of_arms", "coat_of_arms_manager_database"));
         Map<Long, Ck3Title> titleIds = Ck3Title.createTitleMap(n, coaMap);
 
         var living = n.getNodeForKey("living");
@@ -185,7 +186,7 @@ public class Ck3Tag {
         return governmentName;
     }
 
-    public Ck3CoatOfArms getCoatOfArms() {
+    public CoatOfArms getCoatOfArms() {
         return coatOfArms != null ? coatOfArms : getPrimaryTitle().getCoatOfArms();
     }
 

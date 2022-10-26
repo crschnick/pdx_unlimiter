@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
@@ -9,7 +10,6 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
-import com.crschnick.pdxu.model.SavegameInfo;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import javafx.scene.image.Image;
 

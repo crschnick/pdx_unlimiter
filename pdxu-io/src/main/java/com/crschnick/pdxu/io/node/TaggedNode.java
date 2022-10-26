@@ -49,7 +49,7 @@ public final class TaggedNode extends Node {
                 return null;
             }
 
-            if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h' && ctx.getData()[begin] != 'L') {
+            if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h' && ctx.getData()[begin] != 'l' && ctx.getData()[begin] != 'L') {
                 return null;
             }
 
@@ -61,6 +61,11 @@ public final class TaggedNode extends Node {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getString() {
+        return toString();
     }
 
     public void set(TaggedNode other) {
@@ -133,12 +138,18 @@ public final class TaggedNode extends Node {
         return matcher.matchesScalar(new NodeContext(type.getId(), false), 0);
     }
 
+    @Override
+    public Node copy() {
+        return new TaggedNode(type, values.stream().map(valueNode -> valueNode.copy().getValueNode()).toList());
+    }
+
     public enum TagType {
         RGB("rgb"),
         HSV("hsv"),
         HSV360("hsv360"),
         HEX("hex"),
-        LIST("LIST");
+        LIST("list"),
+        UPPERCASE_LIST("LIST");
 
         private final String id;
         private final byte[] bytes;

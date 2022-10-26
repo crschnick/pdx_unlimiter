@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.core;
 
+import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
-import com.crschnick.pdxu.model.SavegameInfo;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;

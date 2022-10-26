@@ -49,6 +49,10 @@ public abstract class GameDist {
         return getGame().getInstallType().getExecutable(getInstallLocation());
     }
 
+    public Optional<Path> getWorkshopDir() {
+        return Optional.empty();
+    }
+
     public abstract boolean supportsLauncher();
 
     public abstract boolean supportsDirectLaunch();

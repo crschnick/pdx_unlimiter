@@ -7,6 +7,7 @@ import java.util.List;
 
 public abstract class ArrayNode extends Node {
 
+
     public static ArrayNode array(List<Node> values) {
         // Defensive copy of values
         return new SimpleArrayNode(new NodeContext(), null, null, new ArrayList<>(values));
