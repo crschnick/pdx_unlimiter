@@ -27,6 +27,7 @@ Therefore, this version is only available as a pre-release:
 
 - [Windows](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0-pre/pdx_unlimiter-windows.zip)
 - [Linux](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0-pre/pdx_unlimiter-linux.zip)
+- [Mac (Intel)](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0-pre/pdx_unlimiter-mac_intel.zip)
 
 In case you already use the installation distribution with the update function and want to try out this latest version,
 you can still download the release and run it interchangeably with your existing installation without problems.
