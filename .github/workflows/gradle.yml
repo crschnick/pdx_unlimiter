@@ -1,7 +1,9 @@
 name: Build
 
 on: [
-  push,
+  push:
+    tags-ignore:
+      - '**'
   pull_request
 ]
 
