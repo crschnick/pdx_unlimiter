@@ -26,8 +26,14 @@ public class JsonHelper {
 
     public static void writeObject(Object obj, Path out) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.setVisibility(mapper
+                                           .getSerializationConfig()
+                                           .getDefaultVisibilityChecker()
+                                           .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                                           .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                                           .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                                           .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+                                           .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         JsonFactory f = new JsonFactory();
@@ -39,8 +45,14 @@ public class JsonHelper {
 
     public static JsonNode read(Path in) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.setVisibility(mapper
+                                     .getSerializationConfig()
+                                     .getDefaultVisibilityChecker()
+                                     .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                                     .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                                     .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                                     .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+                                     .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
         return mapper.readTree(in.toFile());
     }
 

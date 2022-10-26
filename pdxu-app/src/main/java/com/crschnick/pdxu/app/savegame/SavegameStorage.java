@@ -74,8 +74,8 @@ public abstract class SavegameStorage<
             GameDateType dateType,
             SavegameType type,
             Class<I> infoClass) {
-        this.infoFactory = (node, melted) -> {
-                var created = (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
+        this.infoFactory = (content, melted) -> {
+                var created = (I) infoClass.getDeclaredConstructor(SavegameContent.class).newInstance(content);
                 created.getData().setBinary(melted);
                 return created;
         };

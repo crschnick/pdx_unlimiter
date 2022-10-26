@@ -5,5 +5,6 @@ module com.crschnick.pdxu.io {
 
     requires org.apache.commons.lang;
     requires org.graalvm.sdk;
+    requires org.graalvm.truffle;
     requires static lombok;
 }

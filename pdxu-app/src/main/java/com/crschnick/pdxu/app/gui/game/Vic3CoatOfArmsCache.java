@@ -18,7 +18,6 @@ import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import javafx.scene.image.Image;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -96,7 +95,8 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
                 return Optional.of(content);
             }).flatMap(Optional::stream).toList());
             cache.coatOfArmsNode = all;
-        } catch (IOException e) {
+        } catch (Throwable throwable) {
+            ErrorHandler.handleException(throwable);
             cache.coatOfArmsNode = ArrayNode.array(List.of());
         }
 

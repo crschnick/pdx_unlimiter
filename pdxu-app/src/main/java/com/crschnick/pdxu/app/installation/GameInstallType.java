@@ -633,13 +633,13 @@ public interface GameInstallType {
         }
 
         public List<GameMod> loadMods(GameInstallation installation) throws IOException {
-            var directory = installation.getDist().getWorkshopDir().orElseThrow();
-            if (!Files.isDirectory(directory)) {
+            var directory = installation.getDist().getWorkshopDir();
+            if (directory.isEmpty() || !Files.isDirectory(directory.get())) {
                 return List.of();
             }
 
             var mods = new ArrayList<GameMod>();
-            try (var list = Files.list(directory)) {
+            try (var list = Files.list(directory.get())) {
                 list.forEach(f -> {
                     GameMod.fromVictoria3Directory(f).ifPresent(m -> {
                         mods.add(m);
