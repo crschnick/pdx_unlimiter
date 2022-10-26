@@ -1,11 +1,10 @@
 name: Build
 
-on: [
+on:
   push:
     tags-ignore:
       - '**'
   pull_request:
-]
 
 jobs:
   build:
