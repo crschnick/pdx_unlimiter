@@ -100,7 +100,6 @@ public abstract class CoatOfArmsRenderer {
     }
 
     public BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int width, int height) {
-        ensureImagesLoaded();
         var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
             int pColor1 = sub.getColors()[0] != null
@@ -188,8 +187,6 @@ public abstract class CoatOfArmsRenderer {
             GameFileContext ctx,
             int width, int height
     ) {
-        ensureImagesLoaded();
-
         Function<Integer, Integer> customFilter;
         boolean hasColor = emblem.getColors() != null;
         if (emblem.getColors() != null) {
@@ -259,13 +256,6 @@ public abstract class CoatOfArmsRenderer {
                 currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new Color(0, 0, 0, 0), null);
             }
         });
-    }
-
-    private void ensureImagesLoaded() {
-        // Ugly hack to ensure that all needed images are loaded!
-        if (GameImage.CK3_HOUSE_FRAME == ImageHelper.DEFAULT_IMAGE) {
-            GameImage.loadCk3Images();
-        }
     }
 
     void renderImage(Graphics g, java.awt.Image img, double x, double y, double w, double h) {

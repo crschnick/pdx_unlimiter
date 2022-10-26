@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
+import com.crschnick.pdxu.model.CoatOfArms;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
@@ -23,6 +24,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     private GameVersion version;
     private Vic3Tag tag;
     private List<Vic3Tag> allTags;
+    private CoatOfArms coatOfArms;
 
     public Vic3SavegameData() {
     }
@@ -41,7 +43,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         campaignHeuristic = SavegameType.VIC3.getCampaignIdHeuristic(content);
 
         var meta = content.get().getNodeForKey("meta_data");
-        campaignName = meta.getNodeForKey("name").getString();
+        campaignName = meta.getNodeForKeyIfExistent("name").map(Node::getString).orElse("?");
         ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
         date = GameDateType.VIC3.fromString(content.get().getNodeForKeys("meta_data", "game_date").getString());
 

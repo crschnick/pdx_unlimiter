@@ -20,7 +20,7 @@ public class SavegameCompatibility {
                     .map(ins::getModForSavegameId)
                     .anyMatch(Optional::isEmpty);
 
-            boolean missingDlc = info.getData().getDlcs().stream()
+            boolean missingDlc = info.getData().getDlcs() != null && info.getData().getDlcs().stream()
                     .map(ins::getDlcForName)
                     .anyMatch(Optional::isEmpty);
 

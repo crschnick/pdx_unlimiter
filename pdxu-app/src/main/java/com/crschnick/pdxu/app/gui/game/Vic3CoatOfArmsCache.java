@@ -110,7 +110,12 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
             return cachedImg;
         }
 
-        CoatOfArms coa = CoatOfArms.fromNode(getCoatOfArmsNode().getNodeForKey(tag.getTag()), s -> getCoatOfArmsNode().getNodeForKey(s));
+        var found = getCoatOfArmsNode().getNodeForKeyIfExistent(tag.getTag());
+        if (found.isEmpty()) {
+            return ImageHelper.DEFAULT_IMAGE;
+        }
+
+        CoatOfArms coa = CoatOfArms.fromNode(found.get(), s -> getCoatOfArmsNode().getNodeForKey(s));
         var img = Vic3TagRenderer.renderImage(
                 coa, GameFileContext.fromData(info.getData()), (int) (IMG_SIZE * 1.5), IMG_SIZE);
         var convertedImage = ImageHelper.toFXImage(img);
