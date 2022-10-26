@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    tags-ignore:
+    branches:
       - '**'
   pull_request:
 
