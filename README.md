@@ -25,11 +25,12 @@ However, the version with Victoria 3 support comes with many other necessary int
 that have not been tested yet.
 Therefore, this version is only available as a pre-release:
 
-- [Windows](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0/pdx_unlimiter-windows.zip)
-- [Linux](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0/pdx_unlimiter-linux.zip)
+- [Windows](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0-pre/pdx_unlimiter-windows.zip)
+- [Linux](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.0-pre/pdx_unlimiter-linux.zip)
 
 In case you already use the installation distribution with the update function and want to try out this latest version,
 you can still download the release and run it interchangeably with your existing installation without problems.
+Just unzip the download anywhere you want and execute it.
 
 # Download
 
