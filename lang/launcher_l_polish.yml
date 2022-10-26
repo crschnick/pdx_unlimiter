@@ -1,0 +1,9 @@
+l_polish:
+  LAUNCH: "Uruchom"
+  CHANGE_MODS: "Zmień modyfikacje"
+  INCOMPATIBLE: "Wybrany zapis nie jest kompatybilny. Uruchomienie go może spowodować błędy."
+  INCOMPATIBLE_VERSION: "Niekompatybilne wersje"
+  GAME_VERSION: "Wersja gry"
+  SAVEGAME_VERSION: "Wersja zapisu"
+  MOD_INFO_TITLE: "Informacje o modyfikacjach $GAME$"
+  MOD_INFO: "Zapisy $GAME$ nie zawierają informacji o wymaganych modyfikacjach.\nMusisz ręcznie weryfikować, czy używasz prawidłowych.\n\nWłączone są następujące modyfikacje:\n"
