@@ -5,7 +5,6 @@ import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.info.SavegameInfoException;
 import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
@@ -63,7 +62,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger;
     private final Class<I> infoClass;
-    private final FailableBiFunction<SavegameContent, Boolean, I, SavegameInfoException> infoFactory;
+    private final FailableBiFunction<SavegameContent, Boolean, I, Exception> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -76,14 +75,9 @@ public abstract class SavegameStorage<
             SavegameType type,
             Class<I> infoClass) {
         this.infoFactory = (node, melted) -> {
-            try {
                 var created = (I) infoClass.getDeclaredConstructors()[1].newInstance(node);
                 created.getData().setBinary(melted);
                 return created;
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-                return null;
-            }
         };
         this.name = name;
         this.type = type;
@@ -691,7 +685,7 @@ public abstract class SavegameStorage<
                 I info = null;
                 try {
                     info = infoFactory.apply(s.content, melted);
-                } catch (SavegameInfoException e) {
+                } catch (Exception e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;
                 }
@@ -780,7 +774,7 @@ public abstract class SavegameStorage<
         I info;
         try {
             info = infoFactory.apply(s.content, melted);
-        } catch (SavegameInfoException ex) {
+        } catch (Exception ex) {
             ErrorHandler.handleException(ex);
             return;
         }

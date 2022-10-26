@@ -34,8 +34,8 @@ public class SteamDist extends GameDist {
 
     @Override
     public Optional<Path> getWorkshopDir() {
-        var p = getSteamPath().orElseThrow();
-        return Optional.of(p.resolve("workshop").resolve("content").resolve(String.valueOf(getGame().getSteamAppId())));
+        var s = getSteamPath();
+        return s.map(p -> getSteamAppsCommonDir(p).getParent().resolve("workshop").resolve("content").resolve(String.valueOf(getGame().getSteamAppId())));
     }
 
     private static Optional<Path> getSteamPath() {

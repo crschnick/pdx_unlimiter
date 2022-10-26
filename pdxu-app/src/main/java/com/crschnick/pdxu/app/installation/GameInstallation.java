@@ -100,7 +100,7 @@ public final class GameInstallation {
     public void initOptional() throws Exception {
         LoggerFactory.getLogger(getClass()).debug("Initializing optional data ...");
         loadDlcs();
-        loadMods();
+        this.mods.addAll(type.loadMods(this));
         LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
     }
 
@@ -116,25 +116,6 @@ public final class GameInstallation {
                 ErrorHandler.handleException(e);
             }
         });
-    }
-
-    private void loadMods() throws IOException {
-        if (!Files.isDirectory(getUserDir().resolve("mod"))) {
-            return;
-        }
-
-        try (var list = Files.list(getUserDir().resolve("mod"))) {
-            list.forEach(f -> {
-                GameMod.fromFile(f).ifPresent(m -> {
-                    mods.add(m);
-
-                    var ex = m.getAbsoluteContentPath(getUserDir()).map(Files::exists).orElse(null);
-                    logger.debug("Found mod " + m.getName().orElse("<no name>") +
-                            " at " + m.getModFile().toString() + ". Content exists: " + ex +
-                            ". Legacy: " + m.isLegacyArchive());
-                });
-            });
-        }
     }
 
     public Optional<GameDlc> getDlcForName(String name) {

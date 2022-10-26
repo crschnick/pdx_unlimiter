@@ -81,7 +81,8 @@ public interface GameInstallType {
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         Integer.parseInt(m.group(4)),
-                        m.group(5)));
+                        m.group(5)
+                ));
             } else {
                 return Optional.empty();
             }
@@ -135,7 +136,8 @@ public interface GameInstallType {
                         Integer.parseInt(m.group(3)),
                         Integer.parseInt(m.group(4)),
                         0,
-                        m.group(1)));
+                        m.group(1)
+                ));
             } else {
                 return Optional.empty();
             }
@@ -219,7 +221,8 @@ public interface GameInstallType {
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0,
-                        0, m.group(1).trim()));
+                        0, m.group(1).trim()
+                ));
             } else {
                 return Optional.empty();
             }
@@ -240,7 +243,13 @@ public interface GameInstallType {
     GameInstallType CK3 = new StandardInstallType("binaries/ck3") {
         @Override
         public Path chooseBackgroundImage(Path p) {
-            String[] bgs = new String[]{"assassin", "baghdad", "castle", "council", "duel"};
+            String[] bgs = new String[]{
+                    "assassin",
+                    "baghdad",
+                    "castle",
+                    "council",
+                    "duel"
+            };
             return p.resolve("game").resolve("gfx").resolve("interface").resolve("illustrations")
                     .resolve("loading_screens").resolve(bgs[new Random().nextInt(bgs.length)] + ".dds");
         }
@@ -266,7 +275,8 @@ public interface GameInstallType {
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         fourth,
-                        name));
+                        name
+                ));
             } else {
                 return Optional.empty();
             }
@@ -513,7 +523,8 @@ public interface GameInstallType {
                         Integer.parseInt(m.group(2)),
                         Integer.parseInt(m.group(3)),
                         fourth,
-                        name));
+                        name
+                ));
             } else {
                 return Optional.empty();
             }
@@ -596,7 +607,7 @@ public interface GameInstallType {
             }
 
             return StreamSupport.stream(node.required("disabledDLC").spliterator(), false)
-                    .map(n -> n.required("path").textValue())
+                    .map(n -> n.required("paradoxAppId").textValue())
                     .collect(Collectors.toList());
         }
 
@@ -608,37 +619,40 @@ public interface GameInstallType {
             var modsToUse = (getModInfoStorageType() ==
                     GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
             n.putArray("enabledMods").addAll(modsToUse.stream()
-                                                      .map(d -> FilenameUtils.separatorsToUnix
-                                                              (installation.getUserDir().relativize(d.getModFile()).toString()))
-                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path",s)).toList());
+                                                     .map(d -> d.getContentPath())
+                                                     .filter(path -> path.isPresent())
+                                                     .map(s -> JsonNodeFactory.instance.objectNode().put("path", s.get().toString())).toList());
 
             var dlcsToDisable = getDlcInfoStorageType() ==
                     GameInstallType.DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryDisabledDlcs() : installation.getDlcs();
             n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
-                                                       .filter(d -> d.isExpansion() && !dlcs.contains(d))
-                                                       .map(d -> FilenameUtils.separatorsToUnix(
-                                                               installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
-                                                     .map(s -> JsonNodeFactory.instance.objectNode().put("path",s)).toList());
+                                                     .filter(d -> !dlcs.contains(d))
+                                                     .map(d -> d.getName())
+                                                     .map(s -> JsonNodeFactory.instance.objectNode().put("paradoxAppId", s)).toList());
             JsonHelper.write(n, file);
         }
 
-        public  List<GameMod> loadMods(GameInstallation installation) throws IOException {
+        public List<GameMod> loadMods(GameInstallation installation) throws IOException {
             var directory = installation.getDist().getWorkshopDir().orElseThrow();
-            if (!Files.isDirectory(directory) ){
+            if (!Files.isDirectory(directory)) {
                 return List.of();
             }
 
             var mods = new ArrayList<GameMod>();
-            try (var list = Files.list(directory) ){
+            try (var list = Files.list(directory)) {
                 list.forEach(f -> {
                     GameMod.fromVictoria3Directory(f).ifPresent(m -> {
                         mods.add(m);
-                        LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("<no name>") +
-                                                                                     " at " + m.getContentPath() + ".");
+                        LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("?") +
+                                                                                     " at " + m.getContentPath().orElse(null) + ".");
                     });
                 });
             }
             return mods;
+        }
+
+        public String getModSavegameId(Path userDir, GameMod mod) {
+            return mod.getName().orElse("unknown");
         }
     };
 
@@ -652,6 +666,7 @@ public interface GameInstallType {
     List<String> getLaunchArguments();
 
     Path getExecutable(Path p);
+
     Path getProtonExecutable(Path p);
 
     default Optional<GameVersion> getVersion(String versionString) {
@@ -725,6 +740,8 @@ public interface GameInstallType {
 
     public void writeModAndDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs) throws Exception;
 
+    public List<GameMod> loadMods(GameInstallation installation) throws IOException;
+
     default Path determineUserDir(Path p, String name) throws IOException {
         var userDirFile = p.resolve("userdir.txt");
         if (Files.exists(userDirFile)) {
@@ -756,7 +773,7 @@ public interface GameInstallType {
                 }
                 case MAC -> {
                     return p.resolve(p.resolve(executableName + ".app")
-                            .resolve("Contents").resolve("MacOS").resolve(Path.of(executableName).getFileName()));
+                                             .resolve("Contents").resolve("MacOS").resolve(Path.of(executableName).getFileName()));
                 }
             }
 
@@ -833,7 +850,7 @@ public interface GameInstallType {
             JsonHelper.write(n, file);
         }
 
-        public  List<GameMod> loadMods(GameInstallation installation) throws IOException {
+        public List<GameMod> loadMods(GameInstallation installation) throws IOException {
             if (!Files.isDirectory(installation.getUserDir().resolve("mod"))) {
                 return List.of();
             }
@@ -846,8 +863,8 @@ public interface GameInstallType {
 
                         var ex = m.getAbsoluteContentPath(installation.getUserDir()).map(Files::exists).orElse(null);
                         LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("<no name>") +
-                                             " at " + m.getModFile().toString() + ". Content exists: " + ex +
-                                             ". Legacy: " + m.isLegacyArchive());
+                                                                                     " at " + m.getModFile().toString() + ". Content exists: " + ex +
+                                                                                     ". Legacy: " + m.isLegacyArchive());
                     });
                 });
             }

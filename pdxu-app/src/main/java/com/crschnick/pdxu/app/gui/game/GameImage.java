@@ -116,6 +116,7 @@ public class GameImage {
     public static Image VIC2_BACKGROUND;
 
     public static Image VIC3_BACKGROUND;
+    public static Image VIC3_ICON_IRONMAN;
 
     private static void resetImages() {
         for (var field : GameImage.class.getFields()) {
@@ -153,10 +154,11 @@ public class GameImage {
     public static void loadVic3Images() {
         var installPath = GameInstallation.ALL.get(Game.VIC3).getInstallDir();
         Path p = installPath.resolve("game");
-        Path i = p.resolve("gfx").resolve("interface").resolve("icons");
+        Path i = p.resolve("gfx").resolve("frontend").resolve("interface").resolve("icons");
 
         VIC3_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.VIC3)
                                                        .getType().chooseBackgroundImage(installPath));
+        VIC3_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
     }
 
     public static void loadCk3Images() {

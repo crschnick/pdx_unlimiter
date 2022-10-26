@@ -1,14 +1,14 @@
 package com.crschnick.pdxu.app.info.vic3;
 
-import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.info.SavegameInfoException;
-import com.crschnick.pdxu.app.info.VersionComp;
+import com.crschnick.pdxu.app.info.*;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 
 public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
 
+    Vic3IronmanComp ironman;
+    ModComp mods;
+    DlcComp dlcs;
     VersionComp version;
 
     public Vic3SavegameInfo() {
