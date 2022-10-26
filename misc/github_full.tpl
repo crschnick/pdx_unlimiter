@@ -19,3 +19,4 @@ If you don't like installers, you can also use a standalone version, which is pa
 
 - [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-windows.zip)
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-linux.zip)
+- [Mac (Intel) standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-mac_intel.dmg)
