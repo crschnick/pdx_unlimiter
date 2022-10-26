@@ -1,0 +1,10 @@
+l_polish:
+  EXPORT: "Eksportuj"
+  CONTINUE_GAME: "Kontynuuj"
+  START_LAUNCHER: "Uruchom w kliencie"
+  RUNNING: "Uruchomiony"
+  LATEST: "Ostatni"
+  NONE: "BRAK"
+  IMPORT: "Importuj"
+  KILL: "Zakończ"
+  DEBUG_MODE: "Debuguj"

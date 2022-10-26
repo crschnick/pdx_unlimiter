@@ -1,0 +1,6 @@
+l_polish:
+  ERROR_OCCURED: "Zaszedł nieoczekiwany błąd: $CAUSE$"
+  GAME_DATA_PATH_NOT_FOUND: "Nie znaleziono ścieżki gry w pliku konfiguracyjnym klienta $GAME$"
+  INSTALL_DIR_IS_USER_DIR:"Wybrałeś ścieżkę do folderu Dokumenty, a Pdx-Unlimiter wymaga ścieżki instalacyjnej.\nZazwyczaj znajduje się ona w lokalizacjach pokroju:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\nŁatwo znajdziesz ścieżkę gry uruchamiając Steam, przechodząc do Biblioteki, klikając prawym przyciskiem myszy na danej grze, nakierowując na "Zarządzaj", a następnie klikając "Przeglądaj pliki lokalne"."
+  GAME_DATA_PATH_DOES_NOT_EXIST: "Ścieżka instalacyjna $GAME$ została wykryta, ale ścieżka do plików użytkownika $DIR$ nie istnieje.\n Aby rozwiązać ten problem, uruchom grę, która wtedy sama wygeneruje pliki."
+  EXECUTABLE_NOT_FOUND: "Plik wykonywalny $FILE$ gry $GAME$ executable nie został odnaleziony w ścieżce $DIR$.\nZazwyczaj znajduje się on w lokalizacjach pokroju:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\nŁatwo znajdziesz ścieżkę gry uruchamiając Steam, przechodząc do Biblioteki, klikając prawym przyciskiem myszy na danej grze, nakierowując na "Zarządzaj", a następnie klikając "Przeglądaj pliki lokalne".
