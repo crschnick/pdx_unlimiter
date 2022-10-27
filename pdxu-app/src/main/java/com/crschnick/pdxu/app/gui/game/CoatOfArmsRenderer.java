@@ -230,8 +230,15 @@ public abstract class CoatOfArmsRenderer {
             emblem.getInstances().stream()
                     .sorted(Comparator.comparingDouble(CoatOfArms.Instance::getDepth))
                     .forEach(instance -> {
-                        var scaleX = ((double) width / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
-                        var scaleY = ((double) height / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
+                        double angle = Math.toRadians(instance.getRotation());
+                        double sin = Math.sin(angle);
+                        double cos = Math.cos(angle);
+
+                        var rotWidth = img.getWidth() * cos + img.getHeight() * sin;
+                        var rotHeight = img.getWidth() * sin + img.getHeight() * cos;
+
+                        var scaleX = ((double) width / rotWidth) * instance.getScaleX() * sub.getScaleX();
+                        var scaleY = ((double) height / rotHeight) * instance.getScaleY() * sub.getScaleY();
 
                         var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
                         var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
@@ -239,12 +246,11 @@ public abstract class CoatOfArmsRenderer {
                         AffineTransform trans = new AffineTransform();
                         trans.translate(x, y);
                         trans.scale(scaleX, scaleY);
-                        trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
+                        trans.translate(-rotWidth / 2.0, -rotHeight / 2.0);
 
                         if (instance.getRotation() != 0) {
-                            trans.translate(img.getWidth() / 2.0, img.getHeight() / 2.0);
-                            trans.rotate(
-                                    Math.signum(scaleX) * Math.signum(scaleY) * Math.toRadians(instance.getRotation()));
+                            trans.translate(rotWidth / 2.0, rotHeight / 2.0);
+                            trans.rotate(angle);
                             trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
                         }
 

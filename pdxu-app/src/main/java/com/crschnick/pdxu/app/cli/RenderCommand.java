@@ -91,7 +91,7 @@ public class RenderCommand implements Runnable {
         SavegameStorage.init();
 
         if (!game.isEnabled()) {
-            throw new IllegalArgumentException("Game is not set up yet");
+            throw new IllegalArgumentException("Game is not set up yet. Please launch the GUI first");
         }
 
         Files.createDirectories(output);
