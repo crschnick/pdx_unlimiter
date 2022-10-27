@@ -230,15 +230,22 @@ public abstract class CoatOfArmsRenderer {
             emblem.getInstances().stream()
                     .sorted(Comparator.comparingDouble(CoatOfArms.Instance::getDepth))
                     .forEach(instance -> {
-                        double angle = Math.toRadians(instance.getRotation());
-                        double sin = Math.sin(angle);
-                        double cos = Math.cos(angle);
+                        double angle = Math.toRadians(
+                                Math.signum(instance.getScaleX() * sub.getScaleX()) * Math.signum(instance.getScaleY() * sub.getScaleY()) *
+                                        instance.getRotation());
 
-                        var rotWidth = Math.abs(img.getWidth() * cos + img.getHeight() * sin);
-                        var rotHeight = Math.abs(img.getWidth() * sin + img.getHeight() * cos);
+                        var cRotWidth = img.getWidth();
+                        var cRotHeight = img.getHeight();
+                        if ((instance.getRotation() > 45 && instance.getRotation() < 135) ||
+                                (instance.getRotation() > 225 && instance.getRotation() < 315) ||
+                                (instance.getRotation() > -135 && instance.getRotation() < -45) ||
+                                (instance.getRotation() > -315 && instance.getRotation() < -225)) {
+                            cRotWidth = img.getHeight();
+                            cRotHeight = img.getWidth();
+                        }
 
-                        var scaleX = ((double) width / rotWidth) * instance.getScaleX() * sub.getScaleX();
-                        var scaleY = ((double) height / rotHeight) * instance.getScaleY() * sub.getScaleY();
+                        var scaleX = ((double) width / cRotWidth) * instance.getScaleX() * sub.getScaleX();
+                        var scaleY = ((double) height / cRotHeight) * instance.getScaleY() * sub.getScaleY();
 
                         var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
                         var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
@@ -246,13 +253,12 @@ public abstract class CoatOfArmsRenderer {
                         AffineTransform trans = new AffineTransform();
                         trans.translate(x, y);
                         trans.scale(scaleX, scaleY);
-                        trans.translate(-rotWidth / 2.0, -rotHeight / 2.0);
 
                         if (instance.getRotation() != 0) {
-                            trans.translate(rotWidth / 2.0, rotHeight / 2.0);
                             trans.rotate(angle);
-                            trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
                         }
+
+                        trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 
                         usedGraphics.drawImage(img, new AffineTransformOp(trans, AffineTransformOp.TYPE_BICUBIC), 0, 0);
                     });
