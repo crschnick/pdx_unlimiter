@@ -53,7 +53,18 @@ public class PdxuInstallation {
                 || !Files.exists(getResourcesDirectory()));
         if (invalid) {
             ErrorHandler.handleTerminalException(new IOException("Required files not found. " +
-                    "If you use the standalone distribution, please check whether you extracted the archive correctly."));
+                                                                         "If you use the standalone distribution, please check whether you " +
+                                                                         "extracted the archive correctly."));
+        }
+    }
+
+    public void checkDataDirectoryPermissions() {
+        try {
+            Files.createDirectories(getDataDir());
+        } catch (IOException e) {
+            ErrorHandler.handleTerminalException(new IOException(
+                    "Unable to access directory " + getDataDir().getParent() + ". Please make sure that you have the appropriate permissions. " +
+                            "In case you use cloud storage, verify that your cloud storage is working."));
         }
     }
 
@@ -95,8 +106,10 @@ public class PdxuInstallation {
         i.resourceDir = getResourcesDirectory();
 
         // Legacy support
-        var legacyDataDir = Path.of(System.getProperty("user.home"),
-                SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter");
+        var legacyDataDir = Path.of(
+                System.getProperty("user.home"),
+                SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter"
+        );
         if (Files.exists(legacyDataDir)) {
             i.dataDir = legacyDataDir;
         } else {
@@ -151,7 +164,7 @@ public class PdxuInstallation {
             i.version = "dev";
             if (!Files.exists(Path.of("pdxu.properties"))) {
                 System.err.println("You are running pdxu in a dev environment without proper setup. " +
-                        "See https://github.com/crschnick/pdx_unlimiter#development for details.");
+                                           "See https://github.com/crschnick/pdx_unlimiter#development for details.");
                 System.exit(1);
             }
 

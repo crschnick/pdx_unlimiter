@@ -28,7 +28,7 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     public Eu4SavegameInfo() {}
 
-    public Eu4SavegameInfo(SavegameContent content) throws SavegameInfoException {
+    public Eu4SavegameInfo(SavegameContent content) throws Exception {
         super(content);
     }
 

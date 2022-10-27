@@ -6,7 +6,13 @@ import com.crschnick.pdxu.model.vic3.Vic3Tag;
 
 public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
 
+    Vic3AchievementOkComp achievementOk;
     Vic3IronmanComp ironman;
+    Vic3GdpComp gdp;
+    Vic3SolComp sol;
+    Vic3PrestigeComp prestige;
+    Vic3LoyalistComp loyalist;
+    Vic3RadicalComp radical;
     ModComp mods;
     DlcComp dlcs;
     VersionComp version;
@@ -15,7 +21,7 @@ public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
     }
 
 
-    public Vic3SavegameInfo(SavegameContent content) throws SavegameInfoException {
+    public Vic3SavegameInfo(SavegameContent content) throws Exception {
         super(content);
     }
 

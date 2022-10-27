@@ -9,40 +9,32 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
-import java.lang.reflect.InvocationTargetException;
-
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
 public abstract class SavegameInfo<T> {
 
     protected SavegameData<T> data;
 
-    protected SavegameInfo() {}
+    protected SavegameInfo() {
+    }
 
-    protected SavegameInfo(SavegameContent content) throws SavegameInfoException {
-        try {
-            this.data = (SavegameData<T>) getDataClass().getDeclaredConstructors()[0].newInstance();
-            this.data.init(content);
-        } catch (Exception e) {
-            ErrorHandler.handleTerminalException(e);
-        }
+    protected SavegameInfo(SavegameContent content) throws Exception {
+        this.data = getDataClass().getDeclaredConstructor().newInstance();
+        this.data.init(content);
 
         for (var field : getClass().getDeclaredFields()) {
             if (!SavegameInfoComp.class.isAssignableFrom(field.getType())) {
                 continue;
             }
 
-            SavegameInfoComp c = null;
             try {
+                var c = (SavegameInfoComp) field.getType().getDeclaredConstructors()[0].newInstance();
+                c.init(content, data);
                 field.setAccessible(true);
-                field.set(this, field.getType().getDeclaredConstructors()[0].newInstance());
-                c = (SavegameInfoComp) field.get(this);
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                ErrorHandler.handleTerminalException(e);
-                return;
+                field.set(this, c);
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
             }
-
-            c.init(content, this.data);
         }
     }
 
@@ -65,6 +57,9 @@ public abstract class SavegameInfo<T> {
             try {
                 field.setAccessible(true);
                 SavegameInfoComp c = (SavegameInfoComp) field.get(this);
+                if (c == null) {
+                    continue;
+                }
                 var region = c.create(data);
                 if (region != null) {
                     addNode(container, region);

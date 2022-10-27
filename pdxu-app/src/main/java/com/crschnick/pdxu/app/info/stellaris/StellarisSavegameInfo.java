@@ -12,7 +12,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     public StellarisSavegameInfo() {
     }
 
-    public StellarisSavegameInfo(SavegameContent content) throws SavegameInfoException {
+    public StellarisSavegameInfo(SavegameContent content) throws Exception {
         super(content);
     }
 

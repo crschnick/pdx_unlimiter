@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 public class Vic3Tag {
 
+    private String id;
     private String tag;
     private String government;
 }

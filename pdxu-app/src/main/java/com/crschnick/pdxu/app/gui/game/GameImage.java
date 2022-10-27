@@ -117,6 +117,13 @@ public class GameImage {
 
     public static Image VIC3_BACKGROUND;
     public static Image VIC3_ICON_IRONMAN;
+    public static Image VIC3_ICON_ACHIEVEMENT_ELIGIBLE;
+    public static Image VIC3_ICON_ACHIEVEMENT_INELIGIBLE;
+    public static Image VIC3_ICON_GDP;
+    public static Image VIC3_ICON_PRESTIGE;
+    public static Image VIC3_ICON_SOL;
+    public static Image VIC3_ICON_RADICALS;
+    public static Image VIC3_ICON_LOYALISTS;
 
     private static void resetImages() {
         for (var field : GameImage.class.getFields()) {
@@ -139,7 +146,8 @@ public class GameImage {
                 Game.STELLARIS, GameImage::loadStellarisImages,
                 Game.CK2, GameImage::loadCk2Images,
                 Game.VIC2, GameImage::loadVic2Images,
-                Game.VIC3, GameImage::loadVic3Images);
+                Game.VIC3, GameImage::loadVic3Images
+        );
 
         if (g != null) {
             loadFuncs.get(g).run();
@@ -154,11 +162,20 @@ public class GameImage {
     public static void loadVic3Images() {
         var installPath = GameInstallation.ALL.get(Game.VIC3).getInstallDir();
         Path p = installPath.resolve("game");
-        Path i = p.resolve("gfx").resolve("frontend").resolve("interface").resolve("icons");
+        Path fi = p.resolve("gfx").resolve("frontend").resolve("interface").resolve("icons");
+        Path i = p.resolve("gfx").resolve("interface").resolve("icons");
 
         VIC3_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.VIC3)
-                                                       .getType().chooseBackgroundImage(installPath));
-        VIC3_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
+                                                        .getType().chooseBackgroundImage(installPath));
+        VIC3_ICON_IRONMAN = ImageHelper.loadImage(fi.resolve("meta").resolve("icon_ironman.dds"));
+        VIC3_ICON_ACHIEVEMENT_ELIGIBLE = ImageHelper.loadImage(fi.resolve("meta").resolve("icon_achievements_enabled.dds"));
+        VIC3_ICON_ACHIEVEMENT_INELIGIBLE = ImageHelper.loadImage(fi.resolve("meta").resolve("icon_achievements_disabled.dds"));
+
+        VIC3_ICON_GDP = ImageHelper.loadImage(i.resolve("generic_icons").resolve("gdp.dds"));
+        VIC3_ICON_PRESTIGE = ImageHelper.loadImage(p.resolve("gfx").resolve("interface").resolve("flag").resolve("power_rank_04.dds"));
+        VIC3_ICON_SOL = ImageHelper.loadImage(i.resolve("generic_icons").resolve("sol_icon.dds"));
+        VIC3_ICON_LOYALISTS = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population_loyalist.dds"));
+        VIC3_ICON_RADICALS = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population_radical.dds"));
     }
 
     public static void loadCk3Images() {
@@ -169,7 +186,7 @@ public class GameImage {
         CK3_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
 
         CK3_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.CK3)
-                .getType().chooseBackgroundImage(installPath));
+                                                       .getType().chooseBackgroundImage(installPath));
         CK3_TITLE_MASK = ImageHelper.loadImage(
                 installPath.resolve("game").resolve("gfx").resolve("interface")
                         .resolve("coat_of_arms").resolve("title_mask.dds"));
@@ -244,22 +261,23 @@ public class GameImage {
         STELLARIS_FLAG_MASK = ImageHelper.loadImage(f.resolve("empire_flag_200_mask.dds"));
         STELLARIS_FLAG_FRAME = ImageHelper.loadImage(f.resolve("empire_flag_200_frame.dds"));
         STELLARIS_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.STELLARIS)
-                .getType().chooseBackgroundImage(installPath));
+                                                             .getType().chooseBackgroundImage(installPath));
 
     }
 
     private static void loadCk2Images() {
         var installPath = GameInstallation.ALL.get(Game.CK2).getInstallDir();
         CK2_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.CK2)
-                .getType().chooseBackgroundImage(installPath));
+                                                       .getType().chooseBackgroundImage(installPath));
     }
 
     private static void loadVic2Images() {
         var installPath = GameInstallation.ALL.get(Game.VIC2).getInstallDir();
         VIC2_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.VIC2)
-                .getType().chooseBackgroundImage(installPath));
+                                                        .getType().chooseBackgroundImage(installPath));
         VIC2_BACKGROUND = ImageHelper.cut(VIC2_BACKGROUND, new Rectangle2D(100, 100,
-                VIC2_BACKGROUND.getWidth() - 200, VIC2_BACKGROUND.getHeight() - 200));
+                                                                           VIC2_BACKGROUND.getWidth() - 200, VIC2_BACKGROUND.getHeight() - 200
+        ));
     }
 
     private static void loadHoi4Images() {
@@ -275,7 +293,7 @@ public class GameImage {
         HOI4_ICON_DIFF_CIVILIAN = ImageHelper.loadImage(i.resolve("difficulty_button_civilian.dds"));
         HOI4_FLAG_OVERLAY = ImageHelper.loadImage(i.resolve("flag_overlay.dds"));
         HOI4_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.HOI4)
-                .getType().chooseBackgroundImage(installPath));
+                                                        .getType().chooseBackgroundImage(installPath));
 
     }
 
@@ -324,7 +342,8 @@ public class GameImage {
         };
         EU4_ICON_RANDOM_NEW_WORLD = ImageHelper.loadImage(
                 i.resolve("frontend_random_world.dds"),
-                rnwFilter);
+                rnwFilter
+        );
         VIEWPORTS.put(EU4_ICON_RANDOM_NEW_WORLD, new Rectangle2D(14, 0, 33, 30));
 
         Function<Integer, Integer> customFilter = (Integer rgb) -> {
@@ -339,7 +358,8 @@ public class GameImage {
         };
         EU4_ICON_CUSTOM_NATION = ImageHelper.loadImage(
                 i.resolve("frontend_custom_nation.dds"),
-                customFilter);
+                customFilter
+        );
         VIEWPORTS.put(EU4_ICON_CUSTOM_NATION, new Rectangle2D(20, 5, 21, 21));
 
         EU4_ICON_RELEASED_VASSAL = ImageHelper.loadImage(
@@ -352,7 +372,7 @@ public class GameImage {
         EU4_SMALL_SHIELD_FRAME = ImageHelper.loadImage(i.resolve("small_shield_overlay.dds"));
 
         EU4_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.EU4)
-                .getType().chooseBackgroundImage(installPath));
+                                                       .getType().chooseBackgroundImage(installPath));
     }
 
     public static Path getEu4TagPath(String tag) {
@@ -425,7 +445,8 @@ public class GameImage {
                     ((1 - relViewportWidth) / 2.0) * i.getWidth(),
                     ((1 - relViewportHeight) / 2.0) * i.getHeight(),
                     i.getWidth() * relViewportWidth,
-                    i.getHeight() * relViewportHeight));
+                    i.getHeight() * relViewportHeight
+            ));
         };
         pane.widthProperty().addListener(cl);
         pane.heightProperty().addListener(cl);

@@ -18,7 +18,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     public Ck3SavegameInfo() {
     }
 
-    public Ck3SavegameInfo(SavegameContent content) throws SavegameInfoException {
+    public Ck3SavegameInfo(SavegameContent content) throws Exception {
         super(content);
     }
 

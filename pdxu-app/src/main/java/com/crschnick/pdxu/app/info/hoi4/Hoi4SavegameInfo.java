@@ -12,7 +12,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     public Hoi4SavegameInfo() {
     }
 
-    public Hoi4SavegameInfo(SavegameContent content) throws SavegameInfoException {
+    public Hoi4SavegameInfo(SavegameContent content) throws Exception {
         super(content);
     }
 

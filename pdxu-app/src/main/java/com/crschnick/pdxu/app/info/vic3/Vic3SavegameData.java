@@ -47,9 +47,11 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
         date = GameDateType.VIC3.fromString(content.get().getNodeForKeys("meta_data", "game_date").getString());
 
+        coatOfArms = CoatOfArms.fromNode(meta.getNodeForKey("flag"), s -> null);
+
         var countryId = content.get().getNodeForKey("previous_played").getNodeArray().get(0).getNodeForKey("idtype").getValueNode().getString();
         var country = content.get().getNodeForKey("country_manager").getNodeForKey("database").getNodeForKey(countryId);
-        tag = new Vic3Tag(country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString());
+        tag = new Vic3Tag(countryId, country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString());
         allTags = List.of(tag);
         observer = false;
 

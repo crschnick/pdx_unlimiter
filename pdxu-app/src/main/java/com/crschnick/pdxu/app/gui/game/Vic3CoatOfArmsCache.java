@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.fromGameColor;
@@ -110,17 +111,20 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
             return cachedImg;
         }
 
-        var found = getCoatOfArmsNode().getNodeForKeyIfExistent(tag.getTag());
-        if (found.isEmpty()) {
+        try {
+            Supplier<CoatOfArms> coa = tag == info.getData().getTag() ?
+                    () -> info.getData().vic3().getCoatOfArms() :
+                    () -> CoatOfArms.fromNode(
+                            getCoatOfArmsNode().getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> getCoatOfArmsNode().getNodeForKey(s));
+            var img = Vic3TagRenderer.renderImage(
+                    coa.get(), GameFileContext.fromData(info.getData()), (int) (IMG_SIZE * 1.5), IMG_SIZE);
+            var convertedImage = ImageHelper.toFXImage(img);
+            cache.flags.put(tag, convertedImage);
+            return convertedImage;
+        } catch (Exception ex) {
+            ErrorHandler.handleException(ex);
             return ImageHelper.DEFAULT_IMAGE;
         }
-
-        CoatOfArms coa = CoatOfArms.fromNode(found.get(), s -> getCoatOfArmsNode().getNodeForKey(s));
-        var img = Vic3TagRenderer.renderImage(
-                coa, GameFileContext.fromData(info.getData()), (int) (IMG_SIZE * 1.5), IMG_SIZE);
-        var convertedImage = ImageHelper.toFXImage(img);
-        cache.flags.put(tag, convertedImage);
-        return convertedImage;
     }
 
     private boolean colorsLoaded;

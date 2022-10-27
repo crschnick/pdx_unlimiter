@@ -6,10 +6,7 @@ import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.installation.GameInstallType;
-import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.installation.GameMod;
+import com.crschnick.pdxu.app.installation.*;
 import com.crschnick.pdxu.app.savegame.FileExportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
@@ -95,11 +92,11 @@ public class GameDistLauncher {
         );
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
-        var dlcs = ctx.getInfo().getData().getDlcs().stream()
+        var dlcs = ctx.getInfo().getData().getDlcs() != null ? ctx.getInfo().getData().getDlcs().stream()
                 .map(d -> ctx.getInstallation().getDlcForName(d))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : List.<GameDlc>of();
         var mods = ctx.getInfo().getData().getMods() != null ? ctx.getInfo().getData().getMods().stream()
                 .map(m -> ctx.getInstallation().getModForSavegameId(m))
                 .filter(Optional::isPresent)
