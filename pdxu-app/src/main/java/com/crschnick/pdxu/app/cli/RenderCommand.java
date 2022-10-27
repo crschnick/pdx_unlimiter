@@ -67,7 +67,7 @@ public class RenderCommand implements Runnable {
             description = "An optional selector. If set, only the selected coat of arms by name is rendered and outputted.",
             paramLabel = "<selector>"
     )
-    String selector;
+    List<String> selector;
 
     @CommandLine.Option(
             names = {
@@ -147,7 +147,7 @@ public class RenderCommand implements Runnable {
                     return;
                 }
 
-                if (selector != null && !s.equalsIgnoreCase(selector)) {
+                if (selector != null && selector.stream().noneMatch(sel -> sel.equalsIgnoreCase(s))) {
                     return;
                 }
 
@@ -194,7 +194,7 @@ public class RenderCommand implements Runnable {
                     return;
                 }
 
-                if (selector != null && !s.equalsIgnoreCase(selector)) {
+                if (selector != null && selector.stream().noneMatch(sel -> sel.equalsIgnoreCase(s))) {
                     return;
                 }
 
