@@ -237,8 +237,8 @@ public abstract class CoatOfArmsRenderer {
                         var rotWidth = Math.abs(img.getWidth() * cos + img.getHeight() * sin);
                         var rotHeight = Math.abs(img.getWidth() * sin + img.getHeight() * cos);
 
-                        var scaleX = ((double) width / rotWidth) * instance.getScaleX() * sub.getScaleX();
-                        var scaleY = ((double) height / rotHeight) * instance.getScaleY() * sub.getScaleY();
+                        var scaleX = ((double) width / rotWidth) * instance.getScaleX() * sub.getScaleX() * (angle < 0 ? -1 : 1);
+                        var scaleY = ((double) height / rotHeight) * instance.getScaleY() * sub.getScaleY() * (angle < 0 ? -1 : 1);
 
                         var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
                         var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
@@ -250,7 +250,7 @@ public abstract class CoatOfArmsRenderer {
 
                         if (instance.getRotation() != 0) {
                             trans.translate(rotWidth / 2.0, rotHeight / 2.0);
-                            trans.rotate(angle);
+                            trans.rotate(Math.abs(angle));
                             trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
                         }
 
