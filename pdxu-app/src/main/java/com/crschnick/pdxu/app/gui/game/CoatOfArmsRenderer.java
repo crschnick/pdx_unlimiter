@@ -234,8 +234,8 @@ public abstract class CoatOfArmsRenderer {
                         double sin = Math.sin(angle);
                         double cos = Math.cos(angle);
 
-                        var rotWidth = img.getWidth() * cos + img.getHeight() * sin;
-                        var rotHeight = img.getWidth() * sin + img.getHeight() * cos;
+                        var rotWidth = Math.abs(img.getWidth() * cos + img.getHeight() * sin);
+                        var rotHeight = Math.abs(img.getWidth() * sin + img.getHeight() * cos);
 
                         var scaleX = ((double) width / rotWidth) * instance.getScaleX() * sub.getScaleX();
                         var scaleY = ((double) height / rotHeight) * instance.getScaleY() * sub.getScaleY();
