@@ -1,0 +1,7 @@
+.vic3 .tag-icon {
+-fx-min-width: 4em;
+-fx-max-width: 4em;
+-fx-min-height: 3em;
+-fx-max-height: 3em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}

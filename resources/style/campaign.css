@@ -14,8 +14,8 @@
 }
 
 .campaign-list-entry .tag-icon {
--fx-min-width: 4em;
--fx-max-width: 4em;
+-fx-min-width: 5em;
+-fx-max-width: 5em;
 -fx-min-height: 4em;
 -fx-max-height: 4em;
 }

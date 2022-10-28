@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
@@ -59,18 +58,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         content.prefHeightProperty().bind(Bindings.createDoubleBinding(
                 () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
     }
-
-
-    protected void addIntegerEntry(JFXMasonryPane pane,
-                                   Image icon, int value, String tooltip, boolean showPlus) {
-        var text = (showPlus && value > 0 ? "+" + value : String.valueOf(value));
-        var ironman = new StackPane(new Label(text, GameImage.imageNode(icon, CLASS_IMAGE_ICON)));
-        ironman.setAlignment(Pos.CENTER);
-        GuiTooltips.install(ironman, tooltip);
-        ironman.getStyleClass().add("number");
-        addNode(pane, ironman);
-    }
-
 
     public ObservableValue<Node> createImage(SavegameEntry<T, I> entry) {
         SimpleObjectProperty<Node> prop;
