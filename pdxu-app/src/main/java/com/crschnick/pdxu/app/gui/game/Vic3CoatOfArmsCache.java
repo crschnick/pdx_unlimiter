@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -40,13 +41,10 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
             return cache.colors;
         }
 
-        var file = CascadeDirectoryHelper.openFile(
-                Path.of("common").resolve("named_colors").resolve("00_coa_colors.txt"),
-                ctx
-        );
-        if (file.isPresent()) {
+        cache.colorsLoaded = true;
+        Consumer<Path> loader = path -> {
             try {
-                Node node = TextFormatParser.text().parse(file.get());
+                Node node = TextFormatParser.text().parse(path);
                 node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
                     n.forEach((k, v) -> {
                         try {
@@ -55,14 +53,19 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
                         }
                     });
                 });
-                cache.colorsLoaded = true;
-                return cache.colors;
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
             }
+        };
+        CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("named_colors"), ctx, loader);
+
+        var jominiColors = GameInstallation.ALL.get(Game.VIC3)
+                .getInstallDir().resolve("jomini/common/named_colors/default_colors.txt");
+        if (Files.exists(jominiColors)) {
+            loader.accept(jominiColors);
         }
-        cache.colorsLoaded = true;
-        return Map.of();
+
+        return cache.colors;
     }
 
     public static Node getCoatOfArmsNode() {
