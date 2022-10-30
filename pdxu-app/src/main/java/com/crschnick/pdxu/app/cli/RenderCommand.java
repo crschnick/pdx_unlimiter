@@ -11,6 +11,7 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
@@ -25,9 +26,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @CommandLine.Command(
         name = "render",
@@ -51,10 +52,22 @@ public class RenderCommand implements Runnable {
 
     @CommandLine.Option(
             names = {
+                    "-m",
+                    "--mod"
+            },
+            description = "Additional mods to include when looking for coat of arms definitions. Note that the mod name has to be specified here, " +
+                    "not its location.",
+            paramLabel = "<mod>"
+    )
+    List<String> input = List.of();
+
+    @CommandLine.Option(
+            names = {
                     "-o",
                     "--output"
             },
             description = "The output directory",
+            required = true,
             paramLabel = "<output>"
     )
     Path output;
@@ -64,7 +77,8 @@ public class RenderCommand implements Runnable {
                     "-l",
                     "--selector"
             },
-            description = "An optional selector. If set, only the selected coat of arms by name is rendered and outputted.",
+            description = "An optional selector. If set, only the selected coat of arms by name is rendered and outputted. Note that you can also " +
+                    "specify multiple selectors.",
             paramLabel = "<selector>"
     )
     List<String> selector;
@@ -116,97 +130,115 @@ public class RenderCommand implements Runnable {
     }
 
     private void ck3(FailableBiConsumer<String, BufferedImage, Exception> consumer) throws Exception {
-        var directory = GameInstallation.ALL.get(Game.CK3)
-                .getInstallDir()
-                .resolve("game")
-                .resolve("common")
+        var directory = Path.of("common")
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
 
-        try (Stream<Path> list = Files.list(directory)) {
-            var all = new LinkedArrayNode(list.map(path -> {
-                ArrayNode content = null;
-                try {
-                    content = TextFormatParser.ck3().parse(path);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return Optional.<ArrayNode>empty();
-                }
+        var mods = input.stream()
+                .map(s -> GameInstallation.ALL.get(Game.CK3)
+                        .getModForSavegameId(s)
+                        .orElseThrow(() -> new IllegalArgumentException("Mod not found: " + s)))
+                .toList();
 
-                // Skip templates
-                if (content.size() == 1) {
-                    return Optional.<ArrayNode>empty();
-                }
+        var context = GameFileContext.forGameAndMods(Game.CK3, mods);
+        var files = new ArrayList<Path>();
+        CascadeDirectoryHelper.traverseDirectory(directory, context, files::add);
 
-                NodeEvaluator.evaluateArrayNode(content);
-                return Optional.of(content);
-            }).flatMap(Optional::stream).toList());
+        var all = new LinkedArrayNode(files.stream().map(path -> {
+            ArrayNode content = null;
+            try {
+                content = TextFormatParser.ck3().parse(path);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return Optional.<ArrayNode>empty();
+            }
 
-            all.forEach((s, node) -> {
-                if (!node.isArray()) {
-                    return;
-                }
+            // Skip templates
+            if (content.size() == 1) {
+                return Optional.<ArrayNode>empty();
+            }
 
-                if (selector != null && selector.stream().noneMatch(sel -> sel.equalsIgnoreCase(s))) {
-                    return;
-                }
+            NodeEvaluator.evaluateArrayNode(content);
+            return Optional.of(content);
+        }).flatMap(Optional::stream).toList());
 
-                try {
-                    var coa = CoatOfArms.fromNode(node, null);
-                    var image = Ck3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.CK3), size, false);
-                    consumer.accept(s, image);
-                } catch (Exception exception) {
-                    System.err.println(String.format("Error for %s:", s));
-                    exception.printStackTrace();
-                }
-            }, false);
-        }
+        all.forEach((s, node) -> {
+            if (!node.isArray()) {
+                return;
+            }
+
+            if (selector != null && selector.stream().noneMatch(sel -> sel.equalsIgnoreCase(s))) {
+                return;
+            }
+
+            try {
+                var coa = CoatOfArms.fromNode(node, null);
+                var image = Ck3TagRenderer.renderImage(coa, context, size, false);
+                consumer.accept(s, image);
+            } catch (Exception exception) {
+                System.err.println(String.format("Error for %s:", s));
+                exception.printStackTrace();
+            }
+        }, false);
     }
 
     private void vic3(FailableBiConsumer<String, BufferedImage, Exception> consumer) throws Exception {
-        var directory = GameInstallation.ALL.get(Game.VIC3)
-                .getInstallDir()
-                .resolve("game")
-                .resolve("common")
+        var directory = Path.of("common")
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
-        try (Stream<Path> list = Files.list(directory)) {
-            var all = new LinkedArrayNode(list.map(path -> {
-                ArrayNode content = null;
-                try {
-                    content = TextFormatParser.vic3().parse(path);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return Optional.<ArrayNode>empty();
-                }
 
-                // Skip templates
-                if (content.size() == 1) {
-                    return Optional.<ArrayNode>empty();
-                }
+        var mods = input.stream()
+                .map(s -> GameInstallation.ALL.get(Game.VIC3)
+                        .getModForSavegameId(s)
+                        .orElseThrow(() -> new IllegalArgumentException("Mod not found: " + s)))
+                .toList();
 
-                NodeEvaluator.evaluateArrayNode(content);
-                return Optional.of(content);
-            }).flatMap(Optional::stream).toList());
+        var context = GameFileContext.forGameAndMods(Game.VIC3, mods);
+        var files = new ArrayList<Path>();
+        CascadeDirectoryHelper.traverseDirectory(directory, context, files::add);
 
-            all.forEach((s, node) -> {
-                if (!node.isArray()) {
-                    return;
-                }
+        var all = new LinkedArrayNode(files.stream().map(path -> {
+            ArrayNode content = null;
+            try {
+                content = TextFormatParser.vic3().parse(path);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return Optional.<ArrayNode>empty();
+            }
 
-                if (selector != null && selector.stream().noneMatch(sel -> sel.equalsIgnoreCase(s))) {
-                    return;
-                }
+            // Skip templates
+            if (content.size() == 1) {
+                return Optional.<ArrayNode>empty();
+            }
 
-                try {
-                    var coa = CoatOfArms.fromNode(node, parent -> all.getNodeForKeyIfExistent(parent).orElse(null));
-                    var image = Vic3TagRenderer.renderImage(coa, GameFileContext.forGame(Game.VIC3), (int) (1.5 * size), size);
-                    consumer.accept(s, image);
-                } catch (Exception exception) {
-                    System.err.println(String.format("Error for %s:", s));
-                    exception.printStackTrace();
-                }
-            }, false);
-        }
+            NodeEvaluator.evaluateArrayNode(content);
+            return Optional.of(content);
+        }).flatMap(Optional::stream).toList());
+
+        var visited = new ArrayList<String>();
+        all.forEach((s, node) -> {
+            if (!node.isArray()) {
+                return;
+            }
+
+            if (selector != null && selector.stream().noneMatch(sel -> sel.equalsIgnoreCase(s))) {
+                return;
+            }
+
+            if (visited.contains(s)) {
+                return;
+            }
+            visited.add(s);
+
+            try {
+                System.out.println("Rendering " + s + " ...");
+                var coa = CoatOfArms.fromNode(node, parent -> all.getNodeForKeyIfExistent(parent).orElse(null));
+                var image = Vic3TagRenderer.renderImage(coa, context, (int) (1.5 * size), size);
+                consumer.accept(s, image);
+            } catch (Exception exception) {
+                System.err.println(String.format("Error for %s:", s));
+                exception.printStackTrace();
+            }
+        }, false);
     }
 }

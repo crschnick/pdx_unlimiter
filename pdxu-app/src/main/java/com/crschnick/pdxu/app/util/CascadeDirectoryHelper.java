@@ -77,11 +77,11 @@ public class CascadeDirectoryHelper {
             for (Iterator<File> it = FileUtils.iterateFilesAndDirs(
                     dir.toFile(),
                     FileFilterUtils.asFileFilter(f -> dir.relativize(f.toPath()).startsWith(traverseDir)),
-                    FileFilterUtils.asFileFilter(f -> dir.relativize(f.toPath()).startsWith(traverseDir))
+                    FileFilterUtils.asFileFilter(f -> traverseDir.startsWith(dir.relativize(f.toPath())))
             );
                  it.hasNext(); ) {
                 File f = it.next();
-                if (f.isDirectory()) {
+                if (f.isDirectory() || !dir.relativize(f.toPath()).startsWith(traverseDir)) {
                     continue;
                 }
 
