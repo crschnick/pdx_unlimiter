@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public class GameDlc {
 
-    private boolean expansion;
     private Path filePath;
     private Path dataPath;
     private String name;
@@ -30,19 +29,11 @@ public class GameDlc {
 
         Node node = TextFormatParser.text().parse(filePath);
         GameDlc dlc = new GameDlc();
-        dlc.expansion = node.getNodeForKeyIfExistent("category")
-                .map(n -> n.getString().equals("expansion"))
-                .orElse(false);
         dlc.filePath = filePath;
         dlc.dataPath = dataPath;
         dlc.name = node.getNodeForKey("name").getString();
         return Optional.of(dlc);
     }
-
-    public boolean isExpansion() {
-        return expansion;
-    }
-
     public Path getInfoFilePath() {
         return filePath;
     }

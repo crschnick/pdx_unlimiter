@@ -40,14 +40,14 @@ public class DlcComp extends SavegameInfoComp {
         var tooltip = PdxuI18n.get("DLCS_REQUIRED") + ":\n" +
                 dlcs.stream()
                         .map(s -> {
-                            var m = data.installation().getDlcForName(s);
+                            var m = data.installation().getDlcForSavegameId(s);
                             return "- " + (m.isPresent() ? m.get().getName() : s + " (" + PdxuI18n.get("MISSING") + ")");
                         })
                         .collect(Collectors.joining("\n"));
         GuiTooltips.install(label, tooltip);
 
         boolean missing = this.dlcs.stream()
-                .map(m -> data.installation().getDlcForName(m))
+                .map(m -> data.installation().getDlcForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         label.getStyleClass().add(missing ? CLASS_INCOMPATIBLE : CLASS_COMPATIBLE);
         label.setAlignment(Pos.CENTER);

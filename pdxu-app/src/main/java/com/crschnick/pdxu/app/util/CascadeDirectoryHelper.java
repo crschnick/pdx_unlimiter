@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -25,24 +26,28 @@ public class CascadeDirectoryHelper {
     public static void traverseDirectory(
             Path dir,
             GameFileContext ctx,
-            Consumer<Path> consumer) {
+            Consumer<Path> consumer
+    ) {
         traverseDir(dir, getCascadingDirectories(ctx), consumer);
     }
 
     public static Optional<Path> openFile(
             Path file,
-            SavegameInfo<?> info) {
+            SavegameInfo<?> info
+    ) {
         return openFile(file, getCascadingDirectories(GameFileContext.fromData(info.getData())));
     }
 
     public static Optional<Path> openFile(
             Path file,
-            GameFileContext ctx) {
+            GameFileContext ctx
+    ) {
         return openFile(file, getCascadingDirectories(ctx));
     }
 
     private static List<Path> getCascadingDirectories(
-            GameFileContext ctx) {
+            GameFileContext ctx
+    ) {
         List<GameMod> mods = List.of();
         try {
             mods = ctx.getMods() == null ? ctx.getInstall().queryEnabledMods() : ctx.getMods();
@@ -63,6 +68,7 @@ public class CascadeDirectoryHelper {
     }
 
     private static void traverseDir(Path traverseDir, List<Path> cascadingDirectories, Consumer<Path> consumer) {
+        var visited = new ArrayList<Path>();
         for (Path dir : cascadingDirectories) {
             if (!Files.isDirectory(dir)) {
                 continue;
@@ -71,13 +77,20 @@ public class CascadeDirectoryHelper {
             for (Iterator<File> it = FileUtils.iterateFilesAndDirs(
                     dir.toFile(),
                     FileFilterUtils.asFileFilter(f -> dir.relativize(f.toPath()).startsWith(traverseDir)),
-                    FileFilterUtils.asFileFilter(f -> dir.relativize(f.toPath()).startsWith(traverseDir)));
+                    FileFilterUtils.asFileFilter(f -> dir.relativize(f.toPath()).startsWith(traverseDir))
+            );
                  it.hasNext(); ) {
                 File f = it.next();
                 if (f.isDirectory()) {
                     continue;
                 }
 
+                var relativePath = dir.relativize(f.toPath());
+                if (visited.contains(relativePath)) {
+                    continue;
+                }
+
+                visited.add(relativePath);
                 consumer.accept(f.toPath());
             }
         }

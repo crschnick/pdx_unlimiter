@@ -36,10 +36,16 @@ public interface GameInstallType {
 
     public static enum DlcInfoStorageType {
         STORES_INFO,
+        SAVEGAME_DOESNT_STORE_COSMETICS_INFO,
         SAVEGAME_DOESNT_STORE_INFO
     }
 
     GameInstallType EU4 = new StandardInstallType("eu4") {
+
+        @Override
+        public DlcInfoStorageType getDlcInfoStorageType() {
+            return DlcInfoStorageType.SAVEGAME_DOESNT_STORE_COSMETICS_INFO;
+        }
 
         public Path getSteamSpecificFile(Path p) {
             return p.resolve("EmptySteamDepot");
@@ -106,6 +112,16 @@ public interface GameInstallType {
     };
 
     GameInstallType HOI4 = new StandardInstallType("hoi4") {
+
+        public String getDlcLauncherId(GameInstallation installation, GameDlc dlc) {
+            var rel = installation.getInstallDir().relativize(dlc.getInfoFilePath());
+            return FilenameUtils.separatorsToUnix(rel.toString());
+        }
+
+        public String getDlcSavegameId(GameInstallation installation, GameDlc dlc) {
+            throw new UnsupportedOperationException();
+        }
+
         @Override
         public Path getWindowsStoreLauncherDataPath(Path p) {
             return p.resolve("launcher");
@@ -166,7 +182,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public String getModSavegameId(Path userDir, GameMod mod) {
+        public String getModSavegameId(GameInstallation installation, GameMod mod) {
             return mod.getName().orElse("invalid mod");
         }
 
@@ -186,6 +202,16 @@ public interface GameInstallType {
     };
 
     GameInstallType STELLARIS = new StandardInstallType("stellaris") {
+
+        @Override
+        public DlcInfoStorageType getDlcInfoStorageType() {
+            return DlcInfoStorageType.SAVEGAME_DOESNT_STORE_COSMETICS_INFO;
+        }
+
+        @Override
+        public String getModSavegameId(GameInstallation installation, GameMod mod) {
+            throw new UnsupportedOperationException();
+        }
 
         @Override
         public ModInfoStorageType getModInfoStorageType() {
@@ -495,6 +521,17 @@ public interface GameInstallType {
     };
 
     GameInstallType VIC3 = new StandardInstallType("binaries/victoria3") {
+
+        @Override
+        public String getModSavegameId(GameInstallation installation, GameMod mod) {
+            return mod.getName().orElse("?");
+        }
+
+        @Override
+        public String getDlcSavegameId(GameInstallation installation, GameDlc dlc) {
+            return dlc.getName();
+        }
+
         @Override
         public Path chooseBackgroundImage(Path p) {
             int i = new Random().nextInt(9);
@@ -616,15 +653,13 @@ public interface GameInstallType {
             var file = installation.getUserDir().resolve("content_load.json");
             ObjectNode n = JsonNodeFactory.instance.objectNode();
 
-            var modsToUse = (getModInfoStorageType() ==
-                    GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
+            var modsToUse = mods;
             n.putArray("enabledMods").addAll(modsToUse.stream()
                                                      .map(d -> d.getContentPath())
                                                      .filter(path -> path.isPresent())
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path", s.get().toString())).toList());
 
-            var dlcsToDisable = getDlcInfoStorageType() ==
-                    GameInstallType.DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryDisabledDlcs() : installation.getDlcs();
+            var dlcsToDisable = dlcs;
             n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
                                                      .filter(d -> !dlcs.contains(d))
                                                      .map(d -> d.getName())
@@ -649,10 +684,6 @@ public interface GameInstallType {
                 });
             }
             return mods;
-        }
-
-        public String getModSavegameId(Path userDir, GameMod mod) {
-            return mod.getName().orElse("unknown");
         }
     };
 
@@ -681,13 +712,22 @@ public interface GameInstallType {
         return p.resolve("dlc");
     }
 
-    default String getModFileName(Path userDir, GameMod mod) {
-        var rel = userDir.relativize(mod.getModFile());
+    default String getModLauncherId(GameInstallation installation, GameMod mod) {
+        var rel = installation.getUserDir().relativize(mod.getModFile());
         return FilenameUtils.separatorsToUnix(rel.toString());
     }
 
-    default String getModSavegameId(Path userDir, GameMod mod) {
-        return getModFileName(userDir, mod);
+    default String getModSavegameId(GameInstallation installation, GameMod mod) {
+        return getModLauncherId(installation, mod);
+    }
+
+    default String getDlcLauncherId(GameInstallation installation, GameDlc dlc) {
+        var rel = installation.getType().getDlcPath(installation.getInstallDir()).getParent().relativize(dlc.getInfoFilePath());
+        return FilenameUtils.separatorsToUnix(rel.toString());
+    }
+
+    default String getDlcSavegameId(GameInstallation installation, GameDlc dlc) {
+        return dlc.getName();
     }
 
     void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException;
@@ -840,10 +880,14 @@ public interface GameInstallType {
                                                               (installation.getUserDir().relativize(d.getModFile()).toString()))
                                                       .map(JsonNodeFactory.instance::textNode).toList());
 
-            var dlcsToDisable = getDlcInfoStorageType() ==
-                    GameInstallType.DlcInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryDisabledDlcs() : installation.getDlcs();
+            var dlcsToDisable = switch (getDlcInfoStorageType()) {
+                case STORES_INFO -> installation.getDlcs().stream()
+                        .filter(d -> !dlcs.contains(d)).toList();
+                case SAVEGAME_DOESNT_STORE_COSMETICS_INFO ->
+                        installation.queryDisabledDlcs().stream().filter(gameDlc -> !dlcs.contains(gameDlc)).toList();
+                case SAVEGAME_DOESNT_STORE_INFO -> installation.queryDisabledDlcs();
+            };
             n.putArray("disabled_dlcs").addAll(dlcsToDisable.stream()
-                                                       .filter(d -> d.isExpansion() && !dlcs.contains(d))
                                                        .map(d -> FilenameUtils.separatorsToUnix(
                                                                installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
                                                        .map(JsonNodeFactory.instance::textNode).toList());

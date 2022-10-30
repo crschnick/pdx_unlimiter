@@ -49,6 +49,10 @@ public class GameFileContext {
         return new GameFileContext(g, List.of());
     }
 
+    public static GameFileContext forGameAndMods(Game g, List<GameMod> mods) {
+        return new GameFileContext(g, mods);
+    }
+
     public static GameFileContext forType(SavegameType t) {
         return new GameFileContext(TYPE_MAP.get(t), List.of());
     }
@@ -61,15 +65,7 @@ public class GameFileContext {
     public static GameFileContext fromData(SavegameData<?> sgData) {
         var g = INFO_MAP.get(sgData.getClass());
         List<GameMod> mods = sgData.getMods() != null ? sgData.getMods().stream()
-                .map(GameInstallation.ALL.get(g)::getModForFileName)
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList()) : List.of();
-        return new GameFileContext(g, mods);
-    }
-
-    public static GameFileContext fromMods(Game g, List<String> modsStrings) {
-        List<GameMod> mods = modsStrings != null ? modsStrings.stream()
-                .map(GameInstallation.ALL.get(g)::getModForFileName)
+                .map(GameInstallation.ALL.get(g)::getModForSavegameId)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList()) : List.of();
         return new GameFileContext(g, mods);

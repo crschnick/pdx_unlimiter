@@ -118,20 +118,24 @@ public final class GameInstallation {
         });
     }
 
-    public Optional<GameDlc> getDlcForName(String name) {
-        return dlcs.stream().filter(d -> d.getName().equals(name)).findAny();
-    }
-
     public GameDist getDist() {
         return dist;
     }
 
-    public Optional<GameMod> getModForFileName(String fn) {
-        return getMods().stream().filter(m -> type.getModFileName(userDir, m).equals(fn)).findAny();
+    public Optional<GameMod> getModForLauncherId(String fn) {
+        return getMods().stream().filter(m -> type.getModLauncherId(this, m).equals(fn)).findAny();
     }
 
     public Optional<GameMod> getModForSavegameId(String id) {
-        return getMods().stream().filter(m -> type.getModSavegameId(userDir, m).equals(id)).findAny();
+        return getMods().stream().filter(m -> type.getModSavegameId(this, m).equals(id)).findAny();
+    }
+
+    public Optional<GameDlc> getDlcForLauncherId(String fn) {
+        return getDlcs().stream().filter(m -> type.getDlcLauncherId(this, m).equals(fn)).findAny();
+    }
+
+    public Optional<GameDlc> getDlcForSavegameId(String id) {
+        return getDlcs().stream().filter(m -> type.getDlcSavegameId(this, m).equals(id)).findAny();
     }
 
     public void startDirectly(boolean debug) throws IOException {
@@ -216,7 +220,7 @@ public final class GameInstallation {
         logger.debug("Loading enabled mods ...");
         var enabledMods = new ArrayList<GameMod>();
         type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
-            var mod = getModForFileName(s);
+            var mod = getModForLauncherId(s);
             mod.ifPresentOrElse(m -> {
                 enabledMods.add(m);
                 logger.debug("Detected enabled mod " + m.getName());
@@ -231,7 +235,7 @@ public final class GameInstallation {
         logger.debug("Loading disabled dlcs ...");
         var disabledDlcs = new ArrayList<GameDlc>();
         type.getDisabledDlcs(getInstallDir(), userDir).forEach(s -> {
-            var dlc = getDlcForName(s);
+            var dlc = getDlcForLauncherId(s);
             dlc.ifPresentOrElse(m -> {
                 disabledDlcs.add(m);
                 logger.debug("Detected disabled dlc " + m.getName());

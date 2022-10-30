@@ -51,12 +51,12 @@ public class GuiIncompatibleWarning {
         }
 
         boolean missingDlc = info.getData().getDlcs().stream()
-                .map(m -> installation.getDlcForName(m))
+                .map(m -> installation.getDlcForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingDlc) {
             builder.append("\n\nThe following DLCs are missing:\n").append(info.getData().getDlcs().stream()
                     .map(s -> {
-                        var m = installation.getDlcForName(s);
+                        var m = installation.getDlcForSavegameId(s);
                         return (m.isPresent() ? null : "- " + s);
                     })
                     .filter(Objects::nonNull)

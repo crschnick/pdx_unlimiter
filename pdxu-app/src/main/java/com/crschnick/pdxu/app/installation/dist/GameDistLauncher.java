@@ -93,7 +93,7 @@ public class GameDistLauncher {
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
         var dlcs = ctx.getInfo().getData().getDlcs() != null ? ctx.getInfo().getData().getDlcs().stream()
-                .map(d -> ctx.getInstallation().getDlcForName(d))
+                .map(d -> ctx.getInstallation().getDlcForSavegameId(d))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()) : List.<GameDlc>of();

@@ -262,7 +262,7 @@ public class GuiSavegameEntry {
             });
             uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
             GuiTooltips.install(uploadSkanderbeg, PdxuI18n.get("UPLOAD_SKANDERBEG"));
-            // dynamicButtons.getChildren().add(uploadSkanderbeg);
+            dynamicButtons.getChildren().add(uploadSkanderbeg);
         }
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
