@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,12 +20,25 @@ public class CascadeDirectoryHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(CascadeDirectoryHelper.class);
 
+    public static void traverseDirectoryInverse(
+            Path dir,
+            GameFileContext ctx,
+            Consumer<Path> consumer) {
+        var files = new ArrayList<Path>();
+        CascadeDirectoryHelper.traverseDirectory(dir, ctx, files::add);
+        Collections.reverse(files);
+        files.forEach(consumer);
+    }
+
     public static void traverseDirectory(
             Path dir,
             GameFileContext ctx,
             Consumer<Path> consumer
     ) {
-        traverseDir(dir, getCascadingDirectories(ctx), consumer);
+        var files = new ArrayList<Path>();
+        traverseDir(dir, getCascadingDirectories(ctx), files::add);
+        files.sort(Comparator.comparing(o -> o.getFileName().toString()));
+        files.forEach(consumer);
     }
 
     public static Optional<Path> openFile(

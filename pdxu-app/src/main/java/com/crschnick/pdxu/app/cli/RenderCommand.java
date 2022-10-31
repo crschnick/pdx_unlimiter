@@ -215,7 +215,6 @@ public class RenderCommand implements Runnable {
             return Optional.of(content);
         }).flatMap(Optional::stream).toList());
 
-        var visited = new ArrayList<String>();
         all.forEach((s, node) -> {
             if (!node.isArray()) {
                 return;
@@ -225,14 +224,12 @@ public class RenderCommand implements Runnable {
                 return;
             }
 
-            if (visited.contains(s)) {
-                return;
-            }
-            visited.add(s);
-
             try {
                 System.out.println("Rendering " + s + " ...");
-                var coa = CoatOfArms.fromNode(node, parent -> all.getNodeForKeyIfExistent(parent).orElse(null));
+                var coa = CoatOfArms.fromNode(node, parent -> {
+                    var found = all.getNodesForKey(parent);
+                    return found.size() > 0 ? found.get(found.size() - 1) : null;
+                });
                 var image = Vic3TagRenderer.renderImage(coa, context, (int) (1.5 * size), size);
                 consumer.accept(s, image);
             } catch (Exception exception) {
