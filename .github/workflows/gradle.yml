@@ -26,6 +26,7 @@ jobs:
         with:
           version: '21.3.0'
           java-version: '17'
+          github-token: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
       - name: Echo JAVA_HOME
         run: echo $JAVA_HOME
       - name: Verify Gradle Wrapper
