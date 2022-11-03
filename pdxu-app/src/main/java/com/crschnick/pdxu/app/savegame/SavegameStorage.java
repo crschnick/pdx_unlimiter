@@ -436,6 +436,7 @@ public abstract class SavegameStorage<
                 getSavegameCampaign(e).onSavegameLoad(e);
                 return;
             } catch (Exception ex) {
+                e.fail();
                 ErrorHandler.handleException(ex);
             }
         }

@@ -5,28 +5,24 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.info.SavegameInfoMultiComp;
-import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Region;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Eu4WarMultiComp extends SavegameInfoMultiComp {
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class WarComp extends Eu4DiplomacyRowComp {
 
-        private final War<Eu4Tag> war;
-
-        @JsonCreator
-        public WarComp(War<Eu4Tag> war) {
-            this.war = war;
-        }
+        private War<Eu4Tag> war;
 
         @Override
         protected String getStyleClass() {
@@ -49,20 +45,21 @@ public class Eu4WarMultiComp extends SavegameInfoMultiComp {
         }
     }
 
+    private List<WarComp> comps;
+
     @Override
-    protected List<? extends SavegameInfoComp> generate(ArrayNode node, SavegameData<?> data) {
+    protected void init(SavegameContent content, SavegameData<?> data) {
         List<War<Eu4Tag>> wars = new ArrayList<>();
-        for (Node war : node.getNodesForKey("active_war")) {
+        for (Node war : content.get().getNodesForKey("active_war")) {
             String title = war.getNodeForKeyIfExistent("name").map(Node::getString).orElse("MISSING NAME");
             boolean isAttacker = false;
             List<Eu4Tag> attackers = new ArrayList<>();
             if (war.hasKey("attackers")) {
                 for (Node atk : war.getNodeForKey("attackers").getNodeArray()) {
                     String attacker = atk.getString();
+                    attackers.add(Eu4Tag.getTag(data.eu4().getAllTags(), attacker));
                     if (attacker.equals(data.eu4().getTagName())) {
                         isAttacker = true;
-                    } else {
-                        attackers.add(Eu4Tag.getTag(data.eu4().getAllTags(), attacker));
                     }
                 }
             }
@@ -72,25 +69,24 @@ public class Eu4WarMultiComp extends SavegameInfoMultiComp {
             if (war.hasKey("defenders")) {
                 for (Node def : war.getNodeForKey("defenders").getNodeArray()) {
                     String defender = def.getString();
+                    defenders.add(Eu4Tag.getTag(data.eu4().getAllTags(), defender));
                     if (defender.equals(data.eu4().getTagName())) {
                         isDefender = true;
-                    } else {
-                        defenders.add(Eu4Tag.getTag(data.eu4().getAllTags(), defender));
                     }
                 }
             }
             if (isAttacker) {
                 wars.add(new War<Eu4Tag>(title, attackers, defenders));
             } else if (isDefender) {
-
                 wars.add(new War<Eu4Tag>(title, defenders, attackers));
             }
         }
-        return wars.stream().map(WarComp::new).toList();
+        comps = wars.stream().map(WarComp::new).toList();
+        comps.forEach(warComp -> warComp.init(content, data));
     }
 
     @Override
-    public List<? extends Region> create(SavegameData<?> data) {
-        return null;
+    protected List<? extends SavegameInfoComp> create(SavegameData<?> data) {
+        return comps;
     }
 }

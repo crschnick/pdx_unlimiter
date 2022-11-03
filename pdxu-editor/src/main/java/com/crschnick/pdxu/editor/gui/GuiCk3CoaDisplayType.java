@@ -76,6 +76,7 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
         sizes.put("128 x 128", 128);
         sizes.put("256 x 256", 256);
         sizes.put("512 x 512", 512);
+        sizes.put("1024 x 1024", 1024);
         box.getChildren().add(createChoices("Size", 256, sizes, t -> {
             state.getDisplayType().size.set(t.intValue());
             state.updateImage();

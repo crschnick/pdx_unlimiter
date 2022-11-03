@@ -9,6 +9,8 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+import java.util.ArrayList;
+
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
 public abstract class SavegameInfo<T> {
@@ -23,12 +25,12 @@ public abstract class SavegameInfo<T> {
         this.data.init(content);
 
         for (var field : getClass().getDeclaredFields()) {
-            if (!SavegameInfoComp.class.isAssignableFrom(field.getType())) {
+            if (!SavegameContentReader.class.isAssignableFrom(field.getType())) {
                 continue;
             }
 
             try {
-                var c = (SavegameInfoComp) field.getType().getDeclaredConstructors()[0].newInstance();
+                var c = (SavegameContentReader) field.getType().getDeclaredConstructors()[0].newInstance();
                 c.init(content, data);
                 field.setAccessible(true);
                 field.set(this, c);
@@ -49,6 +51,7 @@ public abstract class SavegameInfo<T> {
     public final Region createContainer() {
         var container = createEmptyContainer();
 
+        var comps = new ArrayList<SavegameInfoComp>();
         for (var field : getClass().getDeclaredFields()) {
             if (!SavegameInfoComp.class.isAssignableFrom(field.getType())) {
                 continue;
@@ -60,12 +63,34 @@ public abstract class SavegameInfo<T> {
                 if (c == null) {
                     continue;
                 }
-                var region = c.create(data);
-                if (region != null) {
-                    addNode(container, region);
-                }
+                comps.add(c);
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);
+            }
+        }
+
+        for (var field : getClass().getDeclaredFields()) {
+            if (!SavegameInfoMultiComp.class.isAssignableFrom(field.getType())) {
+                continue;
+            }
+
+            try {
+                field.setAccessible(true);
+                SavegameInfoMultiComp c = (SavegameInfoMultiComp) field.get(this);
+                if (c == null) {
+                    continue;
+                }
+
+                comps.addAll(c.create(data));
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
+            }
+        }
+
+        for (SavegameInfoComp comp : comps) {
+            var region = comp.create(data);
+            if (region != null) {
+                addNode(container, region);
             }
         }
 

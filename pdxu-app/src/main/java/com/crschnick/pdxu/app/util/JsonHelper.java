@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.util;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -16,17 +15,13 @@ import java.nio.file.Path;
 
 public class JsonHelper {
 
-    public static <T> T readObject(Class<T> clazz, Path in) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    public static final ObjectMapper MAPPER = new ObjectMapper();
 
-        return mapper.readValue(Files.readAllBytes(in), clazz);
-    }
-
-    public static void writeObject(Object obj, Path out) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(mapper
+    static {
+        ObjectMapper objectMapper = MAPPER;
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        objectMapper.setVisibility(objectMapper
                                            .getSerializationConfig()
                                            .getDefaultVisibilityChecker()
                                            .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
@@ -34,33 +29,29 @@ public class JsonHelper {
                                            .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
                                            .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
                                            .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
 
+    public static <T> T readObject(Class<T> clazz, Path in) throws IOException {
+        return MAPPER.readValue(Files.readAllBytes(in), clazz);
+    }
+
+    public static void writeObject(Object obj, Path out) throws IOException {
         JsonFactory f = new JsonFactory();
         try (JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
                 .setPrettyPrinter(new DefaultPrettyPrinter())) {
-            mapper.writeValue(g, obj);
+            MAPPER.writeValue(g, obj);
         }
     }
 
     public static JsonNode read(Path in) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(mapper
-                                     .getSerializationConfig()
-                                     .getDefaultVisibilityChecker()
-                                     .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-                                     .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                                     .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
-                                     .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
-                                     .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
-        return mapper.readTree(in.toFile());
+        return MAPPER.readTree(in.toFile());
     }
 
     public static void write(JsonNode node, Path out) throws IOException {
         JsonFactory f = new JsonFactory();
         try (JsonGenerator g = f.createGenerator(out.toFile(), JsonEncoding.UTF8)
                 .setPrettyPrinter(new DefaultPrettyPrinter())) {
-            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+            MAPPER
                     .writeTree(g, node);
         }
     }

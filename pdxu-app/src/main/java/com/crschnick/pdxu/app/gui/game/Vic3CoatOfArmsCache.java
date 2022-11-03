@@ -20,13 +20,12 @@ import javafx.scene.image.Image;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.fromGameColor;
 
@@ -68,41 +67,30 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
         return cache.colors;
     }
 
-    public static Node getCoatOfArmsNode() {
+    public static Node getCoatOfArmsNode(GameFileContext context) {
         var cache = CacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
         if (cache.coatOfArmsNode != null) {
             return cache.coatOfArmsNode;
         }
 
-        var directory = GameInstallation.ALL.get(Game.VIC3)
-                .getInstallDir()
-                .resolve("game")
-                .resolve("common")
+        var dir = Path.of("common")
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
-        try (Stream<Path> list = Files.list(directory)) {
-            var all = new LinkedArrayNode(list.map(path -> {
-                ArrayNode content = null;
-                try {
-                    content = TextFormatParser.vic3().parse(path);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return Optional.<ArrayNode>empty();
-                }
+        var files = new ArrayList<Path>();
+        CascadeDirectoryHelper.traverseDirectory(dir, context, files::add);
 
-                // Skip templates
-                if (content.size() == 1) {
-                    return Optional.<ArrayNode>empty();
-                }
+        var all = new LinkedArrayNode(files.stream().map(path -> {
+            ArrayNode content = null;
+            try {
+                content = TextFormatParser.vic3().parse(path);
+            } catch (Exception e) {
+                return Optional.<ArrayNode>empty();
+            }
 
-                NodeEvaluator.evaluateArrayNode(content);
-                return Optional.of(content);
-            }).flatMap(Optional::stream).toList());
-            cache.coatOfArmsNode = all;
-        } catch (Throwable throwable) {
-            ErrorHandler.handleException(throwable);
-            cache.coatOfArmsNode = ArrayNode.array(List.of());
-        }
+            NodeEvaluator.evaluateArrayNode(content);
+            return Optional.of(content);
+        }).flatMap(Optional::stream).toList());
+        cache.coatOfArmsNode = all;
 
         return cache.coatOfArmsNode;
     }
@@ -114,13 +102,17 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
             return cachedImg;
         }
 
+        var context = GameFileContext.fromData(info.getData());
+        var all = getCoatOfArmsNode(context);
         try {
             Supplier<CoatOfArms> coa = tag == info.getData().getTag() ?
                     () -> info.getData().vic3().getCoatOfArms() :
-                    () -> CoatOfArms.fromNode(
-                            getCoatOfArmsNode().getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> getCoatOfArmsNode().getNodeForKey(s));
+                    () -> CoatOfArms.fromNode(all.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
+                        var found = all.getNodesForKey(s);
+                        return found.size() > 0 ? found.get(found.size() - 1) : null;
+                    });
             var img = Vic3TagRenderer.renderImage(
-                    coa.get(), GameFileContext.fromData(info.getData()), (int) (IMG_SIZE * 1.5), IMG_SIZE);
+                    coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
             var convertedImage = ImageHelper.toFXImage(img);
             cache.flags.put(tag, convertedImage);
             return convertedImage;

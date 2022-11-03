@@ -1,13 +1,12 @@
 package com.crschnick.pdxu.app.info;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
-import javafx.scene.layout.Region;
+import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 import java.util.List;
 
-public abstract class SavegameInfoMultiComp {
+public abstract class SavegameInfoMultiComp extends SavegameContentReader {
 
-    protected abstract List<? extends SavegameInfoComp> generate(ArrayNode node, SavegameData<?> data);
+    protected abstract void init(SavegameContent content, SavegameData<?> data);
 
-    public abstract List<? extends Region> create(SavegameData<?> data);
+    protected abstract List<? extends SavegameInfoComp> create(SavegameData<?> data);
 }

@@ -13,7 +13,7 @@ public class Eu4StabilityComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return (stability > 0 ? "+" : (stability < 0 ? "-" : "")) + stability;
+        return String.valueOf(stability);
     }
 
     @Override

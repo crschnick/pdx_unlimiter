@@ -7,9 +7,9 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.app.util.JsonHelper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -70,8 +70,7 @@ public class SkanderbegHelper {
             String msg = "Skanderbeg.pm returned http " + responseCode;
             throw new IOException(msg);
         } else {
-            ObjectMapper o = new ObjectMapper();
-            JsonNode node = o.readTree(response.body());
+            JsonNode node = JsonHelper.MAPPER.readTree(response.body());
             boolean success = node.required("success").booleanValue();
             if (!success) {
                 throw new IOException("Skanderbeg.pm could not parse savegame");

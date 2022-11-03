@@ -59,7 +59,7 @@ public class RenderCommand implements Runnable {
                     "not its location.",
             paramLabel = "<mod>"
     )
-    List<String> input = List.of();
+    List<String> mods = List.of();
 
     @CommandLine.Option(
             names = {
@@ -134,7 +134,7 @@ public class RenderCommand implements Runnable {
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
 
-        var mods = input.stream()
+        var mods = this.mods.stream()
                 .map(s -> GameInstallation.ALL.get(Game.CK3)
                         .getModForSavegameId(s)
                         .orElseThrow(() -> new IllegalArgumentException("Mod not found: " + s)))
@@ -187,7 +187,7 @@ public class RenderCommand implements Runnable {
                 .resolve("coat_of_arms")
                 .resolve("coat_of_arms");
 
-        var mods = input.stream()
+        var mods = this.mods.stream()
                 .map(s -> GameInstallation.ALL.get(Game.VIC3)
                         .getModForSavegameId(s)
                         .orElseThrow(() -> new IllegalArgumentException("Mod not found: " + s)))
