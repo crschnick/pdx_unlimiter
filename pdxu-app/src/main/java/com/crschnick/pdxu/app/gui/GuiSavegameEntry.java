@@ -226,6 +226,8 @@ public class GuiSavegameEntry {
         HBox dynamicButtons = new HBox();
         dynamicButtons.setAlignment(Pos.CENTER);
         dynamicButtons.getStyleClass().add(CLASS_BUTTON_BAR);
+
+
         {
             Button melt = new JFXButton(null, new FontIcon());
             melt.setGraphic(new FontIcon());
@@ -235,7 +237,7 @@ public class GuiSavegameEntry {
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-                if (ctx.getInfo().getData().isBinary()) {
+                if (ctx.getInfo().getData().isBinary() && Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
                     Platform.runLater(() -> {
                         dynamicButtons.getChildren().add(melt);
                     });

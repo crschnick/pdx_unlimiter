@@ -45,7 +45,7 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
     private void updateDate() {
         getSavegames().stream()
                 .filter(s -> s.infoProperty().isNotNull().get())
-                .max(Comparator.naturalOrder())
+                .min(Comparator.naturalOrder())
                 .map(s -> s.getInfo().getData().getDate())
                 .ifPresent(d -> dateProperty().setValue(d));
     }

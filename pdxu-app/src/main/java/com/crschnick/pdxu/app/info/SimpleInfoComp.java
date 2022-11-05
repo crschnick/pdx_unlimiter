@@ -22,7 +22,7 @@ public abstract class SimpleInfoComp extends SavegameInfoComp {
     }
 
     protected boolean shouldShow() {
-        return true;
+        return getDisplayValue() != null;
     }
 
     @Override
