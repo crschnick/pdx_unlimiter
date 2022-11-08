@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 public abstract class GuiCoaDisplayType {
 
     protected static <T> Node createChoices(String name, T defValue, Map<String,T> choices, Consumer<T> con) {
-        var list = FXCollections.observableArrayList(choices.values());
+        var list = FXCollections.observableArrayList(choices.entrySet().stream().map(Map.Entry::getValue).toList());
         var cb = new ChoiceBox<>(list);
         cb.setValue(defValue);
         cb.valueProperty().addListener((c,o,n) -> {

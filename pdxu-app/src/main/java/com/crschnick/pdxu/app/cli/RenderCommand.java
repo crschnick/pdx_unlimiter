@@ -197,24 +197,7 @@ public class RenderCommand implements Runnable {
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(directory, context, files::add);
 
-        var all = new LinkedArrayNode(files.stream().map(path -> {
-            ArrayNode content = null;
-            try {
-                content = TextFormatParser.vic3().parse(path);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return Optional.<ArrayNode>empty();
-            }
-
-            // Skip templates
-            if (content.size() == 1) {
-                return Optional.<ArrayNode>empty();
-            }
-
-            NodeEvaluator.evaluateArrayNode(content);
-            return Optional.of(content);
-        }).flatMap(Optional::stream).toList());
-
+        var all = Vic3TagRenderer.getCoatOfArmsNode(context);
         all.forEach((s, node) -> {
             if (!node.isArray()) {
                 return;
@@ -226,10 +209,7 @@ public class RenderCommand implements Runnable {
 
             try {
                 System.out.println("Rendering " + s + " ...");
-                var coa = CoatOfArms.fromNode(node, parent -> {
-                    var found = all.getNodesForKey(parent);
-                    return found.size() > 0 ? found.get(found.size() - 1) : null;
-                });
+                var coa = Vic3TagRenderer.getCoatOfArms(node.getArrayNode(), all);
                 var image = Vic3TagRenderer.renderImage(coa, context, (int) (1.5 * size), size);
                 consumer.accept(s, image);
             } catch (Exception exception) {

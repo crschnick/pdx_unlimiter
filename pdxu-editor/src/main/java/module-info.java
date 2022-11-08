@@ -32,6 +32,7 @@ module com.crschnick.pdxu.editor {
     requires org.apache.commons.io;
     requires org.apache.commons.collections4;
     requires org.apache.commons.lang;
+    requires java.desktop;
 
 
 }

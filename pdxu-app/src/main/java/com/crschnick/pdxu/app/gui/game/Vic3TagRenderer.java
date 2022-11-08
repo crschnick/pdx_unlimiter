@@ -1,12 +1,56 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.LinkedArrayNode;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
+import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.CoatOfArms;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class Vic3TagRenderer {
+
+    public static CoatOfArms getCoatOfArms(ArrayNode node, ArrayNode all) {
+        var eval = node.copy();
+        NodeEvaluator.evaluateArrayNode(node);
+
+        var coa = CoatOfArms.fromNode(eval, parent -> {
+            var found = all.getNodesForKey(parent);
+            return found.size() > 0 ? found.get(found.size() - 1) : null;
+        });
+        return coa;
+    }
+
+    public static ArrayNode getCoatOfArmsNode(GameFileContext context, ArrayNode... otherNodes) {
+        var dir = Path.of("common")
+                .resolve("coat_of_arms")
+                .resolve("coat_of_arms");
+        var files = new ArrayList<Path>();
+        CascadeDirectoryHelper.traverseDirectory(dir, context, files::add);
+
+        var all = new LinkedArrayNode(Stream.concat(files.stream().map(path -> {
+                    ArrayNode content = null;
+                    try {
+                        content = TextFormatParser.vic3().parse(path);
+                    } catch (Exception e) {
+                        return Optional.<ArrayNode>empty();
+                    }
+
+                    return Optional.of(content);
+                }), Arrays.stream(otherNodes).map(Optional::of))
+                                              .flatMap(Optional::stream)
+                                              .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode()))
+                                              .toList());
+        return all;
+    }
 
 
     public static BufferedImage renderImage(CoatOfArms coa, GameFileContext ctx, int width, int height) {

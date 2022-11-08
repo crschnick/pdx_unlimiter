@@ -48,6 +48,7 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
         tag = Eu4Tag.getTag(allTags, player);
 
 
+        ironman = content.get().getNodeForKeyIfExistent("is_ironman").map(Node::getBoolean).orElse(false);
         date = GameDateType.EU4.fromString(content.get().getNodeForKey("date").getString());
 
 

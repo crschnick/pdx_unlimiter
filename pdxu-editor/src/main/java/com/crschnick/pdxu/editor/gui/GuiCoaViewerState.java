@@ -1,16 +1,27 @@
 package com.crschnick.pdxu.editor.gui;
 
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
+import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
+import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.crschnick.pdxu.io.node.LinkedArrayNode;
-import com.crschnick.pdxu.io.node.NodeEvaluator;
+import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.model.CoatOfArms;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.io.File;
+import java.io.IOException;
 
 
 public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
@@ -25,6 +36,19 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         protected void setup(HBox box) {
             GuiCk3CoaDisplayType.init(this, box);
         }
+
+        @Override
+        protected CoatOfArms createCoatOfArms() {
+            var additional = state.isSavegame() ?
+                    new ArrayNode[0] :
+                    state.getRootNodes()
+                            .values()
+                            .stream()
+                            .map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode())
+                            .toArray(ArrayNode[]::new);
+            var all = Ck3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.CK3), additional);
+            return Ck3TagRenderer.getCoatOfArms(editorNode.getBackingNode().getArrayNode(), all);
+        }
     }
 
     public static class Vic3GuiCoaViewerState extends GuiCoaViewerState<GuiVic3CoaDisplayType> {
@@ -37,11 +61,24 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         protected void setup(HBox box) {
             GuiVic3CoaDisplayType.init(this, box);
         }
+
+        @Override
+        protected CoatOfArms createCoatOfArms() {
+            var additional = state.isSavegame() ?
+                    new ArrayNode[0] :
+                    state.getRootNodes()
+                            .values()
+                            .stream()
+                            .map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode())
+                            .toArray(ArrayNode[]::new);
+            var all = Vic3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.VIC3), additional);
+            return Vic3TagRenderer.getCoatOfArms(editorNode.getBackingNode().getArrayNode(), all);
+        }
     }
 
     private ObjectProperty<T> displayType;
     protected EditorState state;
-    private EditorRealNode editorNode;
+    protected EditorRealNode editorNode;
     private ObjectProperty<CoatOfArms> parsedCoa;
     private ObjectProperty<Image> image;
 
@@ -56,21 +93,33 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
     void init(HBox box) {
         setup(box);
         refresh();
+        createExportButton(box);
+    }
+
+    private void createExportButton(HBox box) {
+        Button refresh = new Button();
+        refresh.setOnAction(e -> {
+            FileChooser dirChooser = new FileChooser();
+            dirChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
+            dirChooser.setTitle(PdxuI18n.get("SELECT_FILE"));
+            File file = dirChooser.showSaveDialog(null);
+            if (file == null) {
+                return;
+            }
+
+            try {
+                ImageHelper.writePng(image.get(), file.toPath());
+            } catch (IOException ex) {
+                ErrorHandler.handleException(ex);
+            }
+        });
+        refresh.setGraphic(new FontIcon("mdi-export"));
+        box.getChildren().add(refresh);
     }
 
     protected abstract void setup(HBox box);
 
-    private CoatOfArms createCoatOfArms() {
-        // Only evaluate for game date are files
-        var node = new LinkedArrayNode(
-                state.isSavegame() ?
-                        state.getRootNodes().values().stream().map(editorRootNode -> editorRootNode.getBackingNode().getArrayNode()).toList() :
-                        state.getRootNodes().values().stream().map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode()).peek(
-                                NodeEvaluator::evaluateArrayNode).toList());
-        var coatOfArmsNode = editorNode.getBackingNode().copy();
-        NodeEvaluator.evaluateArrayNode(coatOfArmsNode.getArrayNode());
-        return CoatOfArms.fromNode(coatOfArmsNode, s -> node.getNodeForKeyIfExistent(s).orElse(null));
-    }
+    protected abstract CoatOfArms createCoatOfArms();
 
     void refresh() {
         // The data might not be valid anymore

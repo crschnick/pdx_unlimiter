@@ -8,10 +8,7 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.CoatOfArms;
 import com.crschnick.pdxu.model.GameColor;
@@ -20,9 +17,7 @@ import javafx.scene.image.Image;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -73,25 +68,8 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
             return cache.coatOfArmsNode;
         }
 
-        var dir = Path.of("common")
-                .resolve("coat_of_arms")
-                .resolve("coat_of_arms");
-        var files = new ArrayList<Path>();
-        CascadeDirectoryHelper.traverseDirectory(dir, context, files::add);
-
-        var all = new LinkedArrayNode(files.stream().map(path -> {
-            ArrayNode content = null;
-            try {
-                content = TextFormatParser.vic3().parse(path);
-            } catch (Exception e) {
-                return Optional.<ArrayNode>empty();
-            }
-
-            NodeEvaluator.evaluateArrayNode(content);
-            return Optional.of(content);
-        }).flatMap(Optional::stream).toList());
+        var all = Vic3TagRenderer.getCoatOfArmsNode(context);
         cache.coatOfArmsNode = all;
-
         return cache.coatOfArmsNode;
     }
 
