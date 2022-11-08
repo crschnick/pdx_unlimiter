@@ -455,7 +455,7 @@ public abstract class SavegameStorage<
             }
             var struc = type.determineStructure(bytes);
             result = struc.parse(bytes);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             ErrorHandler.handleException(ex);
             e.fail();
             return;
@@ -485,7 +485,7 @@ public abstract class SavegameStorage<
 
                     logger.debug("Writing new info to file " + getSavegameInfoFile(e));
                     JsonHelper.writeObject(info, getSavegameInfoFile(e));
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     ErrorHandler.handleException(ex);
                     e.fail();
                 }
