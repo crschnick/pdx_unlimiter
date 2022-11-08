@@ -9,7 +9,6 @@ import javafx.scene.layout.Region;
 
 import java.util.HashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class GuiListView {
 
@@ -22,13 +21,12 @@ public class GuiListView {
         Platform.runLater(() -> {
             JFXListView<Node> listView = new JFXListView<>();
             var newItems = list.stream()
-                    .map(li -> createForItem(li, nodeFactory))
-                    .collect(Collectors.toList());
+                    .map(li -> createForItem(li, nodeFactory)).toList();
 
-            listView.getItems().setAll(newItems);
             listView.prefWidthProperty().bind(pane.widthProperty());
             listView.prefHeightProperty().bind(pane.heightProperty());
             listView.setExpanded(true);
+            newItems.forEach(li -> listView.getItems().add(li));
 
             pane.getChildren().setAll(listView);
         });
@@ -47,15 +45,14 @@ public class GuiListView {
                                 def = createForItem(li, nodeFactory);
                             }
                             return def;
-                        })
-                        .collect(Collectors.toList());
+                        }).toList();
 
                 map.clear();
 
-                listView.getItems().setAll(newItems);
                 listView.prefWidthProperty().bind(pane.widthProperty());
                 listView.prefHeightProperty().bind(pane.heightProperty());
                 listView.setExpanded(true);
+                newItems.forEach(li -> listView.getItems().add(li));
 
                 var old = (JFXListView<?>) pane.getChildren().get(0);
                 old.getItems().clear();
