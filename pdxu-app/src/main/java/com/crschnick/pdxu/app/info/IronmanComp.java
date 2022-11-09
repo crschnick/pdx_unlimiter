@@ -8,6 +8,11 @@ public abstract class IronmanComp extends SimpleInfoComp {
     private boolean ironman;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected String getTooltip() {
         return PdxuI18n.get("IRONMAN");
     }

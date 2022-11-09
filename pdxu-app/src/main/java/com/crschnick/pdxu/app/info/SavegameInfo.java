@@ -31,6 +31,10 @@ public abstract class SavegameInfo<T> {
 
             try {
                 var c = (SavegameContentReader) field.getType().getDeclaredConstructors()[0].newInstance();
+                if (c.requiresPlayer() && data.getTag() == null) {
+                    continue;
+                }
+
                 c.init(content, data);
                 field.setAccessible(true);
                 field.set(this, c);
@@ -63,6 +67,11 @@ public abstract class SavegameInfo<T> {
                 if (c == null) {
                     continue;
                 }
+
+                if (c.requiresPlayer() && data.getTag() == null) {
+                    continue;
+                }
+
                 comps.add(c);
             } catch (Exception ex) {
                 ErrorHandler.handleException(ex);

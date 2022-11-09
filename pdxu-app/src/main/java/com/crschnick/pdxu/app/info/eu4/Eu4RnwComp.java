@@ -13,6 +13,11 @@ public class Eu4RnwComp extends SimpleInfoComp {
     private boolean rnwEnabled;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected boolean shouldShow() {
         return rnwEnabled;
     }

@@ -20,6 +20,11 @@ public class ModComp extends SavegameInfoComp {
     private List<String> mods;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         this.mods = new ArrayList<>();
         if (data.getMods() != null && data.getMods().size() > 0) {

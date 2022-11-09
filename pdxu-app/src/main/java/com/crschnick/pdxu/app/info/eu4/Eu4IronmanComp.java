@@ -12,6 +12,11 @@ public class Eu4IronmanComp extends SimpleInfoComp {
     private boolean ironman;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected Image getImage() {
         return GameImage.EU4_ICON_IRONMAN;
     }

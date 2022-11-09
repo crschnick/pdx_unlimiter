@@ -17,6 +17,11 @@ public class VersionComp extends SavegameInfoComp {
     private GameVersion version;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected void init(SavegameContent content, SavegameData data) {
         this.version = data.getVersion();
     }

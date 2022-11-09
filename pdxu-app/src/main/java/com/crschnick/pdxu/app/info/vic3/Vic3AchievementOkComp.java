@@ -13,6 +13,11 @@ public class Vic3AchievementOkComp extends SimpleInfoComp {
     private boolean achievementOk;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected Image getImage() {
         if (achievementOk) {
             return GameImage.VIC3_ICON_ACHIEVEMENT_ELIGIBLE;

@@ -20,6 +20,11 @@ public class DlcComp extends SavegameInfoComp {
     private List<String> dlcs;
 
     @Override
+    public boolean requiresPlayer() {
+        return false;
+    }
+
+    @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         this.dlcs = new ArrayList<>();
         if (data.getDlcs() != null && data.getDlcs().size() > 0) {
