@@ -68,7 +68,11 @@ public class SteamDist extends GameDist {
             }
         }
 
-        return steamDir.map(Path::of);
+        try {
+            return steamDir.map(Path::of);
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 
     private static final Pattern STEAM_LIBRARY_DIR_OLD = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
