@@ -20,7 +20,8 @@ import java.util.Random;
  * 0: Uncompressed + Plaintext
  * <p>
  * meta data size:
- * Length of meta data block at the beginning of the file in bytes.
+ * Length of meta data block at the beginning of the file in bytes, or alternatively the amount of bytes to skip until gamestate data is read.
+ * If the meta data is contained in a separate file, i.e. not embedded into the gamestate file, this value will be zero.
  */
 public record ModernHeader(boolean unknown, int compressionType, boolean binary, long randomness, long metaLength) {
 
