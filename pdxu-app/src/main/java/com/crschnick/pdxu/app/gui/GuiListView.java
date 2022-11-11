@@ -15,7 +15,8 @@ public class GuiListView {
     @SuppressWarnings("unchecked")
     public static <T> Region createViewOfList(
             ListProperty<T> list,
-            Function<T, Node> nodeFactory) {
+            Function<T, Node> nodeFactory
+    ) {
         Pane pane = new Pane();
 
         Platform.runLater(() -> {
@@ -25,10 +26,14 @@ public class GuiListView {
 
             listView.prefWidthProperty().bind(pane.widthProperty());
             listView.prefHeightProperty().bind(pane.heightProperty());
-            listView.setExpanded(true);
-            newItems.forEach(li -> listView.getItems().add(li));
 
             pane.getChildren().setAll(listView);
+
+            listView.setExpanded(true);
+            newItems.forEach(li -> listView.getItems().add(li));
+            if (newItems.size() > 0) {
+                listView.fixedCellSizeProperty().bind(((Region) newItems.get(0)).heightProperty());
+            }
         });
 
         list.addListener((c, o, n) -> {
@@ -51,12 +56,16 @@ public class GuiListView {
 
                 listView.prefWidthProperty().bind(pane.widthProperty());
                 listView.prefHeightProperty().bind(pane.heightProperty());
-                listView.setExpanded(true);
-                newItems.forEach(li -> listView.getItems().add(li));
 
                 var old = (JFXListView<?>) pane.getChildren().get(0);
                 old.getItems().clear();
                 pane.getChildren().setAll(listView);
+
+                listView.setExpanded(true);
+                if (newItems.size() > 0) {
+                    listView.fixedCellSizeProperty().bind(((Region) newItems.get(0)).heightProperty());
+                }
+                newItems.forEach(li -> listView.getItems().add(li));
             });
         });
         return pane;
