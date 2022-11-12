@@ -15,7 +15,8 @@ public class GuiListView {
     @SuppressWarnings("unchecked")
     public static <T> Region createViewOfList(
             ListProperty<T> list,
-            Function<T, Node> nodeFactory
+            Function<T, Node> nodeFactory,
+            boolean fixSize
     ) {
         Pane pane = new Pane();
 
@@ -29,11 +30,11 @@ public class GuiListView {
 
             pane.getChildren().setAll(listView);
 
-            listView.setExpanded(true);
-            newItems.forEach(li -> listView.getItems().add(li));
-            if (newItems.size() > 0) {
+            if (fixSize && newItems.size() > 0) {
                 listView.fixedCellSizeProperty().bind(((Region) newItems.get(0)).heightProperty());
             }
+            newItems.forEach(li -> listView.getItems().add(li));
+            listView.setExpanded(true);
         });
 
         list.addListener((c, o, n) -> {
@@ -61,11 +62,11 @@ public class GuiListView {
                 old.getItems().clear();
                 pane.getChildren().setAll(listView);
 
-                listView.setExpanded(true);
-                if (newItems.size() > 0) {
+                if (fixSize && newItems.size() > 0) {
                     listView.fixedCellSizeProperty().bind(((Region) newItems.get(0)).heightProperty());
                 }
                 newItems.forEach(li -> listView.getItems().add(li));
+                listView.setExpanded(true);
             });
         });
         return pane;
