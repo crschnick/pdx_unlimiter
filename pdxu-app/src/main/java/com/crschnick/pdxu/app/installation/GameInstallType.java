@@ -35,8 +35,7 @@ public interface GameInstallType {
     }
 
     public static enum DlcInfoStorageType {
-        STORES_INFO,
-        SAVEGAME_DOESNT_STORE_COSMETICS_INFO,
+        SAVEGAME_STORES_INFO,
         SAVEGAME_DOESNT_STORE_INFO
     }
 
@@ -44,7 +43,7 @@ public interface GameInstallType {
 
         @Override
         public DlcInfoStorageType getDlcInfoStorageType() {
-            return DlcInfoStorageType.SAVEGAME_DOESNT_STORE_COSMETICS_INFO;
+            return DlcInfoStorageType.SAVEGAME_STORES_INFO;
         }
 
         public Path getSteamSpecificFile(Path p) {
@@ -205,7 +204,7 @@ public interface GameInstallType {
 
         @Override
         public DlcInfoStorageType getDlcInfoStorageType() {
-            return DlcInfoStorageType.SAVEGAME_DOESNT_STORE_COSMETICS_INFO;
+            return DlcInfoStorageType.SAVEGAME_STORES_INFO;
         }
 
         @Override
@@ -659,7 +658,8 @@ public interface GameInstallType {
                                                      .filter(path -> path.isPresent())
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path", s.get().toString())).toList());
 
-            var dlcsToDisable = dlcs;
+            var dlcsToDisable = installation.queryDisabledDlcs().stream().filter(gameDlc -> !dlcs.contains(gameDlc)).toList();
+            ;
             n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
                                                      .filter(d -> !dlcs.contains(d))
                                                      .map(d -> d.getName())
@@ -674,6 +674,7 @@ public interface GameInstallType {
             }
 
             var mods = new ArrayList<GameMod>();
+
             try (var list = Files.list(directory.get())) {
                 list.forEach(f -> {
                     GameMod.fromVictoria3Directory(f).ifPresent(m -> {
@@ -737,7 +738,7 @@ public interface GameInstallType {
     }
 
     default DlcInfoStorageType getDlcInfoStorageType() {
-        return DlcInfoStorageType.STORES_INFO;
+        return DlcInfoStorageType.SAVEGAME_STORES_INFO;
     }
 
     default Path getSteamSpecificFile(Path p) {
@@ -880,12 +881,15 @@ public interface GameInstallType {
                                                               (installation.getUserDir().relativize(d.getModFile()).toString()))
                                                       .map(JsonNodeFactory.instance::textNode).toList());
 
+            var availableDlcs = installation.getDlcs();
+            var currentlyDisabledDlcs = installation.queryDisabledDlcs();
             var dlcsToDisable = switch (getDlcInfoStorageType()) {
-                case STORES_INFO -> installation.getDlcs().stream()
-                        .filter(d -> !dlcs.contains(d)).toList();
-                case SAVEGAME_DOESNT_STORE_COSMETICS_INFO ->
-                        installation.queryDisabledDlcs().stream().filter(gameDlc -> !dlcs.contains(gameDlc)).toList();
-                case SAVEGAME_DOESNT_STORE_INFO -> installation.queryDisabledDlcs();
+                case SAVEGAME_STORES_INFO -> availableDlcs
+                        .stream()
+                        .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc)) ||
+                                (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
+                                        .toList();
+                case SAVEGAME_DOESNT_STORE_INFO -> currentlyDisabledDlcs;
             };
             n.putArray("disabled_dlcs").addAll(dlcsToDisable.stream()
                                                        .map(d -> FilenameUtils.separatorsToUnix(

@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+import lombok.Getter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +13,9 @@ public class GameDlc {
     private Path filePath;
     private Path dataPath;
     private String name;
+
+    @Getter
+    private boolean affectsCompatibility;
 
     public static Optional<GameDlc> fromDirectory(Path p) throws Exception {
         if (!Files.isDirectory(p)) {
@@ -32,6 +36,19 @@ public class GameDlc {
         dlc.filePath = filePath;
         dlc.dataPath = dataPath;
         dlc.name = node.getNodeForKey("name").getString();
+
+        if (node.getNodeForKeyIfExistent("affects_compatibility").map(Node::getBoolean).orElse(false)) {
+            dlc.affectsCompatibility = true;
+        }
+
+        if (node.getNodeForKeyIfExistent("affects_save_compatibility").map(Node::getBoolean).orElse(false)) {
+            dlc.affectsCompatibility = true;
+        }
+
+        if (!node.hasKey("affects_compatibility") && !node.hasKey("affects_save_compatibility")) {
+            dlc.affectsCompatibility = true;
+        }
+
         return Optional.of(dlc);
     }
     public Path getInfoFilePath() {
