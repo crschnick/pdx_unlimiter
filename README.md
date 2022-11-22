@@ -18,24 +18,9 @@ great community-made tools, and full support for the following games:
 * Crusader Kings II
 * Victoria II
 
-# Pre-Releases for Victoria III
 
-The Pdx-Unlimiter already supports Victoria III.
-However, the version with Victoria 3 support comes with many other necessary internal changes
-that have not been tested yet.
-Therefore, this version is only available as a pre-release:
-
-- [Windows](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.5-pre/pdx_unlimiter-windows.zip)
-- [Linux](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.5-pre/pdx_unlimiter-linux.zip)
-- [Mac (Intel)](https://github.com/crschnick/pdx_unlimiter/releases/download/2.11.5-pre/pdx_unlimiter-mac_intel.dmg)
-
-In case you already use the installation distribution with the update function and want to try out this latest version,
-you can still download the release and run it interchangeably with your existing installation without problems.
-Just unzip the download anywhere you want and execute it.
 
 # Download
-
-Note: The regular downloads do not contain Victoria III support yet. (See above)
 
 Note that there might be some issues with Windows SmartScreen blocking the executable after downloading.
 If you are facing these issues, click on "More info" and then "Run anyway".
@@ -60,17 +45,16 @@ This version does not come with an update functionality, so you have to manually
 - [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-windows.zip)
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-linux.zip)
 
-You can also find information on how to obtain pre-releases and the latest development builds in
-the [Downloads](https://github.com/crschnick/pdx_unlimiter/wiki/Downloads) section in the wiki.
-
-### Experimental Mac Builds
-
 They are also now mac builds available, although they are very experimental.
 They are not signed at all, so they will be untrusted and you manually have to remove the quarantine by executing the following command:
 `xattr -d com.apple.quarantine Pdx-Unlimiter*.dmg`
 
-- [Apple Silicon](https://github.com/crschnick/pdx_unlimiter/releases/download/2.10.4/Pdx-Unlimiter-AppleSilicon.dmg)
-- [Apple Intel](https://github.com/crschnick/pdx_unlimiter/releases/download/2.10.4/Pdx-Unlimiter-Intel.dmg)
+- [Apple Intel](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/Pdx-Unlimiter-Intel.dmg)
+
+You can also find information on how to obtain pre-releases and the latest development builds in
+the [Downloads](https://github.com/crschnick/pdx_unlimiter/wiki/Downloads) section of the wiki.
+
+
 
 # Features
 
@@ -238,9 +222,8 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 # Development
 
-To build this project, [GraalVM for Java 17](https://github.com/graalvm/graalvm-ce-builds/releases/tag/vm-22.2.0) is required to be the JVM.
-You can't use any other JVM distribution as the Pdx-Unlimiter uses GraalVM specific features.
-You can build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
+To build this project, a JDK for at least Java 17 is required.
+You can then build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
 For running, you can use `gradle/gradlew run`.
 Note here that the gradle wrapper has been moved into the `gradle` subdirectory.
 You can use the automatically generated file `pdxu.properties`, which is created when gradle is run the first time,

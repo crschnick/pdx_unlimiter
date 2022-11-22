@@ -1,4 +1,4 @@
-# Changes in 2.11.6 since 2.10.4
+# Changes in 2.12.0 since 2.10.4
 
 - Add support for Victoria 3.
 
@@ -10,6 +10,7 @@
 
 - The coat of arms renderer for CK3 and Victoria 3 has been updated to come closer to the in game rendering results.
   Thanks to grotaclas for contributing here.
+  It is also now fully functional compared to the pre releases which had some issues with it.
   
 - The new coat of arms renderer can also put to good use either through its integration within the Pdx-Unlimiter editor
   or through the new CLI that allows you to render all coat of arms definitions for Victoria 3 or CK3 at once.

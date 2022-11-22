@@ -70,6 +70,13 @@ jreleaser {
     }
     distributions {
         app {
+            artifact {
+                distributionType = 'BINARY'
+                path = "changelogs/${canonicalVersion}.txt"
+                extraProperties.put('universal', true)
+                transform = 'changelog.txt'
+            }
+
             if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
                 artifact {
                     distributionType = 'BINARY'
