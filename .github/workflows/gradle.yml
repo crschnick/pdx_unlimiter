@@ -25,8 +25,8 @@ jobs:
       - name: Install java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: 'adopt-hotspot'
+          java-version: '17.0.1.12'
 
       - name: Echo JAVA_HOME
         run: echo $JAVA_HOME

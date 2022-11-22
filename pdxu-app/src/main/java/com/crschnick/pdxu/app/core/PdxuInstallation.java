@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class PdxuInstallation {
 
@@ -226,11 +225,9 @@ public class PdxuInstallation {
 
     private boolean isAlreadyRunning() {
         var procs = ProcessHandle.allProcesses()
-                .map(h -> h.info().command().orElse(""))
-                .filter(s -> s.equals(getExecutableLocation().toString()))
-                .collect(Collectors.toList());
+                .filter(h -> h.info().command().orElse("").equals(getExecutableLocation().toString())).toList();
         procs.forEach(p -> LoggerFactory.getLogger(PdxuInstallation.class)
-                .info("Detected running pdxu instance: " + p));
+                .info("Detected running pdxu instance: " + p.info().command().orElse("") + " (PID " + p.pid() + ")"));
         return procs.size() >= 2;
     }
 
