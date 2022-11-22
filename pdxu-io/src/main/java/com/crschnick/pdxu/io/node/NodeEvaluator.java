@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class NodeEvaluator {
 
-    private static final Context JAVASCRIPT_CONTEXT = Context.create("js");
+    private static final Context JAVASCRIPT_CONTEXT = Context.newBuilder("js").option("engine.WarnInterpreterOnly", "false").build();
     private static final NumberFormat FORMATTER = new DecimalFormat("#0.0000000");
 
     public static void evaluateArrayNode(ArrayNode arrayNode) {

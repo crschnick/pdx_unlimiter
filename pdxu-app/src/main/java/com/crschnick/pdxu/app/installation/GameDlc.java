@@ -17,6 +17,11 @@ public class GameDlc {
     @Getter
     private boolean affectsCompatibility;
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public static Optional<GameDlc> fromDirectory(Path p) throws Exception {
         if (!Files.isDirectory(p)) {
             return Optional.empty();
@@ -37,15 +42,17 @@ public class GameDlc {
         dlc.dataPath = dataPath;
         dlc.name = node.getNodeForKey("name").getString();
 
-        if (node.getNodeForKeyIfExistent("affects_compatibility").map(Node::getBoolean).orElse(false)) {
+        // Notice the misspelled word "compatability"!
+        if (node.getNodeForKeyIfExistent("affects_compatability").map(Node::getBoolean).orElse(false)) {
             dlc.affectsCompatibility = true;
         }
 
+        // In this version it is no longer misspelled!
         if (node.getNodeForKeyIfExistent("affects_save_compatibility").map(Node::getBoolean).orElse(false)) {
             dlc.affectsCompatibility = true;
         }
 
-        if (!node.hasKey("affects_compatibility") && !node.hasKey("affects_save_compatibility")) {
+        if (!node.hasKey("affects_compatability") && !node.hasKey("affects_save_compatibility")) {
             dlc.affectsCompatibility = true;
         }
 

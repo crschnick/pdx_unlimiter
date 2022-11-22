@@ -658,11 +658,18 @@ public interface GameInstallType {
                                                      .filter(path -> path.isPresent())
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path", s.get().toString())).toList());
 
-            var dlcsToDisable = installation.queryDisabledDlcs().stream().filter(gameDlc -> !dlcs.contains(gameDlc)).toList();
-            ;
+
+
+            var availableDlcs = installation.getDlcs();
+            var currentlyDisabledDlcs = installation.queryDisabledDlcs();
+            var dlcsToDisable = availableDlcs
+                        .stream()
+                        .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc)) ||
+                                (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
+                        .toList();
+
             n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
-                                                     .filter(d -> !dlcs.contains(d))
-                                                     .map(d -> d.getName())
+                                                     .map(dlc -> getDlcLauncherId(installation, dlc))
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("paradoxAppId", s)).toList());
             JsonHelper.write(n, file);
         }
@@ -685,6 +692,10 @@ public interface GameInstallType {
                 });
             }
             return mods;
+        }
+
+        public String getDlcLauncherId(GameInstallation installation, GameDlc dlc) {
+            return FilenameUtils.getBaseName(dlc.getInfoFilePath().getParent().getFileName().toString());
         }
     };
 

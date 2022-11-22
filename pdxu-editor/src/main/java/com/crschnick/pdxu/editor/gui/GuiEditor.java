@@ -95,7 +95,7 @@ public class GuiEditor {
         v.getStyleClass().add("editor-nav-bar-container");
         v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
 
-        var melterInformation = new Label("To edit this file, use the melter functionality with the savegame first.");
+        var melterInformation = new Label("To edit this file, use the melter functionality with the savegame first or instruct a game to save as plaintext.");
         melterInformation.setAlignment(Pos.CENTER);
         melterInformation.setPadding(new Insets(5, 5, 5, 5));
         var topBars = new VBox(
