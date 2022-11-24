@@ -12,7 +12,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -48,7 +48,7 @@ public class EditorState {
         filter = new EditorFilter(this);
         content = new EditorContent(this);
 
-        rootNodes = new HashMap<>();
+        rootNodes = new LinkedHashMap<>();
         int counter = 0;
         for (var e : nodes.entrySet()) {
             rootNodes.put(e.getKey(), new EditorRootNode(e.getKey(), counter, this, e.getValue()));

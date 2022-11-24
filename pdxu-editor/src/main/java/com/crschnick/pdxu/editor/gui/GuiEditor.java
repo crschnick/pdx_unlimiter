@@ -158,6 +158,11 @@ public class GuiEditor {
             return s;
         }
 
+        // Ignore formatting for variables
+        if (s.startsWith("@")) {
+            return s;
+        }
+
         return Arrays.stream(s.split("_"))
                 .filter(p -> p.length() > 0)
                 .map(p -> p.substring(0, 1).toUpperCase() + p.substring(1))

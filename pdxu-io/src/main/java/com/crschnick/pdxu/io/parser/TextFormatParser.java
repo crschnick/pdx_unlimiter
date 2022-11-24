@@ -108,7 +108,7 @@ public final class TextFormatParser {
 
     private void verifySize(byte[] input) throws ParseException {
         if (input.length > 400_000_000) {
-            throw new ParseException("Input is too large");
+            throw new ParseException("Input data size is too large. (Greater than 400MB)");
         }
     }
 

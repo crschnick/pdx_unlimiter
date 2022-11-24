@@ -9,7 +9,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -48,7 +48,7 @@ public class ZipSavegameStructure implements SavegameStructure {
 
         try {
             try (var zipIn = new ZipInputStream(new ByteArrayInputStream(input, offset, input.length - offset))) {
-                Map<String, ArrayNode> nodes = new HashMap<>();
+                Map<String, ArrayNode> nodes = new LinkedHashMap<>();
                 ZipEntry entry;
                 while ((entry = zipIn.getNextEntry()) != null) {
                     ZipEntry finalEntry = entry;

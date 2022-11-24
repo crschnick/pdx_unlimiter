@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 public class Vic3TagRenderer {
 
     public static CoatOfArms getCoatOfArms(ArrayNode node, ArrayNode all) {
-        var eval = node.copy();
-        NodeEvaluator.evaluateArrayNode(node);
+        var eval = node.copy().getArrayNode();
+        NodeEvaluator.evaluateArrayNode(eval);
 
         var coa = CoatOfArms.fromNode(eval, parent -> {
             var found = all.getNodesForKey(parent);
