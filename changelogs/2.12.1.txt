@@ -1,0 +1,26 @@
+# Changes in 2.12.1
+
+- Fix coat of arms renderer variables not being resolved in the editor
+- Fix external text editor not launching correctly in editor on Linux
+- Fix various other small bugs
+
+
+# Changes in 2.12.0
+
+- Add support for Victoria 3.
+
+- Implement a new save game info display system, which completely replaces the old one.
+  It looks exactly as the old one, but makes it much easier to add more displayed save game information later on.
+
+- Rework mod and DLC loading.
+  This should fix issues with HOI4 DLCs and cosmetic DLCs not being enabled/disabled properly
+
+- The coat of arms renderer for CK3 and Victoria 3 has been updated to come closer to the in game rendering results.
+  Thanks to grotaclas for contributing here.
+  It is also now fully functional compared to the pre releases which had some issues with it.
+  
+- The new coat of arms renderer can also put to good use either through its integration within the Pdx-Unlimiter editor
+  or through the new CLI that allows you to render all coat of arms definitions for Victoria 3 or CK3 at once.
+  See https://github.com/crschnick/pdx_unlimiter/wiki/Coat-of-arms-tools
+
+- This release also includes various bug fixes that accumulated over the last few weeks.

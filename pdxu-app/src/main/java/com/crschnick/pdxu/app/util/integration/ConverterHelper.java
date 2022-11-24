@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.util.integration;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.settings.Settings;
+import com.crschnick.pdxu.app.core.settings.SettingsEntry;
 import com.crschnick.pdxu.app.gui.dialog.GuiConverterConfig;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
@@ -11,6 +12,7 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import javafx.application.Platform;
+import lombok.Value;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -25,6 +27,26 @@ import java.util.Map;
 
 public class ConverterHelper {
 
+    @Value
+    public static class Instance {
+
+        Game fromGame;
+        Game toGame;
+
+        String fromName;
+        String toName;
+
+        SettingsEntry.ThirdPartyDirectory directorySetting;
+
+        public String getName() {
+            return fromName + "to" + toName;
+        }
+
+        public Path getExecutable() {
+            return Path.of(getName(), getName() + "Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : ""));
+        }
+    }
+
     private static void writeLine(BufferedWriter w, String key, Object value) throws IOException {
         w.write(key + " = \"" + value.toString() + "\"\n");
     }
@@ -37,8 +59,7 @@ public class ConverterHelper {
             return map;
         }
 
-        try {
-            var reader = Files.newBufferedReader(config);
+        try ( var reader = Files.newBufferedReader(config)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 var split = line.split(" = ");
