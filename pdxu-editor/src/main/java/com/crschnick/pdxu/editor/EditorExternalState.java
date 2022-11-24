@@ -68,10 +68,10 @@ public class EditorExternalState {
                         try {
                             logger.trace("Registering modification for file " + TEMP.relativize(e.file));
                             logger.trace("Last modification for file: " + e.lastModified.toString() +
-                                    " vs current one: " + e.getLastModified());
+                                                 " vs current one: " + e.getLastModified());
                             if (e.hasChanged()) {
                                 logger.trace("Registering change for file " + TEMP.relativize(e.file) +
-                                        " for editor node " + e.editorNode.getNavigationName());
+                                                     " for editor node " + e.editorNode.getNavigationName());
                                 boolean valid = e.editorNode.isValid();
                                 logger.trace("Editor node " + e.editorNode.getNavigationName() + " validity: " + valid);
                                 if (valid) {
@@ -139,7 +139,8 @@ public class EditorExternalState {
             FileUtils.forceMkdirParent(file.toFile());
             try (var out = Files.newOutputStream(file)) {
                 NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(),
-                        EditorSettings.getInstance().indentation.getValue(), 0);
+                                 EditorSettings.getInstance().indentation.getValue(), 0
+                );
                 var entry = new Entry(file, node, state);
                 entry.registerChange();
                 openEntries.add(entry);
@@ -167,12 +168,11 @@ public class EditorExternalState {
         }
 
         try {
-            var fileName = "\"" + file + "\"";
-            // Use this start command on windows to properly handle spaces in file paths
-            var editorProgramCommand = SystemUtils.IS_OS_WINDOWS ? "cmd.exe /c start \"\" \"" + editor + "\"" : "sh -c \"" + editor + "\"";
-            var cmd = editorProgramCommand + " " + fileName;
-            logger.trace("Executing command: " + cmd);
-            Runtime.getRuntime().exec(cmd);
+            var command = SystemUtils.IS_OS_WINDOWS ?
+                    "cmd.exe /c start \"\" \"" + editor + "\" " + "\"" + file + "\"" :
+                    "sh -c \"\\\"" + editor + "\\\" \\\"" + file + "\\\"\"";
+            logger.trace("Executing command: " + command);
+            Runtime.getRuntime().exec(command);
         } catch (IOException e) {
             ErrorHandler.handleException(e);
         }
