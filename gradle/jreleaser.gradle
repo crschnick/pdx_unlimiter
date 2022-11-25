@@ -106,14 +106,13 @@ jreleaser {
         }
     }
 
-    announce {
-        enabled = isFullRelease || isPreRelease
-        discord {
-            active = 'ALWAYS'
-
-            webhook = proj.hasProperty("PDXU_DISCORD_WEBHOOK") ? proj.property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
-
-            messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : 'misc/discord_pre.tpl'
+    if (isFullRelease || isPreRelease) {
+        announce {
+            discord {
+                active = 'ALWAYS'
+                webhook = proj.hasProperty("PDXU_DISCORD_WEBHOOK") ? proj.property("PDXU_DISCORD_WEBHOOK") : System.getenv("JRELEASER_DISCORD_WEBHOOK")
+                messageTemplate = isFullRelease ? 'misc/discord_full.tpl' : 'misc/discord_pre.tpl'
+            }
         }
     }
 }

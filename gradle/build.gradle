@@ -2,13 +2,13 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     id 'org.beryx.jlink' version '2.24.4'
-    id 'org.jreleaser' version '1.3.0'
+    id 'org.jreleaser' version '1.3.1'
 }
 
 version file('version').text
 def canonicalVersion = file('canonical_version').text
 
-apply from: 'gradle/jreleaser.gradle'
+apply from: "$rootDir/gradle/jreleaser.gradle"
 apply from: 'gradle/java.gradle'
 apply from: 'gradle/mods.gradle'
 
