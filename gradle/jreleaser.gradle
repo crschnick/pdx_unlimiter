@@ -72,7 +72,9 @@ jreleaser {
         app {
             artifact {
                 distributionType = 'BINARY'
-                path = "changelogs/${canonicalVersion}.txt"
+                if (file("changelogs/${canonicalVersion}.txt").exists()) {
+                    path = "changelogs/${canonicalVersion}.txt"
+                }
                 extraProperties.put('universal', true)
                 transform = 'changelog.txt'
             }
