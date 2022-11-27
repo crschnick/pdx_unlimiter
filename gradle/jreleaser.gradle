@@ -70,13 +70,13 @@ jreleaser {
     }
     distributions {
         app {
-            artifact {
-                distributionType = 'BINARY'
-                if (file("changelogs/${canonicalVersion}.txt").exists()) {
+            if (file("changelogs/${canonicalVersion}.txt").exists()) {
+                artifact {
+                    distributionType = 'BINARY'
                     path = "changelogs/${canonicalVersion}.txt"
+                    extraProperties.put('universal', true)
+                    transform = 'changelog.txt'
                 }
-                extraProperties.put('universal', true)
-                transform = 'changelog.txt'
             }
 
             if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
@@ -91,7 +91,7 @@ jreleaser {
                     path = 'build/pdx_unlimiter-linux.zip'
                     platform = 'linux'
                 }
-            } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX() && System.getProperty ("os.arch") == 'aarch64') {
+            } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX() && System.getProperty("os.arch") == 'aarch64') {
 //                artifact {
 //                    distributionType = 'BINARY'
 //                    path = 'build/pdx_unlimiter-mac.zip'
