@@ -659,14 +659,13 @@ public interface GameInstallType {
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("path", s.get().toString())).toList());
 
 
-
             var availableDlcs = installation.getDlcs();
             var currentlyDisabledDlcs = installation.queryDisabledDlcs();
             var dlcsToDisable = availableDlcs
-                        .stream()
-                        .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc)) ||
-                                (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
-                        .toList();
+                    .stream()
+                    .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc)) ||
+                            (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
+                    .toList();
 
             n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
                                                      .map(dlc -> getDlcLauncherId(installation, dlc))
@@ -675,22 +674,30 @@ public interface GameInstallType {
         }
 
         public List<GameMod> loadMods(GameInstallation installation) throws IOException {
-            var directory = installation.getDist().getWorkshopDir();
-            if (directory.isEmpty() || !Files.isDirectory(directory.get())) {
-                return List.of();
+            var modPaths = new ArrayList<Path>();
+
+            var workshop = installation.getDist().getWorkshopDir();
+            if (workshop.isPresent() && Files.isDirectory(workshop.get())) {
+                try (var list = Files.list(workshop.get())) {
+                    modPaths.addAll(list.toList());
+                }
+            }
+
+            var userDirMods = installation.getUserDir().resolve("mod");
+            if (Files.isDirectory(userDirMods)) {
+                try (var list = Files.list(userDirMods)) {
+                    modPaths.addAll(list.toList());
+                }
             }
 
             var mods = new ArrayList<GameMod>();
-
-            try (var list = Files.list(directory.get())) {
-                list.forEach(f -> {
-                    GameMod.fromVictoria3Directory(f).ifPresent(m -> {
-                        mods.add(m);
-                        LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("?") +
-                                                                                     " at " + m.getContentPath().orElse(null) + ".");
-                    });
+            modPaths.forEach(f -> {
+                GameMod.fromVictoria3Directory(f).ifPresent(m -> {
+                    mods.add(m);
+                    LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("?") +
+                                                                                 " at " + m.getContentPath().orElse(null) + ".");
                 });
-            }
+            });
             return mods;
         }
 
@@ -899,7 +906,7 @@ public interface GameInstallType {
                         .stream()
                         .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc)) ||
                                 (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
-                                        .toList();
+                        .toList();
                 case SAVEGAME_DOESNT_STORE_INFO -> currentlyDisabledDlcs;
             };
             n.putArray("disabled_dlcs").addAll(dlcsToDisable.stream()
