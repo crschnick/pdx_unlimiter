@@ -3,7 +3,7 @@ package com.crschnick.pdxu.editor.gui;
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.beans.property.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;

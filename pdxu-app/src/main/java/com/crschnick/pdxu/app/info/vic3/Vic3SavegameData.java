@@ -4,7 +4,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;

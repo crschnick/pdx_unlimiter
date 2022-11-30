@@ -11,7 +11,7 @@ import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Button;

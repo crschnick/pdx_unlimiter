@@ -15,4 +15,5 @@ open module com.crschnick.pdxu.model {
     exports com.crschnick.pdxu.model.stellaris;
     exports com.crschnick.pdxu.model.vic2;
     exports com.crschnick.pdxu.model.vic3;
+    exports com.crschnick.pdxu.model.coa;
 }

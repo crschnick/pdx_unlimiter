@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;

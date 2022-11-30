@@ -10,7 +10,7 @@ import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import javafx.scene.image.Image;

@@ -8,7 +8,7 @@ import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.ck3.Ck3House;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.crschnick.pdxu.model.ck3.Ck3Title;

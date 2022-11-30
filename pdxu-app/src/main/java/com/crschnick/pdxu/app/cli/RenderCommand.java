@@ -16,7 +16,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiConsumer;

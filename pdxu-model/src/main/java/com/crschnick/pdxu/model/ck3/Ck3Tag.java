@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.model.ck3;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 
 import java.util.*;
 import java.util.stream.Collectors;

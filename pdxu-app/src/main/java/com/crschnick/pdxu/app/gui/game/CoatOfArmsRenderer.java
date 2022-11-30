@@ -6,7 +6,8 @@ import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.node.ValueNode;
-import com.crschnick.pdxu.model.CoatOfArms;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
+import com.crschnick.pdxu.model.coa.Emblem;
 import com.crschnick.pdxu.model.GameColor;
 import javafx.scene.image.Image;
 
@@ -183,7 +184,7 @@ public abstract class CoatOfArmsRenderer {
             BufferedImage currentImage,
             BufferedImage rawPatternImage,
             CoatOfArms.Sub sub,
-            CoatOfArms.Emblem emblem,
+            Emblem emblem,
             GameFileContext ctx,
             int width, int height
     ) {
@@ -228,7 +229,7 @@ public abstract class CoatOfArmsRenderer {
                     hasMask ? (Graphics2D) emblemToCullImage.getGraphics() : (Graphics2D) currentImage.getGraphics();
 
             emblem.getInstances().stream()
-                    .sorted(Comparator.comparingDouble(CoatOfArms.Instance::getDepth))
+                    .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
                     .forEach(instance -> {
                         double angle = Math.toRadians(
                                 Math.signum(instance.getScaleX() * sub.getScaleX()) * Math.signum(instance.getScaleY() * sub.getScaleY()) *
