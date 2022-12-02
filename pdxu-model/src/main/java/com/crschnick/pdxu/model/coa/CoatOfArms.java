@@ -163,8 +163,8 @@ public final class CoatOfArms {
 
                 var scale = instanceNode.getNodeForKeyIfExistent("scale").orElse(null);
                 if (scale != null) {
-                    sub.scaleX = scale.getNodeArray().get(0).getDouble();
-                    sub.scaleY = scale.getNodeArray().get(1).getDouble();
+                    sub.scaleX = Math.min(scale.getNodeArray().get(0).getDouble(), 1 - sub.x);
+                    sub.scaleY = Math.min(scale.getNodeArray().get(1).getDouble(), 1 - sub.y);
                 }
             }
 
