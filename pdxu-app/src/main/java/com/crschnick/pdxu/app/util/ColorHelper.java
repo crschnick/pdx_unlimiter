@@ -83,10 +83,14 @@ public class ColorHelper {
                         d0,
                         d1 / 100.0,
                         d2 / 100.0);
-                case RGB -> Color.color(
-                        d0 / 255.0,
-                        d1 / 255.0,
-                        d2 / 255.0);
+                case RGB -> {
+                    var isDecimal = c.get(0).contains(".") || c.get(1).contains(".") || c.get(2).contains(".");
+                    var denominator = isDecimal ? 1.0 : 255.0;
+                    yield Color.color(
+                            d0 / denominator,
+                            d1 / denominator,
+                            d2 / denominator);
+                }
                 default -> throw new IllegalStateException("Unexpected value: " + color.getType());
             };
         } catch (Exception ex) {
