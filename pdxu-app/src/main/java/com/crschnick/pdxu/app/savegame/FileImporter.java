@@ -56,7 +56,7 @@ public class FileImporter {
         }
 
         logger.debug("Starting to import " + input + " from queue file " + queueFile);
-        var targets = FileImportTarget.createTargets(input);
+        var targets = FileImportTarget.createStandardImportsTargets(false, input);
         if (targets.size() == 0) {
             logger.debug("No targets to import.");
 
@@ -79,7 +79,7 @@ public class FileImporter {
     public static void onFileDrop(List<File> files) {
         var importTargets = files.stream()
                 .map(File::toString)
-                .map(FileImportTarget::createTargets)
+                .map(s -> FileImportTarget.createStandardImportsTargets(false, s))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
         FileImporter.importTargets(importTargets);

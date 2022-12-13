@@ -24,7 +24,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
     public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
-            return createExportTarget(ctx.getInstallation().getSavegamesDir(), false, entry);
+            return null;//createExportTarget(ctx.getInstallation().getSavegamesDir(), false, entry);
         });
     }
 

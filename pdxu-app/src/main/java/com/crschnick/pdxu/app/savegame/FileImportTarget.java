@@ -4,32 +4,33 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import org.apache.commons.io.FileUtils;
+import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public abstract class FileImportTarget {
 
-    public static List<StandardImportTarget> createStandardImportsTargets(String toImport) {
+    protected FileImportTarget(boolean cloud) {
+        this.cloud = cloud;
+    }
+
+    public static List<StandardImportTarget> createStandardImportsTargets(boolean cloud, String toImport) {
         Path p;
         try {
             p = Path.of(toImport);
@@ -40,9 +41,9 @@ public abstract class FileImportTarget {
 
         if (Files.isDirectory(p)) {
             List<StandardImportTarget> targets = new ArrayList<>();
-            try {
-                Files.list(p).forEach(f -> targets.addAll(
-                        FileImportTarget.createStandardImportsTargets(f.toString())));
+            try (var list = Files.list(p)) {
+                list.forEach(f -> targets.addAll(
+                        FileImportTarget.createStandardImportsTargets(cloud, f.toString())));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -61,33 +62,22 @@ public abstract class FileImportTarget {
         if (storage.equals(SavegameStorage.get(Game.STELLARIS))) {
             if (Game.STELLARIS.isEnabled()) {
                 if (p.getFileName().toString().equals("ironman.sav")) {
-                    targets.add(new StellarisIronmanImportTarget(p));
+                    targets.add(new StellarisIronmanImportTarget(cloud, p));
                 } else {
-                    targets.add(new StellarisNormalImportTarget(p));
+                    targets.add(new StellarisNormalImportTarget(cloud, p));
                 }
             }
         } else {
             var game = SavegameStorage.ALL.inverseBidiMap().get(storage);
             if (game.isEnabled()) {
-                targets.add(new StandardImportTarget(storage, p));
+                targets.add(new StandardImportTarget(cloud, storage, p));
             }
         }
         return targets;
     }
 
-    public static List<? extends FileImportTarget> createTargets(String toImport) {
-        if (SavegameStorage.ALL.get(Game.EU4) != null && toImport.startsWith("pdxu")) {
-            try {
-                URL url = new URL(toImport.replace("pdxu", "https"));
-                String id = Path.of(url.getPath()).getFileName().toString();
-                URL fileUrl = new URL("https://rakaly.com/api/saves/" + id + "/file");
-                return List.of(new DownloadImportTarget(fileUrl));
-            } catch (Exception ignored) {
-            }
-        }
-
-        return createStandardImportsTargets(toImport);
-    }
+    @Getter
+    private final boolean cloud;
 
     public abstract void importTarget(Consumer<Optional<SavegameParseResult>> onFinish);
 
@@ -122,96 +112,14 @@ public abstract class FileImportTarget {
 
     public abstract Path getPath();
 
-    public static final class DownloadImportTarget extends FileImportTarget {
-
-        private final URL url;
-        private Path downloadedFile;
-
-        public DownloadImportTarget(URL url) {
-            this.url = url;
-        }
-
-        @Override
-        public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {
-            if (GameInstallation.ALL.containsKey(Game.EU4)) {
-                return;
-            }
-
-            TaskExecutor.getInstance().submitTask(() -> {
-                try {
-                    HttpClient client = HttpClient.newBuilder()
-                            .version(HttpClient.Version.HTTP_2)
-                            .followRedirects(HttpClient.Redirect.NORMAL)
-                            .build();
-
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(url.toURI())
-                            .GET()
-                            .build();
-
-                    HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-                    byte[] data = response.body();
-
-                    String tempDir = System.getProperty("java.io.tmpdir");
-                    this.downloadedFile = Paths.get(tempDir).resolve("pdxu")
-                            .resolve(Path.of(url.getPath()).getFileName().toString() + ".eu4");
-                    FileUtils.forceMkdirParent(downloadedFile.toFile());
-                    Files.write(downloadedFile, data);
-
-                    onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, true, null, getCampaignIdOverride().orElse(null)));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            }, true);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            DownloadImportTarget that = (DownloadImportTarget) o;
-            return Objects.equals(url, that.url);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(url);
-        }
-
-        @Override
-        public void delete() {
-            TaskExecutor.getInstance().submitTask(() -> {
-                if (!Files.exists(downloadedFile)) {
-                    return;
-                }
-
-                try {
-                    Files.delete(downloadedFile);
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
-            }, false);
-        }
-
-        @Override
-        public String getRawName() {
-            return url.toString();
-        }
-
-        @Override
-        public Path getPath() {
-            return downloadedFile;
-        }
-    }
-
     public static class StandardImportTarget extends FileImportTarget implements Comparable<StandardImportTarget> {
 
         private final SavegameStorage<?, ?> savegameStorage;
         protected Path path;
         private Instant timestamp;
 
-        public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
+        public StandardImportTarget(boolean cloud, SavegameStorage<?, ?> savegameStorage, Path path) {
+            super(cloud);
             this.savegameStorage = savegameStorage;
             this.path = path;
 
@@ -313,8 +221,8 @@ public abstract class FileImportTarget {
 
     public static final class StellarisNormalImportTarget extends StandardImportTarget {
 
-        public StellarisNormalImportTarget(Path path) {
-            super(SavegameStorage.ALL.get(Game.STELLARIS), path);
+        public StellarisNormalImportTarget(boolean cloud, Path path) {
+            super(cloud, SavegameStorage.ALL.get(Game.STELLARIS), path);
         }
 
         @Override
@@ -326,8 +234,8 @@ public abstract class FileImportTarget {
 
     public static final class StellarisIronmanImportTarget extends StandardImportTarget {
 
-        public StellarisIronmanImportTarget(Path path) {
-            super(SavegameStorage.ALL.get(Game.STELLARIS), path);
+        public StellarisIronmanImportTarget(boolean cloud, Path path) {
+            super(cloud, SavegameStorage.ALL.get(Game.STELLARIS), path);
         }
 
         @Override

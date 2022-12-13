@@ -92,8 +92,8 @@ public final class GameInstallation {
 
     public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
-        savegameDirs.add(getSavegamesDir());
-        savegameDirs.addAll(dist.getAdditionalSavegamePaths());
+        savegameDirs.addAll(getNormalSavegamesDirs());
+        savegameDirs.addAll(getCloudSavegamesDirs());
         return savegameDirs;
     }
 
@@ -192,8 +192,15 @@ public final class GameInstallation {
         return userDir;
     }
 
-    public Path getSavegamesDir() {
-        return getUserDir().resolve("save games");
+    public List<Path> getNormalSavegamesDirs() {
+        var directories = new ArrayList<>(getDist().getAdditionalSavegamePaths());
+        directories.add(getUserDir().resolve("save games"));
+        return directories;
+    }
+
+    public List<Path> getCloudSavegamesDirs() {
+        var directories = new ArrayList<>(getDist().getCloudSavegamePaths());
+        return directories;
     }
 
     public GameVersion getVersion() {

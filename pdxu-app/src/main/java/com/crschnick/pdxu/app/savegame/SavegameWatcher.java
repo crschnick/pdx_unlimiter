@@ -24,7 +24,11 @@ public class SavegameWatcher {
     public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
 
     private final GameInstallation install;
-    private final ListProperty<FileImportTarget.StandardImportTarget> savegames = new SimpleListProperty<>(
+    private final ListProperty<FileImportTarget.StandardImportTarget> normalSavegames = new SimpleListProperty<>(
+            FXCollections.observableArrayList());
+    private final ListProperty<FileImportTarget.StandardImportTarget> cloudSavegames = new SimpleListProperty<>(
+            FXCollections.observableArrayList());
+    private final ListProperty<FileImportTarget.StandardImportTarget> allSavegames = new SimpleListProperty<>(
             FXCollections.observableArrayList());
 
     private SavegameWatcher(GameInstallation install) {
@@ -70,18 +74,19 @@ public class SavegameWatcher {
     }
 
     public synchronized Optional<FileImportTarget.StandardImportTarget> getLatest() {
-        return savegames.stream()
+        return allSavegames.stream()
                 .findFirst();
     }
 
     private synchronized void updateSavegames() {
-        savegames.get().setAll(getLatestSavegames());
+        normalSavegames.setAll(getLatestSavegames(false, install.getNormalSavegamesDirs()));
+        cloudSavegames.setAll(getLatestSavegames(true, install.getCloudSavegamesDirs()));
     }
 
-    private synchronized List<FileImportTarget.StandardImportTarget> getLatestSavegames() {
-        return install.getAllSavegameDirectories().stream()
+    private synchronized List<FileImportTarget.StandardImportTarget> getLatestSavegames(boolean cloud, List<Path> dirs) {
+        return dirs.stream()
                 .map(Path::toString)
-                .map(FileImportTarget::createStandardImportsTargets)
+                .map(v -> FileImportTarget.createStandardImportsTargets(cloud, v))
                 .map(List::stream)
                 .flatMap(Stream::distinct)
                 .sorted(Comparator.reverseOrder())
@@ -89,10 +94,10 @@ public class SavegameWatcher {
     }
 
     public List<FileImportTarget.StandardImportTarget> getSavegames() {
-        return savegames.get();
+        return allSavegames.get();
     }
 
     public ListProperty<FileImportTarget.StandardImportTarget> savegamesProperty() {
-        return savegames;
+        return allSavegames;
     }
 }

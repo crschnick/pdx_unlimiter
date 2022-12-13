@@ -83,6 +83,10 @@ public abstract class GameDist {
         return List.of();
     }
 
+    public List<Path> getCloudSavegamePaths() {
+        return List.of();
+    }
+
     public String getName() {
         return name;
     }
