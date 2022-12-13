@@ -124,16 +124,24 @@ public class ErrorHandler {
         Sentry.setExtra("initError", "true");
         Sentry.captureException(ex);
 
-        CountDownLatch latch = new CountDownLatch(1);
-        Platform.startup(latch::countDown);
         try {
-            latch.await();
-        } catch (InterruptedException ignored) {
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.startup(latch::countDown);
+            try {
+                latch.await();
+            } catch (InterruptedException ignored) {
+            }
+        } catch (Throwable r) {
+            // Check if platform initialization has failed
+            r.printStackTrace();
+            platformShutdown = true;
+            return;
         }
+
         platformInitialized = true;
     }
 
-    public static void handleTerminalException(Exception ex) {
+    public static void handleTerminalException(Throwable ex) {
         handleException(ex, null, null, true);
     }
 
@@ -199,12 +207,7 @@ public class ErrorHandler {
 
             // Wait to send error report
             ThreadHelper.sleep(1000);
-
-            Platform.runLater(() -> {
-                Platform.exit();
-                System.exit(1);
-            });
-            ThreadHelper.sleep(1000);
+            System.exit(1);
         }
     }
 

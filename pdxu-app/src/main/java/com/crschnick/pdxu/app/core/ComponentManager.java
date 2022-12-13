@@ -46,7 +46,7 @@ public class ComponentManager {
 
             // Start task executor early such that a shutdown can be performed from now on!
             TaskExecutor.getInstance().start();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ErrorHandler.handleTerminalException(e);
         }
     }
@@ -64,7 +64,7 @@ public class ComponentManager {
             // Load settings after window setup since settings entries can create dialog windows to notify the user
             Settings.init();
             PdxuApp.getApp().setupBasicWindowContent();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ErrorHandler.handleTerminalException(e);
         }
 
@@ -104,7 +104,7 @@ public class ComponentManager {
             if (PdxuInstallation.getInstance().isNativeHookEnabled() && !SystemUtils.IS_OS_MAC) {
                 GlobalScreen.registerNativeHook();
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             GuiErrorReporter.showSimpleErrorMessage("Unable to register native hook.\n" +
                     "This might be a permissions issue with your system. " +
                     "In-game keyboard shortcuts will be unavailable!");
@@ -117,7 +117,7 @@ public class ComponentManager {
             if (PdxuInstallation.getInstance().isNativeHookEnabled() && !SystemUtils.IS_OS_MAC) {
                 GlobalScreen.unregisterNativeHook();
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             GuiErrorReporter.showSimpleErrorMessage("Unable to unregister native hook.\n" +
                     "This might be a permissions issue with your system.");
             logger.warn("Unable to unregister native hook", ex);
@@ -141,7 +141,7 @@ public class ComponentManager {
 
             EditorProvider.get().init();
             registerNativeHook();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ErrorHandler.handleTerminalException(e);
         }
         logger.debug("Finished initialization");
@@ -170,7 +170,7 @@ public class ComponentManager {
             PdxuI18n.reset();
             CacheManager.reset();
             PdxToolsWebHelper.reset();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ErrorHandler.handleTerminalException(e);
         }
         logger.debug("Reset completed");

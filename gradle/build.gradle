@@ -52,6 +52,7 @@ List<String> runArgs = [
         "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
         "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
+        "-Dfile.encoding=UTF-8",
         "-Xmx4G"]
 
 application {

@@ -72,7 +72,6 @@ public class PdxuInstallation {
 
         try {
             Files.createDirectories(dataDir);
-
             var testDirectory = dataDir.resolve("permissions_check");
             Files.createDirectories(testDirectory);
             Files.delete(testDirectory);
@@ -254,7 +253,7 @@ public class PdxuInstallation {
                 .filter(h -> h.info().command().orElse("").equals(getExecutableLocation().toString())).toList();
         procs.forEach(p -> LoggerFactory.getLogger(PdxuInstallation.class)
                 .info("Detected running pdxu instance: " + p.info().command().orElse("") + " (PID " + p.pid() + ")"));
-        return procs.size() >= 2;
+        return procs.size() >= 3;
     }
 
     public boolean isNativeHookEnabled() {

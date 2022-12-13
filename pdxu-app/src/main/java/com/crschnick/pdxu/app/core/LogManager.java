@@ -98,7 +98,9 @@ public class LogManager {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", PdxuInstallation.getInstance().getLogLevel());
 
         // Debug output for platform
-        // System.setProperty("prism.verbose", "true");
+//        System.setProperty("javafx.verbose", "true");
+//        System.setProperty("prism.verbose", "true");
+//        System.setProperty("quantum.verbose", "true");
 
         if (!debugInstallations) {
             System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
