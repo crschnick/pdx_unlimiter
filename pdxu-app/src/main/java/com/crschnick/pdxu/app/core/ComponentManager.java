@@ -28,8 +28,8 @@ public class ComponentManager {
 
     public static void initialSetup(List<String> inputs) {
         try {
+            PdxuInstallation.checkDataDirectoryPermissions();
             PdxuInstallation.init();
-            PdxuInstallation.getInstance().checkDataDirectoryPermissions();
 
             LogManager.init();
             logger = LoggerFactory.getLogger(ComponentManager.class);

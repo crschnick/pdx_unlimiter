@@ -57,12 +57,28 @@ public class PdxuInstallation {
         }
     }
 
-    public void checkDataDirectoryPermissions() {
+    public static void checkDataDirectoryPermissions() {
+        Path dataDir;
+        // Legacy support
+        var legacyDataDir = Path.of(
+                System.getProperty("user.home"),
+                SystemUtils.IS_OS_WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter"
+        );
+        if (Files.exists(legacyDataDir)) {
+            dataDir = legacyDataDir;
+        } else {
+            dataDir = OsHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+        }
+
         try {
-            Files.createDirectories(getDataDir());
+            Files.createDirectories(dataDir);
+
+            var testDirectory = dataDir.resolve("permissions_check");
+            Files.createDirectories(testDirectory);
+            Files.delete(testDirectory);
         } catch (IOException e) {
             ErrorHandler.handleTerminalException(new IOException(
-                    "Unable to access directory " + getDataDir().getParent() + ". Please make sure that you have the appropriate permissions. " +
+                    "Unable to access directory " + dataDir.getParent() + ". Please make sure that you have the appropriate permissions. " +
                             "In case you use cloud storage, verify that your cloud storage is working."));
         }
     }
@@ -94,11 +110,21 @@ public class PdxuInstallation {
         }
     }
 
+    private  static boolean checkImage() {
+        return PdxuInstallation.class
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getProtocol()
+                .equals("jrt");
+    }
+
+
     public static void init() {
         var i = new PdxuInstallation();
 
         Path appPath = getAppPath();
-        i.image = Files.exists(getVersionFile());
+        i.image = checkImage();
         i.production = i.image;
         i.version = "unknown";
         i.languageDir = getLanguageDirectory();

@@ -5,10 +5,8 @@ import org.jnativehook.GlobalScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -37,11 +35,14 @@ public class LogManager {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
                     .withZone(ZoneId.systemDefault());
             try {
+                Files.createDirectories(i.getLogsLocation());
                 FileUtils.forceMkdir(i.getLogsLocation().toFile());
-                logFile = i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log");
-                System.setProperty("org.slf4j.simpleLogger.logFile", logFile.toString());
+                var file = i.getLogsLocation().resolve("pdxu_" + formatter.format(Instant.now()) + ".log");
+                Files.createFile(file);
+                System.setProperty("org.slf4j.simpleLogger.logFile", file.toString());
+                logFile = file;
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                e.printStackTrace();
             }
         }
 

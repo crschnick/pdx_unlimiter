@@ -171,7 +171,9 @@ public class ErrorHandler {
         if (!platformInitialized) {
             unpreparedStartup(ex);
         } else {
-            LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
+            if (LogManager.getInstance() != null) {
+                LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
+            }
         }
 
         if (!platformShutdown) {
