@@ -6,9 +6,9 @@ import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.node.ValueNode;
+import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.coa.Emblem;
-import com.crschnick.pdxu.model.GameColor;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -146,9 +146,9 @@ public abstract class CoatOfArmsRenderer {
 
     public javafx.scene.paint.Color applyMaskPixel(javafx.scene.paint.Color colour, double maskValue) {
         return new javafx.scene.paint.Color(
-                colour.getRed() * maskValue,
-                colour.getGreen() * maskValue,
-                colour.getBlue() * maskValue,
+                colour.getRed(),
+                colour.getGreen(),
+                colour.getBlue(),
                 maskValue
         );
     }
@@ -176,8 +176,8 @@ public abstract class CoatOfArmsRenderer {
 
         var colors = getPredefinedColors(ctx);
         return color != null
-                ? colors.getOrDefault(color, javafx.scene.paint.Color.TRANSPARENT)
-                : javafx.scene.paint.Color.TRANSPARENT;
+                ? colors.getOrDefault(color, javafx.scene.paint.Color.color(1, 0, 1))
+                : javafx.scene.paint.Color.color(1, 0, 1);
     }
 
     public void emblem(
