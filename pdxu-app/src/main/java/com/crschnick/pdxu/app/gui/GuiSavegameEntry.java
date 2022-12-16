@@ -13,10 +13,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.*;
-import com.crschnick.pdxu.app.util.integration.ConverterHelper;
-import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
-import com.crschnick.pdxu.app.util.integration.PdxToolsWebHelper;
-import com.crschnick.pdxu.app.util.integration.SkanderbegHelper;
+import com.crschnick.pdxu.app.util.integration.*;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXButton;
@@ -237,7 +234,7 @@ public class GuiSavegameEntry {
             melt.getStyleClass().add(CLASS_MELT);
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-                if (ctx.getInfo().getData().isBinary() && Eu4SeHelper.shouldShowButton(e, ctx.getInfo())) {
+                if (ctx.getInfo().getData().isBinary() && RakalyHelper.shouldShowButton(ctx)) {
                     Platform.runLater(() -> {
                         dynamicButtons.getChildren().add(melt);
                     });
