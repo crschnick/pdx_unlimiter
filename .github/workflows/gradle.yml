@@ -26,7 +26,8 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17.0.1+12'
+          java-version: '19.0.1+10'
+          github-token: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
 
       - name: Echo JAVA_HOME
         run: echo $JAVA_HOME
