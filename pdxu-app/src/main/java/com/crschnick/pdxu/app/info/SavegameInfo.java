@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
@@ -38,6 +39,8 @@ public abstract class SavegameInfo<T> {
                 c.init(content, data);
                 field.setAccessible(true);
                 field.set(this, c);
+            } catch (InvocationTargetException e) {
+                ErrorHandler.handleException(e.getCause());
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
             }
