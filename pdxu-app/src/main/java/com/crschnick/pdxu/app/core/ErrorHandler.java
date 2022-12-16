@@ -176,6 +176,10 @@ public class ErrorHandler {
     }
 
     private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
+        if (ex == null) {
+            return;
+        }
+
         if (!platformInitialized) {
             unpreparedStartup(ex);
         } else {
