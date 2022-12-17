@@ -21,7 +21,11 @@ public class ThreadHelper {
     public static void browseDirectory(Path file) {
         if (SystemUtils.IS_OS_WINDOWS) {
             try {
-                Runtime.getRuntime().exec("explorer.exe /select," + file.toString());
+                Runtime.getRuntime().exec(new String[]{
+                        "explorer.exe",
+                        "/select",
+                        file.toString()
+                });
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

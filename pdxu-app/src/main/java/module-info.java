@@ -11,6 +11,8 @@ open module com.crschnick.pdxu.app {
     requires javafx.controls;
     requires javafx.media;
     requires info.picocli;
+    requires com.sun.jna;
+    requires com.sun.jna.platform;
     requires org.jnativehook;
     requires jdk.localedata;
     requires org.kordamp.iconli.core;

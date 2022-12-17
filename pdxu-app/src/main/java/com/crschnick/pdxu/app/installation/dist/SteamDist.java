@@ -43,9 +43,9 @@ public class SteamDist extends GameDist {
         switch (SupportedOs.get()) {
             case WINDOWS -> {
                 if (ArchUtils.getProcessor().is64Bit()) {
-                    steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+                    steamDir = WindowsRegistry.readString(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
                 } else {
-                    steamDir = WindowsRegistry.readRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Valve\\Steam", "InstallPath");
+                    steamDir = WindowsRegistry.readString(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
                 }
             }
             case LINUX -> {

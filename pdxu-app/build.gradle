@@ -64,5 +64,8 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    implementation 'net.java.dev.jna:jna-jpms:5.12.1'
+    implementation 'net.java.dev.jna:jna-platform-jpms:5.12.1'
 }
 

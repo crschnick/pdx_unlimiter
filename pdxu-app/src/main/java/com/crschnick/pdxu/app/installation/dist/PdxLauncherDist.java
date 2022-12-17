@@ -42,7 +42,7 @@ public class PdxLauncherDist extends GameDist {
         Optional<String> launcherDir = Optional.empty();
         switch (SupportedOs.get()) {
             case WINDOWS -> {
-                launcherDir = WindowsRegistry.readRegistry("HKEY_CURRENT_USER\\SOFTWARE\\Paradox Interactive\\Paradox Launcher v2",
+                launcherDir = WindowsRegistry.readString(WindowsRegistry.HKEY_CURRENT_USER, "SOFTWARE\\Paradox Interactive\\Paradox Launcher v2",
                         "LauncherInstallation");
             }
             case LINUX -> {
