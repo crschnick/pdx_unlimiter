@@ -1,0 +1,14 @@
+# Changes in 2.12.2
+
+- Fix melter being accidentally disabled for certain games
+- Load Victoria 3 mods from user directory in addition to Steam mods
+- Update CK3 melter to 1.8
+- Improve error handling for errors occurring during startup
+- Fig various encoding issues for usernames with special characters
+- Some small coat of arms renderer improvements to get closer to the in game results
+
+# Changes in 2.12.1
+
+- Fix coat of arms renderer variables not being resolved in the editor
+- Fix external text editor not launching correctly in editor on Linux
+- Fix various other small bugs
