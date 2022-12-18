@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
 import com.crschnick.pdxu.app.PdxuApp;
+import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -20,6 +21,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GuiErrorReporter {
 
     public static void showReportSent() {
+        // Don't show confirmation in case the error occurred
+        // before the installation has been initialized as we can't load styles
+        if (PdxuInstallation.getInstance() == null) {
+            return;
+        }
+
         Alert a = GuiDialogHelper.createAlert();
         a.initModality(Modality.WINDOW_MODAL);
         a.setAlertType(Alert.AlertType.CONFIRMATION);
