@@ -67,12 +67,18 @@ public abstract class CoatOfArmsRenderer {
         }
     }
 
-    private void applyCullingMask(BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
+    private void applyCullingMask(CoatOfArms.Sub sub, BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
         double xF = (double) patternImage.getWidth() / emblemImage.getWidth();
         double yF = (double) patternImage.getHeight() / emblemImage.getHeight();
         for (int x = 0; x < emblemImage.getWidth(); x++) {
             for (int y = 0; y < emblemImage.getHeight(); y++) {
-                int maskArgb = patternImage.getRGB((int) Math.floor(xF * x), (int) Math.floor(yF * y));
+                var cx = (int) Math.floor(xF * x / sub.getScaleX());
+                var cy = (int) Math.floor(yF * y / sub.getScaleY());
+                if (cx >= patternImage.getWidth() || cy >= patternImage.getHeight()) {
+                    continue;
+                }
+
+                int maskArgb = patternImage.getRGB(cx, cy);
                 int maskRgb = 0x00FFFFFF & maskArgb;
                 int maskIndex =
                         1 + ColorHelper.pickClosestColor(maskRgb, PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
@@ -265,7 +271,7 @@ public abstract class CoatOfArmsRenderer {
                     });
 
             if (hasMask) {
-                applyCullingMask(emblemToCullImage, rawPatternImage, emblem.getMask());
+                applyCullingMask(sub, emblemToCullImage, rawPatternImage, emblem.getMask());
                 currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new Color(0, 0, 0, 0), null);
             }
         });
