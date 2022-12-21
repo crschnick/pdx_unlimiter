@@ -23,7 +23,12 @@ public abstract class SavegameInfo<T> {
 
     protected SavegameInfo(SavegameContent content) throws Exception {
         this.data = getDataClass().getDeclaredConstructor().newInstance();
-        this.data.init(content);
+
+        try {
+            this.data.init(content);
+        } catch (InvocationTargetException e) {
+            throw (Exception) e.getCause();
+        }
 
         for (var field : getClass().getDeclaredFields()) {
             if (!SavegameContentReader.class.isAssignableFrom(field.getType())) {

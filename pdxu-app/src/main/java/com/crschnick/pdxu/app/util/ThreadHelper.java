@@ -63,7 +63,7 @@ public class ThreadHelper {
         var t = new Thread(() -> {
             try {
                 if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    Runtime.getRuntime().exec("xdg-open " + uri);
+                    Runtime.getRuntime().exec(new String[]{"xdg-open", uri});
                 } else {
                     Desktop.getDesktop().browse(URI.create(uri));
                 }
@@ -79,7 +79,7 @@ public class ThreadHelper {
         var t = new Thread(() -> {
             try {
                 if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-                    Runtime.getRuntime().exec("xdg-open " + p.toString());
+                    Runtime.getRuntime().exec(new String[]{"xdg-open", p.toString()});
                 } else {
                     Desktop.getDesktop().open(p.toFile());
                 }

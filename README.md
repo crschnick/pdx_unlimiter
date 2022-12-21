@@ -222,7 +222,7 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 # Development
 
-To build this project, a JDK for at least Java 17 is required.
+To build this project, a JDK for at least Java 19 is required.
 You can then build the gradle project using the gradle wrapper with `gradle/gradlew build` or `gradle\gradlew.bat build`.
 For running, you can use `gradle/gradlew run`.
 Note here that the gradle wrapper has been moved into the `gradle` subdirectory.
