@@ -1,8 +1,8 @@
-OpenJDK 17 (http://jdk.java.net/17/) (GPL2 with the Classpath Exception)
+OpenJDK 19 (http://jdk.java.net/19/) (GPL2 with the Classpath Exception)
 
-GraalVM Community Edition 21 (https://www.graalvm.org/) (GPL2 with the Classpath Exception)
+GraalVM Community Edition 22 (https://www.graalvm.org/) (GPL2 with the Classpath Exception)
 
-JavaFX 17 (https://openjfx.io/) (GPL v2)
+JavaFX 19 (https://openjfx.io/) (GPL v2)
 
 Rakaly CLI (https://github.com/rakaly/cli) (MIT License)
 
@@ -33,6 +33,8 @@ ikonli-javafx (https://kordamp.org/ikonli/) (Apache License v2.0)
 ikonli-materialdesign-pack (https://github.com/Templarian/MaterialDesign) (Pictogrammers Free License)
 
 JFoenix (http://jfoenix.com/) (Apache License v2.0)
+
+JNA (https://github.com/java-native-access/jna) (Apache License v2.0)
 
 ===============================================================================
 ===============================================================================
