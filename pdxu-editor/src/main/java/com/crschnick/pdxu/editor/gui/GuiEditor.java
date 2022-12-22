@@ -95,7 +95,11 @@ public class GuiEditor {
         v.getStyleClass().add("editor-nav-bar-container");
         v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
 
-        var melterInformation = new Label("To edit this file, use the melter functionality with the savegame first or instruct a game to save as plaintext.");
+        var graphic = new StackPane(new FontIcon("mdi-information-outline"));
+        var melterInformation = new Label(
+                "To edit this file, either use the Pdx-Unlimiter melter functionality on the savegame\nfirst or instruct the game to save as plaintext, e.g. by launching it in debug mode",
+                graphic
+        );
         melterInformation.setAlignment(Pos.CENTER);
         melterInformation.setPadding(new Insets(5, 5, 5, 5));
         var topBars = new VBox(
@@ -104,6 +108,7 @@ public class GuiEditor {
         );
         if (!state.isEditable()) {
             topBars.getChildren().add(melterInformation);
+            topBars.getChildren().add(new Separator(Orientation.HORIZONTAL));
         }
         topBars.setFillWidth(true);
         melterInformation.prefWidthProperty().bind(topBars.widthProperty());
