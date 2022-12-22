@@ -33,14 +33,13 @@ dependencies {
 }
 
 repositories {
+    flatDir{
+        dirs file("$rootDir/misc/lib")
+    }
     mavenCentral()
     maven {
         url = 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
-    maven {
-        url = 'https://maven.nikr.net/'
-    }
-    maven { url "https://jitpack.io" }
 }
 
 List<String> runArgs = [
