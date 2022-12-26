@@ -135,7 +135,7 @@ public class PdxLauncherDist extends GameDist {
     }
 
     @Override
-    public List<Path> getAdditionalSavegamePaths() {
+    public List<Path> getCloudSavegamePaths() {
         return List.of();
     }
 }

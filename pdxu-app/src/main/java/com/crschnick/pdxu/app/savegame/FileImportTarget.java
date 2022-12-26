@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import lombok.Getter;
@@ -17,10 +18,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -30,7 +28,7 @@ public abstract class FileImportTarget {
         this.cloud = cloud;
     }
 
-    public static List<StandardImportTarget> createStandardImportsTargets(boolean cloud, String toImport) {
+    public static List<StandardImportTarget> createStandardImportsTargets(GameInstallation g, String toImport) {
         Path p;
         try {
             p = Path.of(toImport);
@@ -43,7 +41,7 @@ public abstract class FileImportTarget {
             List<StandardImportTarget> targets = new ArrayList<>();
             try (var list = Files.list(p)) {
                 list.forEach(f -> targets.addAll(
-                        FileImportTarget.createStandardImportsTargets(cloud, f.toString())));
+                        FileImportTarget.createStandardImportsTargets(g, f.toString())));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }
@@ -56,6 +54,15 @@ public abstract class FileImportTarget {
         // Don't determine type from file contents with import targets
         if (type == null) {
             return List.of();
+        }
+
+        boolean cloud;
+        if (g != null) {
+            cloud = g.getCloudSavegamesDirs().stream().anyMatch(p::startsWith);
+        } else {
+            cloud = GameInstallation.ALL.values().stream().filter(Objects::nonNull).anyMatch(gameInstallation -> {
+                return gameInstallation.getCloudSavegamesDirs().stream().anyMatch(p::startsWith);
+            });
         }
 
         var storage = SavegameStorage.get(type);
@@ -159,7 +166,7 @@ public abstract class FileImportTarget {
                 }
 
                 onFinish.accept(savegameStorage.importSavegame(
-                        path, true, getSourceFileChecksum(), getCampaignIdOverride().orElse(null)));
+                        path, true, getSourceFileChecksum(), getCampaignIdOverride().orElse(null), isCloud()));
             }, true);
         }
 

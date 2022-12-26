@@ -267,12 +267,13 @@ public abstract class SavegameStorage<
                 GameDate date = dateType.fromString(entryNode.required("date").textValue());
                 String checksum = entryNode.required("checksum").textValue();
                 SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
+                boolean cloud = Optional.ofNullable(entryNode.get("cloud")).map(JsonNode::booleanValue).orElse(false);
                 List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
                         .map(n -> StreamSupport.stream(n.spliterator(), false)
                                 .map(JsonNode::textValue)
                                 .collect(Collectors.toList()))
                         .orElse(List.of());
-                collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
+                collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums, cloud));
             });
         }
     }
@@ -290,6 +291,7 @@ public abstract class SavegameStorage<
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString())
+                            .put("cloud", entry.isCloud())
                             .<ObjectNode>set("sourceFileChecksums", JsonNodeFactory.instance.arrayNode().addAll(
                                     entry.getSourceFileChecksums().stream()
                                             .map(TextNode::new)
@@ -326,14 +328,16 @@ public abstract class SavegameStorage<
             I info,
             String name,
             String sourceFileChecksum,
-            String defaultCampaignName) {
+            String defaultCampaignName,
+            boolean cloud) {
         SavegameEntry<T, I> e = new SavegameEntry<>(
                 name != null ? name : getDefaultEntryName(info),
                 entryUuid,
                 checksum,
                 info.getData().getDate(),
                 SavegameNotes.empty(),
-                sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of());
+                sourceFileChecksum != null ? List.of(sourceFileChecksum) : List.of(), cloud
+        );
         if (this.getSavegameCampaign(campainUuid).isEmpty()) {
             logger.debug("Adding new campaign " + getDefaultCampaignName(info));
             var img = GameGuiFactory.<T, I>get(ALL.inverseBidiMap().get(this))
@@ -581,7 +585,7 @@ public abstract class SavegameStorage<
             var targetCollection = type.getCampaignIdHeuristic(c);
             var info = infoFactory.apply(succ.content, false);
             var name = getSavegameCampaign(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
-            addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name);
+            addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name, e.isCloud());
             saveData();
         } catch (Exception ex) {
             ErrorHandler.handleException(ex);
@@ -592,8 +596,8 @@ public abstract class SavegameStorage<
             Path file,
             boolean checkDuplicate,
             String sourceFileChecksum,
-            UUID customCampaignId) {
-        var status = importSavegameData(file, checkDuplicate, sourceFileChecksum, customCampaignId);
+            UUID customCampaignId, boolean cloud) {
+        var status = importSavegameData(file, checkDuplicate, sourceFileChecksum, customCampaignId, cloud);
         saveData();
         return status;
     }
@@ -639,7 +643,7 @@ public abstract class SavegameStorage<
             Path file,
             boolean checkDuplicate,
             String sourceFileChecksum,
-            UUID customCampaignId) {
+            UUID customCampaignId, boolean cloud) {
         logger.debug("Parsing file " + file.toString());
         final SavegameParseResult[] result = new SavegameParseResult[1];
         String checksum;
@@ -692,7 +696,7 @@ public abstract class SavegameStorage<
                 }
 
                 var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
-                addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null);
+                addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null, cloud);
             }
 
             @Override
@@ -710,7 +714,7 @@ public abstract class SavegameStorage<
         return Optional.ofNullable(resultToReturn[0]);
     }
 
-    private void addEntryToCollection(UUID campaignId, FailableConsumer<Path, Exception> writer, String checksum, I info, String sourceFileChecksum, String defaultCampaignName) {
+    private void addEntryToCollection(UUID campaignId, FailableConsumer<Path, Exception> writer, String checksum, I info, String sourceFileChecksum, String defaultCampaignName, boolean cloud) {
         logger.debug("Campaign UUID is " + campaignId.toString());
 
         UUID saveUuid = UUID.randomUUID();
@@ -723,7 +727,7 @@ public abstract class SavegameStorage<
             writer.accept(file);
             JsonHelper.writeObject(info, entryPath.resolve(getInfoFileName()));
 
-            addNewEntryToCampaign(campaignId, saveUuid, checksum, info, null, sourceFileChecksum, defaultCampaignName);
+            addNewEntryToCampaign(campaignId, saveUuid, checksum, info, null, sourceFileChecksum, defaultCampaignName, cloud);
         } catch (Exception e) {
             ErrorHandler.handleException(e);
         }
@@ -782,7 +786,7 @@ public abstract class SavegameStorage<
 
         var sourceName = getSavegameCampaign(e).getName();
         var newName = sourceName + " (" + PdxuI18n.get("NEW_BRANCH") + ")";
-        addEntryToCollection(targetId, writer, checksum, info, null, newName);
+        addEntryToCollection(targetId, writer, checksum, info, null, newName, e.isCloud());
         saveData();
     }
 

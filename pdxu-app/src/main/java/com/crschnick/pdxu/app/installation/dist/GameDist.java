@@ -79,10 +79,6 @@ public abstract class GameDist {
         throw new UnsupportedOperationException();
     }
 
-    public List<Path> getAdditionalSavegamePaths() {
-        return List.of();
-    }
-
     public List<Path> getCloudSavegamePaths() {
         return List.of();
     }

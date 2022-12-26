@@ -11,6 +11,7 @@ import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -60,7 +61,8 @@ public class Ck3RulerComp extends SavegameInfoComp {
                 topBar.setAlignment(Pos.CENTER);
                 topBar.getChildren().add(new HBox(GameImage.imageNode(CK3_ICON_RULER, "ruler-icon")));
                 int age = GameDate.yearsBetween(ruler.getBirth(), data.ck3().getDate());
-                var title = new Label(data.ck3().getTag().getName() + ", " + age);
+                var title = new Label(data.ck3().getPlayerName() + ", " + age);
+                title.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
                 title.getStyleClass().add("ruler-name");
                 topBar.getChildren().add(title);
 

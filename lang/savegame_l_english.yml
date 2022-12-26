@@ -13,6 +13,7 @@ l_english:
   ACHIEVEMENT_ELIGIBLE: "Eligible for achievements"
   ACHIEVEMENT_INELIGIBLE: "Not eligible for achievements"
   EXPORT_SAVEGAME: "Export to $GAME$ save games directory"
+  EXPORT_CLOUD_SAVEGAME: "Export to $GAME$ cloud save games directory"
   REPORT_SAVEGAME_ISSUE: "Report an issue with the savegame"
   COPY_SAVEGAME: "Make a copy of the savegame"
   EDIT_SAVEGAME_NOTES: "Edit savegame notes"

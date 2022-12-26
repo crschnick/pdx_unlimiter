@@ -151,8 +151,6 @@ public class GuiStatusBar {
 
             {
                 Button export = new Button(PdxuI18n.get("EXPORT"));
-                export.setGraphic(new FontIcon());
-                export.getStyleClass().add(CLASS_EXPORT);
                 export.setOnAction(event -> {
                     SavegameActions.exportSavegame(e);
                     SavegameManagerState.<T, I>get().selectEntry(null);
@@ -160,6 +158,13 @@ public class GuiStatusBar {
                     event.consume();
                     getStatusBar().hide();
                 });
+
+                if (e.isCloud()) {
+                    export.setGraphic(new FontIcon("mdi-cloud-upload"));
+                } else {
+                    export.getStyleClass().add(CLASS_EXPORT);
+                }
+
                 buttons.getChildren().add(export);
             }
 

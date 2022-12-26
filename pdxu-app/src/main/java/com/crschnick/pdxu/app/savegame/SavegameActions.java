@@ -203,7 +203,7 @@ public class SavegameActions {
             SavegameContext.withSavegameContext(e, ctx -> {
                 var in = ctx.getStorage().getSavegameFile(e);
                 var campaignId = ctx.getCollection().getUuid();
-                ctx.getStorage().importSavegame(in, false, null, campaignId);
+                ctx.getStorage().importSavegame(in, false, null, campaignId, e.isCloud());
             });
         }, true);
     }

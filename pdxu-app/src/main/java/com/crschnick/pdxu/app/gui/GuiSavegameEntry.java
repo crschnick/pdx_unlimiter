@@ -156,8 +156,14 @@ public class GuiSavegameEntry {
                 SavegameActions.exportSavegame(e);
                 SavegameManagerState.<T, I>get().selectEntry(null);
             });
-            export.getStyleClass().add(CLASS_EXPORT);
-            GuiTooltips.install(export, PdxuI18n.get("EXPORT_SAVEGAME", SavegameContext.getContext(e).getGame().getTranslatedFullName()));
+
+            if (e.isCloud()) {
+                export.setGraphic(new FontIcon("mdi-cloud-upload"));
+                GuiTooltips.install(export, PdxuI18n.get("EXPORT_CLOUD_SAVEGAME", SavegameContext.getContext(e).getGame().getTranslatedFullName()));
+            } else {
+                export.getStyleClass().add(CLASS_EXPORT);
+                GuiTooltips.install(export, PdxuI18n.get("EXPORT_SAVEGAME", SavegameContext.getContext(e).getGame().getTranslatedFullName()));
+            }
             staticButtons.getChildren().add(export);
         }
         {

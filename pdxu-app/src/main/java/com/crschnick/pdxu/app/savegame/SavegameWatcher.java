@@ -24,10 +24,6 @@ public class SavegameWatcher {
     public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
 
     private final GameInstallation install;
-    private final ListProperty<FileImportTarget.StandardImportTarget> normalSavegames = new SimpleListProperty<>(
-            FXCollections.observableArrayList());
-    private final ListProperty<FileImportTarget.StandardImportTarget> cloudSavegames = new SimpleListProperty<>(
-            FXCollections.observableArrayList());
     private final ListProperty<FileImportTarget.StandardImportTarget> allSavegames = new SimpleListProperty<>(
             FXCollections.observableArrayList());
 
@@ -79,14 +75,13 @@ public class SavegameWatcher {
     }
 
     private synchronized void updateSavegames() {
-        normalSavegames.setAll(getLatestSavegames(false, install.getNormalSavegamesDirs()));
-        cloudSavegames.setAll(getLatestSavegames(true, install.getCloudSavegamesDirs()));
+        allSavegames.setAll(getLatestSavegames(install, install.getAllSavegameDirectories()));
     }
 
-    private synchronized List<FileImportTarget.StandardImportTarget> getLatestSavegames(boolean cloud, List<Path> dirs) {
+    private synchronized List<FileImportTarget.StandardImportTarget> getLatestSavegames(GameInstallation install, List<Path> dirs) {
         return dirs.stream()
                 .map(Path::toString)
-                .map(v -> FileImportTarget.createStandardImportsTargets(cloud, v))
+                .map(v -> FileImportTarget.createStandardImportsTargets(install, v))
                 .map(List::stream)
                 .flatMap(Stream::distinct)
                 .sorted(Comparator.reverseOrder())

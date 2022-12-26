@@ -24,19 +24,25 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
     public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
-            return null;//createExportTarget(ctx.getInstallation().getSavegamesDir(), false, entry);
+            var dir = entry.isCloud() && ctx.getInstallation().getCloudSavegamesDirs().size() > 0 ?
+                    ctx.getInstallation().getCloudSavegamesDirs().get(0) :
+                    ctx.getInstallation().getNormalSavegamesDirs().get(0);
+            return createExportTarget(dir, false, entry);
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(Path dir, boolean includeEntryName, SavegameEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(
+            Path dir, boolean includeEntryName, SavegameEntry<T, I> entry
+    ) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             if (SavegameStorage.get(Game.STELLARIS).equals(ctx.getStorage())) {
                 return (FileExportTarget<T, I>) new StellarisExportTarget(
                         dir,
                         includeEntryName,
                         (SavegameStorage<StellarisTag, StellarisSavegameInfo>) ctx.getStorage(),
-                        (SavegameEntry<StellarisTag, StellarisSavegameInfo>) entry);
+                        (SavegameEntry<StellarisTag, StellarisSavegameInfo>) entry
+                );
             } else {
                 return new StandardExportTarget<>(dir, includeEntryName, ctx.getStorage(), entry);
             }
@@ -74,7 +80,8 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
                 Path savegameDir,
                 boolean includeEntryName,
                 SavegameStorage<StellarisTag, StellarisSavegameInfo> storage,
-                SavegameEntry<StellarisTag, StellarisSavegameInfo> entry) {
+                SavegameEntry<StellarisTag, StellarisSavegameInfo> entry
+        ) {
             super(savegameDir, includeEntryName, storage, entry);
         }
 

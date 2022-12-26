@@ -193,7 +193,7 @@ public final class GameInstallation {
     }
 
     public List<Path> getNormalSavegamesDirs() {
-        var directories = new ArrayList<>(getDist().getAdditionalSavegamePaths());
+        var directories = new ArrayList<>(getDist().getCloudSavegamePaths());
         directories.add(getUserDir().resolve("save games"));
         return directories;
     }

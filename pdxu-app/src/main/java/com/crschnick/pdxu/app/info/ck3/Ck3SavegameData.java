@@ -8,6 +8,7 @@ import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -20,6 +21,8 @@ public class Ck3SavegameData extends SavegameData<Ck3Tag> {
     protected Ck3Tag tag;
     protected List<Ck3Tag> allTags;
     private GameVersion version;
+    @Getter
+    private String playerName;
 
     @Override
     public Ck3Tag getTag() {
@@ -47,6 +50,7 @@ public class Ck3SavegameData extends SavegameData<Ck3Tag> {
         allTags = Ck3Tag.fromNode(content.get());
         tag = Ck3Tag.getPlayerTag(content.get(), allTags).orElse(null);
         observer = tag == null;
+        playerName = !observer ? content.get().getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString() : null;
 
         mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
                 .map(Node::getNodeArray).orElse(List.of())

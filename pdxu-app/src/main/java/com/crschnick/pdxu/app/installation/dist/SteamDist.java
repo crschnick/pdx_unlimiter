@@ -251,7 +251,7 @@ public class SteamDist extends GameDist {
     }
 
     @Override
-    public List<Path> getAdditionalSavegamePaths() {
+    public List<Path> getCloudSavegamePaths() {
         return getRemoteDataPaths(getGame().getSteamAppId()).stream()
                 .map(d -> d.resolve("save games"))
                 .collect(Collectors.toList());

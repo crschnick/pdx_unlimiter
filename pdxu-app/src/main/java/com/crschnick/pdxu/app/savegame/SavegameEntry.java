@@ -19,10 +19,13 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final GameDate date;
     private final SavegameNotes notes;
     private final List<String> sourceFileChecksums;
+    private final boolean cloud;
 
     public SavegameEntry(String name, UUID uuid,
                          String contentChecksum, GameDate date, SavegameNotes notes,
-                         List<String> sourceFileChecksums) {
+                         List<String> sourceFileChecksums, boolean cloud
+    ) {
+        this.cloud = cloud;
         this.state = new SimpleObjectProperty<>(State.INACTIVE);
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
@@ -49,6 +52,10 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
             unload();
         }
         state.set(State.INACTIVE);
+    }
+
+    public boolean isCloud() {
+        return cloud;
     }
 
     public void startLoading() {
