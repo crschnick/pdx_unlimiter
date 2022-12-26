@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImagingOpException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -267,7 +268,11 @@ public abstract class CoatOfArmsRenderer {
 
                         trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 
-                        usedGraphics.drawImage(img, new AffineTransformOp(trans, AffineTransformOp.TYPE_BICUBIC), 0, 0);
+                        try {
+                            var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BICUBIC);
+                            usedGraphics.drawImage(img, op, 0, 0);
+                        } catch (ImagingOpException ignored) {
+                        }
                     });
 
             if (hasMask) {
