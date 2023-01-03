@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -21,14 +22,24 @@ public class Eu4DevelopmentComp extends SavegameInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        totalDev = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("raw_development").getDouble();
-        autonomyDev = (int) content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKey("development").getDouble();
+        totalDev = content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTagName()).getNodeForKeyIfExistent("raw_development").map(
+                Node::getDouble).orElse(0.0).intValue();
+        autonomyDev = content.get()
+                .getNodeForKey("countries")
+                .getNodeForKey(data.eu4().getTagName())
+                .getNodeForKeyIfExistent("development")
+                .map(
+                        Node::getDouble)
+                .orElse(0.0)
+                .intValue();
     }
 
     @Override
     public Region create(SavegameData<?> data) {
-        var label = new Label(autonomyDev + " / " + totalDev,
-                GameImage.imageNode(EU4_ICON_DEV, CLASS_IMAGE_ICON));
+        var label = new Label(
+                autonomyDev + " / " + totalDev,
+                GameImage.imageNode(EU4_ICON_DEV, CLASS_IMAGE_ICON)
+        );
         label.setMinWidth(Region.USE_PREF_SIZE);
         label.setEllipsisString("");
 
