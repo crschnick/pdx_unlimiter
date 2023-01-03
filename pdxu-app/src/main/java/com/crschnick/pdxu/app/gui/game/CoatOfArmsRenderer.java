@@ -73,9 +73,9 @@ public abstract class CoatOfArmsRenderer {
         double yF = (double) patternImage.getHeight() / emblemImage.getHeight();
         for (int x = 0; x < emblemImage.getWidth(); x++) {
             for (int y = 0; y < emblemImage.getHeight(); y++) {
-                var cx = (int) Math.floor(xF * x / sub.getScaleX());
-                var cy = (int) Math.floor(yF * y / sub.getScaleY());
-                if (cx >= patternImage.getWidth() || cy >= patternImage.getHeight()) {
+                var cx = (int) Math.floor((xF * x - patternImage.getWidth() * sub.getX()) / sub.getScaleX());
+                var cy = (int) Math.floor((yF * y - patternImage.getHeight() * sub.getY()) / sub.getScaleY());
+                if (cx < 0 || cy < 0 || cx >= patternImage.getWidth() || cy >= patternImage.getHeight()) {
                     continue;
                 }
 
