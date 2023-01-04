@@ -31,7 +31,7 @@ public class LogManager {
 
 
         Path logFile = null;
-        if (i.isProduction()) {
+        if (i.isProduction() && System.console() == null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
                     .withZone(ZoneId.systemDefault());
             try {
@@ -44,6 +44,8 @@ public class LogManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         }
 
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
