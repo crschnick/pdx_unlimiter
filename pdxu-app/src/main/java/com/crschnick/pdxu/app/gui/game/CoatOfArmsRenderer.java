@@ -110,27 +110,22 @@ public abstract class CoatOfArmsRenderer {
     public BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int width, int height) {
         var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
-            int pColor1 = sub.getColors()[0] != null
-                    ? ColorHelper.intFromColor(
-                    colors.getOrDefault(sub.getColors()[0], javafx.scene.paint.Color.TRANSPARENT))
-                    : 0;
-            int pColor2 = sub.getColors()[1] != null
-                    ? ColorHelper.intFromColor(
-                    colors.getOrDefault(sub.getColors()[1], javafx.scene.paint.Color.TRANSPARENT))
-                    : 0;
-            int pColor3 = sub.getColors()[2] != null
-                    ? ColorHelper.intFromColor(
-                    colors.getOrDefault(sub.getColors()[2], javafx.scene.paint.Color.TRANSPARENT))
-                    : 0;
+            javafx.scene.paint.Color pColor1 = sub.getColors()[0] != null
+                    ? colors.getOrDefault(sub.getColors()[0], javafx.scene.paint.Color.TRANSPARENT)
+                    : javafx.scene.paint.Color.TRANSPARENT;
+            javafx.scene.paint.Color pColor2 = sub.getColors()[1] != null
+                    ? colors.getOrDefault(sub.getColors()[1], javafx.scene.paint.Color.TRANSPARENT)
+                    : javafx.scene.paint.Color.TRANSPARENT;
+            javafx.scene.paint.Color pColor3 = sub.getColors()[2] != null
+                    ? colors.getOrDefault(sub.getColors()[2], javafx.scene.paint.Color.TRANSPARENT)
+                    : javafx.scene.paint.Color.TRANSPARENT;
             Function<Integer, Integer> patternFunction = (Integer rgb) -> {
+                javafx.scene.paint.Color newColor = this.applyMaskPixel(pColor1, getRed(rgb) / 255.0);
+                newColor = this.overlayColors(newColor, this.applyMaskPixel(pColor2, getGreen(rgb) / 255.0));
+                newColor = this.overlayColors(newColor, this.applyMaskPixel(pColor3, getBlue(rgb) / 255.0));
+                int usedColor = intFromColor(newColor) & 0x00FFFFFF;
+
                 int alpha = rgb & 0xFF000000;
-                int color = rgb & 0x00FFFFFF;
-                int colorIndex = pickClosestColor(color, PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
-                int usedColor = new int[]{
-                        pColor1,
-                        pColor2,
-                        pColor3
-                }[colorIndex] & 0x00FFFFFF;
                 return alpha + usedColor;
             };
             var patternFile = CascadeDirectoryHelper.openFile(
