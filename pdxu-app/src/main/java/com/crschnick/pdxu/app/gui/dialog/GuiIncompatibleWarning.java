@@ -50,7 +50,7 @@ public class GuiIncompatibleWarning {
                     .collect(Collectors.joining("\n")));
         }
 
-        boolean missingDlc = info.getData().getDlcs().stream()
+        boolean missingDlc = info.getData().getDlcs() != null && info.getData().getDlcs().stream()
                 .map(m -> installation.getDlcForSavegameId(m))
                 .anyMatch(Optional::isEmpty);
         if (missingDlc) {
