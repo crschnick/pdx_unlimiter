@@ -172,6 +172,7 @@ public class RenderCommand implements Runnable {
             }
 
             try {
+                System.out.println("Rendering " + s + " ...");
                 var coa = CoatOfArms.fromNode(node, null);
                 var image = Ck3TagRenderer.renderImage(coa, context, size, false);
                 consumer.accept(s, image);
