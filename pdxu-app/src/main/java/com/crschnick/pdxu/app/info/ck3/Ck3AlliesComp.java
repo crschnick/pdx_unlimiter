@@ -1,39 +1,21 @@
 package com.crschnick.pdxu.app.info.ck3;
 
-import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
-import com.crschnick.pdxu.app.gui.game.GameImage;
-import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Region;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
 import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_ALLY;
 
-public class Ck3AlliesComp extends DiplomacyRowComp<Ck3Tag> {
+public class Ck3AlliesComp extends Ck3DiplomacyRowComp {
 
     @Override
-    protected Region map(SavegameData<?> data, Ck3Tag tag) {
-        return GameImage.imageNode(
-                Ck3TagRenderer.renderRealmImage(tag.getCoatOfArms(), tag.getGovernmentName(), GameFileContext.fromData(data), 64, false),
-                CLASS_TAG_ICON
-        );
-    }
-
-    @Override
-    protected String mapTooltip(SavegameData<?> data, Ck3Tag tag) {
-        return tag.getName();
-    }
-
-    @Override
-    protected final void init(SavegameContent content, SavegameData<?> data) {
-        this.tags = new ArrayList<>();
+    protected List<Ck3Tag> getTags(SavegameContent content, SavegameData<?> data) {
+        var tags = new ArrayList<Ck3Tag>();
         for (var rel : content.get().getNodeForKey("relations").getNodeForKey("active_relations").getNodeArray()) {
             if (!rel.hasKey("alliances")) {
                 continue;
@@ -48,6 +30,7 @@ public class Ck3AlliesComp extends DiplomacyRowComp<Ck3Tag> {
                 Ck3Tag.getTag(data.ck3().getAllTags(), first).ifPresent(t -> tags.add(t));
             }
         }
+        return tags;
     }
 
     @Override

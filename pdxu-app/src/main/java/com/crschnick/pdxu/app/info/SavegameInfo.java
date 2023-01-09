@@ -65,42 +65,36 @@ public abstract class SavegameInfo<T> {
 
         var comps = new ArrayList<SavegameInfoComp>();
         for (var field : getClass().getDeclaredFields()) {
-            if (!SavegameInfoComp.class.isAssignableFrom(field.getType())) {
-                continue;
+            if (SavegameInfoComp.class.isAssignableFrom(field.getType())) {
+                try {
+                    field.setAccessible(true);
+                    SavegameInfoComp c = (SavegameInfoComp) field.get(this);
+                    if (c == null) {
+                        continue;
+                    }
+
+                    if (c.requiresPlayer() && data.getTag() == null) {
+                        continue;
+                    }
+
+                    comps.add(c);
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
+                }
             }
 
-            try {
-                field.setAccessible(true);
-                SavegameInfoComp c = (SavegameInfoComp) field.get(this);
-                if (c == null) {
-                    continue;
+            if (SavegameInfoMultiComp.class.isAssignableFrom(field.getType())) {
+                try {
+                    field.setAccessible(true);
+                    SavegameInfoMultiComp c = (SavegameInfoMultiComp) field.get(this);
+                    if (c == null) {
+                        continue;
+                    }
+
+                    comps.addAll(c.create(data));
+                } catch (Exception ex) {
+                    ErrorHandler.handleException(ex);
                 }
-
-                if (c.requiresPlayer() && data.getTag() == null) {
-                    continue;
-                }
-
-                comps.add(c);
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
-            }
-        }
-
-        for (var field : getClass().getDeclaredFields()) {
-            if (!SavegameInfoMultiComp.class.isAssignableFrom(field.getType())) {
-                continue;
-            }
-
-            try {
-                field.setAccessible(true);
-                SavegameInfoMultiComp c = (SavegameInfoMultiComp) field.get(this);
-                if (c == null) {
-                    continue;
-                }
-
-                comps.addAll(c.create(data));
-            } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
             }
         }
 
