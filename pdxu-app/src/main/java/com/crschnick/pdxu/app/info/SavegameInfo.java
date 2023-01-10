@@ -99,9 +99,13 @@ public abstract class SavegameInfo<T> {
         }
 
         for (SavegameInfoComp comp : comps) {
-            var region = comp.create(data);
-            if (region != null) {
-                addNode(container, region);
+            try {
+                var region = comp.create(data);
+                if (region != null) {
+                    addNode(container, region);
+                }
+            } catch (Exception ex) {
+                ErrorHandler.handleException(ex);
             }
         }
 

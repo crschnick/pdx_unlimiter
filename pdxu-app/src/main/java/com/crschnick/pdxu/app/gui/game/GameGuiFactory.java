@@ -5,9 +5,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ImageHelper;
-import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -22,7 +20,8 @@ import javafx.scene.paint.Color;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import static com.crschnick.pdxu.app.gui.GuiStyle.*;
+import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_IMAGE_ICON;
+import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
 
 public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
 
@@ -41,22 +40,6 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     @SuppressWarnings("unchecked")
     public static <T, I extends SavegameInfo<T>> GameGuiFactory<T, I> get(Game g) {
         return (GameGuiFactory<T, I>) ALL.get(g);
-    }
-
-    protected void addNode(JFXMasonryPane pane, Region content) {
-        content.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE_CONTENT);
-        StackPane p = new StackPane(content);
-        p.setAlignment(Pos.CENTER);
-        p.getStyleClass().add(CLASS_CAMPAIGN_ENTRY_NODE);
-        content.setPadding(new Insets(5, 10, 5, 10));
-        p.setPrefWidth(Region.USE_COMPUTED_SIZE);
-        pane.getChildren().add(p);
-
-        // Magic! Using any other properties breaks the layout
-        content.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getWidth() - p.getPadding().getLeft() - p.getPadding().getRight(), p.widthProperty()));
-        content.prefHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
     }
 
     public ObservableValue<Node> createImage(SavegameEntry<T, I> entry) {
