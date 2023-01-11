@@ -143,16 +143,15 @@ public abstract class CoatOfArmsRenderer {
             };
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(sub.getPatternFile()), ctx);
-            patternFile.map(p -> ImageHelper.loadAwtImage(p, patternFunction)).ifPresent(img -> {
-                g.drawImage(
-                        img,
-                        (int) (sub.getX() * width),
-                        (int) (sub.getY() * height),
-                        (int) (sub.getScaleX() * width),
-                        (int) (sub.getScaleY() * height),
-                        null
-                );
-            });
+            var image = patternFile.map(p -> ImageHelper.loadAwtImage(p, patternFunction)).orElse(ImageHelper.DEFAULT_AWT_IMAGE);
+            g.drawImage(
+                    image,
+                    (int) (sub.getX() * width),
+                    (int) (sub.getY() * height),
+                    (int) (sub.getScaleX() * width),
+                    (int) (sub.getScaleY() * height),
+                    null
+            );
             return patternFile.map(p -> ImageHelper.loadAwtImage(p, null)).orElse(null);
         } else {
             return null;
