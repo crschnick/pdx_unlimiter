@@ -82,6 +82,9 @@ public class ModernSplitCompressedSavegameStructure extends ZipSavegameStructure
         // Check if the header meta length is actually right. If not, manually search for the zip header start
         if (!Arrays.equals(input, contentStart, contentStart + 4, ZIP_HEADER, 0, 4)) {
             contentStart = indexOfCompressedGamestateStart(input);
+            if (contentStart == -1) {
+                throw new IllegalArgumentException("Zip start not found in savegame");
+            }
         }
 
         return parseInput(input, contentStart);
