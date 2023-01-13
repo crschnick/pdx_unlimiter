@@ -61,6 +61,10 @@ jobs:
         if: ${{ startsWith(matrix.os, 'mac') }}
 
       - name: Execute dist build
+        env:
+          MAC_APP_SPECIFIC_PASSWORD: ${{ secrets.MAC_APP_SPECIFIC_PASSWORD }}
+          MAC_NOTARIZATION_APPLE_ID: ${{ secrets.MAC_NOTARIZATION_APPLE_ID }}
+          MAC_NOTARIZATION_TEAM_ID: ${{ secrets.MAC_NOTARIZATION_TEAM_ID }}
         run: ./gradle/gradlew --info createDist
 
       - name: JReleaser Release

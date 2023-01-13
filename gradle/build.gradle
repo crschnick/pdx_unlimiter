@@ -159,8 +159,15 @@ task createDist(type: Zip, dependsOn: jpackage) {
 }
 
 
-task bundleDmg(type: Exec) {
-    commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir"
+task bundleDmg(type: org.gradle.api.DefaultTask) {
+    doLast {
+        exec {
+            commandLine "$projectDir/misc/macos_notarize.sh", "$projectDir"
+        }
+        exec {
+            commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir"
+        }
+    }
 }
 if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     createDist.finalizedBy(bundleDmg)
