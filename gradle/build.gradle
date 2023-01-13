@@ -160,7 +160,7 @@ task createDist(type: Zip, dependsOn: jpackage) {
 
 
 task bundleDmg(type: Exec) {
-    commandLine "$projectDir/misc/mac_intel_dmg.sh"
+    commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir"
 }
 if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     createDist.finalizedBy(bundleDmg)

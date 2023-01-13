@@ -101,7 +101,7 @@ jreleaser {
             } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
                 artifact {
                     distributionType = 'BINARY'
-                    path = 'build/pdx_unlimiter-mac_intel.dmg'
+                    path = 'build/pdx_unlimiter-macos-x86_64.dmg'
                     platform = 'osx'
                 }
             }

@@ -10,4 +10,4 @@ Therefore, if you use a Pdx-Unlimiter installation with automatic updates enable
 
 ### [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-windows.zip)
 ### [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-linux.zip)
-### [Mac (Intel) standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-mac_intel.dmg)
+### [Mac (Intel) standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-macos-x86_64.dmg)
