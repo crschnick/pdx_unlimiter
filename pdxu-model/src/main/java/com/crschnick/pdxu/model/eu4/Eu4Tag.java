@@ -25,7 +25,10 @@ public final class Eu4Tag {
     public Eu4Tag() {
     }
 
-    public Eu4Tag(FlagType flagType, String tag, GameColor mapColor, GameColor countryColor, String name, ColonialFlagData colonialFlagData, CustomFlagData customFlagData) {
+    public Eu4Tag(
+            FlagType flagType, String tag, GameColor mapColor, GameColor countryColor, String name, ColonialFlagData colonialFlagData,
+            CustomFlagData customFlagData
+    ) {
         this.flagType = flagType;
         this.tag = tag;
         this.mapColor = mapColor;
@@ -57,7 +60,8 @@ public final class Eu4Tag {
                     col.getNodeForKey("symbol_index").getInteger(),
                     col.getNodeForKey("flag_colors").getNodeArray().stream()
                             .map(Node::getInteger)
-                            .collect(Collectors.toList()));
+                            .collect(Collectors.toList())
+            );
         } else if (OBSERVER_FLAG_TAG_PATTERN.matcher(tag).matches() || tag.equals(INVALID_TAG_ID)) {
             t = FlagType.NO_FLAG;
         } else {
@@ -68,7 +72,10 @@ public final class Eu4Tag {
     }
 
     public static Eu4Tag getTag(List<Eu4Tag> tags, String name) {
-        return tags.stream().filter(t -> t.tag.equals(name)).findFirst().get();
+        return tags.stream()
+                .filter(t -> t.tag.equals(name))
+                .findFirst()
+                .orElse(new Eu4Tag(FlagType.NO_FLAG, "REB", GameColor.BLACK, GameColor.BLACK, "Unknown", null, null));
     }
 
     public String getTag() {
