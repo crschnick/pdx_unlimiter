@@ -196,6 +196,10 @@ public class ErrorHandler {
                 } catch (InterruptedException ignored) {
                 }
             }
+        } else {
+            if (LogManager.getInstance() != null) {
+                LoggerFactory.getLogger(ErrorHandler.class).error(msg, ex);
+            }
         }
 
         if (terminal) {

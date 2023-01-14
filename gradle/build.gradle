@@ -33,7 +33,7 @@ dependencies {
 }
 
 repositories {
-    flatDir{
+    flatDir {
         dirs file("$rootDir/misc/lib")
     }
     mavenCentral()
@@ -93,12 +93,20 @@ jlink {
         appVersion = canonicalVersion
         imageOutputDir = file("$buildDir/dist")
         imageName = 'Pdx-Unlimiter'
+        imageOptions += ['--verbose']
         if (DefaultNativePlatform.currentOperatingSystem.windows) {
             icon = "misc/logo.ico"
         } else if (DefaultNativePlatform.currentOperatingSystem.linux) {
             icon = "misc/logo.png"
         } else {
             icon = "misc/logo.icns"
+            imageOptions += [
+                    '--mac-sign',
+                    '--mac-package-signing-prefix', 'com.crschnick.pdxu',
+                    '--mac-signing-key-user-name', 'Christopher Schnick (PF6V9HYACS)',
+                    '--mac-package-name', "X-Pipe",
+                    '--mac-entitlements', "$projectDir/misc/Entitlements.plist"
+            ]
         }
         skipInstaller = true
         applicationName = 'Pdx-Unlimiter'
@@ -161,11 +169,13 @@ task createDist(type: Zip, dependsOn: jpackage) {
 
 task bundleDmg(type: org.gradle.api.DefaultTask) {
     doLast {
-        exec {
-            commandLine "$projectDir/misc/macos_notarize.sh", "$projectDir"
-        }
-        exec {
-            commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir"
+        if (System.getenv("MAC_NOTARIZATION_APPLE_ID") != null) {
+            exec {
+                commandLine "$projectDir/misc/macos_notarize.sh", "$projectDir"
+            }
+            exec {
+                commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir"
+            }
         }
     }
 }

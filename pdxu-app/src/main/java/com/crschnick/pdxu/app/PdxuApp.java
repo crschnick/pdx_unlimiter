@@ -38,7 +38,11 @@ public class PdxuApp extends Application {
     }
 
     public static void main() {
-        launch();
+        try {
+            launch();
+        } catch (Throwable t) {
+            ErrorHandler.handleTerminalException(t);
+        }
     }
 
     public void setupWindowState() {

@@ -16,7 +16,6 @@ compileJava {
 }
 
 def currentOS = DefaultNativePlatform.currentOperatingSystem;
-def suffix = ''
 def platform
 if (currentOS.isWindows()) {
     platform = 'win'
@@ -26,7 +25,7 @@ if (currentOS.isWindows()) {
     platform = 'mac'
     def macArch = System.getProperty ("os.arch");
     if (macArch == 'aarch64') {
-        suffix = '-aarch64'
+        platform = 'mac-aarch64'
     }
 }
 

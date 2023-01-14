@@ -9,9 +9,6 @@ echo "$DMG_FILE"
 mkdir -p "$1/build/dist/"
 rm -f "$DMG_FILE"
 
-codesign -vvv --options runtime --deep --force --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR"
-codesign -vvv --force --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR"
-
 create-dmg \
   --volname "Pdx-Unlimiter" \
   --volicon "$1/misc/logo.icns" \

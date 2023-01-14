@@ -296,7 +296,7 @@ public class PdxuInstallation {
                 return dir.resolve("bin").resolve("rakaly_linux");
             }
             case MAC -> {
-                return dir.resolve("bin").resolve("rakaly_mac");
+                return getAppPath().resolve("Contents").resolve("MacOS").resolve("rakaly_mac");
             }
             default -> {
                 return null;
