@@ -4,7 +4,6 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.*;
-import net.nikr.dds.DDSImageReaderSpi;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
@@ -24,7 +23,6 @@ public class ImageHelper {
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
-        registry.registerServiceProvider(new DDSImageReaderSpi());
         registry.registerServiceProvider(new TGAImageReaderSpi());
     }
 

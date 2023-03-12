@@ -5,12 +5,12 @@ open module com.crschnick.pdxu.app {
     requires org.apache.commons.io;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
-    requires net.nikr.dds;
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
     requires javafx.media;
     requires info.picocli;
+    requires io.github.ititus.dds;
     requires com.sun.jna;
     requires com.sun.jna.platform;
     requires org.jnativehook;
