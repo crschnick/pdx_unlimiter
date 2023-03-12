@@ -74,6 +74,10 @@ public class GuiStyle {
     public static String CLASS_CLEAR = "clear-button";
 
     public static void addStylesheets(Scene scene) {
+        if (PdxuInstallation.getInstance() == null) {
+            return;
+        }
+
         try {
             Files.list(PdxuInstallation.getInstance().getResourceDir().resolve("style"))
                     .map(p -> p.toUri().toString())
@@ -84,6 +88,10 @@ public class GuiStyle {
     }
 
     public static void makeEmptyAlert(Scene scene) {
+        if (PdxuInstallation.getInstance() == null) {
+            return;
+        }
+
         scene.getStylesheets().add(PdxuInstallation.getInstance().getResourceDir().resolve("style")
                 .resolve("empty-alert.css").toUri().toString());
     }

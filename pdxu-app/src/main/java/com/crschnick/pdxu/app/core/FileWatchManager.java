@@ -107,7 +107,7 @@ public class FileWatchManager {
         }
 
         private void createRecursiveWatchers(Path dir) {
-            if (!Files.isDirectory(dir)) {
+            if (!Files.isDirectory(dir) || !Files.isReadable(dir)) {
                 return;
             }
 

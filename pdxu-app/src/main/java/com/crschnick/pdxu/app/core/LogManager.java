@@ -108,11 +108,15 @@ public class LogManager {
             System.setProperty("org.slf4j.simpleLogger.log.com.crschnick.pdx_unlimiter.app.installation", "info");
         }
 
-        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.OFF);
-            logger.setUseParentHandlers(false);
-            GlobalScreen.isNativeHookRegistered();
+        try {
+            if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+                java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
+                logger.setLevel(Level.OFF);
+                logger.setUseParentHandlers(false);
+                GlobalScreen.isNativeHookRegistered();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
