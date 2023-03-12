@@ -64,7 +64,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     implementation 'net.java.dev.jna:jna-jpms:5.12.1'
-    implementation 'net.java.dev.jna:jna-platform-jpms:5.12.1'
+    implementation 'net.java.dev.jna:jna-platform-jpms:5.13.0'
     implementation 'io.github.ititus:dds:1.0.0'
 }
 
