@@ -2,7 +2,7 @@ OpenJDK 19 (http://jdk.java.net/19/) (GPL2 with the Classpath Exception)
 
 GraalVM Community Edition 22 (https://www.graalvm.org/) (GPL2 with the Classpath Exception)
 
-JavaFX 19 (https://openjfx.io/) (GPL v2)
+JavaFX 19 (https://openjfx.io/) (GPL2 with the Classpath Exception)
 
 Rakaly CLI (https://github.com/rakaly/cli) (MIT License)
 
@@ -16,7 +16,7 @@ JNativeHook (https://github.com/kwhat/jnativehook) (LGPL v3)
 
 ImageIO.tga (https://github.com/tmyroadctfig/com.realityinteractive.imageio.tga) (LGPL v2.1)
 
-java-dds (https://github.com/GoldenGnu/java-dds) (GPL v2)
+dds (https://github.com/iTitus/dds) (MIT License)
 
 Sentry (https://github.com/getsentry/sentry-java/) (MIT License)
   Copyright (c) 2019 Sentry,

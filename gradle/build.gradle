@@ -104,7 +104,7 @@ jlink {
                     '--mac-sign',
                     '--mac-package-signing-prefix', 'com.crschnick.pdxu',
                     '--mac-signing-key-user-name', 'Christopher Schnick (PF6V9HYACS)',
-                    '--mac-package-name', "X-Pipe",
+                    '--mac-package-name', "Pdx-Unlimiter",
                     '--mac-entitlements', "$projectDir/misc/Entitlements.plist"
             ]
         }
@@ -183,3 +183,10 @@ if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
     createDist.finalizedBy(bundleDmg)
 }
 
+distTar {
+    enabled = false;
+}
+
+distZip {
+    enabled = false;
+}

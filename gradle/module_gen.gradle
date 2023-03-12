@@ -60,15 +60,6 @@ addDependenciesModuleInfo {
             '''
         }
         module {
-            artifact 'net.nikr:dds:1.0.0'
-            moduleInfoSource = '''
-                module net.nikr.dds {
-                    requires java.desktop;
-                    exports net.nikr.dds;
-                }
-            '''
-        }
-        module {
             artifact 'org.apache.commons:commons-lang3:3.12.0'
             moduleInfoSource = '''
                 module org.apache.commons.lang {
