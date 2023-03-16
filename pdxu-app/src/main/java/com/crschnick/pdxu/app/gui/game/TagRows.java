@@ -9,6 +9,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public class TagRows {
         GuiTooltips.install(img, tooltip);
 
         var list = tags.subList(0, Math.min(tags.size(), MAX_DISPLAY_COUNT)).stream()
+                .filter(Objects::nonNull)
                 .map(t -> {
                     var node = gen.apply(t);
                     GuiTooltips.install(node, tooltipGen.apply(t));
