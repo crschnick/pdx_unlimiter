@@ -42,7 +42,7 @@ public final class NodePointer {
 
         @Override
         public Node tryMatch(Node root, Node n) {
-            if (n.getNodeArray().size() > index) {
+            if (n.getNodeArray().size() > index && index >= 0) {
                 return n.getNodeArray().get(index);
             }
             return null;
@@ -50,7 +50,7 @@ public final class NodePointer {
 
         @Override
         public String getKey(Node root, Node n) {
-            if (n.getNodeArray().size() > index) {
+            if (n.getNodeArray().size() > index && index >= 0) {
                 return n.getArrayNode().getKeyAt(index);
             }
             return null;
