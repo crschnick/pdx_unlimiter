@@ -1,0 +1,10 @@
+# Changes in 2.12.3
+
+- macOS builds are now signed and notarized, so they shouldn't cause any warning messages anymore
+- Improve coat of arms renderer in a few places
+- Readd wars and allies display for ck3 savegames
+- Add russian translations (thanks to flashader)
+- Improve error handling
+- Update melter to HOI4 1.12
+- Fix some display bugs for Victoria3 1.2
+- Fix various other small bugs

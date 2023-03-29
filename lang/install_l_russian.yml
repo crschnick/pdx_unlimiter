@@ -1,0 +1,6 @@
+l_russian:
+ ERROR_OCCURED:0 "Произошла непредвиденная ошибка: $CAUSE$"
+ GAME_DATA_PATH_NOT_FOUND:0 "Не удалось найти путь к игровым данным в файле конфигурации программы запуска $GAME$."
+ INSTALL_DIR_IS_USER_DIR:0 "Вы выбрали каталог пользовательских документов игры. Однако для Pdx-Unlimiter требуется каталог установки.\nОбычно место установки игры можно найти в таких местах, как:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- любое другое место, куда вы устанавливаете свои игры."
+ GAME_DATA_PATH_DOES_NOT_EXIST:0 "Обнаружена установка $GAME$, но каталог пользовательских данных $DIR$ не существует.\nЧтобы исправить эту проблему, запустите игру хотя бы один раз, чтобы сгенерировать этот каталог."
+ EXECUTABLE_NOT_FOUND:0 "Исполняемый файл $FILE$ игры $GAME$ не найден в каталоге $DIR$.\nОбычно место установки игры можно найти в таких местах, как:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME $\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- Любое другое место, где вы устанавливаете свои игры"
