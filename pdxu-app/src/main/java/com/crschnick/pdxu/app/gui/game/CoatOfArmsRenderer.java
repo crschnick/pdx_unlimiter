@@ -82,6 +82,10 @@ public abstract class CoatOfArmsRenderer {
     }
 
     private void applyCullingMask(CoatOfArms.Sub sub, BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
+        if (patternImage == null) {
+            return;
+        }
+
         double xF = (double) patternImage.getWidth() / emblemImage.getWidth();
         double yF = (double) patternImage.getHeight() / emblemImage.getHeight();
         for (int x = 0; x < emblemImage.getWidth(); x++) {

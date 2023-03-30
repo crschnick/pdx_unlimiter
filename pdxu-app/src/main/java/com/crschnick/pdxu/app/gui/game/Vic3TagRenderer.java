@@ -63,9 +63,6 @@ public class Vic3TagRenderer {
 
         for (var sub : coa.getSubs()) {
             var rawPatternImg = CoatOfArmsRenderer.VIC3.pattern(g, sub, ctx, width, height);
-            if (rawPatternImg == null) {
-                continue;
-            }
 
             for (var emblem : sub.getEmblems()) {
                 CoatOfArmsRenderer.VIC3.emblem(i, rawPatternImg, sub, emblem, ctx, width, height);
