@@ -11,7 +11,7 @@ Installers are the easiest way to get started. Note that there might be some iss
 
 - [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/download/2.2.10/pdxu_installer-windows.msi)
 - [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/download/2.2.10/pdxu_installer-linux.deb)
-- [Linux .rpm Installer](https://github.com/crschnick/pdxu_launcher/releases/download/2.2.10/pdxu_installer-linux.rpm) (Experimental for now)
+- [Linux .rpm Installer](https://github.com/crschnick/pdxu_launcher/releases/download/2.2.10/pdxu_installer-linux.rpm)
 
 ### Standalone
 
@@ -19,4 +19,4 @@ If you don't like installers, you can also use a standalone version, which is pa
 
 - [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-windows.zip)
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-linux.zip)
-- [Mac (Intel) standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-macos-x86_64.dmg)
+- [Mac standalone](https://github.com/crschnick/pdx_unlimiter/releases/download/{{version}}/pdx_unlimiter-macos-x86_64.dmg)
