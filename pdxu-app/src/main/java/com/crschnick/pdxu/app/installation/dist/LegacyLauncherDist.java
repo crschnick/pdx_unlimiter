@@ -1,10 +1,12 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,7 +32,14 @@ public class LegacyLauncherDist extends GameDist {
     @Override
     public void startLauncher(Map<String,String> env) throws IOException {
         var exec = getGame().getInstallType().getLegacyLauncherExecutable(getInstallLocation()).orElseThrow();
-        var pb = new ProcessBuilder(exec.toString());
+        var input = new ArrayList<String>();
+        // Make UAC popup if needed
+        if (SystemUtils.IS_OS_WINDOWS) {
+            input.add("cmd");
+            input.add("/C");
+        }
+        input.add(exec.toString());
+        var pb = new ProcessBuilder(input);
         pb.environment().putAll(env);
         pb.start();
     }
