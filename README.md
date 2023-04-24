@@ -65,6 +65,7 @@ If you want to know how to use a certain feature, you can
 read about it in the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide).
 There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/wiki/Frequenly-Asked-Questions)
 to answer some of your questions.
+If you like videos, there's now also a [tutorial video on YouTube](https://www.youtube.com/watch?v=i67Q2PxAnzQ).
 
 
 
