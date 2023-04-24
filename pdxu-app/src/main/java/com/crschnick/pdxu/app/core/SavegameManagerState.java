@@ -72,6 +72,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private void addShownContentChangeListeners() {
         var colListener = (SetChangeListener<? super SavegameCampaign<Object, SavegameInfo<Object>>>) c -> {
             updateShownCollections();
+            updateShownEntries();
         };
         current.addListener((c, o, n) -> {
             if (o != null) {
@@ -147,7 +148,6 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         // No integration or campaign selected means no entries are shown
         if (current() == null || globalSelectedCollection.get() == null) {
             shownEntries.clear();
-
             return;
         }
 
