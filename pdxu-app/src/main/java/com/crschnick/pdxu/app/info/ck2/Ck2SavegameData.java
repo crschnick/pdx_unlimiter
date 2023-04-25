@@ -8,6 +8,7 @@ import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.ck2.Ck2Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,6 +19,8 @@ public class Ck2SavegameData extends SavegameData<Ck2Tag> {
 
     protected Ck2Tag tag;
     protected List<Ck2Tag> allTags;
+    @Getter
+    protected String ironmanSaveName;
     private GameVersion version;
 
     @Override
@@ -39,12 +42,13 @@ public class Ck2SavegameData extends SavegameData<Ck2Tag> {
     protected void init(SavegameContent content) {
         campaignHeuristic = SavegameType.CK2.getCampaignIdHeuristic(content);
 
-        ironman = false;
+        ironman = content.get().hasKey("ironman");
         date = GameDateType.CK3.fromString(content.get().getNodeForKey("date").getString());
         binary = false;
 
         tag = new Ck2Tag(content.get().getNodeForKey("player_realm").getString(), content.get().getNodeForKey("player_name").getString());
         allTags = List.of(tag);
+        ironmanSaveName = content.get().getNodeForKeyIfExistent("ironman").map(Node::getString).orElse(null);
 
         mods = null;
         dlcs = null;

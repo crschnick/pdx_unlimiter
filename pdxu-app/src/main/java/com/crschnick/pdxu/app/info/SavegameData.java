@@ -68,6 +68,10 @@ public abstract class SavegameData<T> {
         return (Ck3SavegameData) this;
     }
 
+    public Ck2SavegameData ck2() {
+        return (Ck2SavegameData) this;
+    }
+
     public Vic3SavegameData vic3() {
         return (Vic3SavegameData) this;
     }

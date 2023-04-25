@@ -1,12 +1,15 @@
 package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.model.ck2.Ck2Tag;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Path;
+import java.util.function.Function;
 
 public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
@@ -29,14 +32,25 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(Path dir, boolean includeEntryName, SavegameEntry<T, I> entry) {
+    public static <T, I extends SavegameInfo<T>> FileExportTarget<T, I> createExportTarget(
+            Path dir, boolean includeEntryName, SavegameEntry<T, I> entry
+    ) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             if (SavegameStorage.get(Game.STELLARIS).equals(ctx.getStorage())) {
                 return (FileExportTarget<T, I>) new StellarisExportTarget(
                         dir,
                         includeEntryName,
                         (SavegameStorage<StellarisTag, StellarisSavegameInfo>) ctx.getStorage(),
-                        (SavegameEntry<StellarisTag, StellarisSavegameInfo>) entry);
+                        (SavegameEntry<StellarisTag, StellarisSavegameInfo>) entry
+                );
+            } else if (SavegameStorage.get(Game.CK2).equals(ctx.getStorage()) && entry.getInfo().getData().isIronman()) {
+                return (FileExportTarget<T, I>) new FixedNameTarget<>(
+                        dir,
+                        includeEntryName,
+                        (SavegameStorage<Ck2Tag, Ck2SavegameInfo>) ctx.getStorage(),
+                        (SavegameEntry<Ck2Tag, Ck2SavegameInfo>) entry,
+                        e -> "../" + e.getInfo().getData().ck2().getIronmanSaveName()
+                );
             } else {
                 return new StandardExportTarget<>(dir, includeEntryName, ctx.getStorage(), entry);
             }
@@ -68,13 +82,38 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         }
     }
 
+    public static class FixedNameTarget<T, I extends SavegameInfo<T>> extends FileExportTarget<T, I> {
+
+        private final Function<SavegameEntry<T, I>, String> nameFunction;
+
+        public FixedNameTarget(
+                Path savegameDir, boolean includeEntryName, SavegameStorage<T, I> storage, SavegameEntry<T, I> entry,
+                Function<SavegameEntry<T, I>, String> nameFunction
+        ) {
+            super(savegameDir, includeEntryName, storage, entry);
+            this.nameFunction = nameFunction;
+        }
+
+        private Path getOutputFile() {
+            return targetDir.resolve(nameFunction.apply(entry));
+        }
+
+        @Override
+        public Path export() throws Exception {
+            var out = getOutputFile();
+            storage.copySavegameTo(entry, out);
+            return out;
+        }
+    }
+
     public static class StellarisExportTarget extends FileExportTarget<StellarisTag, StellarisSavegameInfo> {
 
         public StellarisExportTarget(
                 Path savegameDir,
                 boolean includeEntryName,
                 SavegameStorage<StellarisTag, StellarisSavegameInfo> storage,
-                SavegameEntry<StellarisTag, StellarisSavegameInfo> entry) {
+                SavegameEntry<StellarisTag, StellarisSavegameInfo> entry
+        ) {
             super(savegameDir, includeEntryName, storage, entry);
         }
 
