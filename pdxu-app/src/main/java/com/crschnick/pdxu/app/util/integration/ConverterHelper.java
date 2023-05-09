@@ -161,7 +161,8 @@ public class ConverterHelper {
                                 .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
                         if (latestDir.isPresent() && latestFile.isPresent()) {
                             var outDir = Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName());
-                            if (Files.exists(outDir)) {
+                            var outFile = Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName());
+                            if (Files.exists(outDir) || Files.exists(outFile)) {
                                 GuiConverterConfig.showAlreadyExistsDialog(latestDir.get().getFileName().toString());
                             } else {
                                 FileUtils.moveDirectory(
@@ -169,7 +170,7 @@ public class ConverterHelper {
                                         outDir.toFile());
                                 FileUtils.moveFile(
                                         latestFile.get().toFile(),
-                                        Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName()).toFile());
+                                        outFile.toFile());
                             }
                         }
                     }
