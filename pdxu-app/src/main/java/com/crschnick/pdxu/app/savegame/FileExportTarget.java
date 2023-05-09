@@ -121,9 +121,11 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         public Path export() throws Exception {
             var baseName = FilenameUtils.getBaseName(
                     storage.getValidOutputFileName(entry, includeEntryName, null).toString());
+            var customId = entry.getUuid();
+            var suffix = " (" + customId + ")";
 
             Path file;
-            Path dir = targetDir.resolve(baseName);
+            Path dir = targetDir.resolve(baseName + suffix);
             if (entry.getInfo().getData().isIronman()) {
                 file = dir.resolve("ironman.sav");
             } else {
