@@ -34,6 +34,11 @@ public class ProtonDist extends GameDist {
     }
 
     @Override
+    public boolean isGameInstance(String cmd) {
+        return cmd.endsWith(getGame().getInstallType().getProtonExecutableName());
+    }
+
+    @Override
     public boolean supportsLauncher() {
         return true;
     }
