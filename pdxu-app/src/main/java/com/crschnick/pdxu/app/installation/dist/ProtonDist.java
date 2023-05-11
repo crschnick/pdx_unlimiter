@@ -51,7 +51,7 @@ public class ProtonDist extends PdxLauncherDist {
     protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_LINUX) {
             value = value.replace(
-                    "$LINUX_DATA_HOME",
+                    "%USER_DOCUMENTS%",
                     SteamDist.getSteamPath()
                             .orElseThrow()
                             .resolve("steamapps")
