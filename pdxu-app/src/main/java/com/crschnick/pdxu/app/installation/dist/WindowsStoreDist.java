@@ -5,6 +5,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -87,9 +88,19 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     }
 
     @Override
-    public boolean isGameInstance(String cmd) {
+    public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         var execName = getExecutable().getFileName().toString();
-        return cmd.contains("\\\\?\\Volume") && cmd.contains(execName);
+        Optional<ProcessHandle> process = Optional.empty();
+        for (var ph : processes) {
+            var cmd = ph.info().command().orElse(null);
+            if (cmd != null) {
+                if (cmd.contains("\\\\?\\Volume") && cmd.contains(execName)) {
+                    process = Optional.of(ph);
+                    break;
+                }
+            }
+        }
+        return process;
     }
 
     @Override

@@ -36,8 +36,18 @@ public abstract class GameDist {
         return getGame().getInstallType().determineUserDir(getInstallLocation(), getGame().getInstallationName());
     }
 
-    public boolean isGameInstance(String cmd) {
-        return cmd.contains(getExecutable().toString());
+    public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
+        Optional<ProcessHandle> process = Optional.empty();
+        for (var ph : processes) {
+            var cmd = ph.info().command().orElse(null);
+            if (cmd != null) {
+                if (cmd.contains(getExecutable().toString())) {
+                    process = Optional.of(ph);
+                    break;
+                }
+            }
+        }
+        return process;
     }
 
     public Path getIcon() {
@@ -57,7 +67,7 @@ public abstract class GameDist {
 
     public abstract boolean supportsDirectLaunch();
 
-    public void startDirectly(Path executable, List<String> args, Map<String,String> env) throws IOException {
+    public void startDirectly(Path executable, List<String> args, Map<String, String> env) throws IOException {
         if (supportsDirectLaunch()) {
             var input = new ArrayList<String>();
             // Make UAC popup if needed
@@ -75,7 +85,7 @@ public abstract class GameDist {
         }
     }
 
-    public void startLauncher(Map<String,String> env) throws IOException {
+    public void startLauncher(Map<String, String> env) throws IOException {
         throw new UnsupportedOperationException();
     }
 

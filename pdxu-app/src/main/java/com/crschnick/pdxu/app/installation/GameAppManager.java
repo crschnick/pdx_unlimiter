@@ -38,11 +38,6 @@ public final class GameAppManager {
         INSTANCE.stop();
     }
 
-    private static boolean isInstanceOfGame(String cmd, Game game) {
-        var install = GameInstallation.ALL.get(game);
-        return install != null && install.getDist().isGameInstance(cmd);
-    }
-
     public static GameAppManager getInstance() {
         return INSTANCE;
     }
@@ -79,14 +74,13 @@ public final class GameAppManager {
         if ((activeGame.get() == null)) {
             var processes = ProcessHandle.allProcesses().toList();
             Optional<GameApp> process = Optional.empty();
-            for (var ph : processes) {
-                var cmd = ph.info().command().orElse(null);
-                if (cmd != null) {
-                    for (var g : Game.values()) {
-                        if (isInstanceOfGame(cmd, g)) {
-                            process = Optional.of(new GameApp(ph, g));
-                            break;
-                        }
+            for (var g : Game.values()) {
+                var install = GameInstallation.ALL.get(g);
+                if (install != null) {
+                    var p = install.getDist().getGameInstance(processes);
+                    if (p.isPresent()) {
+                        process = p.map(processHandle -> new GameApp(processHandle, g));
+                        break;
                     }
                 }
             }

@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.util.SupportedOs;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 public class ProtonDist extends GameDist {
@@ -34,8 +35,16 @@ public class ProtonDist extends GameDist {
     }
 
     @Override
-    public boolean isGameInstance(String cmd) {
-        return cmd.endsWith(getGame().getInstallType().getProtonExecutableName());
+    public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
+        try {
+            var pgrep = new ProcessBuilder("pgrep", getGame().getInstallType().getProtonExecutableName()).redirectError(
+                    ProcessBuilder.Redirect.DISCARD).start();
+            var id = pgrep.inputReader().readLine();
+            pgrep.waitFor();
+            return id != null && !id.trim().isEmpty() ? ProcessHandle.of(Long.parseLong(id.trim())) : Optional.empty();
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 
     @Override
