@@ -38,7 +38,7 @@ public class SteamDist extends GameDist {
         return s.map(p -> getSteamAppsCommonDir(p).getParent().resolve("workshop").resolve("content").resolve(String.valueOf(getGame().getSteamAppId())));
     }
 
-    private static Optional<Path> getSteamPath() {
+    public static Optional<Path> getSteamPath() {
         Optional<String> steamDir = Optional.empty();
         switch (SupportedOs.get()) {
             case WINDOWS -> {
