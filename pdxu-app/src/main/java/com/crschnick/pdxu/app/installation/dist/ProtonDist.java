@@ -2,14 +2,14 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.SupportedOs;
+import org.apache.commons.lang3.SystemUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-public class ProtonDist extends GameDist {
+public class ProtonDist extends PdxLauncherDist {
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
@@ -48,20 +48,24 @@ public class ProtonDist extends GameDist {
         }
     }
 
-    @Override
-    public Path determineUserDir() throws IOException {
-        return SteamDist.getSteamPath()
-                .orElseThrow()
-                .resolve("steamapps")
-                .resolve("compatdata")
-                .resolve(String.valueOf(getGame().getSteamAppId()))
-                .resolve("pfx")
-                .resolve("drive_c")
-                .resolve("users")
-                .resolve("steamuser")
-                .resolve("Documents")
-                .resolve("Paradox Interactive")
-                .resolve(getGame().getInstallationName());
+    protected Path replaceVariablesInPath(String value) {
+        if (SystemUtils.IS_OS_LINUX) {
+            value = value.replace(
+                    "$LINUX_DATA_HOME",
+                    SteamDist.getSteamPath()
+                            .orElseThrow()
+                            .resolve("steamapps")
+                            .resolve("compatdata")
+                            .resolve(String.valueOf(getGame().getSteamAppId()))
+                            .resolve("pfx")
+                            .resolve("drive_c")
+                            .resolve("users")
+                            .resolve("steamuser")
+                            .resolve("Documents")
+                            .toString()
+            );
+        }
+        return Path.of(value);
     }
 
     @Override

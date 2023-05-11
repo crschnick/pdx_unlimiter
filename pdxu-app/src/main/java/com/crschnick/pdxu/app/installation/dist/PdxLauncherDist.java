@@ -91,7 +91,7 @@ public class PdxLauncherDist extends GameDist {
                 getInstallLocation()).resolve("launcher-settings.json");
     }
 
-    private Path replaceVariablesInPath(String value) {
+    protected Path replaceVariablesInPath(String value) {
         if (SystemUtils.IS_OS_WINDOWS) {
             value = value.replace("%USER_DOCUMENTS%",
                     OsHelper.getUserDocumentsPath().toString());
