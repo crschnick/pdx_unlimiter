@@ -1,0 +1,8 @@
+# Changes in 2.12.4
+
+- Update CK3 melter to 1.9
+- Update EU4 melter to 1.35.3
+- Improve Linux Proton support
+- Fix CK2 savegame name breaking ironman when exporting
+- Make Stellaris campaigns recognizable across sessions by always including id in exported campaign name
+- Fix savegames still being displayed after campaign is deleted
