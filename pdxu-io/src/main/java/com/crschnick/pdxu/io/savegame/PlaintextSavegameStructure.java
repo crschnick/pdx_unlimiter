@@ -32,6 +32,10 @@ public class PlaintextSavegameStructure implements SavegameStructure {
 
     @Override
     public SavegameParseResult parse(byte[] input) {
+        if (input.length == 0) {
+            return new SavegameParseResult.Invalid("File " + name + " is empty. Did something go wrong?");
+        }
+
         if (header != null && !SavegameStructure.validateHeader(header, input)) {
             return new SavegameParseResult.Invalid("File " + name + " has an invalid header");
         }
@@ -39,7 +43,7 @@ public class PlaintextSavegameStructure implements SavegameStructure {
         try {
             var node = type.getParser().parse(name, input, header != null ? header.length + 1 : 0);
             if (node.size() == 0) {
-                return new SavegameParseResult.Invalid("File " + name + " is empty");
+                return new SavegameParseResult.Invalid("File " + name + " is empty. Did something go wrong?");
             }
 
             return new SavegameParseResult.Success(new SavegameContent(Map.of(name, node)));
