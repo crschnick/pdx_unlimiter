@@ -43,6 +43,11 @@ public interface SavegameType {
 
         @Override
         public boolean isBinary(byte[] input) {
+            // Check for uncompressed binary
+            if (SavegameStructure.validateHeader("EU4bin".getBytes(StandardCharsets.US_ASCII), input)) {
+                return true;
+            }
+
             try {
                 var zipIn = new ZipInputStream(new ByteArrayInputStream(input));
                 zipIn.getNextEntry();
