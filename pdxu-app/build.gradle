@@ -3,6 +3,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 plugins {
     id 'java'
     id "org.moditect.gradleplugin" version "1.0.0-rc3"
+    id("dev.hydraulic.conveyor") version "1.6"
 }
 
 java {
