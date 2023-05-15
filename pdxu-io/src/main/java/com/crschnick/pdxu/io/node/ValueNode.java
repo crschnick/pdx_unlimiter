@@ -112,7 +112,7 @@ public final class ValueNode extends Node {
     @Override
     public double getDouble() {
         // Replaces decimal commas
-        return Double.parseDouble(evaluateContent().replaceAll(",", "."));
+        return Double.parseDouble(evaluateContent().replaceAll(",", ""));
     }
 
     @Override
