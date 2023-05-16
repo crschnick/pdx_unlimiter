@@ -49,9 +49,9 @@ public class Eu4SeHelper {
 
             @SuppressWarnings("unchecked")
             SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) entry;
-            String saveFile = "save_file=\"" + SavegameStorage.ALL.get(Game.EU4).getSavegameFile(eu4Entry).toString() + "\"";
-            String gameFolder = "game_folder=\"" + GameInstallation.ALL.get(Game.EU4).getInstallDir().toString() + "\"";
-            String overwrite = "override=true";
+            String saveFile = "\"--save_file=" + SavegameStorage.ALL.get(Game.EU4).getSavegameFile(eu4Entry).toString() + "\"";
+            String gameFolder = "\"--game_folder=" + GameInstallation.ALL.get(Game.EU4).getInstallDir().toString() + "\"";
+            String overwrite = "--override=true";
 
             try {
                 SavegameStorage.<Eu4Tag, Eu4SavegameInfo>get(Game.EU4).invalidateSavegameInfo(eu4Entry);
@@ -63,7 +63,7 @@ public class Eu4SeHelper {
                 )
                         .redirectErrorStream(true)
                         .start();
-                proc.getInputStream().readAllBytes();
+                var out = proc.getInputStream().readAllBytes();
                 SavegameActions.reloadSavegame(eu4Entry);
             } catch (Exception e) {
                 ErrorHandler.handleException(e);
