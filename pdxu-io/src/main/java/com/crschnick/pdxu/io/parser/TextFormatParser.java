@@ -149,6 +149,12 @@ public final class TextFormatParser {
             throw ex;
         }  catch (Throwable t) {
             // Catch also errors!
+
+            // Special case for out of memory
+            if (t instanceof OutOfMemoryError ooe) {
+                throw new ParseException("Not enough free RAM available to load file. ", ooe);
+            }
+
             throw new ParseException(t);
         } finally {
             // Always reset!
