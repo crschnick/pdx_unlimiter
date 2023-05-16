@@ -7,7 +7,6 @@ import com.crschnick.pdxu.app.gui.dialog.GuiSettings;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LanguageManager;
-import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.IronyHelper;
 import javafx.application.Platform;
 
@@ -73,28 +72,6 @@ public final class Settings extends AbstractSettings {
             "launchIrony",
             false
     );
-    public final SettingsEntry.BooleanEntry enableEu4SaveEditor = new SettingsEntry.BooleanEntry(
-            "ENABLE_EU4SE",
-            "enableEu4SaveEditor",
-            false
-    ) {
-        @Override
-        public void set(Boolean newValue) {
-            boolean changedToTrue = !newValue.equals(value.get()) && newValue;
-
-            Path eu4seFile = PdxuInstallation.getInstance().getSettingsLocation().resolve("eu4saveeditor");
-            try {
-                Files.writeString(eu4seFile, Boolean.toString(newValue));
-                super.set(newValue);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-
-            if (changedToTrue) {
-                Eu4SeHelper.showEnabledDialog();
-            }
-        }
-    };
     public final SettingsEntry.BooleanEntry enableAutoUpdate = new SettingsEntry.BooleanEntry(
             "ENABLE_AUTOUPDATE",
             "enableAutoUpdate",

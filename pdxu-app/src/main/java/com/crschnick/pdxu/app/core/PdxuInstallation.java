@@ -21,7 +21,6 @@ public class PdxuInstallation {
     private boolean developerMode;
     private boolean nativeHookEnabled;
     private boolean image;
-    private Path eu4SeDir;
     private Path languageDir;
     private Path resourceDir;
     private boolean preRelease;
@@ -152,11 +151,6 @@ public class PdxuInstallation {
         }
 
         Path defaultAppInstallPath = appInstallPath.resolve("app");
-        i.eu4SeDir = appInstallPath.resolveSibling("Eu4SaveEditor");
-        if (!Files.exists(i.eu4SeDir)) {
-            i.eu4SeDir = null;
-        }
-
         var latestFile = i.dataDir.resolve("settings").resolve("latest");
         if (Files.exists(latestFile)) {
             try {
@@ -260,6 +254,28 @@ public class PdxuInstallation {
         return nativeHookEnabled;
     }
 
+    public Path getJavaExecutableLocation() {
+        Path appPath = getAppPath();
+        switch (SupportedOs.get()) {
+            case WINDOWS -> {
+                return appPath.resolve("runtime").resolve("bin").resolve("java.exe");
+            }
+            case LINUX -> {
+                return appPath.resolve("lib").resolve("runtime").resolve("bin").resolve("java");
+            }
+            case MAC -> {
+                return appPath.resolve("Contents")
+                        .resolve("runtime")
+                        .resolve("Contents")
+                        .resolve("Home")
+                        .resolve("bin");
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
     public Path getExecutableLocation() {
         Path appPath = getAppPath();
         switch (SupportedOs.get()) {
@@ -310,14 +326,6 @@ public class PdxuInstallation {
 
     public Path getDefaultSavegamesLocation() {
         return getDataDir().resolve("savegames");
-    }
-
-    public boolean isEu4SaveEditorInstalled() {
-        return getEu4SaveEditorLocation() != null;
-    }
-
-    public Path getEu4SaveEditorLocation() {
-        return eu4SeDir;
     }
 
     public String getVersion() {
