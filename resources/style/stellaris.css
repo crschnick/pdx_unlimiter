@@ -1,0 +1,15 @@
+.stellaris .tag-icon {
+-fx-min-width: 2em;
+-fx-max-width: 2em;
+-fx-min-height: 2em;
+-fx-max-height: 2em;
+-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.stellaris .resource-icon {
+   -fx-min-width: 1.2em;
+   -fx-max-width: 1.2em;
+   -fx-min-height: 1.2em;
+   -fx-max-height: 1.2em;
+   -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+   }

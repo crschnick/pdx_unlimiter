@@ -2,8 +2,8 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
-import com.jfoenix.controls.JFXMasonryPane;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -16,7 +16,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
 
     @Override
     public Image tagImage(SavegameInfo<StellarisTag> info, StellarisTag tag) {
-        return StellarisTagRenderer.createTagImage(info, tag);
+        return StellarisTagRenderer.createTagImage(GameFileContext.fromData(info.getData()), tag);
     }
 
     @Override

@@ -1,13 +1,24 @@
 package com.crschnick.pdxu.model.stellaris;
 
 import com.crschnick.pdxu.io.node.Node;
+import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
+@Getter
 public class StellarisTag {
 
+    public static StellarisTag getTag(List<StellarisTag> tags, long id) {
+        return tags.stream()
+                .filter(t -> t.id == id)
+                .findFirst()
+                .orElseThrow();
+    }
     @Setter
     private String name;
 
+    private long id;
     private String iconCategory;
     private String iconFile;
 
@@ -16,22 +27,13 @@ public class StellarisTag {
     private String backgroundPrimaryColor;
     private String backgroundSecondaryColor;
 
-    public StellarisTag(String name, String iconCategory, String iconFile, String backgroundCategory, String backgroundFile, String backgroundPrimaryColor, String backgroundSecondaryColor) {
-        this.name = name;
-        this.iconCategory = iconCategory;
-        this.iconFile = iconFile;
-        this.backgroundCategory = backgroundCategory;
-        this.backgroundFile = backgroundFile;
-        this.backgroundPrimaryColor = backgroundPrimaryColor;
-        this.backgroundSecondaryColor = backgroundSecondaryColor;
-    }
-
     public StellarisTag() {
     }
 
-    public static StellarisTag fromNode(Node node) {
+    public static StellarisTag fromNode(int id, Node node) {
         Node flagNode = node.getNodeForKey("flag");
         StellarisTag tag = new StellarisTag();
+        tag.id = id;
         tag.name = "Unknown";
 
         Node icon = flagNode.getNodeForKey("icon");

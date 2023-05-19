@@ -64,6 +64,10 @@ public abstract class SavegameData<T> {
         return (Eu4SavegameData) this;
     }
 
+    public StellarisSavegameData stellaris() {
+        return (StellarisSavegameData) this;
+    }
+
     public Ck3SavegameData ck3() {
         return (Ck3SavegameData) this;
     }

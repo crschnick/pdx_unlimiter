@@ -2,7 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
@@ -38,9 +38,9 @@ public class StellarisTagRenderer {
         return map;
     }
 
-    private static Map<String, javafx.scene.paint.Color> loadPredefinedColorsForSavegame(SavegameInfo<StellarisTag> info) {
+    private static Map<String, javafx.scene.paint.Color> loadPredefinedColorsForSavegame(GameFileContext ctx) {
         var file = CascadeDirectoryHelper.openFile(
-                Path.of("flags").resolve("colors.txt"), info);
+                Path.of("flags").resolve("colors.txt"), ctx);
         if (file.isEmpty()) {
             return Map.of();
         }
@@ -54,9 +54,9 @@ public class StellarisTagRenderer {
         }
     }
 
-    public static Image createTagImage(SavegameInfo<StellarisTag> info, StellarisTag tag) {
+    public static Image createTagImage(GameFileContext ctx, StellarisTag tag) {
         //TODO: Cache better
-        var img = createBasicFlagImage(info, tag);
+        var img = createBasicFlagImage(ctx, tag);
 
         ImageHelper.applyAlphaMask(img, GameImage.STELLARIS_FLAG_MASK);
         img.getGraphics().drawImage(ImageHelper.fromFXImage(GameImage.STELLARIS_FLAG_FRAME), 0, 0, IMG_SIZE, IMG_SIZE, null);
@@ -64,14 +64,14 @@ public class StellarisTagRenderer {
         return ImageHelper.toFXImage(img);
     }
 
-    private static BufferedImage createBasicFlagImage(SavegameInfo<StellarisTag> info, StellarisTag tag) {
+    private static BufferedImage createBasicFlagImage(GameFileContext ctx, StellarisTag tag) {
         var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
         if (cache.colors.size() == 0) {
-            cache.colors.putAll(loadPredefinedColorsForSavegame(info));
+            cache.colors.putAll(loadPredefinedColorsForSavegame(ctx));
         }
 
-        BufferedImage bg = background(info, tag);
-        BufferedImage icon = icon(info, tag);
+        BufferedImage bg = background(ctx, tag);
+        BufferedImage icon = icon(ctx, tag);
 
         BufferedImage result = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         var g = result.getGraphics();
@@ -81,7 +81,7 @@ public class StellarisTagRenderer {
         return result;
     }
 
-    private static BufferedImage icon(SavegameInfo<StellarisTag> info, StellarisTag tag) {
+    private static BufferedImage icon(GameFileContext ctx, StellarisTag tag) {
         var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
 
         var path = Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile());
@@ -89,7 +89,7 @@ public class StellarisTagRenderer {
             return cache.icons.get(path);
         }
 
-        var iconIn = CascadeDirectoryHelper.openFile(path, info);
+        var iconIn = CascadeDirectoryHelper.openFile(path, ctx);
         if (iconIn.isEmpty()) {
             return ImageHelper.DEFAULT_AWT_IMAGE;
         }
@@ -99,7 +99,7 @@ public class StellarisTagRenderer {
         return img;
     }
 
-    private static BufferedImage background(SavegameInfo<StellarisTag> info, StellarisTag tag) {
+    private static BufferedImage background(GameFileContext ctx, StellarisTag tag) {
         var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
 
         int bgPrimary = ColorHelper.intFromColor(cache.colors.getOrDefault(
@@ -116,7 +116,7 @@ public class StellarisTagRenderer {
             return cache.backgrounds.get(path);
         }
 
-        var in = CascadeDirectoryHelper.openFile(path, info);
+        var in = CascadeDirectoryHelper.openFile(path, ctx);
         if (in.isEmpty()) {
             return ImageHelper.DEFAULT_AWT_IMAGE;
         }

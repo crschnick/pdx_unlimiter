@@ -66,6 +66,14 @@ public class GameImage {
     public static Image STELLARIS_FLAG_MASK;
     public static Image STELLARIS_FLAG_FRAME;
     public static Image STELLARIS_BACKGROUND;
+    public static Image STELLARIS_ICON_MINERALS;
+    public static Image STELLARIS_ICON_ENERGY;
+    public static Image STELLARIS_ICON_FOOD;
+    public static Image STELLARIS_ICON_ALLOYS;
+    public static Image STELLARIS_ICON_INFLUENCE;
+    public static Image STELLARIS_ICON_UNITY;
+    public static Image STELLARIS_ICON_RESEARCH;
+    public static Image STELLARIS_ICON_CONSUMER_GOODS;
 
     public static Image HOI4_ICON_IRONMAN;
     public static Image HOI4_ICON_VERSION_WARNING;
@@ -255,6 +263,7 @@ public class GameImage {
     private static void loadStellarisImages() {
         var installPath = GameInstallation.ALL.get(Game.STELLARIS).getInstallDir();
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
+        Path r = installPath.resolve("gfx").resolve("interface").resolve("icons").resolve("resources");
         Path f = installPath.resolve("gfx").resolve("interface").resolve("flags");
 
         STELLARIS_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
@@ -262,6 +271,14 @@ public class GameImage {
         STELLARIS_FLAG_FRAME = ImageHelper.loadImage(f.resolve("empire_flag_200_frame.dds"));
         STELLARIS_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.STELLARIS)
                                                              .getType().chooseBackgroundImage(installPath));
+        STELLARIS_ICON_ALLOYS = ImageHelper.loadImage(r.resolve("alloys.dds"));
+        STELLARIS_ICON_ENERGY = ImageHelper.loadImage(r.resolve("energy.dds"));
+        STELLARIS_ICON_FOOD = ImageHelper.loadImage(r.resolve("food.dds"));
+        STELLARIS_ICON_UNITY = ImageHelper.loadImage(r.resolve("unity.dds"));
+        STELLARIS_ICON_INFLUENCE = ImageHelper.loadImage(r.resolve("influence.dds"));
+        STELLARIS_ICON_RESEARCH = ImageHelper.loadImage(r.resolve("research.dds"));
+        STELLARIS_ICON_MINERALS = ImageHelper.loadImage(r.resolve("minerals.dds"));
+        STELLARIS_ICON_CONSUMER_GOODS = ImageHelper.loadImage(r.resolve("consumer_goods.dds"));
 
     }
 
