@@ -95,13 +95,13 @@ public abstract class FileImportTarget {
 
     protected abstract String getRawName();
 
-    private static final Pattern ID_MATCHER = Pattern.compile("^(.+?) \\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)$");
+    private static final Pattern ID_MATCHER = Pattern.compile("\\s*\\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)");
 
     public String getName() {
         var raw = getRawName();
         var m = ID_MATCHER.matcher(raw);
-        if (m.matches()) {
-            return m.group(1);
+        if (m.find()) {
+            return m.replaceAll("");
         }
 
         return raw;
@@ -110,8 +110,8 @@ public abstract class FileImportTarget {
     public Optional<UUID> getCampaignIdOverride() {
         var raw = getRawName();
         var m = ID_MATCHER.matcher(raw);
-        if (m.matches()) {
-            var id = m.group(2);
+        if (m.find()) {
+            var id = m.group(1);
             try {
                 return Optional.of(UUID.fromString(id));
             } catch (Exception ignored) {}
@@ -319,8 +319,10 @@ public abstract class FileImportTarget {
 
         @Override
         public String getRawName() {
-            return path.getParent().getFileName().toString().split("_")[0] + " " + FilenameUtils.getBaseName(
-                    path.getFileName().toString());
+            var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
+            var date = FilenameUtils.getBaseName(path.getFileName().toString());
+            var campaignName = gameIdSplit != -1 ? path.getParent().getFileName().toString().substring(0, gameIdSplit) : path.getParent().getFileName().toString();
+            return campaignName + " (" + date + ")";
         }
     }
 
@@ -332,7 +334,13 @@ public abstract class FileImportTarget {
 
         @Override
         public String getRawName() {
-            return path.getParent().getFileName().toString().split("_")[0];
+            var n = path.getParent().getFileName();
+            var gameIdSplit = n.toString().lastIndexOf("_");
+            if (gameIdSplit == -1) {
+                return n.toString();
+            }
+
+            return n.toString().substring(0, gameIdSplit);
         }
     }
 }

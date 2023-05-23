@@ -23,7 +23,7 @@ public class Eu4GuiFactory extends GameGuiFactory<Eu4Tag, Eu4SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(EU4_BACKGROUND);
-        bg.setOpacity(0.9);
+        bg.setOpacity(1.0);
         return bg;
     }
 

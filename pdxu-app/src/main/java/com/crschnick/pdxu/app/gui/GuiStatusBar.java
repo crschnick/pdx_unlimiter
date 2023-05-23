@@ -144,11 +144,13 @@ public class GuiStatusBar {
             barPane.setLeft(text);
             BorderPane.setAlignment(text, Pos.CENTER);
 
-            switch (SavegameCompatibility.determineForEntry(e)) {
-                case INCOMPATIBLE -> barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-                case UNKNOWN -> barPane.getStyleClass().add("status-compatible-unknown");
+            var externalData = SavegameCompatibility.determineForModsAndDLCs(e);
+            var version = SavegameCompatibility.determineForVersion(ctx.getInfo().getData().getVersion());
+            if (externalData == SavegameCompatibility.Compatbility.INCOMPATIBLE || version == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
+                barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
+            } else if (externalData == SavegameCompatibility.Compatbility.UNKNOWN || version == SavegameCompatibility.Compatbility.UNKNOWN) {
+                barPane.getStyleClass().add("status-compatible-unknown");
             }
-
             {
                 Button export = new Button(PdxuI18n.get("EXPORT"));
                 export.setGraphic(new FontIcon());

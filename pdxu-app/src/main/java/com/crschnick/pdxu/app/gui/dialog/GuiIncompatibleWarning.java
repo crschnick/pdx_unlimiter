@@ -29,7 +29,7 @@ public class GuiIncompatibleWarning {
                     .append(installation.getVersion().toString()).append("\n")
                     .append("- Savegame version: ")
                     .append(info.getData().getVersion().toString());
-        } else if (SavegameCompatibility.determineForEntry(entry) == SavegameCompatibility.Compatbility.UNKNOWN) {
+        } else if (SavegameCompatibility.determineForModsAndDLCs(entry) == SavegameCompatibility.Compatbility.UNKNOWN) {
             builder.append("Unknown compatibility:\n")
                     .append("- Game version: ")
                     .append("Unknown").append("\n")

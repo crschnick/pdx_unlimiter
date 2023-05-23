@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class SavegameCompatibility {
 
-    public static Compatbility determineForEntry(SavegameEntry<?, ?> entry) {
+    public static Compatbility determineForModsAndDLCs(SavegameEntry<?, ?> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             var info = ctx.getInfo();
             if (info == null) {

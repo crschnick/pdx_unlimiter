@@ -76,7 +76,7 @@ public class PdxuInstallation {
             Files.delete(testDirectory);
         } catch (IOException e) {
             ErrorHandler.handleTerminalException(new IOException(
-                    "Unable to access directory " + dataDir.getParent() + ". Please make sure that you have the appropriate permissions and no Antivirus program is blocking the access. " +
+                    "Unable to access directory " + dataDir.getParent() + ". Please make sure that you have the appropriate permissions and no Antivirus program is blocking the access (Windows Defender often does that). " +
                             "In case you use cloud storage, verify that your cloud storage is working and you are logged in."));
         }
     }

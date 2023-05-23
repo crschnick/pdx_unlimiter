@@ -56,7 +56,7 @@ public class Eu4SeHelper {
             try {
                 SavegameStorage.<Eu4Tag, Eu4SavegameInfo>get(Game.EU4).invalidateSavegameInfo(eu4Entry);
                 var proc = new ProcessBuilder(
-                        "java",
+                        PdxuInstallation.getInstance().getJavaExecutableLocation().toString(),
                         "-jar",
                         PdxuInstallation.getInstance().getResourceDir().resolve("bin").resolve("OsaSaveEditor.jar").toString(),
                         saveFile, gameFolder, overwrite

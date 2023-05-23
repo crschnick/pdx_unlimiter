@@ -17,7 +17,7 @@ public class Ck3AlliesComp extends Ck3DiplomacyRowComp {
     protected List<Ck3Tag> getTags(SavegameContent content, SavegameData<?> data) {
         var tags = new ArrayList<Ck3Tag>();
         for (var rel : content.get().getNodeForKey("relations").getNodeForKey("active_relations").getNodeArray()) {
-            if (!rel.hasKey("alliances")) {
+            if (rel.isValue() || !rel.hasKey("alliances")) {
                 continue;
             }
 

@@ -56,7 +56,8 @@ public class GameDistLauncher {
                 return;
             }
 
-            if (SavegameCompatibility.determineForEntry(e) != SavegameCompatibility.Compatbility.COMPATIBLE) {
+            if (SavegameCompatibility.determineForModsAndDLCs(e) != SavegameCompatibility.Compatbility.COMPATIBLE ||
+                    SavegameCompatibility.determineForVersion(e.getInfo().getData().getVersion()) != SavegameCompatibility.Compatbility.COMPATIBLE) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
                         ctx.getInstallation(), e);
                 if (!startAnyway) {

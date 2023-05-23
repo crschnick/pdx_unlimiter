@@ -22,7 +22,7 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
-        bg.setOpacity(0.3);
+        bg.setOpacity(0.5);
         return bg;
     }
 
