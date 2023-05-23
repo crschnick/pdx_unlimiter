@@ -34,6 +34,7 @@ public abstract class Vic3ChannelComp extends SimpleInfoComp {
             return;
         }
 
+
         value = NodePointer.fromBase(base)
                 .name("values")
                 .index(index.getInteger() - 1)

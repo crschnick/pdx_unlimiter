@@ -11,7 +11,7 @@ public class Vic3GdpComp extends Vic3ChannelComp {
 
     @Override
     protected String getDisplayValue() {
-        return Math.round((value / 2.0 / 10000.0)) + "M";
+        return Math.round((value / 1000000.0)) + "M";
     }
 
     @Override

@@ -10,12 +10,16 @@ public class Vic3LoyalistComp extends Vic3ChannelComp {
 
     @Override
     protected String getDisplayValue() {
+        if (value < 1000) {
+            return String.valueOf(Math.round(value));
+        }
+
         return String.valueOf(Math.round(value / 1000)) + "K";
     }
 
     @Override
     protected List<String> getNames() {
-        return List.of("pop_statistics", "loyalist_trend");
+        return List.of("pop_statistics", "trend_loyalists");
     }
 
     @Override
