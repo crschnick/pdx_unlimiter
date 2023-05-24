@@ -1,17 +1,14 @@
 package com.crschnick.pdxu.io.savegame;
 
-import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 
-import java.util.Map;
 import java.util.Optional;
 
 public abstract class SavegameParseResult {
 
     public abstract void visit(Visitor visitor);
 
-    public abstract Success orThrow() throws Exception;
+    public abstract Success orThrow() throws Throwable;
 
     public Optional<Success> success() {
         return Optional.empty();
@@ -55,14 +52,14 @@ public abstract class SavegameParseResult {
 
     public static class Error extends SavegameParseResult {
 
-        public Exception error;
+        public Throwable error;
 
-        public Error(Exception error) {
+        public Error(Throwable error) {
             this.error = error;
         }
 
         @Override
-        public Success orThrow() throws Exception {
+        public Success orThrow() throws Throwable {
             throw error;
         }
 

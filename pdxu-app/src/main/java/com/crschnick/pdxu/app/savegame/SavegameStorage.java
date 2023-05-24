@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -62,7 +63,7 @@ public abstract class SavegameStorage<
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Logger logger;
     private final Class<I> infoClass;
-    private final FailableBiFunction<SavegameContent, Boolean, I, Exception> infoFactory;
+    private final FailableBiFunction<SavegameContent, Boolean, I, Throwable> infoFactory;
     private final String name;
     private final GameDateType dateType;
     private final Path path;
@@ -75,9 +76,13 @@ public abstract class SavegameStorage<
             SavegameType type,
             Class<I> infoClass) {
         this.infoFactory = (content, melted) -> {
+            try {
                 var created = (I) infoClass.getDeclaredConstructor(SavegameContent.class).newInstance(content);
                 created.getData().setBinary(melted);
                 return created;
+            } catch (InvocationTargetException ex) {
+                throw ex.getCause();
+            }
         };
         this.name = name;
         this.type = type;
@@ -583,7 +588,7 @@ public abstract class SavegameStorage<
             var name = getSavegameCampaign(e).getName() + " (" + PdxuI18n.get("MELTED") + ")";
             addEntryToCollection(targetCollection, file -> struc.write(file, c), checksum, info, null, name);
             saveData();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             ErrorHandler.handleException(ex);
         }
     }
@@ -686,7 +691,7 @@ public abstract class SavegameStorage<
                 I info = null;
                 try {
                     info = infoFactory.apply(s.content, melted);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     resultToReturn[0] = new SavegameParseResult.Error(e);
                     return;
                 }
@@ -775,7 +780,7 @@ public abstract class SavegameStorage<
         I info;
         try {
             info = infoFactory.apply(s.content, melted);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             ErrorHandler.handleException(ex);
             return;
         }
