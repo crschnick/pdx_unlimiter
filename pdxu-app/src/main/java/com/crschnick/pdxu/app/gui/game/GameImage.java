@@ -63,6 +63,8 @@ public class GameImage {
     public static Image CK3_ICON_HEALTH;
 
     public static Image STELLARIS_ICON_IRONMAN;
+    public static Image STELLARIS_ICON_WAR;
+    public static Image STELLARIS_ICON_ALLIANCE;
     public static Image STELLARIS_FLAG_MASK;
     public static Image STELLARIS_FLAG_FRAME;
     public static Image STELLARIS_BACKGROUND;
@@ -262,6 +264,7 @@ public class GameImage {
 
     private static void loadStellarisImages() {
         var installPath = GameInstallation.ALL.get(Game.STELLARIS).getInstallDir();
+        Path it = installPath.resolve("gfx").resolve("interface");
         Path i = installPath.resolve("gfx").resolve("interface").resolve("icons");
         Path r = installPath.resolve("gfx").resolve("interface").resolve("icons").resolve("resources");
         Path f = installPath.resolve("gfx").resolve("interface").resolve("flags");
@@ -271,6 +274,9 @@ public class GameImage {
         STELLARIS_FLAG_FRAME = ImageHelper.loadImage(f.resolve("empire_flag_200_frame.dds"));
         STELLARIS_BACKGROUND = ImageHelper.loadImage(GameInstallation.ALL.get(Game.STELLARIS)
                                                              .getType().chooseBackgroundImage(installPath));
+        STELLARIS_ICON_WAR = ImageHelper.loadImage(it.resolve("waroverview").resolve("at_war_with_bg.dds"));
+        STELLARIS_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("diplomacy").resolve("diplomacy_alliance.dds"));
+        STELLARIS_ICON_ALLOYS = ImageHelper.loadImage(r.resolve("alloys.dds"));
         STELLARIS_ICON_ALLOYS = ImageHelper.loadImage(r.resolve("alloys.dds"));
         STELLARIS_ICON_ENERGY = ImageHelper.loadImage(r.resolve("energy.dds"));
         STELLARIS_ICON_FOOD = ImageHelper.loadImage(r.resolve("food.dds"));

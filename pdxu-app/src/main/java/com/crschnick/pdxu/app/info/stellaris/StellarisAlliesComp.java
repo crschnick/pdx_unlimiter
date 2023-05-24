@@ -26,7 +26,7 @@ public class StellarisAlliesComp extends StellarisDiplomacyRowComp {
 
     @Override
     protected Image getIcon() {
-        return GameImage.EU4_ICON_ALLIANCE;
+        return GameImage.STELLARIS_ICON_ALLIANCE;
     }
 
     @Override

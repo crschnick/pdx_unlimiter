@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.info.stellaris;
 
 import com.crschnick.pdxu.app.gui.GuiStyle;
+import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.info.SavegameInfoMultiComp;
@@ -35,7 +36,7 @@ public class StellarisWarMultiComp extends SavegameInfoMultiComp {
 
         @Override
         protected Image getIcon() {
-            return null;
+            return GameImage.STELLARIS_ICON_WAR;
         }
 
         @Override

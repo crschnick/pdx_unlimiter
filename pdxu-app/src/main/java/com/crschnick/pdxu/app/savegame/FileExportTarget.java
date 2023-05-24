@@ -121,7 +121,7 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         public Path export() throws Exception {
             var baseName = FilenameUtils.getBaseName(
                     storage.getValidOutputFileName(entry, includeEntryName, null).toString());
-            var customId = entry.getUuid();
+            var customId = storage.getSavegameCampaign(entry).getUuid();
             var suffix = " (" + customId + ")";
 
             Path file;

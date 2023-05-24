@@ -46,8 +46,7 @@ This version does not come with an update functionality, so you have to manually
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-linux.zip)
 - [Mac standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-macos-x86_64.dmg) (Works on Intel and Apple Silicon)
 
-You can also find information on how to obtain pre-releases and the latest development builds in
-the [Downloads](https://github.com/crschnick/pdx_unlimiter/wiki/Downloads) section of the wiki.
+Note that if you utilize any accessibility software, you should use the standalone version.
 
 
 

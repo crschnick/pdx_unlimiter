@@ -96,7 +96,7 @@ public class GuiIncompatibleWarning {
             alert.setHeaderText(PdxuI18n.get("MOD_INFO", game.getTranslatedFullName()));
 
             String builder = enabledMods.stream()
-                    .map(m -> "- " + m.getName())
+                    .map(m -> "- " + m.getName().orElse(m.getModFile().getFileName().toString()))
                     .collect(Collectors.joining("\n"));
             if (enabledMods.size() == 0) {
                 builder = builder + "<None>";
