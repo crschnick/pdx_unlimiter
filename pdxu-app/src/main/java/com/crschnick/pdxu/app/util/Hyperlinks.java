@@ -10,6 +10,7 @@ public class Hyperlinks {
     public static final String DISCORD = "https://discord.com/invite/BVE4vxqFpU";
     public static final String NEW_ISSUE = "https://github.com/crschnick/pdx_unlimiter/issues/new";
     public static final String TRANSLATION_ISSUE = "https://github.com/crschnick/pdx_unlimiter/issues/58";
+    public static final String XPIPE = "https://github.com/xpipe-io/xpipe";
 
     public static final String CK3_TO_EU4_DOWNLOADS = "https://github.com/ParadoxGameConverters/CK3toEU4/releases";
     public static final String EU4_SE_MAIN_PAGE = "https://forum.paradoxplaza.com/forum/threads/save-game-editor.1450703/";

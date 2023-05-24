@@ -70,6 +70,11 @@ public class GuiMenuBar {
 
         Menu about = new Menu(PdxuI18n.get("ABOUT"));
 
+        MenuItem other = new MenuItem(PdxuI18n.get("OTHER_PROJECTS"));
+        other.setOnAction((a) -> {
+            Hyperlinks.open(Hyperlinks.XPIPE);
+        });
+
         MenuItem tri = new MenuItem(PdxuI18n.get("TRANSLATE"));
         tri.setOnAction((a) -> {
             GuiTranslate.showTranslatationAlert();
@@ -91,6 +96,7 @@ public class GuiMenuBar {
                     PdxuI18n.get("THIRD_PARTY_INFO"),
                     "third_party.txt");
         });
+        about.getItems().add(other);
         about.getItems().add(tri);
         about.getItems().add(src);
         about.getItems().add(lc);
