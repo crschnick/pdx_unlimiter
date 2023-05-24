@@ -8,14 +8,14 @@ import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
-import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.*;
-import com.crschnick.pdxu.app.util.integration.*;
+import com.crschnick.pdxu.app.util.integration.ConverterHelper;
+import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
+import com.crschnick.pdxu.app.util.integration.RakalyHelper;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
-import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXMasonryPane;
 import com.jfoenix.controls.JFXSpinner;
@@ -123,6 +123,7 @@ public class GuiSavegameEntry {
         entryNode.setFillWidth(true);
         entryNode.getStyleClass().add(CLASS_ENTRY);
         entryNode.setOnMouseClicked(event -> SavegameManagerState.<T, I>get().selectEntry(e));
+        entryNode.accessibleTextProperty().bind(e.nameProperty());
 
         setupDragAndDrop(entryNode, e);
 
@@ -169,6 +170,7 @@ public class GuiSavegameEntry {
                 ErrorHandler.reportIssue(SavegameContext.getContext(e).getStorage().getSavegameFile(e));
             });
             report.getStyleClass().add("report-button");
+            report.setAccessibleText("Report");
             GuiTooltips.install(report, PdxuI18n.get("REPORT_SAVEGAME_ISSUE"));
             staticButtons.getChildren().add(report);
         }
@@ -179,6 +181,7 @@ public class GuiSavegameEntry {
                 SavegameActions.copySavegame(e);
             });
             copy.getStyleClass().add(CLASS_COPY);
+            copy.setAccessibleText("Copy");
             GuiTooltips.install(copy, PdxuI18n.get("COPY_SAVEGAME"));
             staticButtons.getChildren().add(copy);
         }
@@ -189,6 +192,7 @@ public class GuiSavegameEntry {
                 GuiSavegameNotes.showSavegameNotesDialog(e.getNotes());
             });
             notes.getStyleClass().add("notes-button");
+            notes.setAccessibleText("Notes");
             GuiTooltips.install(notes, PdxuI18n.get("EDIT_SAVEGAME_NOTES"));
             staticButtons.getChildren().add(notes);
         }
@@ -205,6 +209,7 @@ public class GuiSavegameEntry {
                     SavegameActions.delete(e);
                 }
             });
+            del.setAccessibleText("Delete");
             del.getStyleClass().add(CLASS_DELETE);
             GuiTooltips.install(del, PdxuI18n.get("DELETE_SAVEGAME"));
             staticButtons.getChildren().add(del);
@@ -234,6 +239,7 @@ public class GuiSavegameEntry {
                 SavegameActions.meltSavegame(e);
             });
             melt.getStyleClass().add(CLASS_MELT);
+            melt.setAccessibleText("Melt");
             GuiTooltips.install(melt, PdxuI18n.get("MELT_SAVEGAME"));
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
                 if (ctx.getInfo().getData().isBinary() && RakalyHelper.shouldShowButton(ctx)) {
@@ -242,28 +248,6 @@ public class GuiSavegameEntry {
                     });
                 }
             });
-        }
-
-        if (SavegameStorage.ALL.get(Game.EU4) != null && SavegameStorage.ALL.get(Game.EU4).contains(e)) {
-            SavegameEntry<Eu4Tag, Eu4SavegameInfo> eu4Entry = (SavegameEntry<Eu4Tag, Eu4SavegameInfo>) e;
-            Button upload = new JFXButton(null, new FontIcon());
-            upload.setGraphic(new FontIcon());
-            upload.setOnMouseClicked((m) -> {
-                PdxToolsWebHelper.uploadSavegame(eu4Entry);
-            });
-            upload.getStyleClass().add(CLASS_ANALYZE);
-            GuiTooltips.install(upload, PdxuI18n.get("ANALYZE_RAKALY"));
-            // dynamicButtons.getChildren().add(upload);
-
-
-            Button uploadSkanderbeg = new JFXButton(null, new FontIcon());
-            uploadSkanderbeg.setGraphic(new FontIcon());
-            uploadSkanderbeg.setOnMouseClicked((m) -> {
-                SkanderbegHelper.uploadSavegame(eu4Entry);
-            });
-            uploadSkanderbeg.getStyleClass().add(CLASS_MAP);
-            GuiTooltips.install(uploadSkanderbeg, PdxuI18n.get("UPLOAD_SKANDERBEG"));
-            dynamicButtons.getChildren().add(uploadSkanderbeg);
         }
 
         SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
@@ -275,6 +259,7 @@ public class GuiSavegameEntry {
                         Eu4SeHelper.open(e);
                     });
                     eu4Se.getStyleClass().add("eu4se-button");
+                    eu4Se.setAccessibleText("EU4 Save Editor");
                     GuiTooltips.install(eu4Se, PdxuI18n.get("EDIT_EU4SAVEEDITOR"));
                     dynamicButtons.getChildren().add(0, eu4Se);
                 });
@@ -293,6 +278,7 @@ public class GuiSavegameEntry {
                     SavegameActions.branch(e);
                 });
                 branch.getStyleClass().add("branch-button");
+                branch.setAccessibleText("Branch");
                 GuiTooltips.install(branch, PdxuI18n.get("BRANCH_SAVEGAME"));
                 dynamicButtons.getChildren().add(0, branch);
             });
@@ -306,6 +292,7 @@ public class GuiSavegameEntry {
                 ConverterHelper.convertCk3ToEu4(ck3Entry);
             });
             convert.getStyleClass().add(CLASS_CONVERT);
+            convert.setAccessibleText("Convert to EU4 savegame");
             GuiTooltips.install(convert, PdxuI18n.get("CONVERT_TO_EU4"));
             dynamicButtons.getChildren().add(convert);
         }
@@ -314,6 +301,7 @@ public class GuiSavegameEntry {
         edit.setOnMouseClicked((m) -> {
             SavegameActions.editSavegame(e);
         });
+        edit.setAccessibleText("Edit");
         GuiTooltips.install(edit, PdxuI18n.get("EDIT_SAVEGAME"));
         ChangeListener<SavegameEntry.State> stateChange = new ChangeListener<>() {
             @Override

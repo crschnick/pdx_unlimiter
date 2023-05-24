@@ -56,11 +56,13 @@ public class GuiSavegameCampaign {
 
             JFXTextField name = new JFXTextField(c.getName());
             name.getStyleClass().add(CLASS_TEXT_FIELD);
+            name.setAccessibleText("Campaign name");
             name.textProperty().bindBidirectional(c.nameProperty());
             top.getChildren().add(name);
 
             Button del = new JFXButton(null, new FontIcon());
             del.getStyleClass().add("delete-button");
+            del.setAccessibleText("Delete campaign");
             del.setOnMouseClicked((m) -> {
                 if (GuiDialogHelper.showBlockingAlert(alert -> {
                     alert.setAlertType(Alert.AlertType.CONFIRMATION);
@@ -84,6 +86,7 @@ public class GuiSavegameCampaign {
                 date.textProperty().bind(gi.getGuiFactory().createInfoString(c));
             });
             date.getStyleClass().add(CLASS_DATE);
+            date.setAccessibleText("Date");
             bottom.getChildren().add(date);
 
             Region spacer = new Region();
@@ -105,6 +108,7 @@ public class GuiSavegameCampaign {
         }
         btn.getChildren().add(info);
         btn.setCursor(Cursor.HAND);
+        btn.accessibleTextProperty().bind(c.nameProperty());
         return btn;
     }
 }

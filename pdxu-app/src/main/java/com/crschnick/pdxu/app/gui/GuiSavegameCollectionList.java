@@ -21,6 +21,7 @@ public class GuiSavegameCollectionList {
                 GuiSavegameCampaign::createCampaignButton,
                 false);
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
+        list.setAccessibleText("Campaign list");
 
         var top = createTopBar();
         var box = new VBox(top, list);
@@ -45,6 +46,7 @@ public class GuiSavegameCollectionList {
             filter.clear();
         });
         filter.textProperty().bindBidirectional(SavegameManagerState.get().getFilter().filterProperty());
+        filter.setAccessibleText("Filter");
         box.getChildren().add(filter);
         HBox.setHgrow(filter, Priority.ALWAYS);
         return box;

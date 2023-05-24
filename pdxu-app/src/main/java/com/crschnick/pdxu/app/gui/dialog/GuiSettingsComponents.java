@@ -47,6 +47,7 @@ public class GuiSettingsComponents {
         typeLabel.setGraphic(new FontIcon("mdi-help"));
 
         TextField locationLabel = new TextField();
+        locationLabel.setAccessibleText(de.getDescription() + " path");
         locationLabel.setEditable(false);
         EventHandler<MouseEvent> chooseDir = (m) -> {
             DirectoryChooser dirChooser = new DirectoryChooser();
@@ -67,12 +68,14 @@ public class GuiSettingsComponents {
         };
 
         Button browse = new Button();
+        browse.setAccessibleText("Browse");
         browse.setGraphic(new FontIcon());
         browse.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         browse.setOnMouseClicked(chooseDir);
         GuiTooltips.install(browse, PdxuI18n.get("BROWSE_DIST_BUTTON"));
 
         Button xbox = new Button();
+        xbox.setAccessibleText("Xbox distribution");
         xbox.setGraphic(new FontIcon());
         xbox.getStyleClass().add("xbox-button");
         GuiTooltips.install(xbox, PdxuI18n.get("XBOX_DIST_BUTTON"));
@@ -90,6 +93,7 @@ public class GuiSettingsComponents {
         }
 
         Button del = new Button();
+        del.setAccessibleText("Delete");
         del.setGraphic(new FontIcon());
         del.getStyleClass().add("delete-install-button");
         del.setOnMouseClicked(e -> setDist.set(null));
@@ -132,6 +136,7 @@ public class GuiSettingsComponents {
 
     private static Region pathEntryNode(SettingsEntry<Path> de, Set<Runnable> applyFuncs) {
         TextField textArea = new TextField();
+        textArea.setAccessibleText(de.getDescription() + " path");
         EventHandler<MouseEvent> eh = (m) -> {
             DirectoryChooser dirChooser = new DirectoryChooser();
             var text = textArea.getText().trim();
@@ -152,6 +157,7 @@ public class GuiSettingsComponents {
         textArea.setOnMouseClicked(eh);
 
         Button b = new Button();
+        b.setAccessibleText("Browse");
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         b.setOnMouseClicked(eh);

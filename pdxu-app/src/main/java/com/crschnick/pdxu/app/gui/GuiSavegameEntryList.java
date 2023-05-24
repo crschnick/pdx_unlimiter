@@ -38,6 +38,7 @@ public class GuiSavegameEntryList {
             grid.setVisible(!n);
             ncn.setVisible(n);
         });
+        grid.setAccessibleText("Campaign savegames");
         return pane;
     }
 

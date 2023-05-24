@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.util.integration;
 
 import com.crschnick.pdxu.app.core.PdxuInstallation;
-import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ public class RakalyHelper {
 
 
     public static boolean shouldShowButton(SavegameContext<?, ?> context) {
-        return context.getGame() != Game.VIC3;
+        return true;
     }
 
     public static byte[] toMeltedPlaintext(Path file) throws Exception {
