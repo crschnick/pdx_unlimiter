@@ -23,7 +23,7 @@ l_polish:
   MELT_SAVEGAME: ""Przetop" zapis (skonwertuj do typu nie-Ironman)"
   ANALYZE_RAKALY: "Wyślij i przeanalizuj za pomocą pdx.tools"
   UPLOAD_SKANDERBEG: "Wyślij do Skanderbeg.pm"
-  EDIT_EU4SAVEEDITOR: "Edytuj za pomocą Eu4SaveEditor"
+  EDIT_EU4SAVEEDITOR: "Edytuj za pomocą OsaSaveEditor"
   CONVERT_TO_EU4: "Skonwertuj do zapisu EU4"
   EDIT_SAVEGAME: "Edytuj zapis"
   COMPATIBLE: "Kompatybilna wersja"

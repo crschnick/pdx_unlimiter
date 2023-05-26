@@ -23,7 +23,7 @@ l_russian:
  MELT_SAVEGAME:0 "Испортить сохранение (преобразование в не-Ironman)"
  ANALYZE_RAKALY:0 "Загрузить для анализа с помощью pdx.tools"
  UPLOAD_SKANDERBEG:0 "Загрузить на Skanderbeg.pm"
- EDIT_EU4SAVEEDITOR:0 "Редактировать с помощью Eu4SaveEditor"
+ EDIT_EU4SAVEEDITOR:0 "Редактировать с помощью OsaSaveEditor"
  CONVERT_TO_EU4:0 "Конвертировать в сохранение EU4"
  EDIT_SAVEGAME:0 "Изменить сохранение"
  COMPATIBLE:0 "Совместимая версия"

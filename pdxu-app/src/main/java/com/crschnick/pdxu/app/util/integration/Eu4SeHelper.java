@@ -11,7 +11,6 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +18,7 @@ import java.nio.file.Files;
 public class Eu4SeHelper {
 
     public static boolean isSupported() {
-        return SystemUtils.IS_OS_WINDOWS;
+        return false;
     }
 
     public static boolean shouldShowButton(SavegameEntry<?, ?> entry, SavegameInfo<?> info) {
@@ -61,9 +60,13 @@ public class Eu4SeHelper {
                         PdxuInstallation.getInstance().getResourceDir().resolve("bin").resolve("OsaSaveEditor.jar").toString(),
                         saveFile, gameFolder, overwrite
                 )
-                        .redirectErrorStream(true)
+                        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                         .start();
-                var out = proc.getInputStream().readAllBytes();
+                var out = proc.getErrorStream().readAllBytes();
+                var exit = proc.waitFor();
+                if (exit != 0) {
+                    throw new IOException(new String(out));
+                }
                 SavegameActions.reloadSavegame(eu4Entry);
             } catch (Exception e) {
                 ErrorHandler.handleException(e);

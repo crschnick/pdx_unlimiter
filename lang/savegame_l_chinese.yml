@@ -23,7 +23,7 @@ l_chinese:
   MELT_SAVEGAME: "转换为非铁人存档"
   ANALYZE_RAKALY: "上传至 pdx.tools 并分析"
   UPLOAD_SKANDERBEG: "上传至 Skanderbeg.pm"
-  EDIT_EU4SAVEEDITOR: "使用 Eu4SaveEditor 编辑"
+  EDIT_EU4SAVEEDITOR: "使用 OsaSaveEditor 编辑"
   CONVERT_TO_EU4: "转换至 EU4 存档"
   EDIT_SAVEGAME: "编辑存档"
   COMPATIBLE: "兼容版本"

@@ -23,7 +23,7 @@ l_english:
   MELT_SAVEGAME: "Melt savegame (Convert to Non-Ironman)"
   ANALYZE_RAKALY: "Upload and analyze with pdx.tools"
   UPLOAD_SKANDERBEG: "Upload to Skanderbeg.pm"
-  EDIT_EU4SAVEEDITOR: "Edit with Eu4SaveEditor"
+  EDIT_EU4SAVEEDITOR: "Edit with OsaSaveEditor"
   CONVERT_TO_EU4: "Convert to EU4 savegame"
   EDIT_SAVEGAME: "Edit savegame"
   COMPATIBLE: "Compatible version"

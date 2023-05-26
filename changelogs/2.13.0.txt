@@ -1,0 +1,15 @@
+# Changes in 2.13.0
+
+- Make Victoria 3 melter available for savegames (Please report any issues that you encounter with it)
+- Update Victoria 3 support to 1.3
+
+- Add basic savegame information for Stellaris savegames (more to come)
+- Make Stellaris campaigns recognizable across sessions by always including id in exported campaign name (This time for real)
+
+- Fix Invalid header error for some multiplayer EU4 savegames
+
+- Fix melted Hoi4 saves still being treated as ironman by the game
+
+- Improve accessibility descriptions of the user interface
+
+
