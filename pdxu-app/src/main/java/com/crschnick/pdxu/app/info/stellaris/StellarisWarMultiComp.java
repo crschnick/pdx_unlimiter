@@ -62,7 +62,8 @@ public class StellarisWarMultiComp extends SavegameInfoMultiComp {
             if (war.hasKey("attackers")) {
                 for (Node atk : war.getNodeForKey("attackers").getNodeArray()) {
                     var attacker = atk.getNodeForKey("country").getLong();
-                    attackers.add(StellarisTag.getTag(data.stellaris().getAllTags(), attacker));
+                    var tag = StellarisTag.getTag(data.stellaris().getAllTags(), attacker);
+                    tag.ifPresent(attackers::add);
                     if (attacker == 0) {
                         isAttacker = true;
                     }
@@ -74,7 +75,8 @@ public class StellarisWarMultiComp extends SavegameInfoMultiComp {
             if (war.hasKey("defenders")) {
                 for (Node def : war.getNodeForKey("defenders").getNodeArray()) {
                     var defender = def.getNodeForKey("country").getLong();
-                    defenders.add(StellarisTag.getTag(data.stellaris().getAllTags(), defender));
+                    var tag = StellarisTag.getTag(data.stellaris().getAllTags(), defender);
+                    tag.ifPresent(defenders::add);
                     if (defender == 0) {
                         isDefender = true;
                     }

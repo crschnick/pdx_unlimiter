@@ -36,7 +36,7 @@ public class StellarisAlliesComp extends StellarisDiplomacyRowComp {
             if (alli.getNodeForKeyIfExistent("alliance").map(Node::getBoolean).orElse(false)) {
                 var c = alli.getNodeForKey("country").getLong();
                 var tag = StellarisTag.getTag(data.stellaris().getAllTags(), c);
-                list.add(tag);
+                tag.ifPresent(list::add);
             }
         }
         return list;

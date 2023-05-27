@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.Optional;
+
 @Jacksonized
 @Builder
 @Value
@@ -13,25 +15,29 @@ public class Resource {
     double income;
     double expense;
 
-    public static Resource parseFromCountryNode(Node node, String name) {
-        var budget = node.getNodeForKeys("budget", "current_month");
+    public static Optional<Resource> parseFromCountryNode(Node node, String name) {
+        var budget = node.getNodeForKeysIfExistent("budget", "current_month");
+        if (budget.isEmpty()) {
+            return Optional.empty();
+        }
+
         final double[] income = {0.0};
         final double[] expense = {0.0};
-        budget.getNodeForKey("income").forEach((k, v) -> {
+        budget.get().getNodeForKeyIfExistent("income").ifPresent(incomeNode -> incomeNode.forEach((k, v) -> {
             v.forEach((resourceName, amount) -> {
                 if (name.equals(resourceName)) {
                     income[0] += amount.getDouble();
                 }
             });
-        });
-        budget.getNodeForKey("expenses").forEach((k, v) -> {
+        }));
+        budget.get().getNodeForKeyIfExistent("expenses").ifPresent(expensesNode -> expensesNode.forEach((k, v) -> {
             v.forEach((resourceName, amount) -> {
                 if (name.equals(resourceName)) {
                     expense[0] += amount.getDouble();
                 }
             });
-        });
-        var stored = node.getNodeForKeys("modules", "standard_economy_module", "resources", name).getDouble();
-        return Resource.builder().stored(stored).income(income[0]).expense(expense[0]).build();
+        }));
+        var stored = node.getNodeForKeysIfExistent("modules", "standard_economy_module", "resources", name).map(Node::getDouble).orElse(0.0);
+        return Optional.ofNullable(Resource.builder().stored(stored).income(income[0]).expense(expense[0]).build());
     }
 }

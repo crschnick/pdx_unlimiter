@@ -30,7 +30,7 @@ public abstract class StellarisResourceComp extends SavegameInfoComp {
     protected abstract Image getImage();
 
     protected boolean shouldShow() {
-        return true;
+        return resource != null;
     }
 
     @Override
@@ -52,7 +52,11 @@ public abstract class StellarisResourceComp extends SavegameInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        var node = content.get().getNodeForKeys("country", "0");
-        resource = Resource.parseFromCountryNode(node, getResourceName());
+        var node = content.get().getNodeForKeysIfExistent("country", "0");
+        if (node.isEmpty()) {
+            return;
+        }
+
+        resource = Resource.parseFromCountryNode(node.get(), getResourceName()).orElse(null);
     }
 }

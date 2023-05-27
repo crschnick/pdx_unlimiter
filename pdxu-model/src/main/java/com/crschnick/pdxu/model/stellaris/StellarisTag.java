@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class StellarisTag {
 
-    public static StellarisTag getTag(List<StellarisTag> tags, long id) {
+    public static Optional<StellarisTag> getTag(List<StellarisTag> tags, long id) {
         return tags.stream()
                 .filter(t -> t.id == id)
-                .findFirst()
-                .orElseThrow();
+                .findFirst();
     }
     @Setter
     private String name;
