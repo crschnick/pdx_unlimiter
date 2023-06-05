@@ -1,12 +1,12 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LocalisationHelper;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
+import com.crschnick.pdxu.app.util.integration.ConverterSupport;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.jfoenix.controls.JFXRadioButton;
@@ -16,6 +16,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
+import lombok.Value;
 
 import java.util.Map;
 import java.util.Optional;
@@ -23,10 +24,12 @@ import java.util.Optional;
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 import static com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper.createAlert;
 
+@Value
 public class GuiConverterConfig {
 
+    ConverterSupport converterSupport;
 
-    public static boolean showConfirmConversionDialog() {
+    public boolean showConfirmConversionDialog() {
         Alert alert = createAlert();
 
         var config = new ButtonType("Configure");
@@ -34,9 +37,9 @@ public class GuiConverterConfig {
 
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm conversion");
-        alert.setHeaderText("""
-                Do you want to convert the selected CK3 savegame to an EU4 mod?
-                """);
+        alert.setHeaderText(String.format("""
+                                                  Do you want to convert the selected %s savegame to an %s mod?
+                                                  """, converterSupport.getFromName(), converterSupport.getToName()));
         alert.setContentText("""
                 This conversion may take a while.
                 """);
@@ -44,26 +47,26 @@ public class GuiConverterConfig {
         return result.isPresent() && result.get().equals(config);
     }
 
-    public static void showUsageDialog() {
+    public void showUsageDialog() {
         Alert alert = createAlert();
 
         var download = new ButtonType("Show downloads");
         alert.getButtonTypes().add(download);
         Button val = (Button) alert.getDialogPane().lookupButton(download);
         val.setOnAction(e -> {
-            Hyperlinks.open(Hyperlinks.CK3_TO_EU4_DOWNLOADS);
+            Hyperlinks.open(converterSupport.getDownloadLink());
         });
 
         alert.setAlertType(Alert.AlertType.INFORMATION);
-        alert.setTitle("CK3 to EU4 converter");
+        alert.setTitle(converterSupport.getFromName() + " to " + converterSupport.getToName() + " converter");
         alert.setHeaderText("""
-                To use the converter functionality, you first have to download the CK3toEU4 converter,
+                To use the converter functionality, you first have to download the converter,
                 extract it, and then set the path to the extracted directory in the settings menu.
                 """);
         alert.showAndWait();
     }
 
-    public static void showAlreadyExistsDialog(String name) {
+    public void showAlreadyExistsDialog(String name) {
         GuiDialogHelper.showBlockingAlert(alert -> {
             alert.setAlertType(Alert.AlertType.INFORMATION);
             alert.setTitle("Mod already exists");
@@ -71,7 +74,7 @@ public class GuiConverterConfig {
         });
     }
 
-    public static void showConversionSuccessDialog() {
+    public void showConversionSuccessDialog() {
         Alert alert = createAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.setTitle("Conversion succeeded");
@@ -80,12 +83,12 @@ public class GuiConverterConfig {
                 """);
         alert.setContentText("""
                 The created mod has been added to your mod directory.
-                To play it, simply enable the mod your EU4 the launcher.
+                To play it, simply enable the mod your the Paradox launcher.
                 """);
         alert.showAndWait();
     }
 
-    public static void showConversionErrorDialog() {
+    public void showConversionErrorDialog() {
         Alert alert = createAlert();
         var openLog = new ButtonType("Open log");
         alert.getButtonTypes().add(openLog);
@@ -99,12 +102,12 @@ public class GuiConverterConfig {
                 """);
         Button val = (Button) alert.getDialogPane().lookupButton(openLog);
         val.setOnAction(e -> {
-            ThreadHelper.open(Settings.getInstance().ck3toeu4Dir.getValue().resolve("CK3toEU4").resolve("log.txt"));
+            ThreadHelper.open(converterSupport.getBaseDir().resolve("log.txt"));
         });
         alert.showAndWait();
     }
 
-    private static javafx.scene.Node createOptionNode(
+    private javafx.scene.Node createOptionNode(
             Node n,
             Map<String, String> translations,
             Map<String, String> values) {
@@ -149,13 +152,13 @@ public class GuiConverterConfig {
         return grid;
     }
 
-    public static boolean showConfig(Map<String, String> values) {
+    public boolean showConfig(Map<String, String> values) {
         Node configNode;
         Map<String, String> translations;
         try {
-            configNode = TextFormatParser.text().parse(Settings.getInstance().ck3toeu4Dir.getValue()
+            configNode = TextFormatParser.text().parse(converterSupport.getBaseDir()
                             .resolve("Configuration").resolve("fronter-options.txt"));
-            translations = LocalisationHelper.loadTranslations(Settings.getInstance().ck3toeu4Dir.getValue()
+            translations = LocalisationHelper.loadTranslations(converterSupport.getBaseDir()
                     .resolve("Configuration").resolve("options.yml"), Language.ENGLISH);
         } catch (Exception e) {
             ErrorHandler.handleException(e);
@@ -172,8 +175,7 @@ public class GuiConverterConfig {
         val.addEventFilter(
                 ActionEvent.ACTION,
                 e -> {
-                    ThreadHelper.open(Settings.getInstance().ck3toeu4Dir.getValue()
-                            .resolve("CK3toEU4").resolve("configurables"));
+                    ThreadHelper.open(converterSupport.getBackendDir().resolve("configurables"));
                     e.consume();
                 });
 

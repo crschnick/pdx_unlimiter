@@ -1,51 +1,23 @@
 package com.crschnick.pdxu.app.util.integration;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.settings.Settings;
-import com.crschnick.pdxu.app.core.settings.SettingsEntry;
-import com.crschnick.pdxu.app.gui.dialog.GuiConverterConfig;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
-import javafx.application.Platform;
-import lombok.Value;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConverterHelper {
-
-    @Value
-    public static class Instance {
-
-        Game fromGame;
-        Game toGame;
-
-        String fromName;
-        String toName;
-
-        SettingsEntry.ThirdPartyDirectory directorySetting;
-
-        public String getName() {
-            return fromName + "to" + toName;
-        }
-
-        public Path getExecutable() {
-            return Path.of(getName(), getName() + "Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : ""));
-        }
-    }
 
     private static void writeLine(BufferedWriter w, String key, Object value) throws IOException {
         w.write(key + " = \"" + value.toString() + "\"\n");
@@ -110,77 +82,5 @@ public class ConverterHelper {
             writeLine(writer, e.getKey(), e.getValue());
         }
         writer.close();
-    }
-
-    public static void convertCk3ToEu4(SavegameEntry<Ck3Tag, Ck3SavegameInfo> entry) {
-        if (Settings.getInstance().ck3toeu4Dir.getValue() == null) {
-            GuiConverterConfig.showUsageDialog();
-            return;
-        }
-
-        if (!GuiConverterConfig.showConfirmConversionDialog()) {
-            return;
-        }
-
-        var values = ConverterHelper.loadConfig();
-        if (!GuiConverterConfig.showConfig(values)) {
-            return;
-        }
-
-        TaskExecutor.getInstance().submitTask(() -> {
-            try {
-                ConverterHelper.writeConfig(entry, values);
-
-                var handle = new ProcessBuilder(Settings.getInstance().ck3toeu4Dir.getValue()
-                        .resolve("CK3toEU4")
-                        .resolve("CK3ToEU4Converter" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "")).toString())
-                        .directory(Settings.getInstance().ck3toeu4Dir.getValue().resolve("CK3toEU4").toFile())
-                        .redirectErrorStream(true)
-                        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                        .start();
-
-                try {
-                    int returnCode = handle.waitFor();
-
-                    Platform.runLater(() -> {
-                        if (returnCode == 0) {
-                            GuiConverterConfig.showConversionSuccessDialog();
-                        } else {
-                            GuiConverterConfig.showConversionErrorDialog();
-                        }
-                    });
-
-                    if (returnCode == 0) {
-                        var latestDir = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
-                                .resolve("CK3toEU4").resolve("output"))
-                                .filter(Files::isDirectory)
-                                .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
-                        var latestFile = Files.list(Settings.getInstance().ck3toeu4Dir.getValue()
-                                .resolve("CK3toEU4").resolve("output"))
-                                .filter(Files::isRegularFile)
-                                .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
-                        if (latestDir.isPresent() && latestFile.isPresent()) {
-                            var outDir = Path.of(getEu4ModDir()).resolve(latestDir.get().getFileName());
-                            var outFile = Path.of(getEu4ModDir()).resolve(latestFile.get().getFileName());
-                            if (Files.exists(outDir) || Files.exists(outFile)) {
-                                GuiConverterConfig.showAlreadyExistsDialog(latestDir.get().getFileName().toString());
-                            } else {
-                                FileUtils.moveDirectory(
-                                        latestDir.get().toFile(),
-                                        outDir.toFile());
-                                FileUtils.moveFile(
-                                        latestFile.get().toFile(),
-                                        outFile.toFile());
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        }, true);
     }
 }
