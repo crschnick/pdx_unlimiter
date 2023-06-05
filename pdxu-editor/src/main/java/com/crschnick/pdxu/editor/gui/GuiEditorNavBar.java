@@ -48,6 +48,7 @@ public class GuiEditorNavBar {
         box.setFillHeight(true);
         {
             var backButton = new JFXButton(null, new FontIcon());
+            backButton.setAccessibleText("Go back");
             GuiTooltips.install(backButton, "Go back");
             backButton.getStyleClass().add("nav-back-button");
             backButton.setGraphic(new FontIcon());
@@ -55,10 +56,10 @@ public class GuiEditorNavBar {
             box.getChildren().add(backButton);
             backButton.disableProperty().bind(Bindings.not(state.getNavigation().canGoBackProperty()));
             backButton.setOnAction(e -> state.getNavigation().goBack());
-            backButton.setFocusTraversable(false);
         }
         {
             var forwardButton = new JFXButton(null, new FontIcon());
+            forwardButton.setAccessibleText("Go forward");
             GuiTooltips.install(forwardButton, "Go forward");
             forwardButton.getStyleClass().add("nav-forward-button");
             forwardButton.setGraphic(new FontIcon());
@@ -66,7 +67,6 @@ public class GuiEditorNavBar {
             box.getChildren().add(forwardButton);
             forwardButton.disableProperty().bind(Bindings.not(state.getNavigation().canGoForwardProperty()));
             forwardButton.setOnAction(e -> state.getNavigation().goForward());
-            forwardButton.setFocusTraversable(false);
         }
         return box;
     }

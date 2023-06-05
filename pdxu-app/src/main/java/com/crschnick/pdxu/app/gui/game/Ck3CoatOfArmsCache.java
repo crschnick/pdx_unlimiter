@@ -2,16 +2,16 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
-import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.ck3.Ck3House;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.scene.image.Image;
 
 import java.nio.file.Path;
@@ -58,7 +58,7 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
         return Map.of();
     }
 
-    public static Image realmImage(SavegameInfo<Ck3Tag> info, Ck3Tag tag) {
+    public static Image realmImage(SavegameData<Ck3Tag> data, Ck3Tag tag) {
         var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.realms.get(tag);
         if (cachedImg != null) {
@@ -66,7 +66,7 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
         }
         CoatOfArms coa = tag.getCoatOfArms();
         var img = Ck3TagRenderer.renderRealmImage(
-                coa, tag.getGovernmentName(), GameFileContext.fromData(info.getData()), REALM_DEFAULT_IMG_SIZE, true);
+                coa, tag.getGovernmentName(), GameFileContext.fromData(data), REALM_DEFAULT_IMG_SIZE, true);
         cache.realms.put(tag, img);
         return img;
     }

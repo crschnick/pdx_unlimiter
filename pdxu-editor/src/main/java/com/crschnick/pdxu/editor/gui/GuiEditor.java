@@ -17,6 +17,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -210,7 +211,11 @@ public class GuiEditor {
             int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
             for (int i = offset; i < nodeCount + offset; i++) {
                 var n = nodes.get(i - offset);
-                var kn = createGridElement(new Label(getFormattedName(n.getNavigationName())), i, keyHighlight);
+                var label = new Button(getFormattedName(n.getNavigationName()));
+                label.setDisable(true);
+                label.setAccessibleText(n.getNavigationName());
+                label.setAccessibleRole(AccessibleRole.LIST_ITEM);
+                var kn = createGridElement(label, i, keyHighlight);
                 kn.setAlignment(Pos.CENTER_LEFT);
 
                 grid.add(createGridElement(GuiEditorTypes.createTypeNode(n), i, keyHighlight), 0, i);
@@ -297,6 +302,7 @@ public class GuiEditor {
 
         {
             ToggleButton filterKeys = new ToggleButton();
+            filterKeys.setAccessibleText("Include keys in search");
             filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
             filterKeys.setGraphic(new FontIcon());
             filterKeys.selectedProperty().bindBidirectional(edFilter.filterKeysProperty());
@@ -306,6 +312,7 @@ public class GuiEditor {
 
         {
             ToggleButton filterValues = new ToggleButton();
+            filterValues.setAccessibleText("Include values in search");
             filterValues.getStyleClass().add(GuiStyle.CLASS_VALUE);
             filterValues.setGraphic(new FontIcon());
             filterValues.selectedProperty().bindBidirectional(edFilter.filterValuesProperty());
@@ -322,6 +329,7 @@ public class GuiEditor {
         {
             TextField filter = new TextField();
             {
+                filter.setAccessibleText("Filter");
                 filter.focusedProperty().addListener((c, o, n) -> {
                     if (n) {
                         Platform.runLater(filter::selectAll);
@@ -339,6 +347,7 @@ public class GuiEditor {
 
             {
                 Button search = new Button();
+                search.setAccessibleText("Apply filter");
                 search.setOnAction(e -> {
                     edFilter.filterStringProperty().set(filter.getText());
                     filter.setEffect(null);
@@ -350,6 +359,7 @@ public class GuiEditor {
 
             {
                 Button clear = new Button();
+                clear.setAccessibleText("Reset filter");
                 clear.setOnAction(e -> {
                     filter.setText("");
                     edFilter.filterStringProperty().set("");
@@ -366,6 +376,7 @@ public class GuiEditor {
 
         {
             ToggleButton cs = new ToggleButton();
+            cs.setAccessibleText("Case sensitive");
             cs.getStyleClass().add(GuiStyle.CLASS_CASE_SENSITIVE);
             cs.setGraphic(new FontIcon());
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());

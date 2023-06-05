@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui.game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
@@ -74,6 +75,8 @@ public class Ck3TagRenderer {
             CoatOfArmsRenderer.CK3.applyMask(i, GameImage.CK3_COA_OVERLAY);
             CoatOfArmsRenderer.CK3.brighten(i);
         }
+
+        ThreadHelper.sleep(30);
 
         return i;
     }

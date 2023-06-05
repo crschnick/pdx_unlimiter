@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.info.ck3;
 
-import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
+import com.crschnick.pdxu.app.gui.game.Ck3CoatOfArmsCache;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
@@ -19,7 +19,7 @@ public class Ck3ClaimsComp extends DiplomacyRowComp<Ck3Title> {
     @Override
     protected Region map(SavegameData<?> data, Ck3Title tag) {
         return GameImage.imageNode(
-                Ck3TagRenderer.renderTitleImage(tag.getCoatOfArms(), GameFileContext.fromData(data), 64, false),
+                Ck3CoatOfArmsCache.titleImage(tag, GameFileContext.fromData(data)),
                 CLASS_TAG_ICON
         );
     }

@@ -21,7 +21,7 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        return Ck3CoatOfArmsCache.realmImage(info, tag);
+        return Ck3CoatOfArmsCache.realmImage(info.getData(), tag);
     }
 
     @Override
