@@ -44,7 +44,7 @@ public class GuiSettings {
                 new Separator(),
                 GuiSettingsComponents.section("IRONY", applyFuncs, s.ironyDir, s.launchIrony),
                 new Separator(),
-                GuiSettingsComponents.section("CONVERTERS", applyFuncs, s.ck3toeu4Dir),
+                GuiSettingsComponents.section("CONVERTERS", applyFuncs, s.ck3toeu4Dir, s.eu4tovic3Dir, s.vic3tohoi4Dir),
                 new Separator(),
                 GuiSettingsComponents.section("SKANDERBEG", applyFuncs, s.skanderbegApiKey));
         vbox.setSpacing(10);

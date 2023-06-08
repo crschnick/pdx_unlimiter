@@ -7,12 +7,11 @@ import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.app.savegame.SavegameActions;
-import com.crschnick.pdxu.app.savegame.SavegameBranches;
-import com.crschnick.pdxu.app.savegame.SavegameContext;
-import com.crschnick.pdxu.app.savegame.SavegameEntry;
+import com.crschnick.pdxu.app.savegame.*;
+import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.integration.ConverterSupport;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
 import com.crschnick.pdxu.app.util.integration.RakalyHelper;
@@ -284,23 +283,25 @@ public class GuiSavegameEntry {
             });
         });
 
-        SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-            ConverterSupport.ALL.forEach(converterSupport -> {
-                if (converterSupport.getFromGame().equals(ctx.getGame())) {
-                    Platform.runLater(() -> {
-                        Button convert = new JFXButton(null, new FontIcon());
-                        convert.setGraphic(new FontIcon());
-                        convert.setOnMouseClicked((m) -> {
-                            converterSupport.convert(e);
+        if (SupportedOs.get().equals(SupportedOs.WINDOWS)) {
+            SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+                ConverterSupport.ALL.forEach(converterSupport -> {
+                    if (converterSupport.getFromGame().equals(ctx.getGame()) && GameInstallation.ALL.get(converterSupport.getToGame()) != null) {
+                        Platform.runLater(() -> {
+                            Button convert = new JFXButton(null, new FontIcon());
+                            convert.setGraphic(new FontIcon());
+                            convert.setOnMouseClicked((m) -> {
+                                converterSupport.convert(e);
+                            });
+                            convert.getStyleClass().add(CLASS_CONVERT);
+                            convert.setAccessibleText("Convert to " + converterSupport.getToName() + " savegame");
+                            GuiTooltips.install(convert, PdxuI18n.get("CONVERT_TO_" + converterSupport.getToName()));
+                            dynamicButtons.getChildren().add(convert);
                         });
-                        convert.getStyleClass().add(CLASS_CONVERT);
-                        convert.setAccessibleText("Convert to " + converterSupport.getToName() + " savegame");
-                        GuiTooltips.install(convert, PdxuI18n.get("CONVERT_TO_" + converterSupport.getToName()));
-                        dynamicButtons.getChildren().add(convert);
-                    });
-                }
+                    }
+                });
             });
-        });
+        }
 
         Button edit = new JFXButton(null, new FontIcon());
         edit.setOnMouseClicked((m) -> {

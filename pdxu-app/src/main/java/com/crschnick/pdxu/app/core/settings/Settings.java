@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.gui.dialog.GuiSettings;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LanguageManager;
+import com.crschnick.pdxu.app.util.integration.ConverterSupport;
 import com.crschnick.pdxu.app.util.integration.IronyHelper;
 import javafx.application.Platform;
 
@@ -103,7 +104,21 @@ public final class Settings extends AbstractSettings {
             "ck3toeu4Dir",
             "CK3 to EU4 converter",
             Path.of("Ck3ToEu4", "CK3ToEU4Converter.exe"),
-            () -> null
+            () -> ConverterSupport.CK3_TO_EU4.determineInstallationDirectory().orElse(null)
+    );
+    public final SettingsEntry.ThirdPartyDirectory eu4tovic3Dir = new SettingsEntry.ThirdPartyDirectory(
+            "EU4_TO_VIC3_DIR",
+            "eu4tovic3Dir",
+            "EU4 to VIC3 converter",
+            Path.of("Eu4ToVic3", "EU4ToVIC3Converter.exe"),
+            () -> ConverterSupport.EU4_TO_VIC3.determineInstallationDirectory().orElse(null)
+    );
+    public final SettingsEntry.ThirdPartyDirectory vic3tohoi4Dir = new SettingsEntry.ThirdPartyDirectory(
+            "VIC3_TO_HOI4_DIR",
+            "vic3tohoi4Dir",
+            "VIC3 to HOI4 converter",
+            Path.of("Vic3ToHoi4", "Vic3ToHoi4.exe"),
+            () -> ConverterSupport.VIC3_TO_HOI4.determineInstallationDirectory().orElse(null)
     );
     public final SettingsEntry.IntegerEntry maxTooltipWidth = new SettingsEntry.IntegerEntry(
             "MAX_TOOLTIP_SIZE",

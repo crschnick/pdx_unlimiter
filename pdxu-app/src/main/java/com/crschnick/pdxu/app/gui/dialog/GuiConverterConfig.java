@@ -102,7 +102,7 @@ public class GuiConverterConfig {
                 """);
         Button val = (Button) alert.getDialogPane().lookupButton(openLog);
         val.setOnAction(e -> {
-            ThreadHelper.open(converterSupport.getBaseDir().resolve("log.txt"));
+            ThreadHelper.open(converterSupport.getWorkingDir().resolve("log.txt"));
         });
         alert.showAndWait();
     }
