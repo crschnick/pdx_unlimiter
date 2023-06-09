@@ -1,0 +1,8 @@
+# Changes in 2.13.1
+
+- Add planet count and fleet size information to stellaris savegames
+- Add support for Hoi4ToVic3 and Eu4ToVic3 converters
+- Auto-detect converter installation directories on startup
+- Cache ck3 coat of arms to increase performance
+- Improve accessibility descriptions of the user interface
+- Fix various other small bugs

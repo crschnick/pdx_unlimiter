@@ -17,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -318,6 +319,16 @@ public abstract class FileImportTarget {
         }
 
         @Override
+        public Optional<UUID> getCampaignIdOverride() {
+            var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
+            if (gameIdSplit != -1) {
+                return Optional.of(
+                        UUID.nameUUIDFromBytes(path.getParent().getFileName().toString().substring(gameIdSplit).getBytes(StandardCharsets.UTF_8)));
+            }
+            return Optional.empty();
+        }
+
+        @Override
         public String getRawName() {
             var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
             var date = FilenameUtils.getBaseName(path.getFileName().toString());
@@ -330,6 +341,16 @@ public abstract class FileImportTarget {
 
         public StellarisIronmanImportTarget(Path path) {
             super(SavegameStorage.ALL.get(Game.STELLARIS), path);
+        }
+
+        @Override
+        public Optional<UUID> getCampaignIdOverride() {
+            var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
+            if (gameIdSplit != -1) {
+                return Optional.of(
+                        UUID.nameUUIDFromBytes(path.getParent().getFileName().toString().substring(gameIdSplit).getBytes(StandardCharsets.UTF_8)));
+            }
+            return Optional.empty();
         }
 
         @Override

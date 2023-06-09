@@ -211,10 +211,10 @@ public class GuiEditor {
             int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
             for (int i = offset; i < nodeCount + offset; i++) {
                 var n = nodes.get(i - offset);
-                var label = new Button(getFormattedName(n.getNavigationName()));
-                label.setDisable(true);
-                label.setAccessibleText(n.getNavigationName());
-                label.setAccessibleRole(AccessibleRole.LIST_ITEM);
+                var label = new Label(getFormattedName(n.getNavigationName()));
+                label.setFocusTraversable(true);
+                label.setAccessibleRole(AccessibleRole.TEXT);
+                label.setAccessibleText(getFormattedName(n.getNavigationName()));
                 var kn = createGridElement(label, i, keyHighlight);
                 kn.setAlignment(Pos.CENTER_LEFT);
 

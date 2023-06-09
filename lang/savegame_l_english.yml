@@ -25,6 +25,8 @@ l_english:
   UPLOAD_SKANDERBEG: "Upload to Skanderbeg.pm"
   EDIT_EU4SAVEEDITOR: "Edit with OsaSaveEditor"
   CONVERT_TO_EU4: "Convert to EU4 savegame"
+  CONVERT_TO_VIC3: "Convert to VIC3 savegame"
+  CONVERT_TO_HOI4: "Convert to HOI4 savegame"
   EDIT_SAVEGAME: "Edit savegame"
   COMPATIBLE: "Compatible version"
   INCOMPATIBLE: "Incompatible savegame version"
