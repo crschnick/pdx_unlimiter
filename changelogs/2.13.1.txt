@@ -5,4 +5,6 @@
 - Auto-detect converter installation directories on startup
 - Cache ck3 coat of arms to increase performance
 - Improve accessibility descriptions of the user interface
+- Correlate Stellaris campaigns across sessions
+- Fix Stellaris savegame errors
 - Fix various other small bugs
