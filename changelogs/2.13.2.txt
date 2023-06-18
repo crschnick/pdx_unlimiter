@@ -1,0 +1,5 @@
+# Changes in 2.13.2
+
+- Add more information to Stellaris savegames
+- Fix Stellaris campaign correlation being broken again (fourth time is the charm for sure)
+- Fix various other small bugs
