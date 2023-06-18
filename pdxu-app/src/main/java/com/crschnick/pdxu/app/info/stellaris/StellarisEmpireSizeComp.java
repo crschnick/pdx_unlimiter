@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -11,13 +12,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
-public class StellarisFleetsComp extends SimpleInfoComp {
+public class StellarisEmpireSizeComp extends SimpleInfoComp {
 
-    private int fleets;
+    private int size;
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        fleets = (int) content.get().getNodeForKeys("meta_fleets").getDouble();
+        size = content.get().getNodeForKeysIfExistent("country", "0", "empire_size").map(Node::getInteger).orElse(0);
     }
 
     @Override
@@ -33,16 +34,16 @@ public class StellarisFleetsComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return String.valueOf(fleets);
+        return String.valueOf(size);
     }
 
     @Override
     protected Image getImage() {
-        return GameImage.STELLARIS_ICON_FLEETS;
+        return GameImage.STELLARIS_ICON_EMPIRE_SIZE;
     }
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("FLEETS");
+        return PdxuI18n.get("EMPIRE_SIZE");
     }
 }

@@ -17,11 +17,6 @@ public class SavegameBranches {
             return ctx.getInfo().getData().isIronman();
         }
 
-        // Stellaris branching is pointless as campaigns can't be recognized across game sessions
-        if (ctx.getGame() == Game.STELLARIS) {
-            return false;
-        }
-
         return true;
     }
 

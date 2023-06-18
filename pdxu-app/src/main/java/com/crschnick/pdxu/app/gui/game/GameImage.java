@@ -77,6 +77,7 @@ public class GameImage {
     public static Image STELLARIS_ICON_RESEARCH;
     public static Image STELLARIS_ICON_CONSUMER_GOODS;
     public static Image STELLARIS_ICON_FLEETS;
+    public static Image STELLARIS_ICON_EMPIRE_SIZE;
     public static Image STELLARIS_ICON_PLANETS;
 
     public static Image HOI4_ICON_IRONMAN;
@@ -288,6 +289,7 @@ public class GameImage {
         STELLARIS_ICON_MINERALS = ImageHelper.loadImage(r.resolve("minerals.dds"));
         STELLARIS_ICON_CONSUMER_GOODS = ImageHelper.loadImage(r.resolve("consumer_goods.dds"));
         STELLARIS_ICON_FLEETS = ImageHelper.loadImage(i.resolve("fleet_size_icon.dds"));
+        STELLARIS_ICON_EMPIRE_SIZE = ImageHelper.loadImage(i.resolve("empire_sprawl_icon.dds"));
         STELLARIS_ICON_PLANETS = ImageHelper.loadImage(i.resolve("planet.dds"));
 
     }

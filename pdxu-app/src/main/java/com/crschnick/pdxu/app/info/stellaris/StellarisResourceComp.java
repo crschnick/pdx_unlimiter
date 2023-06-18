@@ -20,7 +20,8 @@ public abstract class StellarisResourceComp extends SavegameInfoComp {
     protected abstract String getResourceName();
 
     protected String getDisplayValue() {
-        return (int) resource.getStored() + " " + (resource.getIncome() > resource.getExpense() ? "+" : "") + (int) (resource.getIncome() - resource.getExpense());
+        var stored = Math.abs(resource.getStored()) >= 1000 ? String.valueOf((int) resource.getStored() / 1000) + "k" : String.valueOf((int) resource.getStored());
+        return stored + " " + (resource.getIncome() >= resource.getExpense() ? "+" : "") + (int) (resource.getIncome() - resource.getExpense());
     }
 
     protected String getTooltip() {

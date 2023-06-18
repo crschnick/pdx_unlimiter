@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.node.NodePointer;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StellarisSavegameAdapter implements EditorSavegameAdapter {
@@ -18,7 +19,15 @@ public class StellarisSavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
-        return Map.of();
+        var map = new LinkedHashMap<String, NodePointer>();
+
+        map.put("DLCs", NodePointer.builder().name("required_dlcs").build());
+        map.put("Galaxy", NodePointer.builder().name("galaxy").build());
+
+        var country = NodePointer.builder().name("country").name("0").build();
+        map.put("Player country", country);
+
+        return map;
     }
 
     @Override

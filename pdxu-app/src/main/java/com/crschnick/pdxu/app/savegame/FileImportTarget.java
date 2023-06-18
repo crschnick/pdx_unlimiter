@@ -325,7 +325,7 @@ public abstract class FileImportTarget {
                 return Optional.of(
                         UUID.nameUUIDFromBytes(path.getParent().getFileName().toString().substring(gameIdSplit).getBytes(StandardCharsets.UTF_8)));
             }
-            return Optional.empty();
+            return super.getCampaignIdOverride();
         }
 
         @Override
@@ -350,7 +350,7 @@ public abstract class FileImportTarget {
                 return Optional.of(
                         UUID.nameUUIDFromBytes(path.getParent().getFileName().toString().substring(gameIdSplit).getBytes(StandardCharsets.UTF_8)));
             }
-            return Optional.empty();
+            return super.getCampaignIdOverride();
         }
 
         @Override

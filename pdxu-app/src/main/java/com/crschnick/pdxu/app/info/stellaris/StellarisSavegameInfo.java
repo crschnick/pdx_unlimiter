@@ -9,12 +9,16 @@ import com.crschnick.pdxu.model.stellaris.StellarisTag;
 
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
+    StellarisEmpireSizeComp empireSize;
     StellarisPlanetsComp planets;
     StellarisFleetsComp fleets;
     StellarisEnergyComp energy;
     StellarisMineralsComp minerals;
     StellarisFoodComp food;
+    StellarisConsumerGoodsComp consumerGoods;
     StellarisAlloysComp alloys;
+    StellarisInfluenceComp influence;
+    StellarisUnityComp unity;
     StellarisAlliesComp allies;
     StellarisWarMultiComp wars;
     StellarisIronmanComp ironman;
