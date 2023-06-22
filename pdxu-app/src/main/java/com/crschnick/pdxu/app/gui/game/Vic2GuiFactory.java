@@ -28,7 +28,7 @@ public class Vic2GuiFactory extends GameGuiFactory<Vic2Tag, Vic2SavegameInfo> {
     public Pane createIcon() {
         var icon = GameImage.getGameIcon(Game.VIC2);
         var cut = ImageHelper.cut(icon,
-                new Rectangle2D(125, 0, icon.getWidth() - 240, icon.getHeight()));
+                new Rectangle2D(125, 0, Math.max(0, icon.getWidth() - 240), Math.max(0, icon.getHeight())));
         return GameImage.imageNode(cut, GuiStyle.CLASS_IMAGE_ICON);
     }
 
