@@ -37,7 +37,7 @@ public class GuiEditor {
 
         var icon = PdxuApp.getApp().getIcon();
         stage.getIcons().add(icon);
-        var title = state.getFileName() + " - " + "Pdx-U Editor";
+        var title = state.getFileName() + " - " + "Pdx-Unlimiter Editor";
         stage.setTitle(title);
         state.dirtyProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
