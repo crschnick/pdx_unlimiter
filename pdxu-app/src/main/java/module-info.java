@@ -10,7 +10,6 @@ open module com.crschnick.pdxu.app {
     requires javafx.controls;
     requires javafx.media;
     requires info.picocli;
-    requires io.github.ititus.dds;
     requires com.sun.jna;
     requires com.sun.jna.platform;
     requires org.jnativehook;

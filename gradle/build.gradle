@@ -85,6 +85,8 @@ jlink {
                 'jdk.crypto.ec',
                 'org.kordamp.ikonli.materialdesign',
                 'jdk.zipfs',
+                'io.github.ititus.dds',
+                'io.github.ititus.ddsiio',
                 'jdk.accessibility'
         ]
     }
