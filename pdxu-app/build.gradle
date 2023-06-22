@@ -65,6 +65,7 @@ dependencies {
 
     implementation 'net.java.dev.jna:jna-jpms:5.12.1'
     implementation 'net.java.dev.jna:jna-platform-jpms:5.12.1'
-    implementation 'io.github.ititus:dds:1.0.0'
+    implementation 'io.github.ititus:dds:2.1.0'
+    implementation 'io.github.ititus:ddsiio:2.1.0'
 }
 
