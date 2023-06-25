@@ -285,7 +285,7 @@ public class GameImage {
         STELLARIS_ICON_FOOD = ImageHelper.loadImage(r.resolve("food.dds"));
         STELLARIS_ICON_UNITY = ImageHelper.loadImage(r.resolve("unity.dds"));
         STELLARIS_ICON_INFLUENCE = ImageHelper.loadImage(r.resolve("influence.dds"));
-        STELLARIS_ICON_RESEARCH = ImageHelper.loadImage(r.resolve("research.dds"));
+        STELLARIS_ICON_RESEARCH = ImageHelper.loadImage(i.resolve("research_icon.dds"));
         STELLARIS_ICON_MINERALS = ImageHelper.loadImage(r.resolve("minerals.dds"));
         STELLARIS_ICON_CONSUMER_GOODS = ImageHelper.loadImage(r.resolve("consumer_goods.dds"));
         STELLARIS_ICON_FLEETS = ImageHelper.loadImage(i.resolve("fleet_size_icon.dds"));
