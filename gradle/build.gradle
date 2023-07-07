@@ -9,6 +9,7 @@ version file('version').text
 def canonicalVersion = file('canonical_version').text
 
 apply from: "$rootDir/gradle/jreleaser.gradle"
+apply from: "$rootDir/gradle/conveyor.gradle"
 apply from: 'gradle/java.gradle'
 apply from: 'gradle/mods.gradle'
 
@@ -96,11 +97,11 @@ jlink {
         imageName = 'Pdx-Unlimiter'
         imageOptions += ['--verbose']
         if (DefaultNativePlatform.currentOperatingSystem.windows) {
-            icon = "misc/logo.ico"
+            icon = "misc/logo/logo.ico"
         } else if (DefaultNativePlatform.currentOperatingSystem.linux) {
-            icon = "misc/logo.png"
+            icon = "misc/logo/logo.png"
         } else {
-            icon = "misc/logo.icns"
+            icon = "misc/logo/logo.icns"
             imageOptions += [
                     '--mac-sign',
                     '--mac-package-signing-prefix', 'com.crschnick.pdxu',

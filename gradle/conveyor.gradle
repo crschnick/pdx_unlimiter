@@ -1,0 +1,11 @@
+def isCI = System.getenv("CI") != null
+version file('version').text
+def canonicalVersion = file('canonical_version').text
+def changelog = file("changelogs/${canonicalVersion}.txt").exists() ?
+        file("changelogs/${canonicalVersion}.txt").text.replace('\r\n', '\n') : ""
+
+tasks.register('conveyor', Exec) {
+    commandLine 'conveyor', "-f=conveyor/${isCI ? 'ci.conveyor.conf' : 'conveyor.conf'}", '--agree-to-license=1', 'make', '-o=build/conveyor', 'site'
+    environment("CHANGELOG", changelog)
+    environment("VERSION", version)
+}

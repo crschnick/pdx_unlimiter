@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.settings.SavedState;
 import com.crschnick.pdxu.app.gui.GuiLayout;
 import com.crschnick.pdxu.app.gui.GuiStyle;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
@@ -18,8 +19,7 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PdxuApp extends Application {
@@ -166,12 +166,7 @@ public class PdxuApp extends Application {
         APP = this;
         stage = primaryStage;
 
-        try (var in = Files.newInputStream(PdxuInstallation.getInstance().getResourceDir().resolve("logo.png"))) {
-            icon = new Image(in);
-            primaryStage.getIcons().add(icon);
-        } catch (IOException ex) {
-            ErrorHandler.handleException(ex);
-        }
+        addIcons(stage);
 
         primaryStage.setOnCloseRequest(event -> {
             windowActive = false;
@@ -185,6 +180,19 @@ public class PdxuApp extends Application {
         });
 
         ComponentManager.initialPlatformSetup();
+    }
+
+    private void addIcons(Stage stage) {
+        stage.getIcons().clear();
+        for (String s : List.of(
+                "logo_16x16.png",
+                "logo_24x24.png",
+                "logo_32x32.png",
+                "logo_48x48.png",
+                "logo_128x128.png",
+                "logo_256x256.png")) {
+            stage.getIcons().add(ImageHelper.loadImage(PdxuInstallation.getInstance().getResourceDir().resolve("logo/" + s)));
+        }
     }
 
     public Image getIcon() {
