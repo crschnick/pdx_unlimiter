@@ -78,6 +78,7 @@ public class GuiImporter {
 
         Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.initModality(Modality.WINDOW_MODAL);
+        alert.setResizable(true);
         alert.setTitle("Import savegames");
         alert.getDialogPane().setContent(createContent(state));
         alert.getDialogPane().getScene().getWindow()

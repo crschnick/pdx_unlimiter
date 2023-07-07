@@ -5,7 +5,7 @@
 }
 
 .import-content .scroll-pane {
--fx-max-height: 600px;
+-fx-max-height: 500px;
 }
 
 .import-content .filter-bar {
