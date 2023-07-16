@@ -11,7 +11,7 @@ rm -f "$DMG_FILE"
 
 create-dmg \
   --volname "Pdx-Unlimiter" \
-  --volicon "$1/misc/logo.icns" \
+  --volicon "$1/misc/logo/logo.icns" \
   --window-pos 200 120 \
   --window-size 512 228 \
   --icon-size 128 \
