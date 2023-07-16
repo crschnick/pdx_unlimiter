@@ -15,7 +15,12 @@ public class WindowsRegistry {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(Advapi32Util.registryGetStringValue(
-                hkey == HKEY_LOCAL_MACHINE ? WinReg.HKEY_LOCAL_MACHINE : WinReg.HKEY_CURRENT_USER, key, valueName));
+        // This can fail even with errors in case the jna native library extraction fails
+        try {
+            return Optional.ofNullable(Advapi32Util.registryGetStringValue(
+                    hkey == HKEY_LOCAL_MACHINE ? WinReg.HKEY_LOCAL_MACHINE : WinReg.HKEY_CURRENT_USER, key, valueName));
+        } catch (Throwable t) {
+            return Optional.empty();
+        }
     }
 }
