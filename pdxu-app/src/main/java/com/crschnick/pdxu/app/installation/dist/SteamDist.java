@@ -80,7 +80,6 @@ public class SteamDist extends GameDist {
         }
     }
 
-    private static final Pattern STEAM_LIBRARY_DIR_OLD = Pattern.compile("\\s+\"\\d+\"\\s+\"(.+)\"");
     private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");
 
     private static Path getSteamAppsCommonDir(Path base) {
@@ -105,11 +104,7 @@ public class SteamDist extends GameDist {
             var libraryFoldersFile = Files.readString(p.get().resolve("steamapps").resolve("libraryfolders.vdf"));
             libraryFoldersFile.lines().forEach(line -> {
                 try {
-                    var m = STEAM_LIBRARY_DIR_OLD.matcher(line);
-                    if (m.find()) {
-                        list.add(getSteamAppsCommonDir(Path.of(m.group(1))));
-                    }
-                    m = STEAM_LIBRARY_DIR_NEW.matcher(line);
+                    var m = STEAM_LIBRARY_DIR_NEW.matcher(line);
                     if (m.find()) {
                         list.add(getSteamAppsCommonDir(Path.of(m.group(1))));
                     }
