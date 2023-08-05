@@ -7,7 +7,9 @@ import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Region;
 
 public class Eu4AchievementOkComp extends SimpleInfoComp {
 
@@ -22,6 +24,17 @@ public class Eu4AchievementOkComp extends SimpleInfoComp {
     @Override
     protected Image getImage() {
         return GameImage.EU4_ICON_ACHIEVEMENT;
+    }
+
+    @Override
+    public Region create(SavegameData<?> data) {
+        var r = super.create(data);
+        if (!achievementOk) {
+            ColorAdjust grayscale = new ColorAdjust();
+            grayscale.setSaturation(-1);
+            r.setEffect(grayscale);
+        }
+        return r;
     }
 
     @Override
