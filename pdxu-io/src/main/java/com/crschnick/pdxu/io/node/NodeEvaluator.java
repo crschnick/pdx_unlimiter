@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class NodeEvaluator {
 
-    private static final Context JAVASCRIPT_CONTEXT = Context.newBuilder("js").option("engine.WarnInterpreterOnly", "false").build();
+    private static Context JAVASCRIPT_CONTEXT;
     private static final NumberFormat FORMATTER = new DecimalFormat("#0.0000000");
 
     public static void evaluateArrayNode(ArrayNode arrayNode) {
@@ -39,6 +39,14 @@ public class NodeEvaluator {
     }
 
     public static Node evaluateValueNode(ValueNode node, NodeEnvironment environment) {
+        if (ModuleLayer.boot().findModule("org.graalvm.js").isEmpty()) {
+            throw new UnsupportedOperationException("Node evaluation is only supported with module org.graalvm.js in module path");
+        }
+
+        if (JAVASCRIPT_CONTEXT == null) {
+            JAVASCRIPT_CONTEXT = Context.newBuilder("js").option("engine.WarnInterpreterOnly", "false").build();
+        }
+
         var expression = node.getInlineMathExpression();
         if (expression.isPresent()) {
             var string = expression.get();

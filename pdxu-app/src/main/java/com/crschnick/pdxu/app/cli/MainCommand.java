@@ -12,7 +12,7 @@ import java.util.List;
                 CommandLine.HelpCommand.class,
                 RenderCommand.class
         },
-        header = "Runsthe Pdx-Unlimiter application."
+        header = "Runs the Pdx-Unlimiter application."
 )
 class MainCommand implements Runnable {
 

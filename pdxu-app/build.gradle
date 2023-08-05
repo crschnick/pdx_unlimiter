@@ -55,6 +55,8 @@ dependencies {
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
 
+    implementation 'org.graalvm.js:js:22.3.0'
+
     implementation 'info.picocli:picocli:4.6.3'
     annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
     testImplementation 'info.picocli:picocli:4.6.3'

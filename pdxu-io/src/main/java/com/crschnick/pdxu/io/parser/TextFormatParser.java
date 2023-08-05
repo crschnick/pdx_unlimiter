@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.io.parser;
 
 import com.crschnick.pdxu.io.node.*;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -11,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 public final class TextFormatParser {
@@ -56,16 +56,21 @@ public final class TextFormatParser {
 
     public static TextFormatParser ck2() {
         return new TextFormatParser(
-                SystemUtils.IS_OS_MAC ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
+                isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
                 TaggedNode.NO_TAGS,
                 s -> false);
     }
 
     public static TextFormatParser vic2() {
         return new TextFormatParser(
-                SystemUtils.IS_OS_MAC ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
+                isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
                 TaggedNode.NO_TAGS,
                 s -> false);
+    }
+
+    private static boolean isMacOs() {
+        String osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        return osName.contains("mac") || osName.contains("darwin");
     }
 
     private final Charset charset;

@@ -86,7 +86,8 @@ jlink {
                 'org.kordamp.ikonli.materialdesign',
                 'jdk.zipfs',
                 'io.github.ititus.ddsiio',
-                'jdk.accessibility'
+                'jdk.accessibility',
+                'org.graalvm.js'
         ]
     }
 
