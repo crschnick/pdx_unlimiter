@@ -26,6 +26,17 @@ public abstract class ArrayNode extends Node {
         return new SimpleArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
     }
 
+    public final ArrayNode replaceKey(String key, Node value) {
+        var r = ArrayNode.singleKeyNode(key, value);
+        for (int i = 0; i < size(); i++) {
+            if (isKeyAt(key, i)) {
+                return replacePart(r, i, 1);
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid key " + key);
+    }
+
     public final ArrayNode replacePart(ArrayNode toInsert, int beginIndex, int length) {
         if (beginIndex == 0 && length == size()) {
             return toInsert;
