@@ -169,8 +169,8 @@ public class EditorExternalState {
 
         try {
             var command = SystemUtils.IS_OS_WINDOWS ?
-                    List.of("cmd.exe", "/c", "start \"\" \"" + editor + "\" \"" + file + "\"") :
-                    List.of("sh","-c", "\"" + editor + "\" \"" + file + "\"");
+                    List.of("cmd.exe", "/c", "start \"\" \"" + editor + "\" \"" + file + "\"") : SystemUtils.IS_OS_LINUX ?
+                    List.of("sh", "-c", "\"" + editor + "\" \"" + file + "\"") : List.of("open", "-a", editor, file);
             logger.trace("Executing command: " + command);
             Runtime.getRuntime().exec(command.toArray(String[]::new));
         } catch (IOException e) {

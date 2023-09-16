@@ -97,6 +97,10 @@ public class EditorSettings extends AbstractSettings {
             return "notepad";
         }
 
+        if (SystemUtils.IS_OS_MAC) {
+            return "TextEdit.app";
+        }
+
         return System.getenv("VISUAL") != null ?
                 System.getenv("VISUAL") : null;
     }
