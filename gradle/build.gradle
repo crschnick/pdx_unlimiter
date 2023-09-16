@@ -52,7 +52,7 @@ List<String> runArgs = [
         "--add-opens", "com.google.gson/com.google.gson.internal=io.sentry",
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
         "-Dfile.encoding=UTF-8",
-        "-Xmx4G"]
+        "-Xmx8G"]
 
 application {
     mainModule = 'com.crschnick.pdxu.app'
