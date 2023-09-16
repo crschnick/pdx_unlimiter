@@ -111,12 +111,6 @@ public final class TextFormatParser {
         }
     }
 
-    private void verifySize(byte[] input) throws ParseException {
-        if (input.length > 400_000_000) {
-            throw new ParseException("Input data size is too large (Greater than 400MB). This is usually caused by mods or game bugs generating an insane amount of duplicate events.");
-        }
-    }
-
     public final synchronized ArrayNode parse(Path file) throws IOException, ParseException {
         return parse(file.getFileName().toString(), Files.readAllBytes(file), 0, false);
     }
@@ -132,7 +126,6 @@ public final class TextFormatParser {
     public final synchronized ArrayNode parse(String name, byte[] input, int start, boolean strict) throws ParseException {
         try {
             verifyTextFormat(input);
-            verifySize(input);
 
             this.tokenizer = new TextFormatTokenizer(name, input, start, strict);
 

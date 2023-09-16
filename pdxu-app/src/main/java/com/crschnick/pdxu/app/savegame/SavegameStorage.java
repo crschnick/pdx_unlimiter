@@ -697,7 +697,7 @@ public abstract class SavegameStorage<
                 }
 
                 var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
-                addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, null, null);
+                addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, sourceFileChecksum, null);
             }
 
             @Override
