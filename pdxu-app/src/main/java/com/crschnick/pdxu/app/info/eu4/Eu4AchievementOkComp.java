@@ -29,6 +29,10 @@ public class Eu4AchievementOkComp extends SimpleInfoComp {
     @Override
     public Region create(SavegameData<?> data) {
         var r = super.create(data);
+        if (r == null) {
+            return null;
+        }
+
         if (!achievementOk) {
             ColorAdjust grayscale = new ColorAdjust();
             grayscale.setSaturation(-1);
