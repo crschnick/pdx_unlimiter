@@ -1,0 +1,15 @@
+# Changes in 2.13.4
+
+- Fix NullPointerException for non-ironman eu4 savegames
+
+# Changes in 2.13.3
+
+- Remove limits for savegame size and increase max RAM usage limit to allow for importing of very large savegames
+- Remove legacy steam library detection logic to fix long first startup time
+- Improve handling of external text editor in macOS. You just have to provide the app name in the editor, e.g. TextEdit.app
+- Update Victoria 3 melter to 1.4 and CK3 melter to 1.10
+- Fix trailing spaces in savegame name breaking export
+- Fix duplicate detection and CTRL+SHIFT+R shortcuts not working
+- Fix import window being too high on some resolutions
+- Gray out achievement compatible icon for savegames when achievements are disabled
+- Update dds library to support some modded dds files
