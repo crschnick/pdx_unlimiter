@@ -124,7 +124,7 @@ public class EditorSettings extends AbstractSettings {
 
     @Override
     public void check() {
-        if (externalEditor.getValue().isBlank()) {
+        if (externalEditor.getValue() == null || externalEditor.getValue().isBlank()) {
             externalEditor.set(getDefaultEditor());
         }
     }

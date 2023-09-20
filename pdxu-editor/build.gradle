@@ -7,8 +7,8 @@ plugins {
 
 java {
     modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 def currentOS = DefaultNativePlatform.currentOperatingSystem;
@@ -30,10 +30,10 @@ apply from: "$rootDir/gradle/module_gen.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
-    compileOnly "org.openjfx:javafx-base:19:${platform}${suffix}"
-    compileOnly "org.openjfx:javafx-controls:19:${platform}${suffix}"
-    compileOnly "org.openjfx:javafx-graphics:19:${platform}${suffix}"
-    compileOnly "org.openjfx:javafx-media:19:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-base:21:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-controls:21:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-graphics:21:${platform}${suffix}"
+    compileOnly "org.openjfx:javafx-media:21:${platform}${suffix}"
     compileOnly 'com.jfoenix:jfoenix:9.0.10'
     compileOnly group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
 

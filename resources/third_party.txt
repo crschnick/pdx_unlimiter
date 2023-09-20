@@ -1,8 +1,8 @@
-OpenJDK 19 (http://jdk.java.net/19/) (GPL2 with the Classpath Exception)
+OpenJDK 21 (http://jdk.java.net/21/) (GPL2 with the Classpath Exception)
 
-GraalVM Community Edition 22 (https://www.graalvm.org/) (GPL2 with the Classpath Exception)
+GraalVM Community Edition 21 (https://www.graalvm.org/) (GPL2 with the Classpath Exception)
 
-JavaFX 19 (https://openjfx.io/) (GPL2 with the Classpath Exception)
+JavaFX 21 (https://openjfx.io/) (GPL2 with the Classpath Exception)
 
 Rakaly CLI (https://github.com/rakaly/cli) (MIT License)
 

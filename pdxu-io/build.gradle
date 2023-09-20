@@ -1,22 +1,21 @@
 plugins {
     id 'java'
-    id "org.moditect.gradleplugin" version "1.0.0-rc3"
 }
 
 java {
     modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
     mavenCentral()
 }
 
-apply from: "$rootDir/gradle/module_gen.gradle"
-
 dependencies {
-    compileOnly 'org.graalvm.js:js:22.3.0'
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly group: 'org.graalvm.polyglot', name: 'polyglot', version: '23.1.0'
+    compileOnly group: 'org.graalvm.polyglot', name: 'js-community', version: '23.1.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 }

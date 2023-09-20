@@ -7,8 +7,8 @@ plugins {
 
 java {
     modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 compileJava {
@@ -33,10 +33,10 @@ apply from: "$rootDir/gradle/module_gen.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
-    implementation "org.openjfx:javafx-base:19:${platform}"
-    implementation "org.openjfx:javafx-controls:19:${platform}"
-    implementation "org.openjfx:javafx-graphics:19:${platform}"
-    implementation "org.openjfx:javafx-media:19:${platform}"
+    implementation "org.openjfx:javafx-base:21:${platform}"
+    implementation "org.openjfx:javafx-controls:21:${platform}"
+    implementation "org.openjfx:javafx-graphics:21:${platform}"
+    implementation "org.openjfx:javafx-media:21:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation 'com.google.code.gson:gson:2.8.9'
@@ -54,16 +54,17 @@ dependencies {
 
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
+    implementation group: 'org.graalvm.polyglot', name: 'polyglot', version: '23.1.0'
+    implementation group: 'org.graalvm.polyglot', name: 'js-community', version: '23.1.0'
 
-    implementation 'org.graalvm.js:js:22.3.0'
 
     implementation 'info.picocli:picocli:4.6.3'
     annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
     testImplementation 'info.picocli:picocli:4.6.3'
     testAnnotationProcessor 'info.picocli:picocli-codegen:4.6.3'
 
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     implementation 'net.java.dev.jna:jna-jpms:5.12.1'
     implementation 'net.java.dev.jna:jna-platform-jpms:5.12.1'
