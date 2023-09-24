@@ -77,16 +77,6 @@ public abstract class FileImportTarget {
     }
 
     public static List<? extends FileImportTarget> createTargets(String toImport) {
-        if (SavegameStorage.ALL.get(Game.EU4) != null && toImport.startsWith("pdxu")) {
-            try {
-                URL url = new URL(toImport.replace("pdxu", "https"));
-                String id = Path.of(url.getPath()).getFileName().toString();
-                URL fileUrl = new URL("https://rakaly.com/api/saves/" + id + "/file");
-                return List.of(new DownloadImportTarget(fileUrl));
-            } catch (Exception ignored) {
-            }
-        }
-
         return createStandardImportsTargets(toImport);
     }
 

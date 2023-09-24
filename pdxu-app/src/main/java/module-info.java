@@ -18,7 +18,6 @@ open module com.crschnick.pdxu.app {
     requires org.kordamp.iconli.core;
     requires org.kordamp.ikonli.javafx;
     requires com.jfoenix;
-    requires com.google.gson;
     requires org.slf4j;
     requires org.slf4j.simple;
     requires io.sentry;
