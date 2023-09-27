@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [
           ubuntu-20.04,
-          macos-latest,
+          # macos-latest,
           windows-2022
         ]
       fail-fast: false
