@@ -52,7 +52,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
     }
 
     private void initVersion(Node n) {
-        Pattern p = Pattern.compile("(\\w+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\w+))?\\s+.*");
+        Pattern p = Pattern.compile("([\\w ]+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\w+))?\\s+.*");
         var string = n.getNodeForKey("version").getString();
         Matcher m = p.matcher(string);
         if (m.matches()) {
