@@ -48,12 +48,6 @@ jreleaser {
             checksums = false
             signatures = false
 
-            // Always set a pre-release, as drafts do not fully work
-            prerelease {
-                enabled = true
-                pattern = '.*'
-            }
-
             update {
                 enabled = true
                 section('ASSETS')
