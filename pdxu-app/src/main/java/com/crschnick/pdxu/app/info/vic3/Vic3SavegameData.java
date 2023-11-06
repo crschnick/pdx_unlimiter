@@ -50,10 +50,10 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         coatOfArms = meta.getNodeForKeyIfExistent("flag").map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null)).orElse(CoatOfArms.empty());
 
         var countryId = content.get().getNodeForKey("previous_played").getNodeArray().get(0).getNodeForKey("idtype").getValueNode().getString();
-        var country = content.get().getNodeForKey("country_manager").getNodeForKey("database").getNodeForKey(countryId);
-        tag = new Vic3Tag(countryId, country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString());
-        allTags = List.of(tag);
-        observer = false;
+        var country = content.get().getNodeForKey("country_manager").getNodeForKey("database").getNodeForKeyIfExistent(countryId).orElse(null);
+        tag = country != null ? new Vic3Tag(countryId, country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString()) : null;
+        allTags = tag != null ? List.of(tag) : List.of();
+        observer = tag == null;
 
         mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
                 .map(Node::getNodeArray).orElse(List.of())

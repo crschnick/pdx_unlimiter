@@ -21,6 +21,15 @@ clean {
     }
 }
 
+clean {
+    doFirst {
+        // Fix clean failing when file is read-only
+        if (file("$project.buildDir").exists()) {
+            file("$project.buildDir").traverse { f -> if (f.exists() && f.isFile()) f.writable = true }
+        }
+    }
+}
+
 if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/misc/pdxu.properties.default").getText())
 }
@@ -52,7 +61,7 @@ List<String> runArgs = [
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
         '-XX:+UseZGC',
         "-Dfile.encoding=UTF-8",
-        "-Xmx8G"]
+        "-Xmx16G"]
 
 application {
     mainModule = 'com.crschnick.pdxu.app'

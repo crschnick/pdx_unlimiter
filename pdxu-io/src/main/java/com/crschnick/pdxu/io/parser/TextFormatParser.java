@@ -150,7 +150,7 @@ public final class TextFormatParser {
 
             // Special case for out of memory
             if (t instanceof OutOfMemoryError ooe) {
-                throw new ParseException("Not enough free RAM available to load file. ", ooe);
+                throw new ParseException("Not enough free RAM available to load file " + name + " with size " + (input.length / 1_000_000) + "Mb.", ooe);
             }
 
             throw new ParseException(t);
