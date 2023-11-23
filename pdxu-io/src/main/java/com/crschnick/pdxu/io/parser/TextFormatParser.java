@@ -115,12 +115,12 @@ public final class TextFormatParser {
         return parse(file.getFileName().toString(), Files.readAllBytes(file), 0, false);
     }
 
-    public final synchronized ArrayNode parse(String name, Path file, boolean strict) throws IOException, ParseException {
-        return parse(name, Files.readAllBytes(file), 0, strict);
+    public final synchronized ArrayNode parse(String displayName, Path file, boolean strict) throws IOException, ParseException {
+        return parse(displayName, Files.readAllBytes(file), 0, strict);
     }
 
-    public final synchronized ArrayNode parse(String name, byte[] input, int start) throws ParseException {
-        return parse(name, input, start, false);
+    public final synchronized ArrayNode parse(String displayName, byte[] input, int start) throws ParseException {
+        return parse(displayName, input, start, false);
     }
 
     public final synchronized ArrayNode parse(String name, byte[] input, int start, boolean strict) throws ParseException {

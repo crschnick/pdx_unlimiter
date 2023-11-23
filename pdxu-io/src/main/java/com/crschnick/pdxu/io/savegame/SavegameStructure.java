@@ -63,7 +63,7 @@ public interface SavegameStructure {
             "CK2txt".getBytes(),
             SavegameType.CK2,
             Set.of(new ZipSavegameStructure.SavegamePart("meta", "meta"),
-                    new ZipSavegameStructure.SavegamePart("gamestate", "*"))) {
+                    new ZipSavegameStructure.SavegamePart("*", "gamestate"))) {
 
         @Override
         public void writeData(OutputStream out, ArrayNode node) throws IOException {

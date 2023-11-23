@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -34,16 +31,16 @@ public class ZipSavegameStructure implements SavegameStructure {
     private final Set<SavegamePart> parts;
     private final String[] ignored;
 
-    public ZipSavegameStructure(byte[] header,SavegameType type, Set<SavegamePart> parts, String... ignored) {
+    public ZipSavegameStructure(byte[] header,SavegameType type, Set<SavegamePart> parts, String... ignoredFiles) {
         this.header = header;
         this.type = type;
         this.parts = parts;
-        this.ignored = ignored;
+        this.ignored = ignoredFiles;
     }
 
     protected SavegameParseResult parseInput(byte[] input, int offset) {
         var wildcard = parts.stream()
-                .filter(p -> p.identifier().equals("*"))
+                .filter(p -> p.fileName().equals("*"))
                 .findAny();
 
         try {
@@ -51,15 +48,15 @@ public class ZipSavegameStructure implements SavegameStructure {
                 Map<String, ArrayNode> nodes = new LinkedHashMap<>();
                 ZipEntry entry;
                 while ((entry = zipIn.getNextEntry()) != null) {
-                    ZipEntry finalEntry = entry;
+                    ZipEntry finalZipEntry = entry;
 
                     // Skip ignored entries
-                    if (Arrays.stream(ignored).anyMatch(s -> s.equals(finalEntry.getName()))) {
+                    if (Arrays.stream(ignored).anyMatch(s -> s.equals(finalZipEntry.getName()))) {
                         continue;
                     }
 
                     var part = parts.stream()
-                            .filter(p -> p.identifier().equals(finalEntry.getName()))
+                            .filter(p -> p.fileName().equals(finalZipEntry.getName()))
                             .findAny().or(() -> wildcard);
 
                     // Ignore unknown entry
@@ -72,16 +69,16 @@ public class ZipSavegameStructure implements SavegameStructure {
                         return new SavegameParseResult.Invalid("File " + part.get().identifier() + " has an invalid header");
                     }
 
-                    var node = type.getParser().parse(part.get().name, bytes, header != null ? header.length + 1 : 0);
+                    var node = type.getParser().parse(part.get().identifier(), bytes, header != null ? header.length + 1 : 0);
                     if (node.size() == 0) {
-                        return new SavegameParseResult.Invalid("File " + entry.getName() + " is empty");
+                        return new SavegameParseResult.Invalid("File " + part.get().identifier() + " is empty");
                     }
 
-                    nodes.put(part.get().name(), node);
+                    nodes.put(part.get().identifier(), node);
                 }
 
                 var missingParts = parts.stream()
-                        .map(SavegamePart::name)
+                        .map(SavegamePart::identifier)
                         .filter(s -> !nodes.containsKey(s))
                         .toList();
                 if (missingParts.size() > 0) {
@@ -98,15 +95,27 @@ public class ZipSavegameStructure implements SavegameStructure {
     @Override
     public void write(Path out, SavegameContent content) throws IOException {
         try (var fs = FileSystems.newFileSystem(out, Map.of("create", true))) {
+            Optional<SavegamePart> wildcardPart;
+            try (var list = Files.list(fs.getPath("/"))) {
+                 wildcardPart = list.map(path -> path.getFileName().toString()).filter(p -> content.entrySet().stream().noneMatch(e -> p.equals(e.getKey())))
+                         .map(s -> new SavegamePart(s, "gamestate"))
+                        .findAny();
+            }
+
             for (var e : content.entrySet()) {
                 var usedPart = parts.stream()
-                        .filter(part -> part.name().equals(e.getKey()))
+                        .filter(part -> part.fileName().equals(e.getKey()))
                         .findAny();
+
+                if (usedPart.isEmpty() && wildcardPart.isPresent() && wildcardPart.get().identifier().equals(e.getKey())) {
+                    usedPart = wildcardPart;
+                }
+
                 if (usedPart.isEmpty()) {
                     continue;
                 }
 
-                var path = fs.getPath(usedPart.get().identifier());
+                var path = fs.getPath(usedPart.get().fileName());
                 try (var partOut = Files.newOutputStream(path)) {
                     if (header != null) {
                         partOut.write(header);
@@ -128,6 +137,6 @@ public class ZipSavegameStructure implements SavegameStructure {
         return type;
     }
 
-    public record SavegamePart(String name, String identifier) {
+    public record SavegamePart(String fileName, String identifier) {
     }
 }
