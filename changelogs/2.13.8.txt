@@ -1,0 +1,38 @@
+# Changes in 2.13.8
+
+- Update melter to CK3 1.11
+- Update melter to Vic3 1.5
+- Fix compressed ck2 and vic2 savegames getting corrupted when editing
+
+# Changes in 2.13.7
+
+- Update melter to EU4 1.36
+- Improve parser heuristic to lower chance of running out of memory
+- Show raw file size when running out of memory
+- Fix Vic3 observer savegames failing to import
+
+# Changes in 2.13.6
+
+- Fix hoi4 1.13 save import failing
+- Update hoi4 melter to 1.13.3
+
+# Changes in 2.13.5
+
+- Fix NullPointerException on Linux when no VISUAL variable editor was set
+- Try to improve performance with updated GraalVM 21 runtime and new ZGC garbage collector
+
+# Changes in 2.13.4
+
+- Fix NullPointerException for non-ironman eu4 savegames
+
+# Changes in 2.13.3
+
+- Remove limits for savegame size and increase max RAM usage limit to allow for importing of very large savegames
+- Remove legacy steam library detection logic to fix long first startup time
+- Improve handling of external text editor in macOS. You just have to provide the app name in the editor, e.g. TextEdit.app
+- Update Victoria 3 melter to 1.4 and CK3 melter to 1.10
+- Fix trailing spaces in savegame name breaking export
+- Fix duplicate detection and CTRL+SHIFT+R shortcuts not working
+- Fix import window being too high on some resolutions
+- Gray out achievement compatible icon for savegames when achievements are disabled
+- Update dds library to support some modded dds files
