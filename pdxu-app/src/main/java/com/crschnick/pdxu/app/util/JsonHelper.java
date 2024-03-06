@@ -44,7 +44,11 @@ public class JsonHelper {
     }
 
     public static JsonNode read(Path in) throws IOException {
-        return MAPPER.readTree(in.toFile());
+        try {
+            return MAPPER.readTree(in.toFile());
+        } catch (IOException ex) {
+            throw new IOException("Unable to read file " + in, ex);
+        }
     }
 
     public static void write(JsonNode node, Path out) throws IOException {
