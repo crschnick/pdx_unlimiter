@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
@@ -59,6 +60,10 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
     }
 
     public static Image realmImage(SavegameData<Ck3Tag> data, Ck3Tag tag) {
+        if (data == null) {
+            return ImageHelper.DEFAULT_IMAGE;
+        }
+
         var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.realms.get(tag);
         if (cachedImg != null) {
@@ -72,6 +77,10 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
     }
 
     public static Image houseImage(Ck3House house, GameFileContext ctx) {
+        if (house == null) {
+            return ImageHelper.DEFAULT_IMAGE;
+        }
+
         var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.houses.get(house);
         if (cachedImg != null) {
@@ -83,6 +92,10 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
     }
 
     public static Image titleImage(Ck3Title title, GameFileContext ctx) {
+        if (title == null) {
+            return ImageHelper.DEFAULT_IMAGE;
+        }
+
         var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.titles.get(title);
         if (cachedImg != null) {
