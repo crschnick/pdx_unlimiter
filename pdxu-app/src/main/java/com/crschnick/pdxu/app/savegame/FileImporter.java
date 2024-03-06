@@ -107,8 +107,7 @@ public class FileImporter {
                             .ifPresent(e -> {
                                 ErrorHandler.handleException(
                                         ((SavegameParseResult.Error) e.getValue()).error,
-                                        null,
-                                        e.getKey().getPath());
+                                        null);
                             });
 
                     Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));

@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
@@ -10,7 +9,10 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.lang.PdxuI18n;
-import com.crschnick.pdxu.app.savegame.*;
+import com.crschnick.pdxu.app.savegame.SavegameActions;
+import com.crschnick.pdxu.app.savegame.SavegameBranches;
+import com.crschnick.pdxu.app.savegame.SavegameContext;
+import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.integration.ConverterSupport;
 import com.crschnick.pdxu.app.util.integration.Eu4SeHelper;
@@ -161,17 +163,6 @@ public class GuiSavegameEntry {
             export.setAccessibleText("Export");
             GuiTooltips.install(export, PdxuI18n.get("EXPORT_SAVEGAME", SavegameContext.getContext(e).getGame().getTranslatedFullName()));
             staticButtons.getChildren().add(export);
-        }
-        {
-            Button report = new JFXButton(null, new FontIcon());
-            report.setGraphic(new FontIcon());
-            report.setOnMouseClicked((m) -> {
-                ErrorHandler.reportIssue(SavegameContext.getContext(e).getStorage().getSavegameFile(e));
-            });
-            report.getStyleClass().add("report-button");
-            report.setAccessibleText("Report");
-            GuiTooltips.install(report, PdxuI18n.get("REPORT_SAVEGAME_ISSUE"));
-            staticButtons.getChildren().add(report);
         }
         {
             Button copy = new JFXButton(null, new FontIcon());

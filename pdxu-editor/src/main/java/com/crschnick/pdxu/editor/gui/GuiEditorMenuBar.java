@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
@@ -38,13 +37,6 @@ public class GuiEditorMenuBar {
             Hyperlinks.open(Hyperlinks.EDITOR_GUIDE);
         });
         editor.getItems().add(guide);
-
-        MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
-        is.setOnAction((a) -> {
-            ErrorHandler.reportIssue(null);
-        });
-        editor.getItems().add(is);
-
 
         Menu jump = new Menu("Jump to");
         Runnable fillJumps = () -> {

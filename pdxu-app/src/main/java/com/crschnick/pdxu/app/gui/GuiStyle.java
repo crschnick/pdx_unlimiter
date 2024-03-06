@@ -83,7 +83,7 @@ public class GuiStyle {
                     .map(p -> p.toUri().toString())
                     .forEach(s -> scene.getStylesheets().add(s));
         } catch (IOException e) {
-            ErrorHandler.handleException(e, "Pdx-Unlimiter installation files could not be found at " + PdxuInstallation.getInstance().getResourceDir() + ". Were they deleted somehow?", null);
+            ErrorHandler.handleException(e, "Pdx-Unlimiter installation files could not be found at " + PdxuInstallation.getInstance().getResourceDir() + ". Were they deleted somehow?");
         }
     }
 

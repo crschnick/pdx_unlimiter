@@ -180,7 +180,7 @@ public final class Settings extends AbstractSettings {
                         hoi4.getValue() == null && stellaris.getValue() == null &&
                         ck2.getValue() == null && vic2.getValue() == null && vic3.getValue() == null;
         if (hasNoValidInstallation) {
-            var res = GuiErrorReporter.showSimpleErrorMessage("""
+            GuiErrorReporter.showSimpleErrorMessage("""
                     Welcome to the Pdx-Unlimiter!
                                             
                     The automatic game detection did not detect any supported Paradox game.
@@ -188,9 +188,7 @@ public final class Settings extends AbstractSettings {
 
                     Note that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set.
                                         """);
-            if (res) {
-                Platform.runLater(GuiSettings::showSettings);
-            }
+            Platform.runLater(GuiSettings::showSettings);
         }
 
         // Disable irony if needed

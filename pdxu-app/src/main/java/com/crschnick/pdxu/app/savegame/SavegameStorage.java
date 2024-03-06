@@ -499,13 +499,13 @@ public abstract class SavegameStorage<
             @Override
             public void error(SavegameParseResult.Error er) {
                 e.fail();
-                ErrorHandler.handleException(er.error, null, file);
+                ErrorHandler.handleException(er.error, null);
             }
 
             @Override
             public void invalid(SavegameParseResult.Invalid iv) {
                 e.fail();
-                ErrorHandler.handleException(new IllegalArgumentException(iv.message), null, file);
+                ErrorHandler.handleException(new IllegalArgumentException(iv.message), null);
             }
         });
     }

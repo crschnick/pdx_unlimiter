@@ -78,7 +78,7 @@ public class Editor implements EditorProvider {
             try {
                 nodes = target.parse();
             } catch (Exception e) {
-                ErrorHandler.handleException(e, null, target.getFile());
+                ErrorHandler.handleException(e, null);
                 return;
             }
             EditorState state = new EditorState(target.getName(), target.getFileContext(), nodes, target.getParser(), n -> {

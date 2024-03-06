@@ -3,26 +3,14 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.util.SupportedOs;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import io.sentry.Attachment;
 import io.sentry.Sentry;
 import io.sentry.SentryEvent;
-import io.sentry.UserFeedback;
-import io.sentry.protocol.SentryId;
 import javafx.application.Platform;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class ErrorHandler {
 
@@ -110,7 +98,7 @@ public class ErrorHandler {
 
     public static void registerThread(Thread thread) {
         thread.setUncaughtExceptionHandler((t, e) -> {
-            handleException(e, "An uncaught exception was thrown", null);
+            handleException(e, "An uncaught exception was thrown");
         });
     }
 
@@ -142,26 +130,25 @@ public class ErrorHandler {
     }
 
     public static void handleTerminalException(Throwable ex) {
-        handleException(ex, null, null, true);
+        handleException(ex, null, true);
     }
 
     public static void handleException(Throwable ex) {
-        handleException(ex, "An error occured", null);
+        handleException(ex, "An error occured");
     }
 
-    public static void handleException(Throwable ex, String msg, Path attachFile) {
-        handleException(ex, msg, attachFile, false);
+    public static void handleException(Throwable ex, String msg) {
+        handleException(ex, msg, false);
     }
 
-    private static CountDownLatch showErrorReporter(Throwable ex, Path attachFile, boolean terminal) {
+    private static CountDownLatch showErrorReporter(Throwable ex, boolean terminal) {
         CountDownLatch latch = new CountDownLatch(1);
         Runnable run = () -> {
             boolean show = (PdxuInstallation.getInstance() == null ||
                     PdxuInstallation.getInstance().isProduction()) && !errorReporterShowing;
             if (show) {
                 errorReporterShowing = true;
-                boolean shouldSendDiagnostics = GuiErrorReporter.showException(ex, terminal);
-                reportError(ex, shouldSendDiagnostics, attachFile, terminal);
+                GuiErrorReporter.showException(ex, terminal);
                 errorReporterShowing = false;
             }
 
@@ -175,7 +162,7 @@ public class ErrorHandler {
         return latch;
     }
 
-    private static void handleException(Throwable ex, String msg, Path attachFile, boolean terminal) {
+    private static void handleException(Throwable ex, String msg, boolean terminal) {
         if (ex == null) {
             return;
         }
@@ -189,7 +176,7 @@ public class ErrorHandler {
         }
 
         if (!platformShutdown) {
-            var latch = showErrorReporter(ex, attachFile, terminal);
+            var latch = showErrorReporter(ex, terminal);
             if (terminal) {
                 try {
                     latch.await();
@@ -216,98 +203,6 @@ public class ErrorHandler {
             // Wait to send error report
             ThreadHelper.sleep(1000);
             System.exit(1);
-        }
-    }
-
-    public static void reportError(Throwable t, boolean diag, Path attachFile, boolean terminal) {
-        if (diag) {
-            AtomicReference<SentryId> id = new AtomicReference<>();
-            Sentry.withScope(scope -> {
-                LogManager.getInstance().getLogFile().ifPresent(l -> {
-                    scope.addAttachment(new Attachment(l.toString()));
-                });
-                scope.setTag("diagnoticsData", "true");
-                Sentry.setExtra("terminal", String.valueOf(terminal));
-                id.set(Sentry.captureException(t));
-            });
-            if (attachFile != null) {
-                addAttachment(id.get(), attachFile);
-            }
-        } else {
-            Sentry.withScope(scope -> {
-                scope.setTag("diagnoticsData", "false");
-                Sentry.setExtra("terminal", String.valueOf(terminal));
-                Sentry.captureException(t);
-            });
-        }
-    }
-
-    private static void addAttachment(SentryId id, Path attachFile) {
-        if (!Files.exists(attachFile)) {
-            return;
-        }
-
-        try {
-            var bytes = Files.readAllBytes(attachFile);
-            var out = new ByteArrayOutputStream();
-            var zipName = "pdxu-report-" + new Random().nextInt(Integer.MAX_VALUE) + ".zip";
-            try (var zipOut = new ZipOutputStream(out)) {
-                zipOut.putNextEntry(new ZipEntry(attachFile.getFileName().toString()));
-                zipOut.write(bytes);
-            }
-
-            for (var part : splitInPartsIfNeeded(zipName, out.toByteArray())) {
-                Sentry.withScope(scope -> {
-                    scope.setTag("id", id.toString());
-                    scope.addAttachment(new Attachment(part.toString()));
-                    Sentry.captureMessage("Attachment");
-                });
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static List<Path> splitInPartsIfNeeded(String prefix, byte[] bytes) throws IOException {
-        var length = 9_000_000;
-        if (bytes.length <= length) {
-            Files.write(FileUtils.getTempDirectory().toPath().resolve(prefix), bytes);
-            return List.of(FileUtils.getTempDirectory().toPath().resolve(prefix));
-        }
-
-        List<Path> files = new ArrayList<>();
-        for (int i = 0; i < Math.ceil((double) bytes.length / length); i++) {
-            var file = FileUtils.getTempDirectory().toPath().resolve(prefix + ".part" + i);
-            try (var out = Files.newOutputStream(file)) {
-                out.write(bytes, i * length, Math.min(length, bytes.length - (i * length)));
-            }
-            files.add(file);
-        }
-        return files;
-    }
-
-    public static void reportIssue(Path attachFile) {
-        Runnable run = () -> {
-            var r = GuiErrorReporter.showIssueDialog();
-            r.ifPresent(msg -> {
-                AtomicReference<SentryId> id = new AtomicReference<>();
-                Sentry.withScope(scope -> {
-                    LogManager.getInstance().getLogFile().ifPresent(l -> {
-                        scope.addAttachment(new Attachment(l.toString()));
-                    });
-
-                    id.set(Sentry.captureMessage("User Issue Report"));
-                    Sentry.captureUserFeedback(new UserFeedback(id.get(), null, null, msg));
-                });
-                if (attachFile != null) {
-                    addAttachment(id.get(), attachFile);
-                }
-            });
-        };
-        if (Platform.isFxApplicationThread()) {
-            run.run();
-        } else {
-            Platform.runLater(run);
         }
     }
 }

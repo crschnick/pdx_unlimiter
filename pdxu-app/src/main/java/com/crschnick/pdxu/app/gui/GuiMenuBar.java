@@ -111,12 +111,6 @@ public class GuiMenuBar {
         });
         help.getItems().add(guide);
 
-        MenuItem is = new MenuItem(PdxuI18n.get("REPORT_ISSUE"));
-        is.setOnAction((a) -> {
-            ErrorHandler.reportIssue(null);
-        });
-        help.getItems().add(is);
-
         MenuItem discord = new MenuItem(PdxuI18n.get("DISCORD"));
         discord.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.DISCORD);
