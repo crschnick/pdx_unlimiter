@@ -17,7 +17,7 @@ public class GameApp {
 
     public void onStart() {
         if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
-            listener = new GameKeyListener(this);
+            listener = new GameKeyListener(this, 5000);
             GlobalScreen.addNativeKeyListener(listener);
         }
     }
