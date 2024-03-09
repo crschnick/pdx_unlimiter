@@ -1,0 +1,8 @@
+# Changes in 2.13.9
+
+- Fix keyboard shortcuts triggering multiple times
+- Update ironman melter to CK3 1.12
+- Update ironman melter to Vic3 1.6
+- Retire automatic issue report service. There's no longer a button to report an issue automatically.
+  So you have to post any issue reports on GitHub or Discord now.
+- Improve GUI performance
