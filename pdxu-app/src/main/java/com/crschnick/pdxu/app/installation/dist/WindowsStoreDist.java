@@ -30,10 +30,6 @@ public final class WindowsStoreDist extends PdxLauncherDist {
             return Optional.empty();
         }
 
-        if (!SystemUtils.IS_OS_WINDOWS_10 && !SystemUtils.IS_OS_WINDOWS_8) {
-            return Optional.empty();
-        }
-
         // Prevent querying for appx-package if we can rule out that the given dir is a windows store dist
         if (dir != null && !dir.toString().contains("WindowsApps")) {
             return Optional.empty();
