@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.PdxuInstallation;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class RakalyHelper {
@@ -15,6 +16,7 @@ public class RakalyHelper {
 
     public static byte[] toMeltedPlaintext(Path file) throws Exception {
         var melter = PdxuInstallation.getInstance().getRakalyExecutable();
+        check(melter);
         var proc = new ProcessBuilder(
                 melter.toString(),
                 "melt",
@@ -35,8 +37,10 @@ public class RakalyHelper {
     }
 
     public static byte[] toEquivalentPlaintext(Path file) throws Exception {
+        var melter = PdxuInstallation.getInstance().getRakalyExecutable();
+        check(melter);
         var proc = new ProcessBuilder(
-                PdxuInstallation.getInstance().getRakalyExecutable().toString(),
+                melter.toString(),
                 "melt",
                 "--unknown-key", "stringify",
                 "--retain",
@@ -53,5 +57,11 @@ public class RakalyHelper {
         }
 
         return b;
+    }
+
+    private static void check(Path file) throws IOException {
+        if (!Files.exists(file)) {
+            throw new IOException("Ironman melter executable " + file + " is missing. This is usually caused by Windows Defender or another AntiVirus program removing the melter executable because it thinks it's malicious.\n\nYou can try deleting %LOCALAPPDATA%\\Programs\\Pdx-Unlimiter\\app\\ and relaunching pdxu. That should trigger a new download. If the file then gets removed again, you probably have to add an exception to your antivirus.");
+        }
     }
 }
