@@ -1,7 +1,7 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
-    id 'org.beryx.jlink' version '2.26.0'
+    id 'org.beryx.jlink' version '3.0.1'
     id 'org.jreleaser' version '1.8.0'
 }
 
@@ -61,6 +61,9 @@ List<String> runArgs = [
         "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
         '-XX:+UseZGC',
         "-Dfile.encoding=UTF-8",
+        // This option completely breaks the module integration if set to true.
+        // We have to explicitly disable it as it is true by default
+        '-Dpolyglotimpl.DisableClassPathIsolation=false',
         "-Xmx16G"]
 
 application {
