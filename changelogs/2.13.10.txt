@@ -1,0 +1,15 @@
+# Changes in 2.13.10
+
+- Update hoi4 ironman melter to 1.14
+- Fix vic3 save loading throwing errors
+- Fix coat of arms renderer being broken
+- Fix Xbox Store installations not being recognized on Windows 11
+
+# Changes in 2.13.9
+
+- Fix keyboard shortcuts triggering multiple times
+- Update ironman melter to CK3 1.12
+- Update ironman melter to Vic3 1.6
+- Retire automatic issue report service. There's no longer a button to report an issue automatically.
+  So you have to post any issue reports on GitHub or Discord now.
+- Improve GUI performance
