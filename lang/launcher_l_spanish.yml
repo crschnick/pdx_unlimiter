@@ -1,0 +1,9 @@
+l_spanish:
+  LAUNCH: "Iniciar"
+  CHANGE_MODS: "Cambiar mods"
+  INCOMPATIBLE: "La partida guardada no es compatible. Iniciarlo de todos puede causar problemas."
+  INCOMPATIBLE_VERSION: "Versiones incompatibles"
+  GAME_VERSION: "Versión de juego"
+  SAVEGAME_VERSION: "Versión de partida guardada"
+  MOD_INFO_TITLE: "$GAME$ información de mod"
+  MOD_INFO: "$GAME$ las partidas guardadas no almacenan qué mods requieren.\nPor ello, debes verificar manualmente que estás utilizando los mods correctos.\n\nLos siguientes Mods están habilitados:\n"

@@ -1,0 +1,6 @@
+l_spanish:
+  ERROR_OCCURED: "Ocurrió un error inesperado: $CAUSE$"
+  GAME_DATA_PATH_NOT_FOUND: "No se pudo encontrar la ruta de $GAME$ en la configuración del launcher"
+  INSTALL_DIR_IS_USER_DIR: "Seleccionaste el directorio de documentos de usuario del juego. Sin embargo, Pdx-Unlimiter requiere la ruta de instalación.\nNormalmente puedes encontrar la ruta del juego en rutas como estas:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- O cualquier otra ruta donde instales tus juegos"
+  GAME_DATA_PATH_DOES_NOT_EXIST: "Se ha detectado una instalación de $GAME$, pero el directorio de datos de usuario $DIR$ no existe.\Para arreglar este problema, ejecuta el juego para generarlo."
+  EXECUTABLE_NOT_FOUND: "El ejecutable $FILE$ de $GAME$ no se ha encontrado en $DIR$.\nNormalmente puedes encontrar la ruta de instalación de tu juego en rutas como:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- O cualquier otra ruta donde instales tus juegos"
