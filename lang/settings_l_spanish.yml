@@ -17,7 +17,7 @@ l_spanish:
  GAME_DIR_ERROR_MSG: "El soporte de $GAME$ ha sido deshabilitado. Si crees que tu instalación es válida,\npor favor verifica si la ruta de instalación es correcta."
  GAME_DIR: "Ruta de $GAME$"
  GAME_DIR_DESC: "Ruta de $GAME$.\n\nTen en cuenta que esta ruta debe de contener los ejecutables y assets del juego\nNO uses la ruta usuario que contiene tus partidas guardadas y mods."
- STORAGE_DIR: "Storage directory"
+ STORAGE_DIR: "Ruta de almacenamiento"
  STORAGE_DIR_DESC: "La ruta donde Pdx-Unlimiter guarda todos las partidas importadas.\nEsto es completamente independiente de las rutas de partidas guardadas de tus juegos de Paradox"
  STORAGE_DIR_DIALOG_TITLE: "Confirmar movimiento de almacenamiento"
  STORAGE_DIR_DIALOG_TEXT: "Estás intentando mover tu almacenamiento de partidas guardadas de $FROM$\na $TO$.\nEsto moverá todos los archivos de partidas guardadas y puede tardar un tiempo."
