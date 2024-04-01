@@ -1,0 +1,10 @@
+l_english:
+  EXPORT: "Export"
+  CONTINUE_GAME: "Continue Game"
+  START_LAUNCHER: "Start in Launcher"
+  RUNNING: "Running"
+  LATEST: "Latest"
+  NONE: "NONE"
+  IMPORT: "Import"
+  KILL: "Kill"
+  DEBUG_MODE: "Debug mode"

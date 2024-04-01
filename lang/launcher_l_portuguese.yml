@@ -1,0 +1,9 @@
+l_english:
+  LAUNCH: "Launch"
+  CHANGE_MODS: "Change mods"
+  INCOMPATIBLE: "Selected savegame is incompatible. Launching it anyway, can cause problems."
+  INCOMPATIBLE_VERSION: "Incompatible versions"
+  GAME_VERSION: "Game version"
+  SAVEGAME_VERSION: "Savegame version"
+  MOD_INFO_TITLE: "$GAME$ mod information"
+  MOD_INFO: "$GAME$ savegames do not store which mods they require.\nTherefore, you have to verify manually, that you are using the correct ones.\n\nThe following Mods are enabled:\n"
