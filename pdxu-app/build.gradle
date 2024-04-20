@@ -33,16 +33,16 @@ apply from: "$rootDir/gradle/module_gen.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
 
 dependencies {
-    implementation "org.openjfx:javafx-base:22-ea+28:${platform}"
-    implementation "org.openjfx:javafx-controls:22-ea+28:${platform}"
-    implementation "org.openjfx:javafx-graphics:22-ea+28:${platform}"
-    implementation "org.openjfx:javafx-media:22-ea+28:${platform}"
+    implementation "org.openjfx:javafx-base:22.0.1:${platform}"
+    implementation "org.openjfx:javafx-controls:22.0.1:${platform}"
+    implementation "org.openjfx:javafx-graphics:22.0.1:${platform}"
+    implementation "org.openjfx:javafx-media:22.0.1:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'
 
     implementation files("$project.buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
     implementation files("$project.buildDir/generated-modules/commons-lang3-3.12.0.jar")
@@ -65,8 +65,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    implementation 'net.java.dev.jna:jna-jpms:5.12.1'
-    implementation 'net.java.dev.jna:jna-platform-jpms:5.12.1'
+    implementation 'net.java.dev.jna:jna-jpms:5.13.0'
+    implementation 'net.java.dev.jna:jna-platform-jpms:5.13.0'
     implementation 'io.github.ititus:ddsiio:3.0.1'
 }
 
