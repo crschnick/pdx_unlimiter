@@ -1,0 +1,9 @@
+l_portuguese:
+  LAUNCH: "Iniciar"
+  CHANGE_MODS: "Alterar mods"
+  INCOMPATIBLE: "O jogo salvo selecionado é incompatível. Se ele for iniciado, poderá causar problemas."
+  INCOMPATIBLE_VERSION: "Versões incompatíveis"
+  GAME_VERSION: "Versão do jogo"
+  SAVEGAME_VERSION: "Versão do jogo salvo"
+  MOD_INFO_TITLE: "Informações do mod $GAME$"
+  MOD_INFO: "Os jogos salvos do $GAME$ não armazenam os mods necessários.\nPortanto, você precisa verificar manualmente se está usando os mods corretos.\n\nOs seguintes mods estão ativados:\n"

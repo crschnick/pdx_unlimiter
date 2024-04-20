@@ -1,0 +1,10 @@
+l_portuguese:
+  EXPORT: "Exportar"
+  CONTINUE_GAME: "Continuar jogo"
+  START_LAUNCHER: "Abrir no Inicializador"
+  RUNNING:  "Em execução"
+  LATEST:  "Mais recente"
+  NONE: "Nenhum"
+  IMPORT: "Importar"
+  KILL: "Encerrar"
+  DEBUG_MODE:  "Modo de debug"
