@@ -30,7 +30,7 @@ public class StellarisTag {
     public StellarisTag() {
     }
 
-    public static StellarisTag fromNode(int id, Node node) {
+    public static StellarisTag fromNode(long id, Node node) {
         Node flagNode = node.getNodeForKey("flag");
         StellarisTag tag = new StellarisTag();
         tag.id = id;

@@ -55,7 +55,7 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
                 return;
             }
 
-            allTags.add(StellarisTag.fromNode(Integer.parseInt(k), v));
+            allTags.add(StellarisTag.fromNode(Long.parseLong(k), v));
         });
         tag = allTags.get(0);
         tag.setName(content.get().getNodeForKey("name").getString());
