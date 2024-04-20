@@ -1,0 +1,10 @@
+l_spanish:
+  EXPORT: "Exportar"
+  CONTINUE_GAME: "Continuar partida"
+  START_LAUNCHER: "Iniciar en Launcher"
+  RUNNING: "Ejecutando"
+  LATEST: "Último"
+  NONE: "NINGUNO"
+  IMPORT: "Importar"
+  KILL: "Matar"
+  DEBUG_MODE: "Modo de depuración"
