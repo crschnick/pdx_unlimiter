@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     compileOnly group: 'org.graalvm.polyglot', name: 'polyglot', version: '23.1.2'
-    compileOnly group: 'org.graalvm.polyglot', name: 'js-community', version: '23.1.2'
+    compileOnly group: 'org.graalvm.polyglot', name: 'js-community', version: '24.0.1'
 
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'

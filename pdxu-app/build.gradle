@@ -54,7 +54,7 @@ dependencies {
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
     implementation group: 'org.graalvm.polyglot', name: 'polyglot', version: '23.1.2'
-    implementation group: 'org.graalvm.polyglot', name: 'js-community', version: '23.1.2'
+    implementation group: 'org.graalvm.polyglot', name: 'js-community', version: '24.0.1'
 
 
     implementation 'info.picocli:picocli:4.6.3'
