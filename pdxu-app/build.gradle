@@ -58,9 +58,9 @@ dependencies {
 
 
     implementation 'info.picocli:picocli:4.6.3'
-    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.5'
     testImplementation 'info.picocli:picocli:4.6.3'
-    testAnnotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+    testAnnotationProcessor 'info.picocli:picocli-codegen:4.7.5'
 
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
