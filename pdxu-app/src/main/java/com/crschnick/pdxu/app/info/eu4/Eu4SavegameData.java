@@ -10,6 +10,7 @@ import com.crschnick.pdxu.model.eu4.Eu4Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,7 +75,7 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
     private void queryMods(Node n) {
         // Mod data has changed in 1.31
         if (version.compareTo(new GameVersion(1, 31, 0, 0)) >= 0) {
-            var list = new ArrayList<String>();
+            var list = new LinkedHashSet<String>();
             n.getNodeForKeyIfExistent("mods_enabled_names").ifPresent(me -> me.forEach((k, v) -> {
                 list.add(v.getNodeForKey("filename").getString());
             }, true));
@@ -82,7 +83,7 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
         } else {
             mods = n.getNodeForKeyIfExistent("mod_enabled").map(Node::getNodeArray).orElse(List.of())
                     .stream().map(Node::getString)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
     }
 

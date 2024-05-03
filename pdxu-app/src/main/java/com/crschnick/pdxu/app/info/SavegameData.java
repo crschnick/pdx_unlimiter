@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Setter;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public abstract class SavegameData<T> {
 
     protected GameDate date;
     protected UUID campaignHeuristic;
-    protected List<String> mods;
+    protected LinkedHashSet<String> mods;
     protected List<String> dlcs;
     protected boolean ironman;
     @Setter
@@ -96,7 +97,7 @@ public abstract class SavegameData<T> {
         return campaignHeuristic;
     }
 
-    public List<String> getMods() {
+    public LinkedHashSet<String> getMods() {
         return mods;
     }
 

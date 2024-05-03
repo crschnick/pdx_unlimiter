@@ -11,6 +11,7 @@ import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,7 +59,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
-                .collect(Collectors.toList());
+              .collect(Collectors.toCollection(LinkedHashSet::new));
         dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)

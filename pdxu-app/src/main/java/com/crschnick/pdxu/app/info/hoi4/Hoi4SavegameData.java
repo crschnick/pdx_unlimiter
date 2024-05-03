@@ -9,6 +9,7 @@ import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +47,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
         mods = content.get().getNodeForKeyIfExistent("mods")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
-                .collect(Collectors.toList());
+              .collect(Collectors.toCollection(LinkedHashSet::new));
         dlcs = null;
         initVersion(content.get());
     }

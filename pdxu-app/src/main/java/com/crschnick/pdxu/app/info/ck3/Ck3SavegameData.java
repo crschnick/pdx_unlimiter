@@ -9,6 +9,7 @@ import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,7 +52,7 @@ public class Ck3SavegameData extends SavegameData<Ck3Tag> {
         mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
                 .map(Node::getNodeArray).orElse(List.of())
                 .stream().map(Node::getString)
