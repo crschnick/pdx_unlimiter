@@ -63,6 +63,11 @@ public interface GameInstallType {
                 return launcherBg;
             }
 
+            var launcherBgNew = getLauncherDataPath(p).resolve("assets").resolve("app-background.png");
+            if (Files.exists(launcherBgNew)) {
+                return launcherBgNew;
+            }
+
             var launcherWindowsBg = getWindowsStoreLauncherDataPath(p).resolve("launcher-assets").resolve("app-background.png");
             if (Files.exists(launcherWindowsBg)) {
                 return launcherWindowsBg;
@@ -106,7 +111,13 @@ public interface GameInstallType {
 
         @Override
         public Path getIcon(Path p) {
-            return p.resolve("launcher-assets").resolve("icon.png");
+            var old = p.resolve("launcher-assets").resolve("icon.png");
+            if (Files.exists(old)) {
+                return old;
+            }
+
+            var n = p.resolve("assets").resolve("icon.png");
+            return n;
         }
     };
 
@@ -177,7 +188,13 @@ public interface GameInstallType {
 
         @Override
         public Path getIcon(Path p) {
-            return p.resolve("launcher-assets").resolve("game-icon.png");
+            var old = p.resolve("launcher-assets").resolve("game-icon.png");
+            if (Files.exists(old)) {
+                return old;
+            }
+
+            var n = p.resolve("assets").resolve("game-icon.png");
+            return n;
         }
 
         @Override
