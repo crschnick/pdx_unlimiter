@@ -1,0 +1,8 @@
+# Changes in 2.13.11
+
+- Update eu4 ironman melter to 1.37
+- Improve mod handling when buggy duplicated mod entries were contained in a save
+- Fix game icons being broken in eu4 and hoi4
+- Fix integer overflow for some stellaris campaigns
+- Add portuguese brazil translations (Thanks to @EnzoMaitan)
+- Add spanish translations (Thanks to @L3KTRO)
