@@ -29,7 +29,7 @@ public class GameDlc {
 
         String dlcName = p.getFileName().toString();
         String dlcId = dlcName.split("_")[0];
-        Path filePath = p.resolve(dlcId + ".dlc");
+        Path filePath = Files.exists(p.resolve(dlcId + ".dlc")) ? p.resolve(dlcId + ".dlc") : p.resolve(dlcName + ".dlc");
         Path dataPath = p.resolve(dlcId + ".zip");
 
         if (!Files.exists(filePath)) {
