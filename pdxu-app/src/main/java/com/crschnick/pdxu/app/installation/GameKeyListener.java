@@ -42,7 +42,7 @@ public class GameKeyListener implements NativeKeyListener {
     }
 
 
-    private boolean canPass(int action) {
+    private synchronized boolean canPass(int action) {
         if (lastCheck == 0 || action != lastAction) {
             lastAction = action;
             lastCheck = System.currentTimeMillis();
