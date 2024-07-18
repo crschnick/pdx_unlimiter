@@ -1,0 +1,4 @@
+# Changes in 2.13.12
+
+- Fix latest vic3 DLCs not being recognized by pdxu
+- Update vic3 ironman melter to 1.7
