@@ -12,9 +12,9 @@ jobs:
     strategy:
       matrix:
         os: [
-          ubuntu-20.04,
+          ubuntu-latest
           # macos-latest,
-          windows-2022
+          windows-latest
         ]
       fail-fast: false
     name: ${{ matrix.os }}
@@ -83,21 +83,21 @@ jobs:
         if: ${{ matrix.os == 'windows-2022' && github.ref == 'refs/heads/master' }}
 
       - name: Upload mac dist as an artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pdx_unlimiter-mac-dev
           path: build/pdx_unlimiter-macos-x86_64.dmg
           if-no-files-found: ignore
 
       - name: Upload Windows dist as an artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pdx_unlimiter-windows-dev
           path: build/pdx_unlimiter-windows.zip
           if-no-files-found: ignore
 
       - name: Upload Linux dist as an artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pdx_unlimiter-linux-dev
           path: build/pdx_unlimiter-linux.zip
