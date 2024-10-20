@@ -14,6 +14,8 @@ import javafx.collections.SetChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -178,7 +180,21 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 newEntries.remove(entry);
             }
         });
-        newEntries.sort(Comparator.comparing(SavegameEntry::getDate, Comparator.reverseOrder()));
+        newEntries.sort((o1, o2) -> {
+            var date = o1.compareTo(o2);
+            if (date != 0) {
+                return date;
+            }
+
+            try {
+                var mod = Files.getLastModifiedTime(SavegameStorage.get(current()).getSavegameFile(o1))
+                               .compareTo(Files.getLastModifiedTime(SavegameStorage.get(current()).getSavegameFile(o2)));
+                return mod;
+            } catch (IOException e) {
+                ErrorHandler.handleException(e);
+                return 0;
+            }
+        });
 
         shownEntries.set(newEntries);
 
