@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.lang.Language;
 import com.crschnick.pdxu.app.lang.LanguageManager;
 import com.crschnick.pdxu.app.util.JsonHelper;
@@ -40,6 +41,13 @@ public interface GameInstallType {
     }
 
     GameInstallType EU4 = new StandardInstallType("eu4") {
+
+        @Override
+        public List<GameDlc> loadDlcs(Path directory) throws IOException {
+            var dlcs = loadDlcsFromDirectory(getDlcPath(directory));
+            dlcs.addAll(loadDlcsFromDirectory(directory.resolve("builtin_dlc")));
+            return dlcs;
+        }
 
         @Override
         public DlcInfoStorageType getDlcInfoStorageType() {
@@ -748,6 +756,26 @@ public interface GameInstallType {
 
     default Path getDlcPath(Path p) {
         return p.resolve("dlc");
+    }
+
+    default List<GameDlc> loadDlcs(Path p) throws IOException {
+        return loadDlcsFromDirectory(getDlcPath(p));
+    }
+
+    default List<GameDlc> loadDlcsFromDirectory(Path directory) throws IOException {
+        var dlcs = new ArrayList<GameDlc>();
+        if (!Files.isDirectory(directory)) {
+            return dlcs;
+        }
+
+        Files.list(directory).forEach(f -> {
+            try {
+                GameDlc.fromDirectory(f).ifPresent(dlcs::add);
+            } catch (Exception e) {
+                ErrorHandler.handleException(e);
+            }
+        });
+        return dlcs;
     }
 
     default String getModLauncherId(GameInstallation installation, GameMod mod) {

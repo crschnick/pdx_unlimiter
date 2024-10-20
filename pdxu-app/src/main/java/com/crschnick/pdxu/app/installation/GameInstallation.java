@@ -105,17 +105,7 @@ public final class GameInstallation {
     }
 
     private void loadDlcs() throws IOException {
-        if (!Files.isDirectory(type.getDlcPath(getInstallDir()))) {
-            return;
-        }
-
-        Files.list(type.getDlcPath(getInstallDir())).forEach(f -> {
-            try {
-                GameDlc.fromDirectory(f).ifPresent(d -> dlcs.add(d));
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
+        dlcs.addAll(type.loadDlcs(getInstallDir()));
     }
 
     public GameDist getDist() {
