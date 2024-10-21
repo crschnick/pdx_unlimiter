@@ -180,21 +180,25 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 newEntries.remove(entry);
             }
         });
-        newEntries.sort((o1, o2) -> {
-            var date = o1.compareTo(o2);
-            if (date != 0) {
-                return date;
-            }
+        newEntries.sort(new Comparator<SavegameEntry<T, I>>() {
+            @Override
+            public int compare(SavegameEntry<T, I> o1, SavegameEntry<T, I> o2) {
+                var date = o1.getDate().compareTo(o2.getDate());
+                if (date != 0) {
+                    return date;
+                }
 
-            try {
-                var mod = Files.getLastModifiedTime(SavegameStorage.get(current()).getSavegameFile(o1))
-                               .compareTo(Files.getLastModifiedTime(SavegameStorage.get(current()).getSavegameFile(o2)));
-                return mod;
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-                return 0;
+                try {
+                    var mod = Files.getLastModifiedTime(SavegameStorage.get(SavegameManagerState.this.current()).getSavegameFile(o1))
+                                   .compareTo(
+                                           Files.getLastModifiedTime(SavegameStorage.get(SavegameManagerState.this.current()).getSavegameFile(o2)));
+                    return mod;
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                    return 0;
+                }
             }
-        });
+        }.reversed());
 
         shownEntries.set(newEntries);
 
