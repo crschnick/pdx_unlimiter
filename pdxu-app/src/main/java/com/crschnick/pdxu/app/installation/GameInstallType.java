@@ -768,13 +768,15 @@ public interface GameInstallType {
             return dlcs;
         }
 
-        Files.list(directory).forEach(f -> {
-            try {
-                GameDlc.fromDirectory(f).ifPresent(dlcs::add);
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
+        try (var s = Files.list(directory)) {
+            s.forEach(f -> {
+                try {
+                    GameDlc.fromDirectory(f).ifPresent(dlcs::add);
+                } catch (Exception e) {
+                    ErrorHandler.handleException(e);
+                }
+            });
+        }
         return dlcs;
     }
 
