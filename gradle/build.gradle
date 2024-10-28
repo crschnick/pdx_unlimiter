@@ -153,6 +153,16 @@ task writeVersion(type: DefaultTask) {
 task copyResources(type: Copy) {
     into getResourcesDir() + '/resources'
     from "${projectDir}/resources"
+
+    doLast {
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            copy {
+                from "${projectDir}/resources/bin/rakaly_mac"
+                into "${getDistDir()}/Contents/MacOS"
+            }
+        }
+
+    }
 }
 
 task copyLang(type: Copy) {

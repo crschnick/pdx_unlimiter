@@ -5,7 +5,6 @@ set -e
 APP_DIR="$1/build/dist/Pdx-Unlimiter.app"
 ARCHIVE="$TMPDIR/notarization.zip"
 
-mv -f "$APP_DIR/Contents/Resources/resources/bin/rakaly_mac" "$APP_DIR/Contents/MacOS/rakaly_mac" || true
 codesign -vvv --deep --entitlements "$1/misc/Entitlements.plist" --options=runtime --force --strict --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR/Contents/MacOS/Pdx-Unlimiter"
 codesign -vvv --deep --options=runtime --force --strict --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR/Contents/MacOS/rakaly_mac"
 
