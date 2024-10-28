@@ -9,6 +9,8 @@ echo "$DMG_FILE"
 mkdir -p "$1/build/dist/"
 rm -f "$DMG_FILE"
 
+mv -f "$APP_DIR/Contents/Resources/resources/bin/rakaly_mac" "$APP_DIR/Contents/MacOS/rakaly_mac" || true
+
 create-dmg \
   --volname "Pdx-Unlimiter" \
   --volicon "$1/misc/logo.icns" \
