@@ -113,13 +113,15 @@ jlink {
             icon = "misc/logo.png"
         } else {
             icon = "misc/logo.icns"
-            imageOptions += [
-                    '--mac-sign',
-                    '--mac-package-signing-prefix', 'com.crschnick.pdxu',
-                    '--mac-signing-key-user-name', 'Christopher Schnick (PF6V9HYACS)',
-                    '--mac-package-name', "Pdx-Unlimiter",
-                    '--mac-entitlements', "$projectDir/misc/Entitlements.plist"
-            ]
+            if (System.getenv("MAC_NOTARIZATION_APPLE_ID") != null) {
+                imageOptions += [
+                        '--mac-sign',
+                        '--mac-package-signing-prefix', 'com.crschnick.pdxu',
+                        '--mac-signing-key-user-name', 'Christopher Schnick (PF6V9HYACS)',
+                        '--mac-package-name', "Pdx-Unlimiter",
+                        '--mac-entitlements', "$projectDir/misc/Entitlements.plist"
+                ]
+            }
         }
         skipInstaller = true
         applicationName = 'Pdx-Unlimiter'
