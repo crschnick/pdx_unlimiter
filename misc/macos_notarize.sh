@@ -5,9 +5,16 @@ set -e
 APP_DIR="$1/build/dist/Pdx-Unlimiter.app"
 ARCHIVE="$TMPDIR/notarization.zip"
 
-codesign -vvv --deep --entitlements "$1/misc/Entitlements.plist" --options=runtime --force --strict --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR/Contents/MacOS/Pdx-Unlimiter"
-codesign -vvv --deep --options=runtime --force --strict --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR/Contents/MacOS/rakaly_mac"
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install maven
+source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+git clone https://github.com/dg76/signpackage "$TMPDIR/signpackage" || true
+cd "$TMPDIR/signpackage"
+mvn clean compile package assembly:single
+cp target/SignPackage-1.0-jar-with-dependencies.jar ./SignPackage.jar
+java -jar "$TMPDIR/signpackage/SignPackage.jar" -d "$APP_DIR" -t -k "Developer ID Application: Christopher Schnick (PF6V9HYACS)" -e "$1/misc/Entitlements.plist"
 
 echo "Create keychain profile"
 xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MAC_NOTARIZATION_APPLE_ID" --team-id "$MAC_NOTARIZATION_TEAM_ID" --password "$MAC_APP_SPECIFIC_PASSWORD"
