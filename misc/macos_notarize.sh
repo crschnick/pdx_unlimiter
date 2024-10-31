@@ -14,7 +14,7 @@ git clone https://github.com/dg76/signpackage "$TMPDIR/signpackage" || true
 cd "$TMPDIR/signpackage"
 mvn clean compile package assembly:single
 cp target/SignPackage-1.0-jar-with-dependencies.jar ./SignPackage.jar
-java -jar "$TMPDIR/signpackage/SignPackage.jar" -d "$APP_DIR" -t -k "Developer ID Application: Christopher Schnick (PF6V9HYACS)" -e "$1/misc/Entitlements.plist"
+java -jar "$TMPDIR/signpackage/SignPackage.jar" -r -d "$APP_DIR" -t -k "Developer ID Application: Christopher Schnick (PF6V9HYACS)" -e "$1/misc/Entitlements.plist"
 
 echo "Create keychain profile"
 xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MAC_NOTARIZATION_APPLE_ID" --team-id "$MAC_NOTARIZATION_TEAM_ID" --password "$MAC_APP_SPECIFIC_PASSWORD"
