@@ -86,20 +86,18 @@ jreleaser {
                     platform = 'linux'
                 }
             } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX() && System.getProperty("os.arch") == 'aarch64') {
-//                artifact {
-//                    distributionType = 'BINARY'
-//                    path = 'build/pdx_unlimiter-mac.zip'
-//                    transform = 'pdx_unlimiter-mac-arm64.zip'
-//                    platform = 'osx'
-//                }
+                artifact {
+                    distributionType = 'BINARY'
+                    path = 'build/pdx_unlimiter-macos-arm64.dmg'
+                    platform = 'osx'
+                }
+            } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+                artifact {
+                    distributionType = 'BINARY'
+                    path = 'build/pdx_unlimiter-macos-x86_64.dmg'
+                    platform = 'osx'
+                }
             }
-//            else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-//                artifact {
-//                    distributionType = 'BINARY'
-//                    path = 'build/pdx_unlimiter-macos-x86_64.dmg'
-//                    platform = 'osx'
-//                }
-//            }
         }
     }
 
