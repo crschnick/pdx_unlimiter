@@ -90,13 +90,15 @@ public class IntegrityManager {
     }
 
     private static void update(MessageDigest d, Path pack) throws IOException {
-        Files.list(pack).filter(Files::isRegularFile).forEach(p -> {
-            try {
-                d.update(Files.readAllBytes(p));
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        });
+        try (var s = Files.list(pack)) {
+            s.filter(Files::isRegularFile).forEach(p -> {
+                try {
+                    d.update(Files.readAllBytes(p));
+                } catch (IOException e) {
+                    ErrorHandler.handleException(e);
+                }
+            });
+        }
     }
 
     private static String checksum(MessageDigest d) {

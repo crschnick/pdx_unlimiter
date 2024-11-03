@@ -113,7 +113,9 @@ public class FileWatchManager {
 
             try {
                 dir.register(FileWatchManager.this.watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-                Files.list(dir).filter(Files::isDirectory).forEach(d -> createRecursiveWatchers(d));
+                try (var s = Files.list(dir)) {
+                    s.filter(Files::isDirectory).forEach(this::createRecursiveWatchers);
+                }
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

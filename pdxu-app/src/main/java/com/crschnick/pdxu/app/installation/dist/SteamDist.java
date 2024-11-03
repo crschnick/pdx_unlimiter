@@ -240,11 +240,10 @@ public class SteamDist extends GameDist {
         }
 
         Path userData = p.get().resolve("userdata");
-        try {
-            return Files.list(userData)
-                    .map(d -> d.resolve(String.valueOf(appId)).resolve("remote"))
-                    .filter(Files::exists)
-                    .collect(Collectors.toList());
+        try (var s = Files.list(userData)) {
+            return s.map(d -> d.resolve(String.valueOf(appId)).resolve("remote"))
+             .filter(Files::exists)
+             .toList();
         } catch (IOException e) {
             return List.of();
         }

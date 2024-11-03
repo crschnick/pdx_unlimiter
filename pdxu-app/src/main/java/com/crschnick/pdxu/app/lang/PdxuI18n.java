@@ -14,8 +14,8 @@ public final class PdxuI18n {
     private static final Map<String, String> map = new HashMap<>();
 
     public static void initDefault() {
-        try {
-            Files.list(PdxuInstallation.getInstance().getLanguageLocation()).forEach(p -> {
+        try (var s = Files.list(PdxuInstallation.getInstance().getLanguageLocation())) {
+            s.forEach(p -> {
                 if (LocalisationHelper.isLanguage(p, LanguageManager.DEFAULT)) {
                     defaultMap.putAll(LocalisationHelper.loadTranslations(p));
                 }
@@ -26,9 +26,9 @@ public final class PdxuI18n {
     }
 
     public static void init() {
-        try {
-            map.clear();
-            Files.list(PdxuInstallation.getInstance().getLanguageLocation()).forEach(p -> {
+        map.clear();
+        try (var s = Files.list(PdxuInstallation.getInstance().getLanguageLocation())) {
+            s.forEach(p -> {
                 if (LocalisationHelper.isLanguage(p, LanguageManager.getInstance().getActiveLanguage())) {
                     map.putAll(LocalisationHelper.loadTranslations(p));
                 }

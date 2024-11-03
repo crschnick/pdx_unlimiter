@@ -35,7 +35,9 @@ public class FileImporter {
             importFromQueue(p);
         };
 
-        Files.list(path).forEach(FileImporter::importFromQueue);
+        try (var s = Files.list(path)) {
+            s.forEach(FileImporter::importFromQueue);
+        }
         FileWatchManager.getInstance().startWatchersInDirectories(List.of(path), importFunc);
     }
 

@@ -258,12 +258,18 @@ public class ConverterSupport {
                     });
 
                     if (returnCode == 0) {
-                        var latestDir = Files.list(getBackendDir().resolve("output"))
-                                .filter(Files::isDirectory)
-                                .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
-                        var latestFile = Files.list(getBackendDir().resolve("output"))
-                                .filter(Files::isRegularFile)
-                                .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                        Optional<Path> latestDir;
+                        try (var s = Files.list(getBackendDir().resolve("output"))) {
+                            latestDir = s.filter(Files::isDirectory)
+                                         .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                        }
+
+                        Optional<Path> latestFile;
+                        try (var s = Files.list(getBackendDir().resolve("output"))) {
+                            latestFile = s.filter(Files::isRegularFile)
+                                    .max(Comparator.comparingLong(f -> f.toFile().lastModified()));
+                        }
+
                         if (latestDir.isPresent() && (!hasModFile || latestFile.isPresent())) {
                             var outDir = Path.of(getTargetModDir()).resolve(latestDir.get().getFileName());
                             if (Files.exists(outDir)) {

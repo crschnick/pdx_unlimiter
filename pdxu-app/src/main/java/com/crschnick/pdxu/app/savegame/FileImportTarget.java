@@ -41,8 +41,8 @@ public abstract class FileImportTarget {
 
         if (Files.isDirectory(p)) {
             List<StandardImportTarget> targets = new ArrayList<>();
-            try {
-                Files.list(p).forEach(f -> targets.addAll(
+            try (var s = Files.list(p)) {
+                s.forEach(f -> targets.addAll(
                         FileImportTarget.createStandardImportsTargets(f.toString())));
             } catch (IOException e) {
                 ErrorHandler.handleException(e);

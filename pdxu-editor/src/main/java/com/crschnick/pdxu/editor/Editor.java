@@ -58,8 +58,8 @@ public class Editor implements EditorProvider {
 
     public void openExternalFileIfNoSavegame(Path file) {
         if (Files.isDirectory(file)) {
-            try {
-                Files.list(file).forEach(this::openExternalFileIfNoSavegame);
+            try (var s = Files.list(file)) {
+                s.forEach(this::openExternalFileIfNoSavegame);
             } catch (IOException e) {
                 ErrorHandler.handleException(e);
             }

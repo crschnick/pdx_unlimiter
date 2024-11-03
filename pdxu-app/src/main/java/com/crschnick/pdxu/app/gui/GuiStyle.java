@@ -77,11 +77,8 @@ public class GuiStyle {
         if (PdxuInstallation.getInstance() == null) {
             return;
         }
-
-        try {
-            Files.list(PdxuInstallation.getInstance().getResourceDir().resolve("style"))
-                    .map(p -> p.toUri().toString())
-                    .forEach(s -> scene.getStylesheets().add(s));
+        try (var s = Files.list(PdxuInstallation.getInstance().getResourceDir().resolve("style"))) {
+            s.map(p -> p.toUri().toString()).forEach(style -> scene.getStylesheets().add(style));
         } catch (IOException e) {
             ErrorHandler.handleException(e, "Pdx-Unlimiter installation files could not be found at " + PdxuInstallation.getInstance().getResourceDir() + ". Were they deleted somehow?");
         }
