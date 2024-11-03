@@ -1,0 +1,5 @@
+# Changes in 2.13.14
+
+- There is now an actively maintained macOS build again. There also now separate builds for Intel and Silicon processors
+- Fix various issues leading to some DLCs still not being recognized
+

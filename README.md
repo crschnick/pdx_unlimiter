@@ -35,7 +35,7 @@ which you can also disable in the settings if you want.
 
 - [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi)
 - [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
-- [Linux .rpm Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.rpm) (Experimental for now)
+- [Linux .rpm Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.rpm)
 - [Linux AUR package](https://aur.archlinux.org/packages/pdx-unlimiter)
 
 ### Standalone
@@ -45,7 +45,8 @@ This version does not come with an update functionality, so you have to manually
 
 - [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-windows.zip)
 - [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-linux.zip)
-- [Mac standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-macos-x86_64.dmg) (Works on Intel and Apple Silicon)
+- [Mac standalone (Intel)](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-macos-x86_64.dmg)
+- [Mac standalone (Silicon)](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-macos-arm64.dmg)
 
 Note that if you utilize any accessibility software, you should use the standalone version.
 
