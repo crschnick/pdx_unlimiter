@@ -199,7 +199,7 @@ task bundleDmg(type: org.gradle.api.DefaultTask) {
                 commandLine "$projectDir/misc/macos_notarize.sh", "$projectDir"
             }
             exec {
-                commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir"
+                commandLine "$projectDir/misc/macos_dmg.sh", "$projectDir", System.getProperty("os.arch") == 'aarch64' ? 'arm64' : 'x86_64'
             }
         }
     }

@@ -2,8 +2,9 @@
 
 set -e
 
+ARCH="$2"
 APP_DIR="$1/build/dist/Pdx-Unlimiter.app"
-DMG_FILE="$1/build/pdx_unlimiter-macos-x86_64.dmg"
+DMG_FILE="$1/build/pdx_unlimiter-macos-$ARCH.dmg"
 
 echo "$DMG_FILE"
 mkdir -p "$1/build/dist/"
