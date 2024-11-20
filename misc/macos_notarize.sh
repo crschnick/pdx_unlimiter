@@ -36,6 +36,7 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_DIR" "$ARCHIVE"
 echo "Notarize app"
 ID=$(xcrun notarytool submit "$ARCHIVE" --keychain-profile "notarytool-profile" --wait | grep -o -i -E '[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}' | head -1)
 echo "Submission ID is $ID"
+sleep 5
 xcrun notarytool log "$ID" --keychain-profile "notarytool-profile"
 
 # Finally, we need to "attach the staple" to our executable, which will allow our app to be

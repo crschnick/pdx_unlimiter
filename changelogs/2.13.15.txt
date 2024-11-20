@@ -1,0 +1,5 @@
+# Changes in 2.13.15
+
+- Fix DLC recognition for EU4 in cases where the Steam Updater did not properly clean up files
+- Fix CTRL+SHIFT+R possibly launching multiple game instances when multiple save loading operations were queued
+
