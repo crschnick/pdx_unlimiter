@@ -44,8 +44,10 @@ public interface GameInstallType {
 
         @Override
         public List<GameDlc> loadDlcs(Path directory) throws IOException {
-            var dlcs = loadDlcsFromDirectory(getDlcPath(directory));
-            dlcs.addAll(loadDlcsFromDirectory(directory.resolve("builtin_dlc")));
+            // Prefer builtin_dlcs in case of duplicates
+            var dlcs = new ArrayList<GameDlc>();
+            loadDlcsFromDirectory(directory.resolve("builtin_dlc"), dlcs);
+            loadDlcsFromDirectory(getDlcPath(directory), dlcs);
             return dlcs;
         }
 
@@ -759,25 +761,29 @@ public interface GameInstallType {
     }
 
     default List<GameDlc> loadDlcs(Path p) throws IOException {
-        return loadDlcsFromDirectory(getDlcPath(p));
+        var dlcs = new ArrayList<GameDlc>();
+        loadDlcsFromDirectory(getDlcPath(p), dlcs);
+        return dlcs;
     }
 
-    default List<GameDlc> loadDlcsFromDirectory(Path directory) throws IOException {
-        var dlcs = new ArrayList<GameDlc>();
+    default void loadDlcsFromDirectory(Path directory, List<GameDlc> existing) throws IOException {
         if (!Files.isDirectory(directory)) {
-            return dlcs;
+            return;
         }
 
         try (var s = Files.list(directory)) {
             s.forEach(f -> {
                 try {
-                    GameDlc.fromDirectory(f).ifPresent(dlcs::add);
+                    GameDlc.fromDirectory(f)
+                           // Add duplicate check, in case DLC updates were messed up by Steam
+                           .filter(gameDlc -> existing.stream()
+                                                  .noneMatch(other -> other.getName().equals(gameDlc.getName())))
+                           .ifPresent(existing::add);
                 } catch (Exception e) {
                     ErrorHandler.handleException(e);
                 }
             });
         }
-        return dlcs;
     }
 
     default String getModLauncherId(GameInstallation installation, GameMod mod) {
