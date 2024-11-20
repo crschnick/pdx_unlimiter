@@ -144,7 +144,7 @@ public final class GameAppManager {
         }
     }
 
-    private void killGame(GameApp g) {
+    public void killGame(GameApp g) {
         logger.info("Killing game");
         lastKill = Instant.now();
         g.kill();

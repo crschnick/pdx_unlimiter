@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.savegame.SavegameActions;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ public class GameKeyListener implements NativeKeyListener {
         if ((e.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0 && ((e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0 || (e.getModifiers() & NativeKeyEvent.META_MASK) != 0)) {
             if (e.getKeyCode() == NativeKeyEvent.VC_K && canPass(1)) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Kill key pressed");
-                handle.kill();
+                GameAppManager.getInstance().killGame(handle);
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I && canPass(2)) {
                 LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
@@ -33,10 +34,27 @@ public class GameKeyListener implements NativeKeyListener {
                 GameAppManager.getInstance().loadLatestCheckpoint();
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_R && canPass(4)) {
-                TaskExecutor.getInstance().submitTask(() -> {
-                    LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");
-                    GameAppManager.getInstance().importLatestAndLaunch();
-                }, true);
+                LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");
+                var g = handle.getGame();
+                if (g == null) {
+                    return;
+                }
+
+                if (!handle.isAlive()) {
+                    return;
+                }
+
+                if (!GameInstallation.ALL.get(g).getDist().supportsDirectLaunch()) {
+                    return;
+                }
+
+                if (g.isEnabled()) {
+                    LoggerFactory.getLogger(GameKeyListener.class).info("Import latest savegame and launch");
+                    GameAppManager.getInstance().killGame(handle);
+                    TaskExecutor.getInstance().submitTask(() -> {
+                        SavegameActions.importLatestAndLaunch(g);
+                    }, true);
+                }
             }
         }
     }
