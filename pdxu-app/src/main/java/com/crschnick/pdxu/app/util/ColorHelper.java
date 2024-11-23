@@ -65,7 +65,6 @@ public class ColorHelper {
         var c = color.getValues();
 
         try {
-
             if (color.getType().equals(TaggedNode.TagType.HEX)) {
                 var c0 = c.size() > 0 ? color.getValues().get(0) : "000000";
                 return Color.valueOf("#" + c0);
@@ -77,12 +76,14 @@ public class ColorHelper {
             return switch (color.getType()) {
                 case HSV -> Color.hsb(
                         d0 * 360,
-                        d1,
-                        d2);
+                        Math.min(d1, 1.0),
+                        Math.min(d2, 1.0)
+                );
                 case HSV360 -> Color.hsb(
                         d0,
-                        d1 / 100.0,
-                        d2 / 100.0);
+                        Math.min(d1 / 100.0, 1.0),
+                        Math.min(d2 / 100.0, 1.0)
+                );
                 case RGB -> {
                     var isDecimal = c.get(0).contains(".") || c.get(1).contains(".") || c.get(2).contains(".");
                     var denominator = isDecimal ? 1.0 : 255.0;

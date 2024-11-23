@@ -183,14 +183,15 @@ public abstract class CoatOfArmsRenderer {
 
     private Color evaluateColorDefinition(String color, GameFileContext ctx) {
         // For inline colors like rgb { ... }
-        var tagged = Arrays.stream(TaggedNode.COLORS)
-                .filter(tagType -> color != null && color.startsWith(tagType.getId()))
-                .findAny()
-                .map(tagType -> new TaggedNode(tagType, Arrays.stream(color.substring(tagType.getId().length() + 2, color.length() - 1).split(" "))
-                        .filter(s -> s.length() > 0)
-                        .map(s -> new ValueNode(s, false)).toList()));
-        if (tagged.isPresent()) {
-            return ColorHelper.fromGameColor(GameColor.fromColorNode(tagged.get()));
+        var taggedType = Arrays.stream(TaggedNode.COLORS).sorted(Comparator.comparingInt(value -> -value.getId().length()))
+                               .filter(tagType -> color != null && color.startsWith(tagType.getId()))
+                               .findFirst();
+        if (taggedType.isPresent()) {
+            var values = Arrays.stream(color.substring(taggedType.get().getId().length() + 2, color.length() - 1).split(" "))
+                             .filter(s -> !s.isEmpty())
+                             .map(s -> new ValueNode(s, false)).toList();
+            var node = new TaggedNode(taggedType.get(), values);
+            return ColorHelper.fromGameColor(GameColor.fromColorNode(node));
         }
 
         var colors = getPredefinedColors(ctx);
