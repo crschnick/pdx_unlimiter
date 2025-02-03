@@ -203,10 +203,10 @@ public final class TextFormatParser {
             }
         } else {
             if (tt[index] == TextFormatTokenizer.EQUALS) {
-                throw ParseException.createFromLiteralIndex(name, "encountered unexpected =", slIndex, context);
+                throw ParseException.createFromLiteralIndex(name, "encountered unexpected =", slIndex - 1, context);
             }
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                throw ParseException.createFromLiteralIndex(name, "encountered unexpected }", slIndex, context);
+                throw ParseException.createFromLiteralIndex(name, "encountered unexpected }", slIndex - 1, context);
             }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
                 return parseArray(name, strict);
