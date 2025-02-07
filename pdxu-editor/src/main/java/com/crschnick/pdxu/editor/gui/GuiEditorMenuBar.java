@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
@@ -13,8 +14,8 @@ public class GuiEditorMenuBar {
 
     public static MenuBar createMenuBar(EditorState state) {
 
-        Menu file = new Menu("File");
-        MenuItem c = new MenuItem("Save");
+        Menu file = new Menu(PdxuI18n.get("EDITOR_MENU_FILE"));
+        MenuItem c = new MenuItem(PdxuI18n.get("EDITOR_MENU_FILE_SAVE"));
         c.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         c.setOnAction((a) -> {
             state.save();
@@ -25,20 +26,20 @@ public class GuiEditorMenuBar {
         }
 
 
-        Menu editor = new Menu("Editor");
-        MenuItem cte = new MenuItem("Editor Settings");
+        Menu editor = new Menu(PdxuI18n.get("EDITOR_MENU_EDITOR"));
+        MenuItem cte = new MenuItem(PdxuI18n.get("EDITOR_MENU_EDITOR_SETTINGS"));
         cte.setOnAction((a) -> {
             GuiEditorSettings.showEditorSettings();
         });
         editor.getItems().add(cte);
 
-        MenuItem guide = new MenuItem("Editor Guide");
+        MenuItem guide = new MenuItem(PdxuI18n.get("EDITOR_MENU_EDITOR_GUIDE"));
         guide.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.EDITOR_GUIDE);
         });
         editor.getItems().add(guide);
 
-        Menu jump = new Menu("Jump to");
+        Menu jump = new Menu(PdxuI18n.get("EDITOR_MENU_JUMP"));
         Runnable fillJumps = () -> {
             if (state.isSavegame()) {
                 try {
