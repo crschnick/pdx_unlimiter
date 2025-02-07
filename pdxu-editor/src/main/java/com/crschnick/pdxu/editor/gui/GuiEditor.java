@@ -37,7 +37,7 @@ public class GuiEditor {
 
         var icon = PdxuApp.getApp().getIcon();
         stage.getIcons().add(icon);
-        var title = state.getFileName() + " - " + "Pdx-Unlimiter Editor";
+        var title = state.getFileName() + " - " + "Pdx-Unlimiter " + PdxuI18n.get("EDITOR");
         stage.setTitle(title);
         state.dirtyProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
@@ -57,9 +57,8 @@ public class GuiEditor {
 
     public static boolean showCloseConfirmAlert(Stage s) {
         var r = GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setTitle(PdxuI18n.get("Unsaved Changes"));
-            alert.setHeaderText(
-                    PdxuI18n.get("You are about to close the editor even though there are unsaved changes.\nDo you want to exit anyway?"));
+            alert.setTitle(PdxuI18n.get("UNSAVED_CHANGES"));
+            alert.setHeaderText(PdxuI18n.get("UNSAVED_CHANGES_CONFIRM"));
             alert.setAlertType(Alert.AlertType.WARNING);
             alert.getButtonTypes().clear();
             alert.getButtonTypes().add(ButtonType.YES);
@@ -78,11 +77,9 @@ public class GuiEditor {
             GuiDialogHelper.showBlockingAlert(alert -> {
                 alert.setAlertType(Alert.AlertType.WARNING);
                 alert.getDialogPane().setMaxWidth(500);
-                alert.setTitle("Missing game installation");
-                alert.setHeaderText("No installation has been set for " + state.getFileContext().getGame().getInstallationName() +
-                                            ". You can still use the editor to edit " + state.getFileContext().getGame().getInstallationName() +
-                                            " savegames, but many useful features will be disabled until a valid game installation has been set in " +
-                                            "the settings menu.");
+                alert.setTitle(PdxuI18n.get("MISSING_GAME_INSTALLATION"));
+                String installationName = state.getFileContext().getGame().getInstallationName();
+                alert.setHeaderText(PdxuI18n.get("MISSING_GAME_INSTALLATION_TIPS", installationName, installationName));
             });
         }
     }
@@ -98,7 +95,7 @@ public class GuiEditor {
 
         var graphic = new StackPane(new FontIcon("mdi-information-outline"));
         var melterInformation = new Label(
-                "To edit this file, either use the Pdx-Unlimiter melter functionality on the savegame\nfirst or instruct the game to save as plaintext, e.g. by launching it in debug mode",
+                PdxuI18n.get("SAVEGAME_EDITOR_TIPS"),
                 graphic
         );
         melterInformation.setAlignment(Pos.CENTER);
@@ -272,7 +269,7 @@ public class GuiEditor {
                     edit.setOnAction(e -> {
                         state.getExternalState().startEdit(state, (EditorRealNode) n);
                     });
-                    GuiTooltips.install(edit, "Open in external text editor");
+                    GuiTooltips.install(edit, PdxuI18n.get("EDITOR_OPEN_IN_EXTERNAL_EDITOR"));
                     actions.getChildren().add(edit);
                     edit.prefHeightProperty().bind(actions.heightProperty());
                 }
@@ -306,7 +303,7 @@ public class GuiEditor {
             filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
             filterKeys.setGraphic(new FontIcon());
             filterKeys.selectedProperty().bindBidirectional(edFilter.filterKeysProperty());
-            GuiTooltips.install(filterKeys, "Include keys in search");
+            GuiTooltips.install(filterKeys, PdxuI18n.get("EDITOR_SEARCH_FILTER_KEYS"));
             box.getChildren().add(filterKeys);
         }
 
@@ -319,7 +316,7 @@ public class GuiEditor {
             edFilter.filterValuesProperty().addListener((c, o, n) -> {
                 filterValues.setSelected(n);
             });
-            GuiTooltips.install(filterValues, "Include values in search");
+            GuiTooltips.install(filterValues, PdxuI18n.get("EDITOR_SEARCH_FILTER_VALUES"));
             box.getChildren().add(filterValues);
         }
 
@@ -380,7 +377,7 @@ public class GuiEditor {
             cs.getStyleClass().add(GuiStyle.CLASS_CASE_SENSITIVE);
             cs.setGraphic(new FontIcon());
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
-            GuiTooltips.install(cs, "Case sensitive");
+            GuiTooltips.install(cs, PdxuI18n.get("EDITOR_SEARCH_CASE_SENSITIVE"));
             box.getChildren().add(cs);
         }
 
@@ -393,7 +390,7 @@ public class GuiEditor {
             filterDisplay.setMnemonicParsing(false);
             edFilter.filterStringProperty().addListener((c, o, n) -> {
                 Platform.runLater(() -> filterDisplay.setText(
-                        n.equals("") ? "" : "Showing results for \"" + n + "\""));
+                        n.equals("") ? "" : PdxuI18n.get("EDITOR_SEARCH_RESULT",n)));
             });
             filterDisplay.setAlignment(Pos.CENTER);
             box.getChildren().add(filterDisplay);

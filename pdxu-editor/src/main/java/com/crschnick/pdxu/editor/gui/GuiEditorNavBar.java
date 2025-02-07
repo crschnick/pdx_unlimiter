@@ -4,6 +4,7 @@ package com.crschnick.pdxu.editor.gui;
 import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.editor.EditorNavLocation;
 import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
@@ -49,7 +50,7 @@ public class GuiEditorNavBar {
         {
             var backButton = new JFXButton(null, new FontIcon());
             backButton.setAccessibleText("Go back");
-            GuiTooltips.install(backButton, "Go back");
+            GuiTooltips.install(backButton, PdxuI18n.get("EDITOR_NAVBAR_BACK"));
             backButton.getStyleClass().add("nav-back-button");
             backButton.setGraphic(new FontIcon());
             backButton.setAlignment(Pos.CENTER);
@@ -60,7 +61,7 @@ public class GuiEditorNavBar {
         {
             var forwardButton = new JFXButton(null, new FontIcon());
             forwardButton.setAccessibleText("Go forward");
-            GuiTooltips.install(forwardButton, "Go forward");
+            GuiTooltips.install(forwardButton, PdxuI18n.get("EDITOR_NAVBAR_FORWARD"));
             forwardButton.getStyleClass().add("nav-forward-button");
             forwardButton.setGraphic(new FontIcon());
             forwardButton.setAlignment(Pos.CENTER);
@@ -142,7 +143,7 @@ public class GuiEditorNavBar {
             edit.setFocusTraversable(false);
             edit.setGraphic(new FontIcon());
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-            GuiTooltips.install(edit, "Open in external text editor");
+            GuiTooltips.install(edit, PdxuI18n.get("EDITOR_OPEN_IN_EXTERNAL_EDITOR"));
             edit.setOnAction(e -> {
                 edState.getExternalState().startEdit(edState, (EditorRealNode) edState.getNavigation().getCurrent().getEditorNode());
             });
