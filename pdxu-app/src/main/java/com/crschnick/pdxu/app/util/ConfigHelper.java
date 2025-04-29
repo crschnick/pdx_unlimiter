@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.util;
 
 import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -16,6 +17,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.List;
 
 public class ConfigHelper {
 
@@ -90,9 +94,24 @@ public class ConfigHelper {
         try {
             if (!newContent.equals(currentContent)) {
                 var backupFile = out.resolveSibling(
-                        FilenameUtils.getBaseName(out.toString()) + "_old." + FilenameUtils.getExtension(out.toString()));
+                        FilenameUtils.getBaseName(out.toString()) + "_old_" + System.currentTimeMillis() + "." + FilenameUtils.getExtension(out.toString()));
                 Files.writeString(backupFile, currentContent);
                 Files.writeString(out, newContent);
+
+                // Manage backups to enforce the maximum limit
+                var parentDir = out.getParent();
+                if (parentDir != null) {
+                    List<Path> backups = Files.list(parentDir)
+                            .filter(path -> path.getFileName().toString().startsWith(FilenameUtils.getBaseName(out.toString()) + "_old"))
+                            .sorted(Comparator.comparingLong(path -> path.toFile().lastModified()))
+                            .collect(Collectors.toList());
+
+                    int maxBackups = Settings.getInstance().maxBackups.getValue();
+                    while (backups.size() > maxBackups) {
+                        Files.delete(backups.get(0)); // Delete the oldest backup
+                        backups.remove(0);
+                    }
+                }
             }
         } catch (IOException e) {
             ErrorHandler.handleException(e);
