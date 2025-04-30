@@ -134,7 +134,9 @@ public class Ck3Tag {
                     .map(Node::getDouble).orElse(0.0).intValue();
 
             var aliveNode = v.getNodeForKey("alive_data");
-            var gold = aliveNode.getNodeForKeyIfExistent("gold").map(Node::getDouble).orElse(0.0).intValue();
+            var goldNode = aliveNode.getNodeForKeyIfExistent("gold");
+            var gold = goldNode.map(node -> node.isArray() ? node.getNodeForKeyIfExistent("value")
+                    .map(Node::getDouble).orElse(0.0) : node.getDouble()).orElseGet(() -> goldNode.map(Node::getDouble).orElse(0.0)).intValue();
             var income = aliveNode.getNodeForKeyIfExistent("income").map(Node::getDouble).orElse(0.0).intValue();
             var piety = aliveNode.getNodeForKeysIfExistent("piety", "currency").map(Node::getDouble).orElse(0.0).intValue();
             var prestige = aliveNode.getNodeForKeysIfExistent("prestige", "currency").map(Node::getDouble).orElse(0.0).intValue();
