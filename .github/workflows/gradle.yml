@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - '**'
+  pull_request:
 
 jobs:
   build:
@@ -31,8 +32,9 @@ jobs:
           github-token: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
 
       - name: Install create-dmg for macOS
-        run: ${{ !startsWith(matrix.os, 'mac') }} || brew install create-dmg
+        run: brew install create-dmg
         shell: bash
+        if: ${{ startsWith(matrix.os, 'mac') && github.ref == 'refs/heads/master' }}
 
       - name: Install the Apple certificate and provisioning profile
         env:
@@ -54,7 +56,7 @@ jobs:
           # import certificate to keychain
           security import $CERTIFICATE_PATH -P "$MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
-        if: ${{ startsWith(matrix.os, 'mac') }}
+        if: ${{ startsWith(matrix.os, 'mac') && github.ref == 'refs/heads/master' }}
 
       - name: Execute dist build
         env:
