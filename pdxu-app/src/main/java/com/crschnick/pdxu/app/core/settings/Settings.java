@@ -159,6 +159,13 @@ public final class Settings extends AbstractSettings {
             "useGameLanguage",
             false
     );
+    public final SettingsEntry.IntegerEntry maxBackups = new SettingsEntry.IntegerEntry(
+            "MAX_BACKUPS",
+            "maxBackups",
+            10, // Default value
+            1,  // Minimum value
+            100 // Maximum value
+    );
 
     public static void init() {
         INSTANCE = new Settings();
