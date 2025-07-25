@@ -127,15 +127,9 @@ public abstract class CoatOfArmsRenderer {
     public BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int width, int height) {
         var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
-            Color pColor1 = sub.getColors()[0] != null
-                    ? colors.getOrDefault(sub.getColors()[0], Color.TRANSPARENT)
-                    : Color.TRANSPARENT;
-            Color pColor2 = sub.getColors()[1] != null
-                    ? colors.getOrDefault(sub.getColors()[1], Color.TRANSPARENT)
-                    : Color.TRANSPARENT;
-            Color pColor3 = sub.getColors()[2] != null
-                    ? colors.getOrDefault(sub.getColors()[2], Color.TRANSPARENT)
-                    : Color.TRANSPARENT;
+            Color pColor1 = evaluateColorDefinition(sub.getColors()[0], ctx);
+            Color pColor2 = evaluateColorDefinition(sub.getColors()[1], ctx);
+            Color pColor3 = evaluateColorDefinition(sub.getColors()[2], ctx);
             Function<Integer, Integer> patternFunction = (Integer rgb) -> {
                 Color newColor = this.withAlpha(pColor1, getRed(rgb) / 255.0);
                 newColor = this.overlayColors(newColor, this.withAlpha(pColor2, getGreen(rgb) / 255.0));
@@ -182,6 +176,10 @@ public abstract class CoatOfArmsRenderer {
     }
 
     private Color evaluateColorDefinition(String color, GameFileContext ctx) {
+        if (color == null) {
+            return getMissingReplacementColor();
+        }
+
         // For inline colors like rgb { ... }
         var taggedType = Arrays.stream(TaggedNode.COLORS).sorted(Comparator.comparingInt(value -> -value.getId().length()))
                                .filter(tagType -> color != null && color.startsWith(tagType.getId()))
@@ -195,9 +193,7 @@ public abstract class CoatOfArmsRenderer {
         }
 
         var colors = getPredefinedColors(ctx);
-        return color != null
-                ? colors.getOrDefault(color, getMissingReplacementColor())
-                : getMissingReplacementColor();
+        return colors.getOrDefault(color, getMissingReplacementColor());
     }
 
     public void emblem(
