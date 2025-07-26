@@ -24,6 +24,5 @@ if (!ModuleFinder.ofSystem().find("javafx.base").isPresent()) {
         implementation "org.openjfx:javafx-controls:${devJavafxVersion}:${platform}"
         implementation "org.openjfx:javafx-graphics:${devJavafxVersion}:${platform}"
         implementation "org.openjfx:javafx-media:${devJavafxVersion}:${platform}"
-        implementation "org.openjfx:javafx-web:${devJavafxVersion}:${platform}"
     }
 }
