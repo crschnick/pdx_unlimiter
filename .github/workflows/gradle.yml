@@ -63,17 +63,17 @@ jobs:
           MAC_APP_SPECIFIC_PASSWORD: ${{ secrets.MAC_APP_SPECIFIC_PASSWORD }}
           MAC_NOTARIZATION_APPLE_ID: ${{ secrets.MAC_NOTARIZATION_APPLE_ID }}
           MAC_NOTARIZATION_TEAM_ID: ${{ secrets.MAC_NOTARIZATION_TEAM_ID }}
-        run: ./gradle/gradlew createDist
+        run: ./gradlew createDist
 
       - name: JReleaser Release
-        run: ./gradle/gradlew jreleaserRelease --stacktrace "-Dorg.gradle.jvmargs=-Xmx2048M"
+        run: ./gradlew jreleaserRelease --stacktrace "-Dorg.gradle.jvmargs=-Xmx2048M"
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}
         if: ${{ github.ref == 'refs/heads/master' }}
 
       - name: JReleaser Announce
-        run: ./gradle/gradlew jreleaserAnnounce
+        run: ./gradlew jreleaserAnnounce
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
           JRELEASER_DISCORD_WEBHOOK: ${{ secrets.JRELEASER_DISCORD_WEBHOOK }}

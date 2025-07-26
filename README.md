@@ -220,9 +220,8 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 # Development
 
 To build this project, a JDK for at least Java 24 is required.
-You can then build the gradle project using the gradle wrapper with `./gradle/gradlew build` or `.\gradle\gradlew.bat build`.
-For running, you can use `./gradle/gradlew run`.
-Note here that the gradle wrapper has been moved into the `gradle` subdirectory.
+You can then build the gradle project using the gradle wrapper with `./gradlew build` or `.\gradlew.bat build`.
+For running, you can use `./gradlew run`.
 You can use the automatically generated file `pdxu.properties`, which is created when gradle is run the first time,
 to set some useful development options when needed.
 
