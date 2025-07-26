@@ -5,10 +5,7 @@ plugins {
 apply from: "$rootDir/gradle/java.gradle"
 apply from: "$rootDir/gradle/javafx.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
-
-configurations {
-    compileOnly.extendsFrom(javafx)
-}
+apply from: "$rootDir/gradle/lombok.gradle"
 
 dependencies {
     compileOnly 'com.jfoenix:jfoenix:9.0.10'

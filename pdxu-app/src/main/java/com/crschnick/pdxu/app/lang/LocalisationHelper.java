@@ -51,7 +51,8 @@ public class LocalisationHelper {
         Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_]+):(\\d*) \"(.+)\"$");
 
         try (var in = Files.newInputStream(file)) {
-            var bin = new BOMInputStream(in);
+            var bin = BOMInputStream.builder().setInputStream(in).setInclude(true).setByteOrderMarks(new ByteOrderMark[]{
+                    ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE}).get();
             ByteOrderMark bom = bin.getBOM();
             String charsetName = bom == null ? "UTF-8" : bom.getCharsetName();
 

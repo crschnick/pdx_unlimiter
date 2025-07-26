@@ -15,17 +15,15 @@ if (System.getProperty ("os.arch") == 'aarch64') {
     platform += '-aarch64'
 }
 
-configurations {
-    javafx
-}
+def devJavafxVersion = '25-ea+10'
 
 if (!ModuleFinder.ofSystem().find("javafx.base").isPresent()) {
     // Always use maven version for now
     dependencies {
-        javafx "org.openjfx:javafx-base:${devJavafxVersion}:${platform}"
-        javafx "org.openjfx:javafx-controls:${devJavafxVersion}:${platform}"
-        javafx "org.openjfx:javafx-graphics:${devJavafxVersion}:${platform}"
-        javafx "org.openjfx:javafx-media:${devJavafxVersion}:${platform}"
-        javafx "org.openjfx:javafx-web:${devJavafxVersion}:${platform}"
+        implementation "org.openjfx:javafx-base:${devJavafxVersion}:${platform}"
+        implementation "org.openjfx:javafx-controls:${devJavafxVersion}:${platform}"
+        implementation "org.openjfx:javafx-graphics:${devJavafxVersion}:${platform}"
+        implementation "org.openjfx:javafx-media:${devJavafxVersion}:${platform}"
+        implementation "org.openjfx:javafx-web:${devJavafxVersion}:${platform}"
     }
 }

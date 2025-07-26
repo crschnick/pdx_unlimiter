@@ -34,7 +34,7 @@ public class LanguageManager {
         try {
             logger.debug("Loading languages ...");
             var n = JsonHelper.read(PdxuInstallation.getInstance().getLanguageLocation().resolve("languages.json"));
-            n.get("languages").fields().forEachRemaining(e -> {
+            n.get("languages").properties().forEach(e -> {
                 var loc = LocaleUtils.toLocale(e.getValue().textValue());
                 languages.put(e.getKey(), new Language(loc, e.getKey(), loc.getDisplayName(loc)));
                 logger.debug("Loaded " + loc.getDisplayName(loc));

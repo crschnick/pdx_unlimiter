@@ -5,13 +5,10 @@ plugins {
 apply from: "$rootDir/gradle/java.gradle"
 apply from: "$rootDir/gradle/javafx.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
+apply from: "$rootDir/gradle/lombok.gradle"
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.name}"]
-}
-
-configurations {
-    implementation.extendsFrom(javafx)
 }
 
 dependencies {
@@ -39,9 +36,6 @@ dependencies {
     annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
     testImplementation 'info.picocli:picocli:4.7.6'
     testAnnotationProcessor 'info.picocli:picocli-codegen:4.7.6'
-
-    compileOnly 'org.projectlombok:lombok:1.18.38'
-    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
     implementation 'net.java.dev.jna:jna-jpms:5.13.0'
     implementation 'net.java.dev.jna:jna-platform-jpms:5.13.0'

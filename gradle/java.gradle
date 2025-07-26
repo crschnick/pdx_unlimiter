@@ -3,6 +3,8 @@ tasks.withType(JavaCompile).configureEach {
     targetCompatibility = JavaVersion.VERSION_21
     modularity.inferModulePath = true
     options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Xlint:deprecation"
 }
 
 tasks.withType(JavaExec).configureEach {

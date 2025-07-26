@@ -3,11 +3,9 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/java.gradle"
+apply from: "$rootDir/gradle/lombok.gradle"
 
 dependencies {
     compileOnly group: 'org.graalvm.polyglot', name: 'polyglot', version: '24.2.2'
     compileOnly group: 'org.graalvm.polyglot', name: 'js-community', version: '24.2.2'
-
-    compileOnly 'org.projectlombok:lombok:1.18.38'
-    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }

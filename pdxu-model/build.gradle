@@ -4,10 +4,8 @@ plugins {
 
 apply from: "$rootDir/gradle/java.gradle"
 apply from: "$rootDir/gradle/jackson.gradle"
+apply from: "$rootDir/gradle/lombok.gradle"
 
 dependencies {
     implementation project(':pdxu-io')
-
-    compileOnly 'org.projectlombok:lombok:1.18.38'
-    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }
