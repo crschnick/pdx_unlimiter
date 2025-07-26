@@ -1,42 +1,20 @@
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-
 plugins {
-    id 'java'
-    id "org.moditect.gradleplugin" version "1.0.0-rc3"
+    id 'java-library'
 }
 
-java {
-    modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
+apply from: "$rootDir/gradle/java.gradle"
+apply from: "$rootDir/gradle/javafx.gradle"
+apply from: "$rootDir/gradle/jackson.gradle"
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.name}"]
 }
 
-def currentOS = DefaultNativePlatform.currentOperatingSystem;
-def platform
-if (currentOS.isWindows()) {
-    platform = 'win'
-} else if (currentOS.isLinux()) {
-    platform = 'linux'
-} else if (currentOS.isMacOsX()) {
-    platform = 'mac'
-    def macArch = System.getProperty ("os.arch");
-    if (macArch == 'aarch64') {
-        platform = 'mac-aarch64'
-    }
+configurations {
+    implementation.extendsFrom(javafx)
 }
 
-apply from: "$rootDir/gradle/module_gen.gradle"
-apply from: "$rootDir/gradle/jackson.gradle"
-
 dependencies {
-    implementation "org.openjfx:javafx-base:24-ea+5:${platform}"
-    implementation "org.openjfx:javafx-controls:24-ea+5:${platform}"
-    implementation "org.openjfx:javafx-graphics:24-ea+5:${platform}"
-    implementation "org.openjfx:javafx-media:24-ea+5:${platform}"
     implementation 'com.jfoenix:jfoenix:9.0.10'
 
     implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
@@ -44,29 +22,28 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'
 
-    implementation files("$project.buildDir/generated-modules/com.realityinteractive.imageio.tga-master-SNAPSHOT.jar")
-    implementation files("$project.buildDir/generated-modules/commons-lang3-3.12.0.jar")
-    implementation files("$project.buildDir/generated-modules/commons-io-2.8.0.jar")
-    implementation files("$project.buildDir/generated-modules/commons-collections4-4.4.jar")
-    implementation files("$project.buildDir/generated-modules/sentry-6.29.0.jar")
-    implementation files("$project.buildDir/generated-modules/jnativehook-2.0.2.jar")
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation 'commons-io:commons-io:2.19.0'
+    implementation "org.apache.commons:commons-collections4:4.5.0"
+    implementation 'io.sentry:sentry:8.13.3'
+    implementation 'com.1stleg:jnativehook:2.0.2'
+    implementation 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
 
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
-    implementation group: 'org.graalvm.polyglot', name: 'polyglot', version: '23.1.2'
-    implementation group: 'org.graalvm.polyglot', name: 'js-community', version: '23.1.2'
+    implementation group: 'org.graalvm.polyglot', name: 'polyglot', version: '24.2.2'
+    implementation group: 'org.graalvm.polyglot', name: 'js-community', version: '24.2.2'
 
 
-    implementation 'info.picocli:picocli:4.6.3'
-    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
-    testImplementation 'info.picocli:picocli:4.6.3'
-    testAnnotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+    implementation 'info.picocli:picocli:4.7.6'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
+    testImplementation 'info.picocli:picocli:4.7.6'
+    testAnnotationProcessor 'info.picocli:picocli-codegen:4.7.6'
 
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
     implementation 'net.java.dev.jna:jna-jpms:5.13.0'
     implementation 'net.java.dev.jna:jna-platform-jpms:5.13.0'
     implementation 'io.github.ititus:ddsiio:3.0.1'
 }
-

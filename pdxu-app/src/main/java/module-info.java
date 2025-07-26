@@ -1,7 +1,7 @@
 open module com.crschnick.pdxu.app {
     uses com.crschnick.pdxu.app.core.EditorProvider;
     requires com.realityinteractive.imageio.tga;
-    requires org.apache.commons.lang;
+    requires org.apache.commons.lang3;
     requires org.apache.commons.io;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;

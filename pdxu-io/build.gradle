@@ -1,21 +1,13 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
-java {
-    modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-repositories {
-    mavenCentral()
-}
+apply from: "$rootDir/gradle/java.gradle"
 
 dependencies {
-    compileOnly group: 'org.graalvm.polyglot', name: 'polyglot', version: '23.1.2'
-    compileOnly group: 'org.graalvm.polyglot', name: 'js-community', version: '23.1.2'
+    compileOnly group: 'org.graalvm.polyglot', name: 'polyglot', version: '24.2.2'
+    compileOnly group: 'org.graalvm.polyglot', name: 'js-community', version: '24.2.2'
 
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }

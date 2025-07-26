@@ -1,98 +1,18 @@
-repositories {
-    mavenCentral()
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-    flatDir{
-        dirs file("$rootDir/misc/lib")
-    }
-}
+extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
 
-addDependenciesModuleInfo {
-    overwriteExistingFiles = true
-    jdepsExtraArgs = ['-q']
-    outputDirectory = file("$project.buildDir/generated-modules")
-    modules {
-        module {
-            artifact 'com.1stleg:jnativehook:2.0.2'
-            moduleInfoSource = '''
-                module org.jnativehook {
-                    exports org.jnativehook;
-                    exports org.jnativehook.keyboard;
-                    requires java.logging;
-                    requires java.desktop;
-                }
-            '''
-        }
-        module {
-            artifact 'io.sentry:sentry:6.29.0'
-            moduleInfoSource = '''
-                module io.sentry {
-                    exports io.sentry;
-                    opens io.sentry;
-                    
-                    exports io.sentry.protocol;
-                    opens io.sentry.protocol;
-                    
-                    exports io.sentry.config;
-                    opens io.sentry.config;
-                    
-                    exports io.sentry.transport;
-                    opens io.sentry.transport;
-                    
-                    exports io.sentry.util;
-                    opens io.sentry.util;
-                                        
-                    exports io.sentry.cache;
-                    opens io.sentry.cache;
-                                        
-                    exports io.sentry.exception;
-                    opens io.sentry.exception;
-                                        
-                    exports io.sentry.hints;
-                    opens io.sentry.hints;
-                }
-            '''
-        }
-        module {
-            artifact 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
-            moduleInfoSource = '''
-                module com.realityinteractive.imageio.tga {
-                    requires java.desktop;
-                    exports com.realityinteractive.imageio.tga;
-                }
-            '''
-        }
-        module {
-            artifact 'org.apache.commons:commons-lang3:3.12.0'
-            moduleInfoSource = '''
-                module org.apache.commons.lang {
-                    exports org.apache.commons.lang3;
-                    exports org.apache.commons.lang3.function;
-                    exports org.apache.commons.lang3.arch;
-                    exports org.apache.commons.lang3.reflect;
-                }
-            '''
-        }
-        module {
-            artifact 'org.apache.commons:commons-collections4:4.4'
-            moduleInfoSource = '''
-                module org.apache.commons.collections4 {
-                    exports org.apache.commons.collections4;
-                    exports org.apache.commons.collections4.bidimap;
-                }
-            '''
-        }
-        module {
-            artifact 'commons-io:commons-io:2.8.0'
-            moduleInfoSource = '''
-                module org.apache.commons.io {
-                    exports org.apache.commons.io;
-                    exports org.apache.commons.io.file;
-                    exports org.apache.commons.io.input;
-                    exports org.apache.commons.io.filefilter;
-                }
-            '''
-        }
+    module("io.sentry:sentry", "io.sentry") {
+        exportAllPackages()
+    }
+
+    module("com.1stleg:jnativehook", "org.jnativehook") {
+        exportAllPackages()
+        requires('java.logging')
+        requires('java.desktop')
+    }
+
+    module("com.github.tmyroadctfig:com.realityinteractive.imageio.tga", "com.realityinteractive.imageio.tga") {
+        exportAllPackages()
+        requires('java.desktop')
     }
 }

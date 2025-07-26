@@ -3,14 +3,8 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 plugins {
     id 'org.beryx.jlink' version '3.0.1'
     id 'org.jreleaser' version '1.8.0'
+    id 'org.gradlex.extra-java-module-info' version '1.13' apply false
 }
-
-version file('version').text
-def canonicalVersion = file('canonical_version').text
-
-apply from: "$rootDir/gradle/jreleaser.gradle"
-apply from: 'gradle/java.gradle'
-apply from: 'gradle/mods.gradle'
 
 clean {
     setDelete(Set.of())
@@ -34,6 +28,62 @@ if (!file("${projectDir}/pdxu.properties").exists()) {
     file("${projectDir}/pdxu.properties").write(file("${projectDir}/misc/pdxu.properties.default").getText())
 }
 
+version = file('version').text
+def canonicalVersion = file('canonical_version').text
+
+def jvmRunArgs = [
+        "-Dfile.encoding=UTF-8",
+        // This option completely breaks the module integration if set to true.
+        // We have to explicitly disable it as it is true by default
+        '-Dpolyglotimpl.DisableClassPathIsolation=false']
+
+// Disable JDK24 warnings
+jvmRunArgs += [
+        "--enable-native-access=com.sun.jna",
+        "--enable-native-access=javafx.graphics",
+        "--sun-misc-unsafe-memory-access=allow",
+]
+
+// Module access fixes
+jvmRunArgs += [
+        "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
+        "--add-exports", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
+        "--add-exports", "javafx.base/com.sun.javafx.binding=com.jfoenix",
+        "--add-exports", "javafx.base/com.sun.javafx.event=com.jfoenix",
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control=com.jfoenix",
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
+        "--add-opens", "java.base/java.lang.reflect=com.jfoenix"
+]
+
+// Use project liliput
+jvmRunArgs += ['-XX:+UnlockExperimentalVMOptions', '-XX:+UseCompactObjectHeaders']
+
+// Reduce heap usage with deduplication
+jvmRunArgs += ['-XX:+UseStringDeduplication']
+
+// GC config
+jvmRunArgs += ['-XX:+UseG1GC',
+               '-Xms300m',
+               '-Xmx16G',
+               '-XX:MinHeapFreeRatio=20',
+               '-XX:MaxHeapFreeRatio=30',
+               '-XX:GCTimeRatio=9',
+               // The default makes GC pauses longer for some reason
+               '-XX:G1HeapRegionSize=4m'
+]
+
+apply from: "$rootDir/gradle/jreleaser.gradle"
+apply from: "$rootDir/gradle/mods.gradle"
+
+subprojects {subproject ->
+    apply plugin: 'org.gradlex.extra-java-module-info'
+    apply from: "$rootDir/gradle/module_gen.gradle"
+}
+
+apply plugin: 'org.gradlex.extra-java-module-info'
+apply from: "$rootDir/gradle/java.gradle"
+apply from: "$rootDir/gradle/module_gen.gradle"
+
 dependencies {
     implementation project(':pdxu-editor')
     implementation project(':pdxu-app')
@@ -41,37 +91,15 @@ dependencies {
     implementation project(':pdxu-model')
 }
 
-repositories {
-    flatDir {
-        dirs file("$rootDir/misc/lib")
-    }
-    mavenCentral()
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
-List<String> runArgs = [
-        "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
-        "--add-exports", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
-        "--add-exports", "javafx.base/com.sun.javafx.binding=com.jfoenix",
-        "--add-exports", "javafx.base/com.sun.javafx.event=com.jfoenix",
-        "--add-exports", "javafx.controls/com.sun.javafx.scene.control=com.jfoenix",
-        "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
-        "--add-opens", "java.base/java.lang.reflect=com.jfoenix",
-        '-XX:+UseZGC',
-        "-Dfile.encoding=UTF-8",
-        // This option completely breaks the module integration if set to true.
-        // We have to explicitly disable it as it is true by default
-        '-Dpolyglotimpl.DisableClassPathIsolation=false',
-        "-Xmx16G"]
-
 application {
     mainModule = 'com.crschnick.pdxu.app'
     mainClass = 'com.crschnick.pdxu.app.cli.MainCommand'
-    applicationDefaultJvmArgs = runArgs + ["-ea"]
+    applicationDefaultJvmArgs = jvmRunArgs + ["-ea"]
 }
 
+run {
+    workingDir = rootDir
+}
 
 jlink {
     imageDir = file("$buildDir/image")
@@ -84,7 +112,7 @@ jlink {
         moduleName = 'com.crschnick.pdxu.app'
         mainClassName = 'com.crschnick.pdxu.app.cli.MainCommand'
         name = 'pdxu'
-        jvmArgs = runArgs
+        jvmArgs = jvmRunArgs
     }
 
     customImage {

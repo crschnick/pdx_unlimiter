@@ -64,9 +64,13 @@ public class NodeEvaluator {
                 string = string.replaceAll(entry.getKey(), entry.getValue().getValueNode().getString());
             }
 
-            Value eval = JAVASCRIPT_CONTEXT.eval("js", string);
-            double result = eval.asDouble();
-            return new ValueNode(FORMATTER.format(result), false);
+            try {
+                Value eval = JAVASCRIPT_CONTEXT.eval("js", string);
+                double result = eval.asDouble();
+                return new ValueNode(FORMATTER.format(result), false);
+            } catch (Throwable t) {
+                return new ValueNode("0.0", false);
+            }
         } else if (node.getString().startsWith("@")) {
             if (!environment.getVariables().containsKey(node.getString().substring(1))) {
                 throw new IllegalArgumentException("Unresolved variable: " + node.getString());

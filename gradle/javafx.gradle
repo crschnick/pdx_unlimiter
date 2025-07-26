@@ -1,0 +1,31 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import java.lang.module.ModuleFinder;
+
+def currentOS = DefaultNativePlatform.currentOperatingSystem;
+def platform = null
+if (currentOS.isWindows()) {
+    platform = 'win'
+} else if (currentOS.isMacOsX()) {
+    platform = 'mac'
+} else {
+    platform = 'linux'
+}
+
+if (System.getProperty ("os.arch") == 'aarch64') {
+    platform += '-aarch64'
+}
+
+configurations {
+    javafx
+}
+
+if (!ModuleFinder.ofSystem().find("javafx.base").isPresent()) {
+    // Always use maven version for now
+    dependencies {
+        javafx "org.openjfx:javafx-base:${devJavafxVersion}:${platform}"
+        javafx "org.openjfx:javafx-controls:${devJavafxVersion}:${platform}"
+        javafx "org.openjfx:javafx-graphics:${devJavafxVersion}:${platform}"
+        javafx "org.openjfx:javafx-media:${devJavafxVersion}:${platform}"
+        javafx "org.openjfx:javafx-web:${devJavafxVersion}:${platform}"
+    }
+}

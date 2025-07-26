@@ -5,11 +5,22 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-javadoc{
-    source = sourceSets.main.allJava
-    options {
-        addStringOption('-release', '21')
-        addStringOption('link', 'https://docs.oracle.com/en/java/javase/21/docs/api/')
-        addBooleanOption('html5', true)
+tasks.withType(JavaExec).configureEach {
+    modularity.inferModulePath = true
+}
+
+//javadoc{
+//    options {
+//        addStringOption('-release', '24')
+//        addStringOption('link', 'https://docs.oracle.com/en/java/javase/24/docs/api/')
+//        addBooleanOption('html5', true)
+//        addStringOption('Xdoclint:none', '-quiet')
+//    }
+//}
+
+repositories {
+    mavenCentral()
+    flatDir{
+        dirs file("$rootDir/misc/lib")
     }
 }

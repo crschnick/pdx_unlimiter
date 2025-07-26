@@ -31,7 +31,7 @@ module com.crschnick.pdxu.editor {
     requires org.kordamp.ikonli.javafx;
     requires org.apache.commons.io;
     requires org.apache.commons.collections4;
-    requires org.apache.commons.lang;
+    requires org.apache.commons.lang3;
     requires java.desktop;
 
 
