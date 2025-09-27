@@ -140,6 +140,27 @@ public class TextFormatTokenizer {
         nextScalarStart = i + 1;
     }
 
+
+    private boolean checkBuggyCommentValue(char c) throws ParseException {
+        if (isInQuotes || isInBlock || isInComment) {
+            return false;
+        }
+
+        if (getPredecessorTokenType() != EQUALS) {
+            return false;
+        }
+
+        if (c == '#') {
+            var next = getSuccessorByte();
+            boolean isWhitespace = (next == '\n' || next == '\r' || next == ' ' || next == '\t');
+            if (isWhitespace) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private boolean checkCommentCase(char c) throws ParseException {
         if (isInQuotes || isInBlock) {
             return false;
@@ -252,8 +273,16 @@ public class TextFormatTokenizer {
         nextScalarStart = endExclusive;
     }
 
+    private byte getPredecessorTokenType() {
+        return tokenCounter <= 0 ? 0 : tokenTypes[tokenCounter - 1];
+    }
+
+    private byte getPredecessorByte() {
+        return i <= 0 ? 0 : bytes[i - 1];
+    }
+
     private byte getSuccessorByte() {
-        return i == bytes.length - 1 ? 0 : bytes[i + 1];
+        return i >= bytes.length - 1 ? 0 : bytes[i + 1];
     }
 
     private void setSuccessorByte(byte b) {
@@ -263,13 +292,14 @@ public class TextFormatTokenizer {
     }
 
     private boolean checkForControlTokenKey(byte controlToken) throws ParseException {
-        if (controlToken == CLOSE_GROUP) {
-            if (getSuccessorByte() == EQUALS_CHAR) {
-                if (nextScalarStart == i) {
-                    return true;
-                }
-            }
-        }
+        // It is not possible to differentiate with multikey nodes between } as key and a multikey node
+//        if (controlToken == CLOSE_GROUP) {
+//            if (getSuccessorByte() == EQUALS_CHAR) {
+//                if (nextScalarStart == i) {
+//                    return true;
+//                }
+//            }
+//        }
 
         if (controlToken == OPEN_GROUP) {
             if (getSuccessorByte() == EQUALS_CHAR) {
@@ -351,6 +381,9 @@ public class TextFormatTokenizer {
         // Add extra new line at the end to simulate end of token
         char c = i == bytes.length ? '\n' : (char) bytes[i];
 
+        if (checkBuggyCommentValue(c)) {
+            return;
+        }
         if (checkCommentCase(c)) {
             return;
         }

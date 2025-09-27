@@ -20,6 +20,14 @@ public final class SimpleArrayNode extends ArrayNode {
         this.values = Objects.requireNonNull(values);
     }
 
+    public int[] getKeyScalars() {
+        return keyScalars;
+    }
+
+    public int[] getValueScalars() {
+        return valueScalars;
+    }
+
     @Override
     public String toString() {
         if (values.size() == 0) {

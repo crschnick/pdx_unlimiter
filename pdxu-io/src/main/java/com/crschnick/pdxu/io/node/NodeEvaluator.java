@@ -14,7 +14,7 @@ public class NodeEvaluator {
     private static final NumberFormat FORMATTER = new DecimalFormat("#0.0000000");
 
     public static void evaluateArrayNode(ArrayNode arrayNode) {
-        evaluateArrayNode(arrayNode, new NodeEnvironment(null, Map.of()));
+        evaluateArrayNode(arrayNode, new NodeEnvironment(Map.of()));
     }
 
     public static void evaluateArrayNode(ArrayNode arrayNode, NodeEnvironment environment) {
@@ -30,7 +30,7 @@ public class NodeEvaluator {
                             currentEnvironment[0].put(s.substring(1), evaluated);
                         }
                     } else if (node.isArray()) {
-                        currentEnvironment[0] = currentEnvironment[0].copy(null);
+                        currentEnvironment[0] = currentEnvironment[0].copy();
                         evaluateArrayNode(node.getArrayNode(), currentEnvironment[0]);
                     }
                 },

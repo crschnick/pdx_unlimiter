@@ -11,6 +11,8 @@ import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -22,6 +24,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 
 public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
@@ -71,8 +74,16 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
                             .stream()
                             .map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode())
                             .toArray(ArrayNode[]::new);
+
             var all = Vic3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.VIC3), additional);
-            return Vic3TagRenderer.getCoatOfArms(editorNode.getBackingNode().getArrayNode(), all);
+            var allCopy = all.copy().getArrayNode();
+            var env = new NodeEnvironment(Map.of());
+            NodeEvaluator.evaluateArrayNode(allCopy, env);
+
+            var coaNode = editorNode.getBackingNode().copy().getArrayNode();
+            NodeEvaluator.evaluateArrayNode(coaNode, env);
+
+            return Vic3TagRenderer.getCoatOfArms(coaNode, allCopy);
         }
     }
 

@@ -258,6 +258,19 @@ public final class TextFormatParser {
                 assert size >= builder.getUsedSize() :
                         "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
                 index++;
+
+                boolean isMultiKeyValue = tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
+                if (isMultiKeyValue) {
+                    index++;
+                    var keys = parseNodeIfNotScalarValue(name, strict);
+                    if (!(keys instanceof SimpleArrayNode ar) || ar.getKeyScalars() != null) {
+                        throw ParseException.createFromLiteralIndex(name, "Invalid multi key", index, context);
+                    }
+
+                    var value = builder.build();
+                    return new MultiKeyValueNode(context, ar.getValueScalars(), value);
+                }
+
                 return builder.build();
             }
 
