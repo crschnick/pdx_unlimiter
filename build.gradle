@@ -251,15 +251,6 @@ if (!devProps.exists()) {
     devProps.text = file("$rootDir/gradle/gradle_scripts/dev_default.properties").text
 }
 
-// Add pre commit hook if in git repo
-
-if ((os.isLinux() || os.isMacOsX()) && file("$rootDir/.git/hooks").exists()) {
-    copy {
-        from "$rootDir/gradle/gradle_scripts/pre-commit"
-        into "$rootDir/.git/hooks"
-    }
-}
-
 // Checks
 
 if (System.getProperty("java.home").contains(" ")) {
