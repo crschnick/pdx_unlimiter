@@ -31,6 +31,21 @@ jobs:
     name: Publish
     if: ${{ contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: none
+      attestations: none
+      checks: none
+      contents: write
+      deployments: none
+      id-token: none
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -85,7 +100,8 @@ jobs:
           body_path: dist/build/dist/release/github-changelog.md
           token: ${{ secrets.GH_PAT }}
           preserve_order: true
-          make_latest: true
+          prerelease: true
+          make_latest: false
           tag_name: ${{ env.VERSION }}
           files: |
             dist/build/dist/github-release/*

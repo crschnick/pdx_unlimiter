@@ -13,6 +13,7 @@ configurations {
 dependencies {
     compileOnly 'com.jfoenix:jfoenix:9.0.10'
     compileOnly "org.kordamp.ikonli:ikonli-javafx:12.4.0"
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations:2.20"
 
     compileOnly "org.slf4j:slf4j-api:2.0.17"
 
