@@ -1,0 +1,58 @@
+name: Windows Build
+
+on: workflow_call
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install AzureSignTool
+        run: |
+          dotnet tool install --global AzureSignTool
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'zulu'
+          cache: gradle
+          java-package: jdk
+        if: ${{ contains(runner.arch, 'X64') == true }}
+
+      - name: Set up ARM JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'liberica'
+          cache: gradle
+          java-package: jdk+fx
+        if: ${{ contains(runner.arch, 'ARM64') == true }}
+
+      - name: Execute dist build
+        run: |
+          gradlew.bat clean dist --stacktrace
+        shell: cmd
+        env:
+          AZURE_KEY_VAULT_URI: ${{ secrets.AZURE_KEY_VAULT_URI }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_CERT_NAME: ${{ secrets.AZURE_CERT_NAME}}
+          RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          retention-days: 1
+          compression-level: 1
+          path: |
+            dist/build/dist/artifacts/*

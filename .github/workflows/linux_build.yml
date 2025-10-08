@@ -1,0 +1,36 @@
+name: Linux Build
+
+on: workflow_call
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'zulu'
+          java-package: jdk
+          cache: gradle
+
+      - name: Execute dist build
+        run: ./gradlew clean dist --stacktrace
+        env:
+          RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-artifacts
+          retention-days: 1
+          compression-level: 1
+          path: dist/build/dist/artifacts/*

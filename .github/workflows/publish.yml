@@ -1,0 +1,91 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-windows:
+    uses: ./.github/workflows/windows_build.yml
+    secrets: inherit
+    name: Windows Build
+    if: contains(github.event.head_commit.message, '[release]')
+  build-linux:
+    uses: ./.github/workflows/linux_build.yml
+    secrets: inherit
+    name: Linux Build
+    if: contains(github.event.head_commit.message, '[release]')
+  build-macos:
+    uses: ./.github/workflows/macos_build.yml
+    secrets: inherit
+    name: macOS Build
+    if: contains(github.event.head_commit.message, '[release]')
+
+  publish:
+    needs: [
+      build-windows,
+      build-linux,
+      build-macos
+    ]
+    name: Publish
+    if: ${{ contains(github.event.head_commit.message, '[release]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set variables
+        run: |
+          VER=$(cat "version")
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Create version tag
+        uses: actions/github-script@v8
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ env.VERSION }}',
+              sha: context.sha
+            })
+        if: ${{ contains(github.event.head_commit.message, '[release]') }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'zulu'
+          java-package: jdk
+          cache: gradle
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-artifacts"
+          merge-multiple: true
+          path: dist/build/dist/artifacts
+
+      - name: Create changelog, artifacts, signatures, checksums
+        run: ./gradlew createGithubChangelog createChecksums signArtifacts signChecksums prepareGitHubRelease
+        env:
+          RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_KEY: |
+            ${{ secrets.GPG_KEY }}
+          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        if: ${{ contains(github.event.head_commit.message, '[release]') }}
+        with:
+          body_path: dist/build/dist/release/github-changelog.md
+          token: ${{ secrets.GH_PAT }}
+          preserve_order: true
+          make_latest: true
+          tag_name: ${{ env.VERSION }}
+          files: |
+            dist/build/dist/github-release/*
