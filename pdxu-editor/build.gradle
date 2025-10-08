@@ -17,7 +17,7 @@ dependencies {
 
     compileOnly "org.slf4j:slf4j-api:2.0.17"
 
-    compileOnly 'org.apache.commons:commons-lang3:3.18.0'
+    compileOnly 'org.apache.commons:commons-lang3:3.19.0'
     compileOnly 'commons-io:commons-io:2.20.0'
     compileOnly "org.apache.commons:commons-collections4:4.5.0"
     compileOnly 'io.github.mkpaz:atlantafx-base:2.1.0'
