@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://discord.gg/BVE4vxqFpU"><img alt="Discord" src="https://img.shields.io/discord/786465137191682088?logo=discord&logoColor=white"></a> <a href="https://github.com/crschnick/pdx_unlimiter/actions/workflows/gradle.yml"><img alt="CI" src="https://github.com/crschnick/pdx_unlimiter/actions/workflows/gradle.yml/badge.svg"></a>
+  <a href="https://discord.gg/BVE4vxqFpU"><img alt="Discord" src="https://img.shields.io/discord/786465137191682088?logo=discord&logoColor=white"></a> <a href="https://github.com/crschnick/pdx_unlimiter/actions/workflows/gradle.yml"><img alt="CI" src="https://github.com/crschnick/pdx_unlimiter/actions/workflows/build.yml/badge.svg"></a>
 </h1>
 
 ![Logo](misc/pdxu.png)
