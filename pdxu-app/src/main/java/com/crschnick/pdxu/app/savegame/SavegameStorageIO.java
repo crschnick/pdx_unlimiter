@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
+
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.FileSystemHelper;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class SavegameStorageIO {
                     exportSavegameDirectory(storage, storageDir);
                 }
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                ErrorEventFactory.fromThrowable(e).handle();
             }
         }, true);
     }
@@ -31,7 +32,7 @@ public class SavegameStorageIO {
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> storage, Path out) throws IOException {
         var writtenCollections = new ArrayList<String>();
         for (SavegameCampaign<T, I> c : storage.getCollections()) {
-            var colName = getUniqueName(OsHelper.getFileSystemCompatibleName(c.getName()), writtenCollections);
+            var colName = getUniqueName(FileSystemHelper.getFileSystemCompatibleName(c.getName()), writtenCollections);
             writtenCollections.add(colName);
 
             Path colDir = out.resolve(colName);
@@ -39,7 +40,7 @@ public class SavegameStorageIO {
             var writtenEntries = new ArrayList<String>();
             for (SavegameEntry<T, I> e : c.entryStream().toList()) {
                 var branchSuffix = " (" + c.getUuid() + ")";
-                var eName = OsHelper.getFileSystemCompatibleName(e.getName());
+                var eName = FileSystemHelper.getFileSystemCompatibleName(e.getName());
                 var outName = getUniqueName(eName, writtenEntries) + branchSuffix +
                         "." + storage.getType().getFileEnding();
                 writtenEntries.add(eName);

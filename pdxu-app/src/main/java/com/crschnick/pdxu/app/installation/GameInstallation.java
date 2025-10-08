@@ -1,15 +1,12 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.settings.Settings;
+
 import com.crschnick.pdxu.app.installation.dist.GameDist;
-import com.crschnick.pdxu.app.lang.Language;
-import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.model.GameVersion;
 import org.apache.commons.collections4.BidiMap;
-import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +18,7 @@ import java.util.Optional;
 
 public final class GameInstallation {
 
-    public static final BidiMap<Game, GameInstallation> ALL = new DualHashBidiMap<>();
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    public static final BidiMap<Game, GameInstallation> ALL = new DualLinkedHashBidiMap<>();
 
     private final GameInstallType type;
     private final GameDist dist;
@@ -32,7 +28,7 @@ public final class GameInstallation {
 
     private Path userDir;
     private GameVersion version;
-    private Language language;
+    private GameLanguage language;
 
     public GameInstallation(GameInstallType type, GameDist dist) {
         this.type = type;
@@ -54,38 +50,6 @@ public final class GameInstallation {
         }
     }
 
-    public static void init() {
-        Settings s = Settings.getInstance();
-        Optional.ofNullable(s.eu4.getValue()).ifPresent(
-                p -> ALL.put(Game.EU4, new GameInstallation(Game.EU4.getInstallType(), p)));
-        Optional.ofNullable(s.ck3.getValue()).ifPresent(
-                p -> ALL.put(Game.CK3, new GameInstallation(Game.CK3.getInstallType(), p)));
-        Optional.ofNullable(s.hoi4.getValue()).ifPresent(
-                p -> ALL.put(Game.HOI4, new GameInstallation(Game.HOI4.getInstallType(), p)));
-        Optional.ofNullable(s.stellaris.getValue()).ifPresent(
-                p -> ALL.put(Game.STELLARIS, new GameInstallation(Game.STELLARIS.getInstallType(), p)));
-        Optional.ofNullable(s.ck2.getValue()).ifPresent(
-                p -> ALL.put(Game.CK2, new GameInstallation(Game.CK2.getInstallType(), p)));
-        Optional.ofNullable(s.vic2.getValue()).ifPresent(
-                p -> ALL.put(Game.VIC2, new GameInstallation(Game.VIC2.getInstallType(), p)));
-        Optional.ofNullable(s.vic3.getValue()).ifPresent(
-                p -> ALL.put(Game.VIC3, new GameInstallation(Game.VIC3.getInstallType(), p)));
-        for (Game g : Game.values()) {
-            if (!ALL.containsKey(g)) {
-                continue;
-            }
-
-            var i = ALL.get(g);
-            try {
-                i.loadData();
-                i.initOptional();
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-                ALL.remove(g);
-            }
-        }
-    }
-
     public static void reset() {
         ALL.clear();
     }
@@ -98,10 +62,10 @@ public final class GameInstallation {
     }
 
     public void initOptional() throws Exception {
-        LoggerFactory.getLogger(getClass()).debug("Initializing optional data ...");
+        TrackEvent.debug("Initializing optional data ...");
         loadDlcs();
         this.mods.addAll(type.loadMods(this));
-        LoggerFactory.getLogger(getClass()).debug("Finished initializing optional data\n");
+        TrackEvent.debug("Finished initializing optional data\n");
     }
 
     private void loadDlcs() throws IOException {
@@ -137,36 +101,36 @@ public final class GameInstallation {
     }
 
     public void loadData() throws InvalidInstallationException {
-        Game g = ALL.inverseBidiMap().get(this);
-        LoggerFactory.getLogger(getClass()).debug("Initializing " + g.getTranslatedAbbreviation() + " installation ...");
+        Game g = dist.getGame();
+        TrackEvent.debug("Initializing " + g.getTranslatedAbbreviation() + " installation ...");
 
-        if (getInstallDir().startsWith(OsHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
-            throw new InvalidInstallationException("INSTALL_DIR_IS_USER_DIR", g.getInstallationName(), g.getInstallationName());
+        if (getInstallDir().startsWith(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
+            throw new InvalidInstallationException("installDirIsUserDir", g.getInstallationName(), g.getInstallationName());
         }
 
         if (!Files.isRegularFile(dist.getExecutable())) {
             var exec = getInstallDir().relativize(dist.getExecutable());
-            throw new InvalidInstallationException("EXECUTABLE_NOT_FOUND", g.getInstallationName(), exec.toString(), getInstallDir().toString());
+            throw new InvalidInstallationException("executableNotFound", g.getInstallationName(), exec.toString(), getInstallDir().toString());
         }
 
-        logger.debug(g.getTranslatedAbbreviation() + " distribution type: " + this.dist.getName());
+        TrackEvent.debug(g.getTranslatedAbbreviation() + " distribution type: " + this.dist.getName());
 
         try {
             this.userDir = dist.determineUserDir();
-            logger.debug(g.getTranslatedAbbreviation() + " user dir: " + this.userDir);
+            TrackEvent.debug(g.getTranslatedAbbreviation() + " user dir: " + this.userDir);
             if (!Files.exists(this.userDir)) {
                 throw new InvalidInstallationException(
-                        "GAME_DATA_PATH_DOES_NOT_EXIST", g.getTranslatedAbbreviation(), this.userDir.toString());
+                        "gameDataPathDoesNotExist", g.getTranslatedAbbreviation(), this.userDir.toString());
             }
 
             this.version = dist.determineVersion().map(type::getVersion)
                     .orElse(type.determineVersionFromInstallation(getInstallDir()))
                     .orElse(null);
-            logger.debug(g.getTranslatedAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
+            TrackEvent.debug(g.getTranslatedAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
             this.language = type.determineLanguage(getInstallDir(), userDir).orElse(null);
-            logger.debug(g.getTranslatedAbbreviation() + " language: " +
-                    (this.language != null ? this.language.getDisplayName() : "unknown"));
-            LoggerFactory.getLogger(getClass()).debug("Finished initialization");
+            TrackEvent.debug(g.getTranslatedAbbreviation() + " language: " +
+                    (this.language != null ? this.language.getId() : "unknown"));
+            TrackEvent.debug("Finished initialization");
         } catch (InvalidInstallationException e) {
             throw e;
         } catch (Exception e) {
@@ -198,7 +162,7 @@ public final class GameInstallation {
         return dlcs;
     }
 
-    public Language getLanguage() {
+    public GameLanguage getLanguage() {
         return language;
     }
 
@@ -207,30 +171,30 @@ public final class GameInstallation {
     }
 
     public List<GameMod> queryEnabledMods() throws Exception {
-        logger.debug("Loading enabled mods ...");
+        TrackEvent.debug("Loading enabled mods ...");
         var enabledMods = new ArrayList<GameMod>();
         type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
             var mod = getModForLauncherId(s);
             mod.ifPresentOrElse(m -> {
                 enabledMods.add(m);
-                logger.debug("Detected enabled mod " + m.getName());
+                TrackEvent.debug("Detected enabled mod " + m.getName());
             }, () -> {
-                logger.warn("Detected enabled but unrecognized mod " + s);
+                TrackEvent.warn("Detected enabled but unrecognized mod " + s);
             });
         });
         return enabledMods;
     }
 
     public List<GameDlc> queryDisabledDlcs() throws Exception {
-        logger.debug("Loading disabled dlcs ...");
+        TrackEvent.debug("Loading disabled dlcs ...");
         var disabledDlcs = new ArrayList<GameDlc>();
         type.getDisabledDlcs(getInstallDir(), userDir).forEach(s -> {
             var dlc = getDlcForLauncherId(s);
             dlc.ifPresentOrElse(m -> {
                 disabledDlcs.add(m);
-                logger.debug("Detected disabled dlc " + m.getName());
+                TrackEvent.debug("Detected disabled dlc " + m.getName());
             }, () -> {
-                logger.warn("Detected disabled but unrecognized dlc " + s);
+                TrackEvent.warn("Detected disabled but unrecognized dlc " + s);
             });
         });
         return disabledDlcs;

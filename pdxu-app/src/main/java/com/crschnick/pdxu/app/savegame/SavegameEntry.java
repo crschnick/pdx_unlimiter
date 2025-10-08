@@ -1,9 +1,9 @@
 package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.model.GameDate;
 import javafx.beans.property.*;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         this.notes = notes;
         this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
         this.state.addListener((c,o,n) -> {
-            LoggerFactory.getLogger(getClass()).debug("Changing state of " + this.name.get() + " from " + o + " to " + n);
+            TrackEvent.debug("Changing state of " + this.name.get() + " from " + o + " to " + n);
         });
     }
 

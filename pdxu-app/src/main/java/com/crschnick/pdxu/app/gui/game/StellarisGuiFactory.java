@@ -3,14 +3,12 @@ package com.crschnick.pdxu.app.gui.game;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
-import javafx.geometry.Insets;
+import javafx.beans.binding.Bindings;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 
 public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisSavegameInfo> {
 
@@ -22,14 +20,14 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
-        bg.setOpacity(0.5);
+        bg.opacityProperty().bind(Bindings.createDoubleBinding(() -> {
+            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
+        }, AppPrefs.get().theme()));
         return bg;
     }
 
     @Override
     public Background createEntryInfoBackground(SavegameInfo<StellarisTag> info) {
-        return new Background(new BackgroundFill(
-                Color.GRAY,
-                CornerRadii.EMPTY, Insets.EMPTY));
+        return null;
     }
 }

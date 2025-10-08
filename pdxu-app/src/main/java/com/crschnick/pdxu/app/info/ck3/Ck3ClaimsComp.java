@@ -1,11 +1,12 @@
 package com.crschnick.pdxu.app.info.ck3;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.Ck3CoatOfArmsCache;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
 import javafx.scene.image.Image;
@@ -41,7 +42,7 @@ public class Ck3ClaimsComp extends DiplomacyRowComp<Ck3Title> {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("CLAIMS");
+        return AppI18n.get("claims");
     }
 
     @Override

@@ -1,0 +1,30 @@
+.status-bar {
+    -fx-border-color: -color-success-subtle;
+    -fx-background-color: -color-success-muted;
+    -fx-padding: 0 8 0 8;
+    -fx-min-height: 3.6em;
+    -fx-max-height: 3.6em;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-compatible-unknown {
+-fx-border-color: -color-warning-muted;
+-fx-background-color: -color-warning-muted;
+}
+
+.status-incompatible {
+    -fx-border-color: -color-danger-subtle;
+    -fx-background-color: -color-danger-muted;
+}
+
+.status-running {
+-fx-border-color: -color-success-muted;
+-fx-background-color: -color-success-emphasis;
+}
+
+.status-bar .image-icon {
+-fx-min-width: 1.85em;
+-fx-max-width: 1.85em;
+-fx-min-height: 1.85em;
+-fx-max-height: 1.85em;
+}

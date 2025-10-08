@@ -1,9 +1,9 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.CacheManager;
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
@@ -21,14 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.fromGameColor;
 
-public class Ck3CoatOfArmsCache extends CacheManager.Cache {
+public class Ck3CoatOfArmsCache extends GameCacheManager.Cache {
 
     private static final int REALM_DEFAULT_IMG_SIZE = 64;
     private static final int HOUSE_DEFAULT_IMG_SIZE = 128;
     private static final int TITLE_DEFAULT_IMG_SIZE = 64;
 
     static Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext ctx) {
-        var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var loaded = cache.colorsLoaded;
         if (loaded) {
             return cache.colors;
@@ -52,7 +52,7 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
                 cache.colorsLoaded = true;
                 return cache.colors;
             } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         }
         cache.colorsLoaded = true;
@@ -64,7 +64,7 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.realms.get(tag);
         if (cachedImg != null) {
             return cachedImg;
@@ -81,7 +81,7 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.houses.get(house);
         if (cachedImg != null) {
             return cachedImg;
@@ -96,7 +96,7 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        var cache = CacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Ck3CoatOfArmsCache.class);
         var cachedImg = cache.titles.get(title);
         if (cachedImg != null) {
             return cachedImg;
@@ -115,6 +115,6 @@ public class Ck3CoatOfArmsCache extends CacheManager.Cache {
     private final Map<Ck3House, Image> houses = new ConcurrentHashMap<>();
 
     public Ck3CoatOfArmsCache() {
-        super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
     }
 }

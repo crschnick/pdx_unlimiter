@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.info.eu4;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
@@ -30,6 +31,6 @@ public class Eu4StabilityComp extends SimpleInfoComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("STABILITY");
+        return AppI18n.get("stability");
     }
 }

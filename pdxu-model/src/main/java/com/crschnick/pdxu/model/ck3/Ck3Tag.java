@@ -56,7 +56,7 @@ public class Ck3Tag {
             return Optional.empty();
         }
 
-        long id = n.getNodeForKey("currently_played_characters").getNodeArray().get(0).getLong();
+        long id = n.getNodeForKey("currently_played_characters").getNodeArray().getFirst().getLong();
         if (!n.getNodeForKey("living").hasKey(String.valueOf(id))) {
             return Optional.empty();
         }
@@ -126,7 +126,7 @@ public class Ck3Tag {
                 return;
             }
 
-            var primary = domain.getNodeArray().get(0).getLong();
+            var primary = domain.getNodeArray().getFirst().getLong();
             var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
             var balance = landedNode.getNodeForKeyIfExistent("balance")
                     .map(Node::getDouble).orElse(0.0).intValue();
@@ -177,7 +177,7 @@ public class Ck3Tag {
     }
 
     public Ck3Title getPrimaryTitle() {
-        return titles.get(0);
+        return titles.getFirst();
     }
 
     public long getId() {

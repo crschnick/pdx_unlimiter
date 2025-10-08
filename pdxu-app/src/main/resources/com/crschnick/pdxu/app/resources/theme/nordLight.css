@@ -1,0 +1,13 @@
+.root { -color-bg-default-transparent: #fafafcAF; }
+
+.root .table-view {
+    -color-cell-bg-odd: derive(-color-bg-subtle, 20%);
+}
+
+.root:dark * {
+    -color-foreground-base: derive(-color-bg-default-transparent, 13%);
+}
+
+.root:light * {
+    -color-foreground-base: derive(-color-bg-default-transparent, -3%);
+}

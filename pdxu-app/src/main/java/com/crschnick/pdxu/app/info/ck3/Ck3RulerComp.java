@@ -1,12 +1,13 @@
 package com.crschnick.pdxu.app.info.ck3;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.game.Ck3CoatOfArmsCache;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.installation.GameFileContext;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
 import javafx.geometry.Pos;
@@ -75,7 +76,7 @@ public class Ck3RulerComp extends SavegameInfoComp {
             var house = GameImage.imageNode(
                     Ck3CoatOfArmsCache.houseImage(ruler.getHouse(), GameFileContext.fromData(data)),
                     "house-icon");
-            GuiTooltips.install(house, PdxuI18n.get("HOUSE", ruler.getHouse().getName()));
+            GuiTooltips.install(house, AppI18n.get("house", ruler.getHouse().getName()));
             rulerNode.getChildren().add(house);
         }
         return rulerNode;

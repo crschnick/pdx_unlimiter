@@ -98,7 +98,7 @@ public final class TaggedNode extends Node {
         if (Arrays.stream(COLORS).anyMatch(t -> t.equals(this.type))) {
             return new Descriptor(ValueType.COLOR, KeyType.NONE);
         } else {
-            return new Descriptor(values.get(0).describe().getValueType(), KeyType.NONE);
+            return new Descriptor(values.getFirst().describe().getValueType(), KeyType.NONE);
         }
     }
 

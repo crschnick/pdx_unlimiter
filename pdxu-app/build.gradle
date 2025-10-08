@@ -1,43 +1,131 @@
 plugins {
-    id 'java-library'
+    id 'application'
 }
 
-apply from: "$rootDir/gradle/java.gradle"
-apply from: "$rootDir/gradle/javafx.gradle"
-apply from: "$rootDir/gradle/jackson.gradle"
-apply from: "$rootDir/gradle/lombok.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/java.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/javafx.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/jna.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/lombok.gradle"
 
-compileJava {
-    options.compilerArgs += ["-Aproject=${project.name}"]
+configurations {
+    implementation.extendsFrom(javafx)
+    implementation.extendsFrom(jna)
 }
 
 dependencies {
-    implementation 'com.jfoenix:jfoenix:9.0.10'
+    implementation 'com.vladsch.flexmark:flexmark:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-options:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-data:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-ast:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-builder:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-sequence:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-misc:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-dependency:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-collection:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-format:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-html:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-util-visitor:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-tables:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-footnotes:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-definition:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-anchorlink:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-yaml-front-matter:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-toc:0.64.8'
 
-    implementation group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
-    implementation group: 'org.kordamp.ikonli', name: 'ikonli-materialdesign-pack', version: "11.3.5"
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'
-
+    implementation 'info.picocli:picocli:4.7.7'
     implementation 'org.apache.commons:commons-lang3:3.18.0'
-    implementation 'commons-io:commons-io:2.19.0'
-    implementation "org.apache.commons:commons-collections4:4.5.0"
-    implementation 'io.sentry:sentry:8.13.3'
-    implementation 'com.1stleg:jnativehook:2.0.2'
-    implementation 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
+    implementation 'io.sentry:sentry:8.20.0'
+    implementation 'commons-io:commons-io:2.20.0'
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.20.0"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.20"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0"
+    implementation "org.kordamp.ikonli:ikonli-material2-pack:12.4.0"
+    implementation "org.kordamp.ikonli:ikonli-materialdesign-pack:12.4.0"
+    implementation "org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0"
+    implementation 'org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.4.0'
+    implementation "org.kordamp.ikonli:ikonli-javafx:12.4.0"
+    implementation "org.kordamp.ikonli:ikonli-feather-pack:12.4.0"
+    implementation "org.slf4j:slf4j-api:2.0.17"
+    implementation 'io.xpipe:modulefs:0.1.7'
+    implementation 'io.github.mkpaz:atlantafx-base:2.1.0'
+    implementation "org.kohsuke:github-api:1.330"
 
+    implementation 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
+    implementation("com.github.kwhat:jnativehook:2.2.2")
+    implementation "org.apache.commons:commons-collections4:4.5.0"
+    implementation 'io.github.ititus:ddsiio:3.1.0'
+    implementation 'org.graalvm.polyglot:polyglot:25.0.0'
+    implementation 'org.graalvm.truffle:truffle-runtime:25.0.0'
+    implementation 'org.graalvm.js:js-language:25.0.0'
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
-    implementation group: 'org.graalvm.polyglot', name: 'polyglot', version: '24.2.2'
-    implementation group: 'org.graalvm.js', name: 'js-community', version: '24.2.2'
+    runtimeOnly project(':pdxu-editor')
+    implementation 'com.jfoenix:jfoenix:9.0.10'
+}
 
+application {
+    mainModule = groupName + '.' + artifactName
+    mainClass = groupName + '.' + artifactName + '.Main'
+    applicationDefaultJvmArgs = jvmRunArgs
+}
 
-    implementation 'info.picocli:picocli:4.7.6'
-    annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
-    testImplementation 'info.picocli:picocli:4.7.6'
-    testAnnotationProcessor 'info.picocli:picocli-codegen:4.7.6'
+run {
+    systemProperty propertyName('useVirtualThreads'), 'false'
+    systemProperty propertyName('writeLogs'), "true"
+    systemProperty propertyName('writeSysOut'), "true"
+    systemProperty propertyName('logLevel'), "trace"
 
-    implementation 'net.java.dev.jna:jna-jpms:5.13.0'
-    implementation 'net.java.dev.jna:jna-platform-jpms:5.13.0'
-    implementation 'io.github.ititus:ddsiio:3.0.1'
+    // Apply passed properties
+    for (final def e in System.getProperties().entrySet()) {
+        if (e.getKey().toString().contains(snakeProductName)) {
+            systemProperty e.getKey().toString(), e.getValue()
+        }
+    }
+
+    workingDir = rootDir
+    jvmArgs += ['-XX:+EnableDynamicAgentLoading']
+}
+
+processResources {
+    // Generate binary stylesheets from css
+    doLast {
+        def pkg = groupName.replaceAll("\\.", "/") + "/" + artifactName.replaceAll("\\.", "/")
+        def cssFiles = fileTree(dir: "$sourceSets.main.output.resourcesDir/$pkg/resources/style")
+        cssFiles.include "**/*.css"
+        cssFiles.each { css ->
+            providers.javaexec {
+                workingDir = projectDir
+                jvmArgs += ["--module-path=${configurations.javafx.asFileTree.asPath},", "--add-modules=javafx.graphics"]
+                mainClass = "com.sun.javafx.css.parser.Css2Bin"
+                args css
+            }.result.get()
+
+            delete css
+        }
+    }
+
+    doLast {
+        def pkg = groupName.replaceAll("\\.", "/") + "/" + artifactName.replaceAll("\\.", "/")
+        def resourcesDir = new File(sourceSets.main.output.resourcesDir, "$pkg/resources/third-party")
+        resourcesDir.mkdirs()
+        copy {
+            from "$rootDir/dist/licenses"
+            into resourcesDir
+        }
+    }
+}
+
+distTar {
+    enabled = false
+}
+
+distZip {
+    enabled = false
+}
+
+assembleDist {
+    enabled = false
 }

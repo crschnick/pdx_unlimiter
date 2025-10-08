@@ -24,7 +24,7 @@ public class Vic3TagRenderer {
 
         var coa = CoatOfArms.fromNode(eval, parent -> {
             var found = all.getNodesForKey(parent);
-            return found.size() > 0 ? found.get(found.size() - 1) : null;
+            return found.size() > 0 ? found.getLast() : null;
         });
         return coa;
     }

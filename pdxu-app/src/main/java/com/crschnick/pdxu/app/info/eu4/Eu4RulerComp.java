@@ -25,7 +25,7 @@ public class Eu4RulerComp extends SavegameInfoComp {
     private Ruler ruler;
 
     @Override
-    protected void init(SavegameContent content, SavegameData data) {
+    protected void init(SavegameContent content, SavegameData<?> data) {
         var rulerNode = NodePointer.builder()
                 .name("countries")
                 .name(data.eu4().getTag().getTag())

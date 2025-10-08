@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.model.GameVersion;
 
@@ -36,14 +36,14 @@ public class SavegameCompatibility {
         });
     }
 
-    public static Compatbility determineForVersion(GameVersion version) {
-        var i = GameInstallation.ALL.get(SavegameManagerState.get().current());
+    public static Compatbility determineForVersion(Game game, GameVersion version) {
+        var i = GameInstallation.ALL.get(game);
         if (i.getVersion() == null) {
             return Compatbility.UNKNOWN;
         }
 
         return areCompatible(
-                GameInstallation.ALL.get(SavegameManagerState.get().current()).getVersion(),
+                GameInstallation.ALL.get(game).getVersion(),
                 version) ? Compatbility.COMPATIBLE : Compatbility.INCOMPATIBLE;
     }
 

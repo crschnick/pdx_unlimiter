@@ -1,0 +1,88 @@
+.store-header-bar .menu-button .context-menu > * > * {
+    -fx-padding: 5px 10px 5px 10px;
+}
+
+.store-header-bar .menu-button .context-menu > * {
+    -fx-padding: 0;
+}
+
+.store-header-bar .menu-button .context-menu {
+    -fx-padding: 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-color: -color-border-default;
+}
+
+
+.context-menu > * > * {
+    -fx-padding: 3px 10px 3px 10px;
+    -fx-background-radius: 1px;
+    -fx-spacing: 20px;
+}
+
+.context-menu .menu-up-arrow, .context-menu .menu-down-arrow {
+    -fx-padding: 5;
+    -fx-background-color: -color-bg-default-transparent;
+}
+
+.context-menu .scroll-arrow {
+    -fx-padding: 5;
+    -fx-background-color: -color-fg-muted;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1 0 1 0;
+}
+
+.context-menu .separator {
+    -fx-padding: 0;
+}
+
+.context-menu .separator .line {
+    -fx-padding: 0;
+    -fx-border-insets: 0px;
+}
+
+
+.context-menu .accelerator-text {
+    -fx-padding: 0px 0px 0px 50px;
+}
+
+.context-menu > * {
+    -fx-padding: 0;
+}
+
+.context-menu {
+    -fx-padding: 4 0 4 0;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: -color-border-default;
+}
+
+.root:nord .context-menu {
+    -fx-padding: 0;
+    -fx-background-radius:0;
+    -fx-border-radius: 0;
+}
+
+.context-menu * .context-menu, .context-menu.condensed {
+    -fx-padding: 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.root:performance .context-menu, .root:performance .combo-box-popup .list-view {
+    -fx-effect: NONE;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.root .menu-item:focused{
+    -fx-background-color: -color-context-menu;
+}
+
+.root .menu-item:focused > .label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.root .menu-item:focused .graphic {
+    -fx-icon-color: -color-fg-default;
+}

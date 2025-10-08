@@ -1,0 +1,42 @@
+.sidebar-comp {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+    -fx-border-width: 0 0 0 1px;
+    -fx-border-color: -color-border-default;
+}
+
+.root:dark:separate-frame .sidebar-comp {
+    -fx-background-color: derive(-color-bg-default, 10%);
+}
+
+.root:light:separate-frame .sidebar-comp {
+    -fx-background-color: derive(-color-bg-default, -1%);
+}
+
+.root:seamless-frame .sidebar-comp {
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.sidebar-comp .icon-button-comp, .sidebar-comp .button {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+}
+
+.sidebar-comp .button:disabled {
+    -fx-opacity: 1.0;
+}
+
+.sidebar-comp .icon-button-comp {
+    -fx-padding: 1em 0.75em;
+}
+
+.sidebar-comp .icon-button-comp .vbox {
+    -fx-spacing: 0.5em;
+}
+
+.sidebar-comp .graphic {
+    -fx-icon-size: 20px;
+}

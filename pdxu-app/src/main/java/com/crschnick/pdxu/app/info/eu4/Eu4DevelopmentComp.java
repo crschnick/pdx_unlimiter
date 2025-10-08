@@ -1,10 +1,11 @@
 package com.crschnick.pdxu.app.info.eu4;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.geometry.Pos;
@@ -46,8 +47,7 @@ public class Eu4DevelopmentComp extends SavegameInfoComp {
         var stack = new StackPane(label);
         stack.setAlignment(Pos.CENTER);
         stack.setMinWidth(label.getPrefWidth());
-        stack.getStyleClass().add("number");
-        GuiTooltips.install(stack, PdxuI18n.get("AUTONOMY_DEV") + " / " + PdxuI18n.get("TOTAL_DEV"));
+        GuiTooltips.install(stack, AppI18n.get("autonomyDev") + " / " + AppI18n.get("totalDev"));
         return stack;
     }
 }

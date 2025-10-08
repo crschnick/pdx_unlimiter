@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.core.PdxuInstallation;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.keyboard.NativeKeyListener;
+import com.crschnick.pdxu.app.core.AppProperties;
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 public class GameApp {
 
@@ -16,14 +16,14 @@ public class GameApp {
     }
 
     public void onStart() {
-        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+        if (AppProperties.get().isNativeHookEnabled()) {
             listener = new GameKeyListener(this, 5000);
             GlobalScreen.addNativeKeyListener(listener);
         }
     }
 
     public void onShutdown() {
-        if (PdxuInstallation.getInstance().isNativeHookEnabled()) {
+        if (AppProperties.get().isNativeHookEnabled()) {
             GlobalScreen.removeNativeKeyListener(listener);
             listener = null;
         }

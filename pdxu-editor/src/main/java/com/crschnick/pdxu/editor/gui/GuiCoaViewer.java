@@ -1,9 +1,9 @@
 package com.crschnick.pdxu.editor.gui;
 
-import com.crschnick.pdxu.app.PdxuApp;
-import com.crschnick.pdxu.app.gui.GuiStyle;
+import com.crschnick.pdxu.app.core.window.AppMainWindow;
+import com.crschnick.pdxu.app.core.window.AppModifiedStage;
+import com.crschnick.pdxu.app.core.window.AppWindowStyle;
 import com.crschnick.pdxu.app.util.Hyperlinks;
-import com.crschnick.pdxu.app.util.ThreadHelper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -30,15 +31,20 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
     public void createStage() {
         Stage stage = new Stage();
-
-        var icon = PdxuApp.getApp().getIcon();
-        stage.getIcons().add(icon);
-
         stage.setTitle("Coat of arms preview");
         var scene = new Scene(createLayout(), 720, 600);
+        scene.setFill(Color.TRANSPARENT);
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F5), () -> state.refresh());
         stage.setScene(scene);
-        GuiStyle.addStylesheets(stage.getScene());
+
+        if (AppMainWindow.get() != null) {
+            stage.initOwner(AppMainWindow.get().getStage());
+        }
+        AppModifiedStage.prepareStage(stage);
+        AppWindowStyle.addIcons(stage);
+        AppWindowStyle.addStylesheets(scene);
+        AppWindowStyle.addNavigationPseudoClasses(scene);
+
         stage.show();
     }
 
@@ -64,7 +70,7 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
         Button coaHelp = new Button();
         coaHelp.setOnAction(e -> {
-            ThreadHelper.browse(Hyperlinks.CK3_COA_WIKI);
+            Hyperlinks.open(Hyperlinks.CK3_COA_WIKI);
         });
         coaHelp.setGraphic(new FontIcon("mdi-help-circle-outline"));
         topBar.getChildren().add(coaHelp);

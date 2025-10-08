@@ -1,12 +1,14 @@
 package com.crschnick.pdxu.editor;
 
-import com.crschnick.pdxu.app.PdxuApp;
-import com.crschnick.pdxu.app.core.EditorProvider;
-import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.editor.gui.GuiEditor;
 import com.crschnick.pdxu.editor.target.EditTarget;
 import com.crschnick.pdxu.editor.target.ExternalEditTarget;
@@ -34,7 +36,6 @@ public class Editor implements EditorProvider {
 
     @Override
     public void init() {
-        EditorSettings.init();
         EditorExternalState.init();
     }
 
@@ -46,10 +47,11 @@ public class Editor implements EditorProvider {
         createNewEditor(target);
     }
 
-    public void browseExternalFile() {
+    public void browseExternalFile(Game g) {
         Platform.runLater(() -> {
             FileChooser c = new FileChooser();
-            List<File> file = c.showOpenMultipleDialog(PdxuApp.getApp().getStage());
+            c.setTitle(AppI18n.get("selectGameFile", g.getTranslatedFullName()));
+            List<File> file = c.showOpenMultipleDialog(AppMainWindow.get().getStage());
             if (file != null) {
                 file.forEach(f -> createNewEditor(new ExternalEditTarget(f.toPath())));
             }
@@ -61,7 +63,7 @@ public class Editor implements EditorProvider {
             try (var s = Files.list(file)) {
                 s.forEach(this::openExternalFileIfNoSavegame);
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                ErrorEventFactory.fromThrowable(e).handle();
             }
             return;
         }
@@ -72,20 +74,25 @@ public class Editor implements EditorProvider {
         }
     }
 
+    @Override
+    public String getDefaultEditor() {
+        return EditorProgram.getDefaultEditor();
+    }
+
     public void createNewEditor(EditTarget target) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContent nodes;
             try {
                 nodes = target.parse();
             } catch (Exception e) {
-                ErrorHandler.handleException(e, null);
+                ErrorEventFactory.fromThrowable(e).handle();
                 return;
             }
             EditorState state = new EditorState(target.getName(), target.getFileContext(), nodes, target.getParser(), n -> {
                 try {
                     target.write(n);
                 } catch (Exception e) {
-                    ErrorHandler.handleException(e);
+                    ErrorEventFactory.fromThrowable(e).handle();
                 }
             }, target.isSavegame(), target.canSave());
 

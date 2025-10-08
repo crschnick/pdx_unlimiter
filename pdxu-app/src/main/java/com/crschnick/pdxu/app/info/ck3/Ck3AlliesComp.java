@@ -1,7 +1,8 @@
 package com.crschnick.pdxu.app.info.ck3;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import javafx.scene.image.Image;
@@ -45,7 +46,7 @@ public class Ck3AlliesComp extends Ck3DiplomacyRowComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("ALLIES");
+        return AppI18n.get("allies");
     }
 
     @Override

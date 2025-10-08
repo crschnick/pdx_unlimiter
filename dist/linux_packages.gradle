@@ -1,0 +1,127 @@
+def pkgName = kebapProductName
+def targetDir = "/opt/$pkgName"
+
+ospackage {
+    packager = "crschnick"
+    packageName = pkgName
+    packageGroup = 'default'
+    version = project.canonicalVersionString
+    release = versionReleaseNumber
+    packageDescription = 'A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games'
+    url = 'https://github.com/crschnick/pdx_unlimiter'
+    user = 'root'
+    maintainer = 'Christopher Schnick <cr@crschnick.com>'
+
+    def desktopSource = replaceVariablesInFile("$projectDir/linux_packages/app.desktop", Map.of(
+            '__NAME__', productName,
+            '__TARGET__', targetDir,
+            '__DESCRIPTION__', 'A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games',
+            '__ICON__', pkgName,
+            '__EXECUTABLE_NAME__', jpackageExecutableName
+    ))
+    from(desktopSource.toString()) {
+        into "$targetDir"
+        filePermissions {
+            unix(0644)
+        }
+        rename 'app.desktop', "${pkgName}.desktop"
+    }
+
+    from("$projectDir/linux_packages/installation") {
+        into "$targetDir"
+    }
+
+    from("$projectDir/logo/hicolor") {
+        into "/usr/share/icons/hicolor"
+        rename 'logo.png', "${pkgName}.png"
+    }
+
+    from("${project.layout.buildDirectory.get()}/dist/base") {
+        into "$targetDir"
+        filePermissions {
+            unix(0755)
+        }
+    }
+}
+
+buildDeb {
+    // Java
+    requires('libc6')
+    requires('zlib1g')
+    requires('xdg-utils')
+
+    // JavaFX from https://packages.debian.org/trixie/libopenjfx-jni
+    requires('libatomic1')
+    requires('libcairo2')
+    requires('libfreetype6')
+    // Note that we want to use https://packages.debian.org/de/sid/libgdk-pixbuf2.0-0
+    // to also make it work on Ubuntu < 22
+    requires('libgdk-pixbuf-2.0-0 | libgdk-pixbuf2.0-0')
+    requires('libgl1')
+    requires('libglib2.0-0')
+    requires('libgtk-3-0')
+    requires('libpango-1.0-0')
+    requires('libpangoft2-1.0-0')
+    requires('libx11-6')
+    requires('libxtst6')
+
+    requires('hicolor-icon-theme')
+
+    arch = project.arch == 'x86_64' ? 'amd64' : 'arm64'
+    preUninstall replaceVariablesInFile("$projectDir/linux_packages/prerm_deb.sh", Map.of('__PACKAGE__', pkgName, '__TARGET__', targetDir, '__EXECUTABLE_NAME__', jpackageExecutableName))
+    postInstall replaceVariablesInFile("$projectDir/linux_packages/postinst_deb.sh", Map.of('__PACKAGE__', pkgName, '__TARGET__', targetDir, '__EXECUTABLE_NAME__', jpackageExecutableName))
+}
+
+buildRpm {
+    // Java
+    requires('libc.so.6()(64bit)')
+    requires('libz.so.1()(64bit)')
+    requires('xdg-utils')
+
+    // JavaFX from https://rpmfind.net/linux/RPM/fedora/37/x86_64/o/openjfx-17.0.0.1-4.fc37.x86_64.html
+    requires('libatk-1.0.so.0()(64bit)')
+    requires('libcairo.so.2()(64bit)')
+    requires('libfreetype.so.6()(64bit)')
+    requires('libgdk-3.so.0()(64bit)')
+    requires('libgdk-x11-2.0.so.0()(64bit)')
+    requires('libgdk_pixbuf-2.0.so.0()(64bit)')
+    requires('libgio-2.0.so.0()(64bit)')
+    requires('libglib-2.0.so.0()(64bit)')
+    requires('libgobject-2.0.so.0()(64bit)')
+    requires('libgthread-2.0.so.0()(64bit)')
+    // We don't want this. If it is not available, we can fall back to bundled fonts.
+    // Otherwise it might fail if there are no fonts available
+    // requires('libfontconfig.so.1()(64bit)')
+    requires('libGL.so.1()(64bit)')
+    requires('libgtk-3.so.0()(64bit)')
+    requires('libpango-1.0.so.0()(64bit)')
+    requires('libpangocairo-1.0.so.0()(64bit)')
+    requires('libpangoft2-1.0.so.0()(64bit)')
+    requires('libX11.so.6()(64bit)')
+    requires('libXtst.so.6()(64bit)')
+    requires('libXxf86vm.so.1()(64bit)')
+
+    requires('hicolor-icon-theme')
+
+    arch = project.arch == 'x86_64' ? X86_64 : AARCH64
+    os = LINUX
+    postInstall replaceVariablesInFile("$projectDir/linux_packages/postinst_rpm.sh",
+            Map.of('__PACKAGE__', pkgName, '__TARGET__', targetDir, '__EXECUTABLE_NAME__', jpackageExecutableName))
+    preUninstall replaceVariablesInFile("$projectDir/linux_packages/prerm_rpm.sh",
+            Map.of('__PACKAGE__', pkgName, '__TARGET__', targetDir, '__EXECUTABLE_NAME__', jpackageExecutableName))
+}
+
+tasks.register('copyLinuxPackage', Copy) {
+    from "${project.layout.buildDirectory.get()}/distributions"
+    into "${project.layout.buildDirectory.get()}/dist/artifacts"
+    rename "${pkgName}_$canonicalVersionString-${versionReleaseNumber}_amd64.deb", "${distName}-installer-linux-x86_64.deb"
+    rename "${pkgName}_$canonicalVersionString-${versionReleaseNumber}_arm64.deb", "${distName}-installer-linux-arm64.deb"
+    rename "${pkgName}-$canonicalVersionString-${versionReleaseNumber}.x86_64.rpm", "${distName}-installer-linux-x86_64.rpm"
+    rename "${pkgName}-$canonicalVersionString-${versionReleaseNumber}.aarch64.rpm", "${distName}-installer-linux-arm64.rpm"
+    exclude '*.changes'
+}
+buildDeb.finalizedBy(copyLinuxPackage)
+buildRpm.finalizedBy(copyLinuxPackage)
+
+dist.finalizedBy(buildDeb)
+dist.finalizedBy(buildRpm)

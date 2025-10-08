@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.editor.target;
 
-import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -45,7 +45,7 @@ public class DataFileEditTarget extends EditTarget {
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
         try (var out = Files.newOutputStream(file)) {
             NodeWriter.write(out, getParser().getCharset(), nodeMap.values().iterator().next(),
-                    EditorSettings.getInstance().indentation.getValue(), 0);
+                    AppPrefs.get().editorIndentation().getValue().getValue(), 0);
         }
     }
 

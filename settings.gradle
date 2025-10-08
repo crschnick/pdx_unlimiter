@@ -1,7 +1,6 @@
-rootProject.name = 'pdx_unlimiter'
-rootProject.buildFileName = 'gradle/build.gradle'
+include 'dist'
 
-include 'pdxu-editor'
 include 'pdxu-app'
-include 'pdxu-model'
 include 'pdxu-io'
+include 'pdxu-model'
+include 'pdxu-editor'

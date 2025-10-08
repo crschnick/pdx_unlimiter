@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
+
+import com.crschnick.pdxu.app.core.AppI18n;
 
 import java.util.List;
 
@@ -88,7 +90,8 @@ public enum Game {
     }
 
     public String getTranslatedAbbreviation() {
-        return PdxuI18n.get(abbreviation + "_ABBREVIATION");
+        String base = abbreviation.toLowerCase();
+        return AppI18n.get(base + "Abbreviation");
     }
 
     public String getId() {
@@ -100,7 +103,7 @@ public enum Game {
     }
 
     public String getTranslatedFullName() {
-        return PdxuI18n.get(abbreviation);
+        return AppI18n.get(id);
     }
 
     public String getWindowsStoreName() {

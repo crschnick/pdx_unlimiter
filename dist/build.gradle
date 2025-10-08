@@ -1,0 +1,114 @@
+plugins {
+    id 'org.beryx.jlink' version '3.1.3'
+    id("com.netflix.nebula.ospackage") version "12.1.0"
+    id 'org.gradle.crypto.checksum' version '1.4.0'
+    id 'signing'
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs "$rootDir/gradle/gradle_scripts"
+    }
+}
+
+tasks.register('dist', DefaultTask) {}
+
+import org.gradle.crypto.checksum.Checksum
+
+import java.util.stream.Collectors
+
+def distDir = layout.buildDirectory.get().dir('dist')
+tasks.register('createChecksums', Checksum) {
+    inputFiles.setFrom(distDir.dir('artifacts').getAsFileTree().files)
+    outputDirectory.set(layout.buildDirectory.dir("dist/checksums/artifacts"))
+    checksumAlgorithm.set(Checksum.Algorithm.SHA256)
+
+    doLast {
+        def artifactChecksumsSha256Hex = new HashMap<String, String>()
+        for (final def file in outputDirectory.get().getAsFileTree().files) {
+            def name = file.name.lastIndexOf('.').with { it != -1 ? file.name[0..<it] : file.name }
+            if (name.endsWith('.asc')) {
+                continue
+            }
+
+            artifactChecksumsSha256Hex.put(name, file.text.strip())
+        }
+
+        file(layout.buildDirectory.dir("dist/checksums/sha256sums.txt")).text = artifactChecksumsSha256Hex.entrySet().stream()
+                .map(e -> e.getValue() + ' ' + e.getKey())
+                .collect(Collectors.joining('\n'))
+    }
+}
+
+String getArtifactChecksumSha256Hex(String name) {
+    var file = layout.buildDirectory.file("dist/checksums/artifacts/${name}.sha256")
+    return file.get().getAsFile().exists() ? file.get().getAsFile().text : ""
+}
+
+clean {
+    doFirst {
+        // Fix clean failing when file is read-only
+        if (file("$distDir").exists()) {
+            file("$distDir").traverse { f -> if (f.exists() && f.isFile()) f.writable = true }
+        }
+    }
+}
+
+apply from: 'train.gradle'
+apply from: 'base.gradle'
+apply from: 'jpackage.gradle'
+apply from: 'portable.gradle'
+apply from: 'github.gradle'
+apply from: 'reinstall.gradle'
+
+if (file("i18n.gradle").exists()) {
+    apply from: 'i18n.gradle'
+}
+
+if (os.isLinux()) {
+    apply from: 'linux_packages.gradle'
+} else if (os.isWindows()) {
+    apply from: 'msi/msi.gradle'
+} else if (os.isMacOsX()) {
+    apply from: 'pkg/pkg.gradle'
+}
+
+if (signingEnabled) {
+    signing {
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    }
+
+
+    tasks.register('signArtifacts', Sign) {
+        def dir = layout.buildDirectory.dir("dist/artifacts").get()
+        dir.asFileTree.files.forEach { sign(it) }
+    }
+
+    tasks.register('signChecksums', Sign) {
+        def checksums = layout.buildDirectory.file("dist/checksums/sha256sums.txt").get().asFile
+        sign(checksums)
+    }
+} else {
+    tasks.register('signArtifacts', org.gradle.api.DefaultTask) {}
+
+    tasks.register('signChecksums', org.gradle.api.DefaultTask) {}
+}
+
+run {
+    enabled = false
+}
+
+distTar {
+    enabled = false
+}
+
+distZip {
+    enabled = false
+}
+
+assembleDist {
+    enabled = false
+    dependsOn.clear()
+}
+

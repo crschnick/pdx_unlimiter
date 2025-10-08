@@ -58,7 +58,7 @@ public class Ck2SavegameData extends SavegameData<Ck2Tag> {
 
     private void initVersion(Node n) {
         Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)");
-        var v = n.getNodesForKey("version").get(0).getString();
+        var v = n.getNodesForKey("version").getFirst().getString();
         Matcher m = p.matcher(v);
         if (m.matches()) {
             version = new GameVersion(

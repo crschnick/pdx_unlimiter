@@ -1,0 +1,72 @@
+def javafxPlatform = null
+if (os.isWindows()) {
+    javafxPlatform = 'win'
+} else if (os.isLinux()) {
+    javafxPlatform = 'linux'
+} else if (os.isMacOsX()) {
+    javafxPlatform = 'mac'
+}
+
+def platformClassifier = javafxPlatform
+if (System.getProperty ("os.arch") == 'aarch64') {
+    platformClassifier += '-aarch64'
+}
+
+configurations {
+    javafx
+}
+
+if (customJavaFxPath != null) {
+    repositories {
+        flatDir {
+            dirs customJavaFxPath
+        }
+    }
+    dependencies {
+        javafx fileTree(dir: customJavaFxPath, include: '*.jar')
+    }
+} else if (!jdkHasBundledJavaFx) {
+    // Always use maven version for development
+    // The jpackage script uses the jmod sdk files for JavaFX
+    dependencies {
+        javafx "org.openjfx:javafx-base:${devJavafxVersion}:${platformClassifier}"
+        javafx "org.openjfx:javafx-controls:${devJavafxVersion}:${platformClassifier}"
+        javafx "org.openjfx:javafx-graphics:${devJavafxVersion}:${platformClassifier}"
+        javafx "org.openjfx:javafx-media:${devJavafxVersion}:${platformClassifier}"
+        javafx "org.openjfx:javafx-web:${devJavafxVersion}:${platformClassifier}"
+        javafx "org.openjfx:javafx-fxml:${devJavafxVersion}:${platformClassifier}"
+        javafx "org.openjfx:javafx-swing:${devJavafxVersion}:${platformClassifier}"
+    }
+}
+
+tasks.register('downloadJavafxJmods', DefaultTask) {
+    doLast {
+        def targetDir = file("$projectDir/javafx/$javafxPlatform/$arch")
+        if (fileTree(targetDir).filter { it.name != ".gitkeep" }.getFiles().size() > 0) {
+            return
+        }
+
+        // Why do they use different names than the JavaFX classifiers? ...
+        def gluonPlatformName = os.isMacOsX() ? "osx" : os.isWindows() ? "windows" : "linux"
+        def majorVersion = productionJavafxVersion.split("-")[0].split("\\.")[0]
+        def assetName = "openjfx-${productionJavafxVersion}_${gluonPlatformName}-${arch == 'x86_64' ? 'x64' : 'aarch64'}_bin-jmods.zip"
+        def url = "https://download2.gluonhq.com/openjfx/${majorVersion}/${assetName}"
+
+        download.run {
+            src url
+            dest layout.buildDirectory.file('javafx.zip')
+            overwrite true
+        }
+
+        copy {
+            from zipTree(layout.buildDirectory.file('javafx.zip'))
+            into layout.buildDirectory
+        }
+
+        mkdir(targetDir)
+        copy {
+            from layout.buildDirectory.file("javafx-jmods-$majorVersion")
+            into targetDir
+        }
+    }
+}

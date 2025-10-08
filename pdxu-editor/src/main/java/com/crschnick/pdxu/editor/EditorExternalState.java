@@ -1,11 +1,10 @@
 package com.crschnick.pdxu.editor;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.FileWatchManager;
-import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
-import com.crschnick.pdxu.app.util.OsHelper;
+import com.crschnick.pdxu.app.core.AppFileWatcher;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.editor.gui.GuiEditorSettings;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
@@ -31,6 +30,7 @@ public class EditorExternalState {
     private static final Path TEMP = FileUtils.getTempDirectory().toPath()
             .resolve("pdxu").resolve("editor");
     private static final Logger logger = LoggerFactory.getLogger(EditorExternalState.class);
+    private static final int INTERVAL = 1500;
     private final Set<Entry> openEntries = new CopyOnWriteArraySet<>();
 
     public static void init() {
@@ -43,20 +43,20 @@ public class EditorExternalState {
             } catch (IOException ignored) {
             }
 
-            FileWatchManager.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
+            AppFileWatcher.getInstance().startWatchersInDirectories(List.of(TEMP), (changed, kind) -> {
                 if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                     logger.trace("Editor entry file " + changed.toString() + " has been removed");
                     removeForFile(changed);
                 } else {
                     getForFile(changed).ifPresent(e -> {
                         if (e.editorNode.isRoot()) {
-                            ThreadHelper.sleep(EditorSettings.getInstance().externalEditorWaitInterval.getValue());
+                            ThreadHelper.sleep(INTERVAL);
                         }
 
                         // Wait for edit to finish in case external editor has write lock
                         if (!Files.exists(changed)) {
                             logger.trace("File " + TEMP.relativize(e.file) + " is probably still writing ...");
-                            ThreadHelper.sleep(EditorSettings.getInstance().externalEditorWaitInterval.getValue());
+                            ThreadHelper.sleep(INTERVAL);
 
                             // If still no read lock after 500ms, just don't parse it
                             if (!Files.exists(changed)) {
@@ -87,13 +87,13 @@ public class EditorExternalState {
                                 }
                             }
                         } catch (Exception ex) {
-                            GuiErrorReporter.showSimpleErrorMessage(ex.getMessage());
+                            ErrorEventFactory.fromMessage(ex.getMessage()).handle();
                         }
                     });
                 }
             });
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
         }
     }
 
@@ -133,13 +133,13 @@ public class EditorExternalState {
             return;
         }
 
-        var name = OsHelper.getFileSystemCompatibleName(node.getNavigationName()) + " - " + UUID.randomUUID() + ".pdxt";
+        var name = FileSystemHelper.getFileSystemCompatibleName(node.getNavigationName()) + " - " + UUID.randomUUID() + ".pdxt";
         Path file = TEMP.resolve(name);
         try {
             FileUtils.forceMkdirParent(file.toFile());
             try (var out = Files.newOutputStream(file)) {
                 NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(),
-                                 EditorSettings.getInstance().indentation.getValue(), 0
+                        AppPrefs.get().editorIndentation().getValue().getValue(), 0
                 );
                 var entry = new Entry(file, node, state);
                 entry.registerChange();
@@ -147,7 +147,7 @@ public class EditorExternalState {
                 openFile(file.toString());
             }
         } catch (IOException ex) {
-            ErrorHandler.handleException(ex);
+            ErrorEventFactory.fromThrowable(ex).handle();
         }
     }
 
@@ -156,9 +156,9 @@ public class EditorExternalState {
     }
 
     private void openFile(String file) {
-        var editor = EditorSettings.getInstance().externalEditor.getValue();
+        var editor = AppPrefs.get().editorExternalProgram().getValue();
         if (editor == null || editor.length() == 0) {
-            GuiEditorSettings.showEditorSettings();
+            AppPrefs.get().selectCategory("editor");
             return;
         }
 
@@ -174,7 +174,7 @@ public class EditorExternalState {
             logger.trace("Executing command: " + command);
             Runtime.getRuntime().exec(command.toArray(String[]::new));
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
         }
     }
 

@@ -1,19 +1,21 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.core.EditorProvider;
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.core.TaskExecutor;
-import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
+import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
-import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.app.util.integration.RakalyHelper;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.util.DesktopHelper;
+import com.crschnick.pdxu.app.util.EditorProvider;
+import com.crschnick.pdxu.app.util.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +33,7 @@ public class SavegameActions {
             try {
                 out = target.export();
             } catch (Exception ioException) {
-                ErrorHandler.handleException(ioException);
+                ErrorEventFactory.fromThrowable(ioException).handle();
                 return null;
             }
             return out;
@@ -40,7 +42,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void openSavegame(SavegameEntry<T, I> entry) {
         SavegameContext.withSavegameContext(entry, ctx -> {
-            ThreadHelper.open(ctx.getStorage().getSavegameDataDirectory(entry));
+            DesktopHelper.browsePath(ctx.getStorage().getSavegameDataDirectory(entry));
         });
     }
 
@@ -53,7 +55,7 @@ public class SavegameActions {
             try {
                 FileExportTarget.createExportTarget(e).export();
             } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         });
     }
@@ -81,7 +83,7 @@ public class SavegameActions {
         SavegameType type = SavegameStorage.get(g).getType();
         SavegameParseResult r = null;
         try {
-            var file = savegames.get(0).path;
+            var file = savegames.getFirst().path;
             var bytes = Files.readAllBytes(file);
             if (type.isBinary(bytes)) {
                 bytes = RakalyHelper.toEquivalentPlaintext(file);
@@ -89,7 +91,7 @@ public class SavegameActions {
             var struc = type.determineStructure(bytes);
             r = struc.parse(bytes);
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
         }
 
         if (r == null) {
@@ -100,7 +102,7 @@ public class SavegameActions {
             @Override
             public void success(SavegameParseResult.Success s) {
                 try {
-                    var targetUuuid = savegames.get(0).getCampaignIdOverride()
+                    var targetUuuid = savegames.getFirst().getCampaignIdOverride()
                             .orElse(type.getCampaignIdHeuristic(s.content));
                     SavegameStorage.get(g).getSavegameCampaign(targetUuuid)
                             .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
@@ -112,7 +114,7 @@ public class SavegameActions {
                         }, true);
                     });
                 } catch (Exception e) {
-                    ErrorHandler.handleException(e);
+                    ErrorEventFactory.fromThrowable(e).handle();
                 }
             }
         });
@@ -124,7 +126,7 @@ public class SavegameActions {
             return;
         }
 
-        FileImporter.importTargets(Set.of(savegames.get(0)));
+        FileImporter.importTargets(Set.of(savegames.getFirst()));
     }
 
     public static void importLatestAndLaunch(Game g) {
@@ -133,9 +135,9 @@ public class SavegameActions {
             return;
         }
 
-        var target = savegames.get(0);
+        var target = savegames.getFirst();
         var checksum = target.getSourceFileChecksum();
-        savegames.get(0).importTarget(s -> {
+        savegames.getFirst().importTarget(s -> {
             if (s.isEmpty()) {
                 SavegameStorage.get(g).getEntryForSourceFileChecksum(checksum).ifPresent(e -> {
                     // The info is loaded asynchronously only when the savegame is opened in the gui.
@@ -154,7 +156,16 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
-        if (!GuiDialogHelper.showMeltDialog()) {
+        Alert alert = AppSideWindow.createEmptyAlert();
+        alert.setAlertType(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Melt savegame");
+        alert.setHeaderText("""
+                Do you want to convert the selected savegame into a non-ironman savegame using the Rakaly melter?
+                """);
+        alert.setContentText("""
+                The original savegame will not get modified.""");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (!(result.isPresent() && result.get().getButtonData().isDefaultButton())) {
             return;
         }
 
@@ -190,7 +201,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
         TaskExecutor.getInstance().submitTask(() -> {
             SavegameContext.withSavegameContext(e, ctx -> {
-                LoggerFactory.getLogger(SavegameActions.class).debug("Reloading savegame");
+                TrackEvent.debug("Reloading savegame");
                 e.unload();
                 ctx.getStorage().invalidateSavegameInfo(e);
                 ctx.getStorage().loadEntry(e);

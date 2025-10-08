@@ -1,0 +1,41 @@
+.combo-box {
+    -fx-focus-color: transparent;
+}
+
+.combo-box-base:hover .arrow-button:hover .arrow {
+    -fx-background-color: -color-accent-fg;
+}
+
+.identity-select-comp .clear-button:hover .ikonli-font-icon {
+    -fx-icon-color: -color-accent-fg;
+}
+
+.identity-select-comp .clear-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-cell:hover, .combo-box-popup .list-cell:focused {
+    -fx-background-color: -color-context-menu;
+    -fx-text-fill: -color-fg-default;
+}
+
+.combo-box-popup .list-cell:hover .graphic, .combo-box-popup .list-cell .graphic {
+    -fx-icon-color: -color-fg-default;
+}
+
+.choice-comp-content > .top {
+    -fx-padding: 0.4em;
+    -fx-background-color: -color-neutral-subtle;
+    -fx-border-width: 1 0 1 0;
+    -fx-border-color: -color-border-default;
+}
+
+.choice-comp .filter-comp {
+    -fx-border-width: 1px;
+    -fx-background-color: -color-bg-default-transparent;
+    -fx-border-color: -color-border-default;
+}
+
+.host-address-choice-comp:empty .arrow-button .arrow, .host-address-choice-comp:empty:hover .arrow-button .arrow {
+    -fx-shape: "";
+}

@@ -1,0 +1,161 @@
+package com.crschnick.pdxu.app.comp.base;
+
+import com.crschnick.pdxu.app.comp.Comp;
+import com.crschnick.pdxu.app.comp.SimpleComp;
+import com.crschnick.pdxu.app.core.*;
+import com.crschnick.pdxu.app.core.window.AppDialog;
+import com.crschnick.pdxu.app.core.window.AppMainWindow;
+import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.platform.ColorHelper;
+import com.crschnick.pdxu.app.platform.PlatformThread;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
+
+import javafx.animation.*;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
+public class AppMainWindowContentComp extends SimpleComp {
+
+    private final Stage stage;
+
+    public AppMainWindowContentComp(Stage stage) {
+        this.stage = stage;
+    }
+
+    @Override
+    protected Region createSimple() {
+        var overlay = AppDialog.getModalOverlays();
+        var loaded = AppMainWindow.getLoadedContent();
+        var sidebarPresent = new SimpleBooleanProperty();
+        var bg = Comp.of(() -> {
+            var loadingIcon = new ImageView();
+            loadingIcon.setFitWidth(80);
+            loadingIcon.setFitHeight(80);
+
+            var dark =
+                    AppPrefs.get() != null && AppPrefs.get().theme().getValue().isDark();
+            loadingIcon.setOpacity(dark ? 0.95 : 0.93);
+
+            var color = AppPrefs.get() != null
+                    ? ColorHelper.withOpacity(
+                            AppPrefs.get().theme().getValue().getEmphasisColor().get(), dark ? 0.7 : 0.85)
+                    : Color.TRANSPARENT;
+            DropShadow shadow = new DropShadow();
+            shadow.setRadius(10);
+            shadow.setColor(color);
+
+            var loadingAnimation = new AnimationTimer() {
+
+                long offset;
+
+                @Override
+                public void handle(long now) {
+                    // Increment offset as we are always having 60fps
+                    // Prevents animation jumps when the animation timer isn't called for a long time
+                    offset += 1000 / 60;
+
+                    // Move shadow in a circle
+                    var rad = -(offset % 1300.0) / 1300.0 * 2 * Math.PI;
+                    var x = Math.sin(rad);
+                    var y = Math.cos(rad);
+                    shadow.setOffsetX(x * 3);
+                    shadow.setOffsetY(y * 3);
+                }
+            };
+
+            loadingIcon.setEffect(shadow);
+            loadingAnimation.start();
+
+            // This allows for assigning logos even if AppImages has not been initialized yet
+            var dir = "img/loading/";
+            AppResources.with(AppResources.MAIN_MODULE, dir, path -> {
+                var image = AppPrefs.get() != null
+                                && AppPrefs.get().theme().getValue().isDark()
+                        ? path.resolve("loading-160-dark.png")
+                        : path.resolve("loading-160.png");
+                loadingIcon.setImage(AppImages.loadImage(image));
+            });
+
+            var version = new LabelComp(
+                    (AppNames.ofCurrent().getName()) + " " + AppProperties.get().getVersion());
+            version.apply(struc -> {
+                AppFontSizes.apply(struc.get(), appFontSizes -> "15");
+                struc.get().setOpacity(0.65);
+            });
+
+            var text = new LabelComp(AppMainWindow.getLoadingText());
+            text.apply(struc -> {
+                struc.get().setOpacity(0.8);
+            });
+
+            var loadingVbox = new VBox(
+                    Comp.vspacer().createRegion(),
+                    loadingIcon,
+                    Comp.vspacer(19).createRegion(),
+                    version.createRegion(),
+                    Comp.vspacer().createRegion(),
+                    text.createRegion(),
+                    Comp.vspacer(20).createRegion());
+            loadingVbox.setAlignment(Pos.CENTER);
+
+            var pane = new StackPane(loadingVbox);
+            pane.setAlignment(Pos.TOP_LEFT);
+            pane.getStyleClass().add("background");
+
+            loaded.subscribe(struc -> {
+                if (struc != null) {
+                    TrackEvent.info("Window content node set");
+                    PlatformThread.runNestedLoopIteration();
+                    struc.prepareAddition();
+                    pane.getStyleClass().remove("background");
+                    loadingAnimation.stop();
+                    pane.getChildren().remove(loadingVbox);
+                    pane.getChildren().add(struc.get());
+                    sidebarPresent.set(true);
+                    PlatformThread.runNestedLoopIteration();
+                    struc.show();
+                    TrackEvent.info("Window content node shown");
+                }
+            });
+
+            overlay.addListener((ListChangeListener<? super ModalOverlay>) c -> {
+                if (c.next() && c.wasAdded()) {
+                    AppMainWindow.get().focus(false);
+
+                    // Close blocking modal windows
+                    var childWindows = Window.getWindows().stream()
+                            .filter(window -> window instanceof Stage s && stage.equals(s.getOwner()))
+                            .toList();
+                    childWindows.forEach(window -> {
+                        ((Stage) window).close();
+                    });
+                }
+            });
+
+            return pane;
+        });
+
+        var modal = new ModalOverlayStackComp(bg, overlay);
+        var r = modal.createRegion();
+        var p = r.lookupAll(".modal-overlay-stack-element");
+        sidebarPresent.subscribe(v -> {
+            if (v) {
+                p.forEach(node -> {
+                    node.pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded"), true);
+                });
+            }
+        });
+
+        return r;
+    }
+}

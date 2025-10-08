@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.info.*;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 
+@SuppressWarnings("unused")
 public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
 
     Vic3AchievementOkComp achievementOk;

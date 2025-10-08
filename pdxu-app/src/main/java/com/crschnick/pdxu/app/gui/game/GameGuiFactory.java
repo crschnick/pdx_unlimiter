@@ -46,10 +46,10 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         SimpleObjectProperty<Node> prop;
         if (entry.getInfo() == null) {
             prop = new SimpleObjectProperty<>(new Region());
-            entry.stateProperty().addListener(new ChangeListener<SavegameEntry.State>() {
+            entry.stateProperty().addListener(new ChangeListener<>() {
                 @Override
                 public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
-                    prop.set(n == SavegameEntry.State.LOADED? tagNode(entry.getInfo()) : new Region());
+                    prop.set(n == SavegameEntry.State.LOADED ? tagNode(entry.getInfo()) : new Region());
                     if (n == SavegameEntry.State.INACTIVE) {
                         entry.stateProperty().removeListener(this);
                     }

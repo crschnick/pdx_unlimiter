@@ -1,8 +1,0 @@
-compileJava {
-    options.compilerArgs << '-parameters'
-}
-
-dependencies {
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.19.2"
-    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: "2.19.2"
-}

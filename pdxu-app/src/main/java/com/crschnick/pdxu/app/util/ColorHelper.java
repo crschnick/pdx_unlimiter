@@ -66,7 +66,7 @@ public class ColorHelper {
 
         try {
             if (color.getType().equals(TaggedNode.TagType.HEX)) {
-                var c0 = c.size() > 0 ? color.getValues().get(0) : "000000";
+                var c0 = c.size() > 0 ? color.getValues().getFirst() : "000000";
                 return Color.valueOf("#" + c0);
             }
 

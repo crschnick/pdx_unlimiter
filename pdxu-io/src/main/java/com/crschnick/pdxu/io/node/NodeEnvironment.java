@@ -6,11 +6,9 @@ import java.util.Map;
 
 public class NodeEnvironment {
 
-    private final ArrayNode parent;
     private final Map<String, Node> variables;
 
-    public NodeEnvironment(ArrayNode parent, Map<String, Node> variables) {
-        this.parent = parent;
+    public NodeEnvironment(Map<String, Node> variables) {
         this.variables = new HashMap<>(variables);
     }
 
@@ -19,15 +17,11 @@ public class NodeEnvironment {
         return this;
     }
 
-    public NodeEnvironment copy(ArrayNode parent) {
-        return new NodeEnvironment(parent, variables);
+    public NodeEnvironment copy() {
+        return new NodeEnvironment(variables);
     }
 
     public Map<String, Node> getVariables() {
         return Collections.unmodifiableMap(variables);
-    }
-
-    public ArrayNode getParent() {
-        return parent;
     }
 }

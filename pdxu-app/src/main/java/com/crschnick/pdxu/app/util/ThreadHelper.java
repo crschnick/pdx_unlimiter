@@ -1,94 +1,41 @@
 package com.crschnick.pdxu.app.util;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import org.apache.commons.lang3.SystemUtils;
-
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
+import com.crschnick.pdxu.app.core.AppProperties;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
 public class ThreadHelper {
 
-    public static Thread create(String name, boolean daemon, Runnable r) {
-        var t = new Thread(r);
-        ErrorHandler.registerThread(t);
-        t.setDaemon(daemon);
-        t.setName(name);
+    public static Thread unstarted(Runnable r) {
+        return AppProperties.get().isUseVirtualThreads()
+                ? Thread.ofVirtual().unstarted(r)
+                : Thread.ofPlatform().unstarted(r);
+    }
+
+    public static Thread runAsync(Runnable r) {
+        var t = unstarted(r);
+        t.setDaemon(true);
+        t.start();
         return t;
     }
 
-    public static void browseDirectory(Path file) {
-        if (SystemUtils.IS_OS_WINDOWS) {
+    public static Thread runFailableAsync(FailableRunnable<Throwable> r) {
+        var t = unstarted(() -> {
             try {
-                Runtime.getRuntime().exec(new String[]{
-                        "explorer.exe",
-                        "/select",
-                        file.toString()
-                });
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        } else {
-            if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
-                if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-                    return;
-                }
-
-                var t = new Thread(() -> {
-                    try {
-                        Desktop.getDesktop().open(file.getParent().toFile());
-                    } catch (Exception e) {
-                        ErrorHandler.handleException(e);
-                    }
-                });
-                t.setDaemon(true);
-                t.start();
-                return;
-            }
-
-            var t = new Thread(() -> {
-                try {
-                    Desktop.getDesktop().browseFileDirectory(file.toFile());
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            });
-            t.setDaemon(true);
-            t.start();
-        }
-    }
-
-    public static void browse(String uri) {
-        var t = new Thread(() -> {
-            try {
-                if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    Runtime.getRuntime().exec(new String[]{"xdg-open", uri});
-                } else {
-                    Desktop.getDesktop().browse(URI.create(uri));
-                }
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                r.run();
+            } catch (Throwable e) {
+                ErrorEventFactory.fromThrowable(e).handle();
             }
         });
         t.setDaemon(true);
         t.start();
+        return t;
     }
 
-    public static void open(Path p) {
-        var t = new Thread(() -> {
-            try {
-                if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-                    Runtime.getRuntime().exec(new String[]{"xdg-open", p.toString()});
-                } else {
-                    Desktop.getDesktop().open(p.toFile());
-                }
-            } catch (Exception e) {
-                ErrorHandler.handleException(e);
-            }
-        });
-        t.setDaemon(true);
-        t.start();
+    public static Thread createPlatformThread(String name, boolean daemon, Runnable r) {
+        var t = new Thread(r);
+        t.setDaemon(daemon);
+        t.setName(name);
+        return t;
     }
 
     public static void sleep(long ms) {

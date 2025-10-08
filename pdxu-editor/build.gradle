@@ -2,21 +2,24 @@ plugins {
     id 'java-library'
 }
 
-apply from: "$rootDir/gradle/java.gradle"
-apply from: "$rootDir/gradle/javafx.gradle"
-apply from: "$rootDir/gradle/jackson.gradle"
-apply from: "$rootDir/gradle/lombok.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/java.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/javafx.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/lombok.gradle"
+
+configurations {
+    compileOnly.extendsFrom(javafx)
+}
 
 dependencies {
     compileOnly 'com.jfoenix:jfoenix:9.0.10'
-    compileOnly group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: "11.3.5"
+    compileOnly "org.kordamp.ikonli:ikonli-javafx:12.4.0"
 
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.13'
+    compileOnly "org.slf4j:slf4j-api:2.0.17"
 
-    implementation 'org.apache.commons:commons-lang3:3.18.0'
-    implementation 'commons-io:commons-io:2.19.0'
-    implementation "org.apache.commons:commons-collections4:4.5.0"
+    compileOnly 'org.apache.commons:commons-lang3:3.18.0'
+    compileOnly 'commons-io:commons-io:2.20.0'
+    compileOnly "org.apache.commons:commons-collections4:4.5.0"
+    compileOnly 'io.github.mkpaz:atlantafx-base:2.1.0'
 
     compileOnly project(':pdxu-app')
     compileOnly project(':pdxu-io')

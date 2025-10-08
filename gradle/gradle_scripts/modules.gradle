@@ -1,0 +1,54 @@
+extraJavaModuleInfo {
+    module("com.vladsch.flexmark:flexmark", "com.vladsch.flexmark") {
+        mergeJar('com.vladsch.flexmark:flexmark-util')
+        mergeJar('com.vladsch.flexmark:flexmark-util-options')
+        mergeJar('com.vladsch.flexmark:flexmark-util-data')
+        mergeJar('com.vladsch.flexmark:flexmark-util-format')
+        mergeJar('com.vladsch.flexmark:flexmark-util-ast')
+        mergeJar('com.vladsch.flexmark:flexmark-util-sequence')
+        mergeJar('com.vladsch.flexmark:flexmark-util-builder')
+        mergeJar('com.vladsch.flexmark:flexmark-util-html')
+        mergeJar('com.vladsch.flexmark:flexmark-util-dependency')
+        mergeJar('com.vladsch.flexmark:flexmark-util-collection')
+        mergeJar('com.vladsch.flexmark:flexmark-util-misc')
+        mergeJar('com.vladsch.flexmark:flexmark-util-visitor')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-tables')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-gfm-strikethrough')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-gfm-tasklist')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-footnotes')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-definition')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-anchorlink')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-yaml-front-matter')
+        mergeJar('com.vladsch.flexmark:flexmark-ext-toc')
+        exportAllPackages()
+    }
+}
+
+extraJavaModuleInfo {
+    module("org.kohsuke:github-api", "org.kohsuke.github") {
+        exports('org.kohsuke.github')
+        exports('org.kohsuke.github.function')
+        exports('org.kohsuke.github.authorization')
+        exports('org.kohsuke.github.extras')
+        exports('org.kohsuke.github.connector')
+        requires('java.logging')
+        requires('org.apache.commons.io')
+        requires('org.apache.commons.lang3')
+        requires('com.fasterxml.jackson.databind')
+        overrideModuleName()
+    }
+}
+
+extraJavaModuleInfo {
+    module("io.sentry:sentry", "io.sentry") {
+        exportAllPackages()
+    }
+}
+
+extraJavaModuleInfo {
+    module("net.datafaker:datafaker", "datafaker") {
+        requires('java.logging')
+
+        exportAllPackages()
+    }
+}

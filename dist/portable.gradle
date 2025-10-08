@@ -1,0 +1,44 @@
+def distDir = "${project.layout.buildDirectory.get()}/dist"
+
+tasks.register('portableDist', DefaultTask) {
+    dependsOn baseDist
+    doLast {
+        copy {
+            from "$distDir/base/"
+            into "$distDir/portable/"
+        }
+    }
+}
+
+if (os.isWindows()) {
+    tasks.register('packagePortable', Zip) {
+        from "$distDir/portable"
+        into "${distName}-$versionString"
+        archiveFileName = "${distName}-portable-windows-${project.arch}.zip"
+        destinationDirectory = file("$distDir/artifacts")
+    }
+} else if (os.isLinux()) {
+    tasks.register('packagePortable', Tar) {
+        from "$distDir/portable"
+        into "${distName}-$versionString"
+        archiveFileName = "${distName}-portable-linux-${project.arch}.tar.gz"
+        destinationDirectory = file("$distDir/artifacts")
+        compression = Compression.GZIP
+    }
+} else {
+    tasks.register('packagePortable', DefaultTask) {
+        doLast {
+            providers.exec {
+                commandLine "$projectDir/dmg/build-dmg.sh", "$projectDir", arch, productName, "${distName}-portable-macos-${arch}.dmg"
+            }.getResult().get()
+
+            copy {
+                from "${project.layout.buildDirectory.get()}/dist/dmg/"
+                into "${project.layout.buildDirectory.get()}/dist/artifacts"
+                include "${distName}-portable-macos-*.dmg"
+            }
+        }
+    }
+}
+portableDist.finalizedBy(packagePortable)
+dist.finalizedBy(portableDist)

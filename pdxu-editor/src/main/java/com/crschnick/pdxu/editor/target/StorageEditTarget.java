@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.editor.target;
 
-import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
@@ -51,7 +51,7 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     @Override
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
         if (!storage.contains(entry)) {
-            GuiErrorReporter.showSimpleErrorMessage("Could not save savegame as it does no longer exist in the storage");
+            ErrorEventFactory.fromMessage("Could not save savegame as it does no longer exist in the storage").expected().handle();
             return;
         }
 

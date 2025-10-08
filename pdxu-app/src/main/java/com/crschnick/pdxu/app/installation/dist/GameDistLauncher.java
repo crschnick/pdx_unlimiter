@@ -1,17 +1,13 @@
 package com.crschnick.pdxu.app.installation.dist;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.SavegameManagerState;
-import com.crschnick.pdxu.app.core.settings.Settings;
 import com.crschnick.pdxu.app.gui.dialog.GuiIncompatibleWarning;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.*;
-import com.crschnick.pdxu.app.savegame.FileExportTarget;
-import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
-import com.crschnick.pdxu.app.savegame.SavegameContext;
-import com.crschnick.pdxu.app.savegame.SavegameEntry;
-import com.crschnick.pdxu.app.util.integration.IronyHelper;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.savegame.*;
+import com.crschnick.pdxu.app.util.IronyHelper;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -22,20 +18,15 @@ import java.util.stream.Collectors;
 
 public class GameDistLauncher {
 
-    public static void startLauncher() {
+    public static void startLauncher(Game game) {
         try {
-            var game = SavegameManagerState.get().current();
-            if (game == null) {
-                return;
-            }
-
-            if (Settings.getInstance().launchIrony.getValue()) {
+            if (AppPrefs.get().launchIrony().getValue()) {
                 IronyHelper.launchEntry(game, false);
             } else {
                 GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
             }
         } catch (IOException ex) {
-            ErrorHandler.handleException(ex);
+            ErrorEventFactory.fromThrowable(ex).handle();
         }
     }
 
@@ -44,9 +35,9 @@ public class GameDistLauncher {
 
         try {
             setupContinueGame(e);
-            startLauncherDirectly();
+            startLauncherDirectly(e);
         } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
+            ErrorEventFactory.fromThrowable(ex).handle();
         }
     }
 
@@ -57,7 +48,7 @@ public class GameDistLauncher {
             }
 
             if (SavegameCompatibility.determineForModsAndDLCs(e) != SavegameCompatibility.Compatbility.COMPATIBLE ||
-                    SavegameCompatibility.determineForVersion(e.getInfo().getData().getVersion()) != SavegameCompatibility.Compatbility.COMPATIBLE) {
+                    SavegameCompatibility.determineForVersion(ctx.getGame(), e.getInfo().getData().getVersion()) != SavegameCompatibility.Compatbility.COMPATIBLE) {
                 boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
                         ctx.getInstallation(), e);
                 if (!startAnyway) {
@@ -71,7 +62,7 @@ public class GameDistLauncher {
                 setupContinueGame(e);
                 startGameDirectly(e, debug);
             } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         });
     }
@@ -108,13 +99,13 @@ public class GameDistLauncher {
     }
 
     public static boolean canChangeMods(Game game) {
-        return Settings.getInstance().launchIrony.getValue() ||
+        return AppPrefs.get().launchIrony().getValue() ||
                 GameInstallation.ALL.get(game).getDist().supportsLauncher();
     }
 
-    private static void startLauncherDirectly() throws IOException {
-        var game = SavegameManagerState.get().current();
-        if (Settings.getInstance().launchIrony.getValue()) {
+    private static void startLauncherDirectly(SavegameEntry<?, ?> e) throws IOException {
+        var game = SavegameContext.getForSavegame(e);
+        if (AppPrefs.get().launchIrony().getValue()) {
             IronyHelper.launchEntry(game, true);
         } else {
             if (!GameInstallation.ALL.get(game).getDist().supportsLauncher()) {
@@ -136,13 +127,13 @@ public class GameDistLauncher {
                 if (b) {
                     ctx.getInstallation().startDirectly(debug);
                 } else {
-                    startLauncherDirectly();
+                    startLauncherDirectly(e);
                 }
             }
             return;
         }
 
-        if (Settings.getInstance().launchIrony.getValue()) {
+        if (AppPrefs.get().launchIrony().getValue()) {
             IronyHelper.launchEntry(ctx.getGame(), true);
         } else {
             ctx.getInstallation().startDirectly(debug);

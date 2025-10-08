@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.info.eu4;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
@@ -35,6 +36,6 @@ public class Eu4RnwComp extends SimpleInfoComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("RNW");
+        return AppI18n.get("rnw");
     }
 }

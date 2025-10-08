@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
-import com.crschnick.pdxu.app.core.SavegameManagerState;
+import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameWatcher;
 import javafx.beans.property.*;
@@ -15,19 +15,21 @@ import java.util.stream.Collectors;
 
 public class GuiImporterState {
 
+    private final Game game;
     private final BooleanProperty selectAll;
     private final StringProperty filter;
     private final List<ImportEntry> allTargets;
     private final ListProperty<ImportEntry> shownTargets;
 
-    public GuiImporterState() {
+    public GuiImporterState(Game game) {
+        this.game = game;
         selectAll = new SimpleBooleanProperty();
         filter = new SimpleStringProperty("");
         allTargets = new CopyOnWriteArrayList<>();
         shownTargets = new SimpleListProperty<>(FXCollections.observableArrayList());
         setupListeners();
 
-        allTargets.addAll(SavegameWatcher.ALL.get(SavegameManagerState.get().current()).getSavegames().stream()
+        allTargets.addAll(SavegameWatcher.ALL.get(game).getSavegames().stream()
                 .map(t -> new ImportEntry(t, new SimpleBooleanProperty(false)))
                 .collect(Collectors.toList()));
         updateShownTargets();
@@ -38,7 +40,7 @@ public class GuiImporterState {
             updateShownTargets();
         });
 
-        SavegameWatcher.ALL.get(SavegameManagerState.get().current()).savegamesProperty().addListener((c, o, n) -> {
+        SavegameWatcher.ALL.get(game).savegamesProperty().addListener((c, o, n) -> {
             allTargets.clear();
             allTargets.addAll(n.stream()
                     .map(t -> new ImportEntry(t, new SimpleBooleanProperty(false)))

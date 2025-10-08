@@ -10,7 +10,7 @@ import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
-import com.jfoenix.controls.JFXButton;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Region;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -35,7 +35,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
 
         @Override
         public javafx.scene.Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
-            var b = new JFXButton(null, new FontIcon());
+            var b = new Button(null, new FontIcon());
             b.setGraphic(new FontIcon());
             b.getStyleClass().add("coa-button");
             GuiTooltips.install(b, "Open in coat of arms preview window");
@@ -305,8 +305,8 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
 
         if (keyOpt.isPresent() && node.getBackingNode().isArray() && node.getBackingNode().getArrayNode().size() == 1
-                && node.getBackingNode().getNodeArray().get(0).isValue()) {
-            return get(keyOpt.get(), node.getBackingNode().getNodeArray().get(0).getString());
+                && node.getBackingNode().getNodeArray().getFirst().isValue()) {
+            return get(keyOpt.get(), node.getBackingNode().getNodeArray().getFirst().getString());
         }
 
         if (parentKey.isPresent() && node.getBackingNode().isValue()) {

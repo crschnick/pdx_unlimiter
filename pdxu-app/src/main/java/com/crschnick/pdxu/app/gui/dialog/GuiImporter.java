@@ -1,18 +1,22 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.comp.Comp;
+import com.crschnick.pdxu.app.comp.base.ModalButton;
+import com.crschnick.pdxu.app.comp.base.ModalOverlay;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppDialog;
+import com.crschnick.pdxu.app.core.window.AppSideWindow;
+import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
-import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 
 import java.util.Map;
 
@@ -22,7 +26,7 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParseResult> statusMap) {
-        Alert alert = GuiDialogHelper.createEmptyAlert();
+        Alert alert = AppSideWindow.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.INFORMATION);
         alert.setTitle("Import results");
         alert.setHeaderText("The import of the selected savegames has finished.");
@@ -54,7 +58,8 @@ public class GuiImporter {
     }
 
     private static Region createBottomNode(CheckBox cb) {
-        Label name = new Label("Select all");
+        Label name = new Label();
+        name.textProperty().bind(AppI18n.observable("selectAll"));
         name.setOnMouseClicked(e -> cb.setSelected(!cb.isSelected()));
 
         HBox box = new HBox(cb, new Label("  "), name);
@@ -66,56 +71,35 @@ public class GuiImporter {
         Label name = new Label(entry.target().getName());
         name.setTextOverrun(OverrunStyle.ELLIPSIS);
 
-        JFXCheckBox cb = new JFXCheckBox();
+        var cb = new CheckBox();
         cb.selectedProperty().bindBidirectional(entry.selected());
         name.setOnMouseClicked(e -> cb.setSelected(!cb.isSelected()));
 
         return new HBox(cb, new Label("  "), name);
     }
 
-    public static void createImporterDialog() {
-        GuiImporterState state = new GuiImporterState();
+    public static void createImporterDialog(Game game) {
+        GuiImporterState state = new GuiImporterState(game);
 
-        Alert alert = GuiDialogHelper.createEmptyAlert();
-        alert.initModality(Modality.WINDOW_MODAL);
-        alert.setResizable(true);
-        alert.setTitle("Import savegames");
-        alert.getDialogPane().setContent(createContent(state));
-        alert.getDialogPane().getScene().getWindow()
-                .setOnCloseRequest(e -> alert.setResult(ButtonType.CLOSE));
-
-
-        var importType = new ButtonType("Import", ButtonBar.ButtonData.LEFT);
-        alert.getButtonTypes().add(importType);
-        Button importB = (Button) alert.getDialogPane().lookupButton(importType);
-        importB.setOnAction(e -> {
-            FileImporter.importTargets(state.getSelectedTargets());
-            e.consume();
-        });
-
-
-        var deleteType = new ButtonType("Delete", ButtonBar.ButtonData.RIGHT);
-        alert.getButtonTypes().add(deleteType);
-        Button deleteB = (Button) alert.getDialogPane().lookupButton(deleteType);
-        deleteB.setOnAction(e -> {
-            if (GuiDialogHelper.showBlockingAlert(dAlert -> {
-                dAlert.setAlertType(Alert.AlertType.CONFIRMATION);
-                dAlert.setTitle("Confirm deletion");
-                dAlert.setHeaderText("Do you want to delete the selected savegame(s)?");
-            }).map(t -> t.getButtonData().isDefaultButton()).orElse(false)) {
+        var modal = ModalOverlay.of("importSavegames", Comp.of(() -> createContent(state)));
+        modal.addButton(new ModalButton("delete", () -> {
+            var confirm = AppDialog.confirm("deleteSavegames");
+            if (confirm) {
                 state.getSelectedTargets().forEach(FileImportTarget::delete);
             }
-            e.consume();
-        });
-
-        alert.show();
+        }, false, false));
+        modal.addButtonBarComp(Comp.hspacer());
+        modal.addButton(new ModalButton("import", () -> {
+            FileImporter.importTargets(state.getSelectedTargets());
+        }, true, true));
+        modal.show();
     }
 
-    private static Node createContent(GuiImporterState state) {
+    private static Region createContent(GuiImporterState state) {
         VBox targets = new VBox();
         targets.getStyleClass().add("import-targets");
 
-        JFXCheckBox cbAll = new JFXCheckBox();
+        var cbAll = new CheckBox();
         cbAll.selectedProperty().bindBidirectional(state.selectAllProperty());
 
         var emptyLabel = new Label("There are no savegames available to import!");
@@ -161,10 +145,12 @@ public class GuiImporter {
 
     private static Region createFilterBar(GuiImporterState state) {
         HBox box = new HBox();
+        box.setSpacing(9);
         box.setAlignment(Pos.CENTER);
         box.getStyleClass().add("filter-bar");
 
-        var fLabel = new Label("Filter:  ");
+        var fLabel = new Label();
+        fLabel.textProperty().bind(AppI18n.observable("filter"));
         fLabel.setAlignment(Pos.CENTER);
         box.getChildren().add(fLabel);
 

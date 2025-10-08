@@ -1,11 +1,10 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.lang.Language;
-import com.crschnick.pdxu.app.lang.LanguageManager;
-import com.crschnick.pdxu.app.util.JsonHelper;
-import com.crschnick.pdxu.app.util.OsHelper;
-import com.crschnick.pdxu.app.util.SupportedOs;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.util.FileSystemHelper;
+import com.crschnick.pdxu.app.util.JacksonMapper;
+import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameNamedVersion;
@@ -13,7 +12,6 @@ import com.crschnick.pdxu.model.GameVersion;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -116,7 +114,7 @@ public interface GameInstallType {
                     .put("desc", "")
                     .put("date", lastPlayed.toString())
                     .put("filename", sgPath);
-            JsonHelper.write(n, userDir.resolve("continue_game.json"));
+            JacksonMapper.getDefault().writeValue(userDir.resolve("continue_game.json").toFile(), n);
         }
 
         @Override
@@ -193,7 +191,7 @@ public interface GameInstallType {
                     .put("date", d.format(new Date(lastPlayed.toEpochMilli())) + "\n")
                     .put("filename", userDir.resolve("save games").relativize(path).toString())
                     .put("is_remote", false);
-            JsonHelper.write(n, userDir.resolve("continue_game.json"));
+            JacksonMapper.getDefault().writeValue(userDir.resolve("continue_game.json").toFile(), n);
         }
 
         @Override
@@ -213,7 +211,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
             var sf = userDir.resolve("pdx_settings.txt");
             if (!Files.exists(sf)) {
                 return Optional.empty();
@@ -223,7 +221,7 @@ public interface GameInstallType {
             var langId = node
                     .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
                     .map(Node::getString);
-            return langId.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l)));
+            return langId.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l)));
         }
     };
 
@@ -288,7 +286,7 @@ public interface GameInstallType {
                     .put("title", sgPath)
                     .put("desc", name)
                     .put("date", "");
-            JsonHelper.write(n, userDir.resolve("continue_game.json"));
+            JacksonMapper.getDefault().writeValue(userDir.resolve("continue_game.json").toFile(), n);
         }
     };
 
@@ -340,7 +338,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
             var sf = userDir.resolve("pdx_settings.txt");
             if (!Files.exists(sf)) {
                 return Optional.empty();
@@ -350,7 +348,7 @@ public interface GameInstallType {
             var langId = node
                     .getNodeForKeysIfExistent("\"System\"", "\"language\"", "value")
                     .map(Node::getString);
-            return langId.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l)));
+            return langId.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l)));
         }
 
         public Path getSteamSpecificFile(Path p) {
@@ -380,11 +378,11 @@ public interface GameInstallType {
                     .put("title", sgPath)
                     .put("desc", "")
                     .put("date", date);
-            JsonHelper.write(n, userDir.resolve("continue_game.json"));
+            JacksonMapper.getDefault().writeValue(userDir.resolve("continue_game.json").toFile(), n);
         }
     };
 
-    GameInstallType CK2 = new StandardInstallType("CK2game") {
+    GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.MACOS ? "ck2" : "CK2game") {
 
         public String getCompatibleSavegameName(String name) {
             return Normalizer.normalize(super.getCompatibleSavegameName(name), Normalizer.Form.NFC)
@@ -413,7 +411,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) {
 
         }
 
@@ -423,7 +421,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
             var sf = userDir.resolve("settings.txt");
             if (!Files.exists(sf)) {
                 return Optional.empty();
@@ -431,7 +429,7 @@ public interface GameInstallType {
 
             var node = TextFormatParser.text().parse(sf);
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
-            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+            return Optional.ofNullable(GameLanguage.byId(langId));
         }
 
         @Override
@@ -501,7 +499,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) throws IOException {
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) {
 
         }
 
@@ -515,11 +513,11 @@ public interface GameInstallType {
                 }
             }
 
-            return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve("Victoria II");
+            return FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve("Victoria II");
         }
 
         @Override
-        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
             var sf = userDir.resolve("settings.txt");
             if (!Files.exists(sf)) {
                 return Optional.empty();
@@ -527,7 +525,7 @@ public interface GameInstallType {
 
             var node = TextFormatParser.text().parse(sf);
             var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
-            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+            return Optional.ofNullable(GameLanguage.byId(langId));
         }
 
         @Override
@@ -541,7 +539,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
+        public List<String> getEnabledMods(Path dir, Path userDir) {
             return List.of();
         }
     };
@@ -599,15 +597,15 @@ public interface GameInstallType {
         }
 
         @Override
-        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
             var sf = userDir.resolve("pdx_settings.json");
             if (!Files.exists(sf)) {
                 return Optional.empty();
             }
 
-            var node = JsonHelper.read(sf);
+            var node = JacksonMapper.getDefault().readTree(sf.toFile());
             var id = Optional.ofNullable(node.get("System")).flatMap(n -> Optional.ofNullable(n.get("language")));
-            return id.flatMap(l -> Optional.ofNullable(LanguageManager.getInstance().byId(l.asText())));
+            return id.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l.asText())));
         }
 
         public Path getSteamSpecificFile(Path p) {
@@ -639,7 +637,7 @@ public interface GameInstallType {
                     .put("desc", "")
                     .put("date", date)
                     .put("rawVersion", rawVersion);
-            JsonHelper.write(n, userDir.resolve("continue_game.json"));
+            JacksonMapper.getDefault().writeValue(userDir.resolve("continue_game.json").toFile(), n);
         }
 
         public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
@@ -648,7 +646,7 @@ public interface GameInstallType {
                 return List.of();
             }
 
-            var node = JsonHelper.read(file);
+            var node = JacksonMapper.getDefault().readTree(file.toFile());
             if (node.get("enabledMods") == null) {
                 return List.of();
             }
@@ -664,7 +662,7 @@ public interface GameInstallType {
                 return List.of();
             }
 
-            var node = JsonHelper.read(file);
+            var node = JacksonMapper.getDefault().readTree(file.toFile());
             if (node.get("disabledDLC") == null) {
                 return List.of();
             }
@@ -697,7 +695,7 @@ public interface GameInstallType {
             n.putArray("disabledDLC").addAll(dlcsToDisable.stream()
                                                      .map(dlc -> getDlcLauncherId(installation, dlc))
                                                      .map(s -> JsonNodeFactory.instance.objectNode().put("paradoxAppId", s)).toList());
-            JsonHelper.write(n, file);
+            JacksonMapper.getDefault().writeValue(file.toFile(), n);
         }
 
         public List<GameMod> loadMods(GameInstallation installation) throws IOException {
@@ -721,7 +719,7 @@ public interface GameInstallType {
             modPaths.forEach(f -> {
                 GameMod.fromVictoria3Directory(f).ifPresent(m -> {
                     mods.add(m);
-                    LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("?") +
+                    TrackEvent.debug("Found mod " + m.getName().orElse("?") +
                                                                                  " at " + m.getContentPath().orElse(null) + ".");
                 });
             });
@@ -752,7 +750,7 @@ public interface GameInstallType {
         throw new UnsupportedOperationException();
     }
 
-    default Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+    default Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
         return Optional.empty();
     }
 
@@ -780,7 +778,7 @@ public interface GameInstallType {
                                                   .noneMatch(other -> other.getName().equals(gameDlc.getName())))
                            .ifPresent(existing::add);
                 } catch (Exception e) {
-                    ErrorHandler.handleException(e);
+                    ErrorEventFactory.fromThrowable(e).handle();
                 }
             });
         }
@@ -845,7 +843,7 @@ public interface GameInstallType {
     }
 
     default String getCompatibleSavegameName(String name) {
-        return OsHelper.getFileSystemCompatibleName(name);
+        return FileSystemHelper.getFileSystemCompatibleName(name);
     }
 
     public List<String> getEnabledMods(Path dir, Path userDir) throws Exception;
@@ -865,7 +863,7 @@ public interface GameInstallType {
             }
         }
 
-        return OsHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name);
+        return FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name);
     }
 
     abstract class StandardInstallType implements GameInstallType {
@@ -878,20 +876,18 @@ public interface GameInstallType {
 
         @Override
         public Path getExecutable(Path p) {
-            switch (SupportedOs.get()) {
-                case WINDOWS -> {
+            switch (OsType.ofLocal()) {
+                case OsType.Windows ignored -> {
                     return p.resolve(executableName + ".exe");
                 }
-                case LINUX -> {
+                case OsType.Linux ignored -> {
                     return p.resolve(executableName);
                 }
-                case MAC -> {
+                case OsType.MacOs ignored -> {
                     return p.resolve(p.resolve(executableName + ".app")
                                              .resolve("Contents").resolve("MacOS").resolve(Path.of(executableName).getFileName()));
                 }
             }
-
-            throw new AssertionError();
         }
 
         @Override
@@ -905,7 +901,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public Optional<Language> determineLanguage(Path dir, Path userDir) throws Exception {
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
             var sf = userDir.resolve("settings.txt");
             if (!Files.exists(sf)) {
                 return Optional.empty();
@@ -913,7 +909,7 @@ public interface GameInstallType {
 
             var node = TextFormatParser.text().parse(sf);
             var langId = node.getNodeForKey("language").getString();
-            return Optional.ofNullable(LanguageManager.getInstance().byId(langId));
+            return Optional.ofNullable(GameLanguage.byId(langId));
         }
 
         public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
@@ -922,7 +918,7 @@ public interface GameInstallType {
                 return List.of();
             }
 
-            var node = JsonHelper.read(file);
+            var node = JacksonMapper.getDefault().readTree(file.toFile());
             if (node.get("enabled_mods") == null) {
                 return List.of();
             }
@@ -938,7 +934,7 @@ public interface GameInstallType {
                 return List.of();
             }
 
-            var node = JsonHelper.read(file);
+            var node = JacksonMapper.getDefault().readTree(file.toFile());
             if (node.get("disabled_dlcs") == null) {
                 return List.of();
             }
@@ -953,7 +949,7 @@ public interface GameInstallType {
             ObjectNode n = JsonNodeFactory.instance.objectNode();
 
             var modsToUse = (getModInfoStorageType() ==
-                    GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
+                    ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO ? installation.queryEnabledMods() : mods);
             n.putArray("enabled_mods").addAll(modsToUse.stream()
                                                       .map(d -> FilenameUtils.separatorsToUnix
                                                               (installation.getUserDir().relativize(d.getModFile()).toString()))
@@ -973,7 +969,7 @@ public interface GameInstallType {
                                                        .map(d -> FilenameUtils.separatorsToUnix(
                                                                installation.getInstallDir().relativize(d.getInfoFilePath()).toString()))
                                                        .map(JsonNodeFactory.instance::textNode).toList());
-            JsonHelper.write(n, file);
+            JacksonMapper.getDefault().writeValue(file.toFile(), n);
         }
 
         public List<GameMod> loadMods(GameInstallation installation) throws IOException {
@@ -988,7 +984,7 @@ public interface GameInstallType {
                         mods.add(m);
 
                         var ex = m.getAbsoluteContentPath(installation.getUserDir()).map(Files::exists).orElse(null);
-                        LoggerFactory.getLogger(GameInstallType.class).debug("Found mod " + m.getName().orElse("<no name>") +
+                        TrackEvent.debug("Found mod " + m.getName().orElse("<no name>") +
                                                                                      " at " + m.getModFile().toString() + ". Content exists: " + ex +
                                                                                      ". Legacy: " + m.isLegacyArchive());
                     });

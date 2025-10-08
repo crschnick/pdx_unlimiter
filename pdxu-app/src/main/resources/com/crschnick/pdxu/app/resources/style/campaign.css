@@ -1,0 +1,58 @@
+.campaign-list-entry .tag-icon {
+-fx-min-width: 5em;
+-fx-max-width: 5em;
+-fx-min-height: 4em;
+-fx-max-height: 4em;
+}
+
+.campaign-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.campaign-list {
+    -fx-background-color: transparent;
+}
+
+.campaign-list .list-cell {
+-fx-padding: 8 8 0 8;
+}
+
+.campaign-list .list-view {
+    -fx-border-width: 0;
+}
+
+.campaign-list-entry {
+    -fx-padding: 0.1em 0.35em 0.1em 0.5em;
+    -fx-spacing: 0.3em;
+    -fx-background-color: -color-bg-default-transparent;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.campaign-list-entry.eu4-campaign, .campaign-list-entry.ck3-campaign, .campaign-list-entry.stellaris-campaign, .campaign-list-entry.ck2-campaign    {
+    -fx-padding: 0.1em 0.35em 0.1em 0.1em;
+    -fx-spacing: 0;
+}
+
+.campaign-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:hover .campaign-list-entry {
+    -fx-background-color: -color-bg-default;
+}
+
+.campaign-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:selected .campaign-list-entry {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+
+.campaign-list-entry .text-field {
+-fx-padding: 0.3em 0.3em 0.3em 0.3em;
+-jfx-unfocus-color: transparent;
+-fx-background-color: transparent;
+}
+
+.campaign-list-entry .date {
+-fx-padding: 0.3em 0.3em 0.3em 0.3em;
+}
+

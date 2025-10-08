@@ -1,7 +1,8 @@
 package com.crschnick.pdxu.editor.gui;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
@@ -14,8 +15,8 @@ public class GuiEditorMenuBar {
 
     public static MenuBar createMenuBar(EditorState state) {
 
-        Menu file = new Menu(PdxuI18n.get("EDITOR_MENU_FILE"));
-        MenuItem c = new MenuItem(PdxuI18n.get("EDITOR_MENU_FILE_SAVE"));
+        Menu file = new Menu(AppI18n.get("editorMenuFile"));
+        MenuItem c = new MenuItem(AppI18n.get("editorMenuFileSave"));
         c.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         c.setOnAction((a) -> {
             state.save();
@@ -26,20 +27,20 @@ public class GuiEditorMenuBar {
         }
 
 
-        Menu editor = new Menu(PdxuI18n.get("EDITOR_MENU_EDITOR"));
-        MenuItem cte = new MenuItem(PdxuI18n.get("EDITOR_MENU_EDITOR_SETTINGS"));
+        Menu editor = new Menu(AppI18n.get("editorMenuEditor"));
+        MenuItem cte = new MenuItem(AppI18n.get("editorMenuEditorSettings"));
         cte.setOnAction((a) -> {
-            GuiEditorSettings.showEditorSettings();
+            AppPrefs.get().selectCategory("editor");
         });
         editor.getItems().add(cte);
 
-        MenuItem guide = new MenuItem(PdxuI18n.get("EDITOR_MENU_EDITOR_GUIDE"));
+        MenuItem guide = new MenuItem(AppI18n.get("editorMenuEditorGuide"));
         guide.setOnAction((a) -> {
             Hyperlinks.open(Hyperlinks.EDITOR_GUIDE);
         });
         editor.getItems().add(guide);
 
-        Menu jump = new Menu(PdxuI18n.get("EDITOR_MENU_JUMP"));
+        Menu jump = new Menu(AppI18n.get("editorMenuJump"));
         Runnable fillJumps = () -> {
             if (state.isSavegame()) {
                 try {
@@ -53,7 +54,7 @@ public class GuiEditorMenuBar {
                         j.setDisable(v == null);
                     });
                 } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
+                    ErrorEventFactory.fromThrowable(ex).handle();
                 }
             }
         };

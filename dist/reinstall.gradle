@@ -1,0 +1,18 @@
+def distDir = "${project.layout.buildDirectory.get()}/dist"
+
+tasks.register('installProduction', Exec) {
+    if (os.isWindows()) {
+        commandLine "$projectDir/tools/reinstall_windows.bat", productName, file("$distDir/artifacts/$distName-installer-windows-${arch}.msi").canonicalPath
+    } else if (os.isLinux()) {
+        commandLine "$projectDir/tools/reinstall_deb.sh", projectDir.toString(), kebapProductName
+        standardInput = System.in
+    } else {
+        commandLine "$projectDir/tools/reinstall_macos.sh", productName, "$distDir/artifacts/$distName-installer-macos-${arch}.pkg"
+        standardInput = System.in
+    }
+}
+
+tasks.register('distAndInstall', DefaultTask) {
+    dependsOn(dist)
+    finalizedBy(installProduction)
+}

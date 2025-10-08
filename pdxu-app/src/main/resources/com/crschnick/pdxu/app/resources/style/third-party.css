@@ -1,0 +1,11 @@
+.third-party-dependency-list-comp .titled-pane .content * {
+    -fx-background-color: transparent;
+}
+
+.third-party-dependency-list-comp .titled-pane {
+    -fx-background-radius: 5;
+}
+
+.third-party-dependency-list-comp .titled-pane .content {
+    -fx-padding: 4;
+}

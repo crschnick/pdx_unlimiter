@@ -65,8 +65,8 @@ public class TagRows {
         second.setAlignment(Pos.CENTER);
         var spacer = new Region();
         spacer.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> (list.get(0).getMinWidth() / 2) - (first.getSpacing()),
-                list.get(0).minWidthProperty(), first.spacingProperty()));
+                () -> (list.getFirst().getMinWidth() / 2) - (first.getSpacing()),
+                list.getFirst().minWidthProperty(), first.spacingProperty()));
         second.getChildren().add(spacer);
         second.getChildren().addAll(list.subList(firstRow, firstRow + secondRow));
         if (exceeded) {

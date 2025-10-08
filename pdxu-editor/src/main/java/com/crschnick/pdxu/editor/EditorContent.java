@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor;
 
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -12,9 +13,10 @@ import java.util.function.Consumer;
 public class EditorContent {
 
     public static List<Integer> calculatePageSizes(int nodesSize) {
+        var pageSize = AppPrefs.get().editorPageSize().getValue();
         List<Integer> pageSizes = new ArrayList<>();
-        for (int i = 0; i < nodesSize; i += EditorSettings.getInstance().pageSize.getValue()) {
-            int size = Math.min(nodesSize - i, EditorSettings.getInstance().pageSize.getValue());
+        for (int i = 0; i < nodesSize; i += pageSize) {
+            int size = Math.min(nodesSize - i, pageSize);
             pageSizes.add(size);
         }
         return pageSizes;
@@ -42,9 +44,10 @@ public class EditorContent {
     }
 
     private void rebuildPageSizes() {
+        var pageSize = AppPrefs.get().editorPageSize().getValue();
         pageSizes.clear();
-        for (int i = 0; i < filteredNodes.size(); i += EditorSettings.getInstance().pageSize.getValue()) {
-            int size = Math.min(filteredNodes.size() - i, EditorSettings.getInstance().pageSize.getValue());
+        for (int i = 0; i < filteredNodes.size(); i += pageSize) {
+            int size = Math.min(filteredNodes.size() - i, pageSize);
             pageSizes.add(size);
         }
     }

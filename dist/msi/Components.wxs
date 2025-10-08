@@ -1,0 +1,70 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+			<ComponentGroup Id="FileComponents" Directory="APPLICATIONFOLDER">
+				<Files Include="..\build\dist\installer-win\**">
+					<Exclude Files="..\build\dist\installer-win\$(var.ExecutableName).exe" />
+				</Files>
+				<File Id="Executable" Source="..\build\dist\installer-win\$(var.ExecutableName).exe"></File>
+			</ComponentGroup>
+
+
+			<!-- Start Menu Shortcut-->
+			<Component Id="StartMenuShortcut">
+				<Shortcut Id="StartMenuShortcut" Name="$(var.DynamicProductName)" Target="[APPLICATIONFOLDER]\$(var.ExecutableName).exe" Directory="InstallProgramMenuFolder" WorkingDirectory="APPLICATIONFOLDER" Icon="StartMenuIcon" />
+
+				<RegistryValue Id="RegStartMenuShortcutKey" Root="HKMU" Key="SOFTWARE\$(var.DynamicProductName)" Name="StartMenuShortcut" Value="1" Type="integer" KeyPath="yes" />
+
+				<RemoveFolder Id="RemoveStartMenuShortcut" Directory="InstallProgramMenuFolder" On="uninstall" />
+			</Component>
+
+			<!-- Desktop shortcut -->
+			<Component Id="DesktopShortcut">
+				<Shortcut Id="DesktopShortcut" Name="$(var.DynamicProductName)" Description="!(loc.DesktopShortcutDescription)" Target="[APPLICATIONFOLDER]\$(var.ExecutableName).exe" Directory="DesktopFolder" Icon="Icon" WorkingDirectory="APPLICATIONFOLDER" />
+					
+				<RemoveFolder Id="RemoveDesktopShortcut" On="uninstall" />
+
+				<RegistryValue Id="RegDesktopShortcutKey" Root="HKMU" Key="SOFTWARE\$(var.DynamicProductName)" Name="DesktopShortcut" Value="1" Type="integer" KeyPath="yes" />
+			</Component>
+
+			<!-- File associations -->
+			<Component Id="FileAssociations">
+				<ProgId Id="Eu4ProgId" Description="!(loc.Eu4Desc)" Icon="Executable">
+					<Extension Id="eu4">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				<ProgId Id="Ck3ProgId" Description="!(loc.Ck3Desc)" Icon="Executable">
+					<Extension Id="ck3">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				<ProgId Id="Hoi4ProgId" Description="!(loc.Hoi4Desc)" Icon="Executable">
+					<Extension Id="hoi4">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				<ProgId Id="StellarisProgId" Description="!(loc.StellarisDesc)" Icon="Executable">
+					<Extension Id="sav">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				<ProgId Id="Ck2ProgId" Description="!(loc.Ck2Desc)" Icon="Executable">
+					<Extension Id="ck2">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				<ProgId Id="Vic2ProgId" Description="!(loc.Vic2Desc)" Icon="Executable">
+					<Extension Id="v2">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				<ProgId Id="Vic3ProgId" Description="!(loc.Vic3Desc)" Icon="Executable">
+					<Extension Id="v3">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
+				
+				<RegistryValue Id="FileAssociationsKey" Root="HKMU" Key="SOFTWARE\$(var.DynamicProductName)" Name="FileAssociations" Value="1" Type="integer" KeyPath="yes" />
+			</Component>
+	</Fragment>
+</Wix>

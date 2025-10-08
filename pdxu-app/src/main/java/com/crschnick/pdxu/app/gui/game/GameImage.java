@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
@@ -138,20 +137,7 @@ public class GameImage {
     public static Image VIC3_ICON_RADICALS;
     public static Image VIC3_ICON_LOYALISTS;
 
-    private static void resetImages() {
-        for (var field : GameImage.class.getFields()) {
-            if (field.getType().equals(Image.class)) {
-                try {
-                    field.set(null, ImageHelper.DEFAULT_IMAGE);
-                } catch (IllegalAccessException e) {
-                    ErrorHandler.handleException(e);
-                }
-            }
-        }
-    }
-
     public static void loadGameImages(Game g) {
-        resetImages();
         Map<Game, Runnable> loadFuncs = Map.of(
                 Game.EU4, GameImage::loadEu4Images,
                 Game.CK3, GameImage::loadCk3Images,
@@ -169,7 +155,11 @@ public class GameImage {
 
     public static Image getGameIcon(Game g) {
         var iconFile = GameInstallation.ALL.get(g).getDist().getIcon();
-        return ImageHelper.loadImage(iconFile);
+        var img = ImageHelper.loadImage(iconFile);
+        if (g == Game.CK3) {
+            img = ImageHelper.cut(img, new Rectangle2D(25, 25, 512 - 50, 512 - 50));
+        }
+        return img;
     }
 
     public static void loadVic3Images() {

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DESTINATION="${2}"
+PRODUCT_HOME="${DESTINATION}/__PRODUCT__.app"
+
+echo "Post installation process started"
+
+echo "Changing permissions in __PRODUCT__ home"
+cd "${PRODUCT_HOME}"
+chmod -R 755 .
+echo "Post installation process finished"

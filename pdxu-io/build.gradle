@@ -2,10 +2,9 @@ plugins {
     id 'java-library'
 }
 
-apply from: "$rootDir/gradle/java.gradle"
-apply from: "$rootDir/gradle/lombok.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/java.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/lombok.gradle"
 
 dependencies {
-    compileOnly group: 'org.graalvm.polyglot', name: 'polyglot', version: '24.2.2'
-    compileOnly group: 'org.graalvm.js', name: 'js-community', version: '24.2.2'
+    compileOnly 'org.graalvm.polyglot:polyglot:25.0.0'
 }

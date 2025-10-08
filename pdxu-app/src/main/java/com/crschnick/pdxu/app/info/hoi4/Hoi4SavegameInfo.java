@@ -1,6 +1,9 @@
 package com.crschnick.pdxu.app.info.hoi4;
 
-import com.crschnick.pdxu.app.info.*;
+import com.crschnick.pdxu.app.info.ModComp;
+import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.info.VersionComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 

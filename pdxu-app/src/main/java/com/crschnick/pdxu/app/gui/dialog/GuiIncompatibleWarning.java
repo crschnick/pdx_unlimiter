@@ -1,16 +1,19 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.comp.Comp;
+import com.crschnick.pdxu.app.comp.base.ModalButton;
+import com.crschnick.pdxu.app.comp.base.ModalOverlay;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.GameMod;
-import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
 import com.crschnick.pdxu.app.savegame.SavegameCompatibility;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
 import java.util.List;
@@ -23,7 +26,7 @@ public class GuiIncompatibleWarning {
     public static boolean showIncompatibleWarning(GameInstallation installation, SavegameEntry<?, ?> entry) {
         var info = SavegameContext.getContext(entry).getInfo();
         StringBuilder builder = new StringBuilder();
-        if (SavegameCompatibility.determineForVersion(info.getData().getVersion()) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
+        if (SavegameCompatibility.determineForVersion(installation.getDist().getGame(), info.getData().getVersion()) == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
             builder.append("Incompatible versions:\n")
                     .append("- Game version: ")
                     .append(installation.getVersion().toString()).append("\n")
@@ -68,52 +71,37 @@ public class GuiIncompatibleWarning {
         text.setEditable(false);
         text.setPadding(Insets.EMPTY);
 
-        var launch = new ButtonType("Launch anyway");
-        return GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setAlertType(Alert.AlertType.WARNING);
-            alert.getButtonTypes().clear();
-            alert.getButtonTypes().add(ButtonType.CLOSE);
-            alert.getButtonTypes().add(launch);
-            alert.setTitle("Incompatible savegame");
-            alert.setHeaderText("Selected savegame may be incompatible. Launching it anyway, can cause problems");
-            alert.getDialogPane().setContent(text);
-        }).orElse(ButtonType.CLOSE).equals(launch);
+        var ok = new SimpleBooleanProperty();
+        var modal = ModalOverlay.of("incompatibleSavegameTitle", AppDialog.dialogTextKey("incompatibleSavegameContent"));
+        modal.addButton(ModalButton.cancel());
+        modal.addButton(new ModalButton("launchAnyway", () -> {
+            ok.set(true);
+        }, true, true));
+        modal.showAndWait();
+        return ok.get();
     }
 
     public static Optional<Boolean> showNoSavedModsWarning(Game game, List<GameMod> enabledMods) {
-        var launchButton = new ButtonType(PdxuI18n.get("LAUNCH"));
-        var changeModsButton = new ButtonType(PdxuI18n.get("CHANGE_MODS"));
-
-        var r = GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setAlertType(Alert.AlertType.WARNING);
-            alert.getButtonTypes().clear();
-            alert.getButtonTypes().add(ButtonType.CLOSE);
-            alert.getButtonTypes().add(launchButton);
-            if (GameDistLauncher.canChangeMods(game)) {
-                alert.getButtonTypes().add(changeModsButton);
-            }
-            alert.setTitle(PdxuI18n.get("MOD_INFO_TITLE", game.getTranslatedFullName()));
-            alert.setHeaderText(PdxuI18n.get("MOD_INFO", game.getTranslatedFullName()));
-
+        var val = new SimpleObjectProperty<Boolean>();
+        var modal = ModalOverlay.of("modInfoTitle", Comp.of(() -> {
+            var header = AppI18n.get("modInfo", game.getTranslatedFullName());
             String builder = enabledMods.stream()
                     .map(m -> "- " + m.getName().orElse(m.getModFile().getFileName().toString()))
                     .collect(Collectors.joining("\n"));
             if (enabledMods.size() == 0) {
                 builder = builder + "<None>";
             }
-            var text = new TextArea(builder);
+            var text = new TextArea(header + builder);
             text.setPrefHeight(200);
             text.setEditable(false);
-
-            alert.getDialogPane().setContent(text);
-            alert.getDialogPane().setPadding(Insets.EMPTY);
-            alert.getDialogPane().minHeightProperty().bind(text.prefHeightProperty());
-        });
-
-        if (r.isPresent()) {
-            if (r.get().equals(launchButton)) return Optional.of(true);
-            if (r.get().equals(changeModsButton)) return Optional.of(false);
-        }
-        return Optional.empty();
+            return text;
+        }));
+        modal.addButton(new ModalButton("launch", () -> {
+            val.setValue(true);
+        }, true, false));
+        modal.addButton(new ModalButton("changeMods", () -> {
+            val.setValue(false);
+        }, true, false));
+        return Optional.ofNullable(val.get());
     }
 }

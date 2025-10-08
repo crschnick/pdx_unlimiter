@@ -1,8 +1,9 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
-import com.crschnick.pdxu.app.core.settings.SavedState;
+import com.crschnick.pdxu.app.core.AppCache;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.gui.GuiStyle;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -20,10 +21,10 @@ import java.util.Optional;
 public class GuiSavegameIO {
 
     public static Optional<Path> showExportDialog() {
-        Alert alert = GuiDialogHelper.createAlert();
+        Alert alert = AppSideWindow.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(PdxuI18n.get("EXPORT_STORAGE"));
-        alert.setHeaderText(PdxuI18n.get("EXPORT_STORAGE_INFO"));
+        alert.setTitle(AppI18n.get("exportStorage"));
+        alert.setHeaderText(AppI18n.get("exportStorageinfo"));
 
         HBox dialogPaneContent = new HBox();
         dialogPaneContent.setAlignment(Pos.CENTER);
@@ -32,7 +33,7 @@ public class GuiSavegameIO {
 
         TextField textArea = new TextField();
         textArea.setEditable(false);
-        var prev = SavedState.getInstance().getPreviousExportLocation();
+        Path prev = AppCache.getNonNull("storageExportPath", Path.class, () -> null);
         if (prev != null && Files.exists(prev)) {
             textArea.setText(prev.toString());
         }
@@ -50,7 +51,7 @@ public class GuiSavegameIO {
             File file = directoryChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null) {
                 textArea.setText(file.toString());
-                SavedState.getInstance().setPreviousExportLocation(file.toPath());
+                AppCache.update("storageExportPath", file.toPath());
             }
         });
 

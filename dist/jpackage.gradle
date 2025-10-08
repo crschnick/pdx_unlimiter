@@ -1,0 +1,131 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+apply from: "$rootDir/gradle/gradle_scripts/javafx.gradle"
+apply from: "$rootDir/gradle/gradle_scripts/jna.gradle"
+
+def distDir = "${project.layout.buildDirectory.get()}/dist"
+
+// To remove warnings, the plugin probably does not expect the JPackage tasks to be in a separate project
+application {
+    mainModule = packageName(null)
+    mainClass = packageName('Main')
+}
+
+dependencies {
+    implementation project(':pdxu-app')
+}
+
+// Mac does not like a zero major version
+def macVersion = canonicalVersionString
+if (Integer.parseInt(macVersion.substring(0, 1)) == 0) {
+    macVersion = "1" + macVersion.substring(1)
+}
+
+def getPlatformName() {
+    def currentOS = DefaultNativePlatform.currentOperatingSystem
+    def platform
+    if (currentOS.isWindows()) {
+        platform = 'win'
+    }  else if (currentOS.isMacOsX()) {
+        platform = 'mac'
+    } else {
+        platform = 'linux'
+    }
+    return platform
+}
+
+
+jlink {
+    imageDir = file("${project.layout.buildDirectory.get()}/image")
+    options = [
+            // Disable this as this removes line numbers from stack traces!
+            // '--strip-debug',
+            '--no-header-files',
+            '--no-man-pages',
+            '--compress', 'zip-9',
+            '--ignore-signing-information'
+    ]
+
+    if (os.isLinux()) {
+        options.addAll('--strip-native-debug-symbols', 'exclude-debuginfo-files')
+    }
+
+    if (!jdkHasBundledJavaFx) {
+        addExtraModulePath(layout.projectDirectory.dir("javafx/${platformName}/${arch}").toString())
+    }
+    addExtraModulePath(layout.projectDirectory.dir("jna/${platformName}/${arch}").toString())
+    addExtraModulePath(layout.projectDirectory.dir("jnativehook/${platformName}/${arch}").toString())
+
+    addOptions("--add-modules", "com.crschnick.pdxu.editor")
+
+    // Include debugger module in dev build
+    if (!ci || !isFullRelease) {
+        addOptions("--add-modules", "jdk.jdwp.agent")
+    }
+
+    launcher {
+        moduleName = packageName(null)
+        mainClass = packageName('Main')
+        name = jpackageExecutableName
+        jvmArgs = jpackageReleaseArguments
+    }
+
+    jpackage {
+        imageOutputDir = file("$distDir/jpackage")
+        imageName = jpackageExecutableName
+        if (os.isWindows()) {
+            icon = "$rootDir/dist/logo/logo.ico"
+            appVersion = os.isWindows() ? windowsSchemaCanonicalVersion : canonicalVersionString
+        } else if (os.isLinux()) {
+            icon = "$rootDir/dist/logo/logo.png"
+            appVersion = canonicalVersionString
+        } else {
+            icon = "$rootDir/dist/logo/logo.icns"
+            resourceDir = file("${project.layout.buildDirectory.get()}/macos_resources")
+            appVersion = macVersion
+            imageOptions = ["--mac-package-identifier", jpackageMacOsBundleName]
+        }
+        vendor = 'Christopher Schnick'
+        skipInstaller = true
+    }
+}
+
+tasks.register('prepareMacOSResources', DefaultTask) {
+    doLast {
+        file("${project.layout.buildDirectory.get()}/macos_resources").mkdirs()
+        copy {
+            from replaceVariablesInFile("$projectDir/jpackage/Info.plist",
+                                        Map.of('__NAME__',
+                                               productName,
+                                               '__VERSION__',
+                                               versionString,
+                                               '__BUNDLE__',
+                                               jpackageMacOsBundleName,
+                                                '__EXECUTABLE_NAME__',
+                                                jpackageExecutableName))
+            into file("${project.layout.buildDirectory.get()}/macos_resources")
+        }
+    }
+}
+
+tasks.register('finalizeMacOSResources', DefaultTask) {
+    doLast {
+        copy {
+            from file("$projectDir/logo/Assets.car")
+            into file("$distDir/jpackage/${jpackageExecutableName}.app/Contents/Resources")
+        }
+
+        file("$distDir/jpackage/${jpackageExecutableName}.app/Contents/Resources/${jpackageExecutableName}.icns")
+                .renameTo(file("$distDir/jpackage/${jpackageExecutableName}.app/Contents/Resources/logo.icns"))
+    }
+}
+
+if (os.isMacOsX()) {
+    jpackageImage.finalizedBy(finalizeMacOSResources)
+    jpackageImage.dependsOn(prepareMacOSResources)
+}
+
+if (!jdkHasBundledJavaFx) {
+    jpackageImage.dependsOn(downloadJavafxJmods)
+}
+

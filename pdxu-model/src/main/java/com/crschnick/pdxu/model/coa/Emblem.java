@@ -126,7 +126,7 @@ public class Emblem {
                     });
                     i.getNodeForKeyIfExistent("scale").ifPresent(s -> {
                         if (s.isArray() && s.getArrayNode().size() == 1) {
-                            instance.scaleX = s.getNodeArray().get(0).getDouble();
+                            instance.scaleX = s.getNodeArray().getFirst().getDouble();
                             instance.scaleY = 1;
                         } else if (s.isArray()) {
                             instance.scaleX = s.getNodeArray().get(0).getDouble();

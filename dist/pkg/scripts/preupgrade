@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Pre installation process started"
+"/Applications/__PRODUCT__.app/Contents/Resources/scripts/uninstall.sh" || true
+echo "Pre installation process finished"
+echo

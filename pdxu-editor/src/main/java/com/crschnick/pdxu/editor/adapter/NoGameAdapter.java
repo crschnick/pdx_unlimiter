@@ -16,17 +16,17 @@ public class NoGameAdapter implements EditorSavegameAdapter {
     }
 
     @Override
-    public Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception {
+    public Map<String, NodePointer> createCommonJumps(EditorState state) {
         return Map.of();
     }
 
     @Override
-    public NodePointer createNodeJump(EditorState state, EditorRealNode node) throws Exception {
+    public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
         return null;
     }
 
     @Override
-    public Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) throws Exception {
+    public Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) {
         return null;
     }
 }

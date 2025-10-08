@@ -28,7 +28,7 @@ public class Ck3TagRenderer {
 
         var coa = CoatOfArms.fromNode(eval, parent -> {
             var found = all.getNodesForKey(parent);
-            return found.size() > 0 ? found.get(found.size() - 1) : null;
+            return found.size() > 0 ? found.getLast() : null;
         });
         return coa;
     }
@@ -94,7 +94,7 @@ public class Ck3TagRenderer {
         CoatOfArmsRenderer.CK3.applyMask(realmImg, useMask);
         CoatOfArmsRenderer.CK3.brighten(realmImg);
 
-        double scaleFactor = (double) size / CoatOfArmsRenderer.CK3.REF_IMG_SIZE;
+        double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -131,7 +131,7 @@ public class Ck3TagRenderer {
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        double scaleFactor = (double) size / CoatOfArmsRenderer.CK3.REF_IMG_SIZE;
+        double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
         CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 houseImg,
@@ -159,7 +159,7 @@ public class Ck3TagRenderer {
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        double scaleFactor = (double) size / CoatOfArmsRenderer.CK3.REF_IMG_SIZE;
+        double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
         CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 titleImg,

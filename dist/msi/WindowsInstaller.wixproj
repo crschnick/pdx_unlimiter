@@ -1,0 +1,23 @@
+<Project>
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="6.0.1" />
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputName>msi-installer</OutputName>
+    <OutputPath>$(ProjectDir)..\build\dist\installers\windows\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>out\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <VerboseOutput>False</VerboseOutput>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <SuppressPdbOutput>True</SuppressPdbOutput>
+    <SuppressIces>ICE91;ICE64;ICE61;ICE38;ICE57;ICE60;ICE105;ICE69</SuppressIces>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.1" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.1" />
+  </ItemGroup>
+  <!-- Before build -->
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="6.0.1" />
+  <Target Name="BeforeBuild">
+    <PropertyGroup>
+      <DefineConstants>BuildVersion=$(CANONICAL_VERSION);BasePath=$(ProjectDir)\..\build\dist\installer-win;DynamicProductCode=$(PRODUCT_CODE);DynamicProductName=$(PRODUCT_NAME);ExecutableName=$(EXECUTABLE_NAME)</DefineConstants>
+    </PropertyGroup>
+  </Target>
+</Project>

@@ -1,0 +1,12 @@
+.error-handler-comp .top {
+    -fx-spacing: 0.7em;
+}
+
+.error-handler-comp .actions {
+    -fx-spacing: 0.3em;
+}
+
+.error-handler-comp .button:hover {
+    -fx-border-width: 1;
+    -fx-background-color: -color-context-menu;
+}

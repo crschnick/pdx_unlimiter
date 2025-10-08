@@ -1,9 +1,9 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.CacheManager;
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class Eu4CustomFlagCache extends CacheManager.Cache {
+public class Eu4CustomFlagCache extends GameCacheManager.Cache {
 
     private static final int EMBLEM_SIZE = 64;
     private static final int EMBLEM_WIDTH = 32;
@@ -31,7 +31,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
     private BufferedImage emblems;
 
     public Eu4CustomFlagCache() {
-        super(CacheManager.Scope.GAME_SPECIFIC);
+        super(GameCacheManager.Scope.GAME_SPECIFIC);
 
         try {
             emblems = ImageHelper.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("gfx")
@@ -56,7 +56,7 @@ public class Eu4CustomFlagCache extends CacheManager.Cache {
                 textures.add(tex);
             });
         } catch (Exception e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
         }
     }
 

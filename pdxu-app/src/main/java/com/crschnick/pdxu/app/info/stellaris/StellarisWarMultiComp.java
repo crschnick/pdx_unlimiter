@@ -83,9 +83,9 @@ public class StellarisWarMultiComp extends SavegameInfoMultiComp {
                 }
             }
             if (isAttacker) {
-                wars.add(new War<StellarisTag>(title, attackers, defenders));
+                wars.add(new War<>(title, attackers, defenders));
             } else if (isDefender) {
-                wars.add(new War<StellarisTag>(title, defenders, attackers));
+                wars.add(new War<>(title, defenders, attackers));
             }
         }
         comps = wars.stream().map(WarComp::new).toList();

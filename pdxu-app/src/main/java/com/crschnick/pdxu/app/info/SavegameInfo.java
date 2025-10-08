@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.info;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
+
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.beans.binding.Bindings;
@@ -45,9 +46,9 @@ public abstract class SavegameInfo<T> {
                 field.setAccessible(true);
                 field.set(this, c);
             } catch (InvocationTargetException e) {
-                ErrorHandler.handleException(e.getCause());
+                ErrorEventFactory.fromThrowable(e.getCause()).handle();
             } catch (Exception e) {
-                ErrorHandler.handleException(e);
+                ErrorEventFactory.fromThrowable(e).handle();
             }
         }
     }
@@ -79,7 +80,7 @@ public abstract class SavegameInfo<T> {
 
                     comps.add(c);
                 } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
+                    ErrorEventFactory.fromThrowable(ex).handle();
                 }
             }
 
@@ -93,7 +94,7 @@ public abstract class SavegameInfo<T> {
 
                     comps.addAll(c.create(data));
                 } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
+                    ErrorEventFactory.fromThrowable(ex).handle();
                 }
             }
         }
@@ -105,7 +106,7 @@ public abstract class SavegameInfo<T> {
                     addNode(container, region);
                 }
             } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         }
 

@@ -1,16 +1,19 @@
 package com.crschnick.pdxu.editor.gui;
 
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
 import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -22,6 +25,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 
 public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
@@ -71,8 +75,16 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
                             .stream()
                             .map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode())
                             .toArray(ArrayNode[]::new);
+
             var all = Vic3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.VIC3), additional);
-            return Vic3TagRenderer.getCoatOfArms(editorNode.getBackingNode().getArrayNode(), all);
+            var allCopy = all.copy().getArrayNode();
+            var env = new NodeEnvironment(Map.of());
+            NodeEvaluator.evaluateArrayNode(allCopy, env);
+
+            var coaNode = editorNode.getBackingNode().copy().getArrayNode();
+            NodeEvaluator.evaluateArrayNode(coaNode, env);
+
+            return Vic3TagRenderer.getCoatOfArms(coaNode, allCopy);
         }
     }
 
@@ -101,8 +113,8 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         refresh.setOnAction(e -> {
             FileChooser dirChooser = new FileChooser();
             dirChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
-            dirChooser.setTitle(PdxuI18n.get("SELECT_FILE"));
-            File file = dirChooser.showSaveDialog(null);
+            dirChooser.setTitle(AppI18n.get("selectFile"));
+            File file = dirChooser.showSaveDialog(AppMainWindow.get().getStage());
             if (file == null) {
                 return;
             }
@@ -110,7 +122,7 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             try {
                 ImageHelper.writePng(image.get(), file.toPath());
             } catch (IOException ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         });
         refresh.setGraphic(new FontIcon("mdi-export"));

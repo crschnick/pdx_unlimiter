@@ -1,16 +1,15 @@
 package com.crschnick.pdxu.editor.gui;
 
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.editor.EditorNavLocation;
-import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
-import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -30,6 +29,7 @@ public class GuiEditorNavBar {
     static Region createNavigationBar(EditorState edState) {
         HBox bar = new HBox();
         bar.setFillHeight(true);
+        bar.setSpacing(5);
 
         var arrows = setupNavArrows(edState);
         bar.getChildren().add(arrows);
@@ -48,9 +48,9 @@ public class GuiEditorNavBar {
         box.setAlignment(Pos.CENTER);
         box.setFillHeight(true);
         {
-            var backButton = new JFXButton(null, new FontIcon());
+            var backButton = new Button(null, new FontIcon());
             backButton.setAccessibleText("Go back");
-            GuiTooltips.install(backButton, PdxuI18n.get("EDITOR_NAVBAR_BACK"));
+            GuiTooltips.install(backButton, AppI18n.get("editorNavbarBack"));
             backButton.getStyleClass().add("nav-back-button");
             backButton.setGraphic(new FontIcon());
             backButton.setAlignment(Pos.CENTER);
@@ -59,9 +59,9 @@ public class GuiEditorNavBar {
             backButton.setOnAction(e -> state.getNavigation().goBack());
         }
         {
-            var forwardButton = new JFXButton(null, new FontIcon());
+            var forwardButton = new Button(null, new FontIcon());
             forwardButton.setAccessibleText("Go forward");
-            GuiTooltips.install(forwardButton, PdxuI18n.get("EDITOR_NAVBAR_FORWARD"));
+            GuiTooltips.install(forwardButton, AppI18n.get("editorNavbarForward"));
             forwardButton.getStyleClass().add("nav-forward-button");
             forwardButton.setGraphic(new FontIcon());
             forwardButton.setAlignment(Pos.CENTER);
@@ -81,7 +81,7 @@ public class GuiEditorNavBar {
             Platform.runLater(() -> {
                 bar.getChildren().clear();
                 {
-                    var initBtn = new JFXButton("Root");
+                    var initBtn = new Button("Root");
                     initBtn.setFocusTraversable(false);
                     initBtn.setOnAction(e -> {
                         edState.getNavigation().navigateToParent(null);
@@ -90,7 +90,7 @@ public class GuiEditorNavBar {
                 }
 
                 l.path().getPath().subList(1, l.path().getPath().size()).forEach(en -> {
-                    var btn = new JFXButton(GuiEditor.getFormattedName(en.getNavigationName()));
+                    var btn = new Button(GuiEditor.getFormattedName(en.getNavigationName()));
                     btn.setFocusTraversable(false);
                     btn.setMnemonicParsing(false);
                     {
@@ -120,30 +120,30 @@ public class GuiEditorNavBar {
         edState.getNavigation().currentProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
                 if (p.getChildren().size() == 2) {
-                    p.getChildren().remove(0);
+                    p.getChildren().removeFirst();
                 }
 
                 if (n.getEditorNode() != null && n.getEditorNode().isReal() &&
-                        EditorSettings.getInstance().enableNodeTags.getValue()) {
+                        AppPrefs.get().editorEnableNodeTags().getValue()) {
                     try {
                         var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
                                 .createNodeTag(edState, (EditorRealNode) n.getEditorNode(), null);
                         if (tag != null) {
-                            p.getChildren().add(0, tag);
+                            p.getChildren().addFirst(tag);
                         }
                     } catch (Exception ex) {
-                        ErrorHandler.handleException(ex);
+                        ErrorEventFactory.fromThrowable(ex).handle();
                     }
                 }
             });
         });
 
         {
-            Button edit = new JFXButton(null, new FontIcon());
+            Button edit = new Button(null, new FontIcon());
             edit.setFocusTraversable(false);
             edit.setGraphic(new FontIcon());
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-            GuiTooltips.install(edit, PdxuI18n.get("EDITOR_OPEN_IN_EXTERNAL_EDITOR"));
+            GuiTooltips.install(edit, AppI18n.get("editorOpenInExternalEditor"));
             edit.setOnAction(e -> {
                 edState.getExternalState().startEdit(edState, (EditorRealNode) edState.getNavigation().getCurrent().getEditorNode());
             });

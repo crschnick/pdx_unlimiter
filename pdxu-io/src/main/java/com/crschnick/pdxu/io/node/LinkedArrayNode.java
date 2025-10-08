@@ -24,7 +24,7 @@ public final class LinkedArrayNode extends ArrayNode {
 
     @Override
     public Descriptor describe() {
-        return arrayNodes.get(0).describe();
+        return arrayNodes.getFirst().describe();
     }
 
     @Override

@@ -4,9 +4,9 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
@@ -50,7 +50,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
 
         coatOfArms = meta.getNodeForKeyIfExistent("flag").map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null)).orElse(CoatOfArms.empty());
 
-        var countryId = content.get().getNodeForKey("previous_played").getNodeArray().get(0).getNodeForKey("idtype").getValueNode().getString();
+        var countryId = content.get().getNodeForKey("previous_played").getNodeArray().getFirst().getNodeForKey("idtype").getValueNode().getString();
         var country = content.get().getNodeForKey("country_manager").getNodeForKey("database").getNodeForKeyIfExistent(countryId).orElse(null);
         tag = country != null ? new Vic3Tag(countryId, country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString()) : null;
         allTags = tag != null ? List.of(tag) : List.of();

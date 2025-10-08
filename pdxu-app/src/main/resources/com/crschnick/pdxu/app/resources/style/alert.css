@@ -1,0 +1,62 @@
+.dialog-pane:header {
+    -fx-pref-height: 2em;
+}
+
+.dialog-pane .button {
+    -fx-font-size: 0.9em;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    -fx-padding: 6;
+}
+
+.dialog-pane > *.button-bar > *.container {
+    -fx-padding: 12;
+    -fx-border-color: -color-border-default;
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-width: 1 0 0 0;
+}
+
+.root:seamless-frame.dialog-pane > *.button-bar > *.container {
+    -fx-background-color: transparent;
+}
+
+.dialog-pane:header .header-panel {
+    -fx-background-color: -color-bg-default;
+    -fx-padding: 1.5em;
+    -fx-font-size: 1.15em;
+}
+
+.dialog-pane:header .header-panel .graphic-container {
+    -fx-font-size: 0.5em;
+}
+
+.dialog-pane:header > .content {
+    -fx-border-width: 2px 0 0 0;
+    -fx-border-color: -color-accent-fg;
+    -fx-background-color: -color-bg-default;
+    -fx-border-insets: 0 1.5em 1.5em 1.5em;
+    -fx-padding: 1.5em 0 0 0;
+}
+
+.content-text {
+    -fx-text-fill: -color-fg-default;
+}
+
+.dialog-pane:header .content.label {
+    -fx-text-fill: -color-fg-default;
+}
+
+.dialog-pane:header .header-panel .label {
+    -fx-font-size: 1.0em;
+    -fx-wrap-text: true;
+    -fx-text-fill: -color-fg-default;
+}
+
+.dialog-pane:header > *.label.content {
+    -fx-font-size: 0.8em;
+}
+
+.dialog-pane:no-header .content {
+    -fx-background-color: -color-bg-default;
+}

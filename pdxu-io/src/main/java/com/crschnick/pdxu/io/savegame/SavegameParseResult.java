@@ -83,7 +83,7 @@ public abstract class SavegameParseResult {
         }
 
         @Override
-        public Success orThrow() throws Exception {
+        public Success orThrow() {
             throw new IllegalArgumentException(message);
         }
 

@@ -1,8 +1,9 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.CacheManager;
-import com.crschnick.pdxu.app.core.ErrorHandler;
+
+import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
@@ -49,7 +50,7 @@ public class StellarisTagRenderer {
             Node node = TextFormatParser.text().parse(file.get());
             return loadPredefinedStellarisColors(node);
         } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
+            ErrorEventFactory.fromThrowable(ex).handle();
             return Map.of();
         }
     }
@@ -65,7 +66,7 @@ public class StellarisTagRenderer {
     }
 
     private static BufferedImage createBasicFlagImage(GameFileContext ctx, StellarisTag tag) {
-        var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
+        var cache = GameCacheManager.getInstance().get(StellarisTagImageCache.class);
         if (cache.colors.size() == 0) {
             cache.colors.putAll(loadPredefinedColorsForSavegame(ctx));
         }
@@ -82,7 +83,7 @@ public class StellarisTagRenderer {
     }
 
     private static BufferedImage icon(GameFileContext ctx, StellarisTag tag) {
-        var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
+        var cache = GameCacheManager.getInstance().get(StellarisTagImageCache.class);
 
         var path = Path.of("flags", tag.getIconCategory()).resolve(tag.getIconFile());
         if (cache.icons.containsKey(path)) {
@@ -100,7 +101,7 @@ public class StellarisTagRenderer {
     }
 
     private static BufferedImage background(GameFileContext ctx, StellarisTag tag) {
-        var cache = CacheManager.getInstance().get(StellarisTagImageCache.class);
+        var cache = GameCacheManager.getInstance().get(StellarisTagImageCache.class);
 
         int bgPrimary = ColorHelper.intFromColor(cache.colors.getOrDefault(
                 tag.getBackgroundPrimaryColor(), javafx.scene.paint.Color.TRANSPARENT));
@@ -126,14 +127,14 @@ public class StellarisTagRenderer {
         return img;
     }
 
-    public static class StellarisTagImageCache extends CacheManager.Cache {
+    public static class StellarisTagImageCache extends GameCacheManager.Cache {
 
         private final Map<Path, BufferedImage> backgrounds = new ConcurrentHashMap<>();
         private final Map<Path, BufferedImage> icons = new ConcurrentHashMap<>();
         private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
 
         public StellarisTagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+            super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
         }
     }
 }

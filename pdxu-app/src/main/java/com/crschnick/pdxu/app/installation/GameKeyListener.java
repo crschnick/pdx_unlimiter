@@ -1,10 +1,10 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
-import org.slf4j.LoggerFactory;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
 public class GameKeyListener implements NativeKeyListener {
 
@@ -21,20 +21,20 @@ public class GameKeyListener implements NativeKeyListener {
     public void nativeKeyPressed(NativeKeyEvent e) {
         if ((e.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0 && ((e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0 || (e.getModifiers() & NativeKeyEvent.META_MASK) != 0)) {
             if (e.getKeyCode() == NativeKeyEvent.VC_K && canPass(1)) {
-                LoggerFactory.getLogger(GameKeyListener.class).debug("Kill key pressed");
+                TrackEvent.debug("Kill key pressed");
                 GameAppManager.getInstance().killGame(handle);
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_I && canPass(2)) {
-                LoggerFactory.getLogger(GameKeyListener.class).debug("Import key pressed");
+                TrackEvent.debug("Import key pressed");
                 GameAppManager.getInstance().playImportSound();
                 GameAppManager.getInstance().importLatest();
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_C && canPass(3)) {
-                LoggerFactory.getLogger(GameKeyListener.class).debug("Checkpoint key pressed");
+                TrackEvent.debug("Checkpoint key pressed");
                 GameAppManager.getInstance().loadLatestCheckpoint();
             }
             if (e.getKeyCode() == NativeKeyEvent.VC_R && canPass(4)) {
-                LoggerFactory.getLogger(GameKeyListener.class).debug("Reverting to latest save");
+                TrackEvent.debug("Reverting to latest save");
                 var g = handle.getGame();
                 if (g == null) {
                     return;
@@ -49,7 +49,7 @@ public class GameKeyListener implements NativeKeyListener {
                 }
 
                 if (g.isEnabled()) {
-                    LoggerFactory.getLogger(GameKeyListener.class).info("Import latest savegame and launch");
+                    TrackEvent.info("Import latest savegame and launch");
                     GameAppManager.getInstance().killGame(handle);
                     TaskExecutor.getInstance().submitTask(() -> {
                         SavegameActions.importLatestAndLaunch(g);

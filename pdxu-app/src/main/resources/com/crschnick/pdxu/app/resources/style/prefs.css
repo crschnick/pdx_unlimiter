@@ -1,0 +1,86 @@
+.prefs-box {
+    -fx-padding: 0 40 0 15;
+}
+
+.prefs-container .options-comp .name {
+    -fx-padding: 1.8em 0 0 0;
+    -fx-font-weight: BOLD;
+    -fx-font-size: 1.1em;
+}
+
+.initial-setup.prefs-container {
+    -fx-padding: -1.8em 25 0 0;
+}
+
+.prefs .prefs-container.options-comp > .options-comp {
+    -fx-padding: 0 0 0 1em;
+}
+
+.prefs-container .options-comp .description-box {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+
+.prefs-container .options-comp .description {
+    -fx-opacity: 0.9;
+    -fx-font-size: 1.0em;
+}
+
+
+.root:light .prefs-container .options-comp .description {
+    -fx-opacity: 0.95;
+}
+
+.prefs-container .options-comp .options-content {
+    -fx-font-size: 1.0em;
+}
+
+.prefs-container > .title-header {
+    -fx-padding: 2em 0 -0.5em 0;
+    -fx-font-weight: BOLD;
+    -fx-font-size: 1.5em;
+}
+
+.prefs {
+    -fx-background-color: transparent;
+}
+
+.prefs .sidebar {
+    -fx-spacing: 0;
+    -fx-padding: 0.2em 0 0 0;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.root:nord .prefs .sidebar {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.prefs .sidebar .button {
+    -fx-background-color: transparent;
+    -fx-padding: 0.35em 1em 0.35em 1.0em;
+    -fx-background-radius: 0, 4, 4;
+    -fx-background-insets: 0, 1 4 1 4;
+}
+
+.root:nord .prefs .sidebar .button {
+    -fx-background-radius: 0, 0, 0;
+}
+
+.prefs .sidebar .button:selected {
+    -fx-background-color: transparent, -color-border-default, -color-bg-default-transparent;
+    -fx-font-weight: BOLD;
+}
+
+.prefs .sidebar .button:armed {
+    -fx-background-color: transparent, -color-accent-muted, derive(-color-neutral-muted, 25%);
+}
+
+.prefs .sidebar .button:hover, .root:key-navigation .prefs .sidebar .button:focused {
+    -fx-background-color: transparent, -color-border-default, -color-bg-overlay;
+}
+
+.prefs .theme-switcher .combo-box-popup .list-view {
+    -fx-effect: NONE;
+}

@@ -57,7 +57,7 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
 
             allTags.add(StellarisTag.fromNode(Long.parseLong(k), v));
         });
-        tag = allTags.get(0);
+        tag = allTags.getFirst();
         tag.setName(content.get().getNodeForKey("name").getString());
         observer = false;
 
@@ -71,7 +71,7 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
 
     private void initVersion(Node n) {
         Pattern p = Pattern.compile("((?:\\w|\\s)+?)\\s*v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
-        var vs = n.getNodesForKey("version").get(0).getString();
+        var vs = n.getNodesForKey("version").getFirst().getString();
         Matcher m = p.matcher(vs);
         if (m.find()) {
            version = new GameNamedVersion(

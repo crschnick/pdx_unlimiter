@@ -90,7 +90,7 @@ public final class EditorSimpleNode extends EditorRealNode {
         }
 
         if (newNode.getNodeArray().size() == 1) {
-            var nodeToUse = newNode.getNodeArray().get(0);
+            var nodeToUse = newNode.getNodeArray().getFirst();
             // Update parent node to reflect change
             getParent().updateNodeAtRawIndex(nodeToUse, keyName, getRawIndexInParentNode());
             return;

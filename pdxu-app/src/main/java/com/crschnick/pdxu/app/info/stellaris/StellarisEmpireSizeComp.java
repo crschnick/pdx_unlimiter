@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.info.stellaris;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.control.Label;
@@ -24,7 +25,7 @@ public class StellarisEmpireSizeComp extends SimpleInfoComp {
     @Override
     public Region create(SavegameData<?> data) {
         var r = super.create(data);
-        var img = (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().get(0)).getGraphic()).getChildren().get(0);
+        var img = (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().getFirst()).getGraphic()).getChildren().getFirst();
         img.fitWidthProperty().unbind();
         img.fitHeightProperty().unbind();
         img.setFitWidth(25);
@@ -44,6 +45,6 @@ public class StellarisEmpireSizeComp extends SimpleInfoComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("EMPIRE_SIZE");
+        return AppI18n.get("empireSize");
     }
 }

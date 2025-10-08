@@ -111,19 +111,19 @@ public final class TextFormatParser {
         }
     }
 
-    public final synchronized ArrayNode parse(Path file) throws IOException, ParseException {
+    public synchronized ArrayNode parse(Path file) throws IOException, ParseException {
         return parse(file.getFileName().toString(), Files.readAllBytes(file), 0, false);
     }
 
-    public final synchronized ArrayNode parse(String displayName, Path file, boolean strict) throws IOException, ParseException {
+    public synchronized ArrayNode parse(String displayName, Path file, boolean strict) throws IOException, ParseException {
         return parse(displayName, Files.readAllBytes(file), 0, strict);
     }
 
-    public final synchronized ArrayNode parse(String displayName, byte[] input, int start) throws ParseException {
+    public synchronized ArrayNode parse(String displayName, byte[] input, int start) throws ParseException {
         return parse(displayName, input, start, false);
     }
 
-    public final synchronized ArrayNode parse(String name, byte[] input, int start, boolean strict) throws ParseException {
+    public synchronized ArrayNode parse(String name, byte[] input, int start, boolean strict) throws ParseException {
         try {
             verifyTextFormat(input);
 
@@ -258,6 +258,19 @@ public final class TextFormatParser {
                 assert size >= builder.getUsedSize() :
                         "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
                 index++;
+
+                boolean isMultiKeyValue = tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
+                if (isMultiKeyValue) {
+                    index++;
+                    var keys = parseNodeIfNotScalarValue(name, strict);
+                    if (!(keys instanceof SimpleArrayNode ar) || ar.getKeyScalars() != null) {
+                        throw ParseException.createFromLiteralIndex(name, "Invalid multi key", index, context);
+                    }
+
+                    var value = builder.build();
+                    return new MultiKeyValueNode(context, ar.getValueScalars(), value);
+                }
+
                 return builder.build();
             }
 

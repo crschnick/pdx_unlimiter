@@ -1,0 +1,267 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+import java.lang.module.ModuleFinder
+import java.util.stream.Stream
+
+plugins {
+    id 'org.gradlex.extra-java-module-info' version '1.13.1' apply false
+    id("com.diffplug.spotless") version "8.0.0" apply false
+    id 'de.undercouch.download' version '5.6.0'
+}
+
+allprojects { subproject ->
+    apply plugin: 'org.gradlex.extra-java-module-info'
+    extraJavaModuleInfo {
+        failOnMissingModuleInfo.set(true)
+    }
+    apply from: "$rootDir/gradle/gradle_scripts/modules.gradle"
+
+    // https://docs.gradle.org/9.0.0/userguide/upgrading_major_version_9.html#reproducible_archives_by_default
+    tasks.withType(AbstractArchiveTask).configureEach {
+        reproducibleFileOrder = false
+        preserveFileTimestamps = true
+        useFileSystemPermissions()
+    }
+}
+
+subprojects {subproject ->
+    if (subproject.name == 'dist') {
+        return
+    }
+
+    apply plugin: 'com.diffplug.spotless'
+    spotless {
+        java {
+            palantirJavaFormat()
+            trimTrailingWhitespace()
+            endWithNewline()
+            importOrder(groupName, 'javafx', '', 'java', '\\#')
+        }
+    }
+}
+
+// Project variable functions
+
+static def getArchName() {
+    var arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT)
+    if (arch == 'amd64' || arch == 'x86_64') {
+        return 'x86_64'
+    }
+
+    if (arch == 'arm' || arch == 'aarch64') {
+        return 'arm64'
+    }
+
+    if (arch == 'x86') {
+        return 'x86'
+    }
+
+    return arch
+}
+
+def getJvmArgs() {
+    def os = DefaultNativePlatform.currentOperatingSystem
+    def jvmRunArgs = [
+            "-Dvisualvm.display.name=$productName",
+            "-Djavafx.preloader=" + packageName("core.AppPreloader"),
+            "-Djdk.virtualThreadScheduler.parallelism=8"
+    ]
+
+    // Virtual threads cause crashes on Windows ARM with Liberica
+    if (os.isWindows() && arch == "arm64") {
+        jvmRunArgs += [
+                "-D" + propertyName("useVirtualThreads") + "=false"
+        ]
+    }
+
+    // Disable JDK24+ warnings
+    jvmRunArgs += [
+            "--enable-native-access=com.sun.jna",
+            "--enable-native-access=javafx.graphics",
+            "--enable-native-access=javafx.web",
+            "--sun-misc-unsafe-memory-access=allow",
+            "--enable-native-access=javafx.media",
+            "--enable-native-access=com.github.kwhat.jnativehook",
+            "--enable-native-access=org.graalvm.truffle"
+    ]
+
+    // Module access fixes
+    def appPackage = packageName(null)
+    jvmRunArgs += [
+            "--add-exports", "javafx.graphics/com.sun.javafx.tk=$appPackage",
+            "--add-exports", "jdk.zipfs/jdk.nio.zipfs=io.xpipe.modulefs",
+            "--add-opens", "javafx.graphics/com.sun.glass.ui=$appPackage",
+            "--add-opens", "javafx.graphics/javafx.stage=$appPackage",
+            "--add-opens", "javafx.graphics/com.sun.javafx.tk=$appPackage",
+            "--add-opens", "javafx.graphics/com.sun.javafx.tk.quantum=$appPackage"
+    ]
+
+    jvmRunArgs += [
+            "--add-exports", "javafx.graphics/com.sun.javafx.scene=com.jfoenix",
+            "--add-exports", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
+            "--add-exports", "javafx.base/com.sun.javafx.binding=com.jfoenix",
+            "--add-exports", "javafx.base/com.sun.javafx.event=com.jfoenix",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control=com.jfoenix",
+            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
+            "--add-opens", "java.base/java.lang.reflect=com.jfoenix"
+    ]
+
+    // Use project liliput
+    jvmRunArgs += ['-XX:+UseCompactObjectHeaders']
+
+    // Reduce heap usage with deduplication
+    jvmRunArgs += ['-XX:+UseStringDeduplication']
+
+    // GC config
+    jvmRunArgs += ['-XX:+UseG1GC',
+                   '-Xms300m',
+                   '-Xmx4G',
+                   '-XX:MinHeapFreeRatio=20',
+                   '-XX:MaxHeapFreeRatio=30',
+                   '-XX:GCTimeRatio=9',
+                   // The default makes GC pauses longer for some reason
+                   // on older Windows systems
+                   '-XX:G1HeapRegionSize=4m'
+    ]
+
+    // Fix platform theme detection on macOS
+    if (os.isMacOsX()) {
+        jvmRunArgs += ["-Dapple.awt.application.appearance=system"]
+    }
+
+    if (os.isMacOsX()) {
+        jvmRunArgs += "-Xdock:name=$productName"
+    }
+
+    return jvmRunArgs
+}
+
+def getWindowsSchemaCanonicalVersion() {
+    def v = canonicalVersionString
+    def last = 0
+    if (v.split("\\.").length == 2) {
+        v = v + ".0"
+    }
+    return v + "." + last
+}
+
+// Project variables
+
+project.ext {
+    // Enable release pipeline if variable is present
+    isFullRelease = Boolean.parseBoolean(System.getenv('RELEASE'))
+    // Check if in build pipeline
+    ci = System.getenv('CI') != null
+    // Create AOT cache for runtime image only in build pipeline
+    enableAot = ci
+
+    // Names of your app
+    productName = 'Pdx-Unlimiter'
+    kebapProductName = 'pdx-unlimiter'
+    snakeProductName = 'pdx_unlimiter'
+    // The names of your packages
+    groupName = 'com.crschnick'
+    artifactName = 'pdxu.app'
+    // The base name of the generated packages
+    distName = "pdx-unlimiter"
+
+    // Version info
+    rawVersion = file('version').text.strip()
+    versionString = rawVersion + (isFullRelease ? '' : '-SNAPSHOT')
+    versionReleaseNumber = rawVersion.split('-').length == 2 ? Integer.parseInt(rawVersion.split('-')[1]) : 1
+    canonicalVersionString = rawVersion.split('-').length == 2 ? rawVersion.split('-')[0] : rawVersion
+    buildId = UUID.nameUUIDFromBytes(versionString.getBytes())
+    windowsSchemaCanonicalVersion = getWindowsSchemaCanonicalVersion()
+
+    // GPG signing config
+    signingEnabled = false
+    signingKeyId = System.getenv('GPG_KEY_ID') != null ? System.getenv('GPG_KEY_ID') : ""
+    signingKey = System.getenv('GPG_KEY') != null ? System.getenv('GPG_KEY') : ""
+    signingPassword =System.getenv('GPG_KEY_PASSWORD') != null ? System.getenv('GPG_KEY_PASSWORD') : ""
+
+    // Build config
+    os = org.gradle.internal.os.OperatingSystem.current()
+    arch = getArchName()
+    jvmRunArgs = getJvmArgs()
+
+    // JPackage config
+    jpackageExecutableName = distName
+    jpackageMacOsBundleName = "${groupName.replaceAll("_", "-")}.${artifactName.replaceAll("_", "-")}"
+    jpackageReleaseArguments = jvmRunArgs + [
+            "-D" + propertyName("version") + "=" + versionString,
+            "-D" + propertyName("build") + "=$versionString/${new Date().format('yyyy-MM-dd-HH-mm')}",
+            "-D" + propertyName("buildId") + "=" + buildId
+            ]
+
+    // Make sure that the dynamic library from jna is loaded without any extraction
+    jpackageReleaseArguments += [
+            '-Djna.nosys=false',
+            '-Djna.nounpack=true',
+            '-Djna.noclasspath=true'
+    ]
+    if (isFullRelease) {
+        // Prevent debugger attach in production release
+        jpackageReleaseArguments += "-XX:+DisableAttachMechanism"
+    }
+
+    // JavaFX config
+    // Development and production javafx versions can be different
+    // Dev uses the maven dependencies and production uses jmods
+    // unless jdkHasBundledJavaFx is set to true
+    devJavafxVersion = '26-ea+3'
+    productionJavafxVersion = '26-ea+3'
+    jdkHasBundledJavaFx = ModuleFinder.ofSystem().find("javafx.base").isPresent()
+    // Define a custom JavaFX SDK location to use custom JavaFX jars instead of the default one
+    customJavaFxPath = null
+
+    sentryUrl = "https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262"
+    if (sentryUrl != null) {
+        jpackageReleaseArguments += "-D" + propertyName("sentryUrl") + "=" + sentryUrl
+    }
+}
+
+group = groupName
+version = versionString
+
+// Global helper functions
+
+def propertyName(String s) {
+    return groupName + "." + artifactName + "." + s
+}
+
+def packageName(String s) {
+    return groupName + "." + artifactName + (s != null ? "." + s : "")
+}
+
+def replaceVariablesInFile(String f, Map<String, String> replacements) {
+    def fileName = file(f).getName()
+    def text = file(f).text
+    def replaced = text.replace(replacements)
+    def build = "${project.layout.buildDirectory.get()}/${UUID.randomUUID()}"
+    file(build).mkdirs()
+    def temp = "$build/$fileName"
+    file(temp).text = replaced
+    return file(temp)
+}
+
+// Developer config file setup
+
+var devProps = file("$rootDir/pdxu-app/dev.properties")
+if (!devProps.exists()) {
+    devProps.text = file("$rootDir/gradle/gradle_scripts/dev_default.properties").text
+}
+
+// Add pre commit hook if in git repo
+
+if ((os.isLinux() || os.isMacOsX()) && file("$rootDir/.git/hooks").exists()) {
+    copy {
+        from "$rootDir/gradle/gradle_scripts/pre-commit"
+        into "$rootDir/.git/hooks"
+    }
+}
+
+// Checks
+
+if (System.getProperty("java.home").contains(" ")) {
+    throw new IllegalArgumentException("Your JDK home path contains spaces. This will break several gradle plugins")
+}

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=__NAME__
+Comment=__DESCRIPTION__
+TryExec=__TARGET__/bin/__EXECUTABLE_NAME__
+Exec=__TARGET__/bin/__EXECUTABLE_NAME__ %U
+Path=__TARGET__
+Icon=__ICON__
+Terminal=false
+Categories=Utility;Development;
+StartupNotify=true

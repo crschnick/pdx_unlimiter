@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.util.SupportedOs;
+import com.crschnick.pdxu.app.util.OsType;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Files;
@@ -16,7 +16,7 @@ public class ProtonDist extends PdxLauncherDist {
             return Optional.empty();
         }
 
-        if (SupportedOs.get() != SupportedOs.LINUX) {
+        if (OsType.ofLocal() != OsType.LINUX) {
             return Optional.empty();
         }
 

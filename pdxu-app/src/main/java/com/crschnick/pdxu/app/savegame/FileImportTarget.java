@@ -1,15 +1,16 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.SavegameManagerState;
+
+import com.crschnick.pdxu.app.core.AppLayoutModel;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,7 +36,7 @@ public abstract class FileImportTarget {
         try {
             p = Path.of(toImport);
         } catch (InvalidPathException ignored) {
-            LoggerFactory.getLogger(FileImportTarget.class).warn("Unable to determine import target for " + toImport);
+            TrackEvent.warn("Unable to determine import target for " + toImport);
             return List.of();
         }
 
@@ -45,7 +46,7 @@ public abstract class FileImportTarget {
                 s.forEach(f -> targets.addAll(
                         FileImportTarget.createStandardImportsTargets(f.toString())));
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                ErrorEventFactory.fromThrowable(e).handle();
             }
             return targets;
         }
@@ -113,89 +114,6 @@ public abstract class FileImportTarget {
 
     public abstract Path getPath();
 
-    public static final class DownloadImportTarget extends FileImportTarget {
-
-        private final URL url;
-        private Path downloadedFile;
-
-        public DownloadImportTarget(URL url) {
-            this.url = url;
-        }
-
-        @Override
-        public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {
-            if (GameInstallation.ALL.containsKey(Game.EU4)) {
-                return;
-            }
-
-            TaskExecutor.getInstance().submitTask(() -> {
-                try {
-                    HttpClient client = HttpClient.newBuilder()
-                            .version(HttpClient.Version.HTTP_2)
-                            .followRedirects(HttpClient.Redirect.NORMAL)
-                            .build();
-
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(url.toURI())
-                            .GET()
-                            .build();
-
-                    HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-                    byte[] data = response.body();
-
-                    String tempDir = System.getProperty("java.io.tmpdir");
-                    this.downloadedFile = Paths.get(tempDir).resolve("pdxu")
-                            .resolve(Path.of(url.getPath()).getFileName().toString() + ".eu4");
-                    FileUtils.forceMkdirParent(downloadedFile.toFile());
-                    Files.write(downloadedFile, data);
-
-                    onFinish.accept(SavegameStorage.ALL.get(Game.EU4)
-                            .importSavegame(downloadedFile, true, null, getCampaignIdOverride().orElse(null)));
-                } catch (Exception e) {
-                    ErrorHandler.handleException(e);
-                }
-            }, true);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            DownloadImportTarget that = (DownloadImportTarget) o;
-            return Objects.equals(url, that.url);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(url);
-        }
-
-        @Override
-        public void delete() {
-            TaskExecutor.getInstance().submitTask(() -> {
-                if (!Files.exists(downloadedFile)) {
-                    return;
-                }
-
-                try {
-                    Files.delete(downloadedFile);
-                } catch (IOException e) {
-                    ErrorHandler.handleException(e);
-                }
-            }, false);
-        }
-
-        @Override
-        public String getRawName() {
-            return url.toString();
-        }
-
-        @Override
-        public Path getPath() {
-            return downloadedFile;
-        }
-    }
-
     public static class StandardImportTarget extends FileImportTarget implements Comparable<StandardImportTarget> {
 
         private final SavegameStorage<?, ?> savegameStorage;
@@ -221,7 +139,7 @@ public abstract class FileImportTarget {
                 return false;
             }
 
-            return SavegameStorage.get(SavegameManagerState.get().current()).hasImportedSourceFile(cs);
+            return savegameStorage.hasImportedSourceFile(cs);
         }
 
         @Override
@@ -241,6 +159,11 @@ public abstract class FileImportTarget {
                     return;
                 }
 
+                var layout = AppLayoutModel.get();
+                if (layout != null) {
+                    layout.selectGame(SavegameStorage.ALL.inverseBidiMap().get(savegameStorage));
+                }
+
                 onFinish.accept(savegameStorage.importSavegame(
                         path, true, getSourceFileChecksum(), getCampaignIdOverride().orElse(null)));
             }, true);
@@ -256,7 +179,7 @@ public abstract class FileImportTarget {
                 try {
                     Files.delete(path);
                 } catch (IOException e) {
-                    ErrorHandler.handleException(e);
+                    ErrorEventFactory.fromThrowable(e).handle();
                 }
             }, false);
         }

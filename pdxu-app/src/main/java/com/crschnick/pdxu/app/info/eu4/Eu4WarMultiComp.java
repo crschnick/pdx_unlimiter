@@ -76,9 +76,9 @@ public class Eu4WarMultiComp extends SavegameInfoMultiComp {
                 }
             }
             if (isAttacker) {
-                wars.add(new War<Eu4Tag>(title, attackers, defenders));
+                wars.add(new War<>(title, attackers, defenders));
             } else if (isDefender) {
-                wars.add(new War<Eu4Tag>(title, defenders, attackers));
+                wars.add(new War<>(title, defenders, attackers));
             }
         }
         comps = wars.stream().map(WarComp::new).toList();

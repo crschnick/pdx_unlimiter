@@ -1,4 +1,5 @@
-import com.crschnick.pdxu.app.core.EditorProvider;
+
+import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.editor.Editor;
 
 module com.crschnick.pdxu.editor {
@@ -21,7 +22,6 @@ module com.crschnick.pdxu.editor {
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
-    requires javafx.media;
 
     requires com.crschnick.pdxu.app;
     requires com.crschnick.pdxu.io;
@@ -32,7 +32,7 @@ module com.crschnick.pdxu.editor {
     requires org.apache.commons.io;
     requires org.apache.commons.collections4;
     requires org.apache.commons.lang3;
-    requires java.desktop;
+    requires atlantafx.base;
 
 
 }

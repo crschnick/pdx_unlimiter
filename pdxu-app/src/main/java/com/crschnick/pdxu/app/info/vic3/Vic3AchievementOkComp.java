@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.info.vic3;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
@@ -34,9 +35,9 @@ public class Vic3AchievementOkComp extends SimpleInfoComp {
     @Override
     protected String getTooltip() {
         if (achievementOk) {
-            return PdxuI18n.get("ACHIEVEMENT_ELIGIBLE");
+            return AppI18n.get("achievementEligible");
         } else {
-            return PdxuI18n.get("ACHIEVEMENT_INELIGIBLE");
+            return AppI18n.get("achievementIneligible");
         }
     }
 

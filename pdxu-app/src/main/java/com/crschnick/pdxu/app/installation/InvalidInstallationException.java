@@ -1,21 +1,22 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
+import com.crschnick.pdxu.app.core.AppI18n;
 
 public final class InvalidInstallationException extends Exception {
 
     private final String msgId;
-    private final String[] variables;
+    private final Object[] variables;
 
-    public InvalidInstallationException(String msgId, String... vars) {
-        super(PdxuI18n.get(msgId, vars));
+    public InvalidInstallationException(String msgId, Object... vars) {
+        super(AppI18n.get(msgId, vars));
         this.msgId = msgId;
         this.variables = vars;
     }
 
     public InvalidInstallationException(Throwable cause) {
         super(cause);
-        this.msgId = "ERROR_OCCURED";
+        this.msgId = "errorOccurred";
         this.variables = new String[]{cause.getMessage()};
     }
 
@@ -24,6 +25,6 @@ public final class InvalidInstallationException extends Exception {
     }
 
     public String getLocalisedMessage() {
-        return PdxuI18n.get(msgId, variables);
+        return AppI18n.get(msgId, variables);
     }
 }

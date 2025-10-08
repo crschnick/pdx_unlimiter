@@ -1,0 +1,1 @@
+jmod.exe create --class-path .\classes\ --libs .\lib jna-jpms.jmod

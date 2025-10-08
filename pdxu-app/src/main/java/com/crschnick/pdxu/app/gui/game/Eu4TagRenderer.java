@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.CacheManager;
 import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
@@ -33,7 +33,7 @@ public class Eu4TagRenderer {
                 BufferedImage flagImage = ImageHelper.fromFXImage(eu4TagImage(info, ov));
                 Graphics g = flagImage.getGraphics();
 
-                java.awt.Color awtColor = ColorHelper.toAwtColor(ColorHelper.fromGameColor(tag.getCountryColor()));
+                Color awtColor = ColorHelper.toAwtColor(ColorHelper.fromGameColor(tag.getCountryColor()));
                 g.setColor(awtColor);
                 g.fillRect(flagImage.getWidth() / 2, 0, flagImage.getWidth() / 2, flagImage.getWidth());
                 return flagImage;
@@ -41,7 +41,7 @@ public class Eu4TagRenderer {
             case CUSTOM_FLAG -> {
                 BufferedImage flagImage = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
                 var custom = tag.getCustomData();
-                var cache = CacheManager.getInstance().get(Eu4CustomFlagCache.class);
+                var cache = GameCacheManager.getInstance().get(Eu4CustomFlagCache.class);
                 cache.renderTexture(flagImage, custom.getFlagId(), custom.getFlagColors(), custom.getSymbolId());
                 return flagImage;
             }
@@ -50,7 +50,7 @@ public class Eu4TagRenderer {
     }
 
     public static Image smallShieldImage(SavegameData<Eu4Tag> info, Eu4Tag tag) {
-        var cached = CacheManager.getInstance().get(Eu4TagImageCache.class).smallShieldTagImages;
+        var cached = GameCacheManager.getInstance().get(Eu4TagImageCache.class).smallShieldTagImages;
         if (cached.containsKey(tag.getTag())) {
             return cached.get(tag.getTag());
         }
@@ -66,7 +66,7 @@ public class Eu4TagRenderer {
                 5,
                 i.getWidth() - 16,
                 i.getHeight() - 13,
-                new java.awt.Color(0, 0, 0, 0),
+                new Color(0, 0, 0, 0),
                 null);
 
         g.drawImage(ImageHelper.fromFXImage(GameImage.EU4_SMALL_SHIELD_FRAME),
@@ -74,7 +74,7 @@ public class Eu4TagRenderer {
                 -4,
                 i.getWidth() + 4,
                 i.getWidth() + 4,
-                new java.awt.Color(0, 0, 0, 0),
+                new Color(0, 0, 0, 0),
                 null);
 
         var img = ImageHelper.toFXImage(i);
@@ -83,7 +83,7 @@ public class Eu4TagRenderer {
     }
 
     public static Image shieldImage(SavegameData<Eu4Tag> info, Eu4Tag tag) {
-        var cached = CacheManager.getInstance().get(Eu4TagImageCache.class).bigShieldTagImages;
+        var cached = GameCacheManager.getInstance().get(Eu4TagImageCache.class).bigShieldTagImages;
         if (cached.containsKey(tag.getTag())) {
             return cached.get(tag.getTag());
         }
@@ -99,7 +99,7 @@ public class Eu4TagRenderer {
                 42,
                 i.getWidth() - 64,
                 i.getHeight() - 64,
-                new java.awt.Color(0, 0, 0, 0),
+                new Color(0, 0, 0, 0),
                 null);
 
         g.drawImage(ImageHelper.fromFXImage(GameImage.EU4_SHIELD_FRAME),
@@ -107,7 +107,7 @@ public class Eu4TagRenderer {
                 0,
                 i.getWidth() + 50,
                 i.getHeight() + 16,
-                new java.awt.Color(0, 0, 0, 0),
+                new Color(0, 0, 0, 0),
                 null);
 
         var img = ImageHelper.toFXImage(i);
@@ -140,12 +140,12 @@ public class Eu4TagRenderer {
         return ImageHelper.loadImage(in.orElse(null), null);
     }
 
-    public static class Eu4TagImageCache extends CacheManager.Cache {
+    public static class Eu4TagImageCache extends GameCacheManager.Cache {
         Map<String, Image> bigShieldTagImages = new ConcurrentHashMap<>();
         Map<String, Image> smallShieldTagImages = new ConcurrentHashMap<>();
 
         public Eu4TagImageCache() {
-            super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+            super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
         }
     }
 }

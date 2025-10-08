@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.info.eu4;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
@@ -30,6 +31,6 @@ public class Eu4ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("MANPOWER") + " / " + PdxuI18n.get("MAX_MANPOWER");
+        return AppI18n.get("manpower") + " / " + AppI18n.get("maxManpower");
     }
 }

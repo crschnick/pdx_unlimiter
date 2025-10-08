@@ -1,0 +1,13 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+			<!-- Start Menu -->
+			<StandardDirectory Id="ProgramMenuFolder">
+				<Directory Id="InstallProgramMenuFolder" Name="$(var.DynamicProductName)" />
+			</StandardDirectory>
+
+			<!-- Desktop -->
+			<StandardDirectory Id="DesktopFolder" />
+
+			<Directory Id="APPLICATIONFOLDER" />
+		</Fragment>
+</Wix>

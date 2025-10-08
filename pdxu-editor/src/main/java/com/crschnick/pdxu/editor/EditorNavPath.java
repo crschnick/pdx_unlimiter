@@ -33,7 +33,7 @@ public class EditorNavPath {
     }
 
     public EditorNode getEditorNode() {
-        return path.get(path.size() - 1);
+        return path.getLast();
     }
 
     public static EditorNavPath empty() {
@@ -58,7 +58,7 @@ public class EditorNavPath {
     private static Optional<EditorNode> fastEditorNodeFind(ArrayNode content, EditorNode current, NodePointer sub) {
         if (current.isReal()) {
             EditorRealNode s = (EditorRealNode) current;
-            var key = sub.getPath().get(0).getKey(content, s.getBackingNode());
+            var key = sub.getPath().getFirst().getKey(content, s.getBackingNode());
             if (key != null) {
                 return EditorNode.fastEditorSimpleNodeSearch(
                         current, s.getBackingNode().getArrayNode(), key);

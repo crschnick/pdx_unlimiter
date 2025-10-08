@@ -1,0 +1,28 @@
+﻿<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+	<String Id="Company" Value="Christopher Schnick" />
+	<String Id="Language" Value="1033" />
+
+	<String Id="CoreName" Value="Pdx-Unlimiter Core" />
+	<String Id="DesktopName" Value="Desktop Shortcut" />
+	<String Id="StartMenuName" Value="Start Menu Shortcut" />
+	<String Id="FileAssociationsName" Value="File extension associations" />
+
+	<String Id="CoreDesc" Value="The essential Pdx-Unlimiter component files." />
+	<String Id="DesktopDesc" Value="Creates a desktop shortcut." />
+	<String Id="StartMenuDesc" Value="Creates a start menu shortcut." />
+	<String Id="FileAssociationsDesc" Value="Register savegame files to open with the Pdx-Unlimiter" />
+
+	<String Id="Eu4Desc" Value="Europa Universalis IV savegame" />
+	<String Id="Ck3Desc" Value="Crusader Kings 3 savegame" />
+	<String Id="Hoi4Desc" Value="Hearts of Iron IV savegame" />
+	<String Id="StellarisDesc" Value="Stellaris savegame" />
+	<String Id="Ck2Desc" Value="Crusader Kings 2 savegame" />
+	<String Id="Vic2Desc" Value="Victoria 2 savegame" />
+	<String Id="Vic3Desc" Value="Victoria 3 savegame" />
+	
+	<String Id="OpenWith" Value="Open with Pdx-Unlimiter" />
+	<String Id="NewerVersionInstalled" Value="A newer version is already installed." />
+	<String Id="DesktopShortcutDescription" Value="Starts Pdx-Unlimiter" />
+	<String Id="Description" Value="An installer for the Pdx-Unlimiter desktop application" />
+	<String Id="Keywords" Value="application,installer,msi" />
+</WixLocalization>

@@ -1,15 +1,15 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.PdxuInstallation;
-import com.crschnick.pdxu.app.core.settings.Settings;
+
+import com.crschnick.pdxu.app.core.AppResources;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.media.AudioClip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 public final class GameAppManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(GameAppManager.class);
     private static final GameAppManager INSTANCE = new GameAppManager();
 
     private final ObjectProperty<GameApp> activeGame = new SimpleObjectProperty<>(null);
@@ -44,7 +43,7 @@ public final class GameAppManager {
 
     private void start() {
         active = true;
-        thread = ThreadHelper.create("game watcher", true, () -> {
+        thread = ThreadHelper.createPlatformThread("game watcher", true, () -> {
             while (active) {
                 try {
                     update();
@@ -53,7 +52,7 @@ public final class GameAppManager {
                     // Ignore weird "snapshot not available" exception
                 } catch (Exception ex) {
                     // Catch all exceptions to not terminate this thread if an error occurs!
-                    ErrorHandler.handleException(ex);
+                    ErrorEventFactory.fromThrowable(ex).handle();
                 }
             }
         });
@@ -85,7 +84,7 @@ public final class GameAppManager {
                 }
             }
             if (process.isPresent()) {
-                logger.info("Detected new running game instance of " + process.get().getGame().getId());
+                TrackEvent.info("Detected new running game instance of " + process.get().getGame().getId());
                 activeGame.set(process.get());
                 activeGame.get().onStart();
             }
@@ -94,15 +93,15 @@ public final class GameAppManager {
 
             if (!activeGame.get().isAlive()) {
                 var deadGame = activeGame.get().getGame();
-                logger.info("Game instance of " + deadGame.getId() + " is dead");
+                TrackEvent.info("Game instance of " + deadGame.getId() + " is dead");
                 activeGame.get().onShutdown();
                 activeGame.set(null);
 
-                if (Settings.getInstance().importOnGameNormalExit.getValue()) {
-                    logger.info("Import on normal exit is enabled");
+                if (AppPrefs.get().importOnNormalGameExit().getValue()) {
+                    TrackEvent.info("Import on normal exit is enabled");
                     boolean exitedNormally = lastKill == null || Duration.between(lastKill, Instant.now()).getSeconds() > 10;
                     if (exitedNormally) {
-                        logger.info("Game instance of " + deadGame.getId() + " exited normally. Importing latest savegame");
+                        TrackEvent.info("Game instance of " + deadGame.getId() + " exited normally. Importing latest savegame");
                         SavegameActions.importLatestSavegame(deadGame);
                     }
                 }
@@ -111,7 +110,7 @@ public final class GameAppManager {
     }
 
     private void updateImportTimer() {
-        if (!Settings.getInstance().enabledTimedImports.getValue()) {
+        if (!AppPrefs.get().enableTimedImports().getValue()) {
             return;
         }
 
@@ -120,8 +119,8 @@ public final class GameAppManager {
         }
 
         if (Duration.between(lastImport, Instant.now()).compareTo(
-                Duration.of(Settings.getInstance().timedImportsInterval.getValue(), ChronoUnit.MINUTES)) > 0) {
-            logger.info("Importing latest savegame because timed imports is enabled");
+                Duration.of(AppPrefs.get().timedImportsInterval().getValue(), ChronoUnit.MINUTES)) > 0) {
+            TrackEvent.info("Importing latest savegame because timed imports is enabled");
             playImportSound();
             importLatest();
             lastImport = Instant.now();
@@ -129,9 +128,8 @@ public final class GameAppManager {
     }
 
     public void playImportSound() {
-        if (Settings.getInstance().playSoundOnBackgroundImport.getValue()) {
-            var clip = new AudioClip(PdxuInstallation.getInstance().getResourceDir().resolve("sound")
-                    .resolve("import.wav").toUri().toString());
+        if (AppPrefs.get().playSoundOnBackgroundImport().getValue()) {
+            var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sounds/import.wav").toString());
             clip.play(0.2);
         }
     }
@@ -139,13 +137,13 @@ public final class GameAppManager {
     public void importLatest() {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {
-            logger.info("Importing latest savegame");
+            TrackEvent.info("Importing latest savegame");
             SavegameActions.importLatestSavegame(g.getGame());
         }
     }
 
     public void killGame(GameApp g) {
-        logger.info("Killing game");
+        TrackEvent.info("Killing game");
         lastKill = Instant.now();
         g.kill();
     }
@@ -161,7 +159,7 @@ public final class GameAppManager {
         }
 
         if (g.getGame().isEnabled()) {
-            logger.info("Import latest savegame and launch");
+            TrackEvent.info("Import latest savegame and launch");
             killGame(g);
             SavegameActions.importLatestAndLaunch(g.getGame());
         }
@@ -178,7 +176,7 @@ public final class GameAppManager {
         }
 
         if (g.getGame().isEnabled()) {
-            logger.info("Loading latest checkpoint");
+            TrackEvent.info("Loading latest checkpoint");
             killGame(g);
             SavegameActions.loadLatestSavegameCheckpoint(g.getGame());
         }
@@ -187,7 +185,7 @@ public final class GameAppManager {
     public void kill() {
         var g = getActiveGame();
         if (g != null && g.getGame().isEnabled()) {
-            logger.info("Killing active game");
+            TrackEvent.info("Killing active game");
             killGame(g);
         }
     }

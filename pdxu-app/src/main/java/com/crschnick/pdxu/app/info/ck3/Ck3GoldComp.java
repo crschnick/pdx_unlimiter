@@ -1,8 +1,9 @@
 package com.crschnick.pdxu.app.info.ck3;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import javafx.scene.image.Image;
 
@@ -31,6 +32,6 @@ public class Ck3GoldComp extends SimpleInfoComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("TREASURY_GOLD") + " / " + PdxuI18n.get("MONTHLY_INCOME");
+        return AppI18n.get("treasuryGold") + " / " + AppI18n.get("monthlyIncome");
     }
 }

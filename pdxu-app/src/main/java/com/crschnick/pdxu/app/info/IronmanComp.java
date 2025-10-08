@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.info;
 
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.core.AppI18n;
+
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 public abstract class IronmanComp extends SimpleInfoComp {
@@ -14,7 +15,7 @@ public abstract class IronmanComp extends SimpleInfoComp {
 
     @Override
     protected String getTooltip() {
-        return PdxuI18n.get("IRONMAN");
+        return AppI18n.get("ironman");
     }
 
     @Override

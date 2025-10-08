@@ -1,17 +1,17 @@
 package com.crschnick.pdxu.app.gui.game;
 
-import com.crschnick.pdxu.app.core.CacheManager;
-import com.crschnick.pdxu.app.core.ErrorHandler;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
-import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.GameColor;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import javafx.scene.image.Image;
 
@@ -24,12 +24,12 @@ import java.util.function.Supplier;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.fromGameColor;
 
-public class Vic3CoatOfArmsCache extends CacheManager.Cache {
+public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
 
     private static final int IMG_SIZE = 64;
 
     static Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext ctx) {
-        var cache = CacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
         var loaded = cache.colorsLoaded;
         if (loaded) {
             return cache.colors;
@@ -48,7 +48,7 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
                     });
                 });
             } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         };
         CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("named_colors"), ctx, loader);
@@ -63,7 +63,7 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
     }
 
     public static Node getCoatOfArmsNode(GameFileContext context) {
-        var cache = CacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
         if (cache.coatOfArmsNode != null) {
             return cache.coatOfArmsNode;
         }
@@ -74,7 +74,7 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
     }
 
     public static Image tagFlag(SavegameInfo<Vic3Tag> info, Vic3Tag tag) {
-        var cache = CacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
+        var cache = GameCacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
         var cachedImg = cache.flags.get(tag);
         if (cachedImg != null) {
             return cachedImg;
@@ -87,7 +87,7 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
                     () -> info.getData().vic3().getCoatOfArms() :
                     () -> CoatOfArms.fromNode(all.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
                         var found = all.getNodesForKey(s);
-                        return found.size() > 0 ? found.get(found.size() - 1) : null;
+                        return found.size() > 0 ? found.getLast() : null;
                     });
             var img = Vic3TagRenderer.renderImage(
                     coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
@@ -95,7 +95,7 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
             cache.flags.put(tag, convertedImage);
             return convertedImage;
         } catch (Exception ex) {
-            ErrorHandler.handleException(ex);
+            ErrorEventFactory.fromThrowable(ex).handle();
             return ImageHelper.DEFAULT_IMAGE;
         }
     }
@@ -106,6 +106,6 @@ public class Vic3CoatOfArmsCache extends CacheManager.Cache {
     private Node coatOfArmsNode;
 
     public Vic3CoatOfArmsCache() {
-        super(CacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+        super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
     }
 }

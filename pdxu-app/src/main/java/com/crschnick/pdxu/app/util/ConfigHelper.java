@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.util;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
+
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -27,14 +27,14 @@ public class ConfigHelper {
                 node = o.readTree(Files.readAllBytes(in));
             }
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
         }
         if (node != null && !node.isMissingNode()) {
             return node;
         }
 
-        GuiErrorReporter.showSimpleErrorMessage("The config file " + in.toString() +
-                " could not be read. Trying to revert to a backup");
+        ErrorEventFactory.fromMessage("The config file " + in.toString() +
+                " could not be read. Trying to revert to a backup").handle();
         var backupFile = in.resolveSibling(
                 FilenameUtils.getBaseName(in.toString()) + "_old." + FilenameUtils.getExtension(in.toString()));
         if (Files.exists(backupFile)) {
@@ -42,10 +42,10 @@ public class ConfigHelper {
             try {
                 node = o.readTree(Files.readAllBytes(backupFile));
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                ErrorEventFactory.fromThrowable(e).handle();
             }
         } else {
-            GuiErrorReporter.showSimpleErrorMessage("Backup config does not exist. Using blank config");
+            ErrorEventFactory.fromMessage("Backup config does not exist. Using blank config").handle();
             return JsonNodeFactory.instance.objectNode();
         }
 
@@ -53,8 +53,8 @@ public class ConfigHelper {
             return node;
         }
 
-        GuiErrorReporter.showSimpleErrorMessage("The backup config file " + backupFile.toString() +
-                " could also not be read.");
+        ErrorEventFactory.fromMessage("The backup config file " + backupFile.toString() +
+                " could also not be read.").handle();
         return JsonNodeFactory.instance.objectNode();
     }
 
@@ -62,7 +62,7 @@ public class ConfigHelper {
         try {
             FileUtils.forceMkdirParent(out.toFile());
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
             return;
         }
 
@@ -71,7 +71,7 @@ public class ConfigHelper {
             try {
                 currentContent = Files.readString(out);
             } catch (IOException e) {
-                ErrorHandler.handleException(e);
+                ErrorEventFactory.fromThrowable(e).handle();
             }
         }
 
@@ -82,7 +82,7 @@ public class ConfigHelper {
             new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
                     .writeTree(g, node);
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
             return;
         }
 
@@ -95,7 +95,7 @@ public class ConfigHelper {
                 Files.writeString(out, newContent);
             }
         } catch (IOException e) {
-            ErrorHandler.handleException(e);
+            ErrorEventFactory.fromThrowable(e).handle();
         }
     }
 }

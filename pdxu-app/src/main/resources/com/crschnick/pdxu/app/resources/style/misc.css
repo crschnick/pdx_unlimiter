@@ -1,0 +1,42 @@
+.savegame-notes * {
+-fx-spacing: 0.75em;
+}
+
+.content-dialog {
+ -fx-padding: 1em 0 0 0.7em;
+}
+
+.loading {
+-fx-background-color: #FFFFFFcc;
+}
+
+.root:dark .loading {
+    -fx-background-color: #22222288;
+}
+
+.loading > .jfx-spinner {
+    -jfx-radius: 2.15em;
+}
+
+.root:seamless-frame .file-drag {
+    -fx-background-radius: 6 0 0 0;
+}
+
+.root:light .file-drag {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+}
+
+.root:dark .file-drag {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+}
+
+.file-drag .ikonli-font-icon {
+    -fx-opacity: 0.6;
+    -fx-icon-code: "mdi-file-import";
+    -fx-icon-size: 100;
+}
+
+.no-campaign {
+-fx-padding: 2em;
+}
+

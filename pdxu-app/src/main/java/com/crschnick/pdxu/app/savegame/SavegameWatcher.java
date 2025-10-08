@@ -1,9 +1,10 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
-import com.crschnick.pdxu.app.core.FileWatchManager;
+
+import com.crschnick.pdxu.app.core.AppFileWatcher;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -60,11 +61,11 @@ public class SavegameWatcher {
             } catch (AccessDeniedException ignored) {
                 // Ignore permission issues
             } catch (Exception ex) {
-                ErrorHandler.handleException(ex);
+                ErrorEventFactory.fromThrowable(ex).handle();
             }
         }
 
-        FileWatchManager.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
+        AppFileWatcher.getInstance().startWatchersInDirectories(savegameDirs, (p, k) -> {
             updateSavegames();
         });
     }

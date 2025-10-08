@@ -1,0 +1,40 @@
+def distDir = "${project.layout.buildDirectory.get()}/dist"
+
+def RELEASE_PRODUCT_CODE = '{35478070-7e9b-469b-b433-73ed3fa24812}'
+
+tasks.register('installerDist', DefaultTask) {
+    dependsOn baseDist
+    doLast {
+        copy {
+            from "$distDir/base"
+            into "$distDir/installer-win"
+        }
+        copy {
+            from "$projectDir/msi/installation"
+            into "$distDir/installer-win"
+        }
+    }
+}
+
+tasks.register('signInstaller', Exec) {
+    commandLine "$projectDir\\tools\\sign.bat", "$distDir/artifacts/$distName-installer-windows-${arch}.msi"
+    ignoreExitValue = !ci
+}
+
+tasks.register('buildInstaller', Exec) {
+    dependsOn installerDist
+    commandLine 'cmd', '/c', 'CALL', projectDir.toString() + "/msi/build_installer_${arch}.bat"
+    environment('PRODUCT_CODE', RELEASE_PRODUCT_CODE)
+    environment('PRODUCT_NAME', productName)
+    environment('CANONICAL_VERSION', windowsSchemaCanonicalVersion)
+    environment('EXECUTABLE_NAME', jpackageExecutableName)
+    environment('ARTIFACT_NAME', distName)
+}
+
+var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
+if (signEnv != null && !signEnv.isEmpty()) {
+    buildInstaller.finalizedBy(signInstaller)
+}
+
+
+dist.finalizedBy(buildInstaller)

@@ -1,0 +1,57 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+		<Property Id="ApplicationFolderName" Value="$(var.DynamicProductName)" />
+		<Property Id="WixAppFolder" Value="WixPerUserFolder" />
+
+		<CustomAction
+			Id="Overwrite_WixSetDefaultPerUserFolder"
+			Property="WixPerUserFolder"
+			Value="[LocalAppDataFolder][ApplicationFolderName]"
+			Execute="immediate" />
+		<CustomAction
+			Id="Overwrite_WixSetDefaultPerMachineFolder"
+			Property="WixPerMachineFolder"
+			Value="[%ProgramFiles]\[ApplicationFolderName]"
+			Execute="immediate" />
+		<CustomAction
+			Id="Overwrite_WixSetPerUserFolder"
+			Property="APPLICATIONFOLDER"
+			Value="[WixPerUserFolder]"
+			Execute="immediate" />
+		<CustomAction
+			Id="Overwrite_WixSetPerMachineFolder"
+			Property="APPLICATIONFOLDER"
+			Value="[WixPerMachineFolder]"
+			Execute="immediate" />
+
+		<!-- Important: takeown does not like trailing slashes, so append a . to it -->
+		<SetProperty
+		  Id="TakeownCommand"
+		  Value="&quot;[%windir]\System32\takeown.exe&quot; /f &quot;[APPLICATIONFOLDER].&quot; /r"
+		  Before="TakeownCommand"
+		  Sequence="execute"
+		  />
+		<CustomAction
+			Id="TakeownCommand"
+			BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)"
+			DllEntry="WixQuietExec"
+			Execute="deferred"
+			Impersonate="yes"
+			Return="ignore" />
+
+		<InstallExecuteSequence>
+			<Custom Action="Overwrite_WixSetDefaultPerUserFolder" Before="CostFinalize" />
+			<Custom Action="Overwrite_WixSetDefaultPerMachineFolder" After="Overwrite_WixSetDefaultPerUserFolder" />
+			<Custom Action="Overwrite_WixSetPerUserFolder" After="Overwrite_WixSetDefaultPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
+			<Custom Action="Overwrite_WixSetPerMachineFolder" After="Overwrite_WixSetPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND (ALLUSERS=1 OR (ALLUSERS=2 AND Privileged))" />
+			<Custom Action="TakeownCommand" After="InstallFiles" Condition="(NOT Installed OR UPGRADINGPRODUCTCODE) AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
+		</InstallExecuteSequence>
+
+		<InstallUISequence>
+			<Custom Action="Overwrite_WixSetDefaultPerUserFolder" Before="CostFinalize" />
+			<Custom Action="Overwrite_WixSetDefaultPerMachineFolder" After="Overwrite_WixSetDefaultPerUserFolder" />
+			<Custom Action="Overwrite_WixSetPerUserFolder" After="Overwrite_WixSetDefaultPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
+			<Custom Action="Overwrite_WixSetPerMachineFolder" After="Overwrite_WixSetPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND (ALLUSERS=1 OR (ALLUSERS=2 AND Privileged))" />
+		</InstallUISequence>
+	</Fragment>
+</Wix>

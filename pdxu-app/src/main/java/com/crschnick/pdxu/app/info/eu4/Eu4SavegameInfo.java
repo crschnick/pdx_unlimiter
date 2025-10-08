@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.info.*;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
 
+@SuppressWarnings("unused")
 public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
 
     private Eu4RulerComp ruler;

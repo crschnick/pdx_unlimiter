@@ -1,0 +1,64 @@
+/* For development
+*:focused {
+    -fx-border-width: 1;
+    -fx-border-color: red;
+}
+*/
+
+.root:light, .root:dark {
+    -fx-background-color: transparent;
+}
+
+.root:windows .text {
+    -fx-font-smoothing-type: gray;
+}
+
+.root:linux .text {
+    -fx-font-smoothing-type: lcd;
+}
+
+.radio-button {
+    -fx-background-color: transparent;
+}
+
+.icon-button-comp {
+    -fx-padding: 0.05em;
+}
+
+.root:key-navigation .icon-button-comp:focused {
+    -fx-background-color: -color-accent-muted;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.toggle-group-comp .toggle-button {
+    -fx-padding: 3 10;
+}
+
+.root .ikonli-font-icon.graphic.error {
+    -fx-icon-color: -color-danger-fg;
+}
+
+.ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+    -fx-fill: -color-fg-default;
+}
+
+.button.accent .ikonli-font-icon {
+    -fx-icon-color: -color-button-fg;
+}
+
+.button:default, .button.accent {
+    -color-button-bg-focused: -color-accent-subtle;
+}
+
+.game-dist-choice-comp .text-field {
+    -fx-background-color: -color-border-default, -color-bg-default;
+}
+
+.game-dist-choice-comp .icon-button-comp {
+    -fx-opacity: 1.0;
+    -fx-padding: 10;
+}

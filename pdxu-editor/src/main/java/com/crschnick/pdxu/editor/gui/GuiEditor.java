@@ -1,18 +1,21 @@
 package com.crschnick.pdxu.editor.gui;
 
-import com.crschnick.pdxu.app.PdxuApp;
-import com.crschnick.pdxu.app.core.ErrorHandler;
+import atlantafx.base.controls.Spacer;
+import atlantafx.base.layout.InputGroup;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppMainWindow;
+import com.crschnick.pdxu.app.core.window.AppModifiedStage;
+import com.crschnick.pdxu.app.core.window.AppSideWindow;
+import com.crschnick.pdxu.app.core.window.AppWindowStyle;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-import com.crschnick.pdxu.app.gui.dialog.GuiDialogHelper;
-import com.crschnick.pdxu.app.lang.PdxuI18n;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.editor.EditorFilter;
-import com.crschnick.pdxu.editor.EditorSettings;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
-import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -23,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -34,31 +38,36 @@ public class GuiEditor {
 
     public static Stage createStage(EditorState state) {
         Stage stage = new Stage();
-
-        var icon = PdxuApp.getApp().getIcon();
-        stage.getIcons().add(icon);
-        var title = state.getFileName() + " - " + "Pdx-Unlimiter " + PdxuI18n.get("EDITOR");
+        var title = state.getFileName() + " - " + "Pdx-Unlimiter " + AppI18n.get("editor");
         stage.setTitle(title);
         state.dirtyProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
         });
-
         var node = GuiEditor.create(state);
-        stage.setScene(new Scene(node, 720, 600));
-
         // Disable focus on startup
         node.requestFocus();
+        Scene scene = new Scene(node, 720, 600);
+        stage.setScene(scene);
+        scene.setFill(Color.TRANSPARENT);
+        stage.setScene(scene);
 
-        GuiStyle.addStylesheets(stage.getScene());
+        if (AppMainWindow.get() != null) {
+            stage.initOwner(AppMainWindow.get().getStage());
+        }
+        AppModifiedStage.prepareStage(stage);
+        AppWindowStyle.addIcons(stage);
+        AppWindowStyle.addStylesheets(scene);
+        AppWindowStyle.addNavigationPseudoClasses(scene);
+
         showMissingGameWarning(state);
         stage.show();
         return stage;
     }
 
     public static boolean showCloseConfirmAlert(Stage s) {
-        var r = GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setTitle(PdxuI18n.get("UNSAVED_CHANGES"));
-            alert.setHeaderText(PdxuI18n.get("UNSAVED_CHANGES_CONFIRM"));
+        var r = AppSideWindow.showBlockingAlert(alert -> {
+            alert.setTitle(AppI18n.get("unsavedChanges"));
+            alert.setHeaderText(AppI18n.get("unsavedChangesConfirm"));
             alert.setAlertType(Alert.AlertType.WARNING);
             alert.getButtonTypes().clear();
             alert.getButtonTypes().add(ButtonType.YES);
@@ -74,12 +83,12 @@ public class GuiEditor {
 
     private static void showMissingGameWarning(EditorState state) {
         if (!state.isContextGameEnabled()) {
-            GuiDialogHelper.showBlockingAlert(alert -> {
+            AppSideWindow.showBlockingAlert(alert -> {
                 alert.setAlertType(Alert.AlertType.WARNING);
                 alert.getDialogPane().setMaxWidth(500);
-                alert.setTitle(PdxuI18n.get("MISSING_GAME_INSTALLATION"));
+                alert.setTitle(AppI18n.get("missingGameInstallation"));
                 String installationName = state.getFileContext().getGame().getInstallationName();
-                alert.setHeaderText(PdxuI18n.get("MISSING_GAME_INSTALLATION_TIPS", installationName, installationName));
+                alert.setHeaderText(AppI18n.get("missingGameInstallationTips", installationName, installationName));
             });
         }
     }
@@ -95,18 +104,18 @@ public class GuiEditor {
 
         var graphic = new StackPane(new FontIcon("mdi-information-outline"));
         var melterInformation = new Label(
-                PdxuI18n.get("SAVEGAME_EDITOR_TIPS"),
+                AppI18n.get("savegameEditorTips"),
                 graphic
         );
+        melterInformation.setGraphicTextGap(8);
         melterInformation.setAlignment(Pos.CENTER);
-        melterInformation.setPadding(new Insets(5, 5, 5, 5));
+        melterInformation.getStyleClass().add("melter-information");
         var topBars = new VBox(
                 GuiEditorMenuBar.createMenuBar(state),
                 v
         );
         if (!state.isEditable()) {
             topBars.getChildren().add(melterInformation);
-            topBars.getChildren().add(new Separator(Orientation.HORIZONTAL));
         }
         topBars.setFillWidth(true);
         melterInformation.prefWidthProperty().bind(topBars.widthProperty());
@@ -192,7 +201,7 @@ public class GuiEditor {
         state.getContent().withFixedContent(c -> {
             int offset;
             if (c.canGoToPreviousPage()) {
-                Button next = new JFXButton("Go to previous page (" + (c.getPage()) + ")");
+                Button next = new Button("Go to previous page (" + (c.getPage()) + ")");
                 next.setOnAction(e -> {
                     c.previousPage();
                 });
@@ -205,7 +214,7 @@ public class GuiEditor {
             }
 
             var nodes = c.getShownNodes();
-            int nodeCount = Math.min(nodes.size(), EditorSettings.getInstance().pageSize.getValue());
+            int nodeCount = Math.min(nodes.size(), AppPrefs.get().editorPageSize().getValue());
             for (int i = offset; i < nodeCount + offset; i++) {
                 var n = nodes.get(i - offset);
                 var label = new Label(getFormattedName(n.getNavigationName()));
@@ -221,12 +230,12 @@ public class GuiEditor {
 
                 Region valueDisplay = GuiEditorNode.createValueDisplay(n, state);
                 Node tag = null;
-                if (n.isReal() && EditorSettings.getInstance().enableNodeTags.getValue()) {
+                if (n.isReal() && AppPrefs.get().editorEnableNodeTags().getValue()) {
                     try {
                         tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
                                 .createNodeTag(state, (EditorRealNode) n, valueDisplay);
                     } catch (Exception ex) {
-                        ErrorHandler.handleException(ex);
+                        ErrorEventFactory.fromThrowable(ex).handle();
                     }
                 }
                 grid.add(createGridElement(Objects.requireNonNullElseGet(tag, Region::new), i, valueHighlight), 3, i);
@@ -236,12 +245,12 @@ public class GuiEditor {
                 actions.setFillHeight(true);
                 actions.setAlignment(Pos.CENTER_RIGHT);
                 if (n.isReal()) {
-                    if (EditorSettings.getInstance().enableNodeJumps.getValue()) {
+                    if (AppPrefs.get().editorEnableNodeJumps().getValue()) {
                         try {
                             var pointers = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
                                     .createNodeJumps(state, (EditorRealNode) n);
                             if (pointers.size() > 0) {
-                                var b = new JFXButton(null, new FontIcon());
+                                var b = new Button(null, new FontIcon());
                                 b.setGraphic(new FontIcon());
                                 b.getStyleClass().add("jump-to-def-button");
                                 GuiTooltips.install(b, "Jump to " + pointers.stream()
@@ -258,18 +267,18 @@ public class GuiEditor {
                                 b.prefHeightProperty().bind(actions.heightProperty());
                             }
                         } catch (Exception ex) {
-                            ErrorHandler.handleException(ex);
+                            ErrorEventFactory.fromThrowable(ex).handle();
                         }
                     }
 
-                    Button edit = new JFXButton(null, new FontIcon());
+                    Button edit = new Button(null, new FontIcon());
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
                     edit.setDisable(!state.isEditable());
                     edit.setOnAction(e -> {
                         state.getExternalState().startEdit(state, (EditorRealNode) n);
                     });
-                    GuiTooltips.install(edit, PdxuI18n.get("EDITOR_OPEN_IN_EXTERNAL_EDITOR"));
+                    GuiTooltips.install(edit, AppI18n.get("editorOpenInExternalEditor"));
                     actions.getChildren().add(edit);
                     edit.prefHeightProperty().bind(actions.heightProperty());
                 }
@@ -279,7 +288,7 @@ public class GuiEditor {
             }
 
             if (c.canGoToNextPage()) {
-                Button next = new JFXButton("Go to next page (" + (c.getPage() + 2) + ")");
+                Button next = new Button("Go to next page (" + (c.getPage() + 2) + ")");
                 next.setOnAction(e -> {
                     c.nextPage();
                 });
@@ -293,18 +302,19 @@ public class GuiEditor {
     }
 
     private static Region createFilterBar(EditorFilter edFilter) {
-        HBox box = new HBox();
+        var box = new HBox();
+        box.setAlignment(Pos.CENTER_LEFT);
         box.getStyleClass().add(GuiStyle.CLASS_EDITOR_FILTER);
-        box.setSpacing(8);
 
+        var toggleBar = new InputGroup();
         {
             ToggleButton filterKeys = new ToggleButton();
             filterKeys.setAccessibleText("Include keys in search");
             filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
             filterKeys.setGraphic(new FontIcon());
             filterKeys.selectedProperty().bindBidirectional(edFilter.filterKeysProperty());
-            GuiTooltips.install(filterKeys, PdxuI18n.get("EDITOR_SEARCH_FILTER_KEYS"));
-            box.getChildren().add(filterKeys);
+            GuiTooltips.install(filterKeys, AppI18n.get("editorSearchFilterKeys"));
+            toggleBar.getChildren().add(filterKeys);
         }
 
         {
@@ -316,13 +326,14 @@ public class GuiEditor {
             edFilter.filterValuesProperty().addListener((c, o, n) -> {
                 filterValues.setSelected(n);
             });
-            GuiTooltips.install(filterValues, PdxuI18n.get("EDITOR_SEARCH_FILTER_VALUES"));
-            box.getChildren().add(filterValues);
+            GuiTooltips.install(filterValues, AppI18n.get("editorSearchFilterValues"));
+            toggleBar.getChildren().add(filterValues);
         }
+        box.getChildren().add(toggleBar);
 
         box.getChildren().add(new Separator(Orientation.VERTICAL));
 
-        HBox textBar = new HBox();
+        var textBar = new InputGroup();
         {
             TextField filter = new TextField();
             {
@@ -352,6 +363,9 @@ public class GuiEditor {
                 search.setGraphic(new FontIcon());
                 search.getStyleClass().add(GuiStyle.CLASS_FILTER);
                 textBar.getChildren().add(search);
+                filter.prefHeightProperty().bind(search.heightProperty());
+                filter.minHeightProperty().bind(search.heightProperty());
+                filter.maxHeightProperty().bind(search.heightProperty());
             }
 
             {
@@ -377,20 +391,18 @@ public class GuiEditor {
             cs.getStyleClass().add(GuiStyle.CLASS_CASE_SENSITIVE);
             cs.setGraphic(new FontIcon());
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
-            GuiTooltips.install(cs, PdxuI18n.get("EDITOR_SEARCH_CASE_SENSITIVE"));
+            GuiTooltips.install(cs, AppI18n.get("editorSearchCaseSensitive"));
             box.getChildren().add(cs);
         }
 
-        Region spacer = new Region();
-        box.getChildren().add(spacer);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        box.getChildren().add(new Spacer());
 
         {
-            Button filterDisplay = new JFXButton(null, new FontIcon());
+            Label filterDisplay = new Label(null, new FontIcon());
             filterDisplay.setMnemonicParsing(false);
             edFilter.filterStringProperty().addListener((c, o, n) -> {
                 Platform.runLater(() -> filterDisplay.setText(
-                        n.equals("") ? "" : PdxuI18n.get("EDITOR_SEARCH_RESULT",n)));
+                        n.equals("") ? "" : AppI18n.get("editorSearchResult",n)));
             });
             filterDisplay.setAlignment(Pos.CENTER);
             box.getChildren().add(filterDisplay);

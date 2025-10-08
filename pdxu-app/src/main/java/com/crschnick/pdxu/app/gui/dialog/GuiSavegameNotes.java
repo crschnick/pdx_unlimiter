@@ -1,7 +1,11 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.comp.Comp;
+import com.crschnick.pdxu.app.comp.base.ModalButton;
+import com.crschnick.pdxu.app.comp.base.ModalOverlay;
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.savegame.SavegameNotes;
-import com.jfoenix.controls.JFXCheckBox;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -9,11 +13,7 @@ import javafx.scene.layout.VBox;
 public class GuiSavegameNotes {
 
     public static void showSavegameNotesDialog(SavegameNotes notes) {
-        GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setAlertType(Alert.AlertType.NONE);
-            alert.getButtonTypes().add(ButtonType.OK);
-            alert.setTitle("Savegame notes");
-
+        var modal = ModalOverlay.of("savegameNotes", Comp.of(() -> {
             VBox dialogPaneContent = new VBox();
 
             TextArea textArea = new TextArea();
@@ -21,14 +21,18 @@ public class GuiSavegameNotes {
             textArea.autosize();
             dialogPaneContent.getChildren().add(textArea);
 
-            JFXCheckBox cb = new JFXCheckBox();
+            CheckBox cb = new CheckBox();
             cb.selectedProperty().bindBidirectional(notes.remindMeProperty());
-            Label l = new Label("Remind me when launching the savegame");
-            dialogPaneContent.getChildren().add(new HBox(cb, l));
-
-            alert.getDialogPane().setContent(dialogPaneContent);
-            alert.getDialogPane().getStyleClass().add("savegame-notes");
-        });
+            Label l = new Label();
+            l.textProperty().bind(AppI18n.observable("savegameNotesRemind"));
+            HBox hbox = new HBox(cb, l);
+            hbox.setSpacing(8);
+            dialogPaneContent.getChildren().add(hbox);
+            dialogPaneContent.setSpacing(10);
+            return dialogPaneContent;
+        }).prefWidth(700));
+        modal.addButton(ModalButton.ok());
+        modal.show();
     }
 
     public static void showSavegameNotesReminderDialog(SavegameNotes notes) {
@@ -36,19 +40,11 @@ public class GuiSavegameNotes {
             return;
         }
 
-        ButtonType ignoreLater = new ButtonType("Don't remind me again", ButtonBar.ButtonData.APPLY);
-        var r = GuiDialogHelper.showBlockingAlert(alert -> {
-            alert.setAlertType(Alert.AlertType.NONE);
-            alert.getButtonTypes().add(ButtonType.OK);
-            alert.setTitle("Savegame notes");
-            alert.setHeaderText(notes.textProperty().get());
-
-            alert.getButtonTypes().add(ignoreLater);
-        });
-        r.ifPresent(t -> {
-            if (t.equals(ignoreLater)) {
-                notes.remindMeProperty().set(false);
-            }
-        });
+        var modal = ModalOverlay.of("savegameNotes", AppDialog.dialogText(notes.textProperty().get()));
+        modal.addButton(new ModalButton("dontRemind", () -> {
+            notes.remindMeProperty().set(false);
+        }, true, false));
+        modal.addButton(new ModalButton("launch", null, true, true));
+        modal.showAndWait();
     }
 }

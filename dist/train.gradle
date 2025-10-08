@@ -1,0 +1,65 @@
+def distDir = "${project.layout.buildDirectory.get()}/dist"
+
+tasks.register('trainAot', DefaultTask) {
+    doLast {
+        def properties = [
+                "-D" + propertyName("dataDir") + "=$distDir/local_train",
+                "-D" + propertyName("acceptEula") + "=true",
+                "-D" + propertyName("aotTrainMode") + "=true",
+                "-D" + propertyName("writeSysOut") + "=true",
+                "-D" + propertyName("writeLogs") + "=false",
+                "-D" + propertyName("logLevel") + "=trace",
+                "-D" + propertyName("useVirtualThreads") + "=false",
+        ]
+        if (os.isWindows()) {
+            def imageDir = "$distDir/base"
+            def bat = "$imageDir/runtime/bin/${jpackageExecutableName}.bat"
+            def cl = ['cmd', '/c', bat] + properties
+            def graal = System.getProperty("java.vendor.version").toLowerCase().contains("graal")
+            providers.exec {
+                commandLine cl
+                workingDir "$imageDir"
+                environment "CDS_JVM_OPTS",
+                            "-XX:+AOTClassLinking -XX:AOTCacheOutput=./server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
+            }.getResult().get()
+
+            def cfg = file("$imageDir/app/${jpackageExecutableName}.cfg")
+            cfg.text = cfg.text + "java-options=-XX:AOTCache=\$ROOTDIR/runtime/bin/server/cache.aot\n"
+        }
+
+        if (os.isLinux()) {
+            def imageDir = "$distDir/base"
+            def script = "$imageDir/lib/runtime/bin/${jpackageExecutableName}"
+            def cl = [script.toString()] + properties
+            def graal = System.getProperty("java.vendor.version").toLowerCase().contains("graal")
+            providers.exec {
+                commandLine cl
+                workingDir "$imageDir"
+                environment "CDS_JVM_OPTS",
+                            "-XX:+AOTClassLinking -XX:AOTCacheOutput=./lib/runtime/lib/server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
+            }.getResult().get()
+
+            def cfg = file("$imageDir/lib/app/${jpackageExecutableName}.cfg")
+            cfg.text = cfg.text + "java-options=-XX:SharedArchiveFile=\$APPDIR/../../lib/runtime/lib/server/cache.aot\n"
+        }
+
+        if (os.isMacOsX()) {
+            def imageDir = "$distDir/${productName}.app"
+            def script = "$imageDir/Contents/runtime/Contents/Home/bin/${jpackageExecutableName}"
+            def cl = [script.toString()] + properties
+            def graal = System.getProperty("java.vendor.version").toLowerCase().contains("graal")
+            providers.exec {
+                commandLine cl
+                workingDir "$imageDir"
+                environment "CDS_JVM_OPTS",
+                            "-XX:+AOTClassLinking -XX:AOTCacheOutput=./Contents/runtime/Contents/Home/lib/server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
+            }.getResult().get()
+
+            def cfg = file("$imageDir/Contents/app/${jpackageExecutableName}.cfg")
+            cfg.text = cfg.text + "java-options=-XX:SharedArchiveFile=\$ROOTDIR/Contents/runtime/Contents/Home/lib/server/cache.aot\n"
+        }
+
+        def dataDir = project.file("$distDir/local_train")
+        delete(dataDir)
+    }
+}

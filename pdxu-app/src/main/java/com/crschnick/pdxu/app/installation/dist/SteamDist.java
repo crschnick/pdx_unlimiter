@@ -1,20 +1,23 @@
 package com.crschnick.pdxu.app.installation.dist;
 
-import com.crschnick.pdxu.app.core.ErrorHandler;
+
 import com.crschnick.pdxu.app.core.TaskExecutor;
-import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.util.SupportedOs;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -45,15 +48,8 @@ public class SteamDist extends GameDist {
 
     public static Optional<Path> getSteamPath() {
         Optional<String> steamDir = Optional.empty();
-        switch (SupportedOs.get()) {
-            case WINDOWS -> {
-                if (ArchUtils.getProcessor().is64Bit()) {
-                    steamDir = WindowsRegistry.readString(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
-                } else {
-                    steamDir = WindowsRegistry.readString(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
-                }
-            }
-            case LINUX -> {
+        switch (OsType.ofLocal()) {
+            case OsType.Linux ignored -> {
                 try {
                     var steamPath = Path.of(System.getProperty("user.home"), ".steam", "steam");
                     if (Files.exists(steamPath)) {
@@ -62,13 +58,20 @@ public class SteamDist extends GameDist {
                         steamDir = Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
                     }
                 } catch (Exception ex) {
-                    ErrorHandler.handleException(ex);
+                    ErrorEventFactory.fromThrowable(ex).handle();
                 }
             }
-            case MAC -> {
+            case OsType.MacOs ignored -> {
                 var steamPath = Path.of(System.getProperty("user.home"), "Library", "Application Support", "Steam");
                 if (Files.exists(steamPath)) {
                     steamDir = Optional.of(steamPath.toString());
+                }
+            }
+            case OsType.Windows ignored -> {
+                if (ArchUtils.getProcessor().is64Bit()) {
+                    steamDir = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+                } else {
+                    steamDir = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
                 }
             }
         }
@@ -179,28 +182,30 @@ public class SteamDist extends GameDist {
     private void openSteamURI(String uri) {
         if (SystemUtils.IS_OS_LINUX) {
             if (!isSteamRunning()) {
-                GuiErrorReporter.showSimpleErrorMessage("Steam is not started. " +
-                                                                "Please start Steam first before launching the game");
+                ErrorEventFactory.fromMessage("Steam is not started. " +
+                        "Please start Steam first before launching the game").handle();
             } else {
                 TaskExecutor.getInstance().submitTask(() -> {
                     try {
                         var p = new ProcessBuilder("steam", uri).start();
                         p.getInputStream().readAllBytes();
                     } catch (Exception e) {
-                        ErrorHandler.handleException(e);
+                        ErrorEventFactory.fromThrowable(e).handle();
                     }
                 }, true);
             }
         } else {
-            ThreadHelper.browse(uri);
+            ThreadHelper.runFailableAsync(() -> {
+                Desktop.getDesktop().browse(URI.create(uri));
+            });
         }
     }
 
     @Override
     public void startDirectly(Path executable, List<String> args, Map<String, String> env) throws IOException {
         if (!isSteamRunning()) {
-            GuiErrorReporter.showSimpleErrorMessage("Steam is not started but required.\n" +
-                                                            "Please start Steam first before launching the game");
+            ErrorEventFactory.fromMessage("Steam is not started but required.\n" +
+                    "Please start Steam first before launching the game").handle();
             return;
         }
 
@@ -229,7 +234,7 @@ public class SteamDist extends GameDist {
     }
 
     @Override
-    public void startLauncher(Map<String, String> env) throws IOException {
+    public void startLauncher(Map<String, String> env) {
         openSteamURI("steam://run/" + getGame().getSteamAppId() + "//");
     }
 

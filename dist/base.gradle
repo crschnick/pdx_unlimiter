@@ -1,0 +1,246 @@
+import java.util.stream.Collectors
+
+def distDir = "${project.layout.buildDirectory.get()}/dist"
+
+tasks.register('licenses', DefaultTask) {
+    doLast {
+        copy {
+            from "$projectDir/licenses/"
+            into "$distDir/licenses/"
+            include '*.license'
+            rename { String name ->
+                name.replace("license", "txt")
+            }
+        }
+    }
+}
+
+def debugArguments = file("$projectDir/debug/debug_arguments.txt").text.lines()
+        .map(s -> '"-D' + groupName + '.' + artifactName + '.' + s + '"')
+        .collect(Collectors.joining(' '))
+
+if (os.isWindows()) {
+    tasks.register('baseDist', DefaultTask) {
+        doLast {
+            copy {
+                from "$distDir/jpackage/${jpackageExecutableName}"
+                into "$distDir/base"
+            }
+            copy {
+                from "$projectDir/logo/logo.ico"
+                into "$distDir/base"
+            }
+            copy {
+                from "$rootDir/lang"
+                into "$distDir/base/lang"
+            }
+            copy {
+                from "$rootDir/rakaly/rakaly_windows.exe"
+                into "$distDir/base/rakaly"
+                rename "rakaly_windows.exe", "rakaly.exe"
+            }
+
+            file("$distDir/base/app/.jpackage.xml").delete()
+
+            // Don't launch multiple exe instances: https://bugs.openjdk.org/browse/JDK-8340311
+            // We don't need the /app directory to be in the library path
+            def configFile = file("$distDir/base/app/${jpackageExecutableName}.cfg")
+            configFile.text = configFile.text.replace("[Application]", "[Application]\nwin.norestart=true")
+
+            def batLauncherFile = file("$distDir/base/runtime/bin/${jpackageExecutableName}.bat")
+            def batLauncherContent = batLauncherFile.text
+            batLauncherContent = batLauncherContent.replace(" -p \"%~dp0/../app\"", "")
+            batLauncherFile.text = batLauncherContent
+            file("$distDir/base/runtime/bin/${jpackageExecutableName}").delete()
+
+            def debugSource = replaceVariablesInFile("$projectDir/debug/windows/debug.bat", Map.of(
+                    '__JVM_ARGS__', debugArguments,
+                    '__EXECUTABLE_NAME__', jpackageExecutableName
+            ))
+
+            file("$distDir/base/scripts").mkdirs()
+            def debugTarget = file("$distDir/base/scripts/${jpackageExecutableName}_debug.bat")
+            debugTarget.text = debugSource.text
+
+            copy {
+                from "$distDir/licenses"
+                into "$distDir/base/licenses"
+            }
+
+            def customLauncherDir = file("$projectDir/launcher/windows/$arch")
+            if (customLauncherDir.exists()) {
+                copy {
+                    from customLauncherDir
+                    into "$distDir/base"
+                    rename "launcher.exe", "${jpackageExecutableName}.exe"
+                }
+                def rcedit = "$projectDir\\tools\\rcedit-x64.exe"
+                def exeFile = file("$distDir/base/${jpackageExecutableName}.exe")
+                exeFile.setExecutable(true, false)
+                exeFile.writable = true
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-icon', "$projectDir\\logo\\logo.ico"
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-file-version', windowsSchemaCanonicalVersion
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-product-version', windowsSchemaCanonicalVersion
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-version-string', 'CompanyName', 'Christopher Schnick'
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-version-string', 'FileDescription', 'Pdx-Unlimiter'
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-version-string', 'LegalCopyright', '2025, ' + 'Christopher Schnick'
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-version-string', 'OriginalFilename', "${jpackageExecutableName}.exe"
+                }.getResult().get()
+                providers.exec {
+                    commandLine rcedit, exeFile, '--set-version-string', 'ProductName', 'Pdx-Unlimiter'
+                }.getResult().get()
+                exeFile.writable = false
+            }
+
+            var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
+            if (signEnv != null && !signEnv.isEmpty()) {
+                file("$distDir/base/${jpackageExecutableName}.exe").writable = true
+                providers.exec {
+                    commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/${jpackageExecutableName}.exe"
+                    ignoreExitValue = !ci
+                }.getResult().get()
+                file("$distDir/base/${jpackageExecutableName}.exe").writable = false
+            }
+        }
+    }
+} else if (os.isLinux()) {
+    tasks.register('baseDist', DefaultTask) {
+        doLast {
+            copy {
+                from "$distDir/jpackage/${jpackageExecutableName}"
+                into "$distDir/base/"
+            }
+            copy {
+                from "$projectDir/logo/logo.png"
+                into "$distDir/base/"
+            }
+            copy {
+                from "$projectDir/fonts"
+                into "$distDir/base/fonts"
+            }
+            copy {
+                from "$rootDir/lang"
+                into "$distDir/base/lang"
+            }
+            copy {
+                from "$rootDir/rakaly/rakaly_linux"
+                into "$distDir/base/rakaly"
+                rename "rakaly_linux", "rakaly"
+            }
+
+            def customLauncherDir = file("$projectDir/launcher/linux/$arch")
+            if (customLauncherDir.exists()) {
+                copy {
+                    from customLauncherDir
+                    into "$distDir/base/bin"
+                    rename "launcher", "${jpackageExecutableName}"
+                }
+                def exeFile = file("$distDir/base/bin/${jpackageExecutableName}")
+                exeFile.setExecutable(true, false)
+            }
+
+            def shLauncherFile = file("$distDir/base/lib/runtime/bin/${jpackageExecutableName}")
+            def shLauncherContent = shLauncherFile.text
+            shLauncherContent = shLauncherContent.replace(" -p \"\$DIR/../app\"", "")
+            shLauncherFile.text = shLauncherContent
+            file("$distDir/base/lib/runtime/bin/${jpackageExecutableName}.bat").delete()
+
+            def debugSource = replaceVariablesInFile("$projectDir/debug/linux/debug.sh", Map.of(
+                    '__JVM_ARGS__', debugArguments,
+                    '__EXECUTABLE_NAME__', jpackageExecutableName
+            ))
+
+            file("$distDir/base/scripts").mkdirs()
+            def debugTarget = file("$distDir/base/scripts/${jpackageExecutableName}_debug.sh")
+            debugTarget.text = debugSource.text
+            debugTarget.setExecutable(true, false)
+
+            copy {
+                from "$distDir/licenses"
+                into "$distDir/base/licenses"
+            }
+        }
+    }
+} else {
+    tasks.register('baseDist', DefaultTask) {
+        doLast {
+            def app = "${productName}.app"
+            copy {
+                from "$distDir/jpackage/${jpackageExecutableName}.app/Contents"
+                into "$distDir/$app/Contents/"
+            }
+            copy {
+                from "$distDir/licenses"
+                into "$distDir/$app/Contents/Resources/licenses"
+            }
+            copy {
+                from "$rootDir/lang"
+                into "$distDir/$app/Contents/Resources/lang"
+            }
+            copy {
+                from "$rootDir/rakaly/rakaly_mac"
+                into "$distDir/$app/Contents/MacOS"
+                rename "rakaly_mac", "rakaly"
+            }
+
+            def shLauncherFile = file("$distDir/$app/Contents/runtime/Contents/Home/bin/${jpackageExecutableName}")
+            def shLauncherContent = shLauncherFile.text
+            shLauncherContent = shLauncherContent.replace(" -p \"\$DIR/../app\"", "")
+            shLauncherFile.text = shLauncherContent
+            file("$distDir/$app/Contents/runtime/Contents/Home/bin/${jpackageExecutableName}.bat").delete()
+
+
+            def debugSource = replaceVariablesInFile("$projectDir/debug/mac/debug.sh", Map.of(
+                    '__JVM_ARGS__', debugArguments,
+                    '__EXECUTABLE_NAME__', jpackageExecutableName
+            ))
+
+            file("$distDir/$app/Contents/Resources/scripts").mkdirs()
+            def debugTarget = file("$distDir/$app/Contents/Resources/scripts/${jpackageExecutableName}_debug.sh")
+            debugTarget.text = debugSource.text
+            debugTarget.setExecutable(true, false)
+
+            copy {
+                from "$projectDir/pkg/scripts/uninstall.sh"
+                into "$distDir/$app/Contents/Resources/scripts/"
+            }
+            file("$distDir/$app/Contents/Resources/scripts/uninstall.sh").text = file("$distDir/$app/Contents/Resources/scripts/uninstall.sh").text
+                    .replaceAll("__PRODUCT__", productName)
+                    .replaceAll("__PRODUCT_KEBAP__", kebapProductName)
+                    .replaceAll("__VERSION__", versionString)
+                    .replaceAll("__PACKAGE_ID__", groupName + "." + kebapProductName)
+                    .replaceAll('__EXECUTABLE_NAME__', jpackageExecutableName)
+        }
+    }
+
+    tasks.register('notarize', Exec) {
+        mustRunAfter trainAot
+        commandLine "$projectDir/mac_app/notarize_app.sh", "$projectDir", arch.toString(), productName, jpackageExecutableName
+    }
+
+    def certName = System.getenv("MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME");
+    if (certName != null && !certName.isEmpty()) {
+        baseDist.finalizedBy(notarize)
+    }
+}
+
+baseDist.dependsOn(licenses)
+baseDist.dependsOn(jpackage)
+dist.dependsOn(baseDist)
+
+if (enableAot) {
+    baseDist.finalizedBy(trainAot)
+}

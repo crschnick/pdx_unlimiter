@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.VersionComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
 
+@SuppressWarnings("unused")
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
     StellarisEmpireSizeComp empireSize;

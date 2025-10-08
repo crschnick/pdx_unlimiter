@@ -19,7 +19,7 @@ public interface EditorSavegameAdapter {
     Map<Game, EditorSavegameAdapter> ALL = ServiceLoader.load(EditorSavegameAdapter.class)
             .stream().map(prov -> prov.get()).collect(Collectors.toMap(adap -> adap.getGame(), Function.identity()));
 
-    Map<String, NodePointer> createCommonJumps(EditorState state) throws Exception;
+    Map<String, NodePointer> createCommonJumps(EditorState state);
 
     default List<NodePointer> createNodeJumps(EditorState state, EditorRealNode node) throws Exception {
         var j = createNodeJump(state, node);
@@ -30,7 +30,7 @@ public interface EditorSavegameAdapter {
         return List.of(j);
     }
 
-    NodePointer createNodeJump(EditorState state, EditorRealNode node) throws Exception;
+    NodePointer createNodeJump(EditorState state, EditorRealNode node);
 
-    javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) throws Exception;
+    javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay);
 }

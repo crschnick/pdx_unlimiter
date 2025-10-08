@@ -1,0 +1,115 @@
+package com.crschnick.pdxu.app.core;
+
+import com.crschnick.pdxu.app.core.mode.AppOperationMode;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.OsType;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import javax.imageio.ImageIO;
+
+public class AppTrayIcon {
+
+    private final SystemTray tray;
+    private final TrayIcon trayIcon;
+
+    public AppTrayIcon() {
+        ensureSystemTraySupported();
+
+        tray = SystemTray.getSystemTray();
+
+        var image =
+                switch (OsType.ofLocal()) {
+                    case OsType.Windows ignored -> "img/tray/tray_windows.png";
+                    case OsType.Linux ignored -> "img/tray/tray_linux.png";
+                    case OsType.MacOs ignored -> "img/tray/tray_macos.png";
+                };
+        var url = AppResources.getResourceURL(AppResources.MAIN_MODULE, image).orElseThrow();
+
+        PopupMenu popupMenu = new PopupMenu();
+        this.trayIcon =
+                new TrayIcon(loadImageFromURL(url), App.getApp().getStage().getTitle(), popupMenu);
+        this.trayIcon.setToolTip(AppNames.ofCurrent().getName());
+        this.trayIcon.setImageAutoSize(true);
+
+        {
+            var open = new MenuItem(AppI18n.get("open"));
+            open.addActionListener(e -> {
+                tray.remove(trayIcon);
+                AppOperationMode.switchToAsync(AppOperationMode.GUI);
+            });
+            popupMenu.add(open);
+        }
+
+        {
+            var quit = new MenuItem(AppI18n.get("quit"));
+            quit.addActionListener(e -> {
+                tray.remove(trayIcon);
+                AppOperationMode.close();
+            });
+            popupMenu.add(quit);
+        }
+
+        trayIcon.addActionListener(e -> {
+            if (OsType.ofLocal() != OsType.MACOS) {
+                tray.remove(trayIcon);
+                AppOperationMode.switchToAsync(AppOperationMode.GUI);
+            }
+        });
+    }
+
+    private static Image loadImageFromURL(URL iconImagePath) {
+        try {
+            return ImageIO.read(iconImagePath);
+        } catch (IOException e) {
+            ErrorEventFactory.fromThrowable(e).handle();
+            return AppImages.toAwtImage(AppImages.DEFAULT_IMAGE);
+        }
+    }
+
+    private void ensureSystemTraySupported() {
+        if (!SystemTray.isSupported()) {
+            throw new UnsupportedOperationException(
+                    "SystemTray icons are not " + "supported by the current desktop environment.");
+        }
+    }
+
+    public void show() {
+        EventQueue.invokeLater(() -> {
+            try {
+                tray.add(this.trayIcon);
+            } catch (Exception e) {
+                // This can sometimes fail on Linux
+                ErrorEventFactory.fromThrowable("Unable to add TrayIcon", e)
+                        .expected()
+                        .handle();
+            }
+        });
+    }
+
+    public void hide() {
+        EventQueue.invokeLater(() -> {
+            tray.remove(trayIcon);
+        });
+    }
+
+    public void showErrorMessage(String title, String message) {
+        if (OsType.ofLocal() == OsType.MACOS) {
+            showMacAlert(title, message, "Error");
+        } else {
+            EventQueue.invokeLater(() -> this.trayIcon.displayMessage(title, message, TrayIcon.MessageType.ERROR));
+        }
+    }
+
+    private void showMacAlert(String subTitle, String message, String title) {
+        String execute = String.format(
+                "display notification \"%s\"" + " with title \"%s\"" + " subtitle \"%s\"",
+                message != null ? message : "", title != null ? title : "", subTitle != null ? subTitle : "");
+        try {
+            Runtime.getRuntime().exec(new String[] {"osascript", "-e", execute});
+        } catch (IOException e) {
+            throw new UnsupportedOperationException("Cannot run osascript with given parameters.");
+        }
+    }
+}

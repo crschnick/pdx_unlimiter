@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.editor.target;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
-import com.crschnick.pdxu.app.util.integration.RakalyHelper;
+import com.crschnick.pdxu.app.util.RakalyHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameContent;

@@ -2,8 +2,10 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
+import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -27,7 +29,9 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(CK3_BACKGROUND);
-        bg.setOpacity(0.4);
+        bg.opacityProperty().bind(Bindings.createDoubleBinding(() -> {
+            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.15;
+        }, AppPrefs.get().theme()));
         return bg;
     }
 
@@ -35,6 +39,6 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
     public Background createEntryInfoBackground(SavegameInfo<Ck3Tag> info) {
         return new Background(new BackgroundFill(
                 Ck3Backgrounds.getBackgroundColor(info),
-                CornerRadii.EMPTY, Insets.EMPTY));
+                new CornerRadii(4, 4, 0, 0, false), Insets.EMPTY));
     }
 }

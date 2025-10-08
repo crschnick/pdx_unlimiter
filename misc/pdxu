@@ -1,3 +1,0 @@
-#!/bin/sh
-DIR="${0%/*}"
-"$DIR/Pdx-Unlimiter"
