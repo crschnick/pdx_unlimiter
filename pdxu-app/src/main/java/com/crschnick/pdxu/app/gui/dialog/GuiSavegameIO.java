@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import atlantafx.base.layout.InputGroup;
 import com.crschnick.pdxu.app.core.AppCache;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppSideWindow;
@@ -24,11 +25,11 @@ public class GuiSavegameIO {
         Alert alert = AppSideWindow.createEmptyAlert();
         alert.setAlertType(Alert.AlertType.CONFIRMATION);
         alert.setTitle(AppI18n.get("exportStorage"));
-        alert.setHeaderText(AppI18n.get("exportStorageinfo"));
+        alert.setHeaderText(AppI18n.get("exportStorageDescription"));
 
-        HBox dialogPaneContent = new HBox();
+        HBox dialogPaneContent = new InputGroup();
         dialogPaneContent.setAlignment(Pos.CENTER);
-        Label label = new Label("Export location: ");
+        Label label = new Label(AppI18n.get("exportLocation"));
         label.setAlignment(Pos.BOTTOM_CENTER);
 
         TextField textArea = new TextField();
@@ -39,6 +40,7 @@ public class GuiSavegameIO {
         }
 
         Button b = new Button();
+        b.minHeightProperty().bind(textArea.heightProperty());
         b.setGraphic(new FontIcon());
         b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         b.setOnMouseClicked((m) -> {
@@ -47,7 +49,7 @@ public class GuiSavegameIO {
                 directoryChooser.setInitialDirectory(prev.toFile());
             }
 
-            directoryChooser.setTitle("Select export location");
+            directoryChooser.setTitle(AppI18n.get("selectExportLocation"));
             File file = directoryChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
             if (file != null) {
                 textArea.setText(file.toString());

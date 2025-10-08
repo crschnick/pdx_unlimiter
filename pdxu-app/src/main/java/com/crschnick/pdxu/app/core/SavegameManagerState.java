@@ -104,6 +104,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         // No campaign selected means no entries are shown
         if (globalSelectedCollection.get() == null) {
             shownEntries.clear();
+            globalSelectedEntry.setValue(null);
             return;
         }
 

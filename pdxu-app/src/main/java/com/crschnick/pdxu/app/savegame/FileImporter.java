@@ -57,23 +57,4 @@ public class FileImporter {
                     Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
                 }, false);
     }
-
-    private static void importFromString(String input) {
-        TrackEvent.debug("Starting to import " + input);
-        var targets = FileImportTarget.createTargets(input);
-        if (targets.size() == 0) {
-            TrackEvent.debug("No targets to import");
-
-        } else {
-            for (FileImportTarget t : targets) {
-                TrackEvent.debug("Starting to import target " + t.getName() + " from " + input);
-                t.importTarget(s -> {
-                    if (AppPrefs.get().deleteOnImport().getValue()) {
-                        TrackEvent.debug("Deleting import target " + t.getName());
-                        t.delete();
-                    }
-                });
-            }
-        }
-    }
 }

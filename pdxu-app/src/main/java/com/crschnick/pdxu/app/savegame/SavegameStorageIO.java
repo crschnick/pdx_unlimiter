@@ -4,6 +4,7 @@ package com.crschnick.pdxu.app.savegame;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.DesktopHelper;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
 import org.apache.commons.io.FileUtils;
 
@@ -23,6 +24,7 @@ public class SavegameStorageIO {
                     FileUtils.forceMkdir(storageDir.toFile());
                     exportSavegameDirectory(storage, storageDir);
                 }
+                DesktopHelper.browsePath(out);
             } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(e).handle();
             }

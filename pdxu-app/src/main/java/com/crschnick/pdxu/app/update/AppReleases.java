@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.update;
 
+import com.crschnick.pdxu.app.core.AppProperties;
+import com.crschnick.pdxu.app.issue.ErrorEvent;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
 import org.kohsuke.github.GHRelease;
@@ -13,7 +15,7 @@ import java.util.Optional;
 
 public class AppReleases {
 
-    private static final String GITHUB_REPOSITORY = "crschnick/pdx-unlimiter";
+    private static final String GITHUB_REPOSITORY = "crschnick/pdx_unlimiter";
 
     private static GHRepository repository;
 
@@ -31,7 +33,7 @@ public class AppReleases {
         return repository;
     }
 
-    public static Optional<GHRelease> getMarkedLatestRelease() throws IOException {
+    private static Optional<GHRelease> getMarkedLatestRelease() throws IOException {
         try {
             var repo = getRepository();
             return Optional.ofNullable(repo.getLatestRelease());
@@ -39,4 +41,19 @@ public class AppReleases {
             throw ErrorEventFactory.expected(e);
         }
     }
+
+
+    private static Optional<GHRelease> getTopReleaseIncludingPreRelease() throws IOException {
+        var repo = getRepository();
+        return Optional.ofNullable(repo.listReleases().iterator().next());
+    }
+
+    public static Optional<GHRelease> getLatestSuitableRelease() throws IOException {
+        try {
+            return getTopReleaseIncludingPreRelease();
+        } catch (IOException e) {
+            throw ErrorEventFactory.expected(e);
+        }
+    }
+
 }

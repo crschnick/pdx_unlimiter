@@ -62,7 +62,7 @@ public class BasicUpdater extends UpdateHandler {
     }
 
     public synchronized AvailableRelease refreshUpdateCheckImpl() throws Exception {
-        var found = AppReleases.getMarkedLatestRelease();
+        var found = AppReleases.getLatestSuitableRelease();
         if (found.isEmpty()) {
             return null;
         }

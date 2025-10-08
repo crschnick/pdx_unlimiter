@@ -11,6 +11,8 @@ import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import javafx.application.Platform;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -26,35 +28,26 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
 public class GuiImporter {
 
     public static void showResultDialog(Map<FileImportTarget, SavegameParseResult> statusMap) {
-        Alert alert = AppSideWindow.createEmptyAlert();
-        alert.setAlertType(Alert.AlertType.INFORMATION);
-        alert.setTitle("Import results");
-        alert.setHeaderText("The import of the selected savegames has finished.");
-        alert.getDialogPane().getStyleClass().add(CLASS_CONTENT_DIALOG);
+        // Only show dialog if there were issues
+        if (statusMap.isEmpty()) {
+            return;
+        }
 
-        VBox list = new VBox();
-        list.setSpacing(5);
-        list.getChildren().add(new Label("However, there have been some issues with the savegames listed below:"));
+        StringBuilder text = new StringBuilder(AppI18n.get("savegameImportIssues"));
         for (var e : statusMap.entrySet()) {
             e.getValue().visit(new SavegameParseResult.Visitor() {
                 @Override
                 public void invalid(SavegameParseResult.Invalid iv) {
-                    list.getChildren().add(new Label("- " + e.getKey().getName() + ": " + iv.message));
+                    text.append("\n- ").append(e.getKey().getName()).append(": ").append(iv.message);
                 }
 
                 @Override
                 public void error(SavegameParseResult.Error er) {
-                    list.getChildren().add(new Label("- " + e.getKey().getName() + ": " +
-                            er.error.getMessage() + " (error)"));
+                    text.append("- ").append(e.getKey().getName()).append(": ").append(er.error.getMessage());
                 }
             });
         }
-        alert.getDialogPane().setContent(list);
-
-        // Only show dialog if there were issues
-        if (statusMap.size() > 0) {
-            alert.show();
-        }
+        AppDialog.confirm("importResults", new ReadOnlyStringWrapper(text.toString()));
     }
 
     private static Region createBottomNode(CheckBox cb) {

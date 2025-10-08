@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.app.savegame;
 
+import com.crschnick.pdxu.app.comp.base.ModalOverlay;
 import com.crschnick.pdxu.app.core.TaskExecutor;
+import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
@@ -156,16 +158,8 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void meltSavegame(SavegameEntry<T, I> e) {
-        Alert alert = AppSideWindow.createEmptyAlert();
-        alert.setAlertType(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Melt savegame");
-        alert.setHeaderText("""
-                Do you want to convert the selected savegame into a non-ironman savegame using the Rakaly melter?
-                """);
-        alert.setContentText("""
-                The original savegame will not get modified.""");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (!(result.isPresent() && result.get().getButtonData().isDefaultButton())) {
+        var confirm = AppDialog.confirm("meltSavegame");
+        if (!confirm) {
             return;
         }
 
