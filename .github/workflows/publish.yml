@@ -11,16 +11,61 @@ jobs:
     secrets: inherit
     name: Windows Build
     if: contains(github.event.head_commit.message, '[release]')
+    permissions:
+      actions: none
+      attestations: none
+      checks: none
+      contents: read
+      deployments: none
+      id-token: none
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
   build-linux:
     uses: ./.github/workflows/linux_build.yml
     secrets: inherit
     name: Linux Build
     if: contains(github.event.head_commit.message, '[release]')
+    permissions:
+      actions: none
+      attestations: none
+      checks: none
+      contents: read
+      deployments: none
+      id-token: none
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
   build-macos:
     uses: ./.github/workflows/macos_build.yml
     secrets: inherit
     name: macOS Build
     if: contains(github.event.head_commit.message, '[release]')
+    permissions:
+      actions: none
+      attestations: none
+      checks: none
+      contents: read
+      deployments: none
+      id-token: none
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
 
   publish:
     needs: [
@@ -93,15 +138,15 @@ jobs:
             ${{ secrets.GPG_KEY }}
           GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
 
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        if: ${{ contains(github.event.head_commit.message, '[release]') }}
-        with:
-          body_path: dist/build/dist/release/github-changelog.md
-          token: ${{ secrets.GH_PAT }}
-          preserve_order: true
-          prerelease: true
-          make_latest: false
-          tag_name: ${{ env.VERSION }}
-          files: |
-            dist/build/dist/github-release/*
+#      - name: Create release
+#        uses: softprops/action-gh-release@v2
+#        if: ${{ contains(github.event.head_commit.message, '[release]') }}
+#        with:
+#          body_path: dist/build/dist/release/github-changelog.md
+#          token: ${{ secrets.GH_PAT }}
+#          preserve_order: true
+#          prerelease: true
+#          make_latest: false
+#          tag_name: ${{ env.VERSION }}
+#          files: |
+#            dist/build/dist/github-release/*
