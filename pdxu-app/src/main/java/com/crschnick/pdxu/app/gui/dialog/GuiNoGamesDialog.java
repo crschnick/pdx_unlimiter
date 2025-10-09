@@ -8,7 +8,7 @@ import com.crschnick.pdxu.app.prefs.AppPrefs;
 public class GuiNoGamesDialog {
 
     public static void showIfNeeded() {
-        if (AppProperties.get().isDevelopmentEnvironment() || !GameInstallation.ALL.isEmpty()) {
+        if (AppProperties.get().isDevelopmentEnvironment() || AppProperties.get().isAotTrainMode() || !GameInstallation.ALL.isEmpty()) {
             return;
         }
 
