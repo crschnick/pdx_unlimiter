@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
+import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
@@ -7,7 +8,7 @@ import com.crschnick.pdxu.app.prefs.AppPrefs;
 public class GuiNoGamesDialog {
 
     public static void showIfNeeded() {
-        if (!GameInstallation.ALL.isEmpty()) {
+        if (AppProperties.get().isDevelopmentEnvironment() || !GameInstallation.ALL.isEmpty()) {
             return;
         }
 

@@ -25,7 +25,7 @@ import java.util.function.UnaryOperator;
 public class GuiWelcomeDialog {
 
     public static void showAndWaitIfNeeded() {
-        if (AppProperties.get().isInitialLaunch()) {
+        if (AppProperties.get().isDevelopmentEnvironment() || !AppProperties.get().isInitialLaunch()) {
             return;
         }
 
