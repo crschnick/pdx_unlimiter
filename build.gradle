@@ -174,7 +174,7 @@ project.ext {
     windowsSchemaCanonicalVersion = getWindowsSchemaCanonicalVersion()
 
     // GPG signing config
-    signingEnabled = false
+    signingEnabled = true
     signingKeyId = System.getenv('GPG_KEY_ID') != null ? System.getenv('GPG_KEY_ID') : ""
     signingKey = System.getenv('GPG_KEY') != null ? System.getenv('GPG_KEY') : ""
     signingPassword =System.getenv('GPG_KEY_PASSWORD') != null ? System.getenv('GPG_KEY_PASSWORD') : ""

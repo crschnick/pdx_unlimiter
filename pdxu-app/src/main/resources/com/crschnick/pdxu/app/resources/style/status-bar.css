@@ -1,6 +1,6 @@
 .status-bar {
-    -fx-border-color: -color-success-subtle;
-    -fx-background-color: -color-success-muted;
+    -fx-border-color: -color-success-muted;
+    -fx-background-color: -color-success-subtle;
     -fx-padding: 0 8 0 8;
     -fx-min-height: 3.6em;
     -fx-max-height: 3.6em;
@@ -18,8 +18,8 @@
 }
 
 .status-running {
--fx-border-color: -color-success-muted;
--fx-background-color: -color-success-emphasis;
+    -fx-border-color: -color-success-subtle;
+    -fx-background-color: -color-success-muted;
 }
 
 .status-bar .image-icon {

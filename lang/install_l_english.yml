@@ -1,7 +1,0 @@
-l_english:
-  ERROR_OCCURED: "An unexpected error occured: $CAUSE$"
-  GAME_DATA_PATH_NOT_FOUND: "Couldn't find game data path in $GAME$ launcher config file"
-  INSTALL_DIR_IS_USER_DIR: "You selected the user documents directory of the game. However, the Pdx-Unlimiter requires the installation directory.\nYou can usually find the installation location of your game at locations like:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- Any other location where you install your games"
-  GAME_DATA_PATH_DOES_NOT_EXIST: "A $GAME$ installation has been detected, but its user data directory $DIR$ does not exist.\nTo fix this problem, please run the game once to generate it."
-  EXECUTABLE_NOT_FOUND: "$GAME$ executable $FILE$ not found in directory $DIR$.\nYou can usually find the installation location of your game at locations like:\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- Any other location where you install your games"
-  NO_VALID_INSTALLATION: "Welcome to the Pdx-Unlimiter!\n\nThe automatic game detection did not detect any supported Paradox game.\nTo get started, you can set the installation directories of games manually in the settings menu.\n\nNote that you can't do anything useful with the Pdx-Unlimiter until at least one installation is set."

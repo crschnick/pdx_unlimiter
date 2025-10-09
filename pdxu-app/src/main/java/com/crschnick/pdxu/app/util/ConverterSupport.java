@@ -122,7 +122,7 @@ public class ConverterSupport {
     }
 
     public String getToConfigurationName() {
-        return fromName;
+        return toName;
     }
 
     public String getName() {

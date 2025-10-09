@@ -26,6 +26,7 @@ open module com.crschnick.pdxu.app {
     exports com.crschnick.pdxu.app.installation;
     exports com.crschnick.pdxu.app.gui;
     exports com.crschnick.pdxu.app.gui.game;
+    exports com.crschnick.pdxu.app.gui.dialog;
 
     requires static lombok;
     requires com.sun.jna;

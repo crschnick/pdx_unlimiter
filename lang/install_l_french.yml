@@ -1,7 +1,0 @@
-l_french:
-  ERROR_OCCURED: "Une erreur inattendue s'est produite: $CAUSE$"
-  GAME_DATA_PATH_NOT_FOUND: "Impossible de trouver le chemin vers le fichiers du jeu dans le fichier de configuration du lanceur de $GAME$."
-  GAME_DATA_PATH_DOES_NOT_EXIST: "Le répertoire de données utilisateur $DIR$ de $GAME$ n'existe pas. Pour résoudre ce problème, veuillez démarrer le jeu une fois pour le générer"
-  EXECUTABLE_NOT_FOUND: "Impossible de trouver l'exécutable $FILE$ de $GAME$"
-  LAUNCHER_SETTINGS_NOT_FOUND: "Paramètres du lanceur Paradox manquants. Seules les installations utilisant le lanceur Paradox de $GAME$ sont prises en charge."
-  INSTALL_DIR_IS_USER_DIR: "Vous avez sélectionné le répertoire des documents du jeu. Cependant, le Pdx-Unlimiter nécessite le répertoire d'installation.\nL'emplacement d'installation de votre jeu se trouve généralement dans :\n- C:\Program Files (x86)\Steam\steamapps\common\$GAME$\n- C:\Program Files (x86)\Paradox Interactive\$GAME$\n- Tout autre endroit où vous installez vos jeux"

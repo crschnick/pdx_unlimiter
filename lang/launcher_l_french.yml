@@ -1,9 +1,0 @@
-l_french:
-  LAUNCH: "Démarrer"
-  CHANGE_MODS: "Changer les mods"
-  INCOMPATIBLE: "La sauvegarde sélectionnée est incompatible. Si vous la lancez quand même, cela peut causer des problèmes."
-  INCOMPATIBLE_VERSION: "Versions incompatibles"
-  GAME_VERSION: "Version du jeu"
-  SAVEGAME_VERSION: "Version de la sauvegarde"
-  MOD_INFO_TITLE: "Informations sur le mod $GAME$"
-  MOD_INFO: "Les sauvegardes de $GAME$ n'enregistrent pas les mods dont elles ont besoin.\n Par conséquent, vous devez vérifier manuellement que vous utilisez les bons mods.\n\nLes Mods suivants sont activés : \n"

@@ -5,6 +5,10 @@
 -fx-max-height: 4em;
 }
 
+.filter-comp {
+    -fx-padding: 7;
+}
+
 .campaign-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-background-color: transparent;
     -fx-border-width: 0;

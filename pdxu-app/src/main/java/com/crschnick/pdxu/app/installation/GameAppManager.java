@@ -129,7 +129,7 @@ public final class GameAppManager {
 
     public void playImportSound() {
         if (AppPrefs.get().playSoundOnBackgroundImport().getValue()) {
-            var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sounds/import.wav").toString());
+            var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sound/import.wav").orElseThrow().toString());
             clip.play(0.2);
         }
     }

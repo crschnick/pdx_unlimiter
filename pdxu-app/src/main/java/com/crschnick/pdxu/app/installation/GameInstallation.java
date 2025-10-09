@@ -4,6 +4,7 @@ package com.crschnick.pdxu.app.installation;
 import com.crschnick.pdxu.app.installation.dist.GameDist;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
+import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.model.GameVersion;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class GameInstallation {
 
@@ -110,7 +112,14 @@ public final class GameInstallation {
 
         if (!Files.isRegularFile(dist.getExecutable())) {
             var exec = getInstallDir().relativize(dist.getExecutable());
-            throw new InvalidInstallationException("executableNotFound", g.getInstallationName(), exec.toString(), getInstallDir().toString());
+            var dirs = switch (OsType.ofLocal()) {
+                case OsType.Linux linux -> List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
+                case OsType.MacOs macOs -> List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName() + ".app");
+                case OsType.Windows windows -> List.of("C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
+                        "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
+            };
+            var dirsString = dirs.stream().map(s -> "- " + s).collect(Collectors.joining("\n"));
+            throw new InvalidInstallationException("executableNotFound", g.getInstallationName(), exec.toString(), getInstallDir().toString(), dirsString);
         }
 
         TrackEvent.debug(g.getTranslatedAbbreviation() + " distribution type: " + this.dist.getName());

@@ -67,7 +67,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
         barPane.setCenter(latest);
 
         Button importLatest = new Button(AppI18n.get("import"));
-        importLatest.setGraphic(new FontIcon());
+        importLatest.setGraphic(new FontIcon("mdi-import"));
         importLatest.getStyleClass().add(CLASS_IMPORT);
         importLatest.setOnAction(event -> {
             GameAppManager.getInstance().importLatest();

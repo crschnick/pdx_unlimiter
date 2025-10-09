@@ -70,7 +70,7 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
         var launchButton = createLaunchButton();
         var importButton = createImportButton();
         var editButton = createEditButton();
-        var group = new InputGroupComp(List.of(launchButton, editButton, filter, importButton));
+        var group = new InputGroupComp(List.of(importButton, filter, launchButton, editButton));
         group.setMergeComps(false);
         group.setHeightReference(filter);
         group.apply(struc -> {

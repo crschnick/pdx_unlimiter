@@ -6,6 +6,8 @@ import com.crschnick.pdxu.app.core.check.*;
 import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppWindowTitle;
+import com.crschnick.pdxu.app.gui.dialog.GuiNoGamesDialog;
+import com.crschnick.pdxu.app.gui.dialog.GuiWelcomeDialog;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
@@ -83,9 +85,12 @@ public class AppBaseMode extends AppOperationMode {
 
         AppMainWindow.initContent();
 
+        GuiNoGamesDialog.showIfNeeded();
+
         TrackEvent.info("Waiting for startup dialogs to close");
         AppDialog.waitForAllDialogsClose();
 
+        GuiWelcomeDialog.showAndWaitIfNeeded();
         AppConfigurationDialog.showIfNeeded();
 
         TrackEvent.info("Finished base components initialization");

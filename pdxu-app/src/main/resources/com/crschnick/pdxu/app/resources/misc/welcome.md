@@ -4,7 +4,7 @@ The Pdx-Unlimiter got a complete rework in version 3.0. Essentially, on the tech
 
 ### Upgrading
 
-Right now, v3 is still in beta, meaning that it is not published as a full release yet. You can install it manually by downloading it from the GitHub page. The old Pdx-Unlimiter v2 will not offer the update yet automatically. 
+Right now, v3 is still in beta, meaning that it is not published as a full release yet. You can install it manually by downloading it from the GitHub page. The old Pdx-Unlimiter v2 will not offer the update yet automatically.
 
 Since the application is completely new, the Pdx-Unlimiter v3 is a **separate** application, meaning that you can install both the Pdx-Unlimiter v2 and v3 on the same system. The installations don't affect each other. You **don't** have to uninstall v2, you can keep on your system just fine. If you encounter some issue in v3, you can just switch back to using v2 without issue. The only thing you shouldn't do is run them both at the same time.
 
@@ -41,5 +41,3 @@ To now a modern desktop application:
 ![](https://github.com/crschnick/pdx_unlimiter/blob/master/misc/v3_screenshot.png?raw=true)
 
 Thanks for being part of the journey so far, let's hope to another great 5 years! (And that Paradox doesn't screw up EU5)
-
-

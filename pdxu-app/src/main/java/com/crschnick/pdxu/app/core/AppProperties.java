@@ -6,7 +6,9 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 
 import com.crschnick.pdxu.app.util.FileSystemHelper;
+import com.crschnick.pdxu.app.util.OsType;
 import lombok.Value;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -101,7 +103,16 @@ public class AppProperties {
                 .map(Boolean::parseBoolean)
                 .orElse(true);
 
-        defaultDataDir = FileSystemHelper.getUserDocumentsPath().resolve(AppNames.ofCurrent().getName());
+        // Legacy support
+        var legacyDataDir = AppSystemInfo.ofCurrent().getUserHome().resolve(
+                OsType.ofLocal() == OsType.WINDOWS ? "Pdx-Unlimiter" : ".pdx-unlimiter"
+        );
+        if (Files.exists(legacyDataDir)) {
+            defaultDataDir = legacyDataDir;
+        } else {
+            defaultDataDir = FileSystemHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+        }
+
         dataDir = Optional.ofNullable(System.getProperty(AppNames.propertyName("dataDir")))
                 .map(s -> {
                     var p = Path.of(s);

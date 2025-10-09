@@ -1,9 +1,0 @@
-l_chinese:
-  LAUNCH: "启动游戏"
-  CHANGE_MODS: "更改 MOD"
-  INCOMPATIBLE: "选中的存档并不兼容，强行启动可能会导致未知的问题。"
-  INCOMPATIBLE_VERSION: "不兼容的版本"
-  GAME_VERSION: "游戏版本"
-  SAVEGAME_VERSION: "存档版本"
-  MOD_INFO_TITLE: "$GAME$ MOD 信息"
-  MOD_INFO: "$GAME$ 存档并不保存 MOD 信息。\n因此你需要手动确保所有需要的 MOD 均已启用。\n\n已启用 MOD：\n"
