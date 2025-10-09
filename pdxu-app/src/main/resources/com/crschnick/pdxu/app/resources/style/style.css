@@ -37,6 +37,23 @@
     -fx-padding: 3 10;
 }
 
+.root:light .toggle-button {
+     -fx-background-color: -color-neutral-subtle;
+}
+
+.root:light .toggle-button:selected {
+    -fx-background-color: -color-neutral-muted;
+}
+
+.root:light .toggle-button:hover {
+    -fx-background-color: -color-neutral-muted;
+    -fx-opacity: 0.9;
+}
+
+.root:light .toggle-button:hover:selected {
+    -fx-background-color: -color-neutral-muted;
+}
+
 .root .ikonli-font-icon.graphic.error {
     -fx-icon-color: -color-danger-fg;
 }

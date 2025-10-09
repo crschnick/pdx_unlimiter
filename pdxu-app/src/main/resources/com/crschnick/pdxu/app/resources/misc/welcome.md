@@ -8,7 +8,7 @@ Right now, v3 is still in beta, meaning that it is not published as a full relea
 
 https://github.com/crschnick/pdx_unlimiter/releases
 
-Since the application is completely new, the Pdx-Unlimiter v3 is a **separate** application, meaning that you can install both the Pdx-Unlimiter v2 and v3 on the same system. The installations don't affect each other. You **don't** have to uninstall v2, you can keep on your system just fine. If you encounter some issue in v3, you can just switch back to using v2 without issue. The only thing you shouldn't do is run them both at the same time.
+Since the application is completely new, the Pdx-Unlimiter v3 is a **separate** application, meaning that you can install both the Pdx-Unlimiter v2 and v3 on the same system. The installations don't affect each other. You **don't** have to uninstall v2, you can keep it on your system just fine. If you encounter some issue in v3, you can just switch back to using v2 without issue. The only thing you shouldn't do is run them both at the same time.
 
 Once v3 is stable, the auto-updater will automatically offer the update and uninstall v2.
 

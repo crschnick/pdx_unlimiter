@@ -28,7 +28,7 @@ public class ImportsCategory extends AppPrefsCategory {
     public Comp<?> create() {
         var prefs = AppPrefs.get();
         var builder = new OptionsBuilder();
-        builder.addTitle("paradoxConverters")
+        builder.addTitle("imports")
                 .sub(new OptionsBuilder()
                         .pref(prefs.playSoundOnBackgroundImport)
                         .addToggle(prefs.playSoundOnBackgroundImport)

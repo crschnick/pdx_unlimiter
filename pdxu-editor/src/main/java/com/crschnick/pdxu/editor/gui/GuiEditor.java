@@ -3,6 +3,7 @@ package com.crschnick.pdxu.editor.gui;
 import atlantafx.base.controls.Spacer;
 import atlantafx.base.layout.InputGroup;
 import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.AppTheme;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppModifiedStage;
 import com.crschnick.pdxu.app.core.window.AppSideWindow;
@@ -58,6 +59,7 @@ public class GuiEditor {
         AppWindowStyle.addIcons(stage);
         AppWindowStyle.addStylesheets(scene);
         AppWindowStyle.addNavigationPseudoClasses(scene);
+        AppTheme.initThemeHandlers(stage);
 
         showMissingGameWarning(state);
         stage.show();
