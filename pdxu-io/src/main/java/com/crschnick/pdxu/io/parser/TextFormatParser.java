@@ -260,7 +260,8 @@ public final class TextFormatParser {
                 index++;
 
                 boolean isMultiKeyValue = tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
-                if (isMultiKeyValue) {
+                // TODO
+                if (isMultiKeyValue && false) {
                     index++;
                     var keys = parseNodeIfNotScalarValue(name, strict);
                     if (!(keys instanceof SimpleArrayNode ar) || ar.getKeyScalars() != null) {

@@ -138,15 +138,15 @@ jobs:
             ${{ secrets.GPG_KEY }}
           GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
 
-#      - name: Create release
-#        uses: softprops/action-gh-release@v2
-#        if: ${{ contains(github.event.head_commit.message, '[release]') }}
-#        with:
-#          body_path: dist/build/dist/release/github-changelog.md
-#          token: ${{ secrets.GH_PAT }}
-#          preserve_order: true
-#          prerelease: true
-#          make_latest: false
-#          tag_name: ${{ env.VERSION }}
-#          files: |
-#            dist/build/dist/github-release/*
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        if: ${{ contains(github.event.head_commit.message, '[release]') }}
+        with:
+          body_path: dist/build/dist/release/github-changelog.md
+          token: ${{ secrets.GH_PAT }}
+          preserve_order: true
+          prerelease: true
+          make_latest: false
+          tag_name: ${{ env.VERSION }}
+          files: |
+            dist/build/dist/github-release/*

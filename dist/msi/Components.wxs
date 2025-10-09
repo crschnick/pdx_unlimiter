@@ -10,7 +10,7 @@
 
 			<!-- Start Menu Shortcut-->
 			<Component Id="StartMenuShortcut">
-				<Shortcut Id="StartMenuShortcut" Name="$(var.DynamicProductName)" Target="[APPLICATIONFOLDER]\$(var.ExecutableName).exe" Directory="InstallProgramMenuFolder" WorkingDirectory="APPLICATIONFOLDER" Icon="StartMenuIcon" />
+				<Shortcut Id="StartMenuShortcut" Name="$(var.DynamicProductName) 3" Target="[APPLICATIONFOLDER]\$(var.ExecutableName).exe" Directory="InstallProgramMenuFolder" WorkingDirectory="APPLICATIONFOLDER" Icon="StartMenuIcon" />
 
 				<RegistryValue Id="RegStartMenuShortcutKey" Root="HKMU" Key="SOFTWARE\$(var.DynamicProductName)" Name="StartMenuShortcut" Value="1" Type="integer" KeyPath="yes" />
 
@@ -19,7 +19,7 @@
 
 			<!-- Desktop shortcut -->
 			<Component Id="DesktopShortcut">
-				<Shortcut Id="DesktopShortcut" Name="$(var.DynamicProductName)" Description="!(loc.DesktopShortcutDescription)" Target="[APPLICATIONFOLDER]\$(var.ExecutableName).exe" Directory="DesktopFolder" Icon="Icon" WorkingDirectory="APPLICATIONFOLDER" />
+				<Shortcut Id="DesktopShortcut" Name="$(var.DynamicProductName) 3" Description="!(loc.DesktopShortcutDescription)" Target="[APPLICATIONFOLDER]\$(var.ExecutableName).exe" Directory="DesktopFolder" Icon="Icon" WorkingDirectory="APPLICATIONFOLDER" />
 					
 				<RemoveFolder Id="RemoveDesktopShortcut" On="uninstall" />
 

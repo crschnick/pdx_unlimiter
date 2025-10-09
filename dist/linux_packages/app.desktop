@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=__NAME__
+Name=__NAME__ 3
 Comment=__DESCRIPTION__
 TryExec=__TARGET__/bin/__EXECUTABLE_NAME__
 Exec=__TARGET__/bin/__EXECUTABLE_NAME__ %U
