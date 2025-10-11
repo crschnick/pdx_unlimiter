@@ -17,9 +17,7 @@ public class FileSystemHelper {
         documentsPath = switch (OsType.ofLocal()) {
             case OsType.Linux linux -> AppSystemInfo.ofLinux().getUserHome().resolve(".local", "share");
             case OsType.MacOs macOs -> AppSystemInfo.ofMacOs().getUserHome().resolve("Library", "Application Support");
-            case OsType.Windows windows -> Path.of(WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_CURRENT_USER,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", "Personal")
-                    .orElse(AppSystemInfo.ofCurrent().getUserHome().resolve("Documents").toString()));
+            case OsType.Windows windows -> AppSystemInfo.ofWindows().getDocuments();
         };
 
         return documentsPath;
