@@ -7,15 +7,16 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.installation.GameFileContext;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+
 import lombok.NoArgsConstructor;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_RULER;
@@ -25,16 +26,16 @@ import static com.crschnick.pdxu.app.gui.game.GameImage.*;
 public class Ck3RulerComp extends SavegameInfoComp {
 
     @Override
-    protected void init(SavegameContent content, SavegameData<?> data) {
-
-    }
+    protected void init(SavegameContent content, SavegameData<?> data) {}
 
     @Override
     public Region create(SavegameData<?> data) {
         var ruler = data.ck3().getTag().getRuler();
 
-        var imgs = new Image[]{CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
-                               CK3_SKILL_INTRIGUE, CK3_SKILL_LEARNING, CK3_SKILL_PROWESS};
+        var imgs = new Image[] {
+            CK3_SKILL_DIPLOMACY, CK3_SKILL_MARTIAL, CK3_SKILL_STEWARDSHIP,
+            CK3_SKILL_INTRIGUE, CK3_SKILL_LEARNING, CK3_SKILL_PROWESS
+        };
         HBox skills = new HBox();
         skills.setAlignment(Pos.CENTER);
         for (int i = 0; i < 6; i++) {
@@ -74,8 +75,7 @@ public class Ck3RulerComp extends SavegameInfoComp {
         }
         {
             var house = GameImage.imageNode(
-                    Ck3CoatOfArmsCache.houseImage(ruler.getHouse(), GameFileContext.fromData(data)),
-                    "house-icon");
+                    Ck3CoatOfArmsCache.houseImage(ruler.getHouse(), GameFileContext.fromData(data)), "house-icon");
             GuiTooltips.install(house, AppI18n.get("house", ruler.getHouse().getName()));
             rulerNode.getChildren().add(house);
         }

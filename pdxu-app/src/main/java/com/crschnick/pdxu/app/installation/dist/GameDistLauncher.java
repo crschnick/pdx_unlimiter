@@ -47,10 +47,11 @@ public class GameDistLauncher {
                 return;
             }
 
-            if (SavegameCompatibility.determineForModsAndDLCs(e) != SavegameCompatibility.Compatbility.COMPATIBLE ||
-                    SavegameCompatibility.determineForVersion(ctx.getGame(), e.getInfo().getData().getVersion()) != SavegameCompatibility.Compatbility.COMPATIBLE) {
-                boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(
-                        ctx.getInstallation(), e);
+            if (SavegameCompatibility.determineForModsAndDLCs(e) != SavegameCompatibility.Compatbility.COMPATIBLE
+                    || SavegameCompatibility.determineForVersion(
+                                    ctx.getGame(), e.getInfo().getData().getVersion())
+                            != SavegameCompatibility.Compatbility.COMPATIBLE) {
+                boolean startAnyway = GuiIncompatibleWarning.showIncompatibleWarning(ctx.getInstallation(), e);
                 if (!startAnyway) {
                     return;
                 }
@@ -76,31 +77,37 @@ public class GameDistLauncher {
         var ctx = ctxOpt.get();
         var exportTarget = FileExportTarget.createExportTarget(e);
         var path = exportTarget.export();
-        ctx.getInstallation().getType().writeLaunchConfig(
-                ctx.getInstallation().getUserDir(),
-                ctx.getStorage().getEntryName(e),
-                ctx.getCollection().getLastPlayed(),
-                path, ctx.getInfo().getData().getVersion()
-        );
+        ctx.getInstallation()
+                .getType()
+                .writeLaunchConfig(
+                        ctx.getInstallation().getUserDir(),
+                        ctx.getStorage().getEntryName(e),
+                        ctx.getCollection().getLastPlayed(),
+                        path,
+                        ctx.getInfo().getData().getVersion());
         ctx.getCollection().lastPlayedProperty().setValue(Instant.now());
 
-        var dlcs = ctx.getInfo().getData().getDlcs() != null ? ctx.getInfo().getData().getDlcs().stream()
-                .map(d -> ctx.getInstallation().getDlcForSavegameId(d))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()) : List.<GameDlc>of();
-        var mods = ctx.getInfo().getData().getMods() != null ? ctx.getInfo().getData().getMods().stream()
-                .map(m -> ctx.getInstallation().getModForSavegameId(m))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()) : List.<GameMod>of();
+        var dlcs = ctx.getInfo().getData().getDlcs() != null
+                ? ctx.getInfo().getData().getDlcs().stream()
+                        .map(d -> ctx.getInstallation().getDlcForSavegameId(d))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+                : List.<GameDlc>of();
+        var mods = ctx.getInfo().getData().getMods() != null
+                ? ctx.getInfo().getData().getMods().stream()
+                        .map(m -> ctx.getInstallation().getModForSavegameId(m))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList())
+                : List.<GameMod>of();
 
         ctx.getInstallation().getType().writeModAndDlcLoadFile(ctx.getInstallation(), mods, dlcs);
     }
 
     public static boolean canChangeMods(Game game) {
-        return AppPrefs.get().launchIrony().getValue() ||
-                GameInstallation.ALL.get(game).getDist().supportsLauncher();
+        return AppPrefs.get().launchIrony().getValue()
+                || GameInstallation.ALL.get(game).getDist().supportsLauncher();
     }
 
     private static void startLauncherDirectly(SavegameEntry<?, ?> e) throws IOException {
@@ -118,8 +125,8 @@ public class GameDistLauncher {
 
     private static void startGameDirectly(SavegameEntry<?, ?> e, boolean debug) throws Exception {
         var ctx = SavegameContext.getContext(e);
-        if (ctx.getGame().getInstallType().getModInfoStorageType() ==
-                GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
+        if (ctx.getGame().getInstallType().getModInfoStorageType()
+                == GameInstallType.ModInfoStorageType.SAVEGAME_DOESNT_STORE_INFO) {
             var r = GuiIncompatibleWarning.showNoSavedModsWarning(
                     ctx.getGame(), ctx.getInstallation().queryEnabledMods());
             if (r.isPresent()) {

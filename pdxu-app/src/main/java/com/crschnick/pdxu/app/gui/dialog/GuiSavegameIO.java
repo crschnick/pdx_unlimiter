@@ -1,16 +1,18 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
-import atlantafx.base.layout.InputGroup;
 import com.crschnick.pdxu.app.core.AppCache;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.gui.GuiStyle;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
+
+import atlantafx.base.layout.InputGroup;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
@@ -50,7 +52,8 @@ public class GuiSavegameIO {
             }
 
             directoryChooser.setTitle(AppI18n.get("selectExportLocation"));
-            File file = directoryChooser.showDialog(((Node) m.getTarget()).getScene().getWindow());
+            File file = directoryChooser.showDialog(
+                    ((Node) m.getTarget()).getScene().getWindow());
             if (file != null) {
                 textArea.setText(file.toString());
                 AppCache.update("storageExportPath", file.toPath());
@@ -61,7 +64,9 @@ public class GuiSavegameIO {
         HBox.setHgrow(textArea, Priority.ALWAYS);
         alert.getDialogPane().setContent(dialogPaneContent);
         Optional<ButtonType> result = alert.showAndWait();
-        return result.get().getButtonData().isDefaultButton() && textArea.getText().length() > 0 ?
-                Optional.of(Paths.get(textArea.getText())) : Optional.empty();
+        return result.get().getButtonData().isDefaultButton()
+                        && textArea.getText().length() > 0
+                ? Optional.of(Paths.get(textArea.getText()))
+                : Optional.empty();
     }
 }

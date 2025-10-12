@@ -9,8 +9,7 @@ public class Ck3House {
     private String name;
     private CoatOfArms coa;
 
-    public Ck3House() {
-    }
+    public Ck3House() {}
 
     public Ck3House(String name, CoatOfArms coa) {
         this.name = name;

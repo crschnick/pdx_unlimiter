@@ -23,8 +23,7 @@ public class GameLocalisation {
         var cache = GameCacheManager.getInstance().get(LocalisationCache.class);
         if (!cache.isLoaded()) {
             cache.loadLocalisations(
-                    GameLanguage.bySupportedLocale(AppPrefs.get().language().getValue()),
-                    ctx);
+                    GameLanguage.bySupportedLocale(AppPrefs.get().language().getValue()), ctx);
         }
 
         return cache.strings.getOrDefault(key, "Unknown");
@@ -39,17 +38,14 @@ public class GameLocalisation {
         }
 
         public void loadLocalisations(GameLanguage lang, GameFileContext ctx) {
-            CascadeDirectoryHelper.traverseDirectory(
-                    Path.of("localisation"),
-                    ctx,
-                    file -> {
-                        if (!GameLocalisationHelper.isLanguage(file, lang)) {
-                            return;
-                        }
+            CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), ctx, file -> {
+                if (!GameLocalisationHelper.isLanguage(file, lang)) {
+                    return;
+                }
 
-                        var loc = GameLocalisationHelper.loadTranslations(file);
-                        strings.putAll(loc);
-                    });
+                var loc = GameLocalisationHelper.loadTranslations(file);
+                strings.putAll(loc);
+            });
         }
 
         public boolean isLoaded() {

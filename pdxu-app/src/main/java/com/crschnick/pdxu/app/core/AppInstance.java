@@ -9,7 +9,6 @@ import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.List;
 
 public class AppInstance {

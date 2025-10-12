@@ -1,12 +1,12 @@
 package com.crschnick.pdxu.app.installation.dist;
 
-
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
+
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -38,7 +38,11 @@ public class SteamDist extends GameDist {
     @Override
     public Optional<Path> getWorkshopDir() {
         var s = getSteamPath();
-        return s.map(p -> getSteamAppsCommonDir(p).getParent().resolve("workshop").resolve("content").resolve(String.valueOf(getGame().getSteamAppId())));
+        return s.map(p -> getSteamAppsCommonDir(p)
+                .getParent()
+                .resolve("workshop")
+                .resolve("content")
+                .resolve(String.valueOf(getGame().getSteamAppId())));
     }
 
     @Override
@@ -55,7 +59,8 @@ public class SteamDist extends GameDist {
                     if (Files.exists(steamPath)) {
                         // Resolve symlink
                         var steamRealPath = steamPath.toRealPath();
-                        steamDir = Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+                        steamDir =
+                                Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
                     }
                 } catch (Exception ex) {
                     ErrorEventFactory.fromThrowable(ex).handle();
@@ -69,9 +74,15 @@ public class SteamDist extends GameDist {
             }
             case OsType.Windows ignored -> {
                 if (ArchUtils.getProcessor().is64Bit()) {
-                    steamDir = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+                    steamDir = WindowsRegistry.of()
+                            .readStringValueIfPresent(
+                                    WindowsRegistry.HKEY_LOCAL_MACHINE,
+                                    "SOFTWARE\\Wow6432Node\\Valve\\Steam",
+                                    "InstallPath");
                 } else {
-                    steamDir = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
+                    steamDir = WindowsRegistry.of()
+                            .readStringValueIfPresent(
+                                    WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
                 }
             }
         }
@@ -104,7 +115,8 @@ public class SteamDist extends GameDist {
         list.add(getSteamAppsCommonDir(p.get()));
 
         try {
-            var libraryFoldersFile = Files.readString(p.get().resolve("steamapps").resolve("libraryfolders.vdf"));
+            var libraryFoldersFile =
+                    Files.readString(p.get().resolve("steamapps").resolve("libraryfolders.vdf"));
             libraryFoldersFile.lines().forEach(line -> {
                 try {
                     var m = STEAM_LIBRARY_DIR_NEW.matcher(line);
@@ -129,8 +141,8 @@ public class SteamDist extends GameDist {
 
         Path finalDir = dir;
         boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> finalDir.startsWith(ld));
-        boolean looksLikeSteamLibDir = dir.getNameCount() > 3 && Files.exists(
-                dir.getParent().getParent().getParent().resolve("libraryfolder.vdf"));
+        boolean looksLikeSteamLibDir = dir.getNameCount() > 3
+                && Files.exists(dir.getParent().getParent().getParent().resolve("libraryfolder.vdf"));
         return inSteamLibraryDir || looksLikeSteamLibDir;
     }
 
@@ -178,21 +190,24 @@ public class SteamDist extends GameDist {
                 .anyMatch(c -> c.contains("steam") || c.contains("Steam"));
     }
 
-
     private void openSteamURI(String uri) {
         if (SystemUtils.IS_OS_LINUX) {
             if (!isSteamRunning()) {
-                ErrorEventFactory.fromMessage("Steam is not started. " +
-                        "Please start Steam first before launching the game").handle();
+                ErrorEventFactory.fromMessage(
+                                "Steam is not started. " + "Please start Steam first before launching the game")
+                        .handle();
             } else {
-                TaskExecutor.getInstance().submitTask(() -> {
-                    try {
-                        var p = new ProcessBuilder("steam", uri).start();
-                        p.getInputStream().readAllBytes();
-                    } catch (Exception e) {
-                        ErrorEventFactory.fromThrowable(e).handle();
-                    }
-                }, true);
+                TaskExecutor.getInstance()
+                        .submitTask(
+                                () -> {
+                                    try {
+                                        var p = new ProcessBuilder("steam", uri).start();
+                                        p.getInputStream().readAllBytes();
+                                    } catch (Exception e) {
+                                        ErrorEventFactory.fromThrowable(e).handle();
+                                    }
+                                },
+                                true);
             }
         } else {
             ThreadHelper.runFailableAsync(() -> {
@@ -204,8 +219,9 @@ public class SteamDist extends GameDist {
     @Override
     public void startDirectly(Path executable, List<String> args, Map<String, String> env) throws IOException {
         if (!isSteamRunning()) {
-            ErrorEventFactory.fromMessage("Steam is not started but required.\n" +
-                    "Please start Steam first before launching the game").handle();
+            ErrorEventFactory.fromMessage("Steam is not started but required.\n"
+                            + "Please start Steam first before launching the game")
+                    .handle();
             return;
         }
 
@@ -229,8 +245,7 @@ public class SteamDist extends GameDist {
         return Map.of(
                 "SteamAppId", String.valueOf(getGame().getSteamAppId()),
                 "SteamGameId", String.valueOf(getGame().getSteamAppId()),
-                "SteamOverlayGameId", String.valueOf(getGame().getSteamAppId())
-        );
+                "SteamOverlayGameId", String.valueOf(getGame().getSteamAppId()));
     }
 
     @Override
@@ -247,8 +262,8 @@ public class SteamDist extends GameDist {
         Path userData = p.get().resolve("userdata");
         try (var s = Files.list(userData)) {
             return s.map(d -> d.resolve(String.valueOf(appId)).resolve("remote"))
-             .filter(Files::exists)
-             .toList();
+                    .filter(Files::exists)
+                    .toList();
         } catch (IOException e) {
             return List.of();
         }

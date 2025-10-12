@@ -29,45 +29,42 @@ public abstract class EditorNode {
         AtomicInteger index = new AtomicInteger();
         AtomicInteger previousKeyStart = new AtomicInteger();
         AtomicReference<EditorSimpleNode> found = new AtomicReference<>();
-        ar.forEach((k, v) -> {
-            if (k != null) {
-                boolean endsHere = index.get() + 1 == ar.size() ||
-                        !ar.isKeyAt(k, index.get() + 1);
-                if (!endsHere) {
-                    index.getAndIncrement();
-                    return true;
-                }
+        ar.forEach(
+                (k, v) -> {
+                    if (k != null) {
+                        boolean endsHere = index.get() + 1 == ar.size() || !ar.isKeyAt(k, index.get() + 1);
+                        if (!endsHere) {
+                            index.getAndIncrement();
+                            return true;
+                        }
 
-                int start = previousKeyStart.get();
-                int end = index.get();
-                boolean shouldCollect = end > start;
-                if (shouldCollect) {
-                    index.getAndIncrement();
+                        int start = previousKeyStart.get();
+                        int end = index.get();
+                        boolean shouldCollect = end > start;
+                        if (shouldCollect) {
+                            index.getAndIncrement();
+                            parentIndex.getAndIncrement();
+                        }
+
+                        previousKeyStart.set(end + 1);
+
+                        if (shouldCollect) {
+                            return true;
+                        }
+                    } else {
+                        previousKeyStart.incrementAndGet();
+                    }
+
+                    if (k != null && k.equals(key)) {
+                        found.set(new EditorSimpleNode(parent, k, parentIndex.get(), index.get()));
+                        return false;
+                    }
+
                     parentIndex.getAndIncrement();
-                }
-
-                previousKeyStart.set(end + 1);
-
-                if (shouldCollect) {
+                    index.getAndIncrement();
                     return true;
-                }
-            } else {
-                previousKeyStart.incrementAndGet();
-            }
-
-            if (k != null && k.equals(key)) {
-                found.set(new EditorSimpleNode(
-                        parent,
-                        k,
-                        parentIndex.get(),
-                        index.get()));
-                return false;
-            }
-
-            parentIndex.getAndIncrement();
-            index.getAndIncrement();
-            return true;
-        }, true);
+                },
+                true);
         return Optional.ofNullable(found.get());
     }
 
@@ -76,48 +73,40 @@ public abstract class EditorNode {
         AtomicInteger parentIndex = new AtomicInteger();
         AtomicInteger index = new AtomicInteger();
         AtomicInteger previousKeyStart = new AtomicInteger();
-        ar.forEach((k, v) -> {
-            if (k != null) {
-                boolean endsHere = index.get() + 1 == ar.size() ||
-                        !ar.isKeyAt(k, index.get() + 1);
-                if (!endsHere) {
-                    index.getAndIncrement();
-                    return;
-                }
+        ar.forEach(
+                (k, v) -> {
+                    if (k != null) {
+                        boolean endsHere = index.get() + 1 == ar.size() || !ar.isKeyAt(k, index.get() + 1);
+                        if (!endsHere) {
+                            index.getAndIncrement();
+                            return;
+                        }
 
-                int start = previousKeyStart.get();
-                int end = index.get();
-                boolean shouldCollect = end > start;
+                        int start = previousKeyStart.get();
+                        int end = index.get();
+                        boolean shouldCollect = end > start;
 
-                if (shouldCollect) {
-                    result.add(new EditorCollectorNode(
-                            parent,
-                            k,
-                            parentIndex.get(),
-                            start,
-                            end - start + 1));
-                    index.getAndIncrement();
+                        if (shouldCollect) {
+                            result.add(new EditorCollectorNode(parent, k, parentIndex.get(), start, end - start + 1));
+                            index.getAndIncrement();
+                            parentIndex.getAndIncrement();
+                        }
+
+                        previousKeyStart.set(end + 1);
+
+                        if (shouldCollect) {
+                            return;
+                        }
+                    } else {
+                        previousKeyStart.incrementAndGet();
+                    }
+
+                    result.add(new EditorSimpleNode(parent, k, parentIndex.get(), index.get()));
+
                     parentIndex.getAndIncrement();
-                }
-
-                previousKeyStart.set(end + 1);
-
-                if (shouldCollect) {
-                    return;
-                }
-            } else {
-                previousKeyStart.incrementAndGet();
-            }
-
-            result.add(new EditorSimpleNode(
-                    parent,
-                    k,
-                    parentIndex.get(),
-                    index.get()));
-
-            parentIndex.getAndIncrement();
-            index.getAndIncrement();
-        }, true);
+                    index.getAndIncrement();
+                },
+                true);
         return result;
     }
 
@@ -152,7 +141,9 @@ public abstract class EditorNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EditorNode that = (EditorNode) o;
-        return indexInParent == that.indexInParent && Objects.equals(keyName, that.keyName) && Objects.equals(parent, that.parent);
+        return indexInParent == that.indexInParent
+                && Objects.equals(keyName, that.keyName)
+                && Objects.equals(parent, that.parent);
     }
 
     @Override

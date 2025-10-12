@@ -8,6 +8,7 @@ import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
@@ -22,8 +23,6 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
     protected StellarisTag tag;
     protected List<StellarisTag> allTags;
     private GameNamedVersion version;
-
-
 
     @Override
     public StellarisTag getTag() {
@@ -44,9 +43,15 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
     protected void init(SavegameContent content) {
         campaignHeuristic = SavegameType.STELLARIS.getCampaignIdHeuristic(content);
 
-        ironman = NodePointer.builder().name("galaxy").name("ironman").build().getIfPresent(content.get())
-                .map(Node::getBoolean).orElse(false);
-        date = GameDateType.STELLARIS.fromString(content.get().getNodeForKey("date").getString());
+        ironman = NodePointer.builder()
+                .name("galaxy")
+                .name("ironman")
+                .build()
+                .getIfPresent(content.get())
+                .map(Node::getBoolean)
+                .orElse(false);
+        date = GameDateType.STELLARIS.fromString(
+                content.get().getNodeForKey("date").getString());
 
         allTags = new ArrayList<>();
         content.get().getNodeForKey("country").forEach((k, v) -> {
@@ -62,8 +67,8 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
         observer = false;
 
         mods = null;
-        dlcs = content.get().getNodeForKeyIfExistent("required_dlcs").map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
+        dlcs = content.get().getNodeForKeyIfExistent("required_dlcs").map(Node::getNodeArray).orElse(List.of()).stream()
+                .map(Node::getString)
                 .collect(Collectors.toList());
 
         initVersion(content.get());
@@ -74,10 +79,12 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
         var vs = n.getNodesForKey("version").getFirst().getString();
         Matcher m = p.matcher(vs);
         if (m.find()) {
-           version = new GameNamedVersion(
+            version = new GameNamedVersion(
                     Integer.parseInt(m.group(2)),
                     Integer.parseInt(m.group(3)),
-                    m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0, 0, m.group(1));
+                    m.groupCount() == 5 ? Integer.parseInt(m.group(4)) : 0,
+                    0,
+                    m.group(1));
         } else {
             throw new IllegalArgumentException("Invalid Stellaris version: " + vs);
         }

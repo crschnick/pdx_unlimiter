@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui.dialog;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameWatcher;
+
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -80,12 +81,13 @@ public class GuiImporterState {
     public Collection<FileImportTarget.StandardImportTarget> getSelectedTargets() {
         return allTargets.stream()
                 .filter(e -> e.selected.get())
-                .map(e -> e.target).collect(Collectors.toList());
+                .map(e -> e.target)
+                .collect(Collectors.toList());
     }
 
     private boolean shouldShow(ImportEntry entry) {
-        return entry.target().getName().toLowerCase().contains(filter.get().toLowerCase()) &&
-                !entry.target.hasImportedSourceFile();
+        return entry.target().getName().toLowerCase().contains(filter.get().toLowerCase())
+                && !entry.target.hasImportedSourceFile();
     }
 
     public BooleanProperty selectAllProperty() {
@@ -108,6 +110,5 @@ public class GuiImporterState {
         return shownTargets;
     }
 
-    record ImportEntry(FileImportTarget.StandardImportTarget target, BooleanProperty selected) {
-    }
+    record ImportEntry(FileImportTarget.StandardImportTarget target, BooleanProperty selected) {}
 }

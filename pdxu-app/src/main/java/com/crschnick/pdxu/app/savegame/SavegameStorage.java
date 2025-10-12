@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.savegame;
 
-
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.IntegrityManager;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
@@ -27,14 +26,16 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+import javafx.scene.image.Image;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
-import javafx.scene.image.Image;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
@@ -54,10 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public abstract class SavegameStorage<
-        T,
-        I extends SavegameInfo<T>> {
-
+public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
     public static final BidiMap<Game, SavegameStorage<?, ?>> ALL = new DualHashBidiMap<>();
     private final Class<I> infoClass;
@@ -68,14 +66,11 @@ public abstract class SavegameStorage<
     private final SavegameType type;
     private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
 
-    public SavegameStorage(
-            String name,
-            GameDateType dateType,
-            SavegameType type,
-            Class<I> infoClass) {
+    public SavegameStorage(String name, GameDateType dateType, SavegameType type, Class<I> infoClass) {
         this.infoFactory = (content, melted) -> {
             try {
-                var created = (I) infoClass.getDeclaredConstructor(SavegameContent.class).newInstance(content);
+                var created = (I)
+                        infoClass.getDeclaredConstructor(SavegameContent.class).newInstance(content);
                 created.getData().setBinary(melted);
                 return created;
             } catch (InvocationTargetException ex) {
@@ -103,33 +98,20 @@ public abstract class SavegameStorage<
     }
 
     public static void init() {
-        ALL.put(Game.EU4, new SavegameStorage<>(
-                "eu4",
-                GameDateType.EU4,
-                SavegameType.EU4,
-                Eu4SavegameInfo.class) {
+        ALL.put(Game.EU4, new SavegameStorage<>("eu4", GameDateType.EU4, SavegameType.EU4, Eu4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Eu4SavegameInfo info) {
-                return GameLocalisation.getLocalisedValue(info.getData().getTag().getTag(), info);
+                return GameLocalisation.getLocalisedValue(
+                        info.getData().getTag().getTag(), info);
             }
         });
-        ALL.put(Game.HOI4, new SavegameStorage<>(
-                "hoi4",
-                GameDateType.HOI4,
-                SavegameType.HOI4,
-                Hoi4SavegameInfo.class
-        ) {
+        ALL.put(Game.HOI4, new SavegameStorage<>("hoi4", GameDateType.HOI4, SavegameType.HOI4, Hoi4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
                 return "Unknown";
             }
         });
-        ALL.put(Game.CK3, new SavegameStorage<>(
-                "ck3",
-                GameDateType.CK3,
-                SavegameType.CK3,
-                Ck3SavegameInfo.class
-        ) {
+        ALL.put(Game.CK3, new SavegameStorage<>("ck3", GameDateType.CK3, SavegameType.CK3, Ck3SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Ck3SavegameInfo info) {
                 if (info.getData().isObserver()) {
@@ -143,12 +125,7 @@ public abstract class SavegameStorage<
                 return info.getData().getTag().getName();
             }
         });
-        ALL.put(Game.VIC3, new SavegameStorage<>(
-                "vic3",
-                GameDateType.VIC3,
-                SavegameType.VIC3,
-                Vic3SavegameInfo.class
-        ) {
+        ALL.put(Game.VIC3, new SavegameStorage<>("vic3", GameDateType.VIC3, SavegameType.VIC3, Vic3SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Vic3SavegameInfo info) {
                 if (info.getData().isObserver()) {
@@ -162,34 +139,22 @@ public abstract class SavegameStorage<
                 return info.getData().vic3().getCampaignName();
             }
         });
-        ALL.put(Game.STELLARIS, new SavegameStorage<>(
-                "stellaris",
-                GameDateType.STELLARIS,
-                SavegameType.STELLARIS,
-                StellarisSavegameInfo.class
-        ) {
-            @Override
-            protected String getDefaultCampaignName(StellarisSavegameInfo info) {
-                return info.getData().getTag().getName();
-            }
-        });
-        ALL.put(Game.CK2, new SavegameStorage<>(
-                "ck2",
-                GameDateType.CK2,
-                SavegameType.CK2,
-                Ck2SavegameInfo.class
-        ) {
+        ALL.put(
+                Game.STELLARIS,
+                new SavegameStorage<>(
+                        "stellaris", GameDateType.STELLARIS, SavegameType.STELLARIS, StellarisSavegameInfo.class) {
+                    @Override
+                    protected String getDefaultCampaignName(StellarisSavegameInfo info) {
+                        return info.getData().getTag().getName();
+                    }
+                });
+        ALL.put(Game.CK2, new SavegameStorage<>("ck2", GameDateType.CK2, SavegameType.CK2, Ck2SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Ck2SavegameInfo info) {
                 return info.getData().getTag().getRulerName();
             }
         });
-        ALL.put(Game.VIC2, new SavegameStorage<>(
-                "vic2",
-                GameDateType.VIC2,
-                SavegameType.VIC2,
-                Vic2SavegameInfo.class
-        ) {
+        ALL.put(Game.VIC2, new SavegameStorage<>("vic2", GameDateType.VIC2, SavegameType.VIC2, Vic2SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Vic2SavegameInfo info) {
                 return "Unknown";
@@ -250,16 +215,18 @@ public abstract class SavegameStorage<
                 }
 
                 Instant lastDate = Instant.parse(f.get(i).required("lastPlayed").textValue());
-                collections.add(new SavegameCampaign<>(lastDate, name, id, GameDate.zero(dateType), ImageHelper.DEFAULT_IMAGE));
+                collections.add(
+                        new SavegameCampaign<>(lastDate, name, id, GameDate.zero(dateType), ImageHelper.DEFAULT_IMAGE));
             }
         }
 
-
         for (SavegameCampaign<T, I> collection : collections) {
-            var campaignFile = getSavegameDataDirectory().resolve(
-                    collection.getUuid().toString()).resolve("campaign.json");
-            var folderFile = getSavegameDataDirectory().resolve(
-                    collection.getUuid().toString()).resolve("folder.json");
+            var campaignFile = getSavegameDataDirectory()
+                    .resolve(collection.getUuid().toString())
+                    .resolve("campaign.json");
+            var folderFile = getSavegameDataDirectory()
+                    .resolve(collection.getUuid().toString())
+                    .resolve("folder.json");
             var colFile = Files.exists(campaignFile) ? campaignFile : folderFile;
 
             // Campaign file might not exist even though the directory exists. Do not fail in this case
@@ -268,19 +235,23 @@ public abstract class SavegameStorage<
             }
 
             JsonNode campaignNode = JacksonMapper.getDefault().readTree(colFile.toFile());
-            StreamSupport.stream(campaignNode.required("entries").spliterator(), false).forEach(entryNode -> {
-                UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
-                String name = Optional.ofNullable(entryNode.get("name")).map(JsonNode::textValue).orElse(null);
-                GameDate date = dateType.fromString(entryNode.required("date").textValue());
-                String checksum = entryNode.required("checksum").textValue();
-                SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
-                List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
-                        .map(n -> StreamSupport.stream(n.spliterator(), false)
+            StreamSupport.stream(campaignNode.required("entries").spliterator(), false)
+                    .forEach(entryNode -> {
+                        UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
+                        String name = Optional.ofNullable(entryNode.get("name"))
                                 .map(JsonNode::textValue)
-                                .collect(Collectors.toList()))
-                        .orElse(List.of());
-                collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
-            });
+                                .orElse(null);
+                        GameDate date =
+                                dateType.fromString(entryNode.required("date").textValue());
+                        String checksum = entryNode.required("checksum").textValue();
+                        SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
+                        List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
+                                .map(n -> StreamSupport.stream(n.spliterator(), false)
+                                        .map(JsonNode::textValue)
+                                        .collect(Collectors.toList()))
+                                .orElse(List.of());
+                        collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
+                    });
         }
     }
 
@@ -292,30 +263,38 @@ public abstract class SavegameStorage<
             ObjectNode campaignFileNode = JsonNodeFactory.instance.objectNode();
             ArrayNode entries = campaignFileNode.putArray("entries");
             col.getSavegames().stream()
-                    .map(entry -> JsonNodeFactory.instance.objectNode()
+                    .map(entry -> JsonNodeFactory.instance
+                            .objectNode()
                             .put("name", entry.getName())
                             .put("date", entry.getDate().toString())
                             .put("checksum", entry.getContentChecksum())
                             .put("uuid", entry.getUuid().toString())
-                            .<ObjectNode>set("sourceFileChecksums", JsonNodeFactory.instance.arrayNode().addAll(
-                                    entry.getSourceFileChecksums().stream()
-                                            .map(TextNode::new)
-                                            .collect(Collectors.toList())))
+                            .<ObjectNode>set(
+                                    "sourceFileChecksums",
+                                    JsonNodeFactory.instance
+                                            .arrayNode()
+                                            .addAll(entry.getSourceFileChecksums().stream()
+                                                    .map(TextNode::new)
+                                                    .collect(Collectors.toList())))
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
-            ConfigHelper.writeConfig(getSavegameDataDirectory()
-                    .resolve(col.getUuid().toString()).resolve("campaign.json"), campaignFileNode);
+            ConfigHelper.writeConfig(
+                    getSavegameDataDirectory().resolve(col.getUuid().toString()).resolve("campaign.json"),
+                    campaignFileNode);
 
-            var imgFile = getSavegameDataDirectory()
-                    .resolve(col.getUuid().toString()).resolve("campaign.png");
+            var imgFile =
+                    getSavegameDataDirectory().resolve(col.getUuid().toString()).resolve("campaign.png");
             try {
                 ImageHelper.writePng(col.getImage(), imgFile);
             } catch (IOException e) {
-                ErrorEventFactory.fromThrowable("Couldn't write image " + imgFile, e).omit().handle();
+                ErrorEventFactory.fromThrowable("Couldn't write image " + imgFile, e)
+                        .omit()
+                        .handle();
             }
 
-            ObjectNode campaignNode = JsonNodeFactory.instance.objectNode()
+            ObjectNode campaignNode = JsonNodeFactory.instance
+                    .objectNode()
                     .put("name", col.getName())
                     .put("date", col.getDate().toString())
                     .put("lastPlayed", col.getLastPlayed().toString())
@@ -361,22 +340,25 @@ public abstract class SavegameStorage<
     }
 
     private String getDefaultEntryName(I info) {
-        return info.getData().getDate().toDisplayString(AppPrefs.get().language().getValue().getLocale());
+        return info.getData()
+                .getDate()
+                .toDisplayString(AppPrefs.get().language().getValue().getLocale());
     }
 
     protected abstract String getDefaultCampaignName(I info);
 
     public synchronized boolean contains(SavegameEntry<?, ?> e) {
-        return collections.stream()
-                .anyMatch(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
+        return collections.stream().anyMatch(c -> c.getSavegames().stream()
+                .anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
     }
 
     public synchronized SavegameCampaign<T, I> getSavegameCampaign(SavegameEntry<?, ?> e) {
         var campaign = collections.stream()
-                .filter(c -> c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
+                .filter(c ->
+                        c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
                 .findAny();
-        return campaign.orElseThrow(() -> new IllegalArgumentException(
-                "Could not find savegame collection for entry " + e.getName()));
+        return campaign.orElseThrow(
+                () -> new IllegalArgumentException("Could not find savegame collection for entry " + e.getName()));
     }
 
     synchronized void delete(SavegameCampaign<T, I> c) {
@@ -390,14 +372,15 @@ public abstract class SavegameStorage<
         } catch (IOException e) {
             // Don't show the user this error. It sometimes happens when the file is
             // used by another process or even an antivirus program
-            ErrorEventFactory.fromThrowable("Could not delete collection " + c.getName(), e).omit().handle();
+            ErrorEventFactory.fromThrowable("Could not delete collection " + c.getName(), e)
+                    .omit()
+                    .handle();
         }
 
         this.collections.remove(c);
 
         saveData();
     }
-
 
     synchronized void delete(SavegameEntry<T, I> e) {
         SavegameCampaign<T, I> c = getSavegameCampaign(e);
@@ -407,11 +390,14 @@ public abstract class SavegameStorage<
 
         Path campaignPath = path.resolve(c.getUuid().toString());
         try {
-            FileUtils.deleteDirectory(campaignPath.resolve(e.getUuid().toString()).toFile());
+            FileUtils.deleteDirectory(
+                    campaignPath.resolve(e.getUuid().toString()).toFile());
         } catch (IOException ex) {
             // Don't show the user this error. It sometimes happens when the file is
             // used by another process or even an antivirus program
-            ErrorEventFactory.fromThrowable("Could not delete entry " + e.getName(), ex).omit().handle();
+            ErrorEventFactory.fromThrowable("Could not delete entry " + e.getName(), ex)
+                    .omit()
+                    .handle();
         }
 
         c.getSavegames().remove(e);
@@ -428,7 +414,6 @@ public abstract class SavegameStorage<
             return;
         }
 
-
         var file = getSavegameFile(e);
         if (!Files.exists(file)) {
             e.fail();
@@ -439,7 +424,8 @@ public abstract class SavegameStorage<
             TrackEvent.debug("Info file already exists. Loading from file " + getSavegameInfoFile(e));
             try {
                 e.startLoading();
-                e.load(JacksonMapper.getDefault().readValue(getSavegameInfoFile(e).toFile(), infoClass));
+                e.load(JacksonMapper.getDefault()
+                        .readValue(getSavegameInfoFile(e).toFile(), infoClass));
                 getSavegameCampaign(e).onSavegameLoad(e);
                 return;
             } catch (Exception ex) {
@@ -476,7 +462,6 @@ public abstract class SavegameStorage<
                     I info = infoFactory.apply(s.content, melted);
                     e.load(info);
                     getSavegameCampaign(e).onSavegameLoad(e);
-
 
                     // Clear old info files
                     try (var list = Files.list(getSavegameDataDirectory(e))) {
@@ -545,9 +530,13 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName, String suffix) {
-        var name = getSavegameCampaign(e).getName().trim() + (includeEntryName ?
-                " (" + e.getName().trim() + ")" : "") + (suffix != null ? suffix : "");
-        var comp = SavegameContext.getForSavegame(e).getInstallType().getCompatibleSavegameName(name).trim();
+        var name = getSavegameCampaign(e).getName().trim()
+                + (includeEntryName ? " (" + e.getName().trim() + ")" : "")
+                + (suffix != null ? suffix : "");
+        var comp = SavegameContext.getForSavegame(e)
+                .getInstallType()
+                .getCompatibleSavegameName(name)
+                .trim();
 
         // Try to return valid file name
         if (comp.length() > 0) {
@@ -569,7 +558,7 @@ public abstract class SavegameStorage<
         destPath.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
-    public synchronized void melt(SavegameEntry<T,I> e) {
+    public synchronized void melt(SavegameEntry<T, I> e) {
         if (e.getInfo() == null) {
             return;
         }
@@ -596,10 +585,7 @@ public abstract class SavegameStorage<
     }
 
     protected Optional<SavegameParseResult> importSavegame(
-            Path file,
-            boolean checkDuplicate,
-            String sourceFileChecksum,
-            UUID customCampaignId) {
+            Path file, boolean checkDuplicate, String sourceFileChecksum, UUID customCampaignId) {
         var status = importSavegameData(file, checkDuplicate, sourceFileChecksum, customCampaignId);
         saveData();
         return status;
@@ -610,7 +596,8 @@ public abstract class SavegameStorage<
     }
 
     private String getInfoFileName() {
-        String cs = IntegrityManager.getInstance().getChecksum(ALL.inverseBidiMap().get(this));
+        String cs =
+                IntegrityManager.getInstance().getChecksum(ALL.inverseBidiMap().get(this));
         return "info_" + cs + ".json";
     }
 
@@ -643,10 +630,7 @@ public abstract class SavegameStorage<
     }
 
     private Optional<SavegameParseResult> importSavegameData(
-            Path file,
-            boolean checkDuplicate,
-            String sourceFileChecksum,
-            UUID customCampaignId) {
+            Path file, boolean checkDuplicate, String sourceFileChecksum, UUID customCampaignId) {
         TrackEvent.debug("Parsing file " + file.toString());
         final SavegameParseResult[] result = new SavegameParseResult[1];
         String checksum;
@@ -699,36 +683,49 @@ public abstract class SavegameStorage<
                 }
 
                 var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
-                addEntryToCollection(targetId, file -> Files.write(file, bytes), checksum, info, sourceFileChecksum, null);
+                addEntryToCollection(
+                        targetId, file -> Files.write(file, bytes), checksum, info, sourceFileChecksum, null);
             }
 
             @Override
             public void error(SavegameParseResult.Error e) {
-                ErrorEventFactory.fromThrowable("An error occured during parsing", e.error).omit().handle();
+                ErrorEventFactory.fromThrowable("An error occured during parsing", e.error)
+                        .omit()
+                        .handle();
                 resultToReturn[0] = e;
             }
 
             @Override
             public void invalid(SavegameParseResult.Invalid iv) {
-                ErrorEventFactory.fromMessage("Savegame is invalid: " + iv.message).omit().handle();
+                ErrorEventFactory.fromMessage("Savegame is invalid: " + iv.message)
+                        .omit()
+                        .handle();
                 resultToReturn[0] = iv;
             }
         });
         return Optional.ofNullable(resultToReturn[0]);
     }
 
-    private void addEntryToCollection(UUID campaignId, FailableConsumer<Path, Exception> writer, String checksum, I info, String sourceFileChecksum, String defaultCampaignName) {
+    private void addEntryToCollection(
+            UUID campaignId,
+            FailableConsumer<Path, Exception> writer,
+            String checksum,
+            I info,
+            String sourceFileChecksum,
+            String defaultCampaignName) {
         TrackEvent.debug("Campaign UUID is " + campaignId.toString());
 
         UUID saveUuid = UUID.randomUUID();
         TrackEvent.debug("Generated savegame UUID " + saveUuid.toString());
 
-        Path entryPath = getSavegameDataDirectory().resolve(campaignId.toString()).resolve(saveUuid.toString());
+        Path entryPath =
+                getSavegameDataDirectory().resolve(campaignId.toString()).resolve(saveUuid.toString());
         try {
             FileUtils.forceMkdir(entryPath.toFile());
             var file = entryPath.resolve(getSaveFileName());
             writer.accept(file);
-            JacksonMapper.getDefault().writeValue(entryPath.resolve(getInfoFileName()).toFile(), info);
+            JacksonMapper.getDefault()
+                    .writeValue(entryPath.resolve(getInfoFileName()).toFile(), info);
 
             addNewEntryToCampaign(campaignId, saveUuid, checksum, info, null, sourceFileChecksum, defaultCampaignName);
         } catch (Exception e) {
@@ -736,7 +733,7 @@ public abstract class SavegameStorage<
         }
     }
 
-    synchronized void createNewBranch(SavegameEntry<T,I> e) {
+    synchronized void createNewBranch(SavegameEntry<T, I> e) {
         if (!e.isLoaded()) {
             return;
         }
@@ -794,8 +791,10 @@ public abstract class SavegameStorage<
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {
-        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
-                .filter(ch -> ch.getContentChecksum() != null && ch.getContentChecksum().equals(cs))
+        return getCollections().stream()
+                .flatMap(SavegameCampaign::entryStream)
+                .filter(ch -> ch.getContentChecksum() != null
+                        && ch.getContentChecksum().equals(cs))
                 .findAny();
     }
 
@@ -805,14 +804,16 @@ public abstract class SavegameStorage<
         return cn + " (" + en + ")";
     }
 
-    public synchronized Optional<SavegameEntry<T,I>> getEntryForSourceFileChecksum(String sourceFileChecksum) {
-        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
+    public synchronized Optional<SavegameEntry<T, I>> getEntryForSourceFileChecksum(String sourceFileChecksum) {
+        return getCollections().stream()
+                .flatMap(SavegameCampaign::entryStream)
                 .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
                 .findAny();
     }
 
     public synchronized boolean hasImportedSourceFile(String sourceFileChecksum) {
-        return getCollections().stream().flatMap(SavegameCampaign::entryStream)
+        return getCollections().stream()
+                .flatMap(SavegameCampaign::entryStream)
                 .anyMatch(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum));
     }
 

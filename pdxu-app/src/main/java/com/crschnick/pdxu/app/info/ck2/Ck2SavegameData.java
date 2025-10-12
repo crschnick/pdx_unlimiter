@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.ck2.Ck2Tag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 
@@ -19,8 +20,10 @@ public class Ck2SavegameData extends SavegameData<Ck2Tag> {
 
     protected Ck2Tag tag;
     protected List<Ck2Tag> allTags;
+
     @Getter
     protected String ironmanSaveName;
+
     private GameVersion version;
 
     @Override
@@ -46,9 +49,14 @@ public class Ck2SavegameData extends SavegameData<Ck2Tag> {
         date = GameDateType.CK3.fromString(content.get().getNodeForKey("date").getString());
         binary = false;
 
-        tag = new Ck2Tag(content.get().getNodeForKey("player_realm").getString(), content.get().getNodeForKey("player_name").getString());
+        tag = new Ck2Tag(
+                content.get().getNodeForKey("player_realm").getString(),
+                content.get().getNodeForKey("player_name").getString());
         allTags = List.of(tag);
-        ironmanSaveName = content.get().getNodeForKeyIfExistent("ironman").map(Node::getString).orElse(null);
+        ironmanSaveName = content.get()
+                .getNodeForKeyIfExistent("ironman")
+                .map(Node::getString)
+                .orElse(null);
 
         mods = null;
         dlcs = null;

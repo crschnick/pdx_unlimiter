@@ -13,8 +13,7 @@ public class Ck3Person {
     private String firstName;
     private List<Integer> skills;
 
-    public Ck3Person() {
-    }
+    public Ck3Person() {}
 
     public static Ck3Person fromNode(Node n, Ck3House house) {
         Ck3Person p = new Ck3Person();
@@ -25,7 +24,8 @@ public class Ck3Person {
         p.skills = n.getNodeForKey("skill").getNodeArray().stream()
                 .map(Node::getInteger)
                 .collect(Collectors.toList());
-        p.firstName = Ck3Strings.cleanCk3FormatData(n.getNodeForKey("first_name").getString());
+        p.firstName =
+                Ck3Strings.cleanCk3FormatData(n.getNodeForKey("first_name").getString());
         return p;
     }
 

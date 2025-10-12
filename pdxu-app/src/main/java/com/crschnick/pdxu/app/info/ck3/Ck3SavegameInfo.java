@@ -20,8 +20,7 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     DlcComp dlcs;
     VersionComp version;
 
-    public Ck3SavegameInfo() {
-    }
+    public Ck3SavegameInfo() {}
 
     public Ck3SavegameInfo(SavegameContent content) throws Exception {
         super(content);
@@ -36,5 +35,4 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     protected Class<? extends SavegameData<Ck3Tag>> getDataClass() {
         return Ck3SavegameData.class;
     }
-
 }

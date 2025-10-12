@@ -67,7 +67,8 @@ public class ParseException extends Exception {
         var end = getDataEnd(offset, data);
         var length = Math.max(end - start + 1, 0);
         var snippet = new String(data, start, length);
-        var msg = "Parser failed for " + fileName + " at line " + getLineNumber(offset, data) + " / offset " + offset + ": " + s + "\n\n" + snippet;
+        var msg = "Parser failed for " + fileName + " at line " + getLineNumber(offset, data) + " / offset " + offset
+                + ": " + s + "\n\n" + snippet;
         return new ParseException(msg);
     }
 

@@ -5,6 +5,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.node.ValueNode;
+
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -67,8 +68,9 @@ public final class EditorSimpleNode extends EditorRealNode {
         }
 
         ArrayNode ar = b.getArrayNode();
-        var replacement = toInsertKeyName != null ?
-                ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
+        var replacement = toInsertKeyName != null
+                ? ArrayNode.singleKeyNode(toInsertKeyName, replacementValue)
+                : ArrayNode.array(List.of(replacementValue));
         var updatedNode = ar.replacePart(replacement, index, 1);
         getParent().updateNodeAtRawIndex(updatedNode, keyName, getRawIndexInParentNode());
     }
@@ -86,7 +88,8 @@ public final class EditorSimpleNode extends EditorRealNode {
         }
 
         if (newNode.getNodeArray().size() == 0) {
-            throw new IllegalArgumentException("Can't assign empty value to node. Delete the key and value in the parent node instead.");
+            throw new IllegalArgumentException(
+                    "Can't assign empty value to node. Delete the key and value in the parent node instead.");
         }
 
         if (newNode.getNodeArray().size() == 1) {
@@ -96,7 +99,8 @@ public final class EditorSimpleNode extends EditorRealNode {
             return;
         }
 
-        throw new IllegalArgumentException("Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead.");
+        throw new IllegalArgumentException(
+                "Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead.");
     }
 
     public boolean isValid() {
@@ -110,7 +114,6 @@ public final class EditorSimpleNode extends EditorRealNode {
 
         return getParent().getNavigationNameAtRawIndex(rawIndexInParentNode).equals(getNavigationName());
     }
-
 
     @Override
     public Node getNodeAtRawIndex(int index) {

@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.editor.gui;
 
-
 import com.crschnick.pdxu.app.comp.base.TooltipHelper;
 import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
@@ -8,6 +7,7 @@ import com.crschnick.pdxu.app.util.DesktopHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
@@ -30,7 +31,7 @@ public abstract class GuiEditorNodeTagFactory {
 
     public abstract Node create(EditorState state, EditorRealNode node, Region valueDisplay);
 
-    public static abstract class ImagePreviewNodeTagFactory extends GuiEditorNodeTagFactory {
+    public abstract static class ImagePreviewNodeTagFactory extends GuiEditorNodeTagFactory {
 
         private final String icon;
         private final Function<EditorRealNode, Path> fileFunction;
@@ -46,29 +47,30 @@ public abstract class GuiEditorNodeTagFactory {
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon(icon));
             b.setOnAction(e -> {
-                CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
-                    DesktopHelper.browseFileInDirectory(found);
-                });
+                CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext())
+                        .ifPresent(found -> {
+                            DesktopHelper.browseFileInDirectory(found);
+                        });
             });
             b.setOnMouseEntered(e -> {
                 if (b.getTooltip() != null) {
                     return;
                 }
 
-                CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext()).ifPresent(found -> {
-                    var img = ImageHelper.loadImage(found);
-                    var imgView = new ImageView(img);
-                    var tt = new Tooltip();
-                    tt.setGraphic(imgView);
-                    tt.getStyleClass().add("fancy-tooltip");
-                    tt.setShowDelay(Duration.ZERO);
-                    b.setTooltip(tt);
-                });
+                CascadeDirectoryHelper.openFile(fileFunction.apply(node), state.getFileContext())
+                        .ifPresent(found -> {
+                            var img = ImageHelper.loadImage(found);
+                            var imgView = new ImageView(img);
+                            var tt = new Tooltip();
+                            tt.setGraphic(imgView);
+                            tt.getStyleClass().add("fancy-tooltip");
+                            tt.setShowDelay(Duration.ZERO);
+                            b.setTooltip(tt);
+                        });
             });
             return b;
         }
     }
-
 
     public static class CacheTagFactory extends GuiEditorNodeTagFactory {
         private final Set<String> keyNames;
@@ -88,8 +90,11 @@ public abstract class GuiEditorNodeTagFactory {
             b.setAlignment(Pos.CENTER);
             b.setGraphic(new FontIcon("mdi-information-outline"));
 
-            var tt = TooltipHelper.create(new ReadOnlyStringWrapper("The contents of this value are recalculated every time you launch your game. " +
-                    "Therefore, any changes made to this value will not apply to your game."), null);
+            var tt = TooltipHelper.create(
+                    new ReadOnlyStringWrapper(
+                            "The contents of this value are recalculated every time you launch your game. "
+                                    + "Therefore, any changes made to this value will not apply to your game."),
+                    null);
             tt.setShowDelay(Duration.ZERO);
             Tooltip.install(b, tt);
             return b;

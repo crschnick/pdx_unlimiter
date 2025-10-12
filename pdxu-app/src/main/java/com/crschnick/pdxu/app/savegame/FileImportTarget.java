@@ -1,28 +1,21 @@
 package com.crschnick.pdxu.app.savegame;
 
-
 import com.crschnick.pdxu.app.core.AppLayoutModel;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
-import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import org.apache.commons.io.FileUtils;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.*;
@@ -43,8 +36,7 @@ public abstract class FileImportTarget {
         if (Files.isDirectory(p)) {
             List<StandardImportTarget> targets = new ArrayList<>();
             try (var s = Files.list(p)) {
-                s.forEach(f -> targets.addAll(
-                        FileImportTarget.createStandardImportsTargets(f.toString())));
+                s.forEach(f -> targets.addAll(FileImportTarget.createStandardImportsTargets(f.toString())));
             } catch (IOException e) {
                 ErrorEventFactory.fromThrowable(e).handle();
             }
@@ -87,7 +79,8 @@ public abstract class FileImportTarget {
 
     protected abstract String getRawName();
 
-    private static final Pattern ID_MATCHER = Pattern.compile("\\s*\\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)");
+    private static final Pattern ID_MATCHER =
+            Pattern.compile("\\s*\\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)");
 
     public String getName() {
         var raw = getRawName();
@@ -106,7 +99,8 @@ public abstract class FileImportTarget {
             var id = m.group(1);
             try {
                 return Optional.of(UUID.fromString(id));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return Optional.empty();
@@ -153,35 +147,46 @@ public abstract class FileImportTarget {
         }
 
         public void importTarget(Consumer<Optional<SavegameParseResult>> onFinish) {
-            TaskExecutor.getInstance().submitTask(() -> {
-                // File might no longer exist, since this is executed asynchronously in the task executor queue
-                if (!Files.exists(path)) {
-                    return;
-                }
+            TaskExecutor.getInstance()
+                    .submitTask(
+                            () -> {
+                                // File might no longer exist, since this is executed asynchronously in the task
+                                // executor queue
+                                if (!Files.exists(path)) {
+                                    return;
+                                }
 
-                var layout = AppLayoutModel.get();
-                if (layout != null) {
-                    layout.selectGame(SavegameStorage.ALL.inverseBidiMap().get(savegameStorage));
-                }
+                                var layout = AppLayoutModel.get();
+                                if (layout != null) {
+                                    layout.selectGame(
+                                            SavegameStorage.ALL.inverseBidiMap().get(savegameStorage));
+                                }
 
-                onFinish.accept(savegameStorage.importSavegame(
-                        path, true, getSourceFileChecksum(), getCampaignIdOverride().orElse(null)));
-            }, true);
+                                onFinish.accept(savegameStorage.importSavegame(
+                                        path,
+                                        true,
+                                        getSourceFileChecksum(),
+                                        getCampaignIdOverride().orElse(null)));
+                            },
+                            true);
         }
 
         @Override
         public void delete() {
-            TaskExecutor.getInstance().submitTask(() -> {
-                if (!Files.exists(path)) {
-                    return;
-                }
+            TaskExecutor.getInstance()
+                    .submitTask(
+                            () -> {
+                                if (!Files.exists(path)) {
+                                    return;
+                                }
 
-                try {
-                    Files.delete(path);
-                } catch (IOException e) {
-                    ErrorEventFactory.fromThrowable(e).handle();
-                }
-            }, false);
+                                try {
+                                    Files.delete(path);
+                                } catch (IOException e) {
+                                    ErrorEventFactory.fromThrowable(e).handle();
+                                }
+                            },
+                            false);
         }
 
         @Override
@@ -204,7 +209,6 @@ public abstract class FileImportTarget {
                 // Don't use name, since this would introduce problems when importing two differently named
                 // copies of the same savegame. Size and date should be enough!
                 // md.update(getName().getBytes());
-
 
                 long timestamp = Files.getLastModifiedTime(path).toInstant().toEpochMilli();
                 md.update(Long.toString(timestamp).getBytes());
@@ -235,8 +239,11 @@ public abstract class FileImportTarget {
         public Optional<UUID> getCampaignIdOverride() {
             var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
             if (gameIdSplit != -1) {
-                return Optional.of(
-                        UUID.nameUUIDFromBytes(path.getParent().getFileName().toString().substring(gameIdSplit).getBytes(StandardCharsets.UTF_8)));
+                return Optional.of(UUID.nameUUIDFromBytes(path.getParent()
+                        .getFileName()
+                        .toString()
+                        .substring(gameIdSplit)
+                        .getBytes(StandardCharsets.UTF_8)));
             }
             return super.getCampaignIdOverride();
         }
@@ -245,7 +252,9 @@ public abstract class FileImportTarget {
         public String getRawName() {
             var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
             var date = FilenameUtils.getBaseName(path.getFileName().toString());
-            var campaignName = gameIdSplit != -1 ? path.getParent().getFileName().toString().substring(0, gameIdSplit) : path.getParent().getFileName().toString();
+            var campaignName = gameIdSplit != -1
+                    ? path.getParent().getFileName().toString().substring(0, gameIdSplit)
+                    : path.getParent().getFileName().toString();
             return campaignName + " (" + date + ")";
         }
     }
@@ -260,8 +269,11 @@ public abstract class FileImportTarget {
         public Optional<UUID> getCampaignIdOverride() {
             var gameIdSplit = path.getParent().getFileName().toString().lastIndexOf("_");
             if (gameIdSplit != -1) {
-                return Optional.of(
-                        UUID.nameUUIDFromBytes(path.getParent().getFileName().toString().substring(gameIdSplit).getBytes(StandardCharsets.UTF_8)));
+                return Optional.of(UUID.nameUUIDFromBytes(path.getParent()
+                        .getFileName()
+                        .toString()
+                        .substring(gameIdSplit)
+                        .getBytes(StandardCharsets.UTF_8)));
             }
             return super.getCampaignIdOverride();
         }

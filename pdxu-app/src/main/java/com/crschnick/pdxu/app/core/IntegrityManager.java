@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+
 import io.xpipe.modulefs.ModuleFileSystem;
 import lombok.SneakyThrows;
 

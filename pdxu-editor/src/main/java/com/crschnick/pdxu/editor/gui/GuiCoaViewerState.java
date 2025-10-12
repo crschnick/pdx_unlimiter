@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.editor.gui;
 
-
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
@@ -15,18 +14,19 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeEnvironment;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
 
 public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
@@ -43,12 +43,11 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
         @Override
         protected CoatOfArms createCoatOfArms() {
-            var additional = state.isSavegame() ?
-                    new ArrayNode[0] :
-                    state.getRootNodes()
-                            .values()
-                            .stream()
-                            .map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode())
+            var additional = state.isSavegame()
+                    ? new ArrayNode[0]
+                    : state.getRootNodes().values().stream()
+                            .map(editorRootNode ->
+                                    editorRootNode.getBackingNode().copy().getArrayNode())
                             .toArray(ArrayNode[]::new);
             var all = Ck3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.CK3), additional);
             return Ck3TagRenderer.getCoatOfArms(editorNode.getBackingNode().getArrayNode(), all);
@@ -68,12 +67,11 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
         @Override
         protected CoatOfArms createCoatOfArms() {
-            var additional = state.isSavegame() ?
-                    new ArrayNode[0] :
-                    state.getRootNodes()
-                            .values()
-                            .stream()
-                            .map(editorRootNode -> editorRootNode.getBackingNode().copy().getArrayNode())
+            var additional = state.isSavegame()
+                    ? new ArrayNode[0]
+                    : state.getRootNodes().values().stream()
+                            .map(editorRootNode ->
+                                    editorRootNode.getBackingNode().copy().getArrayNode())
                             .toArray(ArrayNode[]::new);
 
             var all = Vic3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.VIC3), additional);

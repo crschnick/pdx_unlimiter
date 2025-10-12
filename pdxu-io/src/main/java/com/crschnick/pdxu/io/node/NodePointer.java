@@ -110,9 +110,7 @@ public final class NodePointer {
 
         @Override
         public Node tryMatch(Node root, Node n) {
-            var res = n.getNodeArray().stream()
-                    .filter(selector)
-                    .findAny();
+            var res = n.getNodeArray().stream().filter(selector).findAny();
             return res.orElse(null);
         }
 
@@ -121,7 +119,6 @@ public final class NodePointer {
             return "[$(...)]";
         }
     }
-
 
     public static class Builder {
 
@@ -134,7 +131,6 @@ public final class NodePointer {
         public Builder(NodePointer pointer) {
             this.path = new ArrayList<>(pointer.path);
         }
-
 
         public Builder name(String name) {
             path.add(new NameElement(name));

@@ -59,9 +59,7 @@ public interface ErrorAction {
                 return true;
             }
 
-            if (event.isShouldSendDiagnostics()) {
-                SentryErrorHandler.getInstance().handle(event);
-            }
+            SentryErrorHandler.getInstance().handle(event);
             return true;
         }
     }

@@ -12,8 +12,7 @@ public final class CoatOfArms {
 
     private List<Sub> subs;
 
-    public CoatOfArms() {
-    }
+    public CoatOfArms() {}
 
     public CoatOfArms(List<Sub> subs) {
         this.subs = subs;
@@ -61,8 +60,7 @@ public final class CoatOfArms {
         private String[] colors = new String[COLOR_NAMES.size()];
         private List<Emblem> emblems = new ArrayList<>();
 
-        public Sub() {
-        }
+        public Sub() {}
 
         private Sub(
                 double x,
@@ -71,8 +69,7 @@ public final class CoatOfArms {
                 double scaleY,
                 String patternFile,
                 String[] colors,
-                List<Emblem> emblems
-        ) {
+                List<Emblem> emblems) {
             this.x = x;
             this.y = y;
             this.scaleX = scaleX;
@@ -83,13 +80,14 @@ public final class CoatOfArms {
         }
 
         static Sub empty() {
-            return new Sub(0, 0, 1, 1, "pattern_solid.dds", new String[]{
-                    "black",
-                    "black",
-                    null,
-                    null,
-                    null
-            }, List.of(Emblem.empty()));
+            return new Sub(
+                    0,
+                    0,
+                    1,
+                    1,
+                    "pattern_solid.dds",
+                    new String[] {"black", "black", null, null, null},
+                    List.of(Emblem.empty()));
         }
 
         public static List<Sub> fromNode(Node n, Function<String, Node> parentResolver) {
@@ -135,20 +133,27 @@ public final class CoatOfArms {
             }
 
             // Ugly fix to override colored emblem colors of parent
-            var parentEmblemList = new ArrayList<>(parentNode != null ? parentNode.getNodesForKey("colored_emblem").stream()
-                    .map(node -> Emblem.fromColoredEmblemNode(node, sub)).toList() : List.of());
+            var parentEmblemList = new ArrayList<>(
+                    parentNode != null
+                            ? parentNode.getNodesForKey("colored_emblem").stream()
+                                    .map(node -> Emblem.fromColoredEmblemNode(node, sub))
+                                    .toList()
+                            : List.of());
             if (parentNode != null) {
                 parentEmblemList.addAll(parentNode.getNodesForKey("textured_emblem").stream()
-                                                .map(Emblem::fromTexturedEmblemNode).toList());
+                        .map(Emblem::fromTexturedEmblemNode)
+                        .toList());
             }
             sub.emblems = parentEmblemList;
 
             n.getNodeForKeyIfExistent("pattern").map(Node::getString).ifPresent(s -> sub.patternFile = s);
 
             var emblemList = new ArrayList<>(n.getNodesForKey("colored_emblem").stream()
-                                                     .map(node -> Emblem.fromColoredEmblemNode(node, sub)).toList());
+                    .map(node -> Emblem.fromColoredEmblemNode(node, sub))
+                    .toList());
             emblemList.addAll(n.getNodesForKey("textured_emblem").stream()
-                                      .map(Emblem::fromTexturedEmblemNode).toList());
+                    .map(Emblem::fromTexturedEmblemNode)
+                    .toList());
             if (emblemList.size() > 0) {
                 sub.emblems.clear();
                 sub.emblems.addAll(emblemList);
@@ -199,5 +204,4 @@ public final class CoatOfArms {
             return emblems;
         }
     }
-
 }

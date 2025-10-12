@@ -4,9 +4,9 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.image.Image;
 
 public class Vic3AchievementOkComp extends SimpleInfoComp {
@@ -48,8 +48,13 @@ public class Vic3AchievementOkComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        achievementOk = NodePointer.builder().name("game_rules").name("setting").build().getIfPresent(content.get())
-                .map(node -> node.getNodeArray().stream().anyMatch(v -> v.isValue() && v.getString().equals("achievements_allowed")))
+        achievementOk = NodePointer.builder()
+                .name("game_rules")
+                .name("setting")
+                .build()
+                .getIfPresent(content.get())
+                .map(node -> node.getNodeArray().stream()
+                        .anyMatch(v -> v.isValue() && v.getString().equals("achievements_allowed")))
                 .orElse(false);
     }
 }

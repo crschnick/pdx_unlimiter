@@ -13,7 +13,8 @@ public final class EditorCollectorNode extends EditorNode {
     private final int firstNodeIndex;
     private final int length;
 
-    public EditorCollectorNode(EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, int length) {
+    public EditorCollectorNode(
+            EditorNode directParent, String keyName, int parentIndex, int firstNodeIndex, int length) {
         super(directParent, keyName, parentIndex);
         this.firstNodeIndex = firstNodeIndex;
         this.length = length;
@@ -43,15 +44,15 @@ public final class EditorCollectorNode extends EditorNode {
             return false;
         }
 
-        boolean priorValid = firstNodeIndex == 0 ||
-                !getParent().getNavigationNameAtRawIndex(firstNodeIndex - 1).equals(getNavigationName());
+        boolean priorValid = firstNodeIndex == 0
+                || !getParent().getNavigationNameAtRawIndex(firstNodeIndex - 1).equals(getNavigationName());
         if (!priorValid) {
             return false;
         }
 
         int endIndex = firstNodeIndex + length - 1;
-        boolean posteriorValid = endIndex == getParent().getRawSize() - 1 ||
-                !getParent().getNavigationNameAtRawIndex(endIndex + 1).equals(getNavigationName());
+        boolean posteriorValid = endIndex == getParent().getRawSize() - 1
+                || !getParent().getNavigationNameAtRawIndex(endIndex + 1).equals(getNavigationName());
         if (!posteriorValid) {
             return false;
         }

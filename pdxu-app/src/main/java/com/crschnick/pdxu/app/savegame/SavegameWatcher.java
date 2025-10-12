@@ -1,13 +1,14 @@
 package com.crschnick.pdxu.app.savegame;
 
-
 import com.crschnick.pdxu.app.core.AppFileWatcher;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
@@ -25,8 +26,8 @@ public class SavegameWatcher {
     public static final BidiMap<Game, SavegameWatcher> ALL = new DualHashBidiMap<>();
 
     private final GameInstallation install;
-    private final ListProperty<FileImportTarget.StandardImportTarget> savegames = new SimpleListProperty<>(
-            FXCollections.observableArrayList());
+    private final ListProperty<FileImportTarget.StandardImportTarget> savegames =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private SavegameWatcher(GameInstallation install) {
         this.install = install;
@@ -71,8 +72,7 @@ public class SavegameWatcher {
     }
 
     public synchronized Optional<FileImportTarget.StandardImportTarget> getLatest() {
-        return savegames.stream()
-                .findFirst();
+        return savegames.stream().findFirst();
     }
 
     private synchronized void updateSavegames() {

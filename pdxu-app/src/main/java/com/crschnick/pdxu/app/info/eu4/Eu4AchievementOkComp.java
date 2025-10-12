@@ -4,10 +4,10 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
@@ -64,7 +64,10 @@ public class Eu4AchievementOkComp extends SimpleInfoComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         ironman = data.isIronman();
-        achievementOk = NodePointer.builder().name("achievement_ok").build().getIfPresent(content.get())
+        achievementOk = NodePointer.builder()
+                .name("achievement_ok")
+                .build()
+                .getIfPresent(content.get())
                 .map(Node::getBoolean)
                 .orElse(false);
     }

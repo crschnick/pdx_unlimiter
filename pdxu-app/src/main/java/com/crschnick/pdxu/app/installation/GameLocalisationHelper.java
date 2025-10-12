@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.app.installation;
 
-
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
+
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.BOMInputStream;
@@ -24,8 +24,8 @@ public class GameLocalisationHelper {
     private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\w+?\\$");
 
     public static Map<String, String> loadTranslations(Path file, GameLanguage lang) {
-        Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.getId() +
-                "." + FilenameUtils.getExtension(file.toString()));
+        Path langFile = file.resolveSibling(FilenameUtils.getBaseName(file.toString()) + "_" + lang.getId() + "."
+                + FilenameUtils.getExtension(file.toString()));
         return loadTranslations(langFile);
     }
 
@@ -52,8 +52,17 @@ public class GameLocalisationHelper {
         Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_]+):(\\d*) \"(.+)\"$");
 
         try (var in = Files.newInputStream(file)) {
-            var bin = BOMInputStream.builder().setInputStream(in).setInclude(true).setByteOrderMarks(new ByteOrderMark[]{
-                    ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE}).get();
+            var bin = BOMInputStream.builder()
+                    .setInputStream(in)
+                    .setInclude(true)
+                    .setByteOrderMarks(new ByteOrderMark[] {
+                        ByteOrderMark.UTF_8,
+                        ByteOrderMark.UTF_16BE,
+                        ByteOrderMark.UTF_16LE,
+                        ByteOrderMark.UTF_32LE,
+                        ByteOrderMark.UTF_32BE
+                    })
+                    .get();
             ByteOrderMark bom = bin.getBOM();
             String charsetName = bom == null ? "UTF-8" : bom.getCharsetName();
 
@@ -68,7 +77,6 @@ public class GameLocalisationHelper {
                         map.put(m.group(1), m.group(3));
                     }
                 }
-
             }
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable(e).handle();

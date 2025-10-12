@@ -26,8 +26,7 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     DlcComp dlcs;
     VersionComp version;
 
-    public StellarisSavegameInfo() {
-    }
+    public StellarisSavegameInfo() {}
 
     public StellarisSavegameInfo(SavegameContent content) throws Exception {
         super(content);

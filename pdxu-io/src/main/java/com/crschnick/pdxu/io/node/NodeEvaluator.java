@@ -34,17 +34,19 @@ public class NodeEvaluator {
                         evaluateArrayNode(node.getArrayNode(), currentEnvironment[0]);
                     }
                 },
-                true
-        );
+                true);
     }
 
     public static Node evaluateValueNode(ValueNode node, NodeEnvironment environment) {
         if (ModuleLayer.boot().findModule("org.graalvm.js").isEmpty()) {
-            throw new UnsupportedOperationException("Node evaluation is only supported with module org.graalvm.js in module path");
+            throw new UnsupportedOperationException(
+                    "Node evaluation is only supported with module org.graalvm.js in module path");
         }
 
         if (JAVASCRIPT_CONTEXT == null) {
-            JAVASCRIPT_CONTEXT = Context.newBuilder("js").option("engine.WarnInterpreterOnly", "false").build();
+            JAVASCRIPT_CONTEXT = Context.newBuilder("js")
+                    .option("engine.WarnInterpreterOnly", "false")
+                    .build();
         }
 
         var expression = node.getInlineMathExpression();
@@ -52,16 +54,17 @@ public class NodeEvaluator {
             var string = expression.get();
             // Prevent cases of replacing a variable which is a sub string of another
             // by ordering them by length descending
-            for (Map.Entry<String, Node> entry : environment.getVariables()
-                    .entrySet()
-                    .stream()
-                    .sorted(Comparator.<Map.Entry<String, Node>>comparingInt(e -> e.getKey().length()).reversed())
+            for (Map.Entry<String, Node> entry : environment.getVariables().entrySet().stream()
+                    .sorted(Comparator.<Map.Entry<String, Node>>comparingInt(
+                                    e -> e.getKey().length())
+                            .reversed())
                     .toList()) {
                 if (!entry.getValue().isValue()) {
                     continue;
                 }
 
-                string = string.replaceAll(entry.getKey(), entry.getValue().getValueNode().getString());
+                string = string.replaceAll(
+                        entry.getKey(), entry.getValue().getValueNode().getString());
             }
 
             try {

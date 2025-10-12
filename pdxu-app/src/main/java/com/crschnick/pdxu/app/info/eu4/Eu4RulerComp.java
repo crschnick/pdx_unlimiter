@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDateType;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -29,8 +30,11 @@ public class Eu4RulerComp extends SavegameInfoComp {
         var rulerNode = NodePointer.builder()
                 .name("countries")
                 .name(data.eu4().getTag().getTag())
-                .build().getIfPresent(content.get());
-        ruler = rulerNode.flatMap(rn -> Ruler.fromCountryNode(rn, getRulerKey())).orElse(getDefault());
+                .build()
+                .getIfPresent(content.get());
+        ruler = rulerNode
+                .flatMap(rn -> Ruler.fromCountryNode(rn, getRulerKey()))
+                .orElse(getDefault());
     }
 
     protected String getRulerKey() {
@@ -88,12 +92,7 @@ public class Eu4RulerComp extends SavegameInfoComp {
         return box;
     }
 
-    public static record Ruler(
-            String name,
-            String fullName,
-            int adm,
-            int dip,
-            int mil) {
+    public static record Ruler(String name, String fullName, int adm, int dip, int mil) {
 
         public static Optional<Ruler> fromCountryNode(Node n, String t) {
             if (!n.hasKey(t)) {
@@ -116,7 +115,8 @@ public class Eu4RulerComp extends SavegameInfoComp {
                                 String name = r.getNodeForKey("name").getString();
                                 String fullName = name;
                                 if (r.hasKey("dynasty")) {
-                                    fullName = name + " " + r.getNodeForKey("dynasty").getString();
+                                    fullName = name + " "
+                                            + r.getNodeForKey("dynasty").getString();
                                 }
                                 current.set(Optional.of(new Ruler(
                                         name,
@@ -133,5 +133,4 @@ public class Eu4RulerComp extends SavegameInfoComp {
             return current.get();
         }
     }
-
 }

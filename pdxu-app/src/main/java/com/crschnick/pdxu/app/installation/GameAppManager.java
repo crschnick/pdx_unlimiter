@@ -1,12 +1,12 @@
 package com.crschnick.pdxu.app.installation;
 
-
 import com.crschnick.pdxu.app.core.AppResources;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.util.ThreadHelper;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.media.AudioClip;
@@ -26,8 +26,7 @@ public final class GameAppManager {
     private boolean active = false;
     private Thread thread;
 
-    private GameAppManager() {
-    }
+    private GameAppManager() {}
 
     public static void init() {
         INSTANCE.start();
@@ -84,7 +83,8 @@ public final class GameAppManager {
                 }
             }
             if (process.isPresent()) {
-                TrackEvent.info("Detected new running game instance of " + process.get().getGame().getId());
+                TrackEvent.info("Detected new running game instance of "
+                        + process.get().getGame().getId());
                 activeGame.set(process.get());
                 activeGame.get().onStart();
             }
@@ -99,9 +99,11 @@ public final class GameAppManager {
 
                 if (AppPrefs.get().importOnNormalGameExit().getValue()) {
                     TrackEvent.info("Import on normal exit is enabled");
-                    boolean exitedNormally = lastKill == null || Duration.between(lastKill, Instant.now()).getSeconds() > 10;
+                    boolean exitedNormally = lastKill == null
+                            || Duration.between(lastKill, Instant.now()).getSeconds() > 10;
                     if (exitedNormally) {
-                        TrackEvent.info("Game instance of " + deadGame.getId() + " exited normally. Importing latest savegame");
+                        TrackEvent.info(
+                                "Game instance of " + deadGame.getId() + " exited normally. Importing latest savegame");
                         SavegameActions.importLatestSavegame(deadGame);
                     }
                 }
@@ -118,8 +120,10 @@ public final class GameAppManager {
             lastImport = Instant.now();
         }
 
-        if (Duration.between(lastImport, Instant.now()).compareTo(
-                Duration.of(AppPrefs.get().timedImportsInterval().getValue(), ChronoUnit.MINUTES)) > 0) {
+        if (Duration.between(lastImport, Instant.now())
+                        .compareTo(Duration.of(
+                                AppPrefs.get().timedImportsInterval().getValue(), ChronoUnit.MINUTES))
+                > 0) {
             TrackEvent.info("Importing latest savegame because timed imports is enabled");
             playImportSound();
             importLatest();
@@ -129,7 +133,9 @@ public final class GameAppManager {
 
     public void playImportSound() {
         if (AppPrefs.get().playSoundOnBackgroundImport().getValue()) {
-            var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sound/import.wav").orElseThrow().toString());
+            var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sound/import.wav")
+                    .orElseThrow()
+                    .toString());
             clip.play(0.2);
         }
     }

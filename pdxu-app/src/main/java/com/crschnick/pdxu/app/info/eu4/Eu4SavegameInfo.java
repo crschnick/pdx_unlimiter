@@ -42,5 +42,4 @@ public class Eu4SavegameInfo extends SavegameInfo<Eu4Tag> {
     protected Class<? extends SavegameData<Eu4Tag>> getDataClass() {
         return Eu4SavegameData.class;
     }
-
 }

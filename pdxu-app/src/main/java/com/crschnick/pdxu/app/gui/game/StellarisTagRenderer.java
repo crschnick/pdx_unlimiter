@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui.game;
 
-
 import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
@@ -12,6 +11,7 @@ import com.crschnick.pdxu.io.node.TaggedNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
+
 import javafx.scene.image.Image;
 
 import java.awt.image.BufferedImage;
@@ -40,8 +40,7 @@ public class StellarisTagRenderer {
     }
 
     private static Map<String, javafx.scene.paint.Color> loadPredefinedColorsForSavegame(GameFileContext ctx) {
-        var file = CascadeDirectoryHelper.openFile(
-                Path.of("flags").resolve("colors.txt"), ctx);
+        var file = CascadeDirectoryHelper.openFile(Path.of("flags").resolve("colors.txt"), ctx);
         if (file.isEmpty()) {
             return Map.of();
         }
@@ -56,11 +55,12 @@ public class StellarisTagRenderer {
     }
 
     public static Image createTagImage(GameFileContext ctx, StellarisTag tag) {
-        //TODO: Cache better
+        // TODO: Cache better
         var img = createBasicFlagImage(ctx, tag);
 
         ImageHelper.applyAlphaMask(img, GameImage.STELLARIS_FLAG_MASK);
-        img.getGraphics().drawImage(ImageHelper.fromFXImage(GameImage.STELLARIS_FLAG_FRAME), 0, 0, IMG_SIZE, IMG_SIZE, null);
+        img.getGraphics()
+                .drawImage(ImageHelper.fromFXImage(GameImage.STELLARIS_FLAG_FRAME), 0, 0, IMG_SIZE, IMG_SIZE, null);
 
         return ImageHelper.toFXImage(img);
     }
@@ -103,13 +103,13 @@ public class StellarisTagRenderer {
     private static BufferedImage background(GameFileContext ctx, StellarisTag tag) {
         var cache = GameCacheManager.getInstance().get(StellarisTagImageCache.class);
 
-        int bgPrimary = ColorHelper.intFromColor(cache.colors.getOrDefault(
-                tag.getBackgroundPrimaryColor(), javafx.scene.paint.Color.TRANSPARENT));
-        int bgSecondary = ColorHelper.intFromColor(cache.colors.getOrDefault(
-                tag.getBackgroundSecondaryColor(), javafx.scene.paint.Color.TRANSPARENT));
+        int bgPrimary = ColorHelper.intFromColor(
+                cache.colors.getOrDefault(tag.getBackgroundPrimaryColor(), javafx.scene.paint.Color.TRANSPARENT));
+        int bgSecondary = ColorHelper.intFromColor(
+                cache.colors.getOrDefault(tag.getBackgroundSecondaryColor(), javafx.scene.paint.Color.TRANSPARENT));
         Function<Integer, Integer> customFilter = (Integer rgb) -> {
             int colorIndex = ColorHelper.pickClosestColor(rgb, PATTERN_COLOR_1, PATTERN_COLOR_2);
-            return new int[]{bgPrimary, bgSecondary}[colorIndex];
+            return new int[] {bgPrimary, bgSecondary}[colorIndex];
         };
 
         var path = Path.of("flags", "backgrounds").resolve(tag.getBackgroundFile());

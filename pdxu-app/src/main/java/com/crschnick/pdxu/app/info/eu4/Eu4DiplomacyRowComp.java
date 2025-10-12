@@ -8,6 +8,7 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
+
 import javafx.scene.layout.Region;
 
 import java.util.List;

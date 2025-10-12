@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.util;
 
 import com.crschnick.pdxu.app.core.AppSystemInfo;
 
-import javax.swing.filechooser.FileSystemView;
 import java.nio.file.Path;
 
 public class FileSystemHelper {

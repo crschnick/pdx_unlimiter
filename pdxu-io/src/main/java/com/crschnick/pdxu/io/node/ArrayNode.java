@@ -7,7 +7,6 @@ import java.util.List;
 
 public abstract class ArrayNode extends Node {
 
-
     public static ArrayNode array(List<Node> values) {
         // Defensive copy of values
         return new SimpleArrayNode(new NodeContext(), null, null, new ArrayList<>(values));
@@ -23,7 +22,7 @@ public abstract class ArrayNode extends Node {
 
     public static ArrayNode singleKeyNode(String key, Node value) {
         var ctx = new NodeContext(key, false);
-        return new SimpleArrayNode(ctx, new int[]{0}, new int[]{-1}, List.of(value));
+        return new SimpleArrayNode(ctx, new int[] {0}, new int[] {-1}, List.of(value));
     }
 
     public final ArrayNode replaceKey(String key, Node value) {
@@ -79,6 +78,9 @@ public abstract class ArrayNode extends Node {
     protected abstract boolean isFlat();
 
     public abstract String getKeyAt(int index);
+
+    @Override
+    public abstract ArrayNode copy();
 
     @Override
     public String toDebugValue() {

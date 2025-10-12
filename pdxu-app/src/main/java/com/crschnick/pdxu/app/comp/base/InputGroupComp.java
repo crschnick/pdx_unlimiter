@@ -1,12 +1,14 @@
 package com.crschnick.pdxu.app.comp.base;
 
-import atlantafx.base.layout.InputGroup;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
+
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+
+import atlantafx.base.layout.InputGroup;
 import lombok.Setter;
 
 import java.util.List;

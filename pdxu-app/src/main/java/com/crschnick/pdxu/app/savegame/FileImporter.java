@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
+
 import javafx.application.Platform;
 
 import java.io.File;
@@ -44,17 +45,21 @@ public class FileImporter {
                 t.delete();
             }
         }));
-        TaskExecutor.getInstance().submitTask(
-                () -> {
-                    // Report errors
-                    statusMap.entrySet().stream()
-                            .filter(e -> e.getValue() instanceof SavegameParseResult.Error)
-                            .findFirst()
-                            .ifPresent(e -> {
-                                ErrorEventFactory.fromThrowable(((SavegameParseResult.Error) e.getValue()).error).handle();
-                            });
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            // Report errors
+                            statusMap.entrySet().stream()
+                                    .filter(e -> e.getValue() instanceof SavegameParseResult.Error)
+                                    .findFirst()
+                                    .ifPresent(e -> {
+                                        ErrorEventFactory.fromThrowable(
+                                                        ((SavegameParseResult.Error) e.getValue()).error)
+                                                .handle();
+                                    });
 
-                    Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
-                }, false);
+                            Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
+                        },
+                        false);
     }
 }

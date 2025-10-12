@@ -8,8 +8,7 @@ public class War<T> {
     private List<T> attackers;
     private List<T> defenders;
 
-    public War() {
-    }
+    public War() {}
 
     public War(String title, List<T> attackers, List<T> defenders) {
         this.title = title;

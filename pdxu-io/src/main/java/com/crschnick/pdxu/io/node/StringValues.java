@@ -16,8 +16,7 @@ public class StringValues {
             return s;
         }
 
-        boolean quoted = context.getData()[b] == DOUBLE_QUOTE_CHAR &&
-                context.getData()[b + l - 1] == DOUBLE_QUOTE_CHAR;
+        boolean quoted = context.getData()[b] == DOUBLE_QUOTE_CHAR && context.getData()[b + l - 1] == DOUBLE_QUOTE_CHAR;
         if (!quoted) {
             return s;
         }

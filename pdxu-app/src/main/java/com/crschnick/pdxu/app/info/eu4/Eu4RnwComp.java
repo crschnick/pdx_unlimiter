@@ -4,9 +4,9 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.image.Image;
 
 public class Eu4RnwComp extends SimpleInfoComp {
@@ -23,10 +23,12 @@ public class Eu4RnwComp extends SimpleInfoComp {
         return rnwEnabled;
     }
 
-
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        rnwEnabled = content.get().getNodeForKeyIfExistent("is_random_new_world").map(Node::getBoolean).orElse(false);
+        rnwEnabled = content.get()
+                .getNodeForKeyIfExistent("is_random_new_world")
+                .map(Node::getBoolean)
+                .orElse(false);
     }
 
     @Override

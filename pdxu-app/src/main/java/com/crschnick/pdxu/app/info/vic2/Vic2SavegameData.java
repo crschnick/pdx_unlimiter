@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.vic2.Vic2Tag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
@@ -19,8 +20,7 @@ public class Vic2SavegameData extends SavegameData<Vic2Tag> {
     private Vic2Tag tag;
     private List<Vic2Tag> allTags;
 
-    public Vic2SavegameData() {
-    }
+    public Vic2SavegameData() {}
 
     public Vic2Tag getTag() {
         return tag;
@@ -48,7 +48,8 @@ public class Vic2SavegameData extends SavegameData<Vic2Tag> {
             allTags.add(new Vic2Tag(k));
         });
         var playerTag = content.get().getNodeForKey("player").getString();
-        tag = allTags.stream().filter(t -> t.getTagId().equals(playerTag))
+        tag = allTags.stream()
+                .filter(t -> t.getTagId().equals(playerTag))
                 .findAny()
                 .orElseThrow(() -> new SavegameInfoException("No player tag found"));
 

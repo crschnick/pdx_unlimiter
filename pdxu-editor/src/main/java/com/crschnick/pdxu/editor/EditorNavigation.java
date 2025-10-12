@@ -2,6 +2,7 @@ package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.io.node.NodePointer;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
@@ -73,15 +74,15 @@ public class EditorNavigation {
     }
 
     public boolean affectsCurrent(EditorNode changed) {
-        return getCurrent().path().getPath().contains(changed) ||
-                (changed.getParent() != null) && getCurrent().path().getPath().contains(changed.getParent());
+        return getCurrent().path().getPath().contains(changed)
+                || (changed.getParent() != null)
+                        && getCurrent().path().getPath().contains(changed.getParent());
     }
 
     public boolean rebaseNavPathsToValid() {
         var currentValid = EditorNavPath.rebaseToValid(this.current.get().path());
         var currentChanged = !currentValid.equals(current.get().path());
-        var newLoc = !currentChanged ? current.get() :
-                new EditorNavLocation(currentValid);
+        var newLoc = !currentChanged ? current.get() : new EditorNavLocation(currentValid);
         this.current.set(newLoc);
         this.history.set(historyPos.get(), newLoc);
 
@@ -112,7 +113,6 @@ public class EditorNavigation {
         this.history.add(newLoc);
         historyPos.set(historyPos.get() + 1);
     }
-
 
     public boolean navigateTo(NodePointer pointer) {
         var np = EditorNavPath.createNavPath(state, pointer);

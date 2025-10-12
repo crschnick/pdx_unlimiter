@@ -7,8 +7,7 @@ public class Hoi4Tag {
     private String tag;
     private String ideology;
 
-    public Hoi4Tag() {
-    }
+    public Hoi4Tag() {}
 
     public Hoi4Tag(String tag, String ideology) {
         this.tag = tag;
@@ -20,8 +19,7 @@ public class Hoi4Tag {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Hoi4Tag hoi4Tag = (Hoi4Tag) o;
-        return Objects.equals(tag, hoi4Tag.tag) &&
-                Objects.equals(ideology, hoi4Tag.ideology);
+        return Objects.equals(tag, hoi4Tag.tag) && Objects.equals(ideology, hoi4Tag.ideology);
     }
 
     @Override

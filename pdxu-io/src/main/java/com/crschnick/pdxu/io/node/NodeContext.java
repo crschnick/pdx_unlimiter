@@ -20,11 +20,12 @@ public final class NodeContext {
     }
 
     public NodeContext(String data, boolean quoted) {
-        this.data = quoted ? ("\"" + StringValues.escapeStringContent(data) + "\"").getBytes() :
-                StringValues.escapeStringContent(data).getBytes();
+        this.data = quoted
+                ? ("\"" + StringValues.escapeStringContent(data) + "\"").getBytes()
+                : StringValues.escapeStringContent(data).getBytes();
         this.charset = StandardCharsets.UTF_8;
-        this.literalsBegin = new int[]{0};
-        this.literalsLength = new short[]{(short) this.data.length};
+        this.literalsBegin = new int[] {0};
+        this.literalsLength = new short[] {(short) this.data.length};
         this.literalsCount = 1;
     }
 

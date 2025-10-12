@@ -29,8 +29,7 @@ public class Emblem {
                         tex -> {
                             c.file = tex.getString();
                         },
-                        () -> c.file = "_default.dds"
-                );
+                        () -> c.file = "_default.dds");
         c.colors = null;
 
         n.getNodeForKeyIfExistent("mask")
@@ -40,8 +39,7 @@ public class Emblem {
                                     .map(Node::getInteger)
                                     .collect(Collectors.toList());
                         },
-                        () -> c.mask = new ArrayList<>()
-                );
+                        () -> c.mask = new ArrayList<>());
 
         c.instances = n.getNodesForKey("instance").stream()
                 .map(i -> {
@@ -82,8 +80,7 @@ public class Emblem {
                         tex -> {
                             c.file = tex.getString();
                         },
-                        () -> c.file = "_default.dds"
-                );
+                        () -> c.file = "_default.dds");
 
         c.colors = new String[3];
 
@@ -91,7 +88,8 @@ public class Emblem {
         for (int i = 0; i < 3; i++) {
             int finalI = i;
             n.getNodeForKeyIfExistent(CoatOfArms.COLOR_NAMES.get(i))
-                    .filter(node -> (node.isValue() || node.isTagged()) && !CoatOfArms.COLOR_NAMES.contains(node.getString()))
+                    .filter(node ->
+                            (node.isValue() || node.isTagged()) && !CoatOfArms.COLOR_NAMES.contains(node.getString()))
                     .map(Node::getString)
                     .ifPresent(s -> c.colors[finalI] = s);
         }
@@ -112,8 +110,7 @@ public class Emblem {
                                     .map(Node::getInteger)
                                     .collect(Collectors.toList());
                         },
-                        () -> c.mask = new ArrayList<>()
-                );
+                        () -> c.mask = new ArrayList<>());
 
         c.instances = n.getNodesForKey("instance").stream()
                 .map(i -> {

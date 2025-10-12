@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
+
 import javafx.beans.binding.Bindings;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -20,9 +21,12 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
-        bg.opacityProperty().bind(Bindings.createDoubleBinding(() -> {
-            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
-        }, AppPrefs.get().theme()));
+        bg.opacityProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> {
+                            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
+                        },
+                        AppPrefs.get().theme()));
         return bg;
     }
 

@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -19,11 +20,7 @@ public class TagRows {
     private static final int MAX_DISPLAY_COUNT = 14;
 
     public static <T> Region createTagRow(
-            Region img,
-            String tooltip,
-            List<T> tags,
-            Function<T, String> tooltipGen,
-            Function<T, Region> gen) {
+            Region img, String tooltip, List<T> tags, Function<T, String> tooltipGen, Function<T, Region> gen) {
         GuiTooltips.install(img, tooltip);
 
         var list = tags.subList(0, Math.min(tags.size(), MAX_DISPLAY_COUNT)).stream()
@@ -64,14 +61,17 @@ public class TagRows {
         var second = new HBox();
         second.setAlignment(Pos.CENTER);
         var spacer = new Region();
-        spacer.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> (list.getFirst().getMinWidth() / 2) - (first.getSpacing()),
-                list.getFirst().minWidthProperty(), first.spacingProperty()));
+        spacer.minWidthProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> (list.getFirst().getMinWidth() / 2) - (first.getSpacing()),
+                        list.getFirst().minWidthProperty(),
+                        first.spacingProperty()));
         second.getChildren().add(spacer);
         second.getChildren().addAll(list.subList(firstRow, firstRow + secondRow));
         if (exceeded) {
-            String tt = tags.subList(firstRow + secondRow,
-                    tags.size()).stream().map(tooltipGen).collect(Collectors.joining(", "));
+            String tt = tags.subList(firstRow + secondRow, tags.size()).stream()
+                    .map(tooltipGen)
+                    .collect(Collectors.joining(", "));
             var label = new Label("...");
             GuiTooltips.install(label, tt);
             second.getChildren().add(label);

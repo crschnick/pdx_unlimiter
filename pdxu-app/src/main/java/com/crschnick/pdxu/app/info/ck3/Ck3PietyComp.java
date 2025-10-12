@@ -3,8 +3,8 @@ package com.crschnick.pdxu.app.info.ck3;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.image.Image;
 
 import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_PIETY;

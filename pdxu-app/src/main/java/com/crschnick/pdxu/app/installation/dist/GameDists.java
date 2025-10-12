@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.OsType;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -17,31 +18,25 @@ import java.util.function.BiFunction;
 
 public class GameDists {
 
-    private static final List<BiFunction<Game, Path, Optional<GameDist>>> FAST_COMPOUND_TYPES = List.of(
-            SteamDist::getDist);
+    private static final List<BiFunction<Game, Path, Optional<GameDist>>> FAST_COMPOUND_TYPES =
+            List.of(SteamDist::getDist);
 
-    private static final List<BiFunction<Game, Path, Optional<GameDist>>> ALL_COMPOUND_TYPES = List.of(
-            SteamDist::getDist,
-            WindowsStoreDist::getDist);
+    private static final List<BiFunction<Game, Path, Optional<GameDist>>> ALL_COMPOUND_TYPES =
+            List.of(SteamDist::getDist, WindowsStoreDist::getDist);
 
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = List.of(
-            ProtonDist::getDist,
-            PdxLauncherDist::getDist,
-            LegacyLauncherDist::getDist,
-            NoLauncherDist::getDist
-    );
+            ProtonDist::getDist, PdxLauncherDist::getDist, LegacyLauncherDist::getDist, NoLauncherDist::getDist);
 
     public static Optional<GameDist> detectDist(Game g, boolean checkXbox) {
-        return getCompoundDistFromDirectory(g, null, checkXbox)
-                .or(() -> {
-                        for (var p : getInstallDirSearchPaths(g)) {
-                            var dist = GameDists.getBasicDistFromDirectory(g, p);
-                            if (dist.isPresent()) {
-                                return dist;
-                            }
-                        }
-                        return Optional.empty();
-                });
+        return getCompoundDistFromDirectory(g, null, checkXbox).or(() -> {
+            for (var p : getInstallDirSearchPaths(g)) {
+                var dist = GameDists.getBasicDistFromDirectory(g, p);
+                if (dist.isPresent()) {
+                    return dist;
+                }
+            }
+            return Optional.empty();
+        });
     }
 
     public static GameDist detectDistFromDirectory(Game g, Path dir) {
@@ -89,7 +84,9 @@ public class GameDists {
             case OsType.Linux ignored -> {
                 // Common manual install location
                 for (var name : g.getCommonInstallDirNames()) {
-                    installDirSearchPaths.add(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive").resolve(name));
+                    installDirSearchPaths.add(FileSystemHelper.getUserDocumentsPath()
+                            .resolve("Paradox Interactive")
+                            .resolve(name));
                 }
             }
             case OsType.MacOs ignored -> {
@@ -98,18 +95,22 @@ public class GameDists {
             case OsType.Windows ignored -> {
                 for (var root : FileSystems.getDefault().getRootDirectories()) {
                     for (var name : g.getCommonInstallDirNames()) {
-                        installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve(name));
+                        installDirSearchPaths.add(
+                                root.resolve("Program Files (x86)").resolve(name));
                     }
 
                     // Paradox Games Launcher path
                     if (g.getParadoxGamesLauncherName() != null) {
-                        installDirSearchPaths.add(root.resolve("Program Files (x86)").resolve("Paradox Interactive")
-                                .resolve("games").resolve(g.getParadoxGamesLauncherName()));
+                        installDirSearchPaths.add(root.resolve("Program Files (x86)")
+                                .resolve("Paradox Interactive")
+                                .resolve("games")
+                                .resolve(g.getParadoxGamesLauncherName()));
                     }
 
                     // Epic Games path
                     if (g.getEpicGamesName() != null) {
-                        installDirSearchPaths.add(root.resolve("Program Files").resolve("Epic Games")
+                        installDirSearchPaths.add(root.resolve("Program Files")
+                                .resolve("Epic Games")
                                 .resolve(g.getEpicGamesName()));
                     }
                 }

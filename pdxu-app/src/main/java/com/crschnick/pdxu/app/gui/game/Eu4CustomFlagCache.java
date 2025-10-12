@@ -34,11 +34,21 @@ public class Eu4CustomFlagCache extends GameCacheManager.Cache {
         super(GameCacheManager.Scope.GAME_SPECIFIC);
 
         try {
-            emblems = ImageHelper.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("gfx")
-                    .resolve("interface").resolve("client_state_symbols_large.dds"), null);
+            emblems = ImageHelper.loadAwtImage(
+                    GameInstallation.ALL
+                            .get(Game.EU4)
+                            .getInstallDir()
+                            .resolve("gfx")
+                            .resolve("interface")
+                            .resolve("client_state_symbols_large.dds"),
+                    null);
 
-            var colorsFile = GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve("common")
-                    .resolve("custom_country_colors").resolve("00_custom_country_colors.txt");
+            var colorsFile = GameInstallation.ALL
+                    .get(Game.EU4)
+                    .getInstallDir()
+                    .resolve("common")
+                    .resolve("custom_country_colors")
+                    .resolve("00_custom_country_colors.txt");
             var content = TextFormatParser.text().parse(colorsFile);
             content.forEach((k, v) -> {
                 if (k.equals("flag_color")) {
@@ -47,8 +57,12 @@ public class Eu4CustomFlagCache extends GameCacheManager.Cache {
             });
             content.getNodeForKey("textures").forEach((k, v) -> {
                 var tex = new Texture(
-                        ImageHelper.loadAwtImage(GameInstallation.ALL.get(Game.EU4).getInstallDir().resolve(
-                                Path.of(v.getNodeForKey("file").getString())), null),
+                        ImageHelper.loadAwtImage(
+                                GameInstallation.ALL
+                                        .get(Game.EU4)
+                                        .getInstallDir()
+                                        .resolve(Path.of(v.getNodeForKey("file").getString())),
+                                null),
                         v.getNodeForKey("size").getNodeForKey("x").getInteger(),
                         v.getNodeForKey("size").getNodeForKey("y").getInteger(),
                         v.getNodeForKey("noOfFrames").getInteger(),
@@ -81,14 +95,15 @@ public class Eu4CustomFlagCache extends GameCacheManager.Cache {
                 int xOff = rel % tex.x;
                 int yOff = rel / tex.x;
 
-                img.getGraphics().drawImage(
-                        tex.img,
-                        -xOff * img.getWidth(),
-                        -yOff * img.getWidth(),
-                        (int) (((double) img.getWidth() / PATTERN_SIZE) * tex.img.getWidth()),
-                        (int) (((double) img.getHeight() / PATTERN_SIZE) * tex.img.getHeight()),
-                        new Color(0, 0, 0, 0),
-                        null);
+                img.getGraphics()
+                        .drawImage(
+                                tex.img,
+                                -xOff * img.getWidth(),
+                                -yOff * img.getWidth(),
+                                (int) (((double) img.getWidth() / PATTERN_SIZE) * tex.img.getWidth()),
+                                (int) (((double) img.getHeight() / PATTERN_SIZE) * tex.img.getHeight()),
+                                new Color(0, 0, 0, 0),
+                                null);
 
                 for (int x = 0; x < img.getWidth(); x++) {
                     for (int y = 0; y < img.getHeight(); y++) {
@@ -121,17 +136,16 @@ public class Eu4CustomFlagCache extends GameCacheManager.Cache {
                 new Color(0, 0, 0, 0),
                 null);
 
-        img.getGraphics().drawImage(
-                i,
-                (int) (0.2 * img.getWidth()),
-                (int) (0.2 * img.getWidth()),
-                (int) (0.6 * img.getWidth()),
-                (int) (0.6 * img.getHeight()),
-                new Color(0, 0, 0, 0),
-                null);
+        img.getGraphics()
+                .drawImage(
+                        i,
+                        (int) (0.2 * img.getWidth()),
+                        (int) (0.2 * img.getWidth()),
+                        (int) (0.6 * img.getWidth()),
+                        (int) (0.6 * img.getHeight()),
+                        new Color(0, 0, 0, 0),
+                        null);
     }
 
-    record Texture(BufferedImage img, int x, int y, int frames, int colors) {
-
-    }
+    record Texture(BufferedImage img, int x, int y, int frames, int colors) {}
 }

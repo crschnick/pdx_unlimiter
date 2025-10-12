@@ -33,14 +33,13 @@ public class StorageCategory extends AppPrefsCategory {
                         .spacer(19)
                         .addComp(
                                 new TileButtonComp("exportStorage", "exportStorageDescription", "mdi-export", e -> {
-                                    Optional<Path> path = GuiSavegameIO.showExportDialog();
-                                    path.ifPresent(p -> {
-                                        SavegameStorageIO.exportSavegameStorage(p);
-                                    });
-                                })
+                                            Optional<Path> path = GuiSavegameIO.showExportDialog();
+                                            path.ifPresent(p -> {
+                                                SavegameStorageIO.exportSavegameStorage(p);
+                                            });
+                                        })
                                         .maxWidth(2000),
-                                null)
-                );
+                                null));
         return builder.buildComp();
     }
 }

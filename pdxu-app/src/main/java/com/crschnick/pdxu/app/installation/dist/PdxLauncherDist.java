@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.JacksonMapper;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -42,16 +43,23 @@ public class PdxLauncherDist extends GameDist {
         Optional<String> launcherDir = Optional.empty();
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
-                String s = Path.of(System.getProperty("user.home")).resolve(".paradoxlauncher").toString();
+                String s = Path.of(System.getProperty("user.home"))
+                        .resolve(".paradoxlauncher")
+                        .toString();
                 launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
             }
             case OsType.MacOs ignored -> {
-                String s = FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive").toString();
+                String s = FileSystemHelper.getUserDocumentsPath()
+                        .resolve("Paradox Interactive")
+                        .toString();
                 launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
             }
             case OsType.Windows ignored -> {
-                launcherDir = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_CURRENT_USER, "SOFTWARE\\Paradox Interactive\\Paradox Launcher v2",
-                        "LauncherInstallation");
+                launcherDir = WindowsRegistry.of()
+                        .readStringValueIfPresent(
+                                WindowsRegistry.HKEY_CURRENT_USER,
+                                "SOFTWARE\\Paradox Interactive\\Paradox Launcher v2",
+                                "LauncherInstallation");
             }
         }
         return launcherDir.map(Path::of);
@@ -69,12 +77,14 @@ public class PdxLauncherDist extends GameDist {
             return;
         }
 
-        var pb = new ProcessBuilder()
-                .directory(launcherPath.toFile());
+        var pb = new ProcessBuilder().directory(launcherPath.toFile());
 
-        var cmd = new ArrayList<>(List.of(bootstrapper.get().toString(),
-                "--pdxlGameDir", launcherPath.toString(),
-                "--gameDir", launcherPath.toString()));
+        var cmd = new ArrayList<>(List.of(
+                bootstrapper.get().toString(),
+                "--pdxlGameDir",
+                launcherPath.toString(),
+                "--gameDir",
+                launcherPath.toString()));
         if (SystemUtils.IS_OS_WINDOWS) {
             cmd.add(0, "cmd.exe");
             cmd.add(1, "/c");
@@ -86,21 +96,25 @@ public class PdxLauncherDist extends GameDist {
     }
 
     protected Path getLauncherSettings() {
-        return getGame().getInstallType().getLauncherDataPath(
-                getInstallLocation()).resolve("launcher-settings.json");
+        return getGame()
+                .getInstallType()
+                .getLauncherDataPath(getInstallLocation())
+                .resolve("launcher-settings.json");
     }
 
     protected Path replaceVariablesInPath(String value) {
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
-                value = value.replace("$LINUX_DATA_HOME",
+                value = value.replace(
+                        "$LINUX_DATA_HOME",
                         FileSystemHelper.getUserDocumentsPath().toString());
             }
             case OsType.MacOs ignored -> {
                 value = value.replace("~", System.getProperty("user.home"));
             }
             case OsType.Windows ignored -> {
-                value = value.replace("%USER_DOCUMENTS%",
+                value = value.replace(
+                        "%USER_DOCUMENTS%",
                         FileSystemHelper.getUserDocumentsPath().toString());
             }
         }
@@ -109,13 +123,15 @@ public class PdxLauncherDist extends GameDist {
 
     @Override
     public Optional<String> determineVersion() throws IOException {
-        JsonNode node = JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
+        JsonNode node =
+                JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
         return Optional.ofNullable(node.get("version")).map(JsonNode::textValue);
     }
 
     @Override
     public Path determineUserDir() throws IOException {
-        JsonNode node = JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
+        JsonNode node =
+                JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
         return Optional.ofNullable(node.get("gameDataPath"))
                 .map(JsonNode::textValue)
                 .map(this::replaceVariablesInPath)

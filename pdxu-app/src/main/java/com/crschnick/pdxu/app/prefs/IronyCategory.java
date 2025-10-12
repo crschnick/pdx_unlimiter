@@ -25,8 +25,7 @@ public class IronyCategory extends AppPrefsCategory {
                         .pref(prefs.ironyDirectory)
                         .addComp(new PathChoiceComp(prefs.ironyDirectory, "ironyDirectory", true).maxWidth(600))
                         .pref(prefs.launchIrony)
-                        .addToggle(prefs.launchIrony)
-                );
+                        .addToggle(prefs.launchIrony));
         return builder.buildComp();
     }
 }

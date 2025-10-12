@@ -4,9 +4,9 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,13 +19,19 @@ public class StellarisEmpireSizeComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        size = content.get().getNodeForKeysIfExistent("country", "0", "empire_size").map(Node::getInteger).orElse(0);
+        size = content.get()
+                .getNodeForKeysIfExistent("country", "0", "empire_size")
+                .map(Node::getInteger)
+                .orElse(0);
     }
 
     @Override
     public Region create(SavegameData<?> data) {
         var r = super.create(data);
-        var img = (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().getFirst()).getGraphic()).getChildren().getFirst();
+        var img =
+                (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().getFirst()).getGraphic())
+                        .getChildren()
+                        .getFirst();
         img.fitWidthProperty().unbind();
         img.fitHeightProperty().unbind();
         img.setFitWidth(25);

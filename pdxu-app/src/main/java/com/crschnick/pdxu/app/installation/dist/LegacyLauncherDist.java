@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -30,8 +31,11 @@ public class LegacyLauncherDist extends GameDist {
     }
 
     @Override
-    public void startLauncher(Map<String,String> env) throws IOException {
-        var exec = getGame().getInstallType().getLegacyLauncherExecutable(getInstallLocation()).orElseThrow();
+    public void startLauncher(Map<String, String> env) throws IOException {
+        var exec = getGame()
+                .getInstallType()
+                .getLegacyLauncherExecutable(getInstallLocation())
+                .orElseThrow();
         var input = new ArrayList<String>();
         // Make UAC popup if needed
         if (SystemUtils.IS_OS_WINDOWS) {

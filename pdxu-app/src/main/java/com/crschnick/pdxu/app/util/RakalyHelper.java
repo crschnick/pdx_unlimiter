@@ -9,7 +9,6 @@ import java.nio.file.Path;
 
 public class RakalyHelper {
 
-
     public static boolean shouldShowButton(SavegameContext<?, ?> context) {
         return true;
     }
@@ -18,11 +17,7 @@ public class RakalyHelper {
         var melter = AppInstallation.ofCurrent().getRakalyExecutable();
         check(melter);
         var proc = new ProcessBuilder(
-                melter.toString(),
-                "melt",
-                "--unknown-key", "stringify",
-                "--to-stdout",
-                file.toString())
+                        melter.toString(), "melt", "--unknown-key", "stringify", "--to-stdout", file.toString())
                 .redirectError(ProcessBuilder.Redirect.DISCARD)
                 .start();
         var b = proc.getInputStream().readAllBytes();
@@ -40,12 +35,13 @@ public class RakalyHelper {
         var melter = AppInstallation.ofCurrent().getRakalyExecutable();
         check(melter);
         var proc = new ProcessBuilder(
-                melter.toString(),
-                "melt",
-                "--unknown-key", "stringify",
-                "--retain",
-                "--to-stdout",
-                file.toString())
+                        melter.toString(),
+                        "melt",
+                        "--unknown-key",
+                        "stringify",
+                        "--retain",
+                        "--to-stdout",
+                        file.toString())
                 .redirectError(ProcessBuilder.Redirect.DISCARD)
                 .start();
         var b = proc.getInputStream().readAllBytes();
@@ -61,7 +57,9 @@ public class RakalyHelper {
 
     private static void check(Path file) throws IOException {
         if (!Files.exists(file)) {
-            throw new IOException("Ironman melter executable " + file + " is missing. This is usually caused by Windows Defender or another AntiVirus program removing the melter executable because it thinks it's malicious.\n\nYou can try deleting %LOCALAPPDATA%\\Programs\\Pdx-Unlimiter\\app\\ and relaunching pdxu. That should trigger a new download. If the file then gets removed again, you probably have to add an exception to your antivirus.");
+            throw new IOException(
+                    "Ironman melter executable " + file
+                            + " is missing. This is usually caused by Windows Defender or another AntiVirus program removing the melter executable because it thinks it's malicious.\n\nYou can try deleting %LOCALAPPDATA%\\Programs\\Pdx-Unlimiter\\app\\ and relaunching pdxu. That should trigger a new download. If the file then gets removed again, you probably have to add an exception to your antivirus.");
         }
     }
 }

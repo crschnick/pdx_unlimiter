@@ -10,8 +10,7 @@ public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
 
     VersionComp version;
 
-    public Vic2SavegameInfo() {
-    }
+    public Vic2SavegameInfo() {}
 
     public Vic2SavegameInfo(SavegameContent content) throws Exception {
         super(content);

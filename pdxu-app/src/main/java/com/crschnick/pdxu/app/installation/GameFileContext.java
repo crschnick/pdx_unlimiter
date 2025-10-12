@@ -26,17 +26,16 @@ public class GameFileContext {
             SavegameType.STELLARIS, Game.STELLARIS,
             SavegameType.CK2, Game.CK2,
             SavegameType.VIC2, Game.VIC2,
-            SavegameType.VIC3, Game.VIC3
-    );
+            SavegameType.VIC3, Game.VIC3);
 
-    public  static final Map<Class<? extends SavegameData<?>>, Game> INFO_MAP = Map.of(
+    public static final Map<Class<? extends SavegameData<?>>, Game> INFO_MAP = Map.of(
             Eu4SavegameData.class, Game.EU4,
             Hoi4SavegameData.class, Game.HOI4,
             Ck2SavegameData.class, Game.CK2,
             Vic2SavegameData.class, Game.VIC2,
             Vic3SavegameData.class, Game.VIC3,
             StellarisSavegameData.class, Game.STELLARIS,
-            Ck3SavegameData .class, Game.CK3);
+            Ck3SavegameData.class, Game.CK3);
 
     private final Game game;
     private final List<GameMod> mods;
@@ -64,10 +63,12 @@ public class GameFileContext {
 
     public static GameFileContext fromData(SavegameData<?> sgData) {
         var g = INFO_MAP.get(sgData.getClass());
-        List<GameMod> mods = sgData.getMods() != null ? sgData.getMods().stream()
-                .map(GameInstallation.ALL.get(g)::getModForSavegameId)
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList()) : List.of();
+        List<GameMod> mods = sgData.getMods() != null
+                ? sgData.getMods().stream()
+                        .map(GameInstallation.ALL.get(g)::getModForSavegameId)
+                        .flatMap(Optional::stream)
+                        .collect(Collectors.toList())
+                : List.of();
         return new GameFileContext(g, mods);
     }
 

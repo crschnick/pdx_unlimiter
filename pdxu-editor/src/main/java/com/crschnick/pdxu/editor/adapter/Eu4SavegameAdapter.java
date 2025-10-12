@@ -5,6 +5,7 @@ import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
+
 import javafx.scene.layout.Region;
 
 import java.util.LinkedHashMap;
@@ -28,7 +29,8 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
             var idn = dateEntry.getNodeForKeyIfExistent("id");
             var id = personId.get(state.getBackingNode());
             if (id != null && id.isValue() && idn.isPresent()) {
-                var nodeId = idn.get().getNodeForKeyIfExistent("id")
+                var nodeId = idn.get()
+                        .getNodeForKeyIfExistent("id")
                         .filter(Node::isValue)
                         .map(Node::getString)
                         .orElse("");
@@ -39,16 +41,20 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
             return false;
         };
 
-        return NodePointer.fromBase(country).name("history").selector(node -> {
-            if (node.isArray()) {
-                for (Node dateEntry : node.getNodeArray()) {
-                    if (personPred.test(dateEntry)) {
-                        return true;
+        return NodePointer.fromBase(country)
+                .name("history")
+                .selector(node -> {
+                    if (node.isArray()) {
+                        for (Node dateEntry : node.getNodeArray()) {
+                            if (personPred.test(dateEntry)) {
+                                return true;
+                            }
+                        }
                     }
-                }
-            }
-            return false;
-        }).selector(personPred).build();
+                    return false;
+                })
+                .selector(personPred)
+                .build();
     }
 
     @Override
@@ -57,19 +63,23 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
 
         map.put("Mods", NodePointer.builder().name("enabled_mods").build());
         map.put("DLCs", NodePointer.builder().name("enabled_dlcs").build());
-        map.put("Settings", NodePointer.builder().name("gameplaysettings").name("setgameplayoptions").build());
+        map.put(
+                "Settings",
+                NodePointer.builder()
+                        .name("gameplaysettings")
+                        .name("setgameplayoptions")
+                        .build());
 
-
-        var country = NodePointer.builder().name("countries")
-                .pointerEvaluation(NodePointer.builder().name("player").build()).build();
+        var country = NodePointer.builder()
+                .name("countries")
+                .pointerEvaluation(NodePointer.builder().name("player").build())
+                .build();
         map.put("Player country", country);
-
 
         var rulerId = NodePointer.fromBase(country).name("monarch").name("id").build();
         var heirId = NodePointer.fromBase(country).name("heir").name("id").build();
         map.put("Player country ruler", personPointer(state, country, rulerId));
         map.put("Player country heir", personPointer(state, country, heirId));
-
 
         return map;
     }
@@ -85,7 +95,10 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
         var n = node.getBackingNode();
         if (n.isValue()) {
             var s = n.getString();
-            if (s.length() == 3 && Character.isLetter(s.charAt(0)) && s.toUpperCase().equals(s) && !EU4_POWER_NAMES.contains(s)) {
+            if (s.length() == 3
+                    && Character.isLetter(s.charAt(0))
+                    && s.toUpperCase().equals(s)
+                    && !EU4_POWER_NAMES.contains(s)) {
                 return NodePointer.builder().name("countries").name(s).build();
             }
         }
@@ -102,8 +115,13 @@ public class Eu4SavegameAdapter implements EditorSavegameAdapter {
             }
 
             if (EU4_TRADE_KEYS.contains(key)) {
-                return NodePointer.builder().name("trade").name("node").selector(tn -> tn.isArray()
-                        && tn.hasKey("definitions") && tn.getNodeForKey("definitions").getString().equals(s)).build();
+                return NodePointer.builder()
+                        .name("trade")
+                        .name("node")
+                        .selector(tn -> tn.isArray()
+                                && tn.hasKey("definitions")
+                                && tn.getNodeForKey("definitions").getString().equals(s))
+                        .build();
             }
         }
         return null;

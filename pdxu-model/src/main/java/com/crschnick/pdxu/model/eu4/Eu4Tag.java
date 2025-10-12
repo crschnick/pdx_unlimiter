@@ -22,13 +22,16 @@ public final class Eu4Tag {
     private ColonialFlagData colonialFlagData;
     private CustomFlagData customFlagData;
 
-    public Eu4Tag() {
-    }
+    public Eu4Tag() {}
 
     public Eu4Tag(
-            FlagType flagType, String tag, GameColor mapColor, GameColor countryColor, String name, ColonialFlagData colonialFlagData,
-            CustomFlagData customFlagData
-    ) {
+            FlagType flagType,
+            String tag,
+            GameColor mapColor,
+            GameColor countryColor,
+            String name,
+            ColonialFlagData colonialFlagData,
+            CustomFlagData customFlagData) {
         this.flagType = flagType;
         this.tag = tag;
         this.mapColor = mapColor;
@@ -39,8 +42,12 @@ public final class Eu4Tag {
     }
 
     public static Eu4Tag fromNode(String tag, Node n) {
-        var mColor = n.getNodeForKeysIfExistent("colors", "map_color").map(GameColor::fromRgbArray).orElse(GameColor.BLACK);
-        var cColor = n.getNodeForKeysIfExistent("colors", "country_color").map(GameColor::fromRgbArray).orElse(GameColor.BLACK);
+        var mColor = n.getNodeForKeysIfExistent("colors", "map_color")
+                .map(GameColor::fromRgbArray)
+                .orElse(GameColor.BLACK);
+        var cColor = n.getNodeForKeysIfExistent("colors", "country_color")
+                .map(GameColor::fromRgbArray)
+                .orElse(GameColor.BLACK);
         String name = n.hasKey("name") ? n.getNodeForKey("name").getString() : null;
 
         FlagType t;
@@ -48,8 +55,8 @@ public final class Eu4Tag {
         CustomFlagData customFlagData = null;
         if (COLONIAL_FLAG_TAG_PATTERN.matcher(tag).matches() && n.hasKey("colonial_parent")) {
             t = FlagType.COLONIAL_FLAG;
-            colonialFlagData = new ColonialFlagData(
-                    n.getNodeForKey("colonial_parent").getString());
+            colonialFlagData =
+                    new ColonialFlagData(n.getNodeForKey("colonial_parent").getString());
 
         } else if (n.getNodeForKey("colors").hasKey("custom_colors")) {
             t = FlagType.CUSTOM_FLAG;
@@ -60,8 +67,7 @@ public final class Eu4Tag {
                     col.getNodeForKey("symbol_index").getInteger(),
                     col.getNodeForKey("flag_colors").getNodeArray().stream()
                             .map(Node::getInteger)
-                            .collect(Collectors.toList())
-            );
+                            .collect(Collectors.toList()));
         } else if (OBSERVER_FLAG_TAG_PATTERN.matcher(tag).matches() || tag.equals(INVALID_TAG_ID)) {
             t = FlagType.NO_FLAG;
         } else {
@@ -124,8 +130,7 @@ public final class Eu4Tag {
     public static class ColonialFlagData {
         private String overlord;
 
-        public ColonialFlagData() {
-        }
+        public ColonialFlagData() {}
 
         public ColonialFlagData(String overlord) {
             this.overlord = overlord;
@@ -142,8 +147,7 @@ public final class Eu4Tag {
         private int symbolId;
         private List<Integer> flagColors;
 
-        public CustomFlagData() {
-        }
+        public CustomFlagData() {}
 
         public CustomFlagData(int flagId, int colorId, int symbolId, List<Integer> flagColors) {
             this.flagId = flagId;

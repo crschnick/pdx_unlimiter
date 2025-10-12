@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.info.eu4;
 
 import com.crschnick.pdxu.app.gui.game.GameImage;
+
 import javafx.scene.image.Image;
 
 public class Eu4HeirComp extends Eu4RulerComp {

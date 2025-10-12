@@ -156,10 +156,12 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
-        forEach((k, v) -> {
-            c.accept(k, v);
-            return true;
-        }, includeNullKeys);
+        forEach(
+                (k, v) -> {
+                    c.accept(k, v);
+                    return true;
+                },
+                includeNullKeys);
     }
 
     protected void writeInternal(NodeWriter writer) throws IOException {
@@ -287,9 +289,14 @@ public final class SimpleArrayNode extends ArrayNode {
     }
 
     @Override
-    public Node copy() {
-        return new SimpleArrayNode(context, keyScalars, valueScalars, values.stream().map(node -> node != null ? node.copy() : null).collect(
-                Collectors.toCollection(ArrayList::new)));
+    public ArrayNode copy() {
+        return new SimpleArrayNode(
+                context,
+                keyScalars,
+                valueScalars,
+                values.stream()
+                        .map(node -> node != null ? node.copy() : null)
+                        .collect(Collectors.toCollection(ArrayList::new)));
     }
 
     @Override

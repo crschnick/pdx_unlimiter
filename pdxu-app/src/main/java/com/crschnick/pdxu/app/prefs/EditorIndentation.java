@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum EditorIndentation implements PrefsChoiceValue {
-
     ONE_SPACE("oneSpace", " "),
     TWO_SPACES("twoSpaces", "  "),
     FOUR_SPACES("fourSpaces", "  "),

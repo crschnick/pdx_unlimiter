@@ -13,6 +13,7 @@ import com.crschnick.pdxu.model.ck3.Ck3House;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.scene.image.Image;
 
 import java.nio.file.Path;
@@ -35,9 +36,7 @@ public class Ck3CoatOfArmsCache extends GameCacheManager.Cache {
         }
 
         var file = CascadeDirectoryHelper.openFile(
-                Path.of("common").resolve("named_colors").resolve("default_colors.txt"),
-                ctx
-        );
+                Path.of("common").resolve("named_colors").resolve("default_colors.txt"), ctx);
         if (file.isPresent()) {
             try {
                 Node node = TextFormatParser.text().parse(file.get());

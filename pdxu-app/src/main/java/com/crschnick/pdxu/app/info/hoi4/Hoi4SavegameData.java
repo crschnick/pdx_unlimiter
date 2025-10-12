@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.LinkedHashSet;
@@ -40,14 +41,15 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
     @Override
     protected void init(SavegameContent content) {
         campaignHeuristic = SavegameType.HOI4.getCampaignIdHeuristic(content);
-        tag = new Hoi4Tag(content.get().getNodeForKey("player").getString(), content.get().getNodeForKey("ideology").getString());
+        tag = new Hoi4Tag(
+                content.get().getNodeForKey("player").getString(),
+                content.get().getNodeForKey("ideology").getString());
         date = GameDateType.HOI4.fromString(content.get().getNodeForKey("date").getString());
         ironman = content.get().hasKey("Ironman");
         allTags = List.of(tag);
-        mods = content.get().getNodeForKeyIfExistent("mods")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
-              .collect(Collectors.toCollection(LinkedHashSet::new));
+        mods = content.get().getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of()).stream()
+                .map(Node::getString)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         dlcs = null;
         initVersion(content.get());
     }
@@ -57,8 +59,12 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
         var string = n.getNodeForKey("version").getString();
         Matcher m = p.matcher(string);
         if (m.matches()) {
-            version = new GameNamedVersion(Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)),
-                                             Integer.parseInt(m.group(4)), 0, m.group(1));
+            version = new GameNamedVersion(
+                    Integer.parseInt(m.group(2)),
+                    Integer.parseInt(m.group(3)),
+                    Integer.parseInt(m.group(4)),
+                    0,
+                    m.group(1));
         } else {
             throw new IllegalArgumentException("Could not parse HOI4 version string: " + string);
         }

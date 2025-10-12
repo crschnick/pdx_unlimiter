@@ -1,7 +1,5 @@
 package com.crschnick.pdxu.editor.gui;
 
-import atlantafx.base.controls.Spacer;
-import atlantafx.base.layout.InputGroup;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.AppTheme;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
@@ -17,6 +15,7 @@ import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -29,6 +28,9 @@ import javafx.scene.effect.SepiaTone;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import atlantafx.base.controls.Spacer;
+import atlantafx.base.layout.InputGroup;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Arrays;
@@ -68,13 +70,14 @@ public class GuiEditor {
 
     public static boolean showCloseConfirmAlert(Stage s) {
         var r = AppSideWindow.showBlockingAlert(alert -> {
-            alert.setTitle(AppI18n.get("unsavedChanges"));
-            alert.setHeaderText(AppI18n.get("unsavedChangesConfirm"));
-            alert.setAlertType(Alert.AlertType.WARNING);
-            alert.getButtonTypes().clear();
-            alert.getButtonTypes().add(ButtonType.YES);
-            alert.getButtonTypes().add(ButtonType.NO);
-        }).filter(b -> b.getButtonData().isDefaultButton());
+                    alert.setTitle(AppI18n.get("unsavedChanges"));
+                    alert.setHeaderText(AppI18n.get("unsavedChangesConfirm"));
+                    alert.setAlertType(Alert.AlertType.WARNING);
+                    alert.getButtonTypes().clear();
+                    alert.getButtonTypes().add(ButtonType.YES);
+                    alert.getButtonTypes().add(ButtonType.NO);
+                })
+                .filter(b -> b.getButtonData().isDefaultButton());
 
         r.ifPresent(t -> {
             s.close();
@@ -105,17 +108,11 @@ public class GuiEditor {
         v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
 
         var graphic = new StackPane(new FontIcon("mdi-information-outline"));
-        var melterInformation = new Label(
-                AppI18n.get("savegameEditorTips"),
-                graphic
-        );
+        var melterInformation = new Label(AppI18n.get("savegameEditorTips"), graphic);
         melterInformation.setGraphicTextGap(8);
         melterInformation.setAlignment(Pos.CENTER);
         melterInformation.getStyleClass().add("melter-information");
-        var topBars = new VBox(
-                GuiEditorMenuBar.createMenuBar(state),
-                v
-        );
+        var topBars = new VBox(GuiEditorMenuBar.createMenuBar(state), v);
         if (!state.isEditable()) {
             topBars.getChildren().add(melterInformation);
         }
@@ -188,10 +185,15 @@ public class GuiEditor {
         grid.getStyleClass().add(GuiStyle.CLASS_EDITOR_GRID);
         var cc = new ColumnConstraints();
         cc.setHgrow(Priority.ALWAYS);
-        grid.getColumnConstraints().addAll(
-                new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints(), cc,
-                new ColumnConstraints(), new ColumnConstraints()
-        );
+        grid.getColumnConstraints()
+                .addAll(
+                        new ColumnConstraints(),
+                        new ColumnConstraints(),
+                        new ColumnConstraints(),
+                        new ColumnConstraints(),
+                        cc,
+                        new ColumnConstraints(),
+                        new ColumnConstraints());
 
         var alwaysHighlight = true;
         var keyHighlight = state.getFilter().filterKeysProperty().get();
@@ -216,7 +218,8 @@ public class GuiEditor {
             }
 
             var nodes = c.getShownNodes();
-            int nodeCount = Math.min(nodes.size(), AppPrefs.get().editorPageSize().getValue());
+            int nodeCount =
+                    Math.min(nodes.size(), AppPrefs.get().editorPageSize().getValue());
             for (int i = offset; i < nodeCount + offset; i++) {
                 var n = nodes.get(i - offset);
                 var label = new Label(getFormattedName(n.getNavigationName()));
@@ -234,7 +237,8 @@ public class GuiEditor {
                 Node tag = null;
                 if (n.isReal() && AppPrefs.get().editorEnableNodeTags().getValue()) {
                     try {
-                        tag = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                        tag = EditorSavegameAdapter.ALL
+                                .get(state.getFileContext().getGame())
                                 .createNodeTag(state, (EditorRealNode) n, valueDisplay);
                     } catch (Exception ex) {
                         ErrorEventFactory.fromThrowable(ex).handle();
@@ -249,15 +253,19 @@ public class GuiEditor {
                 if (n.isReal()) {
                     if (AppPrefs.get().editorEnableNodeJumps().getValue()) {
                         try {
-                            var pointers = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame())
+                            var pointers = EditorSavegameAdapter.ALL
+                                    .get(state.getFileContext().getGame())
                                     .createNodeJumps(state, (EditorRealNode) n);
                             if (pointers.size() > 0) {
                                 var b = new Button(null, new FontIcon());
                                 b.setGraphic(new FontIcon());
                                 b.getStyleClass().add("jump-to-def-button");
-                                GuiTooltips.install(b, "Jump to " + pointers.stream()
-                                        .map(NodePointer::toString)
-                                        .collect(Collectors.joining("\nor      ")));
+                                GuiTooltips.install(
+                                        b,
+                                        "Jump to "
+                                                + pointers.stream()
+                                                        .map(NodePointer::toString)
+                                                        .collect(Collectors.joining("\nor      ")));
                                 b.setOnAction(e -> {
                                     for (var p : pointers) {
                                         if (state.getNavigation().navigateTo(p)) {
@@ -403,8 +411,8 @@ public class GuiEditor {
             Label filterDisplay = new Label(null, new FontIcon());
             filterDisplay.setMnemonicParsing(false);
             edFilter.filterStringProperty().addListener((c, o, n) -> {
-                Platform.runLater(() -> filterDisplay.setText(
-                        n.equals("") ? "" : AppI18n.get("editorSearchResult",n)));
+                Platform.runLater(
+                        () -> filterDisplay.setText(n.equals("") ? "" : AppI18n.get("editorSearchResult", n)));
             });
             filterDisplay.setAlignment(Pos.CENTER);
             box.getChildren().add(filterDisplay);

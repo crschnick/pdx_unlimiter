@@ -7,7 +7,7 @@ import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.jfoenix.controls.JFXSpinner;
+
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.input.Dragboard;
@@ -16,6 +16,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+
+import com.jfoenix.controls.JFXSpinner;
 import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -31,18 +33,21 @@ public class GuiLayoutComp extends SimpleComp {
         var pane = new GuiSavegameEntryListComp<>(savegameManagerState).createRegion();
         layout.setCenter(pane);
 
-        layout.setLeft(new GuiSavegameCollectionListComp<>(savegameManagerState).hide(savegameManagerState.storageEmptyProperty()).createRegion());
+        layout.setLeft(new GuiSavegameCollectionListComp<>(savegameManagerState)
+                .hide(savegameManagerState.storageEmptyProperty())
+                .createRegion());
         return layout;
     }
 
     private void setBusy(Region loadingBg, boolean busy) {
         if (!busy) {
             ThreadHelper.createPlatformThread("loading delay", true, () -> {
-                ThreadHelper.sleep(50);
-                if (!TaskExecutor.getInstance().isBusy()) {
-                    Platform.runLater(() -> loadingBg.setVisible(false));
-                }
-            }).start();
+                        ThreadHelper.sleep(50);
+                        if (!TaskExecutor.getInstance().isBusy()) {
+                            Platform.runLater(() -> loadingBg.setVisible(false));
+                        }
+                    })
+                    .start();
         } else {
             Platform.runLater(() -> loadingBg.setVisible(true));
         }
@@ -104,7 +109,9 @@ public class GuiLayoutComp extends SimpleComp {
             Platform.runLater(() -> {
                 if (scene != null) {
                     GameImage.loadGameImages(savegameManagerState.getGame());
-                    var bg = GameGuiFactory.ALL.get(savegameManagerState.getGame()).background();
+                    var bg = GameGuiFactory.ALL
+                            .get(savegameManagerState.getGame())
+                            .background();
                     stack.getChildren().set(0, bg);
                 } else {
                     stack.getChildren().set(0, new Pane());

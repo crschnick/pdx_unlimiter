@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -33,9 +34,13 @@ public class EditorState {
     private final boolean editable;
 
     public EditorState(
-            String fileName, GameFileContext fileContext, SavegameContent nodes, TextFormatParser parser, Consumer<Map<String, ArrayNode>> saveFunc,
-            boolean savegame, boolean editable
-    ) {
+            String fileName,
+            GameFileContext fileContext,
+            SavegameContent nodes,
+            TextFormatParser parser,
+            Consumer<Map<String, ArrayNode>> saveFunc,
+            boolean savegame,
+            boolean editable) {
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
@@ -61,8 +66,8 @@ public class EditorState {
             return;
         }
 
-        saveFunc.accept(rootNodes.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toWritableNode())));
+        saveFunc.accept(rootNodes.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toWritableNode())));
         dirtyProperty().set(false);
     }
 
@@ -128,7 +133,9 @@ public class EditorState {
     }
 
     public ArrayNode getBackingNode() {
-        return new LinkedArrayNode(rootNodes.values().stream().map(en -> en.getBackingNode().getArrayNode()).toList());
+        return new LinkedArrayNode(rootNodes.values().stream()
+                .map(en -> en.getBackingNode().getArrayNode())
+                .toList());
     }
 
     public boolean isSavegame() {
@@ -140,6 +147,7 @@ public class EditorState {
     }
 
     public boolean isContextGameEnabled() {
-        return fileContext.get().getGame() == null || fileContext.get().getGame().isEnabled();
+        return fileContext.get().getGame() == null
+                || fileContext.get().getGame().isEnabled();
     }
 }

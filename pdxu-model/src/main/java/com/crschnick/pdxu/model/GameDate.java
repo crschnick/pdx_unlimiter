@@ -15,8 +15,7 @@ public final class GameDate implements Comparable<GameDate> {
     private int year;
     private GameDateType type;
 
-    public GameDate() {
-    }
+    public GameDate() {}
 
     public GameDate(int hour, int day, int month, int year, GameDateType type) {
         this.hour = hour;

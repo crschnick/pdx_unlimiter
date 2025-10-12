@@ -1,14 +1,15 @@
 package com.crschnick.pdxu.app.info;
 
-
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
-import com.jfoenix.controls.JFXMasonryPane;
+
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+
+import com.jfoenix.controls.JFXMasonryPane;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -19,8 +20,7 @@ public abstract class SavegameInfo<T> {
 
     protected SavegameData<T> data;
 
-    protected SavegameInfo() {
-    }
+    protected SavegameInfo() {}
 
     protected SavegameInfo(SavegameContent content) throws Exception {
         this.data = getDataClass().getDeclaredConstructor().newInstance();
@@ -37,7 +37,8 @@ public abstract class SavegameInfo<T> {
             }
 
             try {
-                var c = (SavegameContentReader) field.getType().getDeclaredConstructors()[0].newInstance();
+                var c = (SavegameContentReader)
+                        field.getType().getDeclaredConstructors()[0].newInstance();
                 if (c.requiresPlayer() && data.getTag() == null) {
                     continue;
                 }
@@ -123,10 +124,18 @@ public abstract class SavegameInfo<T> {
         pane.getChildren().add(p);
 
         // Magic! Using any other properties breaks the layout
-        content.minWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getWidth() - p.getPadding().getLeft() - p.getPadding().getRight(), p.widthProperty()));
-        content.prefHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> p.getHeight() - p.getPadding().getTop() - p.getPadding().getBottom(), p.heightProperty()));
+        content.minWidthProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> p.getWidth()
+                                - p.getPadding().getLeft()
+                                - p.getPadding().getRight(),
+                        p.widthProperty()));
+        content.prefHeightProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> p.getHeight()
+                                - p.getPadding().getTop()
+                                - p.getPadding().getBottom(),
+                        p.heightProperty()));
     }
 
     private JFXMasonryPane createEmptyContainer() {
@@ -135,11 +144,14 @@ public abstract class SavegameInfo<T> {
         container.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
         container.setHSpacing(10);
         container.setVSpacing(10);
-        container.minHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> 3 * container.getCellHeight() +
-                        2 * container.getVSpacing() +
-                        container.getPadding().getBottom() +
-                        container.getPadding().getTop(), container.paddingProperty()));
+        container
+                .minHeightProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> 3 * container.getCellHeight()
+                                + 2 * container.getVSpacing()
+                                + container.getPadding().getBottom()
+                                + container.getPadding().getTop(),
+                        container.paddingProperty()));
         container.setLimitRow(3);
         container.getStyleClass().add(getStyleClass());
         return container;

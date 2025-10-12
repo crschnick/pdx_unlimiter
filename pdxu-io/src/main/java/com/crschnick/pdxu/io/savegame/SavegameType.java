@@ -64,16 +64,23 @@ public interface SavegameType {
         }
 
         public UUID getCampaignIdHeuristic(SavegameContent c) {
-            return UUID.nameUUIDFromBytes(c.get().getNodeForKey("countries")
-                                                  .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
+            return UUID.nameUUIDFromBytes(c.get()
+                    .getNodeForKey("countries")
+                    .getNodeForKey("REB")
+                    .getNodeForKey("decision_seed")
+                    .getString()
+                    .getBytes());
         }
 
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
             int rand = new Random().nextInt(Integer.MAX_VALUE);
-            c.get().getNodeForKey("countries")
-                    .getNodeForKey("REB").getNodeForKey("decision_seed").getValueNode().set(
-                            new ValueNode(String.valueOf(rand), false));
+            c.get()
+                    .getNodeForKey("countries")
+                    .getNodeForKey("REB")
+                    .getNodeForKey("decision_seed")
+                    .getValueNode()
+                    .set(new ValueNode(String.valueOf(rand), false));
         }
     };
 
@@ -111,8 +118,10 @@ public interface SavegameType {
 
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
-            c.get().getNodeForKey("game_unique_id").getValueNode().set(
-                    new ValueNode(UUID.randomUUID().toString(), false));
+            c.get()
+                    .getNodeForKey("game_unique_id")
+                    .getValueNode()
+                    .set(new ValueNode(UUID.randomUUID().toString(), false));
         }
     };
 
@@ -183,8 +192,10 @@ public interface SavegameType {
 
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
-            c.get("gamestate").getNodeForKey("playthrough_id").getValueNode().set(
-                    new ValueNode(UUID.randomUUID().toString(), true));
+            c.get("gamestate")
+                    .getNodeForKey("playthrough_id")
+                    .getValueNode()
+                    .set(new ValueNode(UUID.randomUUID().toString(), true));
         }
     };
 
@@ -239,11 +250,9 @@ public interface SavegameType {
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
             int rand = new Random().nextInt(Integer.MAX_VALUE);
-            c.get().getNodeForKey("random_seed").getValueNode().set(
-                    new ValueNode(String.valueOf(rand), false));
+            c.get().getNodeForKey("random_seed").getValueNode().set(new ValueNode(String.valueOf(rand), false));
         }
     };
-
 
     SavegameType STELLARIS = new SavegameType() {
 
@@ -282,8 +291,10 @@ public interface SavegameType {
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
             int rand = new Random().nextInt(Integer.MAX_VALUE);
-            c.get("gamestate").getNodeForKey("random_seed").getValueNode().set(
-                    new ValueNode(String.valueOf(rand), false));
+            c.get("gamestate")
+                    .getNodeForKey("random_seed")
+                    .getValueNode()
+                    .set(new ValueNode(String.valueOf(rand), false));
         }
     };
 
@@ -328,8 +339,10 @@ public interface SavegameType {
 
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
-            c.get("gamestate").getNodeForKey("playthrough_id").getValueNode().set(
-                    new ValueNode(String.valueOf(new Random().nextInt(Integer.MAX_VALUE)), false));
+            c.get("gamestate")
+                    .getNodeForKey("playthrough_id")
+                    .getValueNode()
+                    .set(new ValueNode(String.valueOf(new Random().nextInt(Integer.MAX_VALUE)), false));
         }
     };
 
@@ -366,9 +379,7 @@ public interface SavegameType {
         }
 
         @Override
-        public void generateNewCampaignIdHeuristic(SavegameContent c) {
-
-        }
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {}
     };
 
     static SavegameType getTypeForFile(Path path) {

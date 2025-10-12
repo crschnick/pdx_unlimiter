@@ -5,12 +5,14 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
 import com.crschnick.pdxu.app.info.SavegameInfo;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
 import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -43,9 +45,9 @@ public class GuiSavegameEntryListComp<T, I extends SavegameInfo<T>> extends Simp
     @Override
     protected Region createSimple() {
         Region grid = new GuiListViewComp<>(
-                savegameManagerState.getShownEntries(),
-                savegameEntry -> new GuiSavegameEntryComp<>(savegameEntry, savegameManagerState),
-                true)
+                        savegameManagerState.getShownEntries(),
+                        savegameEntry -> new GuiSavegameEntryComp<>(savegameEntry, savegameManagerState),
+                        true)
                 .createRegion();
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);

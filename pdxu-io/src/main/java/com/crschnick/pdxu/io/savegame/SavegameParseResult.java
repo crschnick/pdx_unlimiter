@@ -98,15 +98,12 @@ public abstract class SavegameParseResult {
         }
     }
 
-    public static abstract class Visitor {
+    public abstract static class Visitor {
 
-        public void success(Success s) {
-        }
+        public void success(Success s) {}
 
-        public void error(Error e) {
-        }
+        public void error(Error e) {}
 
-        public void invalid(Invalid iv) {
-        }
+        public void invalid(Invalid iv) {}
     }
 }

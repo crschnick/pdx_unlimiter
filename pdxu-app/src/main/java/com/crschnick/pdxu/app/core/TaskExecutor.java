@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.ThreadHelper;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -26,11 +27,10 @@ public class TaskExecutor {
 
     public void start() {
         active = true;
-        executorService = Executors.newSingleThreadExecutor(
-                r -> {
-                    thread = ThreadHelper.createPlatformThread("Task Executor", false, r);
-                    return thread;
-                });
+        executorService = Executors.newSingleThreadExecutor(r -> {
+            thread = ThreadHelper.createPlatformThread("Task Executor", false, r);
+            return thread;
+        });
     }
 
     public void stopAndWait() {
@@ -67,11 +67,13 @@ public class TaskExecutor {
     }
 
     public void submitTask(Runnable r, boolean isBlocking) {
-        submitTask(() -> {
-            r.run();
-            return null;
-        }, v -> {
-        }, isBlocking);
+        submitTask(
+                () -> {
+                    r.run();
+                    return null;
+                },
+                v -> {},
+                isBlocking);
     }
 
     public <T> void submitTask(Callable<T> r, Consumer<T> onFinish, boolean isBlocking) {
@@ -93,7 +95,6 @@ public class TaskExecutor {
             } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(e).handle();
             }
-
 
             if (isBlocking) {
                 busy.setValue(false);

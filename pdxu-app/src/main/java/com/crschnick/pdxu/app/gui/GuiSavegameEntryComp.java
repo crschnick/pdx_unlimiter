@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui;
 
-import atlantafx.base.controls.Spacer;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.AppResources;
@@ -17,8 +16,7 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ConverterSupport;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.RakalyHelper;
-import com.jfoenix.controls.JFXMasonryPane;
-import com.jfoenix.controls.JFXSpinner;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -37,6 +35,10 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
+
+import atlantafx.base.controls.Spacer;
+import com.jfoenix.controls.JFXMasonryPane;
+import com.jfoenix.controls.JFXSpinner;
 import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -66,15 +68,16 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             });
         });
 
-        var dateString = e.getDate().toDisplayString(AppI18n.activeLanguage().getValue().getLocale());
+        var dateString =
+                e.getDate().toDisplayString(AppI18n.activeLanguage().getValue().getLocale());
         {
             Label l = new Label(dateString);
             l.getStyleClass().add(CLASS_DATE);
 
-            var tagImage = SavegameContext.mapSavegame(e,
-                    ctx -> ctx.getGuiFactory().createImage(e));
+            var tagImage =
+                    SavegameContext.mapSavegame(e, ctx -> ctx.getGuiFactory().createImage(e));
             HBox tagBar = new HBox(tagImage.getValue(), l);
-            tagImage.addListener((c,o,n) -> {
+            tagImage.addListener((c, o, n) -> {
                 Platform.runLater(() -> {
                     tagBar.getChildren().set(0, n);
                 });
@@ -142,7 +145,11 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             });
             export.getStyleClass().add(CLASS_EXPORT);
             export.setAccessibleText("Export");
-            GuiTooltips.install(export, AppI18n.get("exportSavegame", SavegameContext.getContext(e).getGame().getTranslatedFullName()));
+            GuiTooltips.install(
+                    export,
+                    AppI18n.get(
+                            "exportSavegame",
+                            SavegameContext.getContext(e).getGame().getTranslatedFullName()));
             staticButtons.getChildren().add(export);
         }
         {
@@ -189,11 +196,9 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             SavegameActions.openSavegame(e);
         });
 
-
         HBox dynamicButtons = new HBox();
         dynamicButtons.setAlignment(Pos.CENTER);
         dynamicButtons.getStyleClass().add(CLASS_BUTTON_BAR);
-
 
         {
             Button melt = new Button(null, new FontIcon());
@@ -234,7 +239,8 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         if (OsType.ofLocal() == OsType.WINDOWS) {
             SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
                 ConverterSupport.ALL.forEach(converterSupport -> {
-                    if (converterSupport.getFromGame().equals(ctx.getGame()) && GameInstallation.ALL.get(converterSupport.getToGame()) != null) {
+                    if (converterSupport.getFromGame().equals(ctx.getGame())
+                            && GameInstallation.ALL.get(converterSupport.getToGame()) != null) {
                         Platform.runLater(() -> {
                             Button convert = new Button(null, new FontIcon());
                             convert.setGraphic(new FontIcon());
@@ -259,7 +265,10 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         GuiTooltips.install(edit, AppI18n.get("editSavegame"));
         ChangeListener<SavegameEntry.State> stateChange = new ChangeListener<>() {
             @Override
-            public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
+            public void changed(
+                    ObservableValue<? extends SavegameEntry.State> observable,
+                    SavegameEntry.State oldValue,
+                    SavegameEntry.State n) {
                 boolean add = false;
                 if (n.equals(SavegameEntry.State.LOADED)) {
                     boolean binary = e.getInfo().getData().isBinary();
@@ -304,11 +313,14 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         container.setLayoutMode(JFXMasonryPane.LayoutMode.MASONRY);
         container.setHSpacing(10);
         container.setVSpacing(10);
-        container.minHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> 3 * container.getCellHeight() +
-                        2 * container.getVSpacing() +
-                        container.getPadding().getBottom() +
-                        container.getPadding().getTop(), container.paddingProperty()));
+        container
+                .minHeightProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> 3 * container.getCellHeight()
+                                + 2 * container.getVSpacing()
+                                + container.getPadding().getBottom()
+                                + container.getPadding().getTop(),
+                        container.paddingProperty()));
         container.setLimitRow(3);
         return container;
     }
@@ -329,7 +341,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
                 if (ctx.getInfo() != null) {
                     TaskExecutor.getInstance().submitOrRun(() -> {
                         var container = ctx.getInfo().createContainer();
-                        //ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
+                        // ctx.getGuiFactory().fillNodeContainer(ctx.getInfo(), container);
 
                         Platform.runLater(() -> {
                             loading.setVisible(false);
@@ -344,7 +356,10 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
         entry.stateProperty().addListener(new ChangeListener<>() {
             @Override
-            public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
+            public void changed(
+                    ObservableValue<? extends SavegameEntry.State> observable,
+                    SavegameEntry.State oldValue,
+                    SavegameEntry.State n) {
                 boolean showLoad = n == SavegameEntry.State.LOADING;
                 if (showLoad) {
                     Platform.runLater(() -> {
@@ -406,9 +421,9 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         entryNode.getChildren().add(content);
 
         // For debugging memory leaks
-//        for (int i = 0; i < 1000; i++) {
-//            var c = createSavegameInfoNode(e);
-//        }
+        //        for (int i = 0; i < 1000; i++) {
+        //            var c = createSavegameInfoNode(e);
+        //        }
 
         content.setCursor(Cursor.HAND);
 

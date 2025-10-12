@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
+
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -61,15 +62,10 @@ public class Eu4TagRenderer {
         BufferedImage i = new BufferedImage(SMALL_IMG_SIZE, SMALL_IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        g.drawImage(flagImage,
-                8,
-                5,
-                i.getWidth() - 16,
-                i.getHeight() - 13,
-                new Color(0, 0, 0, 0),
-                null);
+        g.drawImage(flagImage, 8, 5, i.getWidth() - 16, i.getHeight() - 13, new Color(0, 0, 0, 0), null);
 
-        g.drawImage(ImageHelper.fromFXImage(GameImage.EU4_SMALL_SHIELD_FRAME),
+        g.drawImage(
+                ImageHelper.fromFXImage(GameImage.EU4_SMALL_SHIELD_FRAME),
                 -2,
                 -4,
                 i.getWidth() + 4,
@@ -94,15 +90,10 @@ public class Eu4TagRenderer {
         BufferedImage i = new BufferedImage(IMG_SIZE, IMG_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
-        g.drawImage(flagImage,
-                32,
-                42,
-                i.getWidth() - 64,
-                i.getHeight() - 64,
-                new Color(0, 0, 0, 0),
-                null);
+        g.drawImage(flagImage, 32, 42, i.getWidth() - 64, i.getHeight() - 64, new Color(0, 0, 0, 0), null);
 
-        g.drawImage(ImageHelper.fromFXImage(GameImage.EU4_SHIELD_FRAME),
+        g.drawImage(
+                ImageHelper.fromFXImage(GameImage.EU4_SHIELD_FRAME),
                 -25,
                 0,
                 i.getWidth() + 50,
@@ -121,8 +112,7 @@ public class Eu4TagRenderer {
         for (int x = 0; x < awtImage.getWidth(); x++) {
             for (int y = 0; y < awtImage.getHeight(); y++) {
                 int argb = awtImage.getRGB(x, y);
-                int maskArgb = mask.getPixelReader().getArgb(
-                        (int) Math.floor(xF * x), (int) Math.floor(yF * y));
+                int maskArgb = mask.getPixelReader().getArgb((int) Math.floor(xF * x), (int) Math.floor(yF * y));
                 int maskAlpha = maskArgb & 0xFF000000;
 
                 int color = (argb & 0x00FFFFFF) + maskAlpha;

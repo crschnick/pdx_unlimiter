@@ -23,8 +23,7 @@ public abstract class GameDateType {
         }
 
         @Override
-        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt)
-                throws IOException {
+        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
             JsonNode node = jp.getCodec().readTree(jp);
             if (node.textValue().equals("eu4")) {
                 return EU4;
@@ -61,7 +60,8 @@ public abstract class GameDateType {
 
         @Override
         public String toLongString(Locale l, GameDate date) {
-            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
+            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", "
+                    + date.getYear();
         }
     };
     public static final GameDateType CK3 = EU4;
@@ -85,7 +85,8 @@ public abstract class GameDateType {
 
         @Override
         public String toLongString(Locale l, GameDate date) {
-            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
+            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", "
+                    + date.getYear();
         }
     };
     public static final GameDateType HOI4 = new GameDateType() {
@@ -106,8 +107,8 @@ public abstract class GameDateType {
 
         @Override
         public String toLongString(Locale l, GameDate date) {
-            return (date.getHour() + 1) + ":00, " + date.getDay() + " " +
-                    Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
+            return (date.getHour() + 1) + ":00, " + date.getDay() + " "
+                    + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
         }
     };
 
@@ -130,7 +131,8 @@ public abstract class GameDateType {
 
         @Override
         public String toLongString(Locale l, GameDate date) {
-            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
+            return date.getDay() + " " + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", "
+                    + date.getYear();
         }
     };
 

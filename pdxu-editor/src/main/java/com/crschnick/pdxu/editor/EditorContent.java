@@ -2,6 +2,7 @@ package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.editor.node.EditorNode;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -82,7 +83,8 @@ public class EditorContent {
         }
 
         this.page = newPage;
-        int offset = pageSizes.subList(0, page).stream().mapToInt(Integer::intValue).sum();
+        int offset =
+                pageSizes.subList(0, page).stream().mapToInt(Integer::intValue).sum();
         int length = pageSizes.get(page);
 
         // Ugly but necessary in case the editor nodes didn't change but the content values did

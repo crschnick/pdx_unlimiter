@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.comp.base.TooltipHelper;
+
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.Node;

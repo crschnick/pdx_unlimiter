@@ -1,9 +1,7 @@
 package com.crschnick.pdxu.app.savegame;
 
-import com.crschnick.pdxu.app.comp.base.ModalOverlay;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.core.window.AppDialog;
-import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
@@ -14,9 +12,9 @@ import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.app.util.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+
 import javafx.scene.image.Image;
+
 import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Files;
@@ -26,7 +24,8 @@ import java.util.Set;
 
 public class SavegameActions {
 
-    public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(SavegameEntry<T, I> entry, boolean includeEntryName) {
+    public static <T, I extends SavegameInfo<T>> Optional<Path> exportToTemp(
+            SavegameEntry<T, I> entry, boolean includeEntryName) {
         return Optional.ofNullable(SavegameContext.mapSavegame(entry, ctx -> {
             var target = FileExportTarget.createExportTarget(
                     FileUtils.getTempDirectory().toPath(), includeEntryName, entry);
@@ -63,16 +62,20 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void branch(SavegameEntry<T, I> entry) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegameInfoContextAsync(entry, ctx -> {
-                ctx.getStorage().createNewBranch(entry);
-            });
-        }, true);
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withSavegameInfoContextAsync(entry, ctx -> {
+                                ctx.getStorage().createNewBranch(entry);
+                            });
+                        },
+                        true);
     }
 
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
-            return ctx.getGuiFactory().tagImage(entry.getInfo(), entry.getInfo().getData().getTag());
+            return ctx.getGuiFactory()
+                    .tagImage(entry.getInfo(), entry.getInfo().getData().getTag());
         });
     }
 
@@ -104,17 +107,22 @@ public class SavegameActions {
             @Override
             public void success(SavegameParseResult.Success s) {
                 try {
-                    var targetUuuid = savegames.getFirst().getCampaignIdOverride()
-                            .orElse(type.getCampaignIdHeuristic(s.content));
-                    SavegameStorage.get(g).getSavegameCampaign(targetUuuid)
-                            .flatMap(col -> col.entryStream().findFirst()).ifPresent(entry -> {
-                        TaskExecutor.getInstance().submitTask(() -> {
-                            SavegameStorage.get(g).loadEntry(entry);
-                            SavegameContext.withSavegameContext(entry, ctx -> {
-                                GameDistLauncher.continueSavegame(entry, false);
+                    var targetUuuid =
+                            savegames.getFirst().getCampaignIdOverride().orElse(type.getCampaignIdHeuristic(s.content));
+                    SavegameStorage.get(g)
+                            .getSavegameCampaign(targetUuuid)
+                            .flatMap(col -> col.entryStream().findFirst())
+                            .ifPresent(entry -> {
+                                TaskExecutor.getInstance()
+                                        .submitTask(
+                                                () -> {
+                                                    SavegameStorage.get(g).loadEntry(entry);
+                                                    SavegameContext.withSavegameContext(entry, ctx -> {
+                                                        GameDistLauncher.continueSavegame(entry, false);
+                                                    });
+                                                },
+                                                true);
                             });
-                        }, true);
-                    });
                 } catch (Exception e) {
                     ErrorEventFactory.fromThrowable(e).handle();
                 }
@@ -163,27 +171,36 @@ public class SavegameActions {
             return;
         }
 
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
-                ctx.getStorage().melt(ctx.getEntry());
-            });
-        }, true);
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+                                ctx.getStorage().melt(ctx.getEntry());
+                            });
+                        },
+                        true);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegameContext(e, ctx -> {
-                ctx.getStorage().delete(e);
-            });
-        }, false);
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withSavegameContext(e, ctx -> {
+                                ctx.getStorage().delete(e);
+                            });
+                        },
+                        false);
     }
 
     public static <T, I extends SavegameInfo<T>> void delete(SavegameCampaign<T, I> c) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withCollectionContext(c, ctx -> {
-                ctx.getStorage().delete(c);
-            });
-        }, false);
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withCollectionContext(c, ctx -> {
+                                ctx.getStorage().delete(c);
+                            });
+                        },
+                        false);
     }
 
     public static <T, I extends SavegameInfo<T>> void editSavegame(SavegameEntry<T, I> e) {
@@ -193,23 +210,29 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void reloadSavegame(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegameContext(e, ctx -> {
-                TrackEvent.debug("Reloading savegame");
-                e.unload();
-                ctx.getStorage().invalidateSavegameInfo(e);
-                ctx.getStorage().loadEntry(e);
-            });
-        }, false);
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withSavegameContext(e, ctx -> {
+                                TrackEvent.debug("Reloading savegame");
+                                e.unload();
+                                ctx.getStorage().invalidateSavegameInfo(e);
+                                ctx.getStorage().loadEntry(e);
+                            });
+                        },
+                        false);
     }
 
     public static <T, I extends SavegameInfo<T>> void copySavegame(SavegameEntry<T, I> e) {
-        TaskExecutor.getInstance().submitTask(() -> {
-            SavegameContext.withSavegameContext(e, ctx -> {
-                var in = ctx.getStorage().getSavegameFile(e);
-                var campaignId = ctx.getCollection().getUuid();
-                ctx.getStorage().importSavegame(in, false, null, campaignId);
-            });
-        }, true);
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withSavegameContext(e, ctx -> {
+                                var in = ctx.getStorage().getSavegameFile(e);
+                                var campaignId = ctx.getCollection().getUuid();
+                                ctx.getStorage().importSavegame(in, false, null, campaignId);
+                            });
+                        },
+                        true);
     }
 }

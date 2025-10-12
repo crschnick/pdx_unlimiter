@@ -2,6 +2,7 @@ package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.io.node.NodeMatcher;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -47,12 +48,14 @@ public class EditorFilter {
 
         var splitKey = Arrays.stream(key.split("_")).map(map).collect(Collectors.toSet());
 
-        var filterSplitSpaces = Arrays.stream(filterString.get().split(" ")).map(map).toList();
+        var filterSplitSpaces =
+                Arrays.stream(filterString.get().split(" ")).map(map).toList();
         if (filterSplitSpaces.stream().allMatch(s -> splitKey.stream().anyMatch(o -> o.contains(s)))) {
             return true;
         }
 
-        var filterSplitUnderscores = Arrays.stream(filterString.get().split("_")).map(map).toList();
+        var filterSplitUnderscores =
+                Arrays.stream(filterString.get().split("_")).map(map).toList();
         if (filterSplitUnderscores.stream().allMatch(s -> splitKey.stream().anyMatch(o -> o.contains(s)))) {
             return true;
         }
@@ -61,24 +64,26 @@ public class EditorFilter {
     }
 
     public List<EditorNode> filter(List<EditorNode> input) {
-        var matcher = caseSensitive.get() ?
-                new NodeMatcher.CaseSenstiveMatcher(filterString.get()) :
-                new NodeMatcher.CaseInsenstiveMatcher(filterString.get());
-        return input.stream().filter(n -> {
-            if (!filterKeys.get() && !filterValues.get()) {
-                return true;
-            }
+        var matcher = caseSensitive.get()
+                ? new NodeMatcher.CaseSenstiveMatcher(filterString.get())
+                : new NodeMatcher.CaseInsenstiveMatcher(filterString.get());
+        return input.stream()
+                .filter(n -> {
+                    if (!filterKeys.get() && !filterValues.get()) {
+                        return true;
+                    }
 
-            if (filterString.get().length() == 0) {
-                return true;
-            }
+                    if (filterString.get().length() == 0) {
+                        return true;
+                    }
 
-            if (filterKeys.get() && n.filterKey(this::matchesKey)) {
-                return true;
-            } else {
-                return filterValues.get() && n.filterValue(matcher);
-            }
-        }).collect(Collectors.toList());
+                    if (filterKeys.get() && n.filterKey(this::matchesKey)) {
+                        return true;
+                    } else {
+                        return filterValues.get() && n.filterValue(matcher);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public StringProperty filterStringProperty() {

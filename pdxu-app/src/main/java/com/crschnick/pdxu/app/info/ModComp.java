@@ -2,11 +2,12 @@ package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
@@ -43,11 +44,14 @@ public class ModComp extends SavegameInfoComp {
         label.setGraphic(new FontIcon());
         label.getStyleClass().add(CLASS_CONTENT);
 
-        var tooltip = AppI18n.get("modsRequired") + ":\n" +
-                mods.stream()
+        var tooltip = AppI18n.get("modsRequired") + ":\n"
+                + mods.stream()
                         .map(s -> {
                             var m = data.installation().getModForSavegameId(s);
-                            return "- " + (m.isPresent() ? m.get().getName().orElse(s) : s + " (" + AppI18n.get("missing") + ")");
+                            return "- "
+                                    + (m.isPresent()
+                                            ? m.get().getName().orElse(s)
+                                            : s + " (" + AppI18n.get("missing") + ")");
                         })
                         .collect(Collectors.joining("\n"));
         GuiTooltips.install(label, tooltip);

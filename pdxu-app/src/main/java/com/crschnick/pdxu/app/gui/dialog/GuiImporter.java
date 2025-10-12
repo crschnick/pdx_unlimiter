@@ -5,13 +5,12 @@ import com.crschnick.pdxu.app.comp.base.ModalButton;
 import com.crschnick.pdxu.app.comp.base.ModalOverlay;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppDialog;
-import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
+
 import javafx.application.Platform;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -21,9 +20,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.Map;
-
-import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CONTENT_DIALOG;
-
 
 public class GuiImporter {
 
@@ -38,7 +34,10 @@ public class GuiImporter {
             e.getValue().visit(new SavegameParseResult.Visitor() {
                 @Override
                 public void invalid(SavegameParseResult.Invalid iv) {
-                    text.append("\n- ").append(e.getKey().getName()).append(": ").append(iv.message);
+                    text.append("\n- ")
+                            .append(e.getKey().getName())
+                            .append(": ")
+                            .append(iv.message);
                 }
 
                 @Override
@@ -75,16 +74,24 @@ public class GuiImporter {
         GuiImporterState state = new GuiImporterState(game);
 
         var modal = ModalOverlay.of("importSavegames", Comp.of(() -> createContent(state)));
-        modal.addButton(new ModalButton("delete", () -> {
-            var confirm = AppDialog.confirm("deleteSavegames");
-            if (confirm) {
-                state.getSelectedTargets().forEach(FileImportTarget::delete);
-            }
-        }, false, false));
+        modal.addButton(new ModalButton(
+                "delete",
+                () -> {
+                    var confirm = AppDialog.confirm("deleteSavegames");
+                    if (confirm) {
+                        state.getSelectedTargets().forEach(FileImportTarget::delete);
+                    }
+                },
+                false,
+                false));
         modal.addButtonBarComp(Comp.hspacer());
-        modal.addButton(new ModalButton("import", () -> {
-            FileImporter.importTargets(state.getSelectedTargets());
-        }, true, true));
+        modal.addButton(new ModalButton(
+                "import",
+                () -> {
+                    FileImporter.importTargets(state.getSelectedTargets());
+                },
+                true,
+                true));
         modal.show();
     }
 

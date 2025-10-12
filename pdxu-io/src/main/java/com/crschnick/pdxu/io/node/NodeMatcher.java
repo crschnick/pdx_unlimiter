@@ -55,8 +55,8 @@ public abstract class NodeMatcher {
                     var lc = lowerCases[j];
                     var uc = upperCases[j];
 
-                    if (!Arrays.equals(array, byteIndex, byteIndex + lc.length, lc, 0, lc.length) &&
-                            !Arrays.equals(array, byteIndex, byteIndex + uc.length, uc, 0, uc.length)) {
+                    if (!Arrays.equals(array, byteIndex, byteIndex + lc.length, lc, 0, lc.length)
+                            && !Arrays.equals(array, byteIndex, byteIndex + uc.length, uc, 0, uc.length)) {
                         found = false;
                         break;
                     }

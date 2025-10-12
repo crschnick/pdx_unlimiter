@@ -21,7 +21,8 @@ public interface NodeWriter {
         return new String(writeToBytes(node, maxLines, indent), StandardCharsets.UTF_8);
     }
 
-    static void write(OutputStream out, Charset charset, ArrayNode node, String indent, int indentLevel) throws IOException {
+    static void write(OutputStream out, Charset charset, ArrayNode node, String indent, int indentLevel)
+            throws IOException {
         var bout = new BufferedOutputStream(out, 1000000);
         try {
             var writer = new NodeWriterImpl(bout, charset, Integer.MAX_VALUE, indent);

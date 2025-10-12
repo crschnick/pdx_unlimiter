@@ -9,7 +9,9 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
+
 import javafx.scene.image.Image;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -55,8 +57,8 @@ public class StellarisWarMultiComp extends SavegameInfoMultiComp {
                 continue;
             }
 
-
-            String title = war.getNodeForKeyIfExistent("key").map(Node::getString).orElse("MISSING NAME");
+            String title =
+                    war.getNodeForKeyIfExistent("key").map(Node::getString).orElse("MISSING NAME");
             boolean isAttacker = false;
             List<StellarisTag> attackers = new ArrayList<>();
             if (war.hasKey("attackers")) {

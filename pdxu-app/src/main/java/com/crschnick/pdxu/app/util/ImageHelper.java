@@ -2,17 +2,19 @@ package com.crschnick.pdxu.app.util;
 
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
-import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
+
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.*;
 
-import javax.imageio.ImageIO;
-import javax.imageio.spi.IIORegistry;
+import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.IIORegistry;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.*;
 
@@ -38,7 +40,8 @@ public class ImageHelper {
 
         PixelReader reader = img.getPixelReader();
         try {
-            return new WritableImage(reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());
+            return new WritableImage(
+                    reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());
         } catch (Exception e) {
             ErrorEventFactory.fromThrowable(e).handle();
             return DEFAULT_IMAGE;
@@ -64,7 +67,9 @@ public class ImageHelper {
         try {
             image = ImageIO.read(p.toFile());
         } catch (IOException e) {
-            ErrorEventFactory.fromThrowable("Image file " + p.toString() + " not readable.", e).omit().handle();
+            ErrorEventFactory.fromThrowable("Image file " + p.toString() + " not readable.", e)
+                    .omit()
+                    .handle();
             return DEFAULT_IMAGE;
         }
 
@@ -80,7 +85,15 @@ public class ImageHelper {
             }
         }
         PixelWriter pw = img.getPixelWriter();
-        pw.setPixels(0, 0, image.getWidth(), image.getHeight(), PixelFormat.getIntArgbInstance(), iArray, 0, image.getWidth());
+        pw.setPixels(
+                0,
+                0,
+                image.getWidth(),
+                image.getHeight(),
+                PixelFormat.getIntArgbInstance(),
+                iArray,
+                0,
+                image.getWidth());
         return img;
     }
 
@@ -97,7 +110,9 @@ public class ImageHelper {
             }
             return image;
         } catch (IOException e) {
-            ErrorEventFactory.fromThrowable("Image file " + input.toString() + " not readable.", e).omit().handle();
+            ErrorEventFactory.fromThrowable("Image file " + input.toString() + " not readable.", e)
+                    .omit()
+                    .handle();
             return DEFAULT_AWT_IMAGE;
         }
     }
@@ -106,13 +121,21 @@ public class ImageHelper {
         WritableImage img = new WritableImage(image.getWidth(), image.getHeight());
         var iArray = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
         PixelWriter pw = img.getPixelWriter();
-        pw.setPixels(0, 0, image.getWidth(), image.getHeight(), PixelFormat.getIntArgbInstance(), iArray, 0, image.getWidth());
+        pw.setPixels(
+                0,
+                0,
+                image.getWidth(),
+                image.getHeight(),
+                PixelFormat.getIntArgbInstance(),
+                iArray,
+                0,
+                image.getWidth());
         return img;
     }
 
     public static BufferedImage fromFXImage(Image fxImage) {
-        BufferedImage img = new BufferedImage(
-                (int) fxImage.getWidth(), (int) fxImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img =
+                new BufferedImage((int) fxImage.getWidth(), (int) fxImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
         for (int x = 0; x < fxImage.getWidth(); x++) {
             for (int y = 0; y < fxImage.getHeight(); y++) {
                 int rgb = fxImage.getPixelReader().getArgb(x, y);
@@ -133,10 +156,8 @@ public class ImageHelper {
             }
         }
 
-        BufferedImage swingImage = new BufferedImage(
-                (int) image.getWidth(),
-                (int) image.getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
+        BufferedImage swingImage =
+                new BufferedImage((int) image.getWidth(), (int) image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
@@ -153,13 +174,9 @@ public class ImageHelper {
         for (int x = 0; x < awtImage.getWidth(); x++) {
             for (int y = 0; y < awtImage.getHeight(); y++) {
                 int argb = awtImage.getRGB(x, y);
-                int maskArgb = mask.getPixelReader().getArgb(
-                        (int) Math.floor(xF * x), (int) Math.floor(yF * y));
+                int maskArgb = mask.getPixelReader().getArgb((int) Math.floor(xF * x), (int) Math.floor(yF * y));
 
-                int color = ((getAlpha(maskArgb)) << 24) +
-                        (getRed(argb) << 16) +
-                        (getGreen(argb) << 8) +
-                        getBlue(argb);
+                int color = ((getAlpha(maskArgb)) << 24) + (getRed(argb) << 16) + (getGreen(argb) << 8) + getBlue(argb);
                 awtImage.setRGB(x, y, color);
             }
         }

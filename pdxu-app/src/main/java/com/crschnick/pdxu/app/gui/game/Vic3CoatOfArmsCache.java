@@ -13,6 +13,7 @@ import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
+
 import javafx.scene.image.Image;
 
 import java.nio.file.Files;
@@ -53,8 +54,10 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
         };
         CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("named_colors"), ctx, loader);
 
-        var jominiColors = GameInstallation.ALL.get(Game.VIC3)
-                .getInstallDir().resolve("jomini/common/named_colors/default_colors.txt");
+        var jominiColors = GameInstallation.ALL
+                .get(Game.VIC3)
+                .getInstallDir()
+                .resolve("jomini/common/named_colors/default_colors.txt");
         if (Files.exists(jominiColors)) {
             loader.accept(jominiColors);
         }
@@ -83,14 +86,14 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
         var context = GameFileContext.fromData(info.getData());
         var all = getCoatOfArmsNode(context);
         try {
-            Supplier<CoatOfArms> coa = tag == info.getData().getTag() ?
-                    () -> info.getData().vic3().getCoatOfArms() :
-                    () -> CoatOfArms.fromNode(all.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
-                        var found = all.getNodesForKey(s);
-                        return found.size() > 0 ? found.getLast() : null;
-                    });
-            var img = Vic3TagRenderer.renderImage(
-                    coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
+            Supplier<CoatOfArms> coa = tag == info.getData().getTag()
+                    ? () -> info.getData().vic3().getCoatOfArms()
+                    : () -> CoatOfArms.fromNode(
+                            all.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
+                                var found = all.getNodesForKey(s);
+                                return found.size() > 0 ? found.getLast() : null;
+                            });
+            var img = Vic3TagRenderer.renderImage(coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
             var convertedImage = ImageHelper.toFXImage(img);
             cache.flags.put(tag, convertedImage);
             return convertedImage;

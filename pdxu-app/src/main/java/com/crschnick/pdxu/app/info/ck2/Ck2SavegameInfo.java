@@ -10,8 +10,7 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
 
     VersionComp version;
 
-    public Ck2SavegameInfo() {
-    }
+    public Ck2SavegameInfo() {}
 
     public Ck2SavegameInfo(SavegameContent content) throws Exception {
         super(content);
@@ -26,5 +25,4 @@ public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
     protected Class<? extends SavegameData<Ck2Tag>> getDataClass() {
         return Ck2SavegameData.class;
     }
-
 }

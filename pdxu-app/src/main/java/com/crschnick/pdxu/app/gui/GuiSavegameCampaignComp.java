@@ -10,6 +10,7 @@ import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
+
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
@@ -23,6 +24,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+
 import lombok.AllArgsConstructor;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
@@ -73,11 +75,12 @@ public class GuiSavegameCampaignComp<T, I extends SavegameInfo<T>> extends Simpl
             AppFontSizes.xxl(name);
 
             var del = new IconButtonComp(new LabelGraphic.IconGraphic("mdi2t-trash-can-outline"), () -> {
-                var confirm = AppDialog.confirm("deleteCampaign");
-                if (confirm) {
-                    SavegameActions.delete(campaign);
-                }
-            }).createRegion();
+                        var confirm = AppDialog.confirm("deleteCampaign");
+                        if (confirm) {
+                            SavegameActions.delete(campaign);
+                        }
+                    })
+                    .createRegion();
             del.setAccessibleText("Delete campaign");
             top.getChildren().add(del);
 

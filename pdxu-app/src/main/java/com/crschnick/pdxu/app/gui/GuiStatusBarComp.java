@@ -11,6 +11,7 @@ import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.app.util.Hyperlinks;
+
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -18,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+
 import lombok.RequiredArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -42,7 +44,8 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
         barPane.getStyleClass().add(CLASS_STATUS_BAR);
         barPane.getStyleClass().add(CLASS_STATUS_RUNNING);
 
-        Label text = new Label(g.getTranslatedFullName() + " (" + AppI18n.get("running") + ")",
+        Label text = new Label(
+                g.getTranslatedFullName() + " (" + AppI18n.get("running") + ")",
                 GameGuiFactory.get(g).createIcon());
         text.getStyleClass().add(CLASS_TEXT);
         barPane.setLeft(text);
@@ -116,8 +119,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
 
         SavegameContext.withSavegameContext(e, ctx -> {
             Label text = new Label(
-                    ctx.getStorage().getEntryName(e),
-                    ctx.getGuiFactory().createIcon());
+                    ctx.getStorage().getEntryName(e), ctx.getGuiFactory().createIcon());
             AppFontSizes.xl(text);
             text.setGraphicTextGap(9);
             text.getStyleClass().add("text");
@@ -125,10 +127,13 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
             BorderPane.setAlignment(text, Pos.CENTER);
 
             var externalData = SavegameCompatibility.determineForModsAndDLCs(e);
-            var version = SavegameCompatibility.determineForVersion(ctx.getGame(), ctx.getInfo().getData().getVersion());
-            if (externalData == SavegameCompatibility.Compatbility.INCOMPATIBLE || version == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
+            var version = SavegameCompatibility.determineForVersion(
+                    ctx.getGame(), ctx.getInfo().getData().getVersion());
+            if (externalData == SavegameCompatibility.Compatbility.INCOMPATIBLE
+                    || version == SavegameCompatibility.Compatbility.INCOMPATIBLE) {
                 barPane.getStyleClass().add(CLASS_STATUS_INCOMPATIBLE);
-            } else if (externalData == SavegameCompatibility.Compatbility.UNKNOWN || version == SavegameCompatibility.Compatbility.UNKNOWN) {
+            } else if (externalData == SavegameCompatibility.Compatbility.UNKNOWN
+                    || version == SavegameCompatibility.Compatbility.UNKNOWN) {
                 barPane.getStyleClass().add("status-compatible-unknown");
             }
             {
@@ -259,7 +264,6 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
             select(pane, sel);
         }
     }
-
 
     @Override
     protected Region createSimple() {

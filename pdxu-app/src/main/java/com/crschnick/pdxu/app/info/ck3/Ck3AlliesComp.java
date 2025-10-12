@@ -2,9 +2,9 @@ package com.crschnick.pdxu.app.info.ck3;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.info.SavegameData;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
+
 import javafx.scene.image.Image;
 
 import java.util.ArrayList;

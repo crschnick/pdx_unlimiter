@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
+
 import javafx.scene.layout.Region;
 
 import java.util.List;
@@ -18,9 +19,9 @@ public abstract class Ck3DiplomacyRowComp extends DiplomacyRowComp<Ck3Tag> {
     @Override
     protected Region map(SavegameData<?> data, Ck3Tag tag) {
         return GameImage.imageNode(
-                Ck3TagRenderer.renderRealmImage(tag.getCoatOfArms(), tag.getGovernmentName(), GameFileContext.fromData(data), 64, false),
-                CLASS_TAG_ICON
-        );
+                Ck3TagRenderer.renderRealmImage(
+                        tag.getCoatOfArms(), tag.getGovernmentName(), GameFileContext.fromData(data), 64, false),
+                CLASS_TAG_ICON);
     }
 
     @Override

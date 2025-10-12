@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -33,7 +34,9 @@ public abstract class GameDist {
     }
 
     public Path determineUserDir() throws IOException {
-        return getGame().getInstallType().determineUserDir(getInstallLocation(), getGame().getInstallationName());
+        return getGame()
+                .getInstallType()
+                .determineUserDir(getInstallLocation(), getGame().getInstallationName());
     }
 
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
@@ -53,7 +56,6 @@ public abstract class GameDist {
     public Path getIcon() {
         return getGame().getInstallType().getIcon(getInstallLocation());
     }
-
 
     public Path getExecutable() {
         return getGame().getInstallType().getExecutable(getInstallLocation());

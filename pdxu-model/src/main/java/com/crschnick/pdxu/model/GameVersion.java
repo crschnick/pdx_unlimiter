@@ -1,18 +1,10 @@
 package com.crschnick.pdxu.model;
 
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        property = "type"
-)
-@JsonSubTypes(
-        {
-                @JsonSubTypes.Type(value = GameNamedVersion.class)
-        }
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({@JsonSubTypes.Type(value = GameNamedVersion.class)})
 public class GameVersion implements Comparable<GameVersion> {
 
     private int first;
@@ -20,8 +12,7 @@ public class GameVersion implements Comparable<GameVersion> {
     private int third;
     private int fourth;
 
-    public GameVersion() {
-    }
+    public GameVersion() {}
 
     public GameVersion(int first, int second, int third, int fourth) {
         this.first = first;
@@ -53,9 +44,10 @@ public class GameVersion implements Comparable<GameVersion> {
 
     @Override
     public int compareTo(GameVersion o) {
-        return (first - o.first) != 0 ? (first - o.first) :
-                (second - o.second) != 0 ? (second - o.second) :
-                        (third - o.third) != 0 ? (third - o.third) :
-                                (fourth - o.fourth);
+        return (first - o.first) != 0
+                ? (first - o.first)
+                : (second - o.second) != 0
+                        ? (second - o.second)
+                        : (third - o.third) != 0 ? (third - o.third) : (fourth - o.fourth);
     }
 }

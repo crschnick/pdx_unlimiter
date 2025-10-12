@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+
 import javafx.beans.value.ObservableValue;
 
 import java.util.Optional;
@@ -37,8 +38,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
     }
 
     public static <T, I extends SavegameInfo<T>> void withCollectionContext(
-            SavegameCampaign<T, I> col,
-            Consumer<SavegameContext<T, I>> con) {
+            SavegameCampaign<T, I> col, Consumer<SavegameContext<T, I>> con) {
         var g = getForCollection(col);
         if (g == null) {
             return;
@@ -56,8 +56,7 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
     }
 
     public static <T, I extends SavegameInfo<T>> void withSavegameInfoContextAsync(
-            SavegameEntry<T, I> e,
-            Consumer<SavegameContext<T, I>> con) {
+            SavegameEntry<T, I> e, Consumer<SavegameContext<T, I>> con) {
         var ctx = getContextIfExistent(e);
         if (ctx.isEmpty()) {
             return;
@@ -115,10 +114,8 @@ public class SavegameContext<T, I extends SavegameInfo<T>> {
         return Optional.of(ctx);
     }
 
-    public static <T, I extends SavegameInfo<T>> SavegameContext<T, I> getContext(
-            SavegameEntry<T, I> e) {
-        return getContextIfExistent(e).orElseThrow(
-                () -> new IllegalStateException("Savegame is not stored (anymore)"));
+    public static <T, I extends SavegameInfo<T>> SavegameContext<T, I> getContext(SavegameEntry<T, I> e) {
+        return getContextIfExistent(e).orElseThrow(() -> new IllegalStateException("Savegame is not stored (anymore)"));
     }
 
     public static <T, I extends SavegameInfo<T>, R> R mapSavegame(

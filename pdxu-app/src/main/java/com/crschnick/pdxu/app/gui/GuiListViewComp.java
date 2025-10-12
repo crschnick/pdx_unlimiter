@@ -2,12 +2,14 @@ package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
+
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+
 import lombok.AllArgsConstructor;
 
 import java.util.HashMap;
@@ -16,9 +18,9 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class GuiListViewComp<T> extends SimpleComp {
 
-    private  final ListProperty<T> list;
-    private  final Function<T, Comp<?>> nodeFactory;
-    private  final boolean fixSize;
+    private final ListProperty<T> list;
+    private final Function<T, Comp<?>> nodeFactory;
+    private final boolean fixSize;
 
     private Region createForItem(T li, Function<T, Comp<?>> nodeFactory) {
         var node = nodeFactory.apply(li).createRegion();
@@ -33,8 +35,8 @@ public class GuiListViewComp<T> extends SimpleComp {
 
         Platform.runLater(() -> {
             ListView<Node> listView = new ListView<>();
-            var newItems = list.stream()
-                    .map(li -> createForItem(li, nodeFactory)).toList();
+            var newItems =
+                    list.stream().map(li -> createForItem(li, nodeFactory)).toList();
 
             listView.prefWidthProperty().bind(pane.widthProperty());
             listView.prefHeightProperty().bind(pane.heightProperty());
@@ -51,7 +53,8 @@ public class GuiListViewComp<T> extends SimpleComp {
             Platform.runLater(() -> {
                 var map = new HashMap<T, Region>();
                 ((ListView<Node>) pane.getChildren().getFirst())
-                        .getItems().forEach(node -> map.put((T) node.getProperties().get("list-item"), (Region) node));
+                        .getItems()
+                        .forEach(node -> map.put((T) node.getProperties().get("list-item"), (Region) node));
 
                 ListView<Node> listView = new ListView<>();
                 var newItems = n.stream()
@@ -61,7 +64,8 @@ public class GuiListViewComp<T> extends SimpleComp {
                                 def = createForItem(li, nodeFactory);
                             }
                             return def;
-                        }).toList();
+                        })
+                        .toList();
 
                 map.clear();
 

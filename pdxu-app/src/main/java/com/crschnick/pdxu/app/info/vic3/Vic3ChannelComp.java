@@ -25,15 +25,15 @@ public abstract class Vic3ChannelComp extends SimpleInfoComp {
             channel.name(s);
         }
 
-        var base = channel
-                .name("channels")
-                .name("0")
-                .build();
-        var index = NodePointer.fromBase(base).name("index").build().getIfPresent(content.get()).orElse(null);
+        var base = channel.name("channels").name("0").build();
+        var index = NodePointer.fromBase(base)
+                .name("index")
+                .build()
+                .getIfPresent(content.get())
+                .orElse(null);
         if (index == null) {
             return;
         }
-
 
         value = NodePointer.fromBase(base)
                 .name("values")

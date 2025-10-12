@@ -1,7 +1,7 @@
 package com.crschnick.pdxu.app.util;
 
-
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -33,8 +33,9 @@ public class ConfigHelper {
             return node;
         }
 
-        ErrorEventFactory.fromMessage("The config file " + in.toString() +
-                " could not be read. Trying to revert to a backup").handle();
+        ErrorEventFactory.fromMessage(
+                        "The config file " + in.toString() + " could not be read. Trying to revert to a backup")
+                .handle();
         var backupFile = in.resolveSibling(
                 FilenameUtils.getBaseName(in.toString()) + "_old." + FilenameUtils.getExtension(in.toString()));
         if (Files.exists(backupFile)) {
@@ -45,7 +46,8 @@ public class ConfigHelper {
                 ErrorEventFactory.fromThrowable(e).handle();
             }
         } else {
-            ErrorEventFactory.fromMessage("Backup config does not exist. Using blank config").handle();
+            ErrorEventFactory.fromMessage("Backup config does not exist. Using blank config")
+                    .handle();
             return JsonNodeFactory.instance.objectNode();
         }
 
@@ -53,8 +55,8 @@ public class ConfigHelper {
             return node;
         }
 
-        ErrorEventFactory.fromMessage("The backup config file " + backupFile.toString() +
-                " could also not be read.").handle();
+        ErrorEventFactory.fromMessage("The backup config file " + backupFile.toString() + " could also not be read.")
+                .handle();
         return JsonNodeFactory.instance.objectNode();
     }
 
@@ -77,10 +79,8 @@ public class ConfigHelper {
 
         JsonFactory f = new JsonFactory();
         var writer = new StringWriter();
-        try (JsonGenerator g = f.createGenerator(writer)
-                .setPrettyPrinter(new DefaultPrettyPrinter())) {
-            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-                    .writeTree(g, node);
+        try (JsonGenerator g = f.createGenerator(writer).setPrettyPrinter(new DefaultPrettyPrinter())) {
+            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeTree(g, node);
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable(e).handle();
             return;
@@ -89,8 +89,8 @@ public class ConfigHelper {
         var newContent = writer.toString();
         try {
             if (!newContent.equals(currentContent)) {
-                var backupFile = out.resolveSibling(
-                        FilenameUtils.getBaseName(out.toString()) + "_old." + FilenameUtils.getExtension(out.toString()));
+                var backupFile = out.resolveSibling(FilenameUtils.getBaseName(out.toString()) + "_old."
+                        + FilenameUtils.getExtension(out.toString()));
                 Files.writeString(backupFile, currentContent);
                 Files.writeString(out, newContent);
             }

@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.ThreadHelper;
+
 import lombok.Getter;
 
 import java.io.IOException;
@@ -171,7 +172,8 @@ public class AppFileWatcher {
             Path file = path.resolve(ev.context());
 
             // Check for outdated info
-            if (ev.kind() == StandardWatchEventKinds.ENTRY_CREATE || ev.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+            if (ev.kind() == StandardWatchEventKinds.ENTRY_CREATE
+                    || ev.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
                 var ex = Files.exists(file);
                 if (!ex) {
                     return;

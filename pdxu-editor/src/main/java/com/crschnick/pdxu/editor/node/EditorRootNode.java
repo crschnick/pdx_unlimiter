@@ -34,8 +34,9 @@ public class EditorRootNode extends EditorRealNode {
 
     @Override
     public void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index) {
-        var replacement = toInsertKeyName != null ?
-                ArrayNode.singleKeyNode(toInsertKeyName, replacementValue) : ArrayNode.array(List.of(replacementValue));
+        var replacement = toInsertKeyName != null
+                ? ArrayNode.singleKeyNode(toInsertKeyName, replacementValue)
+                : ArrayNode.array(List.of(replacementValue));
         root = root.replacePart(replacement, index, 1);
     }
 

@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 
@@ -15,11 +16,8 @@ public abstract class GuiVic3CoaDisplayType extends GuiCoaDisplayType {
 
         @Override
         public Image render(CoatOfArms coa, GameFileContext ctx) {
-            return ImageHelper.toFXImage(
-                    Vic3TagRenderer.renderImage(coa, ctx, (int) (size.get() * 1.5), size.get()));
+            return ImageHelper.toFXImage(Vic3TagRenderer.renderImage(coa, ctx, (int) (size.get() * 1.5), size.get()));
         }
-
-
     };
 
     public static void init(GuiCoaViewerState.Vic3GuiCoaViewerState state, HBox box) {

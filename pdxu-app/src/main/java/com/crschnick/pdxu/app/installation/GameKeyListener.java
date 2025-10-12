@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.installation;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
+
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 
@@ -19,7 +20,9 @@ public class GameKeyListener implements NativeKeyListener {
     }
 
     public void nativeKeyPressed(NativeKeyEvent e) {
-        if ((e.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0 && ((e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0 || (e.getModifiers() & NativeKeyEvent.META_MASK) != 0)) {
+        if ((e.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0
+                && ((e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0
+                        || (e.getModifiers() & NativeKeyEvent.META_MASK) != 0)) {
             if (e.getKeyCode() == NativeKeyEvent.VC_K && canPass(1)) {
                 TrackEvent.debug("Kill key pressed");
                 GameAppManager.getInstance().killGame(handle);
@@ -51,14 +54,16 @@ public class GameKeyListener implements NativeKeyListener {
                 if (g.isEnabled()) {
                     TrackEvent.info("Import latest savegame and launch");
                     GameAppManager.getInstance().killGame(handle);
-                    TaskExecutor.getInstance().submitTask(() -> {
-                        SavegameActions.importLatestAndLaunch(g);
-                    }, true);
+                    TaskExecutor.getInstance()
+                            .submitTask(
+                                    () -> {
+                                        SavegameActions.importLatestAndLaunch(g);
+                                    },
+                                    true);
                 }
             }
         }
     }
-
 
     private synchronized boolean canPass(int action) {
         if (lastCheck == 0 || action != lastAction) {
@@ -74,9 +79,7 @@ public class GameKeyListener implements NativeKeyListener {
         return diff > millisecondsGap;
     }
 
-    public void nativeKeyReleased(NativeKeyEvent e) {
-    }
+    public void nativeKeyReleased(NativeKeyEvent e) {}
 
-    public void nativeKeyTyped(NativeKeyEvent e) {
-    }
+    public void nativeKeyTyped(NativeKeyEvent e) {}
 }

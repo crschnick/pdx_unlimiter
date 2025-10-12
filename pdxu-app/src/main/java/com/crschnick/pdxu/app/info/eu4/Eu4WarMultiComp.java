@@ -9,7 +9,9 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
+
 import javafx.scene.image.Image;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -51,7 +53,8 @@ public class Eu4WarMultiComp extends SavegameInfoMultiComp {
     protected void init(SavegameContent content, SavegameData<?> data) {
         List<War<Eu4Tag>> wars = new ArrayList<>();
         for (Node war : content.get().getNodesForKey("active_war")) {
-            String title = war.getNodeForKeyIfExistent("name").map(Node::getString).orElse("MISSING NAME");
+            String title =
+                    war.getNodeForKeyIfExistent("name").map(Node::getString).orElse("MISSING NAME");
             boolean isAttacker = false;
             List<Eu4Tag> attackers = new ArrayList<>();
             if (war.hasKey("attackers")) {

@@ -11,6 +11,7 @@ import com.crschnick.pdxu.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import com.crschnick.pdxu.model.GameColor;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -18,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class GuiEditorNode {
@@ -37,10 +39,15 @@ public class GuiEditorNode {
             tf.setEditable(state.isEditable());
             box.getChildren().add(tf);
             HBox.setHgrow(tf, Priority.ALWAYS);
-        } else if (n.isReal() && ((EditorRealNode) n).getBackingNode().isTagged() &&
-                ((EditorRealNode) n).getBackingNode().describe().getValueType().equals(Node.ValueType.COLOR)) {
-            var picker = new ColorPicker(ColorHelper.fromGameColor(GameColor.fromColorNode(
-                    ((EditorSimpleNode) n).getBackingNode())));
+        } else if (n.isReal()
+                && ((EditorRealNode) n).getBackingNode().isTagged()
+                && ((EditorRealNode) n)
+                        .getBackingNode()
+                        .describe()
+                        .getValueType()
+                        .equals(Node.ValueType.COLOR)) {
+            var picker = new ColorPicker(
+                    ColorHelper.fromGameColor(GameColor.fromColorNode(((EditorSimpleNode) n).getBackingNode())));
             picker.valueProperty().addListener((c, o, ne) -> {
                 ((EditorSimpleNode) n).updateColor(ne);
                 state.onColorChanged();

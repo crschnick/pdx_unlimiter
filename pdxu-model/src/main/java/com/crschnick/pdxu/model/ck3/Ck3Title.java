@@ -1,8 +1,8 @@
 package com.crschnick.pdxu.model.ck3;
 
 import com.crschnick.pdxu.io.node.Node;
-import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.GameColor;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 
 import java.util.*;
 
@@ -14,8 +14,8 @@ public class Ck3Title {
     private GameColor color;
     private CoatOfArms coatOfArms;
     private Type type;
-    public Ck3Title() {
-    }
+
+    public Ck3Title() {}
 
     public Ck3Title(long id, String key, String name, GameColor color, CoatOfArms coatOfArms, Type type) {
         this.id = id;
@@ -115,7 +115,6 @@ public class Ck3Title {
     }
 
     public static enum Type {
-
         BARONY("b"),
         COUNTY("c"),
         DUCHY("d"),

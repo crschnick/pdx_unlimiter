@@ -33,8 +33,8 @@ public class ExternalEditTarget extends EditTarget {
                 continue;
             }
 
-            if (file.startsWith(GameInstallation.ALL.get(g).getInstallDir()) ||
-                    file.startsWith(GameInstallation.ALL.get(g).getUserDir())) {
+            if (file.startsWith(GameInstallation.ALL.get(g).getInstallDir())
+                    || file.startsWith(GameInstallation.ALL.get(g).getUserDir())) {
                 return GameFileContext.forGame(g);
             }
         }

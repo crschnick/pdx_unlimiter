@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.gui;
 
-import atlantafx.base.theme.Styles;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.comp.base.IconButtonComp;
@@ -11,10 +10,13 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.app.util.ThreadHelper;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.*;
+
+import atlantafx.base.theme.Styles;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -24,7 +26,7 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_CAMPAIGN_LIST;
 @AllArgsConstructor
 public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends SimpleComp {
 
-    private final SavegameManagerState<T,I> savegameManagerState;
+    private final SavegameManagerState<T, I> savegameManagerState;
 
     private Comp<?> createEditButton() {
         var b = new IconButtonComp("mdi2c-comment-edit-outline", () -> {
@@ -84,9 +86,9 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
     @Override
     protected Region createSimple() {
         Region list = new GuiListViewComp<>(
-                savegameManagerState.getShownCollections(),
-                c -> new GuiSavegameCampaignComp<>(c, () -> savegameManagerState.selectCollectionAsync(c)),
-                false)
+                        savegameManagerState.getShownCollections(),
+                        c -> new GuiSavegameCampaignComp<>(c, () -> savegameManagerState.selectCollectionAsync(c)),
+                        false)
                 .createRegion();
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
         list.setAccessibleText("Campaign list");

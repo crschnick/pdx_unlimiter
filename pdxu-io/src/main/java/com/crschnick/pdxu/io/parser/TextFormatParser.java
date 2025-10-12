@@ -21,51 +21,33 @@ public final class TextFormatParser {
 
     public static TextFormatParser eu4() {
         return new TextFormatParser(
-                Charset.forName("windows-1252"),
-                TaggedNode.NO_TAGS,
-                s -> s.equals("map_area_data"));
+                Charset.forName("windows-1252"), TaggedNode.NO_TAGS, s -> s.equals("map_area_data"));
     }
 
     public static TextFormatParser ck3() {
-        return new TextFormatParser(
-                StandardCharsets.UTF_8,
-                TaggedNode.COLORS,
-                s -> false);
+        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.COLORS, s -> false);
     }
 
     public static TextFormatParser vic3() {
-        return new TextFormatParser(
-                StandardCharsets.UTF_8,
-                TaggedNode.ALL,
-                s -> false);
+        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.ALL, s -> false);
     }
 
     public static TextFormatParser hoi4() {
-        return new TextFormatParser(
-                StandardCharsets.UTF_8,
-                TaggedNode.COLORS,
-                s -> false);
+        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.COLORS, s -> false);
     }
 
     public static TextFormatParser stellaris() {
-        return new TextFormatParser(
-                StandardCharsets.UTF_8,
-                TaggedNode.COLORS,
-                s -> false);
+        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.COLORS, s -> false);
     }
 
     public static TextFormatParser ck2() {
         return new TextFormatParser(
-                isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
-                TaggedNode.NO_TAGS,
-                s -> false);
+                isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"), TaggedNode.NO_TAGS, s -> false);
     }
 
     public static TextFormatParser vic2() {
         return new TextFormatParser(
-                isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"),
-                TaggedNode.NO_TAGS,
-                s -> false);
+                isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"), TaggedNode.NO_TAGS, s -> false);
     }
 
     private static boolean isMacOs() {
@@ -106,7 +88,8 @@ public final class TextFormatParser {
             throw new ParseException("Input is a zip file, not a text file");
         }
 
-        if (input.length >= 8 && Arrays.equals(input, 0, 8, new byte[] {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x01, 0x00}, 0, 8)) {
+        if (input.length >= 8
+                && Arrays.equals(input, 0, 8, new byte[] {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x01, 0x00}, 0, 8)) {
             throw new ParseException("Input is a rar file, not a text file");
         }
     }
@@ -115,7 +98,8 @@ public final class TextFormatParser {
         return parse(file.getFileName().toString(), Files.readAllBytes(file), 0, false);
     }
 
-    public synchronized ArrayNode parse(String displayName, Path file, boolean strict) throws IOException, ParseException {
+    public synchronized ArrayNode parse(String displayName, Path file, boolean strict)
+            throws IOException, ParseException {
         return parse(displayName, Files.readAllBytes(file), 0, strict);
     }
 
@@ -133,19 +117,21 @@ public final class TextFormatParser {
             this.tokenizer.tokenize();
             // System.out.println("Tokenizer took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
-            this.context = new NodeContext(input, charset,
+            this.context = new NodeContext(
+                    input,
+                    charset,
                     tokenizer.getScalarsStart(),
                     tokenizer.getScalarsLength(),
                     tokenizer.getScalarCount());
 
             // now = Instant.now();
-            ArrayNode r = parseArray(name, strict);
+            ArrayNode r = (ArrayNode) parseComplexNode(name, strict);
             // System.out.println("Node creator took " + ChronoUnit.MILLIS.between(now, Instant.now()) + "ms");
 
             return r;
         } catch (ParseException ex) {
             throw ex;
-        }  catch (Throwable t) {
+        } catch (Throwable t) {
             // Catch also errors!
 
             // Special case for out of memory
@@ -153,8 +139,12 @@ public final class TextFormatParser {
                 long heapSize = Runtime.getRuntime().totalMemory();
                 long heapMaxSize = Runtime.getRuntime().maxMemory();
                 long heapFreeSize = Runtime.getRuntime().freeMemory();
-                var m = "" + (heapSize / 1_000_000) + "Mb / " + (heapMaxSize / 1_000_000) + "Mb (" + (heapFreeSize / 1_000_000) + "Mb free)";
-                throw new ParseException("Not enough free RAM available to load file " + name + " with size " + (input.length / 1_000_000) + "Mb. " + m, ooe);
+                var m = "" + (heapSize / 1_000_000) + "Mb / " + (heapMaxSize / 1_000_000) + "Mb ("
+                        + (heapFreeSize / 1_000_000) + "Mb free)";
+                throw new ParseException(
+                        "Not enough free RAM available to load file " + name + " with size "
+                                + (input.length / 1_000_000) + "Mb. " + m,
+                        ooe);
             }
 
             throw new ParseException(t);
@@ -171,8 +161,9 @@ public final class TextFormatParser {
     private Node parseNodeIfNotScalarValue(String name, boolean strict) throws ParseException {
         var tt = tokenizer.getTokenTypes();
         if (tt[index] == TextFormatTokenizer.STRING_UNQUOTED) {
-            var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ?
-                    TaggedNode.getTagType(possibleTags, context, slIndex) : null;
+            var colorType = tt[index + 1] == TextFormatTokenizer.OPEN_GROUP
+                    ? TaggedNode.getTagType(possibleTags, context, slIndex)
+                    : null;
 
             if (colorType != null) {
                 if (tt[index + 1] != TextFormatTokenizer.OPEN_GROUP) {
@@ -209,7 +200,7 @@ public final class TextFormatParser {
                 throw ParseException.createFromLiteralIndex(name, "encountered unexpected }", slIndex - 1, context);
             }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
-                return parseArray(name, strict);
+                return parseComplexNode(name, strict);
             }
         }
 
@@ -231,7 +222,7 @@ public final class TextFormatParser {
         }
     }
 
-    private ArrayNode parseArray(String name, boolean strict) throws ParseException {
+    private Node parseComplexNode(String name, boolean strict) throws ParseException {
         var tt = tokenizer.getTokenTypes();
 
         assert tt[index] == TextFormatTokenizer.OPEN_GROUP : "Expected {";
@@ -255,21 +246,17 @@ public final class TextFormatParser {
             }
 
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                assert size >= builder.getUsedSize() :
-                        "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
+                assert size >= builder.getUsedSize()
+                        : "Invalid array size. Expected: <= " + size + ", got: " + builder.getUsedSize();
                 index++;
 
-                boolean isMultiKeyValue = tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
-                // TODO
-                if (isMultiKeyValue && false) {
+                boolean isMultiKeyValue =
+                        tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
+                if (isMultiKeyValue) {
                     index++;
-                    var keys = parseNodeIfNotScalarValue(name, strict);
-                    if (!(keys instanceof SimpleArrayNode ar) || ar.getKeyScalars() != null) {
-                        throw ParseException.createFromLiteralIndex(name, "Invalid multi key", index, context);
-                    }
-
+                    var key = parseNodeIfNotScalarValue(name, strict);
                     var value = builder.build();
-                    return new MultiKeyValueNode(context, ar.getValueScalars(), value);
+                    return new MultiKeyValueNode((ArrayNode) key, value);
                 }
 
                 return builder.build();
@@ -277,8 +264,8 @@ public final class TextFormatParser {
 
             boolean isKeyValue = tt[index + 1] == TextFormatTokenizer.EQUALS;
             if (isKeyValue) {
-                if (tt[index] != TextFormatTokenizer.STRING_UNQUOTED &&
-                        tt[index] != TextFormatTokenizer.STRING_QUOTED) {
+                if (tt[index] != TextFormatTokenizer.STRING_UNQUOTED
+                        && tt[index] != TextFormatTokenizer.STRING_QUOTED) {
                     throw ParseException.createFromOffset(name, "Expected key", lastKnownOffset, context.getData());
                 }
 
@@ -304,8 +291,8 @@ public final class TextFormatParser {
                 continue;
             }
 
-            boolean isKeyValueWithoutEquals = tt[index] == TextFormatTokenizer.STRING_UNQUOTED &&
-                    tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
+            boolean isKeyValueWithoutEquals =
+                    tt[index] == TextFormatTokenizer.STRING_UNQUOTED && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
             if (isKeyValueWithoutEquals && keyWithoutEquals.test(context.evaluate(slIndex))) {
                 int keyIndex = slIndex;
                 moveToNextScalar();

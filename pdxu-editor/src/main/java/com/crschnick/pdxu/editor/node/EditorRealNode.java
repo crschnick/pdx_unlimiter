@@ -15,7 +15,8 @@ public abstract class EditorRealNode extends EditorNode {
 
     @Override
     public ArrayNode getContent() {
-        return getKeyName().map(s -> ArrayNode.singleKeyNode(s, getBackingNode()))
+        return getKeyName()
+                .map(s -> ArrayNode.singleKeyNode(s, getBackingNode()))
                 .orElse(ArrayNode.array(List.of(getBackingNode())));
     }
 
@@ -44,8 +45,7 @@ public abstract class EditorRealNode extends EditorNode {
     }
 
     public ArrayNode toWritableNode() {
-        return getBackingNode().isArray() ? (ArrayNode) getBackingNode() :
-                ArrayNode.array(List.of(getBackingNode()));
+        return getBackingNode().isArray() ? (ArrayNode) getBackingNode() : ArrayNode.array(List.of(getBackingNode()));
     }
 
     @Override

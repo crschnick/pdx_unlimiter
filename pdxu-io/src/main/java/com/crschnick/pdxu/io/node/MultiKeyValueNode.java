@@ -2,199 +2,67 @@ package com.crschnick.pdxu.io.node;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 
-public class MultiKeyValueNode extends ArrayNode {
+public class MultiKeyValueNode extends Node {
 
-    private final NodeContext context;
-    private final int[] keyScalars;
-    private final Node value;
+    private final ArrayNode key;
+    private final ArrayNode value;
 
-    public MultiKeyValueNode(NodeContext context, int[] keyScalars, Node value) {
-        this.context = Objects.requireNonNull(context);
-        this.keyScalars = keyScalars;
+    public MultiKeyValueNode(ArrayNode key, ArrayNode value) {
+        this.key = Objects.requireNonNull(key);
         this.value = Objects.requireNonNull(value);
     }
 
     @Override
     public String toString() {
-        if (keyScalars.length == 0) {
-            return "MultiKeyValueNode(0)";
-        }
-
-        var keys = new StringBuilder();
-        for (int i = 0; i < keyScalars.length; i++) {
-            keys.append(getKeyAt(i));
-            if (i != keyScalars.length - 1) {
-                keys.append(", ");
-            }
-        }
-
-        if (value.getArrayNode().size() <= 10) {
-            StringBuilder sb = new StringBuilder("MultiKeyValueNode(" + keys + ": ");
-            sb.append(value);
-            sb.append(")");
-            return sb.toString();
-        } else {
-            return "MultiKeyValueNode(" + keys + ": " + value.getArrayNode().size() + "... )";
-        }
-    }
-
-
-    @Override
-    public int size() {
-        return keyScalars.length;
+        StringBuilder sb = new StringBuilder("MultiKeyValueNode(");
+        sb.append(key);
+        sb.append("=");
+        sb.append(value);
+        sb.append(")");
+        return sb.toString();
     }
 
     @Override
-    public boolean isKeyAt(String key, int index) {
-        return isKeyAt(index, key.getBytes(context.getCharset()));
-    }
-
-    public ArrayNode splice(int begin, int length) {
-        int[] ks = keyScalars != null ? new int[length] : null;
-        if (keyScalars != null) {
-            System.arraycopy(keyScalars, begin, ks, 0, length);
-        }
-
-        return new MultiKeyValueNode(context, ks, value);
-    }
-
-    @Override
-    public List<Node> getNodeArray() {
-        var repeated = new ArrayList<Node>();
-        for (int i = 0; i < keyScalars.length; i++) {
-            repeated.add(value);
-        }
-        return Collections.unmodifiableList(repeated);
-    }
-
-    @Override
-    public boolean matches(NodeMatcher matcher) {
-        if (value.matches(matcher)) {
-            return true;
-        }
-
-        for (int keyScalar : keyScalars) {
-            if (matcher.matchesScalar(context, keyScalar)) {
-                return true;
-            }
-        }
-        return false;
+    public String toDebugValue() {
+        return NodeWriter.writeToString(key, Integer.MAX_VALUE, " ") + "="
+                + NodeWriter.writeToString(value, Integer.MAX_VALUE, " ");
     }
 
     @Override
     public Descriptor describe() {
-        if (keyScalars.length == 0) {
-            // Empty array type
-            return new Descriptor(null, KeyType.NONE);
-        }
-
-        return new Descriptor(null, KeyType.ALL);
+        return new Descriptor(value.describe().getValueType(), KeyType.ALL);
     }
 
-    public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
-        forEach((k, v) -> {
-            c.accept(k, v);
-            return true;
-        }, includeNullKeys);
-    }
-
-    protected void writeInternal(NodeWriter writer) throws IOException {
-        value.write(writer);
+    @Override
+    public void write(NodeWriter writer) throws IOException {
+        key.write(writer);
         writer.write("=");
-        writer.write("{");
-        for (int i = 0; i < keyScalars.length; i++) {
-            writer.write(context, keyScalars[i]);
-            if (i != keyScalars.length - 1) {
-                writer.write(",");
-            }
-        }
-        writer.write("}");
+        value.write(writer);
     }
 
     @Override
-    public boolean forEach(BiPredicate<String, Node> c, boolean includeNullKeys) {
-        for (int keyScalar : keyScalars) {
-            var key = context.evaluate(keyScalar);
-            if (!c.test(key, value)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    protected void writeFlatInternal(NodeWriter writer) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected boolean isFlat() {
+    public boolean isValue() {
         return false;
     }
 
     @Override
-    public String getKeyAt(int index) {
-        return context.evaluate(keyScalars[index]);
-    }
-
-    private boolean isKeyAt(int index, byte[] b) {
-        int keyScalarIndex = keyScalars[index];
-        if (context.getLiteralsLength()[keyScalarIndex] != b.length) {
-            return false;
-        }
-
-        int start = context.getLiteralsBegin()[keyScalarIndex];
-        for (int i = 0; i < context.getLiteralsLength()[keyScalarIndex]; i++) {
-            if (context.getData()[start + i] != b[i]) {
-                return false;
-            }
-        }
-        return true;
+    public boolean isArray() {
+        return false;
     }
 
     @Override
-    public Optional<Node> getNodeForKeyIfExistent(String key) {
-        return Optional.ofNullable(hasKey(key) ? value : null);
+    public boolean isTagged() {
+        return false;
+    }
+
+    @Override
+    public boolean matches(NodeMatcher matcher) {
+        return key.matches(matcher) || value.matches(matcher);
     }
 
     @Override
     public Node copy() {
-        return new MultiKeyValueNode(context, keyScalars, value.copy());
+        return new MultiKeyValueNode(key.copy(), value.copy());
     }
-
-    @Override
-    public boolean hasKey(String key) {
-        var b = key.getBytes(context.getCharset());
-        for (int i = 0; i < keyScalars.length; i++) {
-            if (isKeyAt(i, b)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public Node getNodeForKey(String key) {
-        if (hasKey(key)) {
-            return value;
-        }
-
-        throw new IllegalArgumentException("Invalid key " + key);
-    }
-
-    @Override
-    public List<Node> getNodesForKey(String key) {
-        var b = key.getBytes(context.getCharset());
-        List<Node> found = new ArrayList<>();
-        for (int i = 0; i < keyScalars.length; i++) {
-            if (isKeyAt(i, b)) {
-                found.add(value);
-            }
-        }
-        return found;
-    }
-
 }

@@ -9,6 +9,7 @@ import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -27,8 +28,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class EditorExternalState {
 
-    private static final Path TEMP = FileUtils.getTempDirectory().toPath()
-            .resolve("pdxu").resolve("editor");
+    private static final Path TEMP =
+            FileUtils.getTempDirectory().toPath().resolve("pdxu").resolve("editor");
     private static final Logger logger = LoggerFactory.getLogger(EditorExternalState.class);
     private static final int INTERVAL = 1500;
     private final Set<Entry> openEntries = new CopyOnWriteArraySet<>();
@@ -67,11 +68,11 @@ public class EditorExternalState {
 
                         try {
                             logger.trace("Registering modification for file " + TEMP.relativize(e.file));
-                            logger.trace("Last modification for file: " + e.lastModified.toString() +
-                                                 " vs current one: " + e.getLastModified());
+                            logger.trace("Last modification for file: " + e.lastModified.toString()
+                                    + " vs current one: " + e.getLastModified());
                             if (e.hasChanged()) {
-                                logger.trace("Registering change for file " + TEMP.relativize(e.file) +
-                                                     " for editor node " + e.editorNode.getNavigationName());
+                                logger.trace("Registering change for file " + TEMP.relativize(e.file)
+                                        + " for editor node " + e.editorNode.getNavigationName());
                                 boolean valid = e.editorNode.isValid();
                                 logger.trace("Editor node " + e.editorNode.getNavigationName() + " validity: " + valid);
                                 if (valid) {
@@ -133,14 +134,18 @@ public class EditorExternalState {
             return;
         }
 
-        var name = FileSystemHelper.getFileSystemCompatibleName(node.getNavigationName()) + " - " + UUID.randomUUID() + ".pdxt";
+        var name = FileSystemHelper.getFileSystemCompatibleName(node.getNavigationName()) + " - " + UUID.randomUUID()
+                + ".pdxt";
         Path file = TEMP.resolve(name);
         try {
             FileUtils.forceMkdirParent(file.toFile());
             try (var out = Files.newOutputStream(file)) {
-                NodeWriter.write(out, state.getParser().getCharset(), node.toWritableNode(),
-                        AppPrefs.get().editorIndentation().getValue().getValue(), 0
-                );
+                NodeWriter.write(
+                        out,
+                        state.getParser().getCharset(),
+                        node.toWritableNode(),
+                        AppPrefs.get().editorIndentation().getValue().getValue(),
+                        0);
                 var entry = new Entry(file, node, state);
                 entry.registerChange();
                 openEntries.add(entry);
@@ -168,9 +173,11 @@ public class EditorExternalState {
         }
 
         try {
-            var command = SystemUtils.IS_OS_WINDOWS ?
-                    List.of("cmd.exe", "/c", "start \"\" \"" + editor + "\" \"" + file + "\"") : SystemUtils.IS_OS_LINUX ?
-                    List.of("sh", "-c", "\"" + editor + "\" \"" + file + "\"") : List.of("open", "-a", editor, file);
+            var command = SystemUtils.IS_OS_WINDOWS
+                    ? List.of("cmd.exe", "/c", "start \"\" \"" + editor + "\" \"" + file + "\"")
+                    : SystemUtils.IS_OS_LINUX
+                            ? List.of("sh", "-c", "\"" + editor + "\" \"" + file + "\"")
+                            : List.of("open", "-a", editor, file);
             logger.trace("Executing command: " + command);
             Runtime.getRuntime().exec(command.toArray(String[]::new));
         } catch (IOException e) {

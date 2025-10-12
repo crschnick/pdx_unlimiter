@@ -47,7 +47,8 @@ public class SavegameEditTarget extends EditTarget {
         if (succ.isPresent()) {
             return succ.get().content;
         } else {
-            var msg = res.error().map(e -> e.error.getMessage())
+            var msg = res.error()
+                    .map(e -> e.error.getMessage())
                     .or(() -> res.invalid().map(i -> i.message))
                     .orElse("");
             throw new IllegalArgumentException(msg);

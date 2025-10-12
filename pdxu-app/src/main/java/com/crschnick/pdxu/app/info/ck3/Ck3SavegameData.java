@@ -7,6 +7,7 @@ import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.LinkedHashSet;
@@ -49,13 +50,23 @@ public class Ck3SavegameData extends SavegameData<Ck3Tag> {
         tag = Ck3Tag.getPlayerTag(content.get(), allTags).orElse(null);
         observer = tag == null;
 
-        mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
+        mods = content
+                .get()
+                .getNodeForKey("meta_data")
+                .getNodeForKeyIfExistent("mods")
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getString)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
+        dlcs = content
+                .get()
+                .getNodeForKey("meta_data")
+                .getNodeForKeyIfExistent("dlcs")
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getString)
                 .collect(Collectors.toList());
 
         initVersion(content.get());
@@ -68,11 +79,7 @@ public class Ck3SavegameData extends SavegameData<Ck3Tag> {
         if (m.matches()) {
             var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
             version = new GameVersion(
-                    Integer.parseInt(m.group(1)),
-                    Integer.parseInt(m.group(2)),
-                    Integer.parseInt(m.group(3)),
-                    fourth
-            );
+                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), fourth);
         } else {
             throw new IllegalArgumentException("Could not parse CK3 version string: " + v);
         }

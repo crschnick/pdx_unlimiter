@@ -8,6 +8,7 @@ import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 
@@ -27,8 +28,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     private List<Vic3Tag> allTags;
     private CoatOfArms coatOfArms;
 
-    public Vic3SavegameData() {
-    }
+    public Vic3SavegameData() {}
 
     public Vic3Tag getTag() {
         return tag;
@@ -46,23 +46,51 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         var meta = content.get().getNodeForKey("meta_data");
         campaignName = meta.getNodeForKeyIfExistent("name").map(Node::getString).orElse("?");
         ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
-        date = GameDateType.VIC3.fromString(content.get().getNodeForKeys("meta_data", "game_date").getString());
+        date = GameDateType.VIC3.fromString(
+                content.get().getNodeForKeys("meta_data", "game_date").getString());
 
-        coatOfArms = meta.getNodeForKeyIfExistent("flag").map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null)).orElse(CoatOfArms.empty());
+        coatOfArms = meta.getNodeForKeyIfExistent("flag")
+                .map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null))
+                .orElse(CoatOfArms.empty());
 
-        var countryId = content.get().getNodeForKey("previous_played").getNodeArray().getFirst().getNodeForKey("idtype").getValueNode().getString();
-        var country = content.get().getNodeForKey("country_manager").getNodeForKey("database").getNodeForKeyIfExistent(countryId).orElse(null);
-        tag = country != null ? new Vic3Tag(countryId, country.getNodeForKey("definition").getString(), country.getNodeForKey("government").getString()) : null;
+        var countryId = content.get()
+                .getNodeForKey("previous_played")
+                .getNodeArray()
+                .getFirst()
+                .getNodeForKey("idtype")
+                .getValueNode()
+                .getString();
+        var country = content.get()
+                .getNodeForKey("country_manager")
+                .getNodeForKey("database")
+                .getNodeForKeyIfExistent(countryId)
+                .orElse(null);
+        tag = country != null
+                ? new Vic3Tag(
+                        countryId,
+                        country.getNodeForKey("definition").getString(),
+                        country.getNodeForKey("government").getString())
+                : null;
         allTags = tag != null ? List.of(tag) : List.of();
         observer = tag == null;
 
-        mods = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("mods")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
-              .collect(Collectors.toCollection(LinkedHashSet::new));
-        dlcs = content.get().getNodeForKey("meta_data").getNodeForKeyIfExistent("dlcs")
-                .map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
+        mods = content
+                .get()
+                .getNodeForKey("meta_data")
+                .getNodeForKeyIfExistent("mods")
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getString)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        dlcs = content
+                .get()
+                .getNodeForKey("meta_data")
+                .getNodeForKeyIfExistent("dlcs")
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getString)
                 .collect(Collectors.toList());
 
         initVersion(content.get());
@@ -75,11 +103,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         if (m.matches()) {
             var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
             version = new GameVersion(
-                    Integer.parseInt(m.group(1)),
-                    Integer.parseInt(m.group(2)),
-                    Integer.parseInt(m.group(3)),
-                    fourth
-            );
+                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), fourth);
         } else {
             throw new IllegalArgumentException("Could not parse VIC3 version string: " + v);
         }

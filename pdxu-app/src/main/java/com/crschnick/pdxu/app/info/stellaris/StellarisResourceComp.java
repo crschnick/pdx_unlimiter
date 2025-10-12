@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.stellaris.Resource;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -20,8 +21,11 @@ public abstract class StellarisResourceComp extends SavegameInfoComp {
     protected abstract String getResourceName();
 
     protected String getDisplayValue() {
-        var stored = Math.abs(resource.getStored()) >= 1000 ? String.valueOf((int) resource.getStored() / 1000) + "k" : String.valueOf((int) resource.getStored());
-        return stored + " " + (resource.getIncome() >= resource.getExpense() ? "+" : "") + (int) (resource.getIncome() - resource.getExpense());
+        var stored = Math.abs(resource.getStored()) >= 1000
+                ? String.valueOf((int) resource.getStored() / 1000) + "k"
+                : String.valueOf((int) resource.getStored());
+        return stored + " " + (resource.getIncome() >= resource.getExpense() ? "+" : "")
+                + (int) (resource.getIncome() - resource.getExpense());
     }
 
     protected String getTooltip() {

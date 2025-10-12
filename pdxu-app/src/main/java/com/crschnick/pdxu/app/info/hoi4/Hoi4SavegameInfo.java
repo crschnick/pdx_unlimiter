@@ -12,8 +12,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     ModComp mods;
     VersionComp version;
 
-    public Hoi4SavegameInfo() {
-    }
+    public Hoi4SavegameInfo() {}
 
     public Hoi4SavegameInfo(SavegameContent content) throws Exception {
         super(content);

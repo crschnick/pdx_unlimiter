@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
+
 import lombok.Getter;
 
 import java.nio.file.Files;
@@ -29,7 +30,8 @@ public class GameDlc {
 
         String dlcName = p.getFileName().toString();
         String dlcId = dlcName.split("_")[0];
-        Path filePath = Files.exists(p.resolve(dlcId + ".dlc")) ? p.resolve(dlcId + ".dlc") : p.resolve(dlcName + ".dlc");
+        Path filePath =
+                Files.exists(p.resolve(dlcId + ".dlc")) ? p.resolve(dlcId + ".dlc") : p.resolve(dlcName + ".dlc");
         Path dataPath = p.resolve(dlcId + ".zip");
 
         if (!Files.exists(filePath)) {
@@ -43,12 +45,16 @@ public class GameDlc {
         dlc.name = node.getNodeForKey("name").getString();
 
         // Notice the misspelled word "compatability"!
-        if (node.getNodeForKeyIfExistent("affects_compatability").map(Node::getBoolean).orElse(false)) {
+        if (node.getNodeForKeyIfExistent("affects_compatability")
+                .map(Node::getBoolean)
+                .orElse(false)) {
             dlc.affectsCompatibility = true;
         }
 
         // In this version it is no longer misspelled!
-        if (node.getNodeForKeyIfExistent("affects_save_compatibility").map(Node::getBoolean).orElse(false)) {
+        if (node.getNodeForKeyIfExistent("affects_save_compatibility")
+                .map(Node::getBoolean)
+                .orElse(false)) {
             dlc.affectsCompatibility = true;
         }
 
@@ -58,6 +64,7 @@ public class GameDlc {
 
         return Optional.of(dlc);
     }
+
     public Path getInfoFilePath() {
         return filePath;
     }

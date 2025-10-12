@@ -10,12 +10,10 @@ import com.crschnick.pdxu.app.issue.UserReportComp;
 import com.crschnick.pdxu.app.page.PrefsPageComp;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.PlatformThread;
-import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.app.util.GlobalTimer;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -59,10 +57,15 @@ public class AppLayoutModel {
     private Entry getInitialEntry() {
         var activeGame = AppCache.getNonNull("activeGame", String.class, () -> null);
         if (activeGame != null) {
-            var foundGame = GameInstallation.ALL.keySet().stream().filter(game -> game.getId().equals(activeGame)).findFirst();
+            var foundGame = GameInstallation.ALL.keySet().stream()
+                    .filter(game -> game.getId().equals(activeGame))
+                    .findFirst();
             // Check if stored active game is no longer valid
             if (foundGame.isPresent()) {
-                return entries.stream().filter(entry -> entry instanceof GameEntry ge && ge.game == foundGame.get()).findFirst().orElseThrow();
+                return entries.stream()
+                        .filter(entry -> entry instanceof GameEntry ge && ge.game == foundGame.get())
+                        .findFirst()
+                        .orElseThrow();
             } else {
                 AppCache.clear("activeGame");
                 return entries.getFirst();
@@ -74,7 +77,9 @@ public class AppLayoutModel {
     }
 
     public void selectGame(Game game) {
-        var entry = entries.stream().filter(e -> e instanceof GameEntry ge && ge.game == game).findFirst();
+        var entry = entries.stream()
+                .filter(e -> e instanceof GameEntry ge && ge.game == game)
+                .findFirst();
         if (entry.isPresent()) {
             PlatformThread.runLaterIfNeeded(() -> {
                 selected.setValue(entry.get());
@@ -123,7 +128,9 @@ public class AppLayoutModel {
 
     public void selectSettings() {
         PlatformThread.runLaterIfNeeded(() -> {
-            var found = entries.stream().filter(entry -> entry.comp instanceof PrefsPageComp).findFirst();
+            var found = entries.stream()
+                    .filter(entry -> entry.comp instanceof PrefsPageComp)
+                    .findFirst();
             selected.setValue(found.orElseThrow());
         });
     }
@@ -156,10 +163,7 @@ public class AppLayoutModel {
                         null,
                         () -> Hyperlinks.open(Hyperlinks.DISCORD)),
                 new Entry(
-                        AppI18n.observable("feedback"),
-                        new LabelGraphic.IconGraphic("mdoal-bug_report"),
-                        null,
-                        () -> {
+                        AppI18n.observable("feedback"), new LabelGraphic.IconGraphic("mdoal-bug_report"), null, () -> {
                             var event = ErrorEventFactory.fromMessage("User Report");
                             if (AppLogs.get().isWriteToFile()) {
                                 event.attachment(AppLogs.get().getSessionLogsDirectory());
@@ -207,21 +211,25 @@ public class AppLayoutModel {
 
     @Value
     @EqualsAndHashCode(callSuper = true)
-    public class GameEntry extends Entry{
+    public class GameEntry extends Entry {
 
         Game game;
 
         private GameEntry(Game game) {
-            super(AppI18n.observable(game.getId()), new LabelGraphic.NodeGraphic(() -> {
-                var pane = GameGuiFactory.get(game).createIcon();
-                pane.setMaxWidth(24);
-                pane.setMaxHeight(24);
-                pane.setPrefWidth(24);
-                pane.setPrefHeight(24);
-                pane.setMinWidth(24);
-                pane.setMinHeight(24);
-                return pane;
-            }), new GuiLayoutComp(new SavegameManagerState<>(game)), null);
+            super(
+                    AppI18n.observable(game.getId()),
+                    new LabelGraphic.NodeGraphic(() -> {
+                        var pane = GameGuiFactory.get(game).createIcon();
+                        pane.setMaxWidth(24);
+                        pane.setMaxHeight(24);
+                        pane.setPrefWidth(24);
+                        pane.setPrefHeight(24);
+                        pane.setMinWidth(24);
+                        pane.setMinHeight(24);
+                        return pane;
+                    }),
+                    new GuiLayoutComp(new SavegameManagerState<>(game)),
+                    null);
             this.game = game;
         }
     }

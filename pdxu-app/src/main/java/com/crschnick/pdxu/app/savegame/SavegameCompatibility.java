@@ -16,13 +16,15 @@ public class SavegameCompatibility {
             }
 
             var ins = ctx.getInstallation();
-            boolean missingMods = info.getData().getMods() != null && info.getData().getMods().stream()
-                    .map(ins::getModForSavegameId)
-                    .anyMatch(Optional::isEmpty);
+            boolean missingMods = info.getData().getMods() != null
+                    && info.getData().getMods().stream()
+                            .map(ins::getModForSavegameId)
+                            .anyMatch(Optional::isEmpty);
 
-            boolean missingDlc = info.getData().getDlcs() != null && info.getData().getDlcs().stream()
-                    .map(ins::getDlcForSavegameId)
-                    .anyMatch(Optional::isEmpty);
+            boolean missingDlc = info.getData().getDlcs() != null
+                    && info.getData().getDlcs().stream()
+                            .map(ins::getDlcForSavegameId)
+                            .anyMatch(Optional::isEmpty);
 
             if (missingMods || missingDlc) {
                 return Compatbility.INCOMPATIBLE;
@@ -42,9 +44,9 @@ public class SavegameCompatibility {
             return Compatbility.UNKNOWN;
         }
 
-        return areCompatible(
-                GameInstallation.ALL.get(game).getVersion(),
-                version) ? Compatbility.COMPATIBLE : Compatbility.INCOMPATIBLE;
+        return areCompatible(GameInstallation.ALL.get(game).getVersion(), version)
+                ? Compatbility.COMPATIBLE
+                : Compatbility.INCOMPATIBLE;
     }
 
     private static boolean areCompatible(GameVersion gameVersion, GameVersion saveVersion) {

@@ -1,7 +1,5 @@
 package com.crschnick.pdxu.app.update;
 
-import com.crschnick.pdxu.app.core.AppProperties;
-import com.crschnick.pdxu.app.issue.ErrorEvent;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
 import org.kohsuke.github.GHRelease;
@@ -42,7 +40,6 @@ public class AppReleases {
         }
     }
 
-
     private static Optional<GHRelease> getTopReleaseIncludingPreRelease() throws IOException {
         var repo = getRepository();
         return Optional.ofNullable(repo.listReleases().iterator().next());
@@ -55,5 +52,4 @@ public class AppReleases {
             throw ErrorEventFactory.expected(e);
         }
     }
-
 }

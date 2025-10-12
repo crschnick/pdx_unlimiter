@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
+
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 

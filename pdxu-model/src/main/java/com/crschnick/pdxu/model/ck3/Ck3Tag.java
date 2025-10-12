@@ -22,10 +22,22 @@ public class Ck3Tag {
     private int piety;
     private int prestige;
 
-    public Ck3Tag() {
-    }
+    public Ck3Tag() {}
 
-    public Ck3Tag(long id, Ck3Person ruler, List<Ck3Title> titles, List<Ck3Title> claims, String governmentName, CoatOfArms coatOfArms, String name, int balance, int strength, int gold, int income, int piety, int prestige) {
+    public Ck3Tag(
+            long id,
+            Ck3Person ruler,
+            List<Ck3Title> titles,
+            List<Ck3Title> claims,
+            String governmentName,
+            CoatOfArms coatOfArms,
+            String name,
+            int balance,
+            int strength,
+            int gold,
+            int income,
+            int piety,
+            int prestige) {
         this.id = id;
         this.ruler = ruler;
         this.titles = titles;
@@ -56,7 +68,10 @@ public class Ck3Tag {
             return Optional.empty();
         }
 
-        long id = n.getNodeForKey("currently_played_characters").getNodeArray().getFirst().getLong();
+        long id = n.getNodeForKey("currently_played_characters")
+                .getNodeArray()
+                .getFirst()
+                .getLong();
         if (!n.getNodeForKey("living").hasKey(String.valueOf(id))) {
             return Optional.empty();
         }
@@ -67,11 +82,13 @@ public class Ck3Tag {
         }
 
         var house = new Ck3House(
-                Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data").getNodeForKey("meta_house_name").getString()),
+                Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data")
+                        .getNodeForKey("meta_house_name")
+                        .getString()),
                 CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null));
         var person = Ck3Person.fromNode(personNode, house);
-        var coaMap = CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms")
-                .getNodeForKey("coat_of_arms_manager_database"));
+        var coaMap =
+                CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms").getNodeForKey("coat_of_arms_manager_database"));
         var titles = Ck3Title.createTitleMap(n, coaMap);
 
         var tagTitles = new ArrayList<Ck3Title>();
@@ -87,9 +104,7 @@ public class Ck3Tag {
             });
         });
 
-
-        var coa = CoatOfArms.fromNode(
-                n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"), null);
+        var coa = CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"), null);
         var name = n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
         var landedNode = personNode.getNodeForKey("landed_data");
@@ -97,9 +112,20 @@ public class Ck3Tag {
         var existingTag = allTags.stream().filter(t -> t.id == id).findAny().orElseThrow();
         allTags.remove(existingTag);
 
-        var tag = new Ck3Tag(id, person, tagTitles, tagClaims, gv, coa, name,
-                existingTag.balance, existingTag.strength, existingTag.gold,
-                existingTag.income, existingTag.piety, existingTag.prestige);
+        var tag = new Ck3Tag(
+                id,
+                person,
+                tagTitles,
+                tagClaims,
+                gv,
+                coa,
+                name,
+                existingTag.balance,
+                existingTag.strength,
+                existingTag.gold,
+                existingTag.income,
+                existingTag.piety,
+                existingTag.prestige);
         allTags.add(tag);
         return Optional.of(tag);
     }
@@ -128,25 +154,60 @@ public class Ck3Tag {
 
             var primary = domain.getNodeArray().getFirst().getLong();
             var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
-            var balance = landedNode.getNodeForKeyIfExistent("balance")
-                    .map(Node::getDouble).orElse(0.0).intValue();
-            var strength = landedNode.getNodeForKeyIfExistent("strength")
-                    .map(Node::getDouble).orElse(0.0).intValue();
+            var balance = landedNode
+                    .getNodeForKeyIfExistent("balance")
+                    .map(Node::getDouble)
+                    .orElse(0.0)
+                    .intValue();
+            var strength = landedNode
+                    .getNodeForKeyIfExistent("strength")
+                    .map(Node::getDouble)
+                    .orElse(0.0)
+                    .intValue();
 
             var aliveNode = v.getNodeForKey("alive_data");
             var goldNode = aliveNode.getNodeForKeyIfExistent("gold");
-            var gold = goldNode.map(node -> node.isArray() ? node.getNodeForKeyIfExistent("value")
-                    .map(Node::getDouble).orElse(0.0) : node.getDouble()).orElseGet(() -> goldNode.map(Node::getDouble).orElse(0.0)).intValue();
-            var income = aliveNode.getNodeForKeyIfExistent("income").map(Node::getDouble).orElse(0.0).intValue();
-            var piety = aliveNode.getNodeForKeysIfExistent("piety", "currency").map(Node::getDouble).orElse(0.0).intValue();
-            var prestige = aliveNode.getNodeForKeysIfExistent("prestige", "currency").map(Node::getDouble).orElse(0.0).intValue();
+            var gold = goldNode.map(node -> node.isArray()
+                            ? node.getNodeForKeyIfExistent("value")
+                                    .map(Node::getDouble)
+                                    .orElse(0.0)
+                            : node.getDouble())
+                    .orElseGet(() -> goldNode.map(Node::getDouble).orElse(0.0))
+                    .intValue();
+            var income = aliveNode
+                    .getNodeForKeyIfExistent("income")
+                    .map(Node::getDouble)
+                    .orElse(0.0)
+                    .intValue();
+            var piety = aliveNode
+                    .getNodeForKeysIfExistent("piety", "currency")
+                    .map(Node::getDouble)
+                    .orElse(0.0)
+                    .intValue();
+            var prestige = aliveNode
+                    .getNodeForKeysIfExistent("prestige", "currency")
+                    .map(Node::getDouble)
+                    .orElse(0.0)
+                    .intValue();
 
             var titleFromId = titleIds.get(primary);
             if (titleFromId == null) {
                 return;
             }
-            allTags.add(new Ck3Tag(id, null, List.of(titleFromId),
-                    null, gv, null, null, balance, strength, gold, income, piety, prestige));
+            allTags.add(new Ck3Tag(
+                    id,
+                    null,
+                    List.of(titleFromId),
+                    null,
+                    gv,
+                    null,
+                    null,
+                    balance,
+                    strength,
+                    gold,
+                    income,
+                    piety,
+                    prestige));
         });
         return allTags;
     }

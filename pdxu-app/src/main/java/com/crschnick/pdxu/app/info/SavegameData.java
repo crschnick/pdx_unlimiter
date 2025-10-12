@@ -12,6 +12,7 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameVersion;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Setter;
@@ -20,21 +21,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        property = "type"
-)
-@JsonSubTypes(
-        {
-                @JsonSubTypes.Type(value = Eu4SavegameData.class),
-                @JsonSubTypes.Type(value = Ck3SavegameData.class),
-                @JsonSubTypes.Type(value = StellarisSavegameData.class),
-                @JsonSubTypes.Type(value = Hoi4SavegameData.class),
-                @JsonSubTypes.Type(value = Vic2SavegameData.class),
-                @JsonSubTypes.Type(value = Vic3SavegameData.class),
-                @JsonSubTypes.Type(value = Ck2SavegameData.class)
-        }
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Eu4SavegameData.class),
+    @JsonSubTypes.Type(value = Ck3SavegameData.class),
+    @JsonSubTypes.Type(value = StellarisSavegameData.class),
+    @JsonSubTypes.Type(value = Hoi4SavegameData.class),
+    @JsonSubTypes.Type(value = Vic2SavegameData.class),
+    @JsonSubTypes.Type(value = Vic3SavegameData.class),
+    @JsonSubTypes.Type(value = Ck2SavegameData.class)
+})
 public abstract class SavegameData<T> {
 
     protected GameDate date;
@@ -42,12 +38,13 @@ public abstract class SavegameData<T> {
     protected LinkedHashSet<String> mods;
     protected List<String> dlcs;
     protected boolean ironman;
+
     @Setter
     protected boolean binary;
+
     protected boolean observer;
 
-    public SavegameData() {
-    }
+    public SavegameData() {}
 
     public abstract T getTag();
 

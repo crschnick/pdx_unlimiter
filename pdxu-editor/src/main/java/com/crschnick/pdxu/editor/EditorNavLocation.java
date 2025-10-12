@@ -6,8 +6,8 @@ import java.util.List;
 
 public record EditorNavLocation(EditorNavPath path, int page, double scroll) {
 
-    public static EditorNavLocation nodeInFocus(List<EditorNode> content, int totalSize,
-                                                EditorNavPath path, EditorNode focus) {
+    public static EditorNavLocation nodeInFocus(
+            List<EditorNode> content, int totalSize, EditorNavPath path, EditorNode focus) {
         if (path.getPath().size() == 1) {
             return new EditorNavLocation(path);
         }
@@ -24,7 +24,7 @@ public record EditorNavLocation(EditorNavPath path, int page, double scroll) {
 
             sum += pageSizes.get(page);
         }
-        return new EditorNavLocation(path, pageSizes.size() -1, 1.0);
+        return new EditorNavLocation(path, pageSizes.size() - 1, 1.0);
     }
 
     public EditorNavLocation(EditorNavPath path) {

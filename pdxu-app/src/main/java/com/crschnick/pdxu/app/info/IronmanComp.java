@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.core.AppI18n;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 public abstract class IronmanComp extends SimpleInfoComp {

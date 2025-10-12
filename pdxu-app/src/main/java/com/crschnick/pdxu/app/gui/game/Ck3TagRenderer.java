@@ -9,6 +9,7 @@ import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -34,25 +35,25 @@ public class Ck3TagRenderer {
     }
 
     public static ArrayNode getCoatOfArmsNode(GameFileContext context, ArrayNode... otherNodes) {
-        var directory = Path.of("common")
-                .resolve("coat_of_arms")
-                .resolve("coat_of_arms");
+        var directory = Path.of("common").resolve("coat_of_arms").resolve("coat_of_arms");
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(directory, context, files::add);
 
-        var all = new LinkedArrayNode(Stream.concat(files.stream().map(path -> {
-                    ArrayNode content = null;
-                    try {
-                        content = TextFormatParser.vic3().parse(path);
-                    } catch (Exception e) {
-                        return Optional.<ArrayNode>empty();
-                    }
+        var all = new LinkedArrayNode(Stream.concat(
+                        files.stream().map(path -> {
+                            ArrayNode content = null;
+                            try {
+                                content = TextFormatParser.vic3().parse(path);
+                            } catch (Exception e) {
+                                return Optional.<ArrayNode>empty();
+                            }
 
-                    return Optional.of(content);
-                }), Arrays.stream(otherNodes).map(Optional::of))
-                                              .flatMap(Optional::stream)
-                                              .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode()))
-                                              .toList());
+                            return Optional.of(content);
+                        }),
+                        Arrays.stream(otherNodes).map(Optional::of))
+                .flatMap(Optional::stream)
+                .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode()))
+                .toList());
         return all;
     }
 
@@ -178,5 +179,4 @@ public class Ck3TagRenderer {
 
         return ImageHelper.toFXImage(i);
     }
-
 }

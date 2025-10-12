@@ -72,7 +72,7 @@ public class EditorNavPath {
                 return Optional.empty();
             }
         } else {
-            var expEdNodes =  current.expand();
+            var expEdNodes = current.expand();
             for (var en : expEdNodes) {
                 var found = fastEditorNodeFind(content, en, sub);
                 if (found.isPresent()) {
@@ -107,7 +107,7 @@ public class EditorNavPath {
 
         EditorNode current = root;
         for (int i = 0; i < pointer.size(); i++) {
-            var sub = pointer.sub(i, i +1);
+            var sub = pointer.sub(i, i + 1);
             var found = fastEditorNodeFind(state.getBackingNode(), current, sub);
             if (found.isEmpty()) {
                 return Optional.empty();

@@ -15,11 +15,7 @@ public class TextFormatTokenizer {
     private static final byte SPACE_CHAR = 32;
     private static final byte EQUALS_CHAR = 61;
 
-    private static final byte[] UTF_8_BOM = new byte[]{
-            (byte) 0xEF,
-            (byte) 0xBB,
-            (byte) 0xBF
-    };
+    private static final byte[] UTF_8_BOM = new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
 
     private final String name;
     private final boolean strict;
@@ -140,7 +136,6 @@ public class TextFormatTokenizer {
         nextScalarStart = i + 1;
     }
 
-
     private boolean checkBuggyCommentValue(char c) {
         if (isInQuotes || isInBlock || isInComment) {
             return false;
@@ -220,7 +215,7 @@ public class TextFormatTokenizer {
                     return true;
                 }
             } else if (c == '[') {
-                finishCurrentToken(i );
+                finishCurrentToken(i);
                 isInBlock = true;
                 return true;
             }
@@ -233,7 +228,6 @@ public class TextFormatTokenizer {
             }
             return true;
         }
-
     }
 
     private void finishCurrentToken() throws ParseException {
@@ -250,10 +244,12 @@ public class TextFormatTokenizer {
 
         // Check for length overflow
         if (length < 0) {
-            throw ParseException.createFromOffset(name,
-                                                  "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1) +
-                                                          ", which is too big", nextScalarStart, bytes
-            );
+            throw ParseException.createFromOffset(
+                    name,
+                    "Encountered scalar with length " + ((endExclusive - 1) - nextScalarStart + 1)
+                            + ", which is too big",
+                    nextScalarStart,
+                    bytes);
         }
 
         assert length > 0 : "Scalar must be of length at least 1";
@@ -293,13 +289,13 @@ public class TextFormatTokenizer {
 
     private boolean checkForControlTokenKey(byte controlToken) {
         // It is not possible to differentiate with multikey nodes between } as key and a multikey node
-//        if (controlToken == CLOSE_GROUP) {
-//            if (getSuccessorByte() == EQUALS_CHAR) {
-//                if (nextScalarStart == i) {
-//                    return true;
-//                }
-//            }
-//        }
+        //        if (controlToken == CLOSE_GROUP) {
+        //            if (getSuccessorByte() == EQUALS_CHAR) {
+        //                if (nextScalarStart == i) {
+        //                    return true;
+        //                }
+        //            }
+        //        }
 
         if (controlToken == OPEN_GROUP) {
             if (getSuccessorByte() == EQUALS_CHAR) {

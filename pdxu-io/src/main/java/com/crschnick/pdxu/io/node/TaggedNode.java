@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public final class TaggedNode extends Node {
 
     public static final TagType[] NO_TAGS = new TagType[0];
-    public static final TagType[] COLORS = new TagType[]{TagType.RGB, TagType.HSV, TagType.HSV360, TagType.HEX};
+    public static final TagType[] COLORS = new TagType[] {TagType.RGB, TagType.HSV, TagType.HSV360, TagType.HEX};
     public static final TagType[] ALL = TagType.values();
     private TagType type;
     private List<ValueNode> values;
@@ -49,7 +49,10 @@ public final class TaggedNode extends Node {
                 return null;
             }
 
-            if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h' && ctx.getData()[begin] != 'l' && ctx.getData()[begin] != 'L') {
+            if (ctx.getData()[begin] != 'r'
+                    && ctx.getData()[begin] != 'h'
+                    && ctx.getData()[begin] != 'l'
+                    && ctx.getData()[begin] != 'L') {
                 return null;
             }
 
@@ -75,9 +78,7 @@ public final class TaggedNode extends Node {
 
     @Override
     public String toString() {
-        return type.getId() + " {" + values.stream()
-                .map(ValueNode::toString)
-                .collect(Collectors.joining(" ")) + "}";
+        return type.getId() + " {" + values.stream().map(ValueNode::toString).collect(Collectors.joining(" ")) + "}";
     }
 
     public TagType getType() {
@@ -140,7 +141,11 @@ public final class TaggedNode extends Node {
 
     @Override
     public Node copy() {
-        return new TaggedNode(type, values.stream().map(valueNode -> valueNode.copy().getValueNode()).toList());
+        return new TaggedNode(
+                type,
+                values.stream()
+                        .map(valueNode -> valueNode.copy().getValueNode())
+                        .toList());
     }
 
     public enum TagType {

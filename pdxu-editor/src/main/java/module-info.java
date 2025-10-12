@@ -1,11 +1,12 @@
-
 import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.editor.Editor;
 
 module com.crschnick.pdxu.editor {
-    provides EditorProvider with Editor;
+    provides EditorProvider with
+            Editor;
 
     uses com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
+
     provides com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter with
             com.crschnick.pdxu.editor.adapter.Eu4SavegameAdapter,
             com.crschnick.pdxu.editor.adapter.Ck3SavegameAdapter,
@@ -22,7 +23,6 @@ module com.crschnick.pdxu.editor {
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
-
     requires com.crschnick.pdxu.app;
     requires com.crschnick.pdxu.io;
     requires com.crschnick.pdxu.model;
@@ -33,6 +33,4 @@ module com.crschnick.pdxu.editor {
     requires org.apache.commons.collections4;
     requires org.apache.commons.lang3;
     requires atlantafx.base;
-
-
 }

@@ -16,7 +16,7 @@ public interface EditorProvider {
 
     void init();
 
-    <T,I extends SavegameInfo<T>> void openSavegame(SavegameStorage<T,I> storage, SavegameEntry<T,I> entry);
+    <T, I extends SavegameInfo<T>> void openSavegame(SavegameStorage<T, I> storage, SavegameEntry<T, I> entry);
 
     void browseExternalFile(Game g);
 

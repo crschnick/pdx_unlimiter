@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
@@ -38,8 +39,14 @@ public final class WindowsStoreDist extends PdxLauncherDist {
         try {
             // This is somehow very slow. Why?
             // Important: Use out-string to increase output width. Otherwise long file paths can be wrapped!
-            var proc = new ProcessBuilder("powershell.exe", "Get-AppxPackage",
-                    g.getWindowsStoreName(), "|", "out-string", "-width", "1000")
+            var proc = new ProcessBuilder(
+                            "powershell.exe",
+                            "Get-AppxPackage",
+                            g.getWindowsStoreName(),
+                            "|",
+                            "out-string",
+                            "-width",
+                            "1000")
                     .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             var in = new String(proc.getInputStream().readAllBytes());
@@ -49,14 +56,20 @@ public final class WindowsStoreDist extends PdxLauncherDist {
                 return Optional.empty();
             }
 
-            var loc = in.lines().map(line -> {
-                var m = LOCATION_PATTERN.matcher(line);
-                return m.matches() ? Optional.of(Path.of(m.group(1))) : Optional.<Path>empty();
-            }).flatMap(Optional::stream).findAny();
-            var pkgFamName = in.lines().map(line -> {
-                var m = PACKAGE_FAMILY_NAME_PATTERN.matcher(line);
-                return m.matches() ? Optional.of(m.group(1)) : Optional.<String>empty();
-            }).flatMap(Optional::stream).findAny();
+            var loc = in.lines()
+                    .map(line -> {
+                        var m = LOCATION_PATTERN.matcher(line);
+                        return m.matches() ? Optional.of(Path.of(m.group(1))) : Optional.<Path>empty();
+                    })
+                    .flatMap(Optional::stream)
+                    .findAny();
+            var pkgFamName = in.lines()
+                    .map(line -> {
+                        var m = PACKAGE_FAMILY_NAME_PATTERN.matcher(line);
+                        return m.matches() ? Optional.of(m.group(1)) : Optional.<String>empty();
+                    })
+                    .flatMap(Optional::stream)
+                    .findAny();
             if (loc.isPresent() && pkgFamName.isPresent()) {
                 // Check whether the already set install location is a windows store dist
                 if (dir != null && !dir.equals(loc.get())) {
@@ -74,8 +87,10 @@ public final class WindowsStoreDist extends PdxLauncherDist {
 
     @Override
     protected Path getLauncherSettings() {
-        return getGame().getInstallType().getWindowsStoreLauncherDataPath(
-                getInstallLocation()).resolve("launcher-settings.json");
+        return getGame()
+                .getInstallType()
+                .getWindowsStoreLauncherDataPath(getInstallLocation())
+                .resolve("launcher-settings.json");
     }
 
     @Override
@@ -100,9 +115,8 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     }
 
     @Override
-    public void startLauncher(Map<String,String> env) throws IOException {
-        var pb = new ProcessBuilder(
-                "cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App");
+    public void startLauncher(Map<String, String> env) throws IOException {
+        var pb = new ProcessBuilder("cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App");
         pb.environment().putAll(env);
         pb.start();
     }

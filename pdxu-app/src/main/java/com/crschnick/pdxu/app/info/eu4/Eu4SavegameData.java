@@ -7,6 +7,7 @@ import com.crschnick.pdxu.model.GameDateType;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
 import com.crschnick.pdxu.model.eu4.Eu4Tag;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
@@ -22,8 +23,7 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
     private Eu4Tag tag;
     private List<Eu4Tag> allTags;
 
-    public Eu4SavegameData() {
-    }
+    public Eu4SavegameData() {}
 
     public String getTagName() {
         return tag.getTag();
@@ -48,10 +48,11 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
         String player = content.get().getNodeForKey("player").getString();
         tag = Eu4Tag.getTag(allTags, player);
 
-
-        ironman = content.get().getNodeForKeyIfExistent("is_ironman").map(Node::getBoolean).orElse(false);
+        ironman = content.get()
+                .getNodeForKeyIfExistent("is_ironman")
+                .map(Node::getBoolean)
+                .orElse(false);
         date = GameDateType.EU4.fromString(content.get().getNodeForKey("date").getString());
-
 
         Node ver = content.get().getNodeForKey("savegame_version");
         version = new GameNamedVersion(
@@ -61,28 +62,33 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
                 ver.getNodeForKey("forth").getInteger(),
                 ver.getNodeForKey("name").getString());
 
-
         queryMods(content.get());
-        dlcs = content.get().getNodeForKeyIfExistent("dlc_enabled").map(Node::getNodeArray).orElse(List.of())
-                .stream().map(Node::getString)
+        dlcs = content.get().getNodeForKeyIfExistent("dlc_enabled").map(Node::getNodeArray).orElse(List.of()).stream()
+                .map(Node::getString)
                 .collect(Collectors.toList());
 
-
-        campaignHeuristic = UUID.nameUUIDFromBytes(content.get().getNodeForKey("countries")
-                .getNodeForKey("REB").getNodeForKey("decision_seed").getString().getBytes());
+        campaignHeuristic = UUID.nameUUIDFromBytes(content.get()
+                .getNodeForKey("countries")
+                .getNodeForKey("REB")
+                .getNodeForKey("decision_seed")
+                .getString()
+                .getBytes());
     }
 
     private void queryMods(Node n) {
         // Mod data has changed in 1.31
         if (version.compareTo(new GameVersion(1, 31, 0, 0)) >= 0) {
             var list = new LinkedHashSet<String>();
-            n.getNodeForKeyIfExistent("mods_enabled_names").ifPresent(me -> me.forEach((k, v) -> {
-                list.add(v.getNodeForKey("filename").getString());
-            }, true));
+            n.getNodeForKeyIfExistent("mods_enabled_names")
+                    .ifPresent(me -> me.forEach(
+                            (k, v) -> {
+                                list.add(v.getNodeForKey("filename").getString());
+                            },
+                            true));
             mods = list;
         } else {
-            mods = n.getNodeForKeyIfExistent("mod_enabled").map(Node::getNodeArray).orElse(List.of())
-                    .stream().map(Node::getString)
+            mods = n.getNodeForKeyIfExistent("mod_enabled").map(Node::getNodeArray).orElse(List.of()).stream()
+                    .map(Node::getString)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         }
     }

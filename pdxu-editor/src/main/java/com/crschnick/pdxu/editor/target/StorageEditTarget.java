@@ -15,7 +15,7 @@ import java.util.Map;
 public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget {
 
     private final GameFileContext context;
-    private final SavegameStorage<T,I> storage;
+    private final SavegameStorage<T, I> storage;
     private final SavegameEntry<T, I> entry;
     private final EditTarget target;
 
@@ -25,8 +25,9 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
         this.entry = entry;
         this.target = target;
         // If savegame failed to load, still allow for editing!
-        this.context = entry.getInfo() != null ? GameFileContext.fromData(entry.getInfo().getData()) :
-                GameFileContext.forGame(SavegameStorage.ALL.inverseBidiMap().get(storage));
+        this.context = entry.getInfo() != null
+                ? GameFileContext.fromData(entry.getInfo().getData())
+                : GameFileContext.forGame(SavegameStorage.ALL.inverseBidiMap().get(storage));
     }
 
     @Override
@@ -51,7 +52,9 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     @Override
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
         if (!storage.contains(entry)) {
-            ErrorEventFactory.fromMessage("Could not save savegame as it does no longer exist in the storage").expected().handle();
+            ErrorEventFactory.fromMessage("Could not save savegame as it does no longer exist in the storage")
+                    .expected()
+                    .handle();
             return;
         }
 
@@ -66,7 +69,8 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
 
     @Override
     public String getName() {
-        return storage.getEntryName(entry) + (entry.getInfo() != null && entry.getInfo().getData().isBinary() ? " (Binary/Read-only)" : "");
+        return storage.getEntryName(entry)
+                + (entry.getInfo() != null && entry.getInfo().getData().isBinary() ? " (Binary/Read-only)" : "");
     }
 
     @Override

@@ -6,9 +6,9 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
+
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 
@@ -19,10 +19,7 @@ public class Ck3ClaimsComp extends DiplomacyRowComp<Ck3Title> {
 
     @Override
     protected Region map(SavegameData<?> data, Ck3Title tag) {
-        return GameImage.imageNode(
-                Ck3CoatOfArmsCache.titleImage(tag, GameFileContext.fromData(data)),
-                CLASS_TAG_ICON
-        );
+        return GameImage.imageNode(Ck3CoatOfArmsCache.titleImage(tag, GameFileContext.fromData(data)), CLASS_TAG_ICON);
     }
 
     @Override

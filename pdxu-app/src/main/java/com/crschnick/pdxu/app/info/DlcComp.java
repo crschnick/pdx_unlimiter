@@ -2,11 +2,12 @@ package com.crschnick.pdxu.app.info;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ public class DlcComp extends SavegameInfoComp {
         label.setGraphic(new FontIcon());
         label.getStyleClass().add(CLASS_CONTENT);
 
-        var tooltip = AppI18n.get("dlcsRequired") + ":\n" +
-                dlcs.stream()
+        var tooltip = AppI18n.get("dlcsRequired") + ":\n"
+                + dlcs.stream()
                         .map(s -> {
                             var m = data.installation().getDlcForSavegameId(s);
                             return "- " + (m.isPresent() ? m.get().getName() : s + " (" + AppI18n.get("missing") + ")");

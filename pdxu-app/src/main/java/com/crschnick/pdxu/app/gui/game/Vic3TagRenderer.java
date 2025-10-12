@@ -30,28 +30,27 @@ public class Vic3TagRenderer {
     }
 
     public static ArrayNode getCoatOfArmsNode(GameFileContext context, ArrayNode... otherNodes) {
-        var dir = Path.of("common")
-                .resolve("coat_of_arms")
-                .resolve("coat_of_arms");
+        var dir = Path.of("common").resolve("coat_of_arms").resolve("coat_of_arms");
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(dir, context, files::add);
 
-        var all = new LinkedArrayNode(Stream.concat(files.stream().map(path -> {
-                    ArrayNode content = null;
-                    try {
-                        content = TextFormatParser.vic3().parse(path);
-                    } catch (Exception e) {
-                        return Optional.<ArrayNode>empty();
-                    }
+        var all = new LinkedArrayNode(Stream.concat(
+                        files.stream().map(path -> {
+                            ArrayNode content = null;
+                            try {
+                                content = TextFormatParser.vic3().parse(path);
+                            } catch (Exception e) {
+                                return Optional.<ArrayNode>empty();
+                            }
 
-                    return Optional.of(content);
-                }), Arrays.stream(otherNodes).map(Optional::of))
-                                              .flatMap(Optional::stream)
-                                              .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode()))
-                                              .toList());
+                            return Optional.of(content);
+                        }),
+                        Arrays.stream(otherNodes).map(Optional::of))
+                .flatMap(Optional::stream)
+                .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode()))
+                .toList());
         return all;
     }
-
 
     public static BufferedImage renderImage(CoatOfArms coa, GameFileContext ctx, int width, int height) {
         if (coa == null) {

@@ -61,7 +61,8 @@ public final class LinkedArrayNode extends ArrayNode {
         List<ArrayNode> spliced = new ArrayList<>();
 
         var localStartFirst = getLocalIndex(ls, begin);
-        spliced.add(arrayNodes.get(ls).splice(localStartFirst, arrayNodes.get(ls).size() - localStartFirst));
+        spliced.add(
+                arrayNodes.get(ls).splice(localStartFirst, arrayNodes.get(ls).size() - localStartFirst));
 
         for (int i = ls + 1; i <= le - 1; i++) {
             spliced.add(arrayNodes.get(i));
@@ -174,8 +175,10 @@ public final class LinkedArrayNode extends ArrayNode {
     }
 
     @Override
-    public Node copy() {
-        return new LinkedArrayNode(arrayNodes.stream().map(arrayNode -> arrayNode.copy().getArrayNode()).toList());
+    public ArrayNode copy() {
+        return new LinkedArrayNode(arrayNodes.stream()
+                .map(arrayNode -> arrayNode.copy().getArrayNode())
+                .toList());
     }
 
     @Override

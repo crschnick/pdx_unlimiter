@@ -128,31 +128,38 @@ public final class AppPrefs {
             .requiresRestart(false)
             .build());
     final Property<Path> storageDirectory = map(Mapping.builder()
-            .property(new SimpleObjectProperty<>(AppProperties.get().getDataDir().resolve("storage")))
+            .property(
+                    new SimpleObjectProperty<>(AppProperties.get().getDataDir().resolve("storage")))
             .key("storageDirectory")
             .valueClass(Path.class)
             .requiresRestart(true)
             .build());
     final Property<Path> ironyDirectory = map(Mapping.builder()
-            .property(new SimpleObjectProperty<>(IronyHelper.getIronyDefaultInstallPath().orElse(null)))
+            .property(new SimpleObjectProperty<>(
+                    IronyHelper.getIronyDefaultInstallPath().orElse(null)))
             .key("ironyDirectory")
             .valueClass(Path.class)
             .requiresRestart(false)
             .build());
     final Property<Path> ck3toeu4Directory = map(Mapping.builder()
-            .property(new SimpleObjectProperty<>(ConverterSupport.CK3_TO_EU4.determineInstallationDirectory().orElse(null)))
+            .property(new SimpleObjectProperty<>(
+                    ConverterSupport.CK3_TO_EU4.determineInstallationDirectory().orElse(null)))
             .key("ck3toeu4Directory")
             .valueClass(Path.class)
             .requiresRestart(false)
             .build());
     final Property<Path> eu4tovic3Directory = map(Mapping.builder()
-            .property(new SimpleObjectProperty<>(ConverterSupport.EU4_TO_VIC3.determineInstallationDirectory().orElse(null)))
+            .property(new SimpleObjectProperty<>(ConverterSupport.EU4_TO_VIC3
+                    .determineInstallationDirectory()
+                    .orElse(null)))
             .key("eu4tovic3Directory")
             .valueClass(Path.class)
             .requiresRestart(false)
             .build());
     final Property<Path> vic3tohoi4Directory = map(Mapping.builder()
-            .property(new SimpleObjectProperty<>(ConverterSupport.VIC3_TO_HOI4.determineInstallationDirectory().orElse(null)))
+            .property(new SimpleObjectProperty<>(ConverterSupport.VIC3_TO_HOI4
+                    .determineInstallationDirectory()
+                    .orElse(null)))
             .key("vic3tohoi4Directory")
             .valueClass(Path.class)
             .requiresRestart(false)
@@ -497,7 +504,8 @@ public final class AppPrefs {
         }
 
         if (prop.getValue() != null) {
-            var install = new GameInstallation(g.getInstallType(), GameDists.detectDistFromDirectory(g, prop.getValue()));
+            var install =
+                    new GameInstallation(g.getInstallType(), GameDists.detectDistFromDirectory(g, prop.getValue()));
             try {
                 install.loadData();
                 install.initOptional();

@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.beans.property.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -17,8 +18,7 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
 
         @Override
         public Image render(CoatOfArms coa, GameFileContext ctx) {
-            return ImageHelper.toFXImage(
-                    Ck3TagRenderer.renderImage(coa, ctx, size.get(), clothPattern.get()));
+            return ImageHelper.toFXImage(Ck3TagRenderer.renderImage(coa, ctx, size.get(), clothPattern.get()));
         }
     };
 
@@ -53,11 +53,16 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
         @Override
         public void addOptions(GuiCoaViewerState<?> state, HBox box) {
             super.addOptions(state, box);
-            addChoice(state, box, "Government", "clan_government", Map.of(
-                    "Clan", "clan_government",
-                    "Republic", "republic_government",
-                    "Theocracy", "theocracy_government",
-                    "Tribal", "tribal_government"),
+            addChoice(
+                    state,
+                    box,
+                    "Government",
+                    "clan_government",
+                    Map.of(
+                            "Clan", "clan_government",
+                            "Republic", "republic_government",
+                            "Theocracy", "theocracy_government",
+                            "Tribal", "tribal_government"),
                     governmentType);
         }
 
@@ -112,5 +117,4 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
     }
 
     protected final BooleanProperty clothPattern = new SimpleBooleanProperty();
-
 }

@@ -5,8 +5,7 @@ public class Ck2Tag {
     private String primaryTitle;
     private String rulerName;
 
-    public Ck2Tag() {
-    }
+    public Ck2Tag() {}
 
     public Ck2Tag(String primaryTitle, String rulerName) {
         this.primaryTitle = primaryTitle;

@@ -6,6 +6,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Files;
@@ -15,8 +16,8 @@ import java.util.Map;
 
 public class DataFileEditTarget extends EditTarget {
 
-    private static final List<String> EXCLUDED_EXTENSIONS = List.of(
-            "dll", "exe", "bin", "json", "dds", "csv", "map", "bmp", "png", "html", "ttf", "ico", "ogg");
+    private static final List<String> EXCLUDED_EXTENSIONS =
+            List.of("dll", "exe", "bin", "json", "dds", "csv", "map", "bmp", "png", "html", "ttf", "ico", "ogg");
 
     private final GameFileContext context;
 
@@ -34,8 +35,8 @@ public class DataFileEditTarget extends EditTarget {
     public SavegameContent parse() throws Exception {
         // Prevent users from opening non text files
         if (EXCLUDED_EXTENSIONS.stream().anyMatch(end -> file.toString().endsWith("." + end))) {
-            throw new IllegalArgumentException("Files of type ." +
-                    FilenameUtils.getExtension(file.toString()) + " are not supported by the editor");
+            throw new IllegalArgumentException("Files of type ." + FilenameUtils.getExtension(file.toString())
+                    + " are not supported by the editor");
         }
 
         return new SavegameContent(Map.of(getName(), getParser().parse(file)));
@@ -44,8 +45,12 @@ public class DataFileEditTarget extends EditTarget {
     @Override
     public void write(Map<String, ArrayNode> nodeMap) throws Exception {
         try (var out = Files.newOutputStream(file)) {
-            NodeWriter.write(out, getParser().getCharset(), nodeMap.values().iterator().next(),
-                    AppPrefs.get().editorIndentation().getValue().getValue(), 0);
+            NodeWriter.write(
+                    out,
+                    getParser().getCharset(),
+                    nodeMap.values().iterator().next(),
+                    AppPrefs.get().editorIndentation().getValue().getValue(),
+                    0);
         }
     }
 

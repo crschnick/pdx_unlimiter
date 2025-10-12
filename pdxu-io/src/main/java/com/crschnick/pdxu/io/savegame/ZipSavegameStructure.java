@@ -31,7 +31,7 @@ public class ZipSavegameStructure implements SavegameStructure {
     private final Set<SavegamePart> parts;
     private final String[] ignored;
 
-    public ZipSavegameStructure(byte[] header,SavegameType type, Set<SavegamePart> parts, String... ignoredFiles) {
+    public ZipSavegameStructure(byte[] header, SavegameType type, Set<SavegamePart> parts, String... ignoredFiles) {
         this.header = header;
         this.type = type;
         this.parts = parts;
@@ -39,9 +39,7 @@ public class ZipSavegameStructure implements SavegameStructure {
     }
 
     protected SavegameParseResult parseInput(byte[] input, int offset) {
-        var wildcard = parts.stream()
-                .filter(p -> p.fileName().equals("*"))
-                .findAny();
+        var wildcard = parts.stream().filter(p -> p.fileName().equals("*")).findAny();
 
         try {
             try (var zipIn = new ZipInputStream(new ByteArrayInputStream(input, offset, input.length - offset))) {
@@ -57,7 +55,8 @@ public class ZipSavegameStructure implements SavegameStructure {
 
                     var part = parts.stream()
                             .filter(p -> p.fileName().equals(finalZipEntry.getName()))
-                            .findAny().or(() -> wildcard);
+                            .findAny()
+                            .or(() -> wildcard);
 
                     // Ignore unknown entry
                     if (part.isEmpty()) {
@@ -66,12 +65,15 @@ public class ZipSavegameStructure implements SavegameStructure {
 
                     var bytes = zipIn.readAllBytes();
                     if (header != null && !SavegameStructure.validateHeader(header, bytes)) {
-                        return new SavegameParseResult.Invalid("File " + part.get().identifier() + " has an invalid header");
+                        return new SavegameParseResult.Invalid(
+                                "File " + part.get().identifier() + " has an invalid header");
                     }
 
-                    var node = type.getParser().parse(part.get().identifier(), bytes, header != null ? header.length + 1 : 0);
+                    var node = type.getParser()
+                            .parse(part.get().identifier(), bytes, header != null ? header.length + 1 : 0);
                     if (node.size() == 0) {
-                        return new SavegameParseResult.Invalid("File " + part.get().identifier() + " is empty");
+                        return new SavegameParseResult.Invalid(
+                                "File " + part.get().identifier() + " is empty");
                     }
 
                     nodes.put(part.get().identifier(), node);
@@ -97,8 +99,9 @@ public class ZipSavegameStructure implements SavegameStructure {
         try (var fs = FileSystems.newFileSystem(out, Map.of("create", true))) {
             Optional<SavegamePart> wildcardPart;
             try (var list = Files.list(fs.getPath("/"))) {
-                 wildcardPart = list.map(path -> path.getFileName().toString()).filter(p -> content.entrySet().stream().noneMatch(e -> p.equals(e.getKey())))
-                         .map(s -> new SavegamePart(s, "gamestate"))
+                wildcardPart = list.map(path -> path.getFileName().toString())
+                        .filter(p -> content.entrySet().stream().noneMatch(e -> p.equals(e.getKey())))
+                        .map(s -> new SavegamePart(s, "gamestate"))
                         .findAny();
             }
 
@@ -107,7 +110,9 @@ public class ZipSavegameStructure implements SavegameStructure {
                         .filter(part -> part.fileName().equals(e.getKey()))
                         .findAny();
 
-                if (usedPart.isEmpty() && wildcardPart.isPresent() && wildcardPart.get().identifier().equals(e.getKey())) {
+                if (usedPart.isEmpty()
+                        && wildcardPart.isPresent()
+                        && wildcardPart.get().identifier().equals(e.getKey())) {
                     usedPart = wildcardPart;
                 }
 
@@ -137,6 +142,5 @@ public class ZipSavegameStructure implements SavegameStructure {
         return type;
     }
 
-    public record SavegamePart(String fileName, String identifier) {
-    }
+    public record SavegamePart(String fileName, String identifier) {}
 }

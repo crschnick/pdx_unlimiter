@@ -27,8 +27,8 @@ public class ConvertersCategory extends AppPrefsCategory {
                         .pref(prefs.eu4tovic3Directory)
                         .addComp(new PathChoiceComp(prefs.eu4tovic3Directory, "eu4tovic3Directory", true).maxWidth(600))
                         .pref(prefs.vic3tohoi4Directory)
-                        .addComp(new PathChoiceComp(prefs.vic3tohoi4Directory, "vic3tohoi4Directory", true).maxWidth(600))
-                );
+                        .addComp(new PathChoiceComp(prefs.vic3tohoi4Directory, "vic3tohoi4Directory", true)
+                                .maxWidth(600)));
         return builder.buildComp();
     }
 }

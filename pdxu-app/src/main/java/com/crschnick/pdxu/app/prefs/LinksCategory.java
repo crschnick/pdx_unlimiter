@@ -15,9 +15,9 @@ public class LinksCategory extends AppPrefsCategory {
                 .addComp(Comp.vspacer(19))
                 .addComp(
                         new TileButtonComp("discord", "discordDescription", "bi-discord", e -> {
-                            Hyperlinks.open(Hyperlinks.DISCORD);
-                            e.consume();
-                        })
+                                    Hyperlinks.open(Hyperlinks.DISCORD);
+                                    e.consume();
+                                })
                                 .maxWidth(2000),
                         null)
                 .addComp(

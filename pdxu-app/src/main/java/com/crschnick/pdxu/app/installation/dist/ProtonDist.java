@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.OsType;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Files;
@@ -30,7 +31,6 @@ public class ProtonDist extends PdxLauncherDist {
         super(game, name, installLocation);
     }
 
-
     public Path getExecutable() {
         return getGame().getInstallType().getProtonExecutable(getInstallLocation());
     }
@@ -38,8 +38,9 @@ public class ProtonDist extends PdxLauncherDist {
     @Override
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         try {
-            var pgrep = new ProcessBuilder("pgrep", getGame().getInstallType().getProtonExecutableName()).redirectError(
-                    ProcessBuilder.Redirect.DISCARD).start();
+            var pgrep = new ProcessBuilder("pgrep", getGame().getInstallType().getProtonExecutableName())
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
+                    .start();
             var id = pgrep.inputReader().readLine();
             pgrep.waitFor();
             return id != null && !id.trim().isEmpty() ? ProcessHandle.of(Long.parseLong(id.trim())) : Optional.empty();
@@ -62,8 +63,7 @@ public class ProtonDist extends PdxLauncherDist {
                             .resolve("users")
                             .resolve("steamuser")
                             .resolve("Documents")
-                            .toString()
-            );
+                            .toString());
         }
         return Path.of(value);
     }

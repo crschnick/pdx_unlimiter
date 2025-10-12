@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.editor.gui;
 
-
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
@@ -10,6 +9,7 @@ import com.crschnick.pdxu.editor.EditorNavLocation;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.Consumer;
@@ -66,7 +67,9 @@ public class GuiEditorNavBar {
             forwardButton.setGraphic(new FontIcon());
             forwardButton.setAlignment(Pos.CENTER);
             box.getChildren().add(forwardButton);
-            forwardButton.disableProperty().bind(Bindings.not(state.getNavigation().canGoForwardProperty()));
+            forwardButton
+                    .disableProperty()
+                    .bind(Bindings.not(state.getNavigation().canGoForwardProperty()));
             forwardButton.setOnAction(e -> state.getNavigation().goForward());
         }
         return box;
@@ -123,10 +126,12 @@ public class GuiEditorNavBar {
                     p.getChildren().removeFirst();
                 }
 
-                if (n.getEditorNode() != null && n.getEditorNode().isReal() &&
-                        AppPrefs.get().editorEnableNodeTags().getValue()) {
+                if (n.getEditorNode() != null
+                        && n.getEditorNode().isReal()
+                        && AppPrefs.get().editorEnableNodeTags().getValue()) {
                     try {
-                        var tag = EditorSavegameAdapter.ALL.get(edState.getFileContext().getGame())
+                        var tag = EditorSavegameAdapter.ALL
+                                .get(edState.getFileContext().getGame())
                                 .createNodeTag(edState, (EditorRealNode) n.getEditorNode(), null);
                         if (tag != null) {
                             p.getChildren().addFirst(tag);
@@ -145,12 +150,18 @@ public class GuiEditorNavBar {
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
             GuiTooltips.install(edit, AppI18n.get("editorOpenInExternalEditor"));
             edit.setOnAction(e -> {
-                edState.getExternalState().startEdit(edState, (EditorRealNode) edState.getNavigation().getCurrent().getEditorNode());
+                edState.getExternalState().startEdit(edState, (EditorRealNode)
+                        edState.getNavigation().getCurrent().getEditorNode());
             });
-            edit.disableProperty().bind(Bindings.createBooleanBinding(
-                    () -> !edState.isEditable() || edState.getNavigation().getCurrent().getEditorNode() == null ||
-                            !edState.getNavigation().getCurrent().getEditorNode().isReal(),
-                    edState.getNavigation().currentProperty()));
+            edit.disableProperty()
+                    .bind(Bindings.createBooleanBinding(
+                            () -> !edState.isEditable()
+                                    || edState.getNavigation().getCurrent().getEditorNode() == null
+                                    || !edState.getNavigation()
+                                            .getCurrent()
+                                            .getEditorNode()
+                                            .isReal(),
+                            edState.getNavigation().currentProperty()));
             edit.setPadding(new Insets(4, 4, 2, 4));
             p.getChildren().add(edit);
         }

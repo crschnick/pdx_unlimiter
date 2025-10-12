@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,9 +23,12 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.HOI4_BACKGROUND);
-        bg.opacityProperty().bind(Bindings.createDoubleBinding(() -> {
-            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
-        }, AppPrefs.get().theme()));
+        bg.opacityProperty()
+                .bind(Bindings.createDoubleBinding(
+                        () -> {
+                            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
+                        },
+                        AppPrefs.get().theme()));
         return bg;
     }
 

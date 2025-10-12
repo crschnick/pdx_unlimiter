@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.stellaris.StellarisTag;
+
 import javafx.scene.layout.Region;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public abstract class StellarisDiplomacyRowComp extends DiplomacyRowComp<Stellar
 
     @Override
     protected Region map(SavegameData<?> data, StellarisTag tag) {
-        return GameImage.imageNode(StellarisTagRenderer.createTagImage(GameFileContext.fromData(data), tag), CLASS_TAG_ICON);
+        return GameImage.imageNode(
+                StellarisTagRenderer.createTagImage(GameFileContext.fromData(data), tag), CLASS_TAG_ICON);
     }
 
     @Override

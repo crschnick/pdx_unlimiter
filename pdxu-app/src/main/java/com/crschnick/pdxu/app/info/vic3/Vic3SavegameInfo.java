@@ -18,9 +18,7 @@ public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
     DlcComp dlcs;
     VersionComp version;
 
-    public Vic3SavegameInfo() {
-    }
-
+    public Vic3SavegameInfo() {}
 
     public Vic3SavegameInfo(SavegameContent content) throws Exception {
         super(content);
@@ -35,5 +33,4 @@ public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
     protected Class<? extends SavegameData<Vic3Tag>> getDataClass() {
         return Vic3SavegameData.class;
     }
-
 }

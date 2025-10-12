@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.model.stellaris;
 
 import com.crschnick.pdxu.io.node.Node;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +12,9 @@ import java.util.Optional;
 public class StellarisTag {
 
     public static Optional<StellarisTag> getTag(List<StellarisTag> tags, long id) {
-        return tags.stream()
-                .filter(t -> t.id == id)
-                .findFirst();
+        return tags.stream().filter(t -> t.id == id).findFirst();
     }
+
     @Setter
     private String name;
 
@@ -27,8 +27,7 @@ public class StellarisTag {
     private String backgroundPrimaryColor;
     private String backgroundSecondaryColor;
 
-    public StellarisTag() {
-    }
+    public StellarisTag() {}
 
     public static StellarisTag fromNode(long id, Node node) {
         Node flagNode = node.getNodeForKey("flag");

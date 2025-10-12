@@ -1,11 +1,11 @@
 package com.crschnick.pdxu.app.util;
 
-
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameMod;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 
@@ -18,44 +18,29 @@ import java.util.stream.Collectors;
 
 public class CascadeDirectoryHelper {
 
-    public static void traverseDirectoryInverse(
-            Path dir,
-            GameFileContext ctx,
-            Consumer<Path> consumer) {
+    public static void traverseDirectoryInverse(Path dir, GameFileContext ctx, Consumer<Path> consumer) {
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(dir, ctx, files::add);
         Collections.reverse(files);
         files.forEach(consumer);
     }
 
-    public static void traverseDirectory(
-            Path dir,
-            GameFileContext ctx,
-            Consumer<Path> consumer
-    ) {
+    public static void traverseDirectory(Path dir, GameFileContext ctx, Consumer<Path> consumer) {
         var files = new ArrayList<Path>();
         traverseDir(dir, getCascadingDirectories(ctx), files::add);
         files.sort(Comparator.comparing(o -> o.getFileName().toString()));
         files.forEach(consumer);
     }
 
-    public static Optional<Path> openFile(
-            Path file,
-            SavegameInfo<?> info
-    ) {
+    public static Optional<Path> openFile(Path file, SavegameInfo<?> info) {
         return openFile(file, getCascadingDirectories(GameFileContext.fromData(info.getData())));
     }
 
-    public static Optional<Path> openFile(
-            Path file,
-            GameFileContext ctx
-    ) {
+    public static Optional<Path> openFile(Path file, GameFileContext ctx) {
         return openFile(file, getCascadingDirectories(ctx));
     }
 
-    private static List<Path> getCascadingDirectories(
-            GameFileContext ctx
-    ) {
+    private static List<Path> getCascadingDirectories(GameFileContext ctx) {
         List<GameMod> mods = List.of();
         try {
             mods = ctx.getMods() == null ? ctx.getInstall().queryEnabledMods() : ctx.getMods();
@@ -83,11 +68,11 @@ public class CascadeDirectoryHelper {
             }
 
             for (Iterator<File> it = FileUtils.iterateFilesAndDirs(
-                    dir.toFile(),
-                    FileFilterUtils.asFileFilter(f -> dir.relativize(f.toPath()).startsWith(traverseDir)),
-                    FileFilterUtils.asFileFilter(f -> traverseDir.startsWith(dir.relativize(f.toPath())))
-            );
-                 it.hasNext(); ) {
+                            dir.toFile(),
+                            FileFilterUtils.asFileFilter(
+                                    f -> dir.relativize(f.toPath()).startsWith(traverseDir)),
+                            FileFilterUtils.asFileFilter(f -> traverseDir.startsWith(dir.relativize(f.toPath()))));
+                    it.hasNext(); ) {
                 File f = it.next();
                 if (f.isDirectory() || !dir.relativize(f.toPath()).startsWith(traverseDir)) {
                     continue;
@@ -129,7 +114,9 @@ public class CascadeDirectoryHelper {
                 return Optional.of(abs);
             }
         } catch (Exception e) {
-            ErrorEventFactory.fromThrowable("Exception while loading file " + file + " from directory " + dir, e).omit().handle();
+            ErrorEventFactory.fromThrowable("Exception while loading file " + file + " from directory " + dir, e)
+                    .omit()
+                    .handle();
         }
         return Optional.empty();
     }

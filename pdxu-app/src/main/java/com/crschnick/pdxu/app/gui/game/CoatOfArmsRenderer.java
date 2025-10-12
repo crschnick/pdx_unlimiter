@@ -9,6 +9,7 @@ import com.crschnick.pdxu.io.node.ValueNode;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.coa.Emblem;
+
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -58,7 +59,6 @@ public abstract class CoatOfArmsRenderer {
 
     public static final Vic3Renderer VIC3 = new Vic3Renderer();
 
-
     static final int REF_IMG_SIZE = 256;
     private static final int PATTERN_COLOR_1 = 0x00FF0000;
     private static final int PATTERN_COLOR_2 = 0x00FFFF00;
@@ -81,7 +81,8 @@ public abstract class CoatOfArmsRenderer {
         }
     }
 
-    private void applyCullingMask(CoatOfArms.Sub sub, BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
+    private void applyCullingMask(
+            CoatOfArms.Sub sub, BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
         if (patternImage == null) {
             return;
         }
@@ -141,15 +142,16 @@ public abstract class CoatOfArmsRenderer {
             };
             var patternFile = CascadeDirectoryHelper.openFile(
                     Path.of("gfx", "coat_of_arms", "patterns").resolve(sub.getPatternFile()), ctx);
-            var image = patternFile.map(p -> ImageHelper.loadAwtImage(p, patternFunction)).orElse(ImageHelper.DEFAULT_AWT_IMAGE);
+            var image = patternFile
+                    .map(p -> ImageHelper.loadAwtImage(p, patternFunction))
+                    .orElse(ImageHelper.DEFAULT_AWT_IMAGE);
             g.drawImage(
                     image,
                     (int) (sub.getX() * width),
                     (int) (sub.getY() * height),
                     (int) (sub.getScaleX() * width),
                     (int) (sub.getScaleY() * height),
-                    null
-            );
+                    null);
             return patternFile.map(p -> ImageHelper.loadAwtImage(p, null)).orElse(null);
         } else {
             return null;
@@ -157,22 +159,19 @@ public abstract class CoatOfArmsRenderer {
     }
 
     public Color withAlpha(Color colour, double maskValue) {
-        return new Color(
-                colour.getRed(),
-                colour.getGreen(),
-                colour.getBlue(),
-                maskValue
-        );
+        return new Color(colour.getRed(), colour.getGreen(), colour.getBlue(), maskValue);
     }
 
     public Color overlayColors(Color bottom, Color top) {
         double alpha = top.getOpacity() + bottom.getOpacity() * (1 - top.getOpacity());
         return new Color(
-                (top.getRed() * top.getOpacity() + bottom.getRed() * bottom.getOpacity() * (1 - top.getOpacity())) / alpha,
-                (top.getGreen() * top.getOpacity() + bottom.getGreen() * bottom.getOpacity() * (1 - top.getOpacity())) / alpha,
-                (top.getBlue() * top.getOpacity() + bottom.getBlue() * bottom.getOpacity() * (1 - top.getOpacity())) / alpha,
-                alpha
-        );
+                (top.getRed() * top.getOpacity() + bottom.getRed() * bottom.getOpacity() * (1 - top.getOpacity()))
+                        / alpha,
+                (top.getGreen() * top.getOpacity() + bottom.getGreen() * bottom.getOpacity() * (1 - top.getOpacity()))
+                        / alpha,
+                (top.getBlue() * top.getOpacity() + bottom.getBlue() * bottom.getOpacity() * (1 - top.getOpacity()))
+                        / alpha,
+                alpha);
     }
 
     private Color evaluateColorDefinition(String color, GameFileContext ctx) {
@@ -181,13 +180,16 @@ public abstract class CoatOfArmsRenderer {
         }
 
         // For inline colors like rgb { ... }
-        var taggedType = Arrays.stream(TaggedNode.COLORS).sorted(Comparator.comparingInt(value -> -value.getId().length()))
-                               .filter(tagType -> color != null && color.startsWith(tagType.getId()))
-                               .findFirst();
+        var taggedType = Arrays.stream(TaggedNode.COLORS)
+                .sorted(Comparator.comparingInt(value -> -value.getId().length()))
+                .filter(tagType -> color != null && color.startsWith(tagType.getId()))
+                .findFirst();
         if (taggedType.isPresent()) {
-            var values = Arrays.stream(color.substring(taggedType.get().getId().length() + 2, color.length() - 1).split(" "))
-                             .filter(s -> !s.isEmpty())
-                             .map(s -> new ValueNode(s, false)).toList();
+            var values = Arrays.stream(color.substring(taggedType.get().getId().length() + 2, color.length() - 1)
+                            .split(" "))
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> new ValueNode(s, false))
+                    .toList();
             var node = new TaggedNode(taggedType.get(), values);
             return ColorHelper.fromGameColor(GameColor.fromColorNode(node));
         }
@@ -202,8 +204,8 @@ public abstract class CoatOfArmsRenderer {
             CoatOfArms.Sub sub,
             Emblem emblem,
             GameFileContext ctx,
-            int width, int height
-    ) {
+            int width,
+            int height) {
         Function<Integer, Integer> customFilter;
         boolean hasColor = emblem.getColors() != null;
         if (emblem.getColors() != null) {
@@ -233,8 +235,7 @@ public abstract class CoatOfArmsRenderer {
         var path = CascadeDirectoryHelper.openFile(
                 Path.of("gfx", "coat_of_arms", (hasColor ? "colored" : "textured") + "_emblems")
                         .resolve(emblem.getFile()),
-                ctx
-        );
+                ctx);
         path.map(p -> ImageHelper.loadAwtImage(p, customFilter)).ifPresent(img -> {
             boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
             BufferedImage emblemToCullImage = null;
@@ -247,16 +248,16 @@ public abstract class CoatOfArmsRenderer {
             emblem.getInstances().stream()
                     .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
                     .forEach(instance -> {
-                        double angle = Math.toRadians(
-                                Math.signum(instance.getScaleX() * sub.getScaleX()) * Math.signum(instance.getScaleY() * sub.getScaleY()) *
-                                        instance.getRotation());
+                        double angle = Math.toRadians(Math.signum(instance.getScaleX() * sub.getScaleX())
+                                * Math.signum(instance.getScaleY() * sub.getScaleY())
+                                * instance.getRotation());
 
                         var cRotWidth = img.getWidth();
                         var cRotHeight = img.getHeight();
-                        if ((instance.getRotation() > 45 && instance.getRotation() < 135) ||
-                                (instance.getRotation() > 225 && instance.getRotation() < 315) ||
-                                (instance.getRotation() > -135 && instance.getRotation() < -45) ||
-                                (instance.getRotation() > -315 && instance.getRotation() < -225)) {
+                        if ((instance.getRotation() > 45 && instance.getRotation() < 135)
+                                || (instance.getRotation() > 225 && instance.getRotation() < 315)
+                                || (instance.getRotation() > -135 && instance.getRotation() < -45)
+                                || (instance.getRotation() > -315 && instance.getRotation() < -225)) {
                             cRotWidth = img.getHeight();
                             cRotHeight = img.getWidth();
                         }
@@ -299,7 +300,6 @@ public abstract class CoatOfArmsRenderer {
                 (int) Math.round(w),
                 (int) Math.round(h),
                 new java.awt.Color(0, 0, 0, 0),
-                null
-        );
+                null);
     }
 }

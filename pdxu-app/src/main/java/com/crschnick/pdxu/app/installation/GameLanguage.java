@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.prefs.SupportedLocale;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,6 @@ import java.util.Arrays;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum GameLanguage {
-
     ENGLISH("l_english", SupportedLocale.ENGLISH),
     GERMAN("l_german", SupportedLocale.GERMAN),
     FRENCH("l_french", SupportedLocale.FRENCH),
@@ -24,11 +24,17 @@ public enum GameLanguage {
     PORTUGUESE("l_portuguese", SupportedLocale.PORTUGUESE);
 
     public static GameLanguage byId(String langId) {
-        return Arrays.stream(values()).filter(gameLanguage -> gameLanguage.getId().equals(langId)).findFirst().orElse(ENGLISH);
+        return Arrays.stream(values())
+                .filter(gameLanguage -> gameLanguage.getId().equals(langId))
+                .findFirst()
+                .orElse(ENGLISH);
     }
 
     public static GameLanguage bySupportedLocale(SupportedLocale supportedLocale) {
-        return Arrays.stream(values()).filter(gameLanguage -> gameLanguage.getSupportedLocale().equals(supportedLocale)).findFirst().orElse(ENGLISH);
+        return Arrays.stream(values())
+                .filter(gameLanguage -> gameLanguage.getSupportedLocale().equals(supportedLocale))
+                .findFirst()
+                .orElse(ENGLISH);
     }
 
     String id;

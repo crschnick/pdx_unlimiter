@@ -10,7 +10,9 @@ import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.ck3.Ck3Strings;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
+
 import javafx.scene.image.Image;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -51,29 +53,38 @@ public class Ck3WarMultiComp extends SavegameInfoMultiComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         List<War<Ck3Tag>> wars = new ArrayList<>();
-        content.get().getNodeForKey("wars").getNodeForKey("active_wars").getNodeArray().forEach(v -> {
-            if (v.isValue() && v.getString().equals("none")) {
-                return;
-            }
+        content.get()
+                .getNodeForKey("wars")
+                .getNodeForKey("active_wars")
+                .getNodeArray()
+                .forEach(v -> {
+                    if (v.isValue() && v.getString().equals("none")) {
+                        return;
+                    }
 
-            var title = v.getNodeForKey("name").getString();
+                    var title = v.getNodeForKey("name").getString();
 
-            List<Ck3Tag> attackers = new ArrayList<>();
-            for (Node atk : v.getNodeForKey("attacker").getNodeForKey("participants").getNodeArray()) {
-                var attacker = atk.getNodeForKey("character").getLong();
-                Ck3Tag.getTag(data.ck3().getAllTags(), attacker).ifPresent(attackers::add);
-            }
+                    List<Ck3Tag> attackers = new ArrayList<>();
+                    for (Node atk : v.getNodeForKey("attacker")
+                            .getNodeForKey("participants")
+                            .getNodeArray()) {
+                        var attacker = atk.getNodeForKey("character").getLong();
+                        Ck3Tag.getTag(data.ck3().getAllTags(), attacker).ifPresent(attackers::add);
+                    }
 
-            List<Ck3Tag> defenders = new ArrayList<>();
-            for (Node atk : v.getNodeForKey("defender").getNodeForKey("participants").getNodeArray()) {
-                var defender = atk.getNodeForKey("character").getLong();
-                Ck3Tag.getTag(data.ck3().getAllTags(), defender).ifPresent(defenders::add);
-            }
+                    List<Ck3Tag> defenders = new ArrayList<>();
+                    for (Node atk : v.getNodeForKey("defender")
+                            .getNodeForKey("participants")
+                            .getNodeArray()) {
+                        var defender = atk.getNodeForKey("character").getLong();
+                        Ck3Tag.getTag(data.ck3().getAllTags(), defender).ifPresent(defenders::add);
+                    }
 
-            if (attackers.contains(data.ck3().getTag()) || defenders.contains(data.ck3().getTag())) {
-                wars.add(new War<>(Ck3Strings.cleanCk3FormatData(title), attackers, defenders));
-            }
-        });
+                    if (attackers.contains(data.ck3().getTag())
+                            || defenders.contains(data.ck3().getTag())) {
+                        wars.add(new War<>(Ck3Strings.cleanCk3FormatData(title), attackers, defenders));
+                    }
+                });
         comps = wars.stream().map(WarComp::new).toList();
         comps.forEach(warComp -> warComp.init(content, data));
     }

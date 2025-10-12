@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ImageHelper;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
@@ -48,7 +50,10 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
             prop = new SimpleObjectProperty<>(new Region());
             entry.stateProperty().addListener(new ChangeListener<>() {
                 @Override
-                public void changed(ObservableValue<? extends SavegameEntry.State> observable, SavegameEntry.State oldValue, SavegameEntry.State n) {
+                public void changed(
+                        ObservableValue<? extends SavegameEntry.State> observable,
+                        SavegameEntry.State oldValue,
+                        SavegameEntry.State n) {
                     prop.set(n == SavegameEntry.State.LOADED ? tagNode(entry.getInfo()) : new Region());
                     if (n == SavegameEntry.State.INACTIVE) {
                         entry.stateProperty().removeListener(this);
@@ -56,15 +61,15 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
                 }
             });
         } else {
-            prop = new SimpleObjectProperty<>(
-                    GameImage.imageNode(tagImage(entry.getInfo(), entry.getInfo().getData().getTag()), CLASS_TAG_ICON));
+            prop = new SimpleObjectProperty<>(GameImage.imageNode(
+                    tagImage(entry.getInfo(), entry.getInfo().getData().getTag()), CLASS_TAG_ICON));
         }
         return prop;
     }
 
     public ObservableValue<Node> createImage(SavegameCampaign<T, I> campaign) {
-        SimpleObjectProperty<Node> prop = new SimpleObjectProperty<>(
-                GameImage.imageNode(campaign.getImage(), CLASS_TAG_ICON));
+        SimpleObjectProperty<Node> prop =
+                new SimpleObjectProperty<>(GameImage.imageNode(campaign.getImage(), CLASS_TAG_ICON));
         campaign.imageProperty().addListener((ChangeListener<? super Image>) (c, o, n) -> {
             prop.set(GameImage.imageNode(n, CLASS_TAG_ICON));
         });

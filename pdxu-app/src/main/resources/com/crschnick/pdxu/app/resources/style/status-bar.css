@@ -28,3 +28,11 @@
 -fx-min-height: 1.85em;
 -fx-max-height: 1.85em;
 }
+
+.split-menu-button .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.split-menu-button .arrow-button:hover {
+    -fx-background-color: -color-bg-default;
+}

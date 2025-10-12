@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.info.stellaris;
 
 import com.crschnick.pdxu.app.gui.game.GameImage;
+
 import javafx.scene.image.Image;
 
 public class StellarisUnityComp extends StellarisResourceComp {

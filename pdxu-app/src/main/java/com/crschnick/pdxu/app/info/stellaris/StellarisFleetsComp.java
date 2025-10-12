@@ -4,8 +4,8 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,7 +24,10 @@ public class StellarisFleetsComp extends SimpleInfoComp {
     @Override
     public Region create(SavegameData<?> data) {
         var r = super.create(data);
-        var img = (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().getFirst()).getGraphic()).getChildren().getFirst();
+        var img =
+                (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().getFirst()).getGraphic())
+                        .getChildren()
+                        .getFirst();
         img.fitWidthProperty().unbind();
         img.fitHeightProperty().unbind();
         img.setFitWidth(25);

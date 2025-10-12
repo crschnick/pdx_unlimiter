@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
+
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -26,7 +27,6 @@ public class GuiEditorMenuBar {
             c.setDisable(true);
         }
 
-
         Menu editor = new Menu(AppI18n.get("editorMenuEditor"));
         MenuItem cte = new MenuItem(AppI18n.get("editorMenuEditorSettings"));
         cte.setOnAction((a) -> {
@@ -44,7 +44,9 @@ public class GuiEditorMenuBar {
         Runnable fillJumps = () -> {
             if (state.isSavegame()) {
                 try {
-                    var jumps = EditorSavegameAdapter.ALL.get(state.getFileContext().getGame()).createCommonJumps(state);
+                    var jumps = EditorSavegameAdapter.ALL
+                            .get(state.getFileContext().getGame())
+                            .createCommonJumps(state);
                     jumps.forEach((k, v) -> {
                         MenuItem j = new MenuItem(k);
                         j.setOnAction((a) -> {

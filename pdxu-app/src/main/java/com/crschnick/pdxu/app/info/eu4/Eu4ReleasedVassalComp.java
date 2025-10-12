@@ -4,9 +4,9 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.image.Image;
 
 public class Eu4ReleasedVassalComp extends SimpleInfoComp {
@@ -15,8 +15,12 @@ public class Eu4ReleasedVassalComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        releasedVassal = content.get().getNodeForKey("countries").getNodeForKey(data.eu4().getTag().getTag())
-                .getNodeForKeyIfExistent("has_switched_nation").map(Node::getBoolean).orElse(false);
+        releasedVassal = content.get()
+                .getNodeForKey("countries")
+                .getNodeForKey(data.eu4().getTag().getTag())
+                .getNodeForKeyIfExistent("has_switched_nation")
+                .map(Node::getBoolean)
+                .orElse(false);
     }
 
     @Override

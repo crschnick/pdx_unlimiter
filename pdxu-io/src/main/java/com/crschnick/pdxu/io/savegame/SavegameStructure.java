@@ -11,71 +11,60 @@ import java.util.Set;
 
 public interface SavegameStructure {
 
-    SavegameStructure EU4_PLAINTEXT = new PlaintextSavegameStructure(
-            "EU4txt".getBytes(),
-            "gamestate",
-            SavegameType.EU4);
+    SavegameStructure EU4_PLAINTEXT =
+            new PlaintextSavegameStructure("EU4txt".getBytes(), "gamestate", SavegameType.EU4);
 
     SavegameStructure EU4_COMPRESSED = new ZipSavegameStructure(
             "EU4txt".getBytes(),
             SavegameType.EU4,
-            Set.of(new ZipSavegameStructure.SavegamePart("ai", "ai"),
+            Set.of(
+                    new ZipSavegameStructure.SavegamePart("ai", "ai"),
                     new ZipSavegameStructure.SavegamePart("meta", "meta"),
                     new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")),
             "rnw.zip");
 
-
     SavegameStructure CK3_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.CK3);
     SavegameStructure CK3_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.CK3);
-
 
     SavegameStructure VIC3_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.VIC3);
     SavegameStructure VIC3_UNIFIED_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.VIC3);
     SavegameStructure VIC3_SPLIT_COMPRESSED = new ModernSplitCompressedSavegameStructure(SavegameType.VIC3);
 
-
-    SavegameStructure HOI4 = new PlaintextSavegameStructure(
-            "HOI4txt".getBytes(),
-            "gamestate",
-            SavegameType.HOI4);
-
+    SavegameStructure HOI4 = new PlaintextSavegameStructure("HOI4txt".getBytes(), "gamestate", SavegameType.HOI4);
 
     SavegameStructure STELLARIS = new ZipSavegameStructure(
             null,
             SavegameType.STELLARIS,
-            Set.of(new ZipSavegameStructure.SavegamePart("meta", "meta"),
+            Set.of(
+                    new ZipSavegameStructure.SavegamePart("meta", "meta"),
                     new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")));
 
+    SavegameStructure CK2_PLAINTEXT =
+            new PlaintextSavegameStructure("CK2txt".getBytes(), "gamestate", SavegameType.CK2) {
 
-    SavegameStructure CK2_PLAINTEXT = new PlaintextSavegameStructure(
-            "CK2txt".getBytes(),
-            "gamestate",
-            SavegameType.CK2) {
+                @Override
+                public void writeData(OutputStream out, ArrayNode node) throws IOException {
+                    NodeWriter.write(out, getType().getParser().getCharset(), node, "\t", 1);
+                    out.write("}".getBytes());
+                }
+            };
 
-        @Override
-        public void writeData(OutputStream out, ArrayNode node) throws IOException {
-            NodeWriter.write(out, getType().getParser().getCharset(), node, "\t", 1);
-            out.write("}".getBytes());
-        }
-    };
+    SavegameStructure CK2_COMPRESSED =
+            new ZipSavegameStructure(
+                    "CK2txt".getBytes(),
+                    SavegameType.CK2,
+                    Set.of(
+                            new ZipSavegameStructure.SavegamePart("meta", "meta"),
+                            new ZipSavegameStructure.SavegamePart("*", "gamestate"))) {
 
-    SavegameStructure CK2_COMPRESSED = new ZipSavegameStructure(
-            "CK2txt".getBytes(),
-            SavegameType.CK2,
-            Set.of(new ZipSavegameStructure.SavegamePart("meta", "meta"),
-                    new ZipSavegameStructure.SavegamePart("*", "gamestate"))) {
+                @Override
+                public void writeData(OutputStream out, ArrayNode node) throws IOException {
+                    NodeWriter.write(out, getType().getParser().getCharset(), node, "\t", 1);
+                    out.write("\n}".getBytes());
+                }
+            };
 
-        @Override
-        public void writeData(OutputStream out, ArrayNode node) throws IOException {
-            NodeWriter.write(out, getType().getParser().getCharset(), node, "\t", 1);
-            out.write("\n}".getBytes());
-        }
-    };
-
-    SavegameStructure VIC2 = new PlaintextSavegameStructure(
-            null,
-            "gamestate",
-            SavegameType.VIC2) {
+    SavegameStructure VIC2 = new PlaintextSavegameStructure(null, "gamestate", SavegameType.VIC2) {
 
         @Override
         public void writeData(OutputStream out, ArrayNode node) throws IOException {

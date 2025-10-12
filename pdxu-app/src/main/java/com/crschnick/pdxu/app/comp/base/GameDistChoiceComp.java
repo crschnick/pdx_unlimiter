@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.comp.base;
 
-import atlantafx.base.theme.Styles;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.AppFontSizes;
 import com.crschnick.pdxu.app.core.AppI18n;
@@ -14,9 +13,12 @@ import com.crschnick.pdxu.app.installation.dist.SteamDist;
 import com.crschnick.pdxu.app.installation.dist.WindowsStoreDist;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
+
 import javafx.beans.property.*;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
+
+import atlantafx.base.theme.Styles;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
@@ -32,8 +34,8 @@ public class GameDistChoiceComp extends SimpleComp {
     private final Property<GameDist> gameDist;
 
     private void showInstallErrorMessage(String msg) {
-        String fullMsg = AppI18n.get("gameDirError", game.getTranslatedFullName()) + ":\n\n" +
-                msg + "\n\n" + AppI18n.get("gameDirErrorMsg", game.getTranslatedFullName());
+        String fullMsg = AppI18n.get("gameDirError", game.getTranslatedFullName()) + ":\n\n" + msg + "\n\n"
+                + AppI18n.get("gameDirErrorMsg", game.getTranslatedFullName());
         ErrorEventFactory.fromMessage(fullMsg).expected().handle();
     }
 
@@ -61,7 +63,8 @@ public class GameDistChoiceComp extends SimpleComp {
         typeLabel.apply(struc -> struc.get().getStyleClass().remove(Styles.FLAT));
         typeLabel.tooltip(typeTooltip);
 
-        var location = new SimpleStringProperty(Optional.ofNullable(gameDist.getValue()).map(v -> v.getInstallLocation().toString())
+        var location = new SimpleStringProperty(Optional.ofNullable(gameDist.getValue())
+                .map(v -> v.getInstallLocation().toString())
                 .orElse(""));
         var locationLabel = new TextFieldComp(location);
         locationLabel.hgrow();
@@ -73,7 +76,8 @@ public class GameDistChoiceComp extends SimpleComp {
         var browse = new IconButtonComp("mdi2f-folder-open-outline", () -> {
             DirectoryChooser dirChooser = new DirectoryChooser();
             if (setDist.get() != null && Files.exists(setDist.get().getInstallLocation())) {
-                dirChooser.setInitialDirectory(setDist.get().getInstallLocation().toFile());
+                dirChooser.setInitialDirectory(
+                        setDist.get().getInstallLocation().toFile());
             }
             dirChooser.setTitle(AppI18n.get("selectDir", AppI18n.get(nameKey)));
             File file = dirChooser.showDialog(AppMainWindow.get().getStage());
@@ -83,7 +87,6 @@ public class GameDistChoiceComp extends SimpleComp {
                 if (path.endsWith("binaries")) {
                     path = path.getParent();
                 }
-
 
                 var newDist = GameDists.detectDistFromDirectory(game, path);
                 if (isValid(newDist)) {
@@ -97,7 +100,9 @@ public class GameDistChoiceComp extends SimpleComp {
         var xbox = new IconButtonComp("mdi-xbox", () -> {
             var dist = WindowsStoreDist.getDist(game, null).orElse(null);
             if (dist == null) {
-                ErrorEventFactory.fromMessage(AppI18n.get("xboxDistNotFound")).expected().handle();
+                ErrorEventFactory.fromMessage(AppI18n.get("xboxDistNotFound"))
+                        .expected()
+                        .handle();
                 return;
             }
 

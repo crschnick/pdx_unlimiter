@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppModifiedStage;
 import com.crschnick.pdxu.app.core.window.AppWindowStyle;
 import com.crschnick.pdxu.app.util.Hyperlinks;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,8 +18,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
 
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
@@ -27,7 +28,6 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
     public GuiCoaViewer(GuiCoaViewerState<T> state) {
         this.state = state;
     }
-
 
     public void createStage() {
         Stage stage = new Stage();
@@ -94,7 +94,7 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
         layout.setTop(topBar);
 
         layout.setCenter(new ImageView(state.getImage()));
-        state.imageProperty().addListener((c,o,n) -> {
+        state.imageProperty().addListener((c, o, n) -> {
             layout.setCenter(new ImageView(n));
         });
 

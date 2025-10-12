@@ -48,11 +48,8 @@ public record ModernHeader(boolean unknown, int compressionType, boolean binary,
             return true;
         }
 
-        return Arrays.equals(input, 0, 9,
-                             "meta_data".getBytes(StandardCharsets.UTF_8), 0, 9
-        );
+        return Arrays.equals(input, 0, 9, "meta_data".getBytes(StandardCharsets.UTF_8), 0, 9);
     }
-
 
     public static ModernHeader determineHeaderForFile(byte[] data) {
         if (data.length < LENGTH) {
@@ -66,10 +63,10 @@ public record ModernHeader(boolean unknown, int compressionType, boolean binary,
         return fromString(new String(data, 0, LENGTH));
     }
 
-
     public static ModernHeader fromString(String header) {
         if (!header.startsWith("SAV000") && !header.startsWith("SAV010")) {
-            throw new SavegameFormatException("Invalid header start: " + header.substring(0, Math.min(6, header.length())));
+            throw new SavegameFormatException(
+                    "Invalid header start: " + header.substring(0, Math.min(6, header.length())));
         }
 
         boolean unknown = Integer.parseInt(header.substring(4, 5)) == 1;
@@ -84,6 +81,7 @@ public record ModernHeader(boolean unknown, int compressionType, boolean binary,
     @Override
     public String toString() {
         int type = (compressionType * 2) + (binary ? 1 : 0);
-        return "SAV0" + (unknown ? 1 : 0) + "0" + type + String.format("%08x", randomness) + String.format("%08x", metaLength);
+        return "SAV0" + (unknown ? 1 : 0) + "0" + type + String.format("%08x", randomness)
+                + String.format("%08x", metaLength);
     }
 }

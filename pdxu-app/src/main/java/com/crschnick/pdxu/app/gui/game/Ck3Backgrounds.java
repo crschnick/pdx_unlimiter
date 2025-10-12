@@ -11,6 +11,7 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.ck3.Ck3Tag;
+
 import javafx.scene.paint.Color;
 
 import java.util.HashMap;
@@ -25,19 +26,27 @@ public class Ck3Backgrounds {
 
         var cache = GameCacheManager.getInstance().get(BackgroundColorCache.class);
         if (cache.colors.size() == 0) {
-            var file = GameInstallation.ALL.get(Game.CK3).getInstallDir().resolve("game")
-                    .resolve("common").resolve("landed_titles").resolve("00_landed_titles.txt");
+            var file = GameInstallation.ALL
+                    .get(Game.CK3)
+                    .getInstallDir()
+                    .resolve("game")
+                    .resolve("common")
+                    .resolve("landed_titles")
+                    .resolve("00_landed_titles.txt");
 
             try {
                 ArrayNode node = TextFormatParser.text().parse(file);
                 cache.addColors(node);
             } catch (Exception e) {
-                ErrorEventFactory.fromThrowable(e).description("Couldn't parse title data").handle();
+                ErrorEventFactory.fromThrowable(e)
+                        .description("Couldn't parse title data")
+                        .handle();
             }
         }
 
         var key = info.getData().getTag().getPrimaryTitle().getKey();
-        var color = cache.colors.containsKey(key) ? ColorHelper.fromGameColor(cache.colors.get(key)) : Color.TRANSPARENT;
+        var color =
+                cache.colors.containsKey(key) ? ColorHelper.fromGameColor(cache.colors.get(key)) : Color.TRANSPARENT;
         return ColorHelper.withAlpha(color, 0.33);
     }
 

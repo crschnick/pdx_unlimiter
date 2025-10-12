@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.savegame;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.model.GameDate;
+
 import javafx.beans.property.*;
 
 import java.util.ArrayList;
@@ -20,9 +21,13 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
     private final SavegameNotes notes;
     private final List<String> sourceFileChecksums;
 
-    public SavegameEntry(String name, UUID uuid,
-                         String contentChecksum, GameDate date, SavegameNotes notes,
-                         List<String> sourceFileChecksums) {
+    public SavegameEntry(
+            String name,
+            UUID uuid,
+            String contentChecksum,
+            GameDate date,
+            SavegameNotes notes,
+            List<String> sourceFileChecksums) {
         this.state = new SimpleObjectProperty<>(State.INACTIVE);
         this.contentChecksum = contentChecksum;
         this.name = new SimpleStringProperty(name);
@@ -31,7 +36,7 @@ public final class SavegameEntry<T, I extends SavegameInfo<T>> implements Compar
         this.date = date;
         this.notes = notes;
         this.sourceFileChecksums = new ArrayList<>(sourceFileChecksums);
-        this.state.addListener((c,o,n) -> {
+        this.state.addListener((c, o, n) -> {
             TrackEvent.debug("Changing state of " + this.name.get() + " from " + o + " to " + n);
         });
     }

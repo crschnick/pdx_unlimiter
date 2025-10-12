@@ -26,7 +26,6 @@ public class EditorProgram {
             return "TextEdit.app";
         }
 
-        return System.getenv("VISUAL") != null ?
-                System.getenv("VISUAL") : null;
+        return System.getenv("VISUAL") != null ? System.getenv("VISUAL") : null;
     }
 }

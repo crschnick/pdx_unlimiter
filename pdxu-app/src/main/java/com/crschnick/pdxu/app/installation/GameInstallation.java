@@ -1,11 +1,11 @@
 package com.crschnick.pdxu.app.installation;
 
-
 import com.crschnick.pdxu.app.installation.dist.GameDist;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.model.GameVersion;
+
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap;
 
@@ -79,19 +79,27 @@ public final class GameInstallation {
     }
 
     public Optional<GameMod> getModForLauncherId(String fn) {
-        return getMods().stream().filter(m -> type.getModLauncherId(this, m).equals(fn)).findAny();
+        return getMods().stream()
+                .filter(m -> type.getModLauncherId(this, m).equals(fn))
+                .findAny();
     }
 
     public Optional<GameMod> getModForSavegameId(String id) {
-        return getMods().stream().filter(m -> type.getModSavegameId(this, m).equals(id)).findAny();
+        return getMods().stream()
+                .filter(m -> type.getModSavegameId(this, m).equals(id))
+                .findAny();
     }
 
     public Optional<GameDlc> getDlcForLauncherId(String fn) {
-        return getDlcs().stream().filter(m -> type.getDlcLauncherId(this, m).equals(fn)).findAny();
+        return getDlcs().stream()
+                .filter(m -> type.getDlcLauncherId(this, m).equals(fn))
+                .findAny();
     }
 
     public Optional<GameDlc> getDlcForSavegameId(String id) {
-        return getDlcs().stream().filter(m -> type.getDlcSavegameId(this, m).equals(id)).findAny();
+        return getDlcs().stream()
+                .filter(m -> type.getDlcSavegameId(this, m).equals(id))
+                .findAny();
     }
 
     public void startDirectly(boolean debug) throws IOException {
@@ -107,19 +115,31 @@ public final class GameInstallation {
         TrackEvent.debug("Initializing " + g.getTranslatedAbbreviation() + " installation ...");
 
         if (getInstallDir().startsWith(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
-            throw new InvalidInstallationException("installDirIsUserDir", g.getInstallationName(), g.getInstallationName());
+            throw new InvalidInstallationException(
+                    "installDirIsUserDir", g.getInstallationName(), g.getInstallationName());
         }
 
         if (!Files.isRegularFile(dist.getExecutable())) {
             var exec = getInstallDir().relativize(dist.getExecutable());
-            var dirs = switch (OsType.ofLocal()) {
-                case OsType.Linux linux -> List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
-                case OsType.MacOs macOs -> List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName() + ".app");
-                case OsType.Windows windows -> List.of("C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
-                        "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
-            };
+            var dirs =
+                    switch (OsType.ofLocal()) {
+                        case OsType.Linux linux ->
+                            List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
+                        case OsType.MacOs macOs ->
+                            List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName()
+                                    + ".app");
+                        case OsType.Windows windows ->
+                            List.of(
+                                    "C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
+                                    "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
+                    };
             var dirsString = dirs.stream().map(s -> "- " + s).collect(Collectors.joining("\n"));
-            throw new InvalidInstallationException("executableNotFound", g.getInstallationName(), exec.toString(), getInstallDir().toString(), dirsString);
+            throw new InvalidInstallationException(
+                    "executableNotFound",
+                    g.getInstallationName(),
+                    exec.toString(),
+                    getInstallDir().toString(),
+                    dirsString);
         }
 
         TrackEvent.debug(g.getTranslatedAbbreviation() + " distribution type: " + this.dist.getName());
@@ -132,13 +152,15 @@ public final class GameInstallation {
                         "gameDataPathDoesNotExist", g.getTranslatedAbbreviation(), this.userDir.toString());
             }
 
-            this.version = dist.determineVersion().map(type::getVersion)
+            this.version = dist.determineVersion()
+                    .map(type::getVersion)
                     .orElse(type.determineVersionFromInstallation(getInstallDir()))
                     .orElse(null);
-            TrackEvent.debug(g.getTranslatedAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
+            TrackEvent.debug(
+                    g.getTranslatedAbbreviation() + " version: " + (this.version != null ? this.version : "unknown"));
             this.language = type.determineLanguage(getInstallDir(), userDir).orElse(null);
-            TrackEvent.debug(g.getTranslatedAbbreviation() + " language: " +
-                    (this.language != null ? this.language.getId() : "unknown"));
+            TrackEvent.debug(g.getTranslatedAbbreviation() + " language: "
+                    + (this.language != null ? this.language.getId() : "unknown"));
             TrackEvent.debug("Finished initialization");
         } catch (InvalidInstallationException e) {
             throw e;
@@ -184,12 +206,14 @@ public final class GameInstallation {
         var enabledMods = new ArrayList<GameMod>();
         type.getEnabledMods(getInstallDir(), userDir).forEach(s -> {
             var mod = getModForLauncherId(s);
-            mod.ifPresentOrElse(m -> {
-                enabledMods.add(m);
-                TrackEvent.debug("Detected enabled mod " + m.getName());
-            }, () -> {
-                TrackEvent.warn("Detected enabled but unrecognized mod " + s);
-            });
+            mod.ifPresentOrElse(
+                    m -> {
+                        enabledMods.add(m);
+                        TrackEvent.debug("Detected enabled mod " + m.getName());
+                    },
+                    () -> {
+                        TrackEvent.warn("Detected enabled but unrecognized mod " + s);
+                    });
         });
         return enabledMods;
     }
@@ -199,12 +223,14 @@ public final class GameInstallation {
         var disabledDlcs = new ArrayList<GameDlc>();
         type.getDisabledDlcs(getInstallDir(), userDir).forEach(s -> {
             var dlc = getDlcForLauncherId(s);
-            dlc.ifPresentOrElse(m -> {
-                disabledDlcs.add(m);
-                TrackEvent.debug("Detected disabled dlc " + m.getName());
-            }, () -> {
-                TrackEvent.warn("Detected disabled but unrecognized dlc " + s);
-            });
+            dlc.ifPresentOrElse(
+                    m -> {
+                        disabledDlcs.add(m);
+                        TrackEvent.debug("Detected disabled dlc " + m.getName());
+                    },
+                    () -> {
+                        TrackEvent.warn("Detected disabled but unrecognized dlc " + s);
+                    });
         });
         return disabledDlcs;
     }

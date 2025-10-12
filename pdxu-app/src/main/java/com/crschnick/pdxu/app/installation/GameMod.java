@@ -41,7 +41,9 @@ public class GameMod {
             return Optional.of(mod);
         } catch (Exception ex) {
             // Don't report mod parsing errors
-            ErrorEventFactory.fromThrowable("Could not parse malformed mod file " + p.toString(), ex).omit().handle();
+            ErrorEventFactory.fromThrowable("Could not parse malformed mod file " + p.toString(), ex)
+                    .omit()
+                    .handle();
         }
 
         return Optional.of(mod);
@@ -86,7 +88,9 @@ public class GameMod {
             return Optional.of(mod);
         } catch (Exception ex) {
             // Don't report mod parsing errors
-            ErrorEventFactory.fromThrowable("Could not parse malformed mod file " + p.toString(), ex).omit().handle();
+            ErrorEventFactory.fromThrowable("Could not parse malformed mod file " + p.toString(), ex)
+                    .omit()
+                    .handle();
         }
 
         return Optional.of(mod);

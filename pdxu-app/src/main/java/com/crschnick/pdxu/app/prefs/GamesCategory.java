@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.installation.dist.GameDist;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.OptionsBuilder;
+
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -51,8 +52,7 @@ public class GamesCategory extends AppPrefsCategory {
                         .addComp(gameChoice(Game.CK2, prefs.ck2Directory))
                         .name("vic2")
                         .description("installationDirectory")
-                        .addComp(gameChoice(Game.VIC2, prefs.vic2Directory))
-                );
+                        .addComp(gameChoice(Game.VIC2, prefs.vic2Directory)));
         return builder.buildComp();
     }
 
@@ -64,7 +64,7 @@ public class GamesCategory extends AppPrefsCategory {
         var initial = GameInstallation.ALL.get(game);
         var prop = new SimpleObjectProperty<>(initial != null ? initial.getDist() : null);
         prop.subscribe(gameDist -> {
-           p.setValue(gameDist != null ? gameDist.getInstallLocation() : null);
+            p.setValue(gameDist != null ? gameDist.getInstallLocation() : null);
         });
         return prop;
     }
