@@ -19,13 +19,17 @@ great community-made tools, and full support for the following games:
 * Victoria II
 
 
-
 # Download
 
-Note that there might be some issues with Windows SmartScreen blocking the executable after downloading.
-If you are facing these issues, click on "More info" and then "Run anyway".
-You can read [this StackExchange post](https://security.stackexchange.com/a/139520) if you want to understand
-why this warning pops up.
+### v3 beta
+
+The Pdx-Unlimiter got a complete rework in version 3.0 with an improved UI. On the technical side, it is a completely new desktop application. On the game/save logic side, it stayed the same, meaning that all game integrations should work as before.
+
+Right now, v3 is still in beta, meaning that it is not published as a full release yet. You can install it manually by downloading it from the GitHub page:
+
+https://github.com/crschnick/pdx_unlimiter/releases
+
+If you are looking for the stable v2 builds, see below.
 
 ### Installers
 
@@ -182,21 +186,13 @@ This feature also allows you to easily savescum, which is kinda necessary for ha
 
 
 
-## Third party tool integration
+## Tool integration
 
 The Pdx-Unlimiter is also built as an application that gives you easy access to many
 other great community-made tools.
 The supported tools are:
 
-- [PDX Tools](https://pdx.tools),
-  a website to analyze and share your eu4 achievements and compete against other players.
-  It is possible to analyze your EU4 savegames on PDX Tools with just one click without having to upload them.
-
-- [Skanderbeg](https://skanderbeg.pm),
-  a website to generate maps and statistics for your savegames.
-  It is possible to upload your EU4 savegames to skanderbeg with just one click.
-
-- The [CK3 to EU4 converter](https://github.com/ParadoxGameConverters/CK3toEU4).
+- The [Paradox game converters](https://paradoxgameconverters.com/).
   This means that you can interact with the converter from within the Pdx-Unlimiter
   and basically convert any managed savegame with just one click as well.
 
@@ -217,18 +213,6 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 
 
-# Development
+# Contributing
 
-To build this project, a JDK for at least Java 25 is required.
-You can then build the gradle project using the gradle wrapper with `./gradlew build` or `.\gradlew.bat build`.
-For running, you can use `./gradlew run`.
-You can use the automatically generated file `dev.properties`, which is created when gradle is run the first time,
-to set some useful development options when needed.
-
-Further, note that as this is a pretty complicated Java project that fully utilizes modularity,
-many IDEs still have problems building this project properly.
-For example, you can't build this project in eclipse or vscode as it will complain about missing modules.
-The tested and recommended IDE is intellij.
-
-Any contribution is welcomed!
-There are no real formal contribution guidelines right now, they will maybe come later.
+See [CONTRIBUTING.md](/CONTRIBUTING.md).
