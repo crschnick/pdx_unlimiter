@@ -7,7 +7,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.UserReportComp;
-import com.crschnick.pdxu.app.page.PrefsPageComp;
+import com.crschnick.pdxu.app.prefs.AppPrefsComp;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.util.GlobalTimer;
@@ -129,7 +129,7 @@ public class AppLayoutModel {
     public void selectSettings() {
         PlatformThread.runLaterIfNeeded(() -> {
             var found = entries.stream()
-                    .filter(entry -> entry.comp instanceof PrefsPageComp)
+                    .filter(entry -> entry.comp instanceof AppPrefsComp)
                     .findFirst();
             selected.setValue(found.orElseThrow());
         });
@@ -145,7 +145,7 @@ public class AppLayoutModel {
                 new Entry(
                         AppI18n.observable("settings"),
                         new LabelGraphic.IconGraphic("mdsmz-miscellaneous_services"),
-                        new PrefsPageComp(),
+                        new AppPrefsComp(),
                         null),
                 new Entry(
                         AppI18n.observable("docs"),

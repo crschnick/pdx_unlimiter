@@ -90,6 +90,8 @@ public class GameImage {
     public static Image HOI4_BACKGROUND;
     public static Image HOI4_FLAG_OVERLAY;
 
+    public static Image EU5_BACKGROUND;
+
     public static Image EU4_ICON_VASSAL;
     public static Image EU4_ICON_ALLIANCE;
     public static Image EU4_ICON_TRIBUTARY;
@@ -138,6 +140,7 @@ public class GameImage {
 
     public static void loadGameImages(Game g) {
         Map<Game, Runnable> loadFuncs = Map.of(
+                Game.EU5, GameImage::loadEu5mages,
                 Game.EU4, GameImage::loadEu4Images,
                 Game.CK3, GameImage::loadCk3Images,
                 Game.HOI4, GameImage::loadHoi4Images,
@@ -334,6 +337,14 @@ public class GameImage {
         HOI4_FLAG_OVERLAY = ImageHelper.loadImage(i.resolve("flag_overlay.dds"));
         HOI4_BACKGROUND = ImageHelper.loadImage(
                 GameInstallation.ALL.get(Game.HOI4).getType().chooseBackgroundImage(installPath));
+    }
+
+    private static void loadEu5mages() {
+        var installPath = GameInstallation.ALL.get(Game.EU5).getInstallDir();
+        Path i = installPath.resolve("gfx").resolve("interface");
+
+        EU5_BACKGROUND = ImageHelper.loadImage(
+                GameInstallation.ALL.get(Game.EU5).getType().chooseBackgroundImage(installPath));
     }
 
     private static void loadEu4Images() {

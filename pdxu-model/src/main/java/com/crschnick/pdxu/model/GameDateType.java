@@ -64,6 +64,7 @@ public abstract class GameDateType {
                     + date.getYear();
         }
     };
+    public static final GameDateType EU5 = EU4;
     public static final GameDateType CK3 = EU4;
     public static final GameDateType CK2 = EU4;
     public static final GameDateType VIC2 = EU4;

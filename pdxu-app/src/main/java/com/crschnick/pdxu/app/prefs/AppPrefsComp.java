@@ -1,12 +1,9 @@
-package com.crschnick.pdxu.app.page;
+package com.crschnick.pdxu.app.prefs;
 
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.comp.base.VerticalComp;
 import com.crschnick.pdxu.app.platform.PlatformThread;
-import com.crschnick.pdxu.app.prefs.AppPrefs;
-import com.crschnick.pdxu.app.prefs.AppPrefsCategory;
-import com.crschnick.pdxu.app.prefs.AppPrefsSidebarComp;
 import com.crschnick.pdxu.app.util.BooleanScope;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,7 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
-public class PrefsPageComp extends SimpleComp {
+public class AppPrefsComp extends SimpleComp {
 
     @Override
     protected Region createSimple() {

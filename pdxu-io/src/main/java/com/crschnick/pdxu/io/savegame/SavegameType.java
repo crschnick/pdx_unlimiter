@@ -382,6 +382,60 @@ public interface SavegameType {
         public void generateNewCampaignIdHeuristic(SavegameContent c) {}
     };
 
+    SavegameType EU5 = new SavegameType() {
+
+        @Override
+        public SavegameStructure determineStructure(byte[] input) {
+            if (isCompressed(input)) {
+                return SavegameStructure.EU5_COMPRESSED;
+            } else {
+                return SavegameStructure.EU5_PLAINTEXT;
+            }
+        }
+
+        @Override
+        public boolean isCompressed(byte[] input) {
+            if (ModernHeader.skipsHeader(input)) {
+                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            }
+
+            var header = ModernHeader.determineHeaderForFile(input);
+            return header.isCompressed();
+        }
+
+        @Override
+        public String getFileEnding() {
+            return "eu5";
+        }
+
+        @Override
+        public boolean isBinary(byte[] input) {
+            if (ModernHeader.skipsHeader(input)) {
+                return false;
+            }
+
+            return ModernHeader.determineHeaderForFile(input).binary();
+        }
+
+        @Override
+        public TextFormatParser getParser() {
+            return TextFormatParser.eu5();
+        }
+
+        public UUID getCampaignIdHeuristic(SavegameContent c) {
+            var seed = UUID.fromString(c.get().getNodeForKeys("metadata", "playthrough_id").getString());
+            return seed;
+        }
+
+        @Override
+        public void generateNewCampaignIdHeuristic(SavegameContent c) {
+            c.get("gamestate")
+                    .getNodeForKey("playthrough_id")
+                    .getValueNode()
+                    .set(new ValueNode(UUID.randomUUID().toString(), true));
+        }
+    };
+
     static SavegameType getTypeForFile(Path path) {
         for (var ft : SavegameType.class.getFields()) {
             try {

@@ -748,6 +748,198 @@ public interface GameInstallType {
         }
     };
 
+
+    GameInstallType EU5 = new StandardInstallType("binaries/eu5") {
+
+        @Override
+        public String getModSavegameId(GameInstallation installation, GameMod mod) {
+            return mod.getName().orElse("?");
+        }
+
+        @Override
+        public String getDlcSavegameId(GameInstallation installation, GameDlc dlc) {
+            return dlc.getName();
+        }
+
+        @Override
+        public Path chooseBackgroundImage(Path p) {
+            return p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loadingscreens").resolve("startscreen.dds");
+        }
+
+        @Override
+        public Optional<String> debugModeSwitch() {
+            return Optional.of("-debug_mode");
+        }
+
+        @Override
+        public List<String> getLaunchArguments() {
+            return List.of("-gdpr-compliant", "--continuelastsave");
+        }
+
+        @Override
+        public Optional<GameVersion> getVersion(String versionString) {
+            Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)(?:\\.(\\d+))?")
+                    .matcher(versionString);
+            if (m.find()) {
+                var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
+                return Optional.of(new GameVersion(
+                        Integer.parseInt(m.group(1)),
+                        Integer.parseInt(m.group(2)),
+                        Integer.parseInt(m.group(3)),
+                        fourth));
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        @Override
+        public Path getDlcPath(Path p) {
+            return p.resolve("game").resolve("dlc");
+        }
+
+        @Override
+        public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
+            var sf = userDir.resolve("pdx_settings.json");
+            if (!Files.exists(sf)) {
+                return Optional.empty();
+            }
+
+            var node = JacksonMapper.getDefault().readTree(sf.toFile());
+            var id = Optional.ofNullable(node.get("System")).flatMap(n -> Optional.ofNullable(n.get("language")));
+            return id.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l.asText())));
+        }
+
+        public Path getSteamSpecificFile(Path p) {
+            return null;
+        }
+
+        public Path getLauncherDataPath(Path p) {
+            return p.resolve("launcher");
+        }
+
+        @Override
+        public Path getIcon(Path p) {
+            return p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("exe_icon.bmp");
+        }
+
+        public Path getModBasePath(Path p) {
+            return p.resolve("game");
+        }
+
+        @Override
+        public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version)
+                throws IOException {
+            SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            var date = d.format(new Date(lastPlayed.toEpochMilli()));
+            var sgPath = FilenameUtils.getBaseName(FilenameUtils.separatorsToUnix(
+                    userDir.resolve("save games").relativize(path).toString()));
+            var rawVersion = String.format("%s.%s.%s", version.getFirst(), version.getSecond(), version.getThird());
+            ObjectNode n = JsonNodeFactory.instance
+                    .objectNode()
+                    .put("title", sgPath)
+                    .put("desc", "")
+                    .put("date", date)
+                    .put("rawGameVersion", rawVersion);
+            JacksonMapper.getDefault()
+                    .writeValue(userDir.resolve("continue_game.json").toFile(), n);
+        }
+
+        public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
+            var file = userDir.resolve("content_load.json");
+            if (!Files.exists(file)) {
+                return List.of();
+            }
+
+            var node = JacksonMapper.getDefault().readTree(file.toFile());
+            if (node.get("enabledMods") == null) {
+                return List.of();
+            }
+
+            return StreamSupport.stream(node.required("enabledMods").spliterator(), false)
+                    .map(n -> n.required("path").textValue())
+                    .collect(Collectors.toList());
+        }
+
+        public List<String> getDisabledDlcs(Path dir, Path userDir) throws Exception {
+            var file = userDir.resolve("content_load.json");
+            if (!Files.exists(file)) {
+                return List.of();
+            }
+
+            var node = JacksonMapper.getDefault().readTree(file.toFile());
+            if (node.get("disabledDLC") == null) {
+                return List.of();
+            }
+
+            return StreamSupport.stream(node.required("disabledDLC").spliterator(), false)
+                    .map(n -> n.required("paradoxAppId").textValue())
+                    .collect(Collectors.toList());
+        }
+
+        public void writeModAndDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs)
+                throws Exception {
+            var file = installation.getUserDir().resolve("content_load.json");
+            ObjectNode n = JsonNodeFactory.instance.objectNode();
+
+            var modsToUse = mods;
+            n.putArray("enabledMods")
+                    .addAll(modsToUse.stream()
+                            .map(d -> d.getContentPath())
+                            .filter(path -> path.isPresent())
+                            .map(s -> JsonNodeFactory.instance
+                                    .objectNode()
+                                    .put("path", s.get().toString()))
+                            .toList());
+
+            var availableDlcs = installation.getDlcs();
+            var currentlyDisabledDlcs = installation.queryDisabledDlcs();
+            var dlcsToDisable = availableDlcs.stream()
+                    .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc))
+                            || (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
+                    .toList();
+
+            n.putArray("disabledDLC")
+                    .addAll(dlcsToDisable.stream()
+                            .map(dlc -> getDlcLauncherId(installation, dlc))
+                            .map(s -> JsonNodeFactory.instance.objectNode().put("paradoxAppId", s))
+                            .toList());
+            JacksonMapper.getDefault().writeValue(file.toFile(), n);
+        }
+
+        public List<GameMod> loadMods(GameInstallation installation) throws IOException {
+            var modPaths = new ArrayList<Path>();
+
+            var workshop = installation.getDist().getWorkshopDir();
+            if (workshop.isPresent() && Files.isDirectory(workshop.get())) {
+                try (var list = Files.list(workshop.get())) {
+                    modPaths.addAll(list.toList());
+                }
+            }
+
+            var userDirMods = installation.getUserDir().resolve("mod");
+            if (Files.isDirectory(userDirMods)) {
+                try (var list = Files.list(userDirMods)) {
+                    modPaths.addAll(list.toList());
+                }
+            }
+
+            var mods = new ArrayList<GameMod>();
+            modPaths.forEach(f -> {
+                GameMod.fromVictoria3Directory(f).ifPresent(m -> {
+                    mods.add(m);
+                    TrackEvent.debug("Found mod " + m.getName().orElse("?") + " at "
+                            + m.getContentPath().orElse(null) + ".");
+                });
+            });
+            return mods;
+        }
+
+        public String getDlcLauncherId(GameInstallation installation, GameDlc dlc) {
+            return FilenameUtils.getBaseName(
+                    dlc.getInfoFilePath().getParent().getFileName().toString());
+        }
+    };
+
     Path chooseBackgroundImage(Path p);
 
     default Optional<GameVersion> determineVersionFromInstallation(Path p) {

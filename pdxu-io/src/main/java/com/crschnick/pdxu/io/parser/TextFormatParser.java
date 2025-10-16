@@ -50,6 +50,10 @@ public final class TextFormatParser {
                 isMacOs() ? StandardCharsets.UTF_8 : Charset.forName("windows-1252"), TaggedNode.NO_TAGS, s -> false);
     }
 
+    public static TextFormatParser eu5() {
+        return new TextFormatParser(StandardCharsets.UTF_8, TaggedNode.COLORS, s -> false);
+    }
+
     private static boolean isMacOs() {
         String osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
         return osName.contains("mac") || osName.contains("darwin");

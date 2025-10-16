@@ -42,7 +42,7 @@ public class GuiImporter {
 
                 @Override
                 public void error(SavegameParseResult.Error er) {
-                    text.append("- ").append(e.getKey().getName()).append(": ").append(er.error.getMessage());
+                    text.append("\n- ").append(e.getKey().getName()).append(": ").append(er.error.getMessage());
                 }
             });
         }

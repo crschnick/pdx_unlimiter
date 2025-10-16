@@ -19,6 +19,7 @@
 	<String Id="Ck2Desc" Value="Crusader Kings 2 savegame" />
 	<String Id="Vic2Desc" Value="Victoria 2 savegame" />
 	<String Id="Vic3Desc" Value="Victoria 3 savegame" />
+	<String Id="Eu5Desc" Value="Europa Universalis V savegame" />
 	
 	<String Id="OpenWith" Value="Open with Pdx-Unlimiter" />
 	<String Id="NewerVersionInstalled" Value="A newer version is already installed." />

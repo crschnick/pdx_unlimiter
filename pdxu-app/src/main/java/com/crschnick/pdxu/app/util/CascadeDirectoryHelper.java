@@ -61,6 +61,14 @@ public class CascadeDirectoryHelper {
     }
 
     private static void traverseDir(Path traverseDir, List<Path> cascadingDirectories, Consumer<Path> consumer) {
+        if (traverseDir.isAbsolute()) {
+            for (Iterator<File> it = FileUtils.iterateFilesAndDirs(traverseDir.toFile(), FileFilterUtils.trueFileFilter(), FileFilterUtils.trueFileFilter());
+                 it.hasNext(); ) {
+                File f = it.next();
+                consumer.accept(f.toPath());
+            }
+        }
+
         var visited = new ArrayList<Path>();
         for (Path dir : cascadingDirectories) {
             if (!Files.isDirectory(dir)) {

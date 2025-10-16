@@ -112,6 +112,7 @@ public class ImageHelper {
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable("Image file " + input.toString() + " not readable.", e)
                     .omit()
+                    .expected()
                     .handle();
             return DEFAULT_AWT_IMAGE;
         }

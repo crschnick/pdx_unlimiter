@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.core;
 
+import com.crschnick.pdxu.app.cli.RenderCommand;
 import com.crschnick.pdxu.app.core.mode.AppOperationModeSelection;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.LogErrorHandler;
@@ -21,12 +22,18 @@ public class AppArguments {
     List<String> rawArgs;
     List<String> resolvedArgs;
     List<String> openArgs;
+    CommandLine commandLine;
 
     public static AppArguments init(String[] args) {
         var rawArgs = Arrays.asList(args);
         var resolvedArgs = Arrays.asList(parseProperties(args));
-        var command = LauncherCommand.resolveLauncher(resolvedArgs.toArray(String[]::new));
-        return new AppArguments(rawArgs, resolvedArgs, command.inputs);
+        var commandLine = LauncherCommand.resolveLauncher(resolvedArgs.toArray(String[]::new));
+        if (!(commandLine.getCommand() instanceof LauncherCommand lc)) {
+            commandLine.execute(args);
+            return new AppArguments(rawArgs, resolvedArgs, List.of(), commandLine);
+        } else {
+            return new AppArguments(rawArgs, resolvedArgs, lc.inputs, commandLine);
+        }
     }
 
     private static String[] parseProperties(String[] args) {
@@ -52,13 +59,15 @@ public class AppArguments {
         }
     }
 
-    @CommandLine.Command()
+    @CommandLine.Command(
+            subcommands = {RenderCommand.class}
+    )
     public static class LauncherCommand implements Callable<Integer> {
 
         @CommandLine.Parameters(paramLabel = "<input>")
         final List<String> inputs = List.of();
 
-        public static LauncherCommand resolveLauncher(String[] args) {
+        public static CommandLine resolveLauncher(String[] args) {
             var cmd = new CommandLine(new LauncherCommand());
             cmd.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
                 var event = ErrorEventFactory.fromThrowable(ex).term().build();
@@ -98,7 +107,7 @@ public class AppArguments {
                 e.handle();
             }
 
-            return cmd.getCommand();
+            return cmd;
         }
 
         @Override

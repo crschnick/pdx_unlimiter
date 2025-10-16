@@ -14,4 +14,5 @@ open module com.crschnick.pdxu.model {
     exports com.crschnick.pdxu.model.vic2;
     exports com.crschnick.pdxu.model.vic3;
     exports com.crschnick.pdxu.model.coa;
+    exports com.crschnick.pdxu.model.eu5;
 }

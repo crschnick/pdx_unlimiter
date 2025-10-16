@@ -40,6 +40,16 @@ public abstract class CoatOfArmsRenderer {
         protected Color getMissingReplacementColor() {
             return Color.TRANSPARENT;
         }
+
+        @Override
+        protected Path getPatternsDir() {
+            return Path.of("gfx", "coat_of_arms", "patterns");
+        }
+
+        @Override
+        protected Path getEmblemDir(boolean textured) {
+            return Path.of("gfx", "coat_of_arms", (!textured ? "colored" : "textured") + "_emblems");
+        }
     }
 
     public static final Ck3Renderer CK3 = new Ck3Renderer();
@@ -55,9 +65,44 @@ public abstract class CoatOfArmsRenderer {
         protected Color getMissingReplacementColor() {
             return Color.color(1, 0, 1);
         }
+
+        @Override
+        protected Path getPatternsDir() {
+            return Path.of("gfx", "coat_of_arms", "patterns");
+        }
+
+        @Override
+        protected Path getEmblemDir(boolean textured) {
+            return Path.of("gfx", "coat_of_arms", (!textured ? "colored" : "textured") + "_emblems");
+        }
+    }
+
+    public static class Eu5Renderer extends CoatOfArmsRenderer {
+
+        @Override
+        protected Map<String, Color> getPredefinedColors(GameFileContext context) {
+            return Eu5CoatOfArmsCache.getPredefinedColors(context);
+        }
+
+        @Override
+        protected Color getMissingReplacementColor() {
+            return Color.color(1, 0, 1);
+        }
+
+        @Override
+        protected Path getPatternsDir() {
+            return Path.of("main_menu", "gfx", "coat_of_arms", "patterns");
+        }
+
+        @Override
+        protected Path getEmblemDir(boolean textured) {
+            return Path.of("main_menu", "gfx", "coat_of_arms", (!textured ? "colored" : "textured") + "_emblems");
+        }
     }
 
     public static final Vic3Renderer VIC3 = new Vic3Renderer();
+
+    public static final Eu5Renderer EU5 = new Eu5Renderer();
 
     static final int REF_IMG_SIZE = 256;
     private static final int PATTERN_COLOR_1 = 0x00FF0000;
@@ -67,6 +112,10 @@ public abstract class CoatOfArmsRenderer {
     protected abstract Map<String, Color> getPredefinedColors(GameFileContext context);
 
     protected abstract Color getMissingReplacementColor();
+
+    protected abstract Path getPatternsDir();
+
+    protected abstract Path getEmblemDir(boolean textured);
 
     public void brighten(BufferedImage awtImage) {
         for (int x = 0; x < awtImage.getWidth(); x++) {
@@ -126,7 +175,6 @@ public abstract class CoatOfArmsRenderer {
     }
 
     public BufferedImage pattern(Graphics g, CoatOfArms.Sub sub, GameFileContext ctx, int width, int height) {
-        var colors = getPredefinedColors(ctx);
         if (sub.getPatternFile() != null) {
             Color pColor1 = evaluateColorDefinition(sub.getColors()[0], ctx);
             Color pColor2 = evaluateColorDefinition(sub.getColors()[1], ctx);
@@ -141,7 +189,7 @@ public abstract class CoatOfArmsRenderer {
                 return alpha + usedColor;
             };
             var patternFile = CascadeDirectoryHelper.openFile(
-                    Path.of("gfx", "coat_of_arms", "patterns").resolve(sub.getPatternFile()), ctx);
+                    getPatternsDir().resolve(sub.getPatternFile()), ctx);
             var image = patternFile
                     .map(p -> ImageHelper.loadAwtImage(p, patternFunction))
                     .orElse(ImageHelper.DEFAULT_AWT_IMAGE);
@@ -233,7 +281,7 @@ public abstract class CoatOfArmsRenderer {
         }
 
         var path = CascadeDirectoryHelper.openFile(
-                Path.of("gfx", "coat_of_arms", (hasColor ? "colored" : "textured") + "_emblems")
+                getEmblemDir(!hasColor)
                         .resolve(emblem.getFile()),
                 ctx);
         path.map(p -> ImageHelper.loadAwtImage(p, customFilter)).ifPresent(img -> {

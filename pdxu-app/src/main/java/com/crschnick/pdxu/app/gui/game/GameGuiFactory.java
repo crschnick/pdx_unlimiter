@@ -30,6 +30,7 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     public static final BidiMap<Game, GameGuiFactory<?, ?>> ALL = new DualHashBidiMap<>();
 
     static {
+        ALL.put(Game.EU5, new Eu5GuiFactory());
         ALL.put(Game.EU4, new Eu4GuiFactory());
         ALL.put(Game.HOI4, new Hoi4GuiFactory());
         ALL.put(Game.CK3, new Ck3GuiFactory());

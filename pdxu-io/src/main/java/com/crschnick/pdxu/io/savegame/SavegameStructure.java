@@ -73,6 +73,11 @@ public interface SavegameStructure {
         }
     };
 
+
+    SavegameStructure EU5_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.EU5);
+    SavegameStructure EU5_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.EU5);
+
+
     static boolean validateHeader(byte[] header, byte[] content) {
         if (content.length < header.length) {
             return false;

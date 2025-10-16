@@ -80,7 +80,18 @@ public enum Game {
             null,
             null,
             List.of("Victoria III", "Victoria 3"),
-            GameInstallType.VIC3);
+            GameInstallType.VIC3),
+
+    EU5(
+            "eu5",
+                    "EU5",
+                    "Europa Universalis V",
+                    null,
+                    3527980,
+                    "eu5",
+                    null,
+            List.of("Europa Universalis V", "Europa Universalis 5"),
+    GameInstallType.EU5),;
 
     private final String id;
     private final String abbreviation;

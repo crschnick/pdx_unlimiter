@@ -4,6 +4,8 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.ck2.Ck2SavegameData;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
+import com.crschnick.pdxu.app.info.eu5.Eu5SavegameData;
+import com.crschnick.pdxu.app.info.eu5.Eu5SavegameInfo;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class GameFileContext {
 
     private static final Map<SavegameType, Game> TYPE_MAP = Map.of(
+            SavegameType.EU5, Game.EU4,
             SavegameType.EU4, Game.EU4,
             SavegameType.CK3, Game.CK3,
             SavegameType.HOI4, Game.HOI4,
@@ -29,6 +32,7 @@ public class GameFileContext {
             SavegameType.VIC3, Game.VIC3);
 
     public static final Map<Class<? extends SavegameData<?>>, Game> INFO_MAP = Map.of(
+            Eu5SavegameData.class, Game.EU5,
             Eu4SavegameData.class, Game.EU4,
             Hoi4SavegameData.class, Game.HOI4,
             Ck2SavegameData.class, Game.CK2,

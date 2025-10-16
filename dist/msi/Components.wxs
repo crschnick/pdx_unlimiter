@@ -63,6 +63,11 @@
 						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
 					</Extension>
 				</ProgId>
+				<ProgId Id="Eu5ProgId" Description="!(loc.Eu5Desc)" Icon="Executable">
+					<Extension Id="eu5">
+						<Verb Id="open" Command="!(loc.OpenWith)" TargetFile="Executable" Argument="&quot;%1&quot;"/>
+					</Extension>
+				</ProgId>
 				
 				<RegistryValue Id="FileAssociationsKey" Root="HKMU" Key="SOFTWARE\$(var.DynamicProductName)" Name="FileAssociations" Value="1" Type="integer" KeyPath="yes" />
 			</Component>

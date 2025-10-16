@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
+import com.crschnick.pdxu.app.info.eu5.Eu5SavegameInfo;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
@@ -158,6 +159,12 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             @Override
             protected String getDefaultCampaignName(Vic2SavegameInfo info) {
                 return "Unknown";
+            }
+        });
+        ALL.put(Game.EU5, new SavegameStorage<>("eu5", GameDateType.EU5, SavegameType.EU5, Eu5SavegameInfo.class) {
+            @Override
+            protected String getDefaultCampaignName(Eu5SavegameInfo info) {
+                return info.getData().eu5().getName();
             }
         });
 

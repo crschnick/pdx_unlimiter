@@ -60,6 +60,12 @@ public final class AppPrefs {
     @Getter
     private final BooleanProperty requiresRestart = new GlobalBooleanProperty(false);
 
+    final Property<Path> eu5Directory = map(Mapping.builder()
+            .property(new SimpleObjectProperty<>())
+            .key("eu5Directory")
+            .valueClass(Path.class)
+            .requiresRestart(true)
+            .build());
     final Property<Path> eu4Directory = map(Mapping.builder()
             .property(new SimpleObjectProperty<>())
             .key("eu4Directory")
@@ -260,34 +266,6 @@ public final class AppPrefs {
         return vic3tohoi4Directory;
     }
 
-    public ObservableValue<Path> eu4Directory() {
-        return eu4Directory;
-    }
-
-    public ObservableValue<Path> ck3Directory() {
-        return ck3Directory;
-    }
-
-    public ObservableValue<Path> hoi4Directory() {
-        return hoi4Directory;
-    }
-
-    public ObservableValue<Path> stellarisDirectory() {
-        return stellarisDirectory;
-    }
-
-    public ObservableValue<Path> ck2Directory() {
-        return ck2Directory;
-    }
-
-    public ObservableValue<Path> vic2Directory() {
-        return vic2Directory;
-    }
-
-    public ObservableValue<Path> vic3Directory() {
-        return vic3Directory;
-    }
-
     public ObservableValue<Path> ironyDirectory() {
         return ironyDirectory;
     }
@@ -478,6 +456,7 @@ public final class AppPrefs {
     }
 
     public void initInstallations() {
+        setInstallation(Game.EU5, eu5Directory);
         setInstallation(Game.EU4, eu4Directory);
         setInstallation(Game.CK3, ck3Directory);
         setInstallation(Game.HOI4, hoi4Directory);

@@ -17,6 +17,7 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 import javafx.application.Platform;
 
 import lombok.SneakyThrows;
+import picocli.CommandLine;
 
 public class AppInit {
 
@@ -142,5 +143,11 @@ public class AppInit {
         System.gc();
         AppOperationMode.setInStartup(false);
         AppOpenArguments.init();
+
+        var cl = AppProperties.get().getArguments().getCommandLine();
+        if (cl != null) {
+            cl.execute(args);
+            AppOperationMode.halt(0);
+        }
     }
 }

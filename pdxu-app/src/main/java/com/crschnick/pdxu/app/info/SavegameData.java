@@ -3,6 +3,8 @@ package com.crschnick.pdxu.app.info;
 import com.crschnick.pdxu.app.info.ck2.Ck2SavegameData;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
+import com.crschnick.pdxu.app.info.eu5.Eu5SavegameData;
+import com.crschnick.pdxu.app.info.eu5.Eu5SavegameInfo;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
@@ -23,6 +25,7 @@ import java.util.UUID;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
+    @JsonSubTypes.Type(value = Eu5SavegameData.class),
     @JsonSubTypes.Type(value = Eu4SavegameData.class),
     @JsonSubTypes.Type(value = Ck3SavegameData.class),
     @JsonSubTypes.Type(value = StellarisSavegameData.class),
@@ -76,6 +79,10 @@ public abstract class SavegameData<T> {
 
     public Vic3SavegameData vic3() {
         return (Vic3SavegameData) this;
+    }
+
+    public Eu5SavegameData eu5() {
+        return (Eu5SavegameData) this;
     }
 
     public GameInstallation installation() {

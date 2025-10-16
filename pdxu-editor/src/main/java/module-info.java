@@ -15,6 +15,7 @@ module com.crschnick.pdxu.editor {
             com.crschnick.pdxu.editor.adapter.Ck2SavegameAdapter,
             com.crschnick.pdxu.editor.adapter.Vic2SavegameAdapter,
             com.crschnick.pdxu.editor.adapter.Vic3SavegameAdapter,
+            com.crschnick.pdxu.editor.adapter.Eu5SavegameAdapter,
             com.crschnick.pdxu.editor.adapter.NoGameAdapter;
 
     exports com.crschnick.pdxu.editor;

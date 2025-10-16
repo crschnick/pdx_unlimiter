@@ -44,7 +44,7 @@ public class AppProperties {
     boolean nativeHookEnabled;
 
     public AppProperties(String[] args) {
-        var appDir = Path.of(System.getProperty("user.dir")).resolve("app");
+        var appDir = Path.of(System.getProperty("user.dir")).resolve("pdxu-app");
         Path propsFile = appDir.resolve("dev.properties");
         if (Files.exists(propsFile)) {
             try {
@@ -91,7 +91,7 @@ public class AppProperties {
         canonicalVersion = AppVersion.parse(version).orElse(null);
         logToSysOut = Optional.ofNullable(System.getProperty(AppNames.propertyName("writeSysOut")))
                 .map(Boolean::parseBoolean)
-                .orElse(false);
+                .orElse(arguments.getCommandLine() != null);
         logToFile = Optional.ofNullable(System.getProperty(AppNames.propertyName("writeLogs")))
                 .map(Boolean::parseBoolean)
                 .orElse(true);
