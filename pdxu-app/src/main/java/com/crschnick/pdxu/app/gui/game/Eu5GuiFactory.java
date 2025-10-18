@@ -27,7 +27,7 @@ public class Eu5GuiFactory extends GameGuiFactory<Eu5Tag, Eu5SavegameInfo> {
         bg.opacityProperty()
                 .bind(Bindings.createDoubleBinding(
                         () -> {
-                            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.06;
+                            return AppPrefs.get().theme().getValue().isDark() ? 0.07 : 0.17;
                         },
                         AppPrefs.get().theme()));
         return bg;

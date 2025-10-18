@@ -763,7 +763,31 @@ public interface GameInstallType {
 
         @Override
         public Path chooseBackgroundImage(Path p) {
-            return p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loadingscreens").resolve("startscreen.dds");
+            var def = p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loadingscreens").resolve("startscreen.dds");
+            var available = new ArrayList<Path>();
+            try (var stream = Files.list(p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loading_screen_assets"))) {
+                var numberDirs = stream.toList();
+                for (Path numberDir : numberDirs) {
+                    if (!numberDir.getFileName().toString().matches("\\d+")) {
+                        continue;
+                    }
+
+                    try (var imgStream = Files.list(numberDir.resolve("images"))) {
+                        var imgs =  imgStream.toList();
+                        for (Path img : imgs) {
+                            if (img.getFileName().toString().matches(".+_00\\.dds")) {
+                                available.add(img);
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                ErrorEventFactory.fromThrowable(e).handle();
+                return def;
+            }
+
+            var rand = new Random();
+            return available.get(rand.nextInt(available.size()));
         }
 
         @Override
