@@ -120,16 +120,18 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
 
     private static final List<String> STATE_KEYS = List.of("state");
     private static final List<String> CULTURE_KEYS = List.of("culture", "primary_culture", "primary_cultures", "accepted_cultures", "tolerated_cultures");
-    private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "provinces", "original_capital", "birth", "cores", "home");
-    private static final List<String> COUNTRY_KEYS = List.of("country", "owner", "controller", "previous_owner");
-    private static final List<String> CHARACTER_KEYS = List.of("ruler", "heir", "actor", "father", "mother", "spouse", "heir_of");
+    private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "provinces", "original_capital", "birth", "cores", "home", "market_parent");
+    private static final List<String> COUNTRY_KEYS = List.of("country", "owner", "controller", "previous_owner", "ruled", "all_members", "leader", "celestial_governor");
+    private static final List<String> CHARACTER_KEYS = List.of("ruler", "heir", "actor", "father", "mother", "spouse", "heir_of", "children", "saints", "artist", "character");
     private static final List<String> CABINET_KEYS = List.of("cabinet_entries");
     private static final List<String> RULER_TERM_KEYS = List.of("ruler_term");
     private static final List<String> MARKET_KEYS = List.of("market", "second_best_market");
     private static final List<String> RELIGION_KEYS = List.of("religion", "primary_religion");
     private static final List<String> DYNASTY_KEYS = List.of("dynasty", "dynasties");
     private static final List<String> HOLY_SITE_KEYS = List.of("holy_site", "holy_sites");
-    private static final List<String> LOCATION_KEYS = List.of("location", "locations", "owned_locations", "controlled_locations", "core_locations");
+    private static final List<String> LOCATION_KEYS = List.of("location", "locations", "owned_locations", "controlled_locations", "core_locations", "locations_ever_affected");
+    private static final List<String> UNIT_KEYS = List.of("unit");
+    private static final List<String> POPULATION_KEYS = List.of("pop", "pops");
 
     private NodePointer get(String key, String val) {
         if (STATE_KEYS.contains(key)) {
@@ -141,7 +143,7 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
         }
         if (CULTURE_KEYS.contains(key)) {
             return NodePointer.builder()
-                    .name("cultures")
+                    .name("culture_manager")
                     .name("database")
                     .name(val)
                     .build();
@@ -221,6 +223,23 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                     .name(val)
                     .build();
         }
+
+        if (UNIT_KEYS.contains(key)) {
+            return NodePointer.builder()
+                    .name("unit_manager")
+                    .name("database")
+                    .name(val)
+                    .build();
+        }
+
+        if (POPULATION_KEYS.contains(key)) {
+            return NodePointer.builder()
+                    .name("population")
+                    .name("database")
+                    .name(val)
+                    .build();
+        }
+
         return null;
     }
 

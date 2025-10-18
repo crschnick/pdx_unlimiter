@@ -132,7 +132,7 @@ public final class SimpleArrayNode extends ArrayNode {
             type = values.getFirst().describe().getValueType();
             for (int i = 1; i < values.size(); i++) {
                 var iT = values.get(i).describe().getValueType();
-                if (!iT.equals(type)) {
+                if (iT != null && !iT.equals(type)) {
                     type = null;
                     break;
                 }
