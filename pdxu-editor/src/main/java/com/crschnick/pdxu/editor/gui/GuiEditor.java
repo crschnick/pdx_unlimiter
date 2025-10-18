@@ -54,9 +54,6 @@ public class GuiEditor {
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
 
-        if (AppMainWindow.get() != null) {
-            stage.initOwner(AppMainWindow.get().getStage());
-        }
         AppModifiedStage.prepareStage(stage);
         AppWindowStyle.addIcons(stage);
         AppWindowStyle.addStylesheets(scene);

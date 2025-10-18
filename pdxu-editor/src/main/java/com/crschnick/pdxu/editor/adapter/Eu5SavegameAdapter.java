@@ -40,20 +40,41 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
             b.getStyleClass().add("coa-button");
             GuiTooltips.install(b, "Open in coat of arms preview window");
             b.setOnAction(e -> {
-                var viewer = new GuiCoaViewer<>(new GuiCoaViewerState.Vic3GuiCoaViewerState(state, node));
+                var viewer = new GuiCoaViewer<>(new GuiCoaViewerState.Eu5GuiCoaViewerState(state, node));
                 viewer.createStage();
             });
             return b;
         }
     }
 
+    static class ImagePreview extends GuiEditorNodeTagFactory.ImagePreviewNodeTagFactory {
+
+        private final String nodeName;
+
+        public ImagePreview(Path base, String nodeName, String icon) {
+            super(icon, node -> GameInstallation.ALL
+                    .get(Game.EU5)
+                    .getInstallDir()
+                    .resolve("game")
+                    .resolve(base)
+                    .resolve(node.getBackingNode().getString()));
+            this.nodeName = nodeName;
+        }
+
+        @Override
+        public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
+            return state.isContextGameEnabled()
+                    && node.getKeyName().map(k -> k.equals(nodeName)).orElse(false);
+        }
+    }
+
     private static final Set<String> CACHED_KEYS = Set.of("domain_limit");
 
     private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(
-            new Vic3SavegameAdapter.CoaPreview(),
+            new CoaPreview(),
             new GuiEditorNodeTagFactory.CacheTagFactory(CACHED_KEYS),
-            new Vic3SavegameAdapter.ImagePreview(Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
-            new Vic3SavegameAdapter.ImagePreview(Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
+            new ImagePreview(Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
+            new ImagePreview(Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory(
                     Set.of("metadata"),
                     "This node contains basic information and the meta data of this savegame that is shown in the main menu. "

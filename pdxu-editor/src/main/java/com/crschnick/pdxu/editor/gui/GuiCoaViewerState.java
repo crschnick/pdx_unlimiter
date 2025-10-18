@@ -3,6 +3,7 @@ package com.crschnick.pdxu.editor.gui;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.gui.game.Ck3TagRenderer;
+import com.crschnick.pdxu.app.gui.game.Eu5TagRenderer;
 import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
@@ -83,6 +84,38 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             NodeEvaluator.evaluateArrayNode(coaNode, env);
 
             return Vic3TagRenderer.getCoatOfArms(coaNode, allCopy);
+        }
+    }
+
+    public static class Eu5GuiCoaViewerState extends GuiCoaViewerState<GuiEu5CoaDisplayType> {
+
+        public Eu5GuiCoaViewerState(EditorState state, EditorRealNode editorNode) {
+            super(state, editorNode, GuiEu5CoaDisplayType.NONE);
+        }
+
+        @Override
+        protected void setup(HBox box) {
+            GuiEu5CoaDisplayType.init(this, box);
+        }
+
+        @Override
+        protected CoatOfArms createCoatOfArms() {
+            var additional = state.isSavegame()
+                    ? new ArrayNode[0]
+                    : state.getRootNodes().values().stream()
+                    .map(editorRootNode ->
+                            editorRootNode.getBackingNode().copy().getArrayNode())
+                    .toArray(ArrayNode[]::new);
+
+            var all = Eu5TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.EU5), additional);
+            var allCopy = all.copy().getArrayNode();
+            var env = new NodeEnvironment(Map.of());
+            NodeEvaluator.evaluateArrayNode(allCopy, env);
+
+            var coaNode = editorNode.getBackingNode().copy().getArrayNode();
+            NodeEvaluator.evaluateArrayNode(coaNode, env);
+
+            return Eu5TagRenderer.getCoatOfArms(coaNode, allCopy);
         }
     }
 
