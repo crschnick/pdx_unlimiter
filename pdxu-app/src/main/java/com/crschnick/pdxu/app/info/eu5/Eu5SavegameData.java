@@ -49,7 +49,7 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
         var previous = content.get().getNodeForKey("previous_played").getArrayNode().getNodeArray().getFirst();
         var tagId = previous.getNodeForKey("idtype").getInteger();
         tag = Eu5Tag.getTag(allTags, tagId);
-        date = GameDateType.EU5.fromString(content.get().getNodeForKeys("ironman_manager", "date").getString());
+        date = GameDateType.EU5.fromString(content.get().getNodeForKeys("metadata", "date").getString());
         mods = content.get().getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of()).stream()
                 .map(Node::getString)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
