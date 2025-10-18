@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.core.AppI18n;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public final class InvalidInstallationException extends Exception {
 
@@ -15,8 +16,8 @@ public final class InvalidInstallationException extends Exception {
 
     public InvalidInstallationException(Throwable cause) {
         super(cause);
-        this.msgId = "errorOccurred";
-        this.variables = new String[] {cause.getMessage()};
+        this.msgId = "installErrorOccurred";
+        this.variables = new String[] {ExceptionUtils.getStackTrace(cause)};
     }
 
     public String getMessageId() {
