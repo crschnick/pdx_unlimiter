@@ -29,10 +29,9 @@ public class AppArguments {
         var resolvedArgs = Arrays.asList(parseProperties(args));
         var commandLine = LauncherCommand.resolveLauncher(resolvedArgs.toArray(String[]::new));
         if (!(commandLine.getCommand() instanceof LauncherCommand lc)) {
-            commandLine.execute(args);
-            return new AppArguments(rawArgs, resolvedArgs, List.of(), commandLine);
+            return new AppArguments(rawArgs, resolvedArgs, List.of(), commandLine.getParent());
         } else {
-            return new AppArguments(rawArgs, resolvedArgs, lc.inputs, commandLine);
+            return new AppArguments(rawArgs, resolvedArgs, lc.inputs, null);
         }
     }
 
@@ -92,7 +91,9 @@ public class AppArguments {
             }
 
             try {
-                cmd.parseArgs(args);
+                var result = cmd.parseArgs(args);
+                var subcommand = result.subcommand();
+                return subcommand != null ? subcommand.commandSpec().commandLine() : cmd;
             } catch (Throwable t) {
                 // Fix serialization issues with exception class
                 var converted = t instanceof CommandLine.UnmatchedArgumentException u
@@ -105,9 +106,8 @@ public class AppArguments {
                 // Print error in case we launched from the command-line
                 new LogErrorHandler().handle(e);
                 e.handle();
+                return cmd;
             }
-
-            return cmd;
         }
 
         @Override
