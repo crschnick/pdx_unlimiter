@@ -8,24 +8,40 @@ import javafx.scene.image.*;
 
 import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
 
+import java.awt.color.ICC_ColorSpace;
+import java.awt.color.ICC_Profile;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
+import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Hashtable;
 import java.util.function.Function;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.*;
+import static java.awt.color.ColorSpace.CS_LINEAR_RGB;
+import static java.awt.color.ColorSpace.CS_sRGB;
 
 public class ImageHelper {
 
     public static final Image DEFAULT_IMAGE = new WritableImage(1, 1);
     public static final BufferedImage DEFAULT_AWT_IMAGE = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    private static Field srgbField = null;
 
     static {
         IIORegistry registry = IIORegistry.getDefaultInstance();
         registry.registerServiceProvider(new TGAImageReaderSpi());
+        try {
+            srgbField = ColorModel.class.getDeclaredField("is_sRGB");
+            srgbField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            ErrorEventFactory.fromThrowable(e).term().handle();
+        }
     }
 
     public static Image loadImage(Path p) {
@@ -100,6 +116,12 @@ public class ImageHelper {
     public static BufferedImage loadAwtImage(Path input, Function<Integer, Integer> pixelSelector) {
         try {
             BufferedImage image = ImageIO.read(input.toFile());
+
+            // Fix eu5 images not being declared srgb even though they should
+            if (!(boolean) srgbField.get(image.getColorModel())) {
+                image = new BufferedImage(ColorModel.getRGBdefault(), image.getRaster(), false, new Hashtable<>());;
+            }
+
             if (pixelSelector != null) {
                 for (int x = 0; x < image.getWidth(); x++) {
                     for (int y = 0; y < image.getHeight(); y++) {
@@ -109,7 +131,7 @@ public class ImageHelper {
                 }
             }
             return image;
-        } catch (IOException e) {
+        } catch (Exception e) {
             ErrorEventFactory.fromThrowable("Image file " + input.toString() + " not readable.", e)
                     .omit()
                     .expected()
