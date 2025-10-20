@@ -327,7 +327,7 @@ public abstract class CoatOfArmsRenderer {
                         trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 
                         try {
-                            var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BICUBIC);
+                            var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
                             usedGraphics.drawImage(img, op, 0, 0);
                         } catch (ImagingOpException ignored) {
                         }

@@ -59,6 +59,7 @@ public class Vic3TagRenderer {
 
         BufferedImage i = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         for (var sub : coa.getSubs()) {
             var rawPatternImg = CoatOfArmsRenderer.VIC3.pattern(g, sub, ctx, width, height);
