@@ -296,10 +296,6 @@ public abstract class CoatOfArmsRenderer {
             emblem.getInstances().stream()
                     .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
                     .forEach(instance -> {
-                        double angle = Math.toRadians(Math.signum(instance.getScaleX() * sub.getScaleX())
-                                * Math.signum(instance.getScaleY() * sub.getScaleY())
-                                * instance.getRotation());
-
                         var cRotWidth = img.getWidth();
                         var cRotHeight = img.getHeight();
                         if ((instance.getRotation() > 45 && instance.getRotation() < 135)
@@ -320,6 +316,7 @@ public abstract class CoatOfArmsRenderer {
                         trans.translate(x, y);
 
                         if (instance.getRotation() != 0) {
+                            double angle = Math.toRadians(instance.getRotation());
                             trans.rotate(angle);
                         }
 
