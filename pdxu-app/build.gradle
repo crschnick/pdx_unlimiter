@@ -56,7 +56,7 @@ dependencies {
     implementation 'com.github.tmyroadctfig:com.realityinteractive.imageio.tga:master-SNAPSHOT'
     implementation("com.github.kwhat:jnativehook:2.2.2")
     implementation "org.apache.commons:commons-collections4:4.5.0"
-    implementation 'io.github.ititus:ddsiio:3.1.0'
+    implementation 'io.github.ititus:ddsiio:3.2.0'
     implementation 'org.graalvm.polyglot:polyglot:25.0.0'
     implementation 'org.graalvm.truffle:truffle-runtime:25.0.0'
     implementation 'org.graalvm.js:js-language:25.0.0'
