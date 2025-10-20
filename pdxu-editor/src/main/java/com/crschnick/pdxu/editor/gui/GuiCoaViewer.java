@@ -37,9 +37,6 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F5), () -> state.refresh());
         stage.setScene(scene);
 
-        if (AppMainWindow.get() != null) {
-            stage.initOwner(AppMainWindow.get().getStage());
-        }
         AppModifiedStage.prepareStage(stage);
         AppWindowStyle.addIcons(stage);
         AppWindowStyle.addStylesheets(scene);
