@@ -11,12 +11,15 @@ import java.util.List;
 public class ColorHelper {
 
     public static int pickClosestColor(int input, int... colors) {
-        int minDist = Integer.MAX_VALUE;
+        double minDist = Double.MAX_VALUE;
         int cMin = -1;
         int counter = 0;
         for (int c : colors) {
-            if (Math.abs(input - c) < minDist) {
-                minDist = Math.abs(input - c);
+            var dist = Math.sqrt(Math.pow(getRed(input) - getRed(c), 2.0) +
+                    Math.pow(getGreen(input) - getGreen(c), 2.0) +
+                    Math.pow(getBlue(input) - getBlue(c), 2.0));
+            if (dist < minDist) {
+                minDist = dist;
                 cMin = counter;
             }
             counter++;
