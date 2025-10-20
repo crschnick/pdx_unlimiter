@@ -91,6 +91,34 @@ public class GameImage {
     public static Image HOI4_FLAG_OVERLAY;
 
     public static Image EU5_BACKGROUND;
+    public static Image EU5_ICON_VASSAL;
+    public static Image EU5_ICON_ALLIANCE;
+    public static Image EU5_ICON_TRIBUTARY;
+    public static Image EU5_ICON_MARCH;
+    public static Image EU5_ICON_TRUCE;
+    public static Image EU5_ICON_ROYAL_MARRIAGE;
+    public static Image EU5_ICON_GUARANTEE;
+    public static Image EU5_ICON_WAR;
+    public static Image EU5_ICON_VERSION_WARNING;
+    public static Image EU5_ICON_IRONMAN;
+    public static Image EU5_ICON_RANDOM_NEW_WORLD;
+    public static Image EU5_ICON_CUSTOM_NATION;
+    public static Image EU5_ICON_RELEASED_VASSAL;
+    public static Image EU5_ICON_RULER;
+    public static Image EU5_ICON_HEIR;
+    public static Image EU5_ICON_ADM;
+    public static Image EU5_ICON_DIP;
+    public static Image EU5_ICON_MIL;
+    public static Image EU5_ICON_UNION_SENIOR;
+    public static Image EU5_ICON_UNION_JUNIOR;
+    public static Image EU5_ICON_DUCATS;
+    public static Image EU5_ICON_DEV;
+    public static Image EU5_ICON_MANPOWER;
+    public static Image EU5_ICON_PRESTIGE;
+    public static Image EU5_ICON_STABILITY;
+    public static Image EU5_ICON_ACHIEVEMENT;
+    public static Image EU5_ICON_POPULATION;
+    public static Image EU5_ICON_LEGITIMACY;
 
     public static Image EU4_ICON_VASSAL;
     public static Image EU4_ICON_ALLIANCE;
@@ -341,10 +369,38 @@ public class GameImage {
 
     private static void loadEu5mages() {
         var installPath = GameInstallation.ALL.get(Game.EU5).getInstallDir();
-        Path i = installPath.resolve("gfx").resolve("interface");
+        Path i = installPath.resolve("game", "main_menu", "gfx").resolve("interface", "icons");
 
         EU5_BACKGROUND = ImageHelper.loadImage(
                 GameInstallation.ALL.get(Game.EU5).getType().chooseBackgroundImage(installPath));
+
+
+        EU5_ICON_VASSAL = ImageHelper.loadImage(i.resolve("icon_vassal.dds"));
+        EU5_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("icon_alliance.dds"));
+        EU5_ICON_TRIBUTARY = ImageHelper.loadImage(i.resolve("subject_tributary_icon.dds"));
+        EU5_ICON_MARCH = ImageHelper.loadImage(i.resolve("icon_march.dds"));
+        EU5_ICON_TRUCE = ImageHelper.loadImage(i.resolve("icon_truce.dds"));
+        EU5_ICON_ROYAL_MARRIAGE = ImageHelper.loadImage(i.resolve("icon_diplomacy_royalmarriage.dds"));
+        EU5_ICON_GUARANTEE = ImageHelper.loadImage(i.resolve("icon_diplomacy_guaranting.dds"));
+        EU5_ICON_WAR = ImageHelper.loadImage(i.resolve("icon_diplomacy_war.dds"));
+        EU5_ICON_VERSION_WARNING = ImageHelper.loadImage(i.resolve("incompatible_warning_icon.dds"));
+        EU5_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        EU5_ICON_RULER = ImageHelper.loadImage(i.resolve("tab_domestic_court.dds"));
+        VIEWPORTS.put(EU5_ICON_RULER, new Rectangle2D(8, 10, 30, 30));
+        EU5_ICON_HEIR = ImageHelper.loadImage(i.resolve("monarch_heir_crown_icon.dds"));
+        EU5_ICON_ADM = ImageHelper.loadImage(i.resolve("icon_powers_administrative_in_text.dds"));
+        EU5_ICON_DIP = ImageHelper.loadImage(i.resolve("icon_powers_diplomatic_in_text.dds"));
+        EU5_ICON_MIL = ImageHelper.loadImage(i.resolve("icon_powers_military_in_text.dds"));
+
+        EU5_ICON_UNION_SENIOR = ImageHelper.loadImage(i.resolve("icon_diplomacy_leadunions.dds"));
+        EU5_ICON_UNION_JUNIOR = ImageHelper.loadImage(i.resolve("icon_diplomacy_inunion.dds"));
+        EU5_ICON_MANPOWER = ImageHelper.loadImage(i.resolve("resources", "manpower.dds"));
+        EU5_ICON_DEV = ImageHelper.loadImage(i.resolve("development_icon.dds"));
+        EU5_ICON_DUCATS = ImageHelper.loadImage(i.resolve("resources", "gold.dds"));
+        EU5_ICON_PRESTIGE = ImageHelper.loadImage(i.resolve("resources", "prestige.dds"));
+        EU5_ICON_STABILITY = ImageHelper.loadImage(i.resolve("resources", "stability.dds"));
+        EU5_ICON_POPULATION = ImageHelper.loadImage(i.resolve("resources", "total_population.dds"));
+        EU5_ICON_LEGITIMACY = ImageHelper.loadImage(i.resolve("resources", "legitimacy.dds"));
     }
 
     private static void loadEu4Images() {

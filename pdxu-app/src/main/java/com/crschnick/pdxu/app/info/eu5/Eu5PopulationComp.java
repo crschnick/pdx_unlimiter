@@ -28,7 +28,7 @@ public class Eu5PopulationComp extends SimpleInfoComp {
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_STABILITY;
+        return GameImage.EU5_ICON_POPULATION;
     }
 
     @Override

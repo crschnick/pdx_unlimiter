@@ -85,11 +85,17 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
         var context = GameFileContext.fromData(info.getData());
         var all = getCoatOfArmsNode(context);
         try {
-            Supplier<CoatOfArms> coa = () -> CoatOfArms.fromNode(
-                            all.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
-                                var found = all.getNodesForKey(s);
-                                return found.size() > 0 ? found.getLast() : null;
-                            });
+            Supplier<CoatOfArms> coa = () -> {
+                var found = all.getNodeForKeyIfExistent(tag.getFlagTag());
+                if (found.isEmpty()) {
+                    return CoatOfArms.empty();
+                }
+
+                return CoatOfArms.fromNode(found.get(), s -> {
+                            var parentFound = all.getNodesForKey(s);
+                            return !parentFound.isEmpty() ? parentFound.getLast() : null;
+                        });
+            };
             var img = Eu5TagRenderer.renderImage(coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
             var convertedImage = ImageHelper.toFXImage(img);
             cache.flags.put(tag, convertedImage);

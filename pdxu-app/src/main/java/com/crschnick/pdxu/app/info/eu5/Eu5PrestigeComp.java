@@ -29,7 +29,7 @@ public class Eu5PrestigeComp extends SimpleInfoComp {
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_PRESTIGE;
+        return GameImage.EU5_ICON_PRESTIGE;
     }
 
     @Override

@@ -35,7 +35,7 @@ public class Eu5DucatsComp extends SimpleInfoComp {
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_DUCATS;
+        return GameImage.EU5_ICON_DUCATS;
     }
 
     @Override

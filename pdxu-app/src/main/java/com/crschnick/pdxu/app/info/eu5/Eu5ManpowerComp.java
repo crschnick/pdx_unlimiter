@@ -14,19 +14,22 @@ public class Eu5ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        value = (int) (content.get()
-                        .getNodeForKey("countries")
-                        .getNodeForKey("database")
-                        .getNodeForKey(data.eu5().getTag().getId() + "")
-                        .getNodeForKey("currency_data")
-                        .getNodeForKey("manpower")
-                        .getDouble() * 1000.0);
-        max = (int) (content.get()
+        var cd = content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")
                 .getNodeForKey(data.eu5().getTag().getId() + "")
+                .getNodeForKey("currency_data");
+        value = cd.hasKey("manpower") ? (int) (cd
+                        .getNodeForKey("manpower")
+                        .getDouble() * 1000.0) : 0;
+
+        var tag = content.get()
+                .getNodeForKey("countries")
+                .getNodeForKey("database")
+                .getNodeForKey(data.eu5().getTag().getId() + "");
+        max = tag.hasKey("max_manpower") ? (int) (tag
                 .getNodeForKey("max_manpower")
-                .getDouble() * 1000.0);
+                .getDouble() * 1000.0) : 0;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class Eu5ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected Image getImage() {
-        return GameImage.EU4_ICON_MANPOWER;
+        return GameImage.EU5_ICON_MANPOWER;
     }
 
     @Override

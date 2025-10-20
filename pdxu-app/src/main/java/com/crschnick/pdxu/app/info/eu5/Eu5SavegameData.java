@@ -54,7 +54,9 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
                 .map(Node::getString)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         dlcs = null;
-        name = content.get().getNodeForKeys("metadata", "player_country_name").getString();
+        name = content.get().getNodeForKeys("metadata").hasKey("player_country_name") ?
+                content.get().getNodeForKey("metadata").getNodeForKey("player_country_name").getString() :
+                content.get().getNodeForKey("metadata").getNodeForKey("playthrough_name").getString();
         initVersion(content.get());
     }
 
