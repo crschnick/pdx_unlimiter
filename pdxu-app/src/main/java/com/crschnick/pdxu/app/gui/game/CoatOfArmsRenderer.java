@@ -298,10 +298,11 @@ public abstract class CoatOfArmsRenderer {
                     .forEach(instance -> {
                         var cRotWidth = img.getWidth();
                         var cRotHeight = img.getHeight();
-                        if ((instance.getRotation() > 45 && instance.getRotation() < 135)
+                        var flippedRotation = (instance.getRotation() > 45 && instance.getRotation() < 135)
                                 || (instance.getRotation() > 225 && instance.getRotation() < 315)
                                 || (instance.getRotation() > -135 && instance.getRotation() < -45)
-                                || (instance.getRotation() > -315 && instance.getRotation() < -225)) {
+                                || (instance.getRotation() > -315 && instance.getRotation() < -225);
+                        if (flippedRotation) {
                             cRotWidth = img.getHeight();
                             cRotHeight = img.getWidth();
                         }
@@ -315,7 +316,7 @@ public abstract class CoatOfArmsRenderer {
                         AffineTransform trans = new AffineTransform();
                         trans.translate(x, y);
 
-                        if (instance.getRotation() % 90 == 0) {
+                        if (flippedRotation) {
                             trans.scale(scaleX, scaleY);
                         }
 
@@ -324,7 +325,7 @@ public abstract class CoatOfArmsRenderer {
                             trans.rotate(angle);
                         }
 
-                        if (instance.getRotation() % 90 != 0) {
+                        if (!flippedRotation) {
                             trans.scale(scaleX, scaleY);
                         }
                         trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
