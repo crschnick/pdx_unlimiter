@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -37,6 +38,8 @@ public abstract class FileImportTarget {
             List<StandardImportTarget> targets = new ArrayList<>();
             try (var s = Files.list(p)) {
                 s.forEach(f -> targets.addAll(FileImportTarget.createStandardImportsTargets(f.toString())));
+            } catch (AccessDeniedException ade) {
+                ErrorEventFactory.fromThrowable(ade).discard().handle();
             } catch (IOException e) {
                 ErrorEventFactory.fromThrowable(e).handle();
             }

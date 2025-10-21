@@ -195,6 +195,7 @@ public class SteamDist extends GameDist {
             if (!isSteamRunning()) {
                 ErrorEventFactory.fromMessage(
                                 "Steam is not started. " + "Please start Steam first before launching the game")
+                        .expected()
                         .handle();
             } else {
                 TaskExecutor.getInstance()
@@ -221,6 +222,7 @@ public class SteamDist extends GameDist {
         if (!isSteamRunning()) {
             ErrorEventFactory.fromMessage("Steam is not started but required.\n"
                             + "Please start Steam first before launching the game")
+                    .expected()
                     .handle();
             return;
         }

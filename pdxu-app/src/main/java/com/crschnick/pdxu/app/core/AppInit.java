@@ -28,6 +28,11 @@ public class AppInit {
             return;
         }
 
+        // The JNativeHook sometimes fails in a native call, nothing we can do about it
+        if (thread.getName().equals("JNativeHook Hook Thread") && ex instanceof NullPointerException) {
+            return;
+        }
+
         // There are some accessibility exceptions on macOS, nothing we can do about that
         if (Platform.isFxApplicationThread()
                 && ex instanceof NullPointerException

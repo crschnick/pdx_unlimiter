@@ -499,6 +499,10 @@ public final class AppPrefs {
         if (System.getProperty("os.name").toLowerCase().contains("server")) {
             performanceMode.setValue(true);
         }
+
+        if (storageDirectory.getValue() == null) {
+            storageDirectory.setValue(AppProperties.get().getDataDir().resolve("storage"));
+        }
     }
 
     private void loadLocal() {

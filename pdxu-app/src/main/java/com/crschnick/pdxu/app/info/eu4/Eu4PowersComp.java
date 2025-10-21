@@ -48,14 +48,19 @@ public class Eu4PowersComp extends SavegameInfoComp {
     public Region create(SavegameData<?> data) {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
+
         Label admL = new Label(adm + "  ", imageNode(EU4_ICON_ADM, CLASS_POWER_ICON));
+        admL.setEllipsisString("");
         box.getChildren().add(admL);
 
         Label dipL = new Label(dip + "  ", imageNode(EU4_ICON_DIP, CLASS_POWER_ICON));
+        dipL.setEllipsisString("");
         box.getChildren().add(dipL);
 
         Label milL = new Label(String.valueOf(mil), imageNode(EU4_ICON_MIL, CLASS_POWER_ICON));
+        milL.setEllipsisString("");
         box.getChildren().add(milL);
+
         return box;
     }
 }

@@ -88,7 +88,7 @@ public class EditorExternalState {
                                 }
                             }
                         } catch (Exception ex) {
-                            ErrorEventFactory.fromMessage(ex.getMessage()).handle();
+                            ErrorEventFactory.fromThrowable(ex).handle();
                         }
                     });
                 }
