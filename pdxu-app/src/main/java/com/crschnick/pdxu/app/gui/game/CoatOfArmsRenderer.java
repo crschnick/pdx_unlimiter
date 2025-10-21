@@ -315,12 +315,18 @@ public abstract class CoatOfArmsRenderer {
                         AffineTransform trans = new AffineTransform();
                         trans.translate(x, y);
 
+                        if (instance.getRotation() % 90 == 0) {
+                            trans.scale(scaleX, scaleY);
+                        }
+
                         if (instance.getRotation() != 0) {
                             double angle = Math.toRadians(instance.getRotation());
                             trans.rotate(angle);
                         }
 
-                        trans.scale(scaleX, scaleY);
+                        if (instance.getRotation() % 90 != 0) {
+                            trans.scale(scaleX, scaleY);
+                        }
                         trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 
                         try {
