@@ -117,6 +117,27 @@ public abstract class CoatOfArmsRenderer {
 
     protected abstract Path getEmblemDir(boolean textured);
 
+    public BufferedImage renderImage(CoatOfArms coa, GameFileContext ctx, int width, int height) {
+        if (coa == null) {
+            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        BufferedImage i = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) i.getGraphics();
+        g.setBackground(ColorHelper.toAwtColor(getMissingReplacementColor()));
+        g.clearRect(0, 0, width, height);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        for (var sub : coa.getSubs()) {
+            var rawPatternImg = pattern(g, sub, ctx, width, height);
+            for (var emblem : sub.getEmblems()) {
+                emblem(i, rawPatternImg, sub, emblem, ctx, width, height);
+            }
+        }
+
+        return i;
+    }
+
     public void brighten(BufferedImage awtImage) {
         for (int x = 0; x < awtImage.getWidth(); x++) {
             for (int y = 0; y < awtImage.getHeight(); y++) {

@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
+import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
@@ -53,22 +54,6 @@ public class Eu5TagRenderer {
     }
 
     public static BufferedImage renderImage(CoatOfArms coa, GameFileContext ctx, int width, int height) {
-        if (coa == null) {
-            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        }
-
-        BufferedImage i = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = (Graphics2D) i.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-        for (var sub : coa.getSubs()) {
-            var rawPatternImg = CoatOfArmsRenderer.EU5.pattern(g, sub, ctx, width, height);
-
-            for (var emblem : sub.getEmblems()) {
-                CoatOfArmsRenderer.EU5.emblem(i, rawPatternImg, sub, emblem, ctx, width, height);
-            }
-        }
-
-        return i;
+        return CoatOfArmsRenderer.EU5.renderImage(coa, ctx, width, height);
     }
 }

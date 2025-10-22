@@ -62,16 +62,7 @@ public class Ck3TagRenderer {
             return new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         }
 
-        BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = i.getGraphics();
-
-        for (var sub : coa.getSubs()) {
-            var rawPatternImg = CoatOfArmsRenderer.CK3.pattern(g, sub, ctx, size, size);
-
-            for (var emblem : sub.getEmblems()) {
-                CoatOfArmsRenderer.CK3.emblem(i, rawPatternImg, sub, emblem, ctx, size, size);
-            }
-        }
+        BufferedImage i = CoatOfArmsRenderer.CK3.renderImage(coa, ctx, size, size);
         if (cloth) {
             CoatOfArmsRenderer.CK3.applyMask(i, GameImage.CK3_COA_OVERLAY);
             CoatOfArmsRenderer.CK3.brighten(i);
