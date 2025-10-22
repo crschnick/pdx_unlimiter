@@ -45,6 +45,7 @@ public class ProtonNoLauncherDist extends GameDist {
                 .resolve("users")
                 .resolve("steamuser")
                 .resolve("Documents")
+                .resolve("Paradox Interactive")
                 .resolve(getGame().getInstallationName());
     }
 
