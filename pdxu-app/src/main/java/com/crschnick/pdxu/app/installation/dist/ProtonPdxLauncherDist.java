@@ -25,7 +25,7 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
             return Optional.empty();
         }
 
-        var dist = new ProtonPdxLauncherDist(g, "Proton", dir);
+        var dist = new ProtonPdxLauncherDist(g, "Proton Paradox Launcher", dir);
         if (!Files.exists(dist.getLauncherSettings())) {
             return Optional.empty();
         }

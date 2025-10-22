@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.OsType;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,12 +25,27 @@ public class ProtonNoLauncherDist extends GameDist {
             return Optional.empty();
         }
 
-        var dist = new ProtonNoLauncherDist(g, "Proton", dir);
+        var dist = new ProtonNoLauncherDist(g, "Proton No Launcher", dir);
         return Optional.of(dist);
     }
 
     public ProtonNoLauncherDist(Game game, String name, Path installLocation) {
         super(game, name, installLocation);
+    }
+
+    @Override
+    public Path determineUserDir() throws IOException {
+        return SteamDist.getSteamPath()
+                .orElseThrow()
+                .resolve("steamapps")
+                .resolve("compatdata")
+                .resolve(String.valueOf(getGame().getSteamAppId()))
+                .resolve("pfx")
+                .resolve("drive_c")
+                .resolve("users")
+                .resolve("steamuser")
+                .resolve("Documents")
+                .resolve(getGame().getInstallationName());
     }
 
     public Path getExecutable() {
