@@ -23,3 +23,7 @@ dist/javafx/**
 gradle.properties
 hs_err_*
 out/
+pdxu_coa/
+comp.txt
+list.txt
+
