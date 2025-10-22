@@ -151,6 +151,16 @@ public abstract class CoatOfArmsRenderer {
         }
     }
 
+    private void applySubClip(Graphics graphics, CoatOfArms.Sub sub, int width, int height) {
+        var x = (int) Math.floor(sub.getX() * width);
+        var y = (int) Math.floor(sub.getY() * height);
+
+        var w = (int) Math.ceil(sub.getScaleX() * width);
+        var h = (int) Math.ceil(sub.getScaleY() * height);
+
+        graphics.setClip(x, y, w, h);
+    }
+
     private void applyCullingMask(
             CoatOfArms.Sub sub, BufferedImage emblemImage, BufferedImage patternImage, List<Integer> indices) {
         if (patternImage == null) {
@@ -305,64 +315,73 @@ public abstract class CoatOfArmsRenderer {
                 getEmblemDir(!hasColor)
                         .resolve(emblem.getFile()),
                 ctx);
-        path.map(p -> ImageHelper.loadAwtImage(p, customFilter)).ifPresent(img -> {
-            boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
-            BufferedImage emblemToCullImage = null;
-            if (hasMask) {
-                emblemToCullImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            }
-            Graphics2D usedGraphics =
-                    hasMask ? (Graphics2D) emblemToCullImage.getGraphics() : (Graphics2D) currentImage.getGraphics();
+        if (path.isEmpty()) {
+            return;
+        }
 
-            emblem.getInstances().stream()
-                    .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
-                    .forEach(instance -> {
-                        var cRotWidth = img.getWidth();
-                        var cRotHeight = img.getHeight();
-                        var flippedRotation = (instance.getRotation() > 45 && instance.getRotation() < 135)
-                                || (instance.getRotation() > 225 && instance.getRotation() < 315)
-                                || (instance.getRotation() > -135 && instance.getRotation() < -45)
-                                || (instance.getRotation() > -315 && instance.getRotation() < -225);
-                        if (flippedRotation) {
-                            cRotWidth = img.getHeight();
-                            cRotHeight = img.getWidth();
+        var img = ImageHelper.loadAwtImage(path.get(), customFilter);
+        boolean hasMask = emblem.getMask().stream().anyMatch(i -> i != 0);
+        BufferedImage emblemToCullImage = null;
+        if (hasMask) {
+            emblemToCullImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        }
+        Graphics2D usedGraphics =
+                hasMask ? (Graphics2D) emblemToCullImage.getGraphics() : (Graphics2D) currentImage.getGraphics();
+
+        emblem.getInstances().stream()
+                .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
+                .forEach(instance -> {
+                    var cRotWidth = img.getWidth();
+                    var cRotHeight = img.getHeight();
+                    var flippedRotation = (instance.getRotation() > 45 && instance.getRotation() < 135)
+                            || (instance.getRotation() > 225 && instance.getRotation() < 315)
+                            || (instance.getRotation() > -135 && instance.getRotation() < -45)
+                            || (instance.getRotation() > -315 && instance.getRotation() < -225);
+                    if (flippedRotation) {
+                        cRotWidth = img.getHeight();
+                        cRotHeight = img.getWidth();
+                    }
+
+                    var scaleX = ((double) width / cRotWidth) * instance.getScaleX() * sub.getScaleX();
+                    var scaleY = ((double) height / cRotHeight) * instance.getScaleY() * sub.getScaleY();
+
+                    var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
+                    var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
+
+                    AffineTransform trans = new AffineTransform();
+                    trans.translate(x, y);
+
+                    if (flippedRotation) {
+                        trans.scale(scaleX, scaleY);
+                    }
+
+                    if (instance.getRotation() != 0) {
+                        double angle = Math.toRadians(instance.getRotation());
+                        trans.rotate(angle);
+                    }
+
+                    if (!flippedRotation) {
+                        trans.scale(scaleX, scaleY);
+                    }
+                    trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
+
+                    try {
+                        var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
+                        if (!hasMask) {
+                            applySubClip(usedGraphics, sub, width, height);
                         }
+                        usedGraphics.drawImage(img, op, 0, 0);
+                    } catch (ImagingOpException ignored) {
+                    }
+                });
 
-                        var scaleX = ((double) width / cRotWidth) * instance.getScaleX() * sub.getScaleX();
-                        var scaleY = ((double) height / cRotHeight) * instance.getScaleY() * sub.getScaleY();
+        if (hasMask) {
+            applyCullingMask(sub, emblemToCullImage, rawPatternImage, emblem.getMask());
+            applySubClip(currentImage.getGraphics(), sub, width, height);
+            currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new java.awt.Color(0, 0, 0, 0), null);
+        }
 
-                        var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
-                        var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
-
-                        AffineTransform trans = new AffineTransform();
-                        trans.translate(x, y);
-
-                        if (flippedRotation) {
-                            trans.scale(scaleX, scaleY);
-                        }
-
-                        if (instance.getRotation() != 0) {
-                            double angle = Math.toRadians(instance.getRotation());
-                            trans.rotate(angle);
-                        }
-
-                        if (!flippedRotation) {
-                            trans.scale(scaleX, scaleY);
-                        }
-                        trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
-
-                        try {
-                            var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
-                            usedGraphics.drawImage(img, op, 0, 0);
-                        } catch (ImagingOpException ignored) {
-                        }
-                    });
-
-            if (hasMask) {
-                applyCullingMask(sub, emblemToCullImage, rawPatternImage, emblem.getMask());
-                currentImage.getGraphics().drawImage(emblemToCullImage, 0, 0, new java.awt.Color(0, 0, 0, 0), null);
-            }
-        });
+        currentImage.getGraphics().setClip(0, 0, width, height);
     }
 
     void renderImage(Graphics g, java.awt.Image img, double x, double y, double w, double h) {
