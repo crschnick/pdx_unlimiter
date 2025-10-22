@@ -37,7 +37,7 @@ dependencies {
 
     implementation 'info.picocli:picocli:4.7.7'
     implementation 'org.apache.commons:commons-lang3:3.18.0'
-    implementation 'io.sentry:sentry:8.20.0'
+    implementation 'io.sentry:sentry:8.24.0'
     implementation 'commons-io:commons-io:2.20.0'
     implementation "com.fasterxml.jackson.core:jackson-databind:2.20.0"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.20"
