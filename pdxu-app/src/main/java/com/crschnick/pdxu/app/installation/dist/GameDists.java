@@ -25,7 +25,7 @@ public class GameDists {
             List.of(SteamDist::getDist, WindowsStoreDist::getDist);
 
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = List.of(
-            ProtonDist::getDist, PdxLauncherDist::getDist, LegacyLauncherDist::getDist, NoLauncherDist::getDist);
+            ProtonPdxLauncherDist::getDist, ProtonNoLauncherDist::getDist, PdxLauncherDist::getDist, LegacyLauncherDist::getDist, NoLauncherDist::getDist);
 
     public static Optional<GameDist> detectDist(Game g, boolean checkXbox) {
         return getCompoundDistFromDirectory(g, null, checkXbox).or(() -> {
@@ -72,10 +72,6 @@ public class GameDists {
             }
         }
         return Optional.empty();
-    }
-
-    public static JsonNode toNode(GameDist d) {
-        return new TextNode(d.getInstallLocation().toString());
     }
 
     private static List<Path> getInstallDirSearchPaths(Game g) {

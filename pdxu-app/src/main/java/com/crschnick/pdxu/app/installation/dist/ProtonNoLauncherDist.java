@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.OsType;
-
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Files;
@@ -10,7 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-public class ProtonDist extends PdxLauncherDist {
+public class ProtonNoLauncherDist extends GameDist {
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
@@ -24,10 +23,12 @@ public class ProtonDist extends PdxLauncherDist {
         if (!Files.exists(g.getInstallType().getProtonExecutable(dir))) {
             return Optional.empty();
         }
-        return Optional.of(new ProtonDist(g, "Proton", dir));
+
+        var dist = new ProtonNoLauncherDist(g, "Proton", dir);
+        return Optional.of(dist);
     }
 
-    public ProtonDist(Game game, String name, Path installLocation) {
+    public ProtonNoLauncherDist(Game game, String name, Path installLocation) {
         super(game, name, installLocation);
     }
 
@@ -49,32 +50,13 @@ public class ProtonDist extends PdxLauncherDist {
         }
     }
 
-    protected Path replaceVariablesInPath(String value) {
-        if (SystemUtils.IS_OS_LINUX) {
-            value = value.replace(
-                    "%USER_DOCUMENTS%",
-                    SteamDist.getSteamPath()
-                            .orElseThrow()
-                            .resolve("steamapps")
-                            .resolve("compatdata")
-                            .resolve(String.valueOf(getGame().getSteamAppId()))
-                            .resolve("pfx")
-                            .resolve("drive_c")
-                            .resolve("users")
-                            .resolve("steamuser")
-                            .resolve("Documents")
-                            .toString());
-        }
-        return Path.of(value);
-    }
-
     @Override
     public boolean supportsLauncher() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean supportsDirectLaunch() {
-        return false;
+        return true;
     }
 }
