@@ -179,10 +179,23 @@ public abstract class CoatOfArmsRenderer {
 
                 int maskArgb = patternImage.getRGB(cx, cy);
                 int maskRgb = 0x00FFFFFF & maskArgb;
-                int maskIndex =
-                        1 + ColorHelper.pickClosestColor(maskRgb, PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
+                int maskIndex = 1 + ColorHelper.pickClosestColor(maskRgb, PATTERN_COLOR_1, PATTERN_COLOR_2, PATTERN_COLOR_3);
+
                 if (!indices.contains(maskIndex)) {
-                    emblemImage.setRGB(x, y, 0);
+                    var exact = maskRgb == PATTERN_COLOR_1 || maskRgb == PATTERN_COLOR_2 || maskRgb == PATTERN_COLOR_3;
+                    if (exact) {
+                        emblemImage.setRGB(x, y, 0);
+                        continue;
+                    }
+
+                    int emblemArgb = emblemImage.getRGB(x, y);
+                    var mr = Math.clamp(ColorHelper.getRed(emblemArgb) / 255.0 - ColorHelper.getGreen(emblemArgb) / 255.0 - ColorHelper.getBlue(emblemArgb) / 255.0, 0.0, 1.0);
+                    var mg = Math.clamp(ColorHelper.getGreen(emblemArgb) / 255.0 - ColorHelper.getBlue(emblemArgb) / 255.0, 0.0, 1.0);
+                    var mb = ColorHelper.getBlue(emblemArgb) / 255.0;
+                    var t = Math.clamp(mr * ColorHelper.getRed(maskRgb) / 255.0 + mg * ColorHelper.getGreen(maskRgb) / 255.0 + mb * ColorHelper.getBlue(maskRgb) / 255.0, 0.0, 1.0);
+                    var alpha = (int) Math.round(ColorHelper.getAlpha(emblemArgb) * t);
+                    var r = (emblemArgb & 0x00FFFFFF) | (alpha << 24);
+                    emblemImage.setRGB(x, y, r);
                 }
             }
         }
