@@ -31,7 +31,4 @@ repositories {
     flatDir {
         dirs "$rootDir/gradle/gradle_scripts"
     }
-    maven {
-        url = "https://central.sonatype.com/repository/maven-snapshots/"
-    }
 }
