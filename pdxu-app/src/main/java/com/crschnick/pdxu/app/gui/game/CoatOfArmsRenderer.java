@@ -178,7 +178,7 @@ public abstract class CoatOfArmsRenderer {
                     continue;
                 }
 
-                int patternArgb = patternImage.getRGB(x, y);
+                int patternArgb = patternImage.getRGB(cx, cy);
                 var mr = Math.clamp(ColorHelper.getRed(patternArgb) / 255.0 - ColorHelper.getGreen(patternArgb) / 255.0 - ColorHelper.getBlue(patternArgb) / 255.0, 0.0, 1.0);
                 var mg = Math.clamp(ColorHelper.getGreen(patternArgb) / 255.0 - ColorHelper.getBlue(patternArgb) / 255.0, 0.0, 1.0);
                 var mb = ColorHelper.getBlue(patternArgb) / 255.0;
