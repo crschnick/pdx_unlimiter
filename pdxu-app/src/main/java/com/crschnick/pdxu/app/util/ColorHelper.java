@@ -10,6 +10,13 @@ import java.util.List;
 
 public class ColorHelper {
 
+    public static double colorDistance(int input, int c) {
+        var dist = Math.sqrt(Math.pow(getRed(input) - getRed(c), 2.0) +
+                Math.pow(getGreen(input) - getGreen(c), 2.0) +
+                Math.pow(getBlue(input) - getBlue(c), 2.0));
+        return dist;
+    }
+
     public static int pickClosestColor(int input, int... colors) {
         double minDist = Double.MAX_VALUE;
         int cMin = -1;
