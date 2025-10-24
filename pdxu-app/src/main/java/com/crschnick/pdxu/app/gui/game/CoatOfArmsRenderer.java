@@ -188,9 +188,9 @@ public abstract class CoatOfArmsRenderer {
                         continue;
                     }
 
-                    var diff = maskIndex == 1 ? ColorHelper.colorDistance(maskRgb & 0x00FFFF00, PATTERN_COLOR_1) : maskIndex == 2 ?
+                    var diff = maskIndex == 1 ? ColorHelper.colorDistance(maskRgb, PATTERN_COLOR_1) : maskIndex == 2 ?
                             ColorHelper.colorDistance(maskRgb, PATTERN_COLOR_2) : ColorHelper.colorDistance(maskRgb, PATTERN_COLOR_3);
-                    var t = Math.clamp(diff / 255.0, 0.0, 1.0);
+                    var t = Math.clamp(diff < 25 ? diff / 100.0 : diff / 255.0, 0.0, 1.0);
 
                     int emblemArgb = emblemImage.getRGB(x, y);
                     var alpha = (int) Math.round(ColorHelper.getAlpha(emblemArgb) * t);
