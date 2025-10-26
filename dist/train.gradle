@@ -16,12 +16,12 @@ tasks.register('trainAot', DefaultTask) {
             def bat = "$imageDir/runtime/bin/${jpackageExecutableName}.bat"
             def cl = ['cmd', '/c', bat] + properties
             def graal = System.getProperty("java.vendor.version").toLowerCase().contains("graal")
-            providers.exec {
+            execOps.exec {
                 commandLine cl
                 workingDir "$imageDir"
                 environment "CDS_JVM_OPTS",
                             "-XX:+AOTClassLinking -XX:AOTCacheOutput=./server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
-            }.getResult().get()
+            }
 
             def cfg = file("$imageDir/app/${jpackageExecutableName}.cfg")
             cfg.text = cfg.text + "java-options=-XX:AOTCache=\$ROOTDIR/runtime/bin/server/cache.aot\n"
@@ -32,12 +32,12 @@ tasks.register('trainAot', DefaultTask) {
             def script = "$imageDir/lib/runtime/bin/${jpackageExecutableName}"
             def cl = [script.toString()] + properties
             def graal = System.getProperty("java.vendor.version").toLowerCase().contains("graal")
-            providers.exec {
+            execOps.exec {
                 commandLine cl
                 workingDir "$imageDir"
                 environment "CDS_JVM_OPTS",
                             "-XX:+AOTClassLinking -XX:AOTCacheOutput=./lib/runtime/lib/server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
-            }.getResult().get()
+            }
 
             def cfg = file("$imageDir/lib/app/${jpackageExecutableName}.cfg")
             cfg.text = cfg.text + "java-options=-XX:SharedArchiveFile=\$APPDIR/../../lib/runtime/lib/server/cache.aot\n"
@@ -48,12 +48,12 @@ tasks.register('trainAot', DefaultTask) {
             def script = "$imageDir/Contents/runtime/Contents/Home/bin/${jpackageExecutableName}"
             def cl = [script.toString()] + properties
             def graal = System.getProperty("java.vendor.version").toLowerCase().contains("graal")
-            providers.exec {
+            execOps.exec {
                 commandLine cl
                 workingDir "$imageDir"
                 environment "CDS_JVM_OPTS",
                             "-XX:+AOTClassLinking -XX:AOTCacheOutput=./Contents/runtime/Contents/Home/lib/server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
-            }.getResult().get()
+            }
 
             def cfg = file("$imageDir/Contents/app/${jpackageExecutableName}.cfg")
             cfg.text = cfg.text + "java-options=-XX:SharedArchiveFile=\$ROOTDIR/Contents/runtime/Contents/Home/lib/server/cache.aot\n"

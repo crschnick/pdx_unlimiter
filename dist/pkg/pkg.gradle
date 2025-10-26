@@ -13,9 +13,9 @@ tasks.register('createPkg', Exec) {
     doLast {
         def certName = System.getenv("MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_NAME")
         if (certName != null && !certName.isEmpty()) {
-            providers.exec {
+            execOps.exec {
                 commandLine "$projectDir/pkg/notarize_pkg.sh", "${project.layout.buildDirectory.get()}/dist/pkg_target/pkg/${distName}-installer-macos-${arch}.pkg"
-            }.getResult().get()
+            }
         }
 
         copy {

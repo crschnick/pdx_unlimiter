@@ -146,6 +146,12 @@ def getWindowsSchemaCanonicalVersion() {
     return v + "." + last
 }
 
+// https://stackoverflow.com/questions/79720795/replacing-deprecated-projectexec-in-dofirst-dolast
+interface InjectedExecOps {
+    @javax.inject.Inject
+    ExecOperations getExecOps()
+}
+
 // Project variables
 
 project.ext {
@@ -219,6 +225,9 @@ project.ext {
     if (sentryUrl != null) {
         jpackageReleaseArguments += "-D" + propertyName("sentryUrl") + "=" + sentryUrl
     }
+
+    def injected = project.objects.newInstance(InjectedExecOps)
+    execOps = injected.execOps;
 }
 
 group = groupName

@@ -78,40 +78,40 @@ if (os.isWindows()) {
                 def exeFile = file("$distDir/base/${jpackageExecutableName}.exe")
                 exeFile.setExecutable(true, false)
                 exeFile.writable = true
-                providers.exec {
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-icon', "$projectDir\\logo\\logo.ico"
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-file-version', windowsSchemaCanonicalVersion
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-product-version', windowsSchemaCanonicalVersion
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-version-string', 'CompanyName', 'Christopher Schnick'
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-version-string', 'FileDescription', 'Pdx-Unlimiter'
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-version-string', 'LegalCopyright', '2025, ' + 'Christopher Schnick'
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-version-string', 'OriginalFilename', "${jpackageExecutableName}.exe"
-                }.getResult().get()
-                providers.exec {
+                }
+                execOps.exec {
                     commandLine rcedit, exeFile, '--set-version-string', 'ProductName', 'Pdx-Unlimiter'
-                }.getResult().get()
+                }
                 exeFile.writable = false
             }
 
             var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
             if (signEnv != null && !signEnv.isEmpty()) {
                 file("$distDir/base/${jpackageExecutableName}.exe").writable = true
-                providers.exec {
+                execOps.exec {
                     commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/${jpackageExecutableName}.exe"
                     ignoreExitValue = !ci
-                }.getResult().get()
+                }
                 file("$distDir/base/${jpackageExecutableName}.exe").writable = false
             }
         }

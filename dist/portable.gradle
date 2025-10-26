@@ -28,9 +28,9 @@ if (os.isWindows()) {
 } else {
     tasks.register('packagePortable', DefaultTask) {
         doLast {
-            providers.exec {
+            execOps.exec {
                 commandLine "$projectDir/dmg/build-dmg.sh", "$projectDir", arch, productName, "${distName}-portable-macos-${arch}.dmg"
-            }.getResult().get()
+            }
 
             copy {
                 from "${project.layout.buildDirectory.get()}/dist/dmg/"
