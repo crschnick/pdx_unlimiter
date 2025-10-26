@@ -349,6 +349,21 @@ public abstract class CoatOfArmsRenderer {
                     var scaleX = ((double) width / cRotWidth) * instance.getScaleX() * sub.getScaleX();
                     var scaleY = ((double) height / cRotHeight) * instance.getScaleY() * sub.getScaleY();
 
+                    if (emblem.getFile().equals("ce_sword_in_bend_long.dds") && (instance.getRotation() == 10.0 || instance.getRotation() == -10.0)) {
+                        scaleX *= 0.91;
+                        scaleY *= 0.91;
+                    }
+
+                    if (emblem.getFile().equals("ce_bend_crancelin_saxony.dds") && instance.getRotation() == 2.5) {
+                        scaleX *= 1.03;
+                        scaleY *= 1.03;
+                    }
+
+                    if (emblem.getFile().equals("ce_bend_crancelin_saxony.dds") && instance.getRotation() == 10.0) {
+                        scaleX *= 0.982;
+                        scaleY *= 0.982;
+                    }
+
                     var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
                     var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
 
