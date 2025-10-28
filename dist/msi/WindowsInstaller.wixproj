@@ -17,7 +17,7 @@
   <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="6.0.1" />
   <Target Name="BeforeBuild">
     <PropertyGroup>
-      <DefineConstants>BuildVersion=$(CANONICAL_VERSION);BasePath=$(ProjectDir)\..\build\dist\installer-win;DynamicProductCode=$(PRODUCT_CODE);DynamicProductName=$(PRODUCT_NAME);ExecutableName=$(EXECUTABLE_NAME)</DefineConstants>
+      <DefineConstants>BuildVersion=$(CANONICAL_VERSION);BasePath=$(ProjectDir)\..\build\dist\installer-win;UpgradeCode=$(UPGRADE_CODE);DynamicProductName=$(PRODUCT_NAME);ExecutableName=$(EXECUTABLE_NAME)</DefineConstants>
     </PropertyGroup>
   </Target>
 </Project>

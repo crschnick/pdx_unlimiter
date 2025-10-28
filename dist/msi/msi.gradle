@@ -1,6 +1,6 @@
 def distDir = "${project.layout.buildDirectory.get()}/dist"
 
-def RELEASE_PRODUCT_CODE = '{35478070-7e9b-469b-b433-73ed3fa24812}'
+def UPGRADE_CODE = '{35478070-7e9b-469b-b433-73ed3fa24812}'
 
 tasks.register('installerDist', DefaultTask) {
     dependsOn baseDist
@@ -24,7 +24,7 @@ tasks.register('signInstaller', Exec) {
 tasks.register('buildInstaller', Exec) {
     dependsOn installerDist
     commandLine 'cmd', '/c', 'CALL', projectDir.toString() + "/msi/build_installer_${arch}.bat"
-    environment('PRODUCT_CODE', RELEASE_PRODUCT_CODE)
+    environment('UPGRADE_CODE', UPGRADE_CODE)
     environment('PRODUCT_NAME', productName)
     environment('CANONICAL_VERSION', windowsSchemaCanonicalVersion)
     environment('EXECUTABLE_NAME', jpackageExecutableName)

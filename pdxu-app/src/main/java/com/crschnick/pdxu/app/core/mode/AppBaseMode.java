@@ -8,7 +8,6 @@ import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppWindowTitle;
 import com.crschnick.pdxu.app.gui.dialog.GuiNoGamesDialog;
 import com.crschnick.pdxu.app.gui.dialog.GuiWelcomeDialog;
-import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameInstallation;
@@ -93,6 +92,7 @@ public class AppBaseMode extends AppOperationMode {
 
         GuiWelcomeDialog.showAndWaitIfNeeded();
         AppConfigurationDialog.showIfNeeded();
+        AppLegacyInstallDialog.showIfNeeded();
 
         TrackEvent.info("Finished base components initialization");
         initialized = true;
