@@ -1,63 +1,44 @@
 package com.crschnick.pdxu.app.util;
 
-import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
-import com.sun.jna.platform.win32.Shell32;
-import com.sun.jna.platform.win32.ShellAPI;
-import com.sun.jna.platform.win32.User32;
-
 import java.awt.*;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DesktopHelper {
 
-    private static final String[] browsers = {
-        "xdg-open", "google-chrome", "firefox", "opera", "konqueror", "mozilla", "gnome-open", "open"
-    };
-
-    public static void openUrlInBrowser(String uri) {
-        try {
-            if (OsType.ofLocal() == OsType.WINDOWS) {
-                var pb = new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", uri);
-                pb.directory(AppSystemInfo.ofCurrent().getUserHome().toFile());
-                pb.redirectErrorStream(true);
-                pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-                pb.start();
-            } else if (OsType.ofLocal() == OsType.LINUX) {
-                String browser = null;
-                for (String b : browsers) {
-                    if (browser == null
-                            && Runtime.getRuntime()
-                                            .exec(new String[] {"which", b})
-                                            .getInputStream()
-                                            .read()
-                                    != -1) {
-                        Runtime.getRuntime().exec(new String[] {browser = b, uri});
-                    }
-                }
-            } else {
-                var pb = new ProcessBuilder("open", uri);
-                pb.directory(AppSystemInfo.ofCurrent().getUserHome().toFile());
-                pb.redirectErrorStream(true);
-                pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-                pb.start();
-            }
-        } catch (Exception e) {
-            ErrorEventFactory.fromThrowable(e).handle();
+    public static void openUrl(String uri) {
+        if (uri == null) {
+            return;
         }
+
+        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            return;
+        }
+
+        URI parsed;
+        try {
+            parsed = URI.create(uri);
+        } catch (IllegalArgumentException e) {
+            ErrorEventFactory.fromThrowable("Invalid URI: " + uri, e.getCause() != null ? e.getCause() : e)
+                    .handle();
+            return;
+        }
+
+        // This can be a blocking operation
+        ThreadHelper.runFailableAsync(() -> {
+            Desktop.getDesktop().browse(parsed);
+        });
     }
 
-    public static void browsePath(Path file) {
-        if (file == null) {
+    public static void browseFile(Path file) {
+        if (file == null || !Files.exists(file)) {
             return;
         }
 
-        if (!Files.exists(file)) {
-            return;
-        }
-
+        // This can be a blocking operation
         ThreadHelper.runAsync(() -> {
             var xdg = OsType.ofLocal() == OsType.LINUX;
             if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
@@ -76,11 +57,27 @@ public class DesktopHelper {
     }
 
     public static void browseFileInDirectory(Path file) {
-        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
-            browsePath(file.getParent());
+        if (file == null || !Files.exists(file)) {
             return;
         }
 
+        // Windows does not support Action.BROWSE_FILE_DIR
+        if (OsType.ofLocal() == OsType.WINDOWS) {
+            // Explorer does not support single quotes, so use normal quotes
+            if (Files.isDirectory(file)) {
+                LocalExec.readStdoutIfPossible("explorer", "\"" + file + "\"");
+            } else {
+                LocalExec.readStdoutIfPossible("explorer", "/select,", "\"" + file + "\"");
+            }
+            return;
+        }
+
+        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+            browseFile(file.getParent());
+            return;
+        }
+
+        // This can be a blocking operation
         ThreadHelper.runAsync(() -> {
             var xdg = OsType.ofLocal() == OsType.LINUX;
             try {
@@ -90,48 +87,22 @@ public class DesktopHelper {
                 ErrorEventFactory.fromThrowable(e).expected().omitted(xdg).handle();
             }
 
+            // Some basic linux systems have trouble with the API call
+            // As a fallback, use xdg-open
             if (xdg) {
                 LocalExec.readStdoutIfPossible("xdg-open", file.getParent().toString());
             }
         });
     }
 
-    public static void openWithAnyApplication(Path localFile) {
-        try {
-            switch (OsType.ofLocal()) {
-                case OsType.Windows ignored -> {
-                    // See https://learn.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-shellexecuteinfoa
-                    var struct = new ShellAPI.SHELLEXECUTEINFO();
-                    struct.fMask = 0x100 | 0xC;
-                    struct.lpVerb = "openas";
-                    struct.lpFile = localFile.toString();
-                    struct.nShow = User32.SW_SHOWDEFAULT;
-                    Shell32.INSTANCE.ShellExecuteEx(struct);
-                }
-                case OsType.Linux ignored -> {
-                    throw new UnsupportedOperationException();
-                }
-                case OsType.MacOs ignored -> {
-                    throw new UnsupportedOperationException();
-                }
-            }
-        } catch (Throwable e) {
-            ErrorEventFactory.fromThrowable("Unable to open file " + localFile, e)
-                    .handle();
+    public static void openFileInDefaultApplication(Path file) {
+        if (file == null || !Files.exists(file)) {
+            return;
         }
-    }
 
-    public static void openInDefaultApplication(Path localFile) {
-        switch (OsType.ofLocal()) {
-            case OsType.Linux linux -> {
-                LocalExec.readStdoutIfPossible("xdg-open", localFile.toString());
-            }
-            case OsType.MacOs macOs -> {
-                LocalExec.readStdoutIfPossible("open", localFile.toString());
-            }
-            case OsType.Windows windows -> {
-                LocalExec.readStdoutIfPossible("cmd", "/c", "start \"\" \"" + localFile.toString() + "\"");
-            }
-        }
+        // This can be a blocking operation
+        ThreadHelper.runFailableAsync(() -> {
+            Desktop.getDesktop().open(file.toFile());
+        });
     }
 }

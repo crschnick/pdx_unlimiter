@@ -73,7 +73,7 @@ public class GuiConverterConfig {
         modal.addButton(new ModalButton(
                 "converterFailedLogs",
                 () -> {
-                    DesktopHelper.openInDefaultApplication(
+                    DesktopHelper.openFileInDefaultApplication(
                             converterSupport.getWorkingDir().resolve("log.txt"));
                 },
                 true,
@@ -145,7 +145,7 @@ public class GuiConverterConfig {
         modal.addButton(new ModalButton(
                 "openConfigs",
                 () -> {
-                    DesktopHelper.browsePath(converterSupport.getBackendDir().resolve("configurables"));
+                    DesktopHelper.browseFile(converterSupport.getBackendDir().resolve("configurables"));
                 },
                 false,
                 false));

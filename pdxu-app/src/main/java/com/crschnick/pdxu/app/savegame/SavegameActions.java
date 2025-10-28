@@ -43,7 +43,7 @@ public class SavegameActions {
 
     public static <T, I extends SavegameInfo<T>> void openSavegame(SavegameEntry<T, I> entry) {
         SavegameContext.withSavegameContext(entry, ctx -> {
-            DesktopHelper.browsePath(ctx.getStorage().getSavegameDataDirectory(entry));
+            DesktopHelper.browseFile(ctx.getStorage().getSavegameDataDirectory(entry));
         });
     }
 

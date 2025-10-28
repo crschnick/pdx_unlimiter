@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui.game;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 
@@ -187,6 +188,15 @@ public class GameImage {
         var img = ImageHelper.loadImage(iconFile);
         if (g == Game.CK3) {
             img = ImageHelper.cut(img, new Rectangle2D(25, 25, 512 - 50, 512 - 50));
+        }
+        if (g == Game.EU5) {
+            img = ImageHelper.loadImage(iconFile, integer -> {
+                if (ColorHelper.getRed(integer) >= 0xF7 && ColorHelper.getGreen(integer) >= 0xF7 && ColorHelper.getBlue(integer) >= 0xF7) {
+                    return 0;
+                } else {
+                    return integer;
+                }
+            });
         }
         return img;
     }

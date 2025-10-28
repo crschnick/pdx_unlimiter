@@ -17,6 +17,7 @@ import com.sun.management.HotSpotDiagnosticMXBean;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
+import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import javax.management.MBeanServer;
@@ -65,7 +66,8 @@ public class TroubleshootCategory extends AppPrefsCategory {
                         new TileButtonComp("launchDebugMode", "launchDebugModeDescription", "mdmz-refresh", e -> {
                                     AppOperationMode.executeAfterShutdown(() -> {
                                         var script = AppInstallation.ofCurrent().getDebugScriptPath();
-                                        DesktopHelper.openInDefaultApplication(script);
+                                        // Use this instead of DesktopHelper to guarantee that it is run synchronously
+                                        Desktop.getDesktop().open(script.toFile());
                                     });
                                     e.consume();
                                 })
@@ -78,7 +80,7 @@ public class TroubleshootCategory extends AppPrefsCategory {
                                     "openCurrentLogFile", "openCurrentLogFileDescription", "mdmz-text_snippet", e -> {
                                         AppLogs.get().flush();
                                         ThreadHelper.sleep(100);
-                                        DesktopHelper.browsePath(AppLogs.get()
+                                        DesktopHelper.browseFile(AppLogs.get()
                                                 .getSessionLogsDirectory()
                                                 .resolve(AppNames.ofMain().getKebapName() + ".log"));
                                         e.consume();
@@ -93,7 +95,7 @@ public class TroubleshootCategory extends AppPrefsCategory {
                                         "openInstallationDirectoryDescription",
                                         "mdomz-snippet_folder",
                                         e -> {
-                                            DesktopHelper.browsePath(
+                                            DesktopHelper.browseFile(
                                                     AppInstallation.ofCurrent().getBaseInstallationPath());
                                             e.consume();
                                         })

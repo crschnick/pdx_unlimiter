@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor.gui;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 
 public abstract class GuiCoaDisplayType {
 
-    protected static <T> Node createChoices(String name, T defValue, Map<String, T> choices, Consumer<T> con) {
+    protected static <T> Node createChoices(String nameKey, T defValue, Map<String, T> choices, Consumer<T> con) {
         var list = FXCollections.observableArrayList(
                 choices.entrySet().stream().map(Map.Entry::getValue).toList());
         var cb = new ChoiceBox<>(list);
@@ -42,7 +43,9 @@ public abstract class GuiCoaDisplayType {
             }
         });
 
-        HBox b = new HBox(new Label(name + ":"), cb);
+        var label = new Label();
+        label.textProperty().bind(AppI18n.observable(nameKey).map(s -> s + ":"));
+        HBox b = new HBox(label, cb);
         b.setAlignment(Pos.CENTER);
         b.setSpacing(3);
         return b;

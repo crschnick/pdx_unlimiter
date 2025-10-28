@@ -26,7 +26,7 @@ public class SavegameStorageIO {
                                     FileUtils.forceMkdir(storageDir.toFile());
                                     exportSavegameDirectory(storage, storageDir);
                                 }
-                                DesktopHelper.browsePath(out);
+                                DesktopHelper.browseFile(out);
                             } catch (Exception e) {
                                 ErrorEventFactory.fromThrowable(e).handle();
                             }

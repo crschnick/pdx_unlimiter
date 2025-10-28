@@ -56,7 +56,7 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
             addChoice(
                     state,
                     box,
-                    "Government",
+                    "government",
                     "clan_government",
                     Map.of(
                             "Clan", "clan_government",
@@ -82,7 +82,7 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
         sizes.put("256 x 256", 256);
         sizes.put("512 x 512", 512);
         sizes.put("1024 x 1024", 1024);
-        box.getChildren().add(createChoices("Size", 256, sizes, t -> {
+        box.getChildren().add(createChoices("size", 256, sizes, t -> {
             state.getDisplayType().size.set(t.intValue());
             state.updateImage();
         }));
@@ -91,7 +91,7 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
         var cloths = new LinkedHashMap<String, Boolean>();
         cloths.put("enable", true);
         cloths.put("disable", false);
-        box.getChildren().add(createChoices("Cloth pattern", true, cloths, t -> {
+        box.getChildren().add(createChoices("clothPattern", true, cloths, t -> {
             state.getDisplayType().clothPattern.set(t);
             state.updateImage();
         }));
@@ -103,7 +103,7 @@ public abstract class GuiCk3CoaDisplayType extends GuiCoaDisplayType {
         types.put("House", HOUSE);
         types.put("Dynasty", DYNASTY);
         types.put("Title", TITLE);
-        box.getChildren().add(createChoices("Type", REALM, types, t -> {
+        box.getChildren().add(createChoices("type", REALM, types, t -> {
             t.size.set(state.getDisplayType().size.get());
             t.clothPattern.set(state.getDisplayType().clothPattern.get());
             state.displayTypeProperty().set(t);

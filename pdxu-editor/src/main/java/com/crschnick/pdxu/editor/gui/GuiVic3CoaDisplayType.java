@@ -30,7 +30,7 @@ public abstract class GuiVic3CoaDisplayType extends GuiCoaDisplayType {
         sizes.put((int) (256 * 1.5) + " x 256", 256);
         sizes.put((int) (512 * 1.5) + " x 512", 512);
         sizes.put((int) (1024 * 1.5) + " x 1024", 1024);
-        box.getChildren().add(createChoices("Size", 256, sizes, t -> {
+        box.getChildren().add(createChoices("size", 256, sizes, t -> {
             state.getDisplayType().size.set(t.intValue());
             state.updateImage();
         }));

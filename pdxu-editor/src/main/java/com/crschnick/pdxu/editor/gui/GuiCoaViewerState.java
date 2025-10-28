@@ -8,6 +8,8 @@ import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.DesktopHelper;
+import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
@@ -53,12 +55,22 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             var all = Ck3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.CK3), additional);
             return Ck3TagRenderer.getCoatOfArms(editorNode.getBackingNode().getArrayNode(), all);
         }
+
+        @Override
+        public String getDocumentation() {
+            return Hyperlinks.CK3_COA_WIKI;
+        }
     }
 
     public static class Vic3GuiCoaViewerState extends GuiCoaViewerState<GuiVic3CoaDisplayType> {
 
         public Vic3GuiCoaViewerState(EditorState state, EditorRealNode editorNode) {
             super(state, editorNode, GuiVic3CoaDisplayType.NONE);
+        }
+
+        @Override
+        public String getDocumentation() {
+            return Hyperlinks.VIC3_COA_WIKI;
         }
 
         @Override
@@ -93,6 +105,10 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             super(state, editorNode, GuiEu5CoaDisplayType.NONE);
         }
 
+        @Override
+        public String getDocumentation() {
+            return Hyperlinks.EU5_COA_WIKI;
+        }
         @Override
         protected void setup(HBox box) {
             GuiEu5CoaDisplayType.init(this, box);
@@ -152,9 +168,12 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
             try {
                 ImageHelper.writePng(image.get(), file.toPath());
+                DesktopHelper.browseFileInDirectory(file.toPath());
             } catch (IOException ex) {
                 ErrorEventFactory.fromThrowable(ex).handle();
             }
+
+            e.consume();
         });
         refresh.setGraphic(new FontIcon("mdi-export"));
         box.getChildren().add(refresh);
@@ -181,6 +200,8 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             image.set(displayType.get().render(parsedCoa.get(), state.getFileContext()));
         }
     }
+
+    public abstract String getDocumentation();
 
     public Image getImage() {
         return image.get();

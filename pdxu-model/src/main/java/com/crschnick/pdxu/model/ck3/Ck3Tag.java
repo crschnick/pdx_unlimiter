@@ -109,7 +109,11 @@ public class Ck3Tag {
 
         var landedNode = personNode.getNodeForKey("landed_data");
         var gv = landedNode.getNodeForKey("government").getString();
-        var existingTag = allTags.stream().filter(t -> t.id == id).findAny().orElseThrow();
+        var existingTag = allTags.stream().filter(t -> t.id == id).findAny();
+        if (existingTag.isEmpty()) {
+            return Optional.empty();
+        }
+
         allTags.remove(existingTag);
 
         var tag = new Ck3Tag(
@@ -120,12 +124,12 @@ public class Ck3Tag {
                 gv,
                 coa,
                 name,
-                existingTag.balance,
-                existingTag.strength,
-                existingTag.gold,
-                existingTag.income,
-                existingTag.piety,
-                existingTag.prestige);
+                existingTag.get().balance,
+                existingTag.get().strength,
+                existingTag.get().gold,
+                existingTag.get().income,
+                existingTag.get().piety,
+                existingTag.get().prestige);
         allTags.add(tag);
         return Optional.of(tag);
     }

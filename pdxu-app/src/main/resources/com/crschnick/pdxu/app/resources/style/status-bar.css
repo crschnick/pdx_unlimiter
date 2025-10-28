@@ -29,10 +29,14 @@
 -fx-max-height: 1.85em;
 }
 
+.split-menu-button * {
+    -fx-border-width: 0;
+}
+
 .split-menu-button .arrow-button {
     -fx-background-color: transparent;
 }
 
-.split-menu-button .arrow-button:hover {
-    -fx-background-color: -color-bg-default;
+.split-menu-button .arrow-button * {
+    -fx-background-color: -color-fg-default;
 }

@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.util.Hyperlinks;
@@ -31,6 +32,7 @@ public class GuiEditorMenuBar {
         MenuItem cte = new MenuItem(AppI18n.get("editorMenuEditorSettings"));
         cte.setOnAction((a) -> {
             AppPrefs.get().selectCategory("editor");
+            AppMainWindow.get().focus(false);
         });
         editor.getItems().add(cte);
 

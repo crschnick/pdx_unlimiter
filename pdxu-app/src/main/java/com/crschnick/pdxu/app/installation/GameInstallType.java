@@ -752,6 +752,33 @@ public interface GameInstallType {
     GameInstallType EU5 = new StandardInstallType("binaries/eu5") {
 
         @Override
+        public Optional<GameVersion> determineVersionFromInstallation(Path p) {
+            var file = p.resolve("caesar_branch.txt");
+            if (!Files.exists(file)) {
+                return Optional.empty();
+            }
+
+            try {
+                var s = Files.readString(file);
+                var split = s.split("/", 2);
+                if (split.length != 2) {
+                    return Optional.empty();
+                }
+
+                var ver = split[1].trim();
+                var m = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)").matcher(ver);
+                if (m.find()) {
+                    return Optional.of(new GameVersion(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), 0));
+                } else {
+                    return Optional.empty();
+                }
+            } catch (Exception e) {
+                ErrorEventFactory.fromThrowable(e).handle();
+                return Optional.empty();
+            }
+        }
+
+        @Override
         public String getModSavegameId(GameInstallation installation, GameMod mod) {
             return mod.getName().orElse("?");
         }
@@ -798,22 +825,6 @@ public interface GameInstallType {
         @Override
         public List<String> getLaunchArguments() {
             return List.of("-gdpr-compliant", "--continuelastsave");
-        }
-
-        @Override
-        public Optional<GameVersion> getVersion(String versionString) {
-            Matcher m = Pattern.compile("(\\d)\\.(\\d+)\\.(\\d+)(?:\\.(\\d+))?")
-                    .matcher(versionString);
-            if (m.find()) {
-                var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
-                return Optional.of(new GameVersion(
-                        Integer.parseInt(m.group(1)),
-                        Integer.parseInt(m.group(2)),
-                        Integer.parseInt(m.group(3)),
-                        fourth));
-            } else {
-                return Optional.empty();
-            }
         }
 
         @Override

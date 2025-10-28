@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor.gui;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppModifiedStage;
 import com.crschnick.pdxu.app.core.window.AppWindowStyle;
@@ -31,8 +32,8 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
     public void createStage() {
         Stage stage = new Stage();
-        stage.setTitle("Coat of arms preview");
-        var scene = new Scene(createLayout(), 720, 600);
+        stage.titleProperty().bind(AppI18n.observable("coaPreview", state.editorNode.getKeyName().orElse("?")));
+        var scene = new Scene(createLayout(), 800, 600);
         scene.setFill(Color.TRANSPARENT);
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F5), () -> state.refresh());
         stage.setScene(scene);
@@ -67,7 +68,8 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
         Button coaHelp = new Button();
         coaHelp.setOnAction(e -> {
-            Hyperlinks.open(Hyperlinks.CK3_COA_WIKI);
+            Hyperlinks.open(state.getDocumentation());
+            e.consume();
         });
         coaHelp.setGraphic(new FontIcon("mdi-help-circle-outline"));
         topBar.getChildren().add(coaHelp);
@@ -75,6 +77,7 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
         Button refresh = new Button();
         refresh.setOnAction(e -> {
             state.refresh();
+            e.consume();
         });
         refresh.setGraphic(new FontIcon("mdi-refresh"));
         topBar.getChildren().add(refresh);

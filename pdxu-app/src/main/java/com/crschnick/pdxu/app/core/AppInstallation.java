@@ -46,12 +46,6 @@ public abstract class AppInstallation {
             case OsType.MacOs ignored ->
                 Path.of("/Applications/" + AppNames.ofCurrent().getName() + ".app");
             case OsType.Windows ignored -> {
-                var pg = AppSystemInfo.ofWindows().getProgramFiles();
-                var systemPath = pg.resolve(AppNames.ofCurrent().getName());
-                if (Files.exists(systemPath)) {
-                    yield systemPath;
-                }
-
                 var ad = AppSystemInfo.ofWindows().getLocalAppData();
                 yield ad.resolve(AppNames.ofCurrent().getName());
             }

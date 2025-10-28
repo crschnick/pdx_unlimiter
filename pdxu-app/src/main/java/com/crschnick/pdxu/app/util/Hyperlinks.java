@@ -12,8 +12,10 @@ public class Hyperlinks {
     public static final String EDITOR_GUIDE = "https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide";
     public static final String DISCORD = "https://discord.com/invite/BVE4vxqFpU";
     public static final String CK3_COA_WIKI = "https://ck3.paradoxwikis.com/Coat_of_arms_modding";
+    public static final String VIC3_COA_WIKI = "https://vic3.paradoxwikis.com/Flag_modding";
+    public static final String EU5_COA_WIKI = "https://eu5.paradoxwikis.com/Flag_modding";
 
     public static void open(String uri) {
-        DesktopHelper.openUrlInBrowser(uri);
+        DesktopHelper.openUrl(uri);
     }
 }

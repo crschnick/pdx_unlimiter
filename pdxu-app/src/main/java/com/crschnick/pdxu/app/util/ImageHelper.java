@@ -58,6 +58,9 @@ public class ImageHelper {
         try {
             return new WritableImage(
                     reader, (int) r.getMinX(), (int) r.getMinY(), (int) r.getWidth(), (int) r.getHeight());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            ErrorEventFactory.fromThrowable(e).expected().omit().handle();
+            return DEFAULT_IMAGE;
         } catch (Exception e) {
             ErrorEventFactory.fromThrowable(e).handle();
             return DEFAULT_IMAGE;

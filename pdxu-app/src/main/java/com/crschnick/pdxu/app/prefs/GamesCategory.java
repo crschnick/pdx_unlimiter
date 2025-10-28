@@ -60,7 +60,7 @@ public class GamesCategory extends AppPrefsCategory {
     }
 
     private Comp<?> gameChoice(Game g, Property<Path> property) {
-        return new GameDistChoiceComp(g.getId() + "Abbreviation", g, wrap(g, property)).maxWidth(600);
+        return new GameDistChoiceComp(g.getId() + "Abbreviation", g, wrap(g, property)).maxWidth(700);
     }
 
     private Property<GameDist> wrap(Game game, Property<Path> p) {
