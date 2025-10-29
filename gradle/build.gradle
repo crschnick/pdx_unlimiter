@@ -143,7 +143,7 @@ jlink {
             icon = "misc/logo.png"
         } else {
             icon = "misc/logo.icns"
-            if (System.getenv("MAC_NOTARIZATION_APPLE_ID") != null) {
+            if (System.getenv("MACOS_NOTARIZATION_APPLE_ID") != null) {
                 imageOptions += [
                         '--mac-sign',
                         '--mac-package-signing-prefix', 'com.crschnick.pdxu',
@@ -224,7 +224,7 @@ task createDist(type: Zip, dependsOn: [jpackage, copyResources, copyLang, copySt
 
 task bundleDmg(type: org.gradle.api.DefaultTask) {
     doLast {
-        if (System.getenv("MAC_NOTARIZATION_APPLE_ID") != null) {
+        if (System.getenv("MACOS_NOTARIZATION_APPLE_ID") != null) {
             exec {
                 commandLine "$projectDir/misc/macos_notarize.sh", "$projectDir"
             }
