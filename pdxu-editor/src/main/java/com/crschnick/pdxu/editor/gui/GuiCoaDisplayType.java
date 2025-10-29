@@ -47,7 +47,7 @@ public abstract class GuiCoaDisplayType {
         label.textProperty().bind(AppI18n.observable(nameKey).map(s -> s + ":"));
         HBox b = new HBox(label, cb);
         b.setAlignment(Pos.CENTER);
-        b.setSpacing(3);
+        b.setSpacing(6);
         return b;
     }
 

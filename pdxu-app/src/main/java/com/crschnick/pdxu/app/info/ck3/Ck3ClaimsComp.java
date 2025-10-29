@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
 

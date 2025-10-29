@@ -49,7 +49,7 @@ public class GameLocalisationHelper {
 
     public static Map<String, String> loadTranslations(Path file) {
         Map<String, String> map = new HashMap<>();
-        Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_]+):(\\d*) \"(.+)\"$");
+        Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_.]+):(\\d*) \"(.+)\"$");
 
         try (var in = Files.newInputStream(file)) {
             var bin = BOMInputStream.builder()

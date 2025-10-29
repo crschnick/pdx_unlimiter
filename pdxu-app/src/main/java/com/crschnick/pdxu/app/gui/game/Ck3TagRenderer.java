@@ -75,7 +75,7 @@ public class Ck3TagRenderer {
 
     public static Image renderRealmImage(
             CoatOfArms coa, String governmentShape, GameFileContext ctx, int size, boolean cloth) {
-        var realmImg = renderImage(coa, ctx, size, false);
+        var realmImg = renderImage(coa, ctx, size, cloth);
 
         var masks = Map.of(
                 "clan_government", GameImage.CK3_REALM_CLAN_MASK,

@@ -5,7 +5,6 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +33,12 @@ public class GameLocalisation {
         private final Map<String, String> strings = new HashMap<>();
 
         public LocalisationCache() {
-            super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);
+            super(GameCacheManager.Scope.GAME_SPECIFIC);
         }
 
         public void loadLocalisations(GameLanguage lang, GameFileContext ctx) {
-            CascadeDirectoryHelper.traverseDirectory(Path.of("localisation"), ctx, file -> {
+            var dir = ctx.getInstall().getInstallDir().resolve(ctx.getInstall().getType().getLocalisationsDirectory());
+            CascadeDirectoryHelper.traverseDirectory(dir, ctx, file -> {
                 if (!GameLocalisationHelper.isLanguage(file, lang)) {
                     return;
                 }

@@ -65,6 +65,10 @@ public class CascadeDirectoryHelper {
             for (Iterator<File> it = FileUtils.iterateFilesAndDirs(traverseDir.toFile(), FileFilterUtils.trueFileFilter(), FileFilterUtils.trueFileFilter());
                  it.hasNext(); ) {
                 File f = it.next();
+                if (f.isDirectory()) {
+                    continue;
+                }
+
                 consumer.accept(f.toPath());
             }
         }

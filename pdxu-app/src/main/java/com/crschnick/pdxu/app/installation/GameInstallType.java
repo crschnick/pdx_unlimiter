@@ -65,6 +65,11 @@ public interface GameInstallType {
         }
 
         @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("localisation");
+        }
+
+        @Override
         public Path chooseBackgroundImage(Path p) {
             // Prefer launcher image!
             var launcherBg = getLauncherDataPath(p).resolve("launcher-assets").resolve("app-background.png");
@@ -135,6 +140,11 @@ public interface GameInstallType {
     };
 
     GameInstallType HOI4 = new StandardInstallType("hoi4") {
+
+        @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("localisation");
+        }
 
         public String getDlcLauncherId(GameInstallation installation, GameDlc dlc) {
             var rel = installation.getInstallDir().relativize(dlc.getInfoFilePath());
@@ -236,6 +246,11 @@ public interface GameInstallType {
     GameInstallType STELLARIS = new StandardInstallType("stellaris") {
 
         @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("localisation");
+        }
+
+        @Override
         public DlcInfoStorageType getDlcInfoStorageType() {
             return DlcInfoStorageType.SAVEGAME_STORES_INFO;
         }
@@ -312,6 +327,11 @@ public interface GameInstallType {
                     .resolve("illustrations")
                     .resolve("loading_screens")
                     .resolve(bgs[new Random().nextInt(bgs.length)] + ".dds");
+        }
+
+        @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("game", "localization");
         }
 
         @Override
@@ -396,6 +416,11 @@ public interface GameInstallType {
 
     GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.MACOS ? "ck2" : "CK2game") {
 
+        @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("localisation");
+        }
+
         public String getCompatibleSavegameName(String name) {
             return Normalizer.normalize(super.getCompatibleSavegameName(name), Normalizer.Form.NFC)
                     .replaceAll("[^\\p{ASCII}]", "");
@@ -471,6 +496,11 @@ public interface GameInstallType {
     }
 
     GameInstallType VIC2 = new StandardInstallType("v2game") {
+
+        @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("localisation");
+        }
 
         public String getCompatibleSavegameName(String name) {
             return Normalizer.normalize(super.getCompatibleSavegameName(name), Normalizer.Form.NFC)
@@ -555,6 +585,11 @@ public interface GameInstallType {
     };
 
     GameInstallType VIC3 = new StandardInstallType("binaries/victoria3") {
+
+        @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("game", "localization");
+        }
 
         @Override
         public String getModSavegameId(GameInstallation installation, GameMod mod) {
@@ -750,6 +785,11 @@ public interface GameInstallType {
 
 
     GameInstallType EU5 = new StandardInstallType("binaries/eu5") {
+
+        @Override
+        public Path getLocalisationsDirectory() {
+            return Path.of("game", "main_menu", "localization");
+        }
 
         @Override
         public Optional<GameVersion> determineVersionFromInstallation(Path p) {
@@ -1071,6 +1111,8 @@ public interface GameInstallType {
     default Path getWindowsStoreLauncherDataPath(Path p) {
         return getLauncherDataPath(p);
     }
+
+    Path getLocalisationsDirectory();
 
     Path getIcon(Path p);
 

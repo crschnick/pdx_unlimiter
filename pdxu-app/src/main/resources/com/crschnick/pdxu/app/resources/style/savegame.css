@@ -4,11 +4,13 @@
 }
 
 .root:light .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:hover .entry {
-    -fx-background-color: derive(-color-bg-default-transparent, -2%);
+    -fx-background-color: derive(-color-bg-default-transparent, 17%);
+    -fx-border-color: -color-accent-muted;
 }
 
 .root:dark .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:hover .entry {
-    -fx-background-color: -color-bg-default;
+    -fx-background-color: derive(-color-bg-default-transparent, -5%);
+    -fx-border-color: -color-border-default;
 }
 
 .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:selected .entry {
@@ -23,7 +25,7 @@ t.entry-list .list-view {
     -fx-border-radius: 4;
     -fx-background-radius: 4;
     -fx-background-color: -color-bg-default-transparent;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-muted;
 }
 
 .entry-list .list-cell {
