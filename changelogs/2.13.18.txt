@@ -1,0 +1,21 @@
+# Changes in 2.13.18
+
+The Pdx-Unlimiter v2 has reached the end of its life. It is succeeded by the Pdx-Unlimiter v3, which is a completely new application.
+
+It comes with:
+- Support for EU5
+- Fixes for CK3 1.18+
+- Fixes for VIC3 1.10+
+- A completely overhauled UI
+- Support for light/dark mode
+- Many more new appearance and applications behaviour settings
+- Signed Windows releases, meaning no more SmartScreen popup
+- An improved desktop icon
+- Faster startup times and improved memory usage
+- Support to run it in the system tray/background
+- Better scaling for hdpi displays
+- Fixes on Windows when pinning the executable to the taskbar
+- Properly working file associations, without confusing various browsers thinking that pdxu can open zip files
+
+Updates to v3 are not distributed through the old updater anymore. You can choose to update to v3 from within the old application. The v2 version will however no longer receive any updates. All future Pdx-Unlimiter updates are only available in the v3 version.
+
