@@ -254,7 +254,7 @@ public class Ck3Tag {
     }
 
     public String getName() {
-        return name != null ? name : getPrimaryTitle().getName();
+        return name != null ? name : getPrimaryTitle().getKey();
     }
 
     public int getBalance() {
