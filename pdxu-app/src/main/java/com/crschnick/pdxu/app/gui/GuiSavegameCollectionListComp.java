@@ -92,7 +92,7 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
                 .createRegion();
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
         list.setAccessibleText("Campaign list");
-        list.setPrefWidth(300);
+        list.setPrefWidth(350);
 
         var top = createTopBar();
         var box = new VBox(top, list);

@@ -3,16 +3,32 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.comp.base.ModalButton;
 import com.crschnick.pdxu.app.comp.base.ModalOverlay;
 import com.crschnick.pdxu.app.core.window.AppDialog;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class AppLegacyInstallDialog {
 
     public static void showIfNeeded() {
+        try {
+            var updateFile = AppProperties.get().getDataDir().resolve("update");
+            if (Files.exists(updateFile)) {
+                Files.writeString(updateFile, "false");
+            }
+
+            var errorExitFile = AppProperties.get().getDataDir().resolve("error_exit");
+            if (Files.exists(errorExitFile)) {
+                Files.writeString(errorExitFile, "false");
+            }
+        } catch (IOException ex) {
+            ErrorEventFactory.fromThrowable(ex).omit().handle();
+        }
+
         if (OsType.ofLocal() != OsType.WINDOWS) {
             return;
         }

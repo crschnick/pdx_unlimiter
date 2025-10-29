@@ -107,8 +107,12 @@ t.entry-list .list-view {
 
 .node-container .node {
 -fx-background-radius: 0.1em;
--fx-background-color: -color-bg-subtle;
+-fx-background-color: -color-bg-default;
 -fx-padding: 0.15em;
+}
+
+.root:dark .node-container .node {
+    -fx-background-color: derive(-color-bg-default, 5%);
 }
 
 .node-container .node-content {

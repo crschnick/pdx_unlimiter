@@ -32,7 +32,7 @@ public class GuiEditorMenuBar {
         MenuItem cte = new MenuItem(AppI18n.get("editorMenuEditorSettings"));
         cte.setOnAction((a) -> {
             AppPrefs.get().selectCategory("editor");
-            AppMainWindow.get().focus(false);
+            AppMainWindow.get().focus(true);
         });
         editor.getItems().add(cte);
 

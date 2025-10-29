@@ -121,7 +121,7 @@ public class ImageHelper {
             BufferedImage image = ImageIO.read(input.toFile());
 
             // Fix eu5 images not being declared srgb even though they should
-            if (!(boolean) srgbField.get(image.getColorModel())) {
+            if (!(boolean) srgbField.get(image.getColorModel()) && ColorModel.getRGBdefault().isCompatibleRaster(image.getRaster())) {
                 image = new BufferedImage(ColorModel.getRGBdefault(), image.getRaster(), false, new Hashtable<>());;
             }
 
