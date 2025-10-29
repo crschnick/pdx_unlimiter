@@ -33,7 +33,7 @@ public class ComponentManager {
             PdxuInstallation.init();
 
             AppDataLock.init();
-            if (AppDataLock.hasLock()) {
+            if (!AppDataLock.hasLock()) {
                 System.exit(1);
                 return;
             }
