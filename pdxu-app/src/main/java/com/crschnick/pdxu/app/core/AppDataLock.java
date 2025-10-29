@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.core;
 
-import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.RandomAccessFile;
