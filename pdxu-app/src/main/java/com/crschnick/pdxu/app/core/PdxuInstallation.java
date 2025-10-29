@@ -234,7 +234,7 @@ public class PdxuInstallation {
         return INSTANCE;
     }
 
-    private Path getDataDir() {
+    public Path getDataDir() {
         return dataDir;
     }
 

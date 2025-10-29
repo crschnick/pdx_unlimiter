@@ -53,8 +53,8 @@ jobs:
 
       - name: Install the Apple certificate and provisioning profile
         env:
-          MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE: ${{ secrets.MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE }}
-          MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE_PASSWORD: ${{ secrets.MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE_PASSWORD }}
+          MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE: ${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE }}
+          MAC_DEVELOPER_ID_APPLCATION_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD }}
         run: |
           # create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -75,9 +75,9 @@ jobs:
 
       - name: Execute dist build
         env:
-          MAC_APP_SPECIFIC_PASSWORD: ${{ secrets.MAC_APP_SPECIFIC_PASSWORD }}
-          MAC_NOTARIZATION_APPLE_ID: ${{ secrets.MAC_NOTARIZATION_APPLE_ID }}
-          MAC_NOTARIZATION_TEAM_ID: ${{ secrets.MAC_NOTARIZATION_TEAM_ID }}
+          MAC_APP_SPECIFIC_PASSWORD: ${{ secrets.MACOS_NOTARIZATION_APP_SPECIFIC_PASSWORD }}
+          MAC_NOTARIZATION_APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
+          MAC_NOTARIZATION_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
         run: ./gradlew createDist
 
       - name: JReleaser Release

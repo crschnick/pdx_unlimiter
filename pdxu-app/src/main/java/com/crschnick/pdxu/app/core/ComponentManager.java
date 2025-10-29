@@ -32,6 +32,12 @@ public class ComponentManager {
             PdxuInstallation.checkDataDirectoryPermissions();
             PdxuInstallation.init();
 
+            AppDataLock.init();
+            if (AppDataLock.hasLock()) {
+                System.exit(1);
+                return;
+            }
+
             LogManager.init();
             logger = LoggerFactory.getLogger(ComponentManager.class);
 
