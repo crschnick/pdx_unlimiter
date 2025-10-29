@@ -14,6 +14,7 @@ import com.crschnick.pdxu.editor.EditorFilter;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+import com.crschnick.pdxu.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import javafx.application.Platform;
@@ -281,7 +282,9 @@ public class GuiEditor {
                     Button edit = new Button(null, new FontIcon());
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-                    edit.setDisable(!state.isEditable());
+                    var disable = !state.isEditable() || (n instanceof EditorSimpleNode es &&
+                            es.getBackingNode().isValue() && es.getBackingNode().getString().contains("\n"));
+                    edit.setDisable(disable);
                     edit.setOnAction(e -> {
                         state.getExternalState().startEdit(state, (EditorRealNode) n);
                     });

@@ -30,13 +30,14 @@ public class GuiEditorNode {
         box.setFillHeight(true);
 
         if (n.isReal() && ((EditorRealNode) n).getBackingNode().isValue()) {
-            var tf = new TextField(((EditorSimpleNode) n).getBackingNode().getString());
+            var s = ((EditorSimpleNode) n).getBackingNode().getString();
+            var tf = new TextField(s);
+            tf.setEditable(state.isEditable() && !s.contains("\n"));
             tf.setAlignment(Pos.CENTER);
             tf.textProperty().addListener((c, o, ne) -> {
                 ((EditorSimpleNode) n).updateText(ne);
                 state.onTextChanged();
             });
-            tf.setEditable(state.isEditable());
             box.getChildren().add(tf);
             HBox.setHgrow(tf, Priority.ALWAYS);
         } else if (n.isReal()

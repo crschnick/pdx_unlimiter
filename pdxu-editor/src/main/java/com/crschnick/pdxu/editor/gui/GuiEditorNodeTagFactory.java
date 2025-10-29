@@ -65,6 +65,7 @@ public abstract class GuiEditorNodeTagFactory {
                             tt.setGraphic(imgView);
                             tt.getStyleClass().add("fancy-tooltip");
                             tt.setShowDelay(Duration.ZERO);
+                            tt.setShowDuration(Duration.INDEFINITE);
                             b.setTooltip(tt);
                         });
             });

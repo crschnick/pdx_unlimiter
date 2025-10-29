@@ -459,11 +459,11 @@ public final class AppPrefs {
         setInstallation(Game.EU5, eu5Directory);
         setInstallation(Game.EU4, eu4Directory);
         setInstallation(Game.CK3, ck3Directory);
+        setInstallation(Game.VIC3, vic3Directory);
         setInstallation(Game.HOI4, hoi4Directory);
         setInstallation(Game.STELLARIS, stellarisDirectory);
         setInstallation(Game.CK2, ck2Directory);
         setInstallation(Game.VIC2, vic2Directory);
-        setInstallation(Game.VIC3, vic3Directory);
     }
 
     private void setInstallation(Game g, Property<Path> prop) {

@@ -258,9 +258,11 @@ public final class TextFormatParser {
                         tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
                 if (isMultiKeyValue) {
                     index++;
-                    var key = parseNodeIfNotScalarValue(name, strict);
-                    var value = builder.build();
-                    return new MultiKeyValueNode((ArrayNode) key, value);
+                    var key = builder.build();
+                    var keyString = NodeWriter.writeToString(ArrayNode.array(List.of(key)), Integer.MAX_VALUE, "\t");
+                    var value = parseNodeIfNotScalarValue(name, strict);
+                    var valueString = NodeWriter.writeToString(ArrayNode.array(List.of(value)), Integer.MAX_VALUE, "\t");
+                    return new ValueNode(keyString.substring(0, keyString.length() - 1) + "=" + valueString, false);
                 }
 
                 return builder.build();

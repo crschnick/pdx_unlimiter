@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
 public class TooltipHelper {
 
@@ -29,6 +30,7 @@ public class TooltipHelper {
         tt.setWrapText(true);
         tt.setMaxWidth(400);
         tt.getStyleClass().add("fancy-tooltip");
+        tt.setShowDuration(Duration.INDEFINITE);
         return tt;
     }
 
