@@ -80,15 +80,7 @@ public final class Settings extends AbstractSettings {
             true
     ) {
         @Override
-        public void set(Boolean newValue) {
-            Path file = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
-            try {
-                Files.writeString(file, Boolean.toString(newValue));
-                super.set(newValue);
-            } catch (IOException e) {
-                ErrorHandler.handleException(e);
-            }
-        }
+        public void set(Boolean newValue) {}
     };
     public final SettingsEntry.StringEntry skanderbegApiKey = new SettingsEntry.StringEntry(
             "SKANDERBEG_API_KEY",

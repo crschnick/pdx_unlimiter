@@ -85,6 +85,14 @@ public class ErrorHandler {
             LoggerFactory.getLogger(ErrorHandler.class).error("Could not write error_exit file", ex);
         }
 
+        var uf = PdxuInstallation.getInstance().getSettingsLocation().resolve("update");
+        try {
+            Files.createDirectories(uf.getParent());
+            Files.writeString(uf, "false");
+        } catch (IOException ex) {
+            LoggerFactory.getLogger(ErrorHandler.class).error("Could not write update file", ex);
+        }
+
         LoggerFactory.getLogger(ErrorHandler.class).info("Finished initializing error handler\n");
     }
 
@@ -190,16 +198,6 @@ public class ErrorHandler {
         }
 
         if (terminal) {
-            if (PdxuInstallation.getInstance() != null &&
-                    PdxuInstallation.getInstance().getSettingsLocation() != null) {
-                var f = PdxuInstallation.getInstance().getSettingsLocation().resolve("error_exit");
-                try {
-                    Files.createDirectories(f.getParent());
-                    Files.writeString(f, "true");
-                } catch (IOException ignored) {
-                }
-            }
-
             // Wait to send error report
             ThreadHelper.sleep(1000);
             System.exit(1);

@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.PdxuApp;
 import com.crschnick.pdxu.app.core.settings.SavedState;
 import com.crschnick.pdxu.app.core.settings.Settings;
+import com.crschnick.pdxu.app.gui.dialog.GuiEolDialog;
 import com.crschnick.pdxu.app.gui.dialog.GuiErrorReporter;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameAppManager;
@@ -74,6 +75,10 @@ public class ComponentManager {
 
     private static void initialFinalSetup() {
         PdxuApp.getApp().setupCompleteWindowContent();
+
+        Platform.runLater(() -> {
+            GuiEolDialog.show();
+        });
     }
 
     public static void switchGame(Game game) {

@@ -9,3 +9,4 @@ out
 misc/macos_notarize_test.sh
 notarization.zip
 .DS_Store
+local*
