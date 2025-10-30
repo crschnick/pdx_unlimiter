@@ -36,8 +36,12 @@ public class Eu5RulerComp extends SavegameInfoComp {
                 .name("database")
                 .pointerEvaluation(countryId)
                 .build();
-        ruler = Ruler.fromCountryNode(content.get(), country.get(content.get()))
+        ruler = Ruler.fromCountryNode(getKey(), content.get(), country.get(content.get()))
                 .orElse(getDefault());
+    }
+
+    protected String getKey() {
+        return "ruler";
     }
 
     private static Region createRulerStatsNode(Ruler ruler) {
@@ -93,8 +97,8 @@ public class Eu5RulerComp extends SavegameInfoComp {
 
     public static record Ruler(String firstName, String nickname, int adm, int dip, int mil) {
 
-        public static Optional<Ruler> fromCountryNode(Node root, Node n) {
-            var rulerIdPointer = NodePointer.builder().name("government").name("ruler").build();
+        public static Optional<Ruler> fromCountryNode(String key, Node root, Node n) {
+            var rulerIdPointer = NodePointer.builder().name("government").name(key).build();
             var rulerPointer = NodePointer.builder().name("character_db").name("database").supplier(() -> {
                 var idNode = rulerIdPointer.get(n);
                 return idNode != null ? idNode.getString() : null;
@@ -109,7 +113,7 @@ public class Eu5RulerComp extends SavegameInfoComp {
             var mil = rulerNode.getNodeForKey("mil").getInteger();
 
             var name = rulerNode.getNodeForKey("first_name").getString();
-            var nickname = rulerNode.getNodeForKey("nickname").getString();
+            var nickname = rulerNode.getNodeForKeyIfExistent("nickname").map(Node::getString).orElse(null);
             return Optional.of(new Ruler(name, nickname, adm, dip, mil));
         }
     }

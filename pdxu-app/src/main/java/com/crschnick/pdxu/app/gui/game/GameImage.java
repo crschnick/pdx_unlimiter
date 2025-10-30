@@ -442,8 +442,8 @@ public class GameImage {
         EU5_ICON_WAR = ImageHelper.loadImage(i.resolve("map_modes", "war.dds"));
         EU5_ICON_VERSION_WARNING = ImageHelper.loadImage(i.resolve("incompatible_warning_icon.dds"));
         EU5_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
-        EU5_ICON_RULER = ImageHelper.loadImage(i.resolve("ruler_default.dds"));
-        EU5_ICON_HEIR = ImageHelper.loadImage(i.resolve("monarch_heir_crown_icon.dds"));
+        EU5_ICON_RULER = ImageHelper.loadImage(i.resolve("character_roles", "ruler.dds"));
+        EU5_ICON_HEIR = ImageHelper.loadImage(i.resolve("character_roles", "heir.dds"));
         EU5_ICON_ADM = ImageHelper.loadImage(i.resolve("modifier_types", "adm.dds"));
         EU5_ICON_DIP = ImageHelper.loadImage(i.resolve("modifier_types", "dip.dds"));
         EU5_ICON_MIL = ImageHelper.loadImage(i.resolve("modifier_types", "mil.dds"));

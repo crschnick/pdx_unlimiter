@@ -11,6 +11,7 @@ import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 public class Eu5SavegameInfo extends SavegameInfo<Eu5Tag> {
 
     Eu5RulerComp ruler;
+    Eu5HeirComp heir;
     Eu5DucatsComp ducats;
     Eu5StabilityComp stability;
     Eu5PopulationComp population;
