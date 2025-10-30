@@ -37,6 +37,13 @@ public class LinksCategory extends AppPrefsCategory {
                                     modal.show();
                                 })
                                 .maxWidth(2000))
+                .addComp(
+                        new TileButtonComp("otherProjects", "otherProjectsDescription", "mdi2d-dots-horizontal-circle-outline", e -> {
+                            Hyperlinks.open(Hyperlinks.XPIPE);
+                            e.consume();
+                        })
+                                .maxWidth(2000),
+                        null)
                 .addComp(Comp.vspacer(40))
                 .buildComp();
     }

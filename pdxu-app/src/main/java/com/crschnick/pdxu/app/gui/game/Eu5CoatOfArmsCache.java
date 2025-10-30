@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
@@ -75,14 +76,14 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
         return cache.coatOfArmsNode;
     }
 
-    public static Image tagFlag(SavegameInfo<Eu5Tag> info, Eu5Tag tag) {
+    public static Image tagFlag(SavegameData<Eu5Tag> data, Eu5Tag tag) {
         var cache = GameCacheManager.getInstance().get(Eu5CoatOfArmsCache.class);
         var cachedImg = cache.flags.get(tag);
         if (cachedImg != null) {
             return cachedImg;
         }
 
-        var context = GameFileContext.fromData(info.getData());
+        var context = GameFileContext.fromData(data);
         var all = getCoatOfArmsNode(context);
         try {
             Supplier<CoatOfArms> coa = () -> {

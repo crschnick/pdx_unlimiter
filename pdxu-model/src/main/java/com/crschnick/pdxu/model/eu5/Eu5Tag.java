@@ -22,7 +22,7 @@ public class Eu5Tag {
 
     public static final String INVALID_TAG_ID = "DUMMY";
 
-    int id;
+    long id;
     String flagTag;
     String nameTag;
     GameColor color;
@@ -47,10 +47,10 @@ public class Eu5Tag {
         var flagTag = n.getNodeForKey("flag").getString();
         var nameTag = n.getNodeForKey("country_name").isValue() ? n.getNodeForKey("country_name").getString() :
                 n.getNodeForKey("country_name").getNodeForKey("name").getString();
-        return new Eu5Tag(Integer.parseInt(key), flagTag, nameTag, color);
+        return new Eu5Tag(Long.parseLong(key), flagTag, nameTag, color);
     }
 
-    public static Eu5Tag getTag(List<Eu5Tag> tags, int id) {
+    public static Eu5Tag getTag(List<Eu5Tag> tags, long id) {
         return tags.stream()
                 .filter(t -> t.id == id)
                 .findFirst()

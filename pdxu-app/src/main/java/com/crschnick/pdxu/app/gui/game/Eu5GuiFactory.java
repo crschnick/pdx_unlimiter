@@ -44,7 +44,7 @@ public class Eu5GuiFactory extends GameGuiFactory<Eu5Tag, Eu5SavegameInfo> {
             return ImageHelper.DEFAULT_IMAGE;
         }
 
-        return Eu5CoatOfArmsCache.tagFlag(info, tag);
+        return Eu5CoatOfArmsCache.tagFlag(info.getData(), tag);
     }
 
     @Override

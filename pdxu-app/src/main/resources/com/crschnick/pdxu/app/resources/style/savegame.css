@@ -13,7 +13,11 @@
     -fx-border-color: -color-border-default;
 }
 
-.entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:selected .entry {
+.root:light .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:selected .entry, .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:hover:selected .entry {
+    -fx-border-color: -color-accent-emphasis;
+}
+
+.root:dark .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:selected .entry, .entry-list .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:hover:selected .entry {
     -fx-border-color: -color-accent-emphasis;
 }
 
@@ -117,4 +121,8 @@ t.entry-list .list-view {
 
 .node-container .node-content {
 -fx-background-radius: 0.1em;
+}
+
+.entry-list .list-view {
+    -fx-border-width: 0 0 0 1;
 }

@@ -1,0 +1,43 @@
+
+
+.eu5 .tag-icon {
+-fx-min-width: 2.5em;
+-fx-max-width: 2.5em;
+}
+
+.eu5 .ruler {
+-fx-padding: 0;
+    -fx-spacing: 5;
+}
+
+.eu5 .war {
+    -fx-padding: 0;
+}
+
+.eu5 .ruler-icon {
+-fx-min-width: 1.5em;
+-fx-min-height: 1.5em;
+-fx-max-width: 1.5em;
+-fx-max-height: 1.5em;
+}
+
+.eu5 .power-icon {
+    -fx-min-width: 1.2em;
+    -fx-min-height: 1.2em;
+-fx-pref-width: 1.2em;
+-fx-pref-height: 1.2em;
+-fx-max-width: 1.2em;
+-fx-max-height: 1.2em;
+}
+
+.eu5 .guarantee {
+      -fx-background-color: #631aa999;
+}
+
+.eu5 .marriage {
+      -fx-background-color: #631aa999;
+}
+
+.eu5 .subject {
+    -fx-background-color: #2daba3AA;
+}

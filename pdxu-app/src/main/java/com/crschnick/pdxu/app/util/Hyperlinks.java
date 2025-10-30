@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.util;
 
 public class Hyperlinks {
 
+    public static final String XPIPE = "https://github.com/xpipe-io/xpipe";
     public static final String GITHUB = "https://github.com/crschnick/pdx_unlimiter";
     public static final String DOCS = "https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide";
     public static final String TRANSLATE = "https://github.com/crschnick/pdx_unlimiter/tree/master/lang";
