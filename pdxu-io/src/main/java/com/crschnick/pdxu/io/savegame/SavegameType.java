@@ -430,7 +430,7 @@ public interface SavegameType {
         @Override
         public void generateNewCampaignIdHeuristic(SavegameContent c) {
             c.get("gamestate")
-                    .getNodeForKey("playthrough_id")
+                    .getNodeForKeys("metadata", "playthrough_id")
                     .getValueNode()
                     .set(new ValueNode(UUID.randomUUID().toString(), true));
         }

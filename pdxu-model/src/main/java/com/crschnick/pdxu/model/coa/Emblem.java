@@ -15,7 +15,6 @@ public class Emblem {
 
     static Emblem empty() {
         Emblem c = new Emblem();
-        c.file = "_default.dds";
         c.mask = new ArrayList<>();
         c.colors = new String[3];
         c.instances = List.of(new Instance());
@@ -24,12 +23,8 @@ public class Emblem {
 
     static Emblem fromTexturedEmblemNode(Node n) {
         Emblem c = new Emblem();
-        n.getNodeForKeyIfExistent("texture")
-                .ifPresentOrElse(
-                        tex -> {
-                            c.file = tex.getString();
-                        },
-                        () -> c.file = "_default.dds");
+        c.file = n.getNodeForKeyIfExistent("texture").map(Node::getString).orElse(null);
+int a = 0;
         c.colors = null;
 
         n.getNodeForKeyIfExistent("mask")
@@ -75,12 +70,7 @@ public class Emblem {
 
     static Emblem fromColoredEmblemNode(Node n, CoatOfArms.Sub sub) {
         Emblem c = new Emblem();
-        n.getNodeForKeyIfExistent("texture")
-                .ifPresentOrElse(
-                        tex -> {
-                            c.file = tex.getString();
-                        },
-                        () -> c.file = "_default.dds");
+        c.file = n.getNodeForKeyIfExistent("texture").map(Node::getString).orElse(null);
 
         c.colors = new String[3];
 

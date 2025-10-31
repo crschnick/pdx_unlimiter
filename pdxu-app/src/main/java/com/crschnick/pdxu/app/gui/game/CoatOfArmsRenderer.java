@@ -315,6 +315,10 @@ public abstract class CoatOfArmsRenderer {
             };
         }
 
+        if (emblem.getFile() == null) {
+            return;
+        }
+
         var path = CascadeDirectoryHelper.openFile(
                 getEmblemDir(!hasColor)
                         .resolve(emblem.getFile()),

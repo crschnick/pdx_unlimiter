@@ -255,7 +255,7 @@ public final class TextFormatParser {
                 index++;
 
                 boolean isMultiKeyValue =
-                        tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
+                        index < tt.length - 1 && tt[index] == TextFormatTokenizer.EQUALS && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
                 if (isMultiKeyValue) {
                     index++;
                     var key = builder.build();

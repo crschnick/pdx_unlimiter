@@ -19,8 +19,9 @@ public class ModernPlaintextSavegameStructure implements SavegameStructure {
     @Override
     public void write(Path out, SavegameContent content) throws IOException {
         var gamestate = content.get("gamestate");
-        ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
-        var metaHeaderNode = ArrayNode.singleKeyNode("meta_data", meta);
+        var key = gamestate.hasKey("meta_data") ? "meta_data" : "metadata";
+        ArrayNode meta = (ArrayNode) gamestate.getNodeForKey(key);
+        var metaHeaderNode = ArrayNode.singleKeyNode(key, meta);
 
         try (var gsOut = Files.newOutputStream(out)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");

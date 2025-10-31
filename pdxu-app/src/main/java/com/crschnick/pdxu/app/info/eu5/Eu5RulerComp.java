@@ -116,9 +116,9 @@ public class Eu5RulerComp extends SavegameInfoComp {
                 return Optional.empty();
             }
 
-            var adm = rulerNode.getNodeForKey("adm").getDouble();
-            var dip = rulerNode.getNodeForKey("dip").getDouble();
-            var mil = rulerNode.getNodeForKey("mil").getDouble();
+            var adm = rulerNode.getNodeForKeyIfExistent("adm").map(Node::getDouble).orElse(0.0);
+            var dip = rulerNode.getNodeForKeyIfExistent("dip").map(Node::getDouble).orElse(0.0);
+            var mil = rulerNode.getNodeForKeyIfExistent("mil").map(Node::getDouble).orElse(0.0);
 
             var name = rulerNode.getNodeForKey("first_name").getString();
             var nickname = rulerNode.getNodeForKeyIfExistent("nickname").map(Node::getString).orElse(null);
