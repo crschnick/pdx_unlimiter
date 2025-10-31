@@ -113,6 +113,7 @@ public class Ck3Title {
         DUCHY("d"),
         KINGDOM("k"),
         EMPIRE("e"),
+        HEGEMONY("h"),
         OTHER("x");
 
         private String prefix;
