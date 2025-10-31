@@ -89,9 +89,8 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
         var countryId = NodePointer.builder()
-                .name("previous_played")
-                .index(0)
-                .name("idtype")
+                .name("played_country")
+                .name("country")
                 .build();
         var country = NodePointer.builder()
                 .name("countries")

@@ -69,8 +69,8 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
         private Path getOutputFile() {
             var customId = storage.getCustomCampaignId(entry);
             // Only try to add id suffix in case for ironman or binary ones
-            var suffix = entry.getInfo().getData().isIronman()
-                            || entry.getInfo().getData().isBinary()
+            var suffix = entry.getInfo() != null && (entry.getInfo().getData().isIronman()
+                            || entry.getInfo().getData().isBinary())
                     ? customId.map(u -> " (" + u + ")").orElse(null)
                     : null;
             var baseName = storage.getValidOutputFileName(entry, includeEntryName, suffix);

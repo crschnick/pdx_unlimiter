@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -29,7 +30,37 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
 
     private static final int IMG_SIZE = 64;
 
-    static Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext ctx) {
+    private static synchronized Map<String, String> getFlagDefinitionMap(GameFileContext ctx) {
+        var cache = GameCacheManager.getInstance().get(Eu5CoatOfArmsCache.class);
+        var loaded = !cache.flagDefinitionMap.isEmpty();
+        if (loaded) {
+            return cache.flagDefinitionMap;
+        }
+
+        Consumer<Path> loader = path -> {
+            try {
+                Node node = TextFormatParser.text().parse(path);
+                node.forEach((k, v) -> {
+                    if (!v.isArray()) {
+                        return;
+                    }
+
+                    var defs = v.getNodesForKey("flag_definition");
+                    if (defs.size() > 0) {
+                        var def = defs.getFirst();
+                        cache.flagDefinitionMap.put(k, def.getNodeForKey("coa").getString());
+                    }
+                });
+            } catch (Exception ex) {
+                ErrorEventFactory.fromThrowable(ex).handle();
+            }
+        };
+        CascadeDirectoryHelper.traverseDirectory(Path.of("main_menu", "common", "flag_definitions"), ctx, loader);
+
+        return cache.flagDefinitionMap;
+    }
+
+    static synchronized Map<String, javafx.scene.paint.Color> getPredefinedColors(GameFileContext ctx) {
         var cache = GameCacheManager.getInstance().get(Eu5CoatOfArmsCache.class);
         var loaded = cache.colorsLoaded;
         if (loaded) {
@@ -65,7 +96,7 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
         return cache.colors;
     }
 
-    public static Node getCoatOfArmsNode(GameFileContext context) {
+    public static synchronized Node getCoatOfArmsNode(GameFileContext context) {
         var cache = GameCacheManager.getInstance().get(Eu5CoatOfArmsCache.class);
         if (cache.coatOfArmsNode != null) {
             return cache.coatOfArmsNode;
@@ -76,7 +107,7 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
         return cache.coatOfArmsNode;
     }
 
-    public static Image tagFlag(SavegameData<Eu5Tag> data, Eu5Tag tag) {
+    public static synchronized Image tagFlag(SavegameData<Eu5Tag> data, Eu5Tag tag) {
         var cache = GameCacheManager.getInstance().get(Eu5CoatOfArmsCache.class);
         var cachedImg = cache.flags.get(tag);
         if (cachedImg != null) {
@@ -84,10 +115,21 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
         }
 
         var context = GameFileContext.fromData(data);
+        var defintionMap = getFlagDefinitionMap(context);
         var all = getCoatOfArmsNode(context);
         try {
             Supplier<CoatOfArms> coa = () -> {
-                var found = all.getNodeForKeyIfExistent(tag.getFlagTag());
+                if (tag == null) {
+                    return CoatOfArms.empty();
+                }
+
+                if (tag == data.getTag()) {
+                    var mainCoa = data.eu5().getTagCoa();
+                    return mainCoa != null ? mainCoa : CoatOfArms.empty();
+                }
+
+                var key = defintionMap.getOrDefault(tag.getFlagTag(), tag.getFlagTag());
+                var found = all.getNodeForKeyIfExistent(key);
                 if (found.isEmpty()) {
                     return CoatOfArms.empty();
                 }
@@ -108,8 +150,9 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
     }
 
     private boolean colorsLoaded;
-    private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
-    private final Map<Eu5Tag, Image> flags = new ConcurrentHashMap<>();
+    private final Map<String, javafx.scene.paint.Color> colors = new HashMap<>();
+    private final Map<Eu5Tag, Image> flags = new HashMap<>();
+    private final Map<String, String> flagDefinitionMap = new HashMap<>();
     private Node coatOfArmsNode;
 
     public Eu5CoatOfArmsCache() {

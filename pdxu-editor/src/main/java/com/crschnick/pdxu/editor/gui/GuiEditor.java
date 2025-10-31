@@ -122,7 +122,7 @@ public class GuiEditor {
         melterInformation.getStyleClass().add("melter-information");
         var topBars = new VBox(GuiEditorMenuBar.createMenuBar(state), v);
         if (!state.isEditable()) {
-            topBars.getChildren().add(melterInformation);
+            topBars.getChildren().addFirst(melterInformation);
         }
         topBars.setFillWidth(true);
         melterInformation.prefWidthProperty().bind(topBars.widthProperty());

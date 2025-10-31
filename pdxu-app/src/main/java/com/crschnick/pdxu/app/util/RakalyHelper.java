@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.savegame.SavegameContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RakalyHelper {
 
@@ -42,14 +43,19 @@ public class RakalyHelper {
                         "--retain",
                         "--to-stdout",
                         file.toString())
-                .redirectError(ProcessBuilder.Redirect.DISCARD)
                 .start();
+        var err = new AtomicReference<byte[]>();
+        ThreadHelper.runFailableAsync(() -> {
+            err.set(proc.getErrorStream().readAllBytes());
+        });
+
         var b = proc.getInputStream().readAllBytes();
         proc.waitFor();
         int returnCode = proc.exitValue();
 
         if (returnCode != 0 && returnCode != 1) {
-            throw new IOException("Rakaly melter failed with exit code " + returnCode);
+            var errString = new String(err.get());
+            throw new IOException("Rakaly melter failed with exit code " + returnCode + ": " + errString);
         }
 
         return b;

@@ -54,6 +54,6 @@ public class Eu5Tag {
         return tags.stream()
                 .filter(t -> t.id == id)
                 .findFirst()
-                .orElse(new Eu5Tag(0, INVALID_TAG_ID, INVALID_TAG_ID, GameColor.BLACK));
+                .orElse(null);
     }
 }

@@ -29,9 +29,8 @@ public class Eu5RulerComp extends SavegameInfoComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         var countryId = NodePointer.builder()
-                .name("previous_played")
-                .index(0)
-                .name("idtype")
+                .name("played_country")
+                .name("country")
                 .build();
         var country = NodePointer.builder()
                 .name("countries")

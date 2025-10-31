@@ -129,30 +129,33 @@ public class AppInit {
         return AppOperationMode.GUI;
     }
 
-    @SneakyThrows
     public static void init(String[] args) {
         AppOperationMode.setInStartup(true);
         setup(args);
 
-        if (AppProperties.get().isAotTrainMode()) {
-            AppOperationMode.switchToSyncOrThrow(AppOperationMode.BACKGROUND);
+        try {
+            if (AppProperties.get().isAotTrainMode()) {
+                AppOperationMode.switchToSyncOrThrow(AppOperationMode.BACKGROUND);
+                AppOperationMode.setInStartup(false);
+                AppAotTrain.runTrainingMode();
+                AppOperationMode.shutdown(false);
+                return;
+            }
+
+            var startupMode = getStartupMode();
+            AppOperationMode.switchToSyncOrThrow(startupMode);
+            // If it doesn't find time, the JVM will not gc the startup workload
+            System.gc();
             AppOperationMode.setInStartup(false);
-            AppAotTrain.runTrainingMode();
-            AppOperationMode.shutdown(false);
-            return;
-        }
+            AppOpenArguments.init();
 
-        var startupMode = getStartupMode();
-        AppOperationMode.switchToSyncOrThrow(startupMode);
-        // If it doesn't find time, the JVM will not gc the startup workload
-        System.gc();
-        AppOperationMode.setInStartup(false);
-        AppOpenArguments.init();
-
-        var cl = AppProperties.get().getArguments().getCommandLine();
-        if (cl != null) {
-            cl.execute(args);
-            AppOperationMode.halt(0);
+            var cl = AppProperties.get().getArguments().getCommandLine();
+            if (cl != null) {
+                cl.execute(args);
+                AppOperationMode.halt(0);
+            }
+        } catch (Throwable ex) {
+            ErrorEventFactory.fromThrowable(ex).term().handle();
         }
     }
 }

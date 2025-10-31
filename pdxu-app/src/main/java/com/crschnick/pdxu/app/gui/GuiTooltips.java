@@ -11,6 +11,10 @@ import javafx.util.Duration;
 public class GuiTooltips {
 
     public static void install(Node node, String text) {
+        if (text == null) {
+            return;
+        }
+
         Platform.runLater(() -> {
             var tt = TooltipHelper.create(new ReadOnlyStringWrapper(text), null);
             tt.setShowDelay(Duration.millis(350));

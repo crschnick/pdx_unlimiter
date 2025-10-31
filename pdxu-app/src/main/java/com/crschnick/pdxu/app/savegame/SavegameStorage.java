@@ -528,7 +528,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
     public synchronized Optional<UUID> getCustomCampaignId(SavegameEntry<?, ?> e) {
         if (!e.isLoaded()) {
-            throw new IllegalStateException("Savegame info not available");
+            return Optional.empty();
         }
 
         var savegameCampaignId = e.getInfo().getData().getCampaignHeuristic();
