@@ -40,6 +40,14 @@ if (os.isWindows()) {
                 rename "rakaly_windows.exe", "rakaly.exe"
             }
 
+            var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
+            if (signEnv != null && !signEnv.isEmpty()) {
+                execOps.exec {
+                    commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/rakaly_windows.exe"
+                    ignoreExitValue = !ci
+                }
+            }
+
             file("$distDir/base/app/.jpackage.xml").delete()
 
             // Don't launch multiple exe instances: https://bugs.openjdk.org/browse/JDK-8340311
@@ -105,7 +113,6 @@ if (os.isWindows()) {
                 exeFile.writable = false
             }
 
-            var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
             if (signEnv != null && !signEnv.isEmpty()) {
                 file("$distDir/base/${jpackageExecutableName}.exe").writable = true
                 execOps.exec {
