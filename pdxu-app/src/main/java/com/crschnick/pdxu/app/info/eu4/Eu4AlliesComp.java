@@ -21,7 +21,7 @@ public class Eu4AlliesComp extends Eu4DiplomacyRowComp {
     }
 
     @Override
-    protected String getTooltip() {
+    protected String getIconTooltip(SavegameData<?> data) {
         return AppI18n.get("allies");
     }
 

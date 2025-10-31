@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.info.eu5;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
+import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
@@ -14,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -67,7 +69,7 @@ public class Eu5RulerComp extends SavegameInfoComp {
     }
 
     protected Ruler getDefault() {
-        return new Ruler("MISSING", "MISSING RULER", -1, -1, -1);
+        return new Ruler("MISSING", null, -1, -1, -1);
     }
 
     @Override
@@ -79,7 +81,13 @@ public class Eu5RulerComp extends SavegameInfoComp {
         VBox box = new VBox();
         var img = getIcon();
 
-        var label = new Label(ruler.firstName());
+        var firstNames = new ArrayList<String>();
+        for (String s : ruler.firstName().split("\\.")) {
+            firstNames.add(GameLocalisation.getLocalisedValue(s, data));
+        }
+
+        var name = String.join(" ", firstNames) + (ruler.nickname() != null ? " (" + ruler.nickname() + ")" : "");
+        var label = new Label(name);
         label.setMinWidth(Region.USE_PREF_SIZE);
         label.setEllipsisString("");
 

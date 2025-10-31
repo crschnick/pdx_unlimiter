@@ -12,42 +12,38 @@ import javafx.scene.image.Image;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Eu5AlliesMultiComp extends Eu5DiplomacyRowComp {
+public class Eu5VassalMultiComp extends Eu5DiplomacyRowComp {
 
     @Override
     protected String getStyleClass() {
-        return GuiStyle.CLASS_ALLIANCE;
+        return GuiStyle.CLASS_VASSAL;
     }
 
     @Override
     protected String getIconTooltip(SavegameData<?> data) {
-        return AppI18n.get("allies");
+        return AppI18n.get("vassals");
     }
 
     @Override
     protected Image getIcon() {
-        return GameImage.EU5_ICON_ALLIANCE;
+        return GameImage.EU5_ICON_VASSAL;
     }
 
     @Override
     protected List<Eu5Tag> getTags(SavegameContent content, SavegameData<?> data) {
         var list = new ArrayList<Eu5Tag>();
         content.get().getNodeForKeys("diplomacy_manager").forEach((s, node) -> {
-            if (s == null || !s.equals("scripted_mutual")) {
+            if (s == null || !s.equals("dependency")) {
                 return;
             }
 
-            var type = node.getNodeForKeyIfExistent("type").map(Node::getString).orElse(null);
-            if (!"alliance".equals(type)) {
-                return;
+            var type = node.getNodeForKeyIfExistent("subject_type").map(Node::getString).orElse(null);
+            if (!"vassal".equals(type)) {
+                // return;
             }
 
             if (node.getNodeForKey("first").getLong() == data.eu5().getTag().getId()) {
                 list.add(Eu5Tag.getTag(data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
-            }
-
-            if (node.getNodeForKey("second").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(data.eu5().getAllTags(), node.getNodeForKey("first").getLong()));
             }
         });
         return list;

@@ -25,7 +25,7 @@ public class GameLocalisation {
                     GameLanguage.bySupportedLocale(AppPrefs.get().language().getValue()), ctx);
         }
 
-        return cache.strings.getOrDefault(key, "Unknown");
+        return cache.strings.getOrDefault(key, key);
     }
 
     public static class LocalisationCache extends GameCacheManager.Cache {

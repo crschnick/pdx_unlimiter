@@ -19,15 +19,15 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
 public abstract class Eu5DiplomacyRowComp extends DiplomacyRowComp<Eu5Tag> {
 
     @Override
-    protected Region map(SavegameData<?> data, Eu5Tag tag) {
+    protected Region mapTag(SavegameData<?> data, Eu5Tag tag) {
         return GameImage.imageNode(
                 Eu5CoatOfArmsCache.tagFlag(data.eu5(), tag),
                 CLASS_TAG_ICON);
     }
 
     @Override
-    protected String mapTooltip(SavegameData<?> data, Eu5Tag tag) {
-        return tag.getNameTag();
+    protected String mapTagTooltip(SavegameData<?> data, Eu5Tag tag) {
+        return GameLocalisation.getLocalisedValue(tag.getNameTag(), data);
     }
 
     @Override

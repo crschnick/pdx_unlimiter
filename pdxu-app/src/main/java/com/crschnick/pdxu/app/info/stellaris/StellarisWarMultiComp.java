@@ -32,7 +32,7 @@ public class StellarisWarMultiComp extends SavegameInfoMultiComp {
         }
 
         @Override
-        protected String getTooltip() {
+        protected String getIconTooltip(SavegameData<?> data) {
             return war.getTitle();
         }
 

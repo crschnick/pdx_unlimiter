@@ -18,12 +18,12 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
 public abstract class Eu4DiplomacyRowComp extends DiplomacyRowComp<Eu4Tag> {
 
     @Override
-    protected Region map(SavegameData<?> data, Eu4Tag tag) {
+    protected Region mapTag(SavegameData<?> data, Eu4Tag tag) {
         return GameImage.imageNode(Eu4TagRenderer.smallShieldImage(data.eu4(), tag), CLASS_TAG_ICON);
     }
 
     @Override
-    protected String mapTooltip(SavegameData<?> data, Eu4Tag tag) {
+    protected String mapTagTooltip(SavegameData<?> data, Eu4Tag tag) {
         var ctx = GameFileContext.fromData(data);
         return GameLocalisation.getLocalisedValue(tag.getTag(), ctx);
     }

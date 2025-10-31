@@ -6,7 +6,6 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
-import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
 
@@ -19,12 +18,12 @@ import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_CLAIMS;
 public class Ck3ClaimsComp extends DiplomacyRowComp<Ck3Title> {
 
     @Override
-    protected Region map(SavegameData<?> data, Ck3Title tag) {
+    protected Region mapTag(SavegameData<?> data, Ck3Title tag) {
         return GameImage.imageNode(Ck3CoatOfArmsCache.titleImage(tag, GameFileContext.fromData(data)), CLASS_TAG_ICON);
     }
 
     @Override
-    protected String mapTooltip(SavegameData<?> data, Ck3Title tag) {
+    protected String mapTagTooltip(SavegameData<?> data, Ck3Title tag) {
         return tag.getKey();
     }
 
@@ -39,7 +38,7 @@ public class Ck3ClaimsComp extends DiplomacyRowComp<Ck3Title> {
     }
 
     @Override
-    protected String getTooltip() {
+    protected String getIconTooltip(SavegameData<?> data) {
         return AppI18n.get("claims");
     }
 

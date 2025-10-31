@@ -432,7 +432,7 @@ public class GameImage {
                 GameInstallation.ALL.get(Game.EU5).getType().chooseBackgroundImage(installPath));
 
 
-        EU5_ICON_VASSAL = ImageHelper.loadImage(i.resolve("icon_vassal.dds"));
+        EU5_ICON_VASSAL = ImageHelper.loadImage(i.resolve("subject_types", "vassal.dds"));
         EU5_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("diplomatic_status", "alliance.dds"));
         EU5_ICON_TRIBUTARY = ImageHelper.loadImage(i.resolve("subject_tributary_icon.dds"));
         EU5_ICON_MARCH = ImageHelper.loadImage(i.resolve("icon_march.dds"));

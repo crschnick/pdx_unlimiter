@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.info.SavegameInfoMultiComp;
+import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
@@ -30,8 +31,8 @@ public class Eu5WarMultiComp extends SavegameInfoMultiComp {
         }
 
         @Override
-        protected String getTooltip() {
-            return war.getTitle();
+        protected String getIconTooltip(SavegameData<?> data) {
+            return null;
         }
 
         @Override

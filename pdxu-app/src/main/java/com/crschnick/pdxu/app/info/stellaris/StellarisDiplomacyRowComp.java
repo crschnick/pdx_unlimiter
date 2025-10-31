@@ -17,13 +17,13 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
 public abstract class StellarisDiplomacyRowComp extends DiplomacyRowComp<StellarisTag> {
 
     @Override
-    protected Region map(SavegameData<?> data, StellarisTag tag) {
+    protected Region mapTag(SavegameData<?> data, StellarisTag tag) {
         return GameImage.imageNode(
                 StellarisTagRenderer.createTagImage(GameFileContext.fromData(data), tag), CLASS_TAG_ICON);
     }
 
     @Override
-    protected String mapTooltip(SavegameData<?> data, StellarisTag tag) {
+    protected String mapTagTooltip(SavegameData<?> data, StellarisTag tag) {
         return tag.getName();
     }
 

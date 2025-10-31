@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +31,10 @@ public class GameLocalisationHelper {
     }
 
     public static boolean isLanguage(Path file, GameLanguage lang) {
+        if (file.getFileName().toString().endsWith(".yml")) {
+            return file.getFileName().toString().endsWith(lang.getId() + ".yml");
+        }
+
         try {
             try (var reader = new BufferedReader(new FileReader(file.toFile()))) {
                 String line = reader.readLine();
@@ -47,9 +52,10 @@ public class GameLocalisationHelper {
         }
     }
 
+    private static final Pattern PATTERN = Pattern.compile("^\\s+([A-Za-z0-9_.]+):(\\d*) \"(.+)\"$");
+
     public static Map<String, String> loadTranslations(Path file) {
         Map<String, String> map = new HashMap<>();
-        Pattern p = Pattern.compile("^\\s+([A-Za-z0-9_.]+):(\\d*) \"(.+)\"$");
 
         try (var in = Files.newInputStream(file)) {
             var bin = BOMInputStream.builder()
@@ -72,7 +78,7 @@ public class GameLocalisationHelper {
 
                 String line;
                 while ((line = br.readLine()) != null) {
-                    Matcher m = p.matcher(line);
+                    Matcher m = PATTERN.matcher(line);
                     if (m.matches()) {
                         map.put(m.group(1), m.group(3));
                     }

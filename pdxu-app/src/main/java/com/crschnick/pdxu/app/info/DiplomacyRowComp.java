@@ -15,13 +15,13 @@ public abstract class DiplomacyRowComp<T> extends SavegameInfoComp {
 
     protected List<T> tags;
 
-    protected abstract Region map(SavegameData<?> data, T tag);
+    protected abstract Region mapTag(SavegameData<?> data, T tag);
 
-    protected abstract String mapTooltip(SavegameData<?> data, T tag);
+    protected abstract String mapTagTooltip(SavegameData<?> data, T tag);
 
     protected abstract String getStyleClass();
 
-    protected abstract String getTooltip();
+    protected abstract String getIconTooltip(SavegameData<?> data);
 
     protected abstract Image getIcon();
 
@@ -33,7 +33,7 @@ public abstract class DiplomacyRowComp<T> extends SavegameInfoComp {
 
         var imgView = GameImage.imageNode(getIcon(), CLASS_IMAGE_ICON);
         var row =
-                TagRows.createTagRow(imgView, getTooltip(), tags, (T t) -> mapTooltip(data, t), (T t) -> map(data, t));
+                TagRows.createTagRow(imgView, getIconTooltip(data), tags, (T t) -> mapTagTooltip(data, t), (T t) -> mapTag(data, t));
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add(getStyleClass());
         return row;

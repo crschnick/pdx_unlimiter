@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.core.AppLayoutModel;
 import com.crschnick.pdxu.app.core.AppResources;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
@@ -87,6 +88,7 @@ public final class GameAppManager {
                         + process.get().getGame().getId());
                 activeGame.set(process.get());
                 activeGame.get().onStart();
+                AppLayoutModel.get().selectGame(activeGame.get().getGame());
             }
         } else {
             updateImportTimer();

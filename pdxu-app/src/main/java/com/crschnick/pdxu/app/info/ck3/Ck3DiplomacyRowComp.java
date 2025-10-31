@@ -17,7 +17,7 @@ import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
 public abstract class Ck3DiplomacyRowComp extends DiplomacyRowComp<Ck3Tag> {
 
     @Override
-    protected Region map(SavegameData<?> data, Ck3Tag tag) {
+    protected Region mapTag(SavegameData<?> data, Ck3Tag tag) {
         return GameImage.imageNode(
                 Ck3TagRenderer.renderRealmImage(
                         tag.getCoatOfArms(), tag.getGovernmentName(), GameFileContext.fromData(data), 64, false),
@@ -25,7 +25,7 @@ public abstract class Ck3DiplomacyRowComp extends DiplomacyRowComp<Ck3Tag> {
     }
 
     @Override
-    protected String mapTooltip(SavegameData<?> data, Ck3Tag tag) {
+    protected String mapTagTooltip(SavegameData<?> data, Ck3Tag tag) {
         return tag.getName();
     }
 
