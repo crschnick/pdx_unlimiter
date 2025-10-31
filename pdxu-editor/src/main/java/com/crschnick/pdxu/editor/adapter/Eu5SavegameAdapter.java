@@ -107,6 +107,21 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                 NodePointer.builder().name("game_rules").name("setting").build());
         map.put("Ironman Settings", NodePointer.builder().name("ironman_manager").build());
         map.put("Player country", country);
+
+        var rulerIdPointer = NodePointer.builder().name("government").name("ruler").build();
+        var rulerPointer = NodePointer.builder().name("character_db").name("database").pointerEvaluation(country, (cn) -> {
+            var idNode = rulerIdPointer.get(cn);
+            return idNode != null ? idNode.getString() : null;
+        }).build();
+        map.put("Player country ruler", rulerPointer);
+
+        var heirIdPointer = NodePointer.builder().name("government").name("heir").build();
+        var heirPointer = NodePointer.builder().name("character_db").name("database").pointerEvaluation(country, (cn) -> {
+            var idNode = heirIdPointer.get(cn);
+            return idNode != null ? idNode.getString() : null;
+        }).build();
+        map.put("Player country heir", heirPointer);
+
         return map;
     }
 
@@ -142,15 +157,15 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> STATE_KEYS = List.of("state");
     private static final List<String> CULTURE_KEYS = List.of("culture", "primary_culture", "primary_cultures", "accepted_cultures", "tolerated_cultures");
     private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "provinces", "original_capital", "birth", "cores", "home", "market_parent");
-    private static final List<String> COUNTRY_KEYS = List.of("country", "owner", "controller", "previous_owner", "ruled", "all_members", "leader", "celestial_governor");
-    private static final List<String> CHARACTER_KEYS = List.of("ruler", "heir", "actor", "father", "mother", "spouse", "heir_of", "children", "saints", "artist", "character");
+    private static final List<String> COUNTRY_KEYS = List.of("curia", "military_order", "bishopric", "countries", "country", "owner", "controller", "previous_owner", "ruled", "all_members", "leader", "celestial_governor");
+    private static final List<String> CHARACTER_KEYS = List.of("founder", "head", "ruler", "heir", "actor", "father", "mother", "spouse", "heir_of", "children", "saints", "artist", "character", "borrower");
     private static final List<String> CABINET_KEYS = List.of("cabinet_entries");
     private static final List<String> RULER_TERM_KEYS = List.of("ruler_term");
     private static final List<String> MARKET_KEYS = List.of("market", "second_best_market");
     private static final List<String> RELIGION_KEYS = List.of("religion", "primary_religion");
     private static final List<String> DYNASTY_KEYS = List.of("dynasty", "dynasties");
     private static final List<String> HOLY_SITE_KEYS = List.of("holy_site", "holy_sites");
-    private static final List<String> LOCATION_KEYS = List.of("location", "locations", "owned_locations", "controlled_locations", "core_locations", "locations_ever_affected");
+    private static final List<String> LOCATION_KEYS = List.of("location", "locations", "owned_locations", "controlled_locations", "core_locations", "locations_ever_affected", "from", "to");
     private static final List<String> UNIT_KEYS = List.of("unit");
     private static final List<String> POPULATION_KEYS = List.of("pop", "pops");
 

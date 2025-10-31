@@ -11,7 +11,6 @@ public class Eu5SavegameInfo extends SavegameInfo<Eu5Tag> {
 
     Eu5RulerComp ruler;
     Eu5HeirComp heir;
-    Eu5IronmanComp ironman;
     Eu5DucatsComp ducats;
     Eu5StabilityComp stability;
     Eu5PopulationComp population;
@@ -20,6 +19,7 @@ public class Eu5SavegameInfo extends SavegameInfo<Eu5Tag> {
     Eu5ManpowerComp manpower;
     Eu5AlliesMultiComp allies;
     Eu5WarMultiComp wars;
+    Eu5IronmanComp ironman;
     ModComp mods;
     VersionComp version;
 

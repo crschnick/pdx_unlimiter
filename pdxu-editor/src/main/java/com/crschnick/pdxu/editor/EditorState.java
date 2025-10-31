@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SequencedMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class EditorState {
     private final String fileName;
     private final TextFormatParser parser;
     private final BooleanProperty dirty;
-    private final Map<String, EditorRootNode> rootNodes;
+    private final SequencedMap<String, EditorRootNode> rootNodes;
     private final EditorExternalState externalState;
     private final EditorFilter filter;
     private final EditorContent content;
@@ -72,7 +73,10 @@ public class EditorState {
     }
 
     public void init() {
-        content.navigate(navigation.getCurrent().getEditorNode(), 0, 0.0);
+        content.navigate(null, 0, 0.0);
+        if (rootNodes.size() == 1) {
+            navigation.navigateToChild(rootNodes.sequencedValues().getFirst());
+        }
     }
 
     public void onFilterChange() {

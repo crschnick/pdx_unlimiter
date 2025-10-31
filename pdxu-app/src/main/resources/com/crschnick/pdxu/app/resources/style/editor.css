@@ -15,12 +15,17 @@
 }
 
 .editor-grid .even {
-    -fx-background-color: -color-bg-muted;
+    -fx-background-color: -color-bg-default;
 }
 
-.editor-grid .odd {
-  -fx-background-color: -color-bg-subtle;
+.root:dark .editor-grid .odd {
+  -fx-background-color: derive(-color-bg-default, 10%);
 }
+
+.root:light .editor-grid .odd {
+    -fx-background-color: derive(-color-bg-default, -5%);
+}
+
 
 .editor-grid .preview {
   -fx-font-family: "monospaced";
