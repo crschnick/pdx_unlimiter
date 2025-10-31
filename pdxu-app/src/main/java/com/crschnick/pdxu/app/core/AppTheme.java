@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.ColorHelper;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
@@ -16,10 +17,12 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
 import javafx.css.PseudoClass;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -32,6 +35,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.function.Supplier;
@@ -46,41 +50,65 @@ public class AppTheme {
     private static boolean init;
 
     public static void initThemeHandlers(Stage stage) {
-        stage.getScene().rootProperty().subscribe(root -> {
-            if (root == null) {
-                return;
-            }
+        if (stage.getScene() == null) {
+            return;
+        }
 
+        var root = stage.getScene().getRoot();
+        if (root != null) {
             root.pseudoClassStateChanged(
                     PseudoClass.getPseudoClass(OsType.ofLocal().getId()), true);
-            if (AppPrefs.get() == null) {
+        }
+
+        if (AppPrefs.get() == null) {
+            if (root != null) {
                 var def = Theme.getDefaultLightTheme();
                 root.pseudoClassStateChanged(PseudoClass.getPseudoClass(def.getCssId()), true);
                 root.pseudoClassStateChanged(LIGHT, true);
                 root.pseudoClassStateChanged(DARK, false);
                 root.pseudoClassStateChanged(PRETTY, true);
                 root.pseudoClassStateChanged(PERFORMANCE, false);
-                return;
             }
+            return;
+        }
 
-            AppPrefs.get().theme().subscribe(t -> {
-                Theme.ALL.forEach(theme -> {
-                    root.pseudoClassStateChanged(
-                            PseudoClass.getPseudoClass(theme.getCssId()),
-                            theme.getCssId().equals(t.getCssId()));
-                });
-                if (t == null) {
-                    return;
+        // Allow for GC
+        var ref = new WeakReference<>(stage);
+
+        AppPrefs.get().theme().subscribe(t -> {
+            var val = ref.get();
+            if (val != null) {
+                var scene = val.getScene();
+                if (scene != null) {
+                    var r = scene.getRoot();
+                    if (r != null) {
+                        Theme.ALL.forEach(theme -> {
+                            r.pseudoClassStateChanged(
+                                    PseudoClass.getPseudoClass(theme.getCssId()),
+                                    theme.getCssId().equals(t.getCssId()));
+                        });
+
+                        if (t != null) {
+                            r.pseudoClassStateChanged(LIGHT, !t.isDark());
+                            r.pseudoClassStateChanged(DARK, t.isDark());
+                        }
+                    }
                 }
+            }
+        });
 
-                root.pseudoClassStateChanged(LIGHT, !t.isDark());
-                root.pseudoClassStateChanged(DARK, t.isDark());
-            });
-
-            AppPrefs.get().performanceMode().subscribe(val -> {
-                root.pseudoClassStateChanged(PRETTY, !val);
-                root.pseudoClassStateChanged(PERFORMANCE, val);
-            });
+        AppPrefs.get().performanceMode().subscribe(pm -> {
+            var val = ref.get();
+            if (val != null) {
+                var scene = val.getScene();
+                if (scene != null) {
+                    var r = scene.getRoot();
+                    if (r != null) {
+                        r.pseudoClassStateChanged(PRETTY, !pm);
+                        r.pseudoClassStateChanged(PERFORMANCE, pm);
+                    }
+                }
+            }
         });
     }
 

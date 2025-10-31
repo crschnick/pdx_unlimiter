@@ -34,6 +34,7 @@ import atlantafx.base.controls.Spacer;
 import atlantafx.base.layout.InputGroup;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,9 +45,18 @@ public class GuiEditor {
         Stage stage = new Stage();
         var title = state.getFileName() + " - " + "Pdx-Unlimiter " + AppI18n.get("editor");
         stage.setTitle(title);
+
+        var ref = new WeakReference<>(stage);
         state.dirtyProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> stage.setTitle((n ? "*" : "") + title));
+            Platform.runLater(() -> {
+                var val = ref.get();
+                if (val != null) {
+                    val.setTitle((n ? "*" : "") + title);
+                }
+            });
         });
+
+
         var node = GuiEditor.create(state);
         // Disable focus on startup
         node.requestFocus();

@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import atlantafx.base.theme.Styles;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +23,7 @@ public class AppStyle {
     private static final Map<Path, String> STYLESHEET_CONTENTS = new LinkedHashMap<>();
     private static final Map<AppTheme.Theme, String> THEME_SPECIFIC_STYLESHEET_CONTENTS = new LinkedHashMap<>();
     private static final Map<AppTheme.Theme, String> THEME_PREFERENCES_STYLESHEET_CONTENTS = new LinkedHashMap<>();
-    private static final List<Scene> scenes = new ArrayList<>();
+    private static final WeakHashMap<Scene, Object> scenes = new WeakHashMap<>();
     private static String FONT_CONTENTS = null;
 
     public static void init() {
@@ -111,11 +112,11 @@ public class AppStyle {
 
     private static void changeFontUsage(boolean use) {
         if (!use) {
-            scenes.forEach(scene -> {
+            scenes.keySet().forEach(scene -> {
                 add(scene, FONT_CONTENTS);
             });
         } else {
-            scenes.forEach(scene -> {
+            scenes.keySet().forEach(scene -> {
                 scene.getStylesheets().remove(FONT_CONTENTS);
             });
         }
@@ -131,7 +132,7 @@ public class AppStyle {
             return;
         }
 
-        scenes.forEach(scene -> {
+        scenes.keySet().forEach(scene -> {
             scene.getStylesheets().remove(THEME_PREFERENCES_STYLESHEET_CONTENTS.get(t));
         });
         THEME_PREFERENCES_STYLESHEET_CONTENTS.clear();
@@ -139,13 +140,13 @@ public class AppStyle {
             THEME_PREFERENCES_STYLESHEET_CONTENTS.put(
                     theme, Styles.toDataURI(theme.getPlatformPreferencesStylesheet()));
         }
-        scenes.forEach(scene -> {
+        scenes.keySet().forEach(scene -> {
             add(scene, THEME_PREFERENCES_STYLESHEET_CONTENTS.get(t));
         });
     }
 
     private static void changeTheme(AppTheme.Theme theme) {
-        scenes.forEach(scene -> {
+        scenes.keySet().forEach(scene -> {
             scene.getStylesheets().removeAll(THEME_SPECIFIC_STYLESHEET_CONTENTS.values());
             scene.getStylesheets().removeAll(THEME_PREFERENCES_STYLESHEET_CONTENTS.values());
             add(scene, THEME_SPECIFIC_STYLESHEET_CONTENTS.get(theme));
@@ -181,6 +182,6 @@ public class AppStyle {
         }
         TrackEvent.debug("Added stylesheets for scene");
 
-        scenes.add(scene);
+        scenes.put(scene, null);
     }
 }
