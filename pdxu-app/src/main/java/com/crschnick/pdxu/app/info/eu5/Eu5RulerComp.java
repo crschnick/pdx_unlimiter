@@ -45,7 +45,7 @@ public class Eu5RulerComp extends SavegameInfoComp {
     }
 
     private static Region createRulerStatsNode(Ruler ruler) {
-        return createPowersNode(ruler.adm(), ruler.dip(), ruler.mil());
+        return createPowersNode((int) ruler.adm(), (int) ruler.dip(), (int) ruler.mil());
     }
 
     private static Region createPowersNode(int admP, int dipP, int milP) {
@@ -95,7 +95,7 @@ public class Eu5RulerComp extends SavegameInfoComp {
         return box;
     }
 
-    public static record Ruler(String firstName, String nickname, int adm, int dip, int mil) {
+    public static record Ruler(String firstName, String nickname, double adm, double dip, double mil) {
 
         public static Optional<Ruler> fromCountryNode(String key, Node root, Node n) {
             var rulerIdPointer = NodePointer.builder().name("government").name(key).build();
@@ -108,9 +108,9 @@ public class Eu5RulerComp extends SavegameInfoComp {
                 return Optional.empty();
             }
 
-            var adm = rulerNode.getNodeForKey("adm").getInteger();
-            var dip = rulerNode.getNodeForKey("dip").getInteger();
-            var mil = rulerNode.getNodeForKey("mil").getInteger();
+            var adm = rulerNode.getNodeForKey("adm").getDouble();
+            var dip = rulerNode.getNodeForKey("dip").getDouble();
+            var mil = rulerNode.getNodeForKey("mil").getDouble();
 
             var name = rulerNode.getNodeForKey("first_name").getString();
             var nickname = rulerNode.getNodeForKeyIfExistent("nickname").map(Node::getString).orElse(null);

@@ -6,18 +6,19 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.VersionComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu5.Eu5Tag;
-import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 
 public class Eu5SavegameInfo extends SavegameInfo<Eu5Tag> {
 
     Eu5RulerComp ruler;
     Eu5HeirComp heir;
+    Eu5IronmanComp ironman;
     Eu5DucatsComp ducats;
     Eu5StabilityComp stability;
     Eu5PopulationComp population;
     Eu5LegitimacyComp legitimacy;
     Eu5PrestigeComp prestige;
     Eu5ManpowerComp manpower;
+    Eu5AlliesMultiComp allies;
     Eu5WarMultiComp wars;
     ModComp mods;
     VersionComp version;

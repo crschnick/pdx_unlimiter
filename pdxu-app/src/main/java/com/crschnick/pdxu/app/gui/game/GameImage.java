@@ -433,7 +433,7 @@ public class GameImage {
 
 
         EU5_ICON_VASSAL = ImageHelper.loadImage(i.resolve("icon_vassal.dds"));
-        EU5_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("icon_alliance.dds"));
+        EU5_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("diplomatic_status", "alliance.dds"));
         EU5_ICON_TRIBUTARY = ImageHelper.loadImage(i.resolve("subject_tributary_icon.dds"));
         EU5_ICON_MARCH = ImageHelper.loadImage(i.resolve("icon_march.dds"));
         EU5_ICON_TRUCE = ImageHelper.loadImage(i.resolve("icon_truce.dds"));
@@ -441,7 +441,7 @@ public class GameImage {
         EU5_ICON_GUARANTEE = ImageHelper.loadImage(i.resolve("icon_diplomacy_guaranting.dds"));
         EU5_ICON_WAR = ImageHelper.loadImage(i.resolve("map_modes", "war.dds"));
         EU5_ICON_VERSION_WARNING = ImageHelper.loadImage(i.resolve("incompatible_warning_icon.dds"));
-        EU5_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        EU5_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("flat_icons", "ironman_flat.dds"));
         EU5_ICON_RULER = ImageHelper.loadImage(i.resolve("character_roles", "ruler.dds"));
         EU5_ICON_HEIR = ImageHelper.loadImage(i.resolve("character_roles", "heir.dds"));
         EU5_ICON_ADM = ImageHelper.loadImage(i.resolve("modifier_types", "adm.dds"));

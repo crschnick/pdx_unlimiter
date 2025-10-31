@@ -10,6 +10,10 @@
     -fx-spacing: 5;
 }
 
+.eu5 .alliance {
+    -fx-padding: 0;
+}
+
 .eu5 .war {
     -fx-padding: 0;
 }

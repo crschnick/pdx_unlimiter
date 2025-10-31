@@ -14,6 +14,10 @@
     -fx-border-color: -color-border-default;
 }
 
+.editor-grid .even {
+    -fx-background-color: -color-bg-muted;
+}
+
 .editor-grid .odd {
   -fx-background-color: -color-bg-subtle;
 }

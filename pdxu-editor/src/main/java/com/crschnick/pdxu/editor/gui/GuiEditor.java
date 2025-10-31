@@ -152,6 +152,8 @@ public class GuiEditor {
         s.getStyleClass().add("pane");
         if (row % 2 != 0) {
             s.getStyleClass().add("odd");
+        } else {
+            s.getStyleClass().add("even");
         }
         s.setAlignment(Pos.CENTER);
         if (child != null) {
