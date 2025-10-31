@@ -339,53 +339,40 @@ public abstract class CoatOfArmsRenderer {
         emblem.getInstances().stream()
                 .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
                 .forEach(instance -> {
-                    var cRotWidth = img.getWidth();
-                    var cRotHeight = img.getHeight();
-                    var flippedRotation = (instance.getRotation() > 45 && instance.getRotation() < 135)
-                            || (instance.getRotation() > 225 && instance.getRotation() < 315)
-                            || (instance.getRotation() > -135 && instance.getRotation() < -45)
-                            || (instance.getRotation() > -315 && instance.getRotation() < -225);
-                    if (flippedRotation) {
-                        cRotWidth = img.getHeight();
-                        cRotHeight = img.getWidth();
-                    }
 
-                    var scaleX = ((double) width / cRotWidth) * instance.getScaleX() * sub.getScaleX();
-                    var scaleY = ((double) height / cRotHeight) * instance.getScaleY() * sub.getScaleY();
-
-                    if (emblem.getFile().equals("ce_sword_in_bend_long.dds") && (instance.getRotation() == 10.0 || instance.getRotation() == -10.0)) {
-                        scaleX *= 0.91;
-                        scaleY *= 0.91;
-                    }
-
-                    if (emblem.getFile().equals("ce_bend_crancelin_saxony.dds") && instance.getRotation() == 2.5) {
-                        scaleX *= 1.03;
-                        scaleY *= 1.03;
-                    }
-
-                    if (emblem.getFile().equals("ce_bend_crancelin_saxony.dds") && instance.getRotation() == 10.0) {
-                        scaleX *= 0.982;
-                        scaleY *= 0.982;
-                    }
+                    var scaleX = ((double) width / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
+                    var scaleY = ((double) height / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
 
                     var x = width * (sub.getX() + (sub.getScaleX() * instance.getX()));
                     var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
 
                     AffineTransform trans = new AffineTransform();
+                    // when doing multiple transformations, they happen in reverse order, so this translate happens last and moves the emblem to its final position
                     trans.translate(x, y);
 
-                    if (flippedRotation) {
-                        trans.scale(scaleX, scaleY);
-                    }
+                    // restore original aspect ratio
+                    trans.scale(((double)img.getWidth()) / ((double)img.getHeight()), 1.0);
+
+                    // Resize
+                    trans.scale(Math.abs(scaleX), Math.abs(scaleY));
 
                     if (instance.getRotation() != 0) {
                         double angle = Math.toRadians(instance.getRotation());
                         trans.rotate(angle);
                     }
 
-                    if (!flippedRotation) {
-                        trans.scale(scaleX, scaleY);
+                    // flip images with negative scale
+                    if(instance.getScaleX() < 0) {
+                        trans.scale(-1.0, 1.0);
                     }
+                    if(instance.getScaleY() < 0) {
+                        trans.scale(1.0, -1.0);
+                     }
+
+                    // scale image to make it square, because the game operates on [-1,1] and [0,1] coordinates
+                    trans.scale(((double)img.getHeight()) / ((double)img.getWidth()), 1.0);
+
+                    // move image so that 0,0 is in the center
                     trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 
                     try {
