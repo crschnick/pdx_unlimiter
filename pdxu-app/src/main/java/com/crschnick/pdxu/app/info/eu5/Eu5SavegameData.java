@@ -57,6 +57,7 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
         name = content.get().getNodeForKeys("metadata").hasKey("player_country_name") ?
                 content.get().getNodeForKey("metadata").getNodeForKey("player_country_name").getString() :
                 content.get().getNodeForKey("metadata").getNodeForKey("playthrough_name").getString();
+        ironman = content.get().getNodeForKeysIfExistent("metadata", "ironman").map(Node::getBoolean).orElse(false);
         initVersion(content.get());
     }
 

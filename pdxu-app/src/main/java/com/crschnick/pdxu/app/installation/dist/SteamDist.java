@@ -235,7 +235,7 @@ public class SteamDist extends GameDist {
 
     @Override
     public boolean supportsLauncher() {
-        return true;
+        return dist.supportsLauncher();
     }
 
     @Override
