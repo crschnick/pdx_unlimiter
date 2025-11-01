@@ -57,7 +57,21 @@ public class Ck3Tag {
         return tags.stream().filter(t -> t.id == id).findFirst();
     }
 
-    public static Optional<Ck3Tag> getPlayerTag(Node n, List<Ck3Tag> allTags) {
+    public static Map<Long, Node> createCoaMap(Node root) {
+        var node = root.getNodeForKey("coat_of_arms").getNodeForKey("coat_of_arms_manager_database");
+
+        Map<Long, Node> map = new HashMap<>();
+        if (node == null) {
+            return map;
+        }
+
+        node.forEach((k, v) -> {
+            map.put(Long.parseLong(k), v);
+        });
+        return map;
+    }
+
+    public static Optional<Ck3Tag> getPlayerTag(Node n, List<Ck3Tag> allTags, Map<Long, Node> coaMap) {
         // Observer check
         if (!n.hasKey("currently_played_characters")) {
             return Optional.empty();
@@ -87,8 +101,6 @@ public class Ck3Tag {
                         .getString()),
                 CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null));
         var person = Ck3Person.fromNode(personNode, house);
-        var coaMap =
-                CoatOfArms.createCoaMap(n.getNodeForKey("coat_of_arms").getNodeForKey("coat_of_arms_manager_database"));
         var titles = Ck3Title.createTitleMap(n, coaMap);
 
         var tagTitles = new ArrayList<Ck3Title>();
@@ -136,8 +148,7 @@ public class Ck3Tag {
         return Optional.of(tag);
     }
 
-    public static List<Ck3Tag> fromNode(Node n) {
-        var coaMap = CoatOfArms.createCoaMap(n.getNodeForKeys("coat_of_arms", "coat_of_arms_manager_database"));
+    public static List<Ck3Tag> fromNode(Node n, Map<Long, Node> coaMap) {
         Map<Long, Ck3Title> titleIds = Ck3Title.createTitleMap(n, coaMap);
 
         var living = n.getNodeForKey("living");

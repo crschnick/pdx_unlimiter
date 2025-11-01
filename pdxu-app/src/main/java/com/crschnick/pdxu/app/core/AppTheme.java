@@ -54,23 +54,16 @@ public class AppTheme {
             return;
         }
 
-        var root = stage.getScene().getRoot();
-        if (root != null) {
-            root.pseudoClassStateChanged(
-                    PseudoClass.getPseudoClass(OsType.ofLocal().getId()), true);
-        }
-
         if (AppPrefs.get() == null) {
-            if (root != null) {
-                var def = Theme.getDefaultLightTheme();
-                root.pseudoClassStateChanged(PseudoClass.getPseudoClass(def.getCssId()), true);
-                root.pseudoClassStateChanged(LIGHT, true);
-                root.pseudoClassStateChanged(DARK, false);
-                root.pseudoClassStateChanged(PRETTY, true);
-                root.pseudoClassStateChanged(PERFORMANCE, false);
-            }
+            var root = stage.getScene().getRoot();
+            applyClasses(root, Theme.getDefaultLightTheme(), false);
             return;
         }
+
+        stage.getScene().rootProperty().subscribe(parent -> {
+            applyClasses(parent, AppPrefs.get().theme().getValue(), AppPrefs.get().performanceMode().getValue());
+        });
+
 
         // Allow for GC
         var ref = new WeakReference<>(stage);
@@ -81,18 +74,7 @@ public class AppTheme {
                 var scene = val.getScene();
                 if (scene != null) {
                     var r = scene.getRoot();
-                    if (r != null) {
-                        Theme.ALL.forEach(theme -> {
-                            r.pseudoClassStateChanged(
-                                    PseudoClass.getPseudoClass(theme.getCssId()),
-                                    theme.getCssId().equals(t.getCssId()));
-                        });
-
-                        if (t != null) {
-                            r.pseudoClassStateChanged(LIGHT, !t.isDark());
-                            r.pseudoClassStateChanged(DARK, t.isDark());
-                        }
-                    }
+                    applyClasses(r, t, AppPrefs.get().performanceMode().get());
                 }
             }
         });
@@ -103,13 +85,33 @@ public class AppTheme {
                 var scene = val.getScene();
                 if (scene != null) {
                     var r = scene.getRoot();
-                    if (r != null) {
-                        r.pseudoClassStateChanged(PRETTY, !pm);
-                        r.pseudoClassStateChanged(PERFORMANCE, pm);
-                    }
+                    applyClasses(r, AppPrefs.get().theme().getValue(), pm);
                 }
             }
         });
+    }
+
+    private static void applyClasses(Node r, Theme t, boolean perf) {
+        if (r == null) {
+            return;
+        }
+
+        r.pseudoClassStateChanged(
+                PseudoClass.getPseudoClass(OsType.ofLocal().getId()), true);
+
+        Theme.ALL.forEach(theme -> {
+            r.pseudoClassStateChanged(
+                    PseudoClass.getPseudoClass(theme.getCssId()),
+                    theme.getCssId().equals(t.getCssId()));
+        });
+
+        if (t != null) {
+            r.pseudoClassStateChanged(LIGHT, !t.isDark());
+            r.pseudoClassStateChanged(DARK, t.isDark());
+        }
+
+        r.pseudoClassStateChanged(PRETTY, !perf);
+        r.pseudoClassStateChanged(PERFORMANCE, perf);
     }
 
     public static void init() {

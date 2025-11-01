@@ -46,8 +46,9 @@ public class Ck3SavegameData extends SavegameData<Ck3Tag> {
         ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
         date = GameDateType.CK3.fromString(content.get().getNodeForKey("date").getString());
 
-        allTags = Ck3Tag.fromNode(content.get());
-        tag = Ck3Tag.getPlayerTag(content.get(), allTags).orElse(null);
+        var coaMap = Ck3Tag.createCoaMap(content.get());
+        allTags = Ck3Tag.fromNode(content.get(), coaMap);
+        tag = Ck3Tag.getPlayerTag(content.get(), allTags, coaMap).orElse(null);
         observer = tag == null;
 
         mods = content

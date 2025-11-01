@@ -42,7 +42,8 @@ public class Eu5GuiFactory extends GameGuiFactory<Eu5Tag, Eu5SavegameInfo> {
 
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Eu5Tag> info) {
-        Color color = ColorHelper.withAlpha(ColorHelper.fromGameColor(info.getData().eu5().getTag().getColor()), 0.33);
+        var tagColor = info.getData().getTag() != null ? ColorHelper.fromGameColor(info.getData().eu5().getTag().getColor()) : Color.BEIGE;
+        Color color = ColorHelper.withAlpha(tagColor, 0.33);
         return new Background(new BackgroundFill(
                 color, new CornerRadii(4, 4, 0, 0, false), Insets.EMPTY));
     }

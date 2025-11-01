@@ -24,7 +24,6 @@ public class Emblem {
     static Emblem fromTexturedEmblemNode(Node n) {
         Emblem c = new Emblem();
         c.file = n.getNodeForKeyIfExistent("texture").map(Node::getString).orElse(null);
-int a = 0;
         c.colors = null;
 
         n.getNodeForKeyIfExistent("mask")

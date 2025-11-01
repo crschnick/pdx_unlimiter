@@ -24,7 +24,7 @@ public class Ck3Title {
         this.type = type;
     }
 
-    public static Map<Long, Ck3Title> createTitleMap(Node node, Map<Long, CoatOfArms> coaMap) {
+    public static Map<Long, Ck3Title> createTitleMap(Node node, Map<Long, Node> coaMap) {
         var tts = node.getNodeForKey("landed_titles").getNodeForKey("landed_titles");
         var map = new HashMap<Long, Ck3Title>();
         tts.forEach((k, v) -> {
@@ -39,7 +39,7 @@ public class Ck3Title {
         return map;
     }
 
-    private static Optional<Ck3Title> fromNode(long id, Node n, Map<Long, CoatOfArms> coaMap) {
+    private static Optional<Ck3Title> fromNode(long id, Node n, Map<Long, Node> coaMap) {
         // If node is "none"
         if (n.isValue()) {
             return Optional.empty();
@@ -61,7 +61,7 @@ public class Ck3Title {
         CoatOfArms coatOfArms;
         if (n.hasKey("coat_of_arms_id")) {
             var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
-            coatOfArms = coaMap.get(coaId);
+            coatOfArms = CoatOfArms.fromNode(coaMap.get(coaId), null);
         } else {
             coatOfArms = CoatOfArms.empty();
         }

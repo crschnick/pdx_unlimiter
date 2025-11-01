@@ -38,12 +38,12 @@ public class VersionComp extends SavegameInfoComp {
                 label.getStyleClass().add(CLASS_COMPATIBLE);
             }
             case INCOMPATIBLE -> {
-                label = new Label("v" + version.toString() + "!");
+                label = new Label("v" + version.toString() + " (!)");
                 GuiTooltips.install(label, AppI18n.get("incompatible"));
                 label.getStyleClass().add(CLASS_INCOMPATIBLE);
             }
             case UNKNOWN -> {
-                label = new Label("v" + version.toString() + "?");
+                label = new Label("v" + version.toString() + " (?)");
                 GuiTooltips.install(label, AppI18n.get("unknownCompatibility"));
                 label.getStyleClass().add("unknown-compatible");
             }

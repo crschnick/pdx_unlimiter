@@ -22,19 +22,6 @@ public final class CoatOfArms {
         return new CoatOfArms(List.of(Sub.empty()));
     }
 
-    public static Map<Long, CoatOfArms> createCoaMap(Node node) {
-        Map<Long, CoatOfArms> map = new HashMap<>();
-        if (node == null) {
-            return map;
-        }
-
-        node.forEach((k, v) -> {
-            var coa = fromNode(v, null);
-            map.put(Long.parseLong(k), coa);
-        });
-        return map;
-    }
-
     public static CoatOfArms fromNode(Node n, Function<String, Node> parentResolver) {
         List<Sub> subs = new ArrayList<>();
         subs.addAll(Sub.fromNode(n, parentResolver));
