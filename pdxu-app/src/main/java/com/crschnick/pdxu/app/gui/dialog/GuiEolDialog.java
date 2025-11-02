@@ -78,7 +78,8 @@ public class GuiEolDialog {
             installB.setOnAction(e -> {
                 try {
                     var exec = Path.of(System.getenv("LOCALAPPDATA"), "Pdx-Unlimiter", "pdx-unlimiter.exe");
-                    var url = "https://github.com/crschnick/pdx_unlimiter/releases/download/3.0.5/pdx-unlimiter-installer-windows-x86_64.msi";//"https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx-unlimiter-installer-windows-x86_64.msi";
+                    var url = "https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx-unlimiter-installer-windows-x86_64.msi";
+                    //"https://github.com/crschnick/pdx_unlimiter/releases/download/3.0.5/pdx-unlimiter-installer-windows-x86_64.msi";
                     var pb = new ProcessBuilder("cmd", "/c", "set MSIFASTINSTALL=7&set DISABLEROLLBACK=1&start \"\" /wait msiexec /qb /i " + url + "&start \"\" \"" + exec + "\"");
                     pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
                     pb.redirectError(ProcessBuilder.Redirect.DISCARD);
