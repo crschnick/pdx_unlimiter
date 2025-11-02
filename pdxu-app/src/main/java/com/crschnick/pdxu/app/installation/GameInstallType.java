@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
@@ -417,6 +418,15 @@ public interface GameInstallType {
     GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.MACOS ? "ck2" : "CK2game") {
 
         @Override
+        public Path determineUserDir(Path p, String name) throws IOException {
+            if (OsType.ofLocal() == OsType.MACOS) {
+                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Crusader Kings II");
+            } else {
+                return super.determineUserDir(p, name);
+            }
+        }
+
+        @Override
         public Path getLocalisationsDirectory() {
             return Path.of("localisation");
         }
@@ -551,9 +561,11 @@ public interface GameInstallType {
                 }
             }
 
-            return FileSystemHelper.getUserDocumentsPath()
-                    .resolve("Paradox Interactive")
-                    .resolve("Victoria II");
+            if (OsType.ofLocal() == OsType.MACOS) {
+                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Victoria II");
+            } else {
+                return super.determineUserDir(p, name);
+            }
         }
 
         @Override
