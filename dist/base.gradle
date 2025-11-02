@@ -228,7 +228,7 @@ if (os.isWindows()) {
 
     tasks.register('notarize', Exec) {
         mustRunAfter trainAot
-        commandLine "$projectDir/mac_app/notarize_app.sh", "$projectDir", arch.toString(), productName, jpackageExecutableName
+        commandLine "$projectDir/mac_app/notarize_app.sh", "$projectDir", arch.toString(), productName
     }
 
     def certName = System.getenv("MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME");
