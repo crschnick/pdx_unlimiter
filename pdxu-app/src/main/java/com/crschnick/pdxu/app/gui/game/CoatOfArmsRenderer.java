@@ -126,7 +126,7 @@ public abstract class CoatOfArmsRenderer {
         Graphics2D g = (Graphics2D) i.getGraphics();
         g.setBackground(ColorHelper.toAwtColor(getMissingReplacementColor()));
         g.clearRect(0, 0, width, height);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
         for (var sub : coa.getSubs()) {
             var rawPatternImg = pattern(g, sub, ctx, width, height);
@@ -376,7 +376,7 @@ public abstract class CoatOfArmsRenderer {
                     trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);
 
                     try {
-                        var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BILINEAR);
+                        var op = new AffineTransformOp(trans, AffineTransformOp.TYPE_BICUBIC);
                         if (!hasMask) {
                             applySubClip(usedGraphics, sub, width, height);
                         }

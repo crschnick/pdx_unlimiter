@@ -89,7 +89,7 @@ public class Ck3TagRenderer {
         double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         CoatOfArmsRenderer.CK3.renderImage(
                 g,
                 realmImg,
@@ -121,7 +121,7 @@ public class Ck3TagRenderer {
 
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
         double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
         CoatOfArmsRenderer.CK3.renderImage(
@@ -149,7 +149,7 @@ public class Ck3TagRenderer {
 
         BufferedImage i = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) i.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
         double scaleFactor = (double) size / CoatOfArmsRenderer.REF_IMG_SIZE;
         CoatOfArmsRenderer.CK3.renderImage(
