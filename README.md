@@ -1,15 +1,19 @@
 <h1 align="center">
-  <a href="https://discord.gg/BVE4vxqFpU"><img alt="Discord" src="https://img.shields.io/discord/786465137191682088?logo=discord&logoColor=white"></a> <a href="https://github.com/crschnick/pdx_unlimiter/actions/workflows/gradle.yml"><img alt="CI" src="https://github.com/crschnick/pdx_unlimiter/actions/workflows/build.yml/badge.svg"></a>
+  <img width=60 height=60 src="misc/pdxu.png">
+  <div>Pdx-Unlimiter</div>
 </h1>
 
-![Logo](misc/pdxu.png)
+<div align="center">
+  <a href="https://discord.gg/BVE4vxqFpU"><img alt="Discord" src="https://img.shields.io/discord/786465137191682088?logo=discord&logoColor=white"></a> <a href="https://github.com/crschnick/pdx_unlimiter/actions/workflows/gradle.yml"><img alt="CI" src="https://github.com/crschnick/pdx_unlimiter/actions/workflows/build.yml/badge.svg"></a>
+</div>
 
 The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a
 powerful and smart savegame manager to quickly organize and play all of your savegames with ease.
 Furthermore, it also comes with an Ironman converter,
-a powerful savegame editor, some savescumming tools, integrations for various other
+a savegame editor, some savescumming tools, integrations for various other
 great community-made tools, and full support for the following games:
 
+* Europa Universalis V
 * Victoria III
 * Europa Universalis IV
 * Crusader Kings III
@@ -18,45 +22,59 @@ great community-made tools, and full support for the following games:
 * Crusader Kings II
 * Victoria II
 
+## Downloads
 
-# Download
+### Windows
 
-### v3 beta
+Installers are the easiest way to get started:
 
-The Pdx-Unlimiter got a complete rework in version 3.0 with an improved UI. On the technical side, it is a completely new desktop application. On the game/save logic side, it stayed the same, meaning that all game integrations should work as before.
+- [Windows .msi Installer (x86-64)](../../releases/latest/download/kickstartfx-installer-windows-x86_64.msi)
 
-Right now, v3 is still in beta, meaning that it is not published as a full release yet. You can install it manually by downloading it from the GitHub page:
+If you don't like installers, you can also use a portable version that is packaged as an archive:
 
-https://github.com/crschnick/pdx_unlimiter/releases
+- [Windows .zip Portable (x86-64)](../../releases/latest/download/kickstartfx-portable-windows-x86_64.zip)
 
-If you are looking for the stable v2 builds, see below.
+### macOS
 
-### Installers
+Installers are the easiest way to get started:
 
-Installers are the easiest way to get started.
-They set up everything automatically and also come with an automatic update feature,
-which you can also disable in the settings if you want.
+- [MacOS .pkg Installer (x86-64)](../../releases/latest/download/kickstartfx-installer-macos-x86_64.pkg)
+- [MacOS .pkg Installer (ARM 64)](../../releases/latest/download/kickstartfx-installer-macos-arm64.pkg)
 
-- [Windows Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-windows.msi)
-- [Linux .deb Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.deb)
-- [Linux .rpm Installer](https://github.com/crschnick/pdxu_launcher/releases/latest/download/pdxu_installer-linux.rpm)
-- [Linux AUR package](https://aur.archlinux.org/packages/pdx-unlimiter)
+If you don't like installers, you can also use a portable version that is packaged as an archive:
 
-### Standalone
+- [MacOS .dmg Portable (x86-64)](../../releases/latest/download/kickstartfx-portable-macos-x86_64.dmg)
+- [MacOS .dmg Portable (ARM 64)](../../releases/latest/download/kickstartfx-portable-macos-arm64.dmg)
 
-If you don't like installers, you can also use a standalone version, which is packaged in a .zip archive.
-This version does not come with an update functionality, so you have to manually download new releases if you want to update.
+### Linux
 
-- [Windows standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-windows.zip)
-- [Linux standalone](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-linux.zip)
-- [Mac standalone (Intel)](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-macos-x86_64.dmg)
-- [Mac standalone (Silicon)](https://github.com/crschnick/pdx_unlimiter/releases/latest/download/pdx_unlimiter-macos-arm64.dmg)
+#### Debian-based distros
 
-Note that if you utilize any accessibility software, you should use the standalone version.
+The following debian installers are available:
 
+- [Linux .deb Installer (x86-64)](../../releases/latest/download/kickstartfx-installer-linux-x86_64.deb)
 
+Note that you should use apt to install the package with `sudo apt install <file>` as other package managers, for example dpkg,
+are not able to resolve and install any dependency packages.
 
-# Features
+#### RHEL-based distros
+
+The following rpm installers are available:
+
+- [Linux .rpm Installer (x86-64)](../../releases/latest/download/kickstartfx-installer-linux-x86_64.rpm)
+
+The same applies here, you should use a package manager that supports resolving and installing required dependencies if needed.
+
+#### Portable
+
+In case you prefer to use an archive version that you can extract anywhere, you can use these:
+
+- [Linux .tar.gz Portable (x86-64)](../../releases/latest/download/kickstartfx-portable-linux-x86_64.tar.gz)
+
+Note that the portable version assumes that you have some basic packages for graphical systems already installed
+as it is not a perfect standalone version. It should however run on most systems.
+
+## Features
 
 The main components of the Pdx-Unlimiter are:
 - [Savegame manager](#savegame-manager)
@@ -68,13 +86,9 @@ The main components of the Pdx-Unlimiter are:
 
 If you want to know how to use a certain feature, you can
 read about it in the [Pdx-Unlimiter Guide](https://github.com/crschnick/pdx_unlimiter/wiki/User-Guide).
-There is also a short [FAQ page](https://github.com/crschnick/pdx_unlimiter/wiki/Frequenly-Asked-Questions)
-to answer some of your questions.
 If you like videos, there's now also a [tutorial video on YouTube](https://www.youtube.com/watch?v=i67Q2PxAnzQ).
 
-
-
-## Savegame manager
+### Savegame manager
 
 Since keeping track of all your savegames is getting more complicated
 with every new savegame you start or backup you revert to,
@@ -93,7 +107,7 @@ without having to visit the Paradox Launcher or main menu.
 
 
 
-## Smart launcher
+### Smart launcher
 
 The problem of playing modded savegames it that you always need to enable the right mods in the Paradox Launcher.
 It can become tedious to always keep track of which mods are required by which savegame.
@@ -115,13 +129,10 @@ Skipping the main menu also saves a lot of time when loading a savegame.
 
 
 
-## Savegame editor
+### Savegame editor
 
-The Pdx-Unlimiter also comes with a savegame editor,
+The Pdx-Unlimiter comes with a savegame editor,
 which can also be used as a savegame navigator to quickly find certain entries in a savegame.
-With this editor you can edit any file that is saved in a Paradox text format.
-This includes EU4 and CK3 non-ironman savegames, all Stellaris savegames, and
-any game data files for mods and other purposes.
 You can use the included [Ironman converter](#ironman-converter) to also edit converted Ironman savegames.
 
 ![Editor](misc/editor.png)
@@ -144,14 +155,11 @@ Using the Pdx-Unlimiter editor has the following benefits:
 - You can easily navigate the hierarchical data with filters compared to the
   laborious process of locating a specific entry with a text editor search function
   
-- The editor can visualize certain data entries and provide more context.
-  The most prominent example would be the coat of arms preview for CK3 savegames
-
 **Usage guide:** [Editing savegames](https://github.com/crschnick/pdx_unlimiter/wiki/Editor-Guide)
 
 
 
-## Ironman converter
+### Ironman converter
 
 Internally, the Pdx-Unlimiter uses the [pdx.tools](https://pdx.tools/) melter to convert
 any ironman savegame into a text-based, non-ironman savegame.
@@ -169,7 +177,7 @@ Moreover, you can also use the in-game console when playing converted savegames.
 
 
 
-## Savescumming tools
+### Savescumming tools
 
 The Pdx-Unlimiter allows you to create savegame checkpoints using the GUI or keyboard shortcuts
 while being ingame.
@@ -186,7 +194,7 @@ This feature also allows you to easily savescum, which is kinda necessary for ha
 
 
 
-## Tool integration
+### Tool integrations
 
 The Pdx-Unlimiter is also built as an application that gives you easy access to many
 other great community-made tools.
@@ -204,7 +212,7 @@ The supported tools are:
 
 
 
-# Community and Support
+## Community and Support
 
 If you have suggestions, need help, ran into any issues or just want to talk to other friendly people,
 you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
@@ -213,6 +221,6 @@ you can join the [Pdx-Unlimiter Discord](https://discord.gg/BVE4vxqFpU).
 
 
 
-# Contributing
+## Contributing
 
 See [CONTRIBUTING.md](/CONTRIBUTING.md).

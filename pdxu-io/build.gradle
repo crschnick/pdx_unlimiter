@@ -6,5 +6,5 @@ apply from: "$rootDir/gradle/gradle_scripts/java.gradle"
 apply from: "$rootDir/gradle/gradle_scripts/lombok.gradle"
 
 dependencies {
-    compileOnly 'org.graalvm.polyglot:polyglot:25.0.0'
+    compileOnly 'org.graalvm.polyglot:polyglot:25.0.1'
 }

@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.AppTray;
 import com.crschnick.pdxu.app.issue.*;
 import com.crschnick.pdxu.app.platform.PlatformInit;
 import com.crschnick.pdxu.app.platform.PlatformThread;
+import com.crschnick.pdxu.app.util.OsType;
 
 import java.awt.*;
 
@@ -11,7 +12,7 @@ public class AppTrayMode extends AppOperationMode {
 
     @Override
     public boolean isSupported() {
-        return SystemTray.isSupported();
+        return OsType.ofLocal() == OsType.WINDOWS && SystemTray.isSupported();
     }
 
     @Override

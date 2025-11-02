@@ -85,14 +85,13 @@ public class AppBaseMode extends AppOperationMode {
 
         AppMainWindow.initContent();
 
-        GuiNoGamesDialog.showIfNeeded();
-
         TrackEvent.info("Waiting for startup dialogs to close");
         AppDialog.waitForAllDialogsClose();
 
         GuiWelcomeDialog.showAndWaitIfNeeded();
         AppConfigurationDialog.showIfNeeded();
         AppLegacyInstallDialog.showIfNeeded();
+        GuiNoGamesDialog.showIfNeeded();
 
         TrackEvent.info("Finished base components initialization");
         initialized = true;
