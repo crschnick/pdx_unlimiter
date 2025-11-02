@@ -14,11 +14,13 @@ import com.crschnick.pdxu.app.installation.dist.WindowsStoreDist;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 
+import com.crschnick.pdxu.app.util.OsType;
 import javafx.beans.property.*;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 
 import atlantafx.base.theme.Styles;
+import javafx.stage.FileChooser;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
@@ -74,13 +76,26 @@ public class GameDistChoiceComp extends SimpleComp {
         });
 
         var browse = new IconButtonComp("mdi2f-folder-open-outline", () -> {
-            DirectoryChooser dirChooser = new DirectoryChooser();
-            if (setDist.get() != null && Files.exists(setDist.get().getInstallLocation())) {
-                dirChooser.setInitialDirectory(
-                        setDist.get().getInstallLocation().toFile());
+            File file;
+            // macOS apps are technically files in the chooser
+            if (OsType.ofLocal() == OsType.MACOS) {
+                FileChooser dirChooser = new FileChooser();
+                if (setDist.get() != null && Files.exists(setDist.get().getInstallLocation())) {
+                    dirChooser.setInitialDirectory(
+                            setDist.get().getInstallLocation().toFile());
+                }
+                dirChooser.setTitle(AppI18n.get("selectDir", AppI18n.get(nameKey)));
+                file = dirChooser.showOpenDialog(AppMainWindow.get().getStage());
+            } else {
+                DirectoryChooser dirChooser = new DirectoryChooser();
+                if (setDist.get() != null && Files.exists(setDist.get().getInstallLocation())) {
+                    dirChooser.setInitialDirectory(
+                            setDist.get().getInstallLocation().toFile());
+                }
+                dirChooser.setTitle(AppI18n.get("selectDir", AppI18n.get(nameKey)));
+                file = dirChooser.showDialog(AppMainWindow.get().getStage());
             }
-            dirChooser.setTitle(AppI18n.get("selectDir", AppI18n.get(nameKey)));
-            File file = dirChooser.showDialog(AppMainWindow.get().getStage());
+
             if (file != null && file.exists()) {
                 var path = file.toPath();
                 // Ugly hack for newer installations

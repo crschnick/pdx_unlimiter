@@ -4,6 +4,8 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.util.FailableSupplier;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 
+import java.io.IOException;
+
 public interface ErrorAction {
 
     static ErrorAction openDocumentation(String link) {
@@ -59,7 +61,9 @@ public interface ErrorAction {
                 return true;
             }
 
-            SentryErrorHandler.getInstance().handle(event);
+            if (!(event.getThrowable() instanceof IOException) || event.isShouldSendDiagnostics()) {
+                SentryErrorHandler.getInstance().handle(event);
+            }
             return true;
         }
     }
