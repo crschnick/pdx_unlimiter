@@ -8,7 +8,7 @@ ARCHIVE="$TMPDIR/notarization.zip"
 find "$APP_DIR/Contents/runtime/Contents/Home/bin/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
 find "$APP_DIR/Contents/runtime/Contents/Home/lib/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
 find "$APP_DIR/Contents/runtime/Contents/MacOS" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
-find "$APP_DIR/Contents/MacOS/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
+find "$APP_DIR/Contents/MacOS/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --deep --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
 
 echo "Create keychain profile"
 xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_APP_SPECIFIC_PASSWORD"
