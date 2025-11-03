@@ -26,10 +26,13 @@ public class IronyHelper {
     }
 
     public static void launchEntry(Game game, boolean continueGame) throws IOException {
-
         var exe = AppPrefs.get().ironyDirectory().getValue().resolve("IronyModManager.exe");
         new ProcessBuilder(
                         "cmd", "/C", exe.toString(), "-g", game.getTranslatedAbbreviation(), continueGame ? "-r" : "")
                 .start();
+    }
+
+    public static boolean canLaunchIrony() {
+        return AppPrefs.get().ironyDirectory().getValue() != null;
     }
 }

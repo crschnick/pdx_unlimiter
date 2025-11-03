@@ -137,7 +137,7 @@ public final class AppPrefs {
             .valueClass(Path.class)
             .requiresRestart(true)
             .build());
-    final Property<Path> ironyDirectory = map(Mapping.builder()
+    final ObjectProperty<Path> ironyDirectory = map(Mapping.builder()
             .property(new SimpleObjectProperty<>(
                     IronyHelper.getIronyDefaultInstallPath().orElse(null)))
             .key("ironyDirectory")

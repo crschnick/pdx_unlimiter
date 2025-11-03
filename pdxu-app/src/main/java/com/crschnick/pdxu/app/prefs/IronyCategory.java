@@ -2,8 +2,10 @@ package com.crschnick.pdxu.app.prefs;
 
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.base.PathChoiceComp;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.OptionsBuilder;
+import javafx.beans.binding.Bindings;
 
 public class IronyCategory extends AppPrefsCategory {
 
@@ -25,7 +27,8 @@ public class IronyCategory extends AppPrefsCategory {
                         .pref(prefs.ironyDirectory)
                         .addComp(new PathChoiceComp(prefs.ironyDirectory, "ironyDirectory", true).maxWidth(600))
                         .pref(prefs.launchIrony)
-                        .addToggle(prefs.launchIrony));
+                        .addToggle(prefs.launchIrony)
+                        .hide(prefs.ironyDirectory.isNull()));
         return builder.buildComp();
     }
 }

@@ -20,7 +20,7 @@ public class GameDistLauncher {
 
     public static void startLauncher(Game game) {
         try {
-            if (AppPrefs.get().launchIrony().getValue()) {
+            if (AppPrefs.get().launchIrony().getValue() && IronyHelper.canLaunchIrony()) {
                 IronyHelper.launchEntry(game, false);
             } else {
                 GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
@@ -107,7 +107,7 @@ public class GameDistLauncher {
 
     private static void startLauncherDirectly(SavegameEntry<?, ?> e) throws IOException {
         var game = SavegameContext.getForSavegame(e);
-        if (AppPrefs.get().launchIrony().getValue()) {
+        if (AppPrefs.get().launchIrony().getValue() && IronyHelper.canLaunchIrony()) {
             IronyHelper.launchEntry(game, true);
         } else {
             if (!GameInstallation.ALL.get(game).getDist().supportsLauncher()) {
@@ -135,7 +135,7 @@ public class GameDistLauncher {
             return;
         }
 
-        if (AppPrefs.get().launchIrony().getValue()) {
+        if (AppPrefs.get().launchIrony().getValue() && IronyHelper.canLaunchIrony()) {
             IronyHelper.launchEntry(ctx.getGame(), true);
         } else {
             ctx.getInstallation().startDirectly(debug);
