@@ -54,7 +54,8 @@ public class RakalyHelper {
         int returnCode = proc.exitValue();
 
         if (returnCode != 0 && returnCode != 1) {
-            var errString = new String(err.get());
+            ThreadHelper.sleep(200);
+            var errString = new String(err.get() != null ? err.get() : new byte[0]);
             throw new IOException("Rakaly melter failed with exit code " + returnCode + ": " + errString);
         }
 

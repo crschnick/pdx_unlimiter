@@ -43,7 +43,7 @@ if (os.isWindows()) {
             var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
             if (signEnv != null && !signEnv.isEmpty()) {
                 execOps.exec {
-                    commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/rakaly_windows.exe"
+                    commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/rakaly.exe"
                     ignoreExitValue = !ci
                 }
             }
