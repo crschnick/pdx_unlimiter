@@ -22,14 +22,9 @@ public enum SupportedLocale implements PrefsChoiceValue {
     RUSSIAN(Locale.of("ru"), "ru"),
     JAPANESE(Locale.of("ja"), "ja"),
     CHINESE_SIMPLIFIED(Locale.SIMPLIFIED_CHINESE, "zh-Hans"),
-    CHINESE_TRADITIONAL(Locale.TRADITIONAL_CHINESE, "zh-Hant"),
-    DANISH(Locale.of("da"), "da"),
-    INDONESIAN(Locale.of("id"), "id"),
-    SWEDISH(Locale.of("sv"), "sv"),
     POLISH(Locale.of("pl"), "pl"),
     KOREAN(Locale.of("ko"), "ko"),
-    TURKISH(Locale.of("tr"), "tr"),
-    VIETNAMESE(Locale.of("vi"), "vi");
+    TURKISH(Locale.of("tr"), "tr");
 
     private final Locale locale;
     private final String id;

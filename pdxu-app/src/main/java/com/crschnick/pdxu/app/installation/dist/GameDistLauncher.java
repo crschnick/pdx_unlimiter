@@ -105,11 +105,6 @@ public class GameDistLauncher {
         ctx.getInstallation().getType().writeModAndDlcLoadFile(ctx.getInstallation(), mods, dlcs);
     }
 
-    public static boolean canChangeMods(Game game) {
-        return AppPrefs.get().launchIrony().getValue()
-                || GameInstallation.ALL.get(game).getDist().supportsLauncher();
-    }
-
     private static void startLauncherDirectly(SavegameEntry<?, ?> e) throws IOException {
         var game = SavegameContext.getForSavegame(e);
         if (AppPrefs.get().launchIrony().getValue()) {

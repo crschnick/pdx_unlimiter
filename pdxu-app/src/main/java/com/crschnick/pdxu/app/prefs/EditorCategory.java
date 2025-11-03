@@ -42,8 +42,6 @@ public class EditorCategory extends AppPrefsCategory {
                         .addComp(ChoiceComp.ofTranslatable(
                                         prefs.editorIndentation, Arrays.asList(EditorIndentation.values()), false)
                                 .maxWidth(600))
-                        .pref(prefs.editorWarnOnNodeTypeChange)
-                        .addToggle(prefs.editorWarnOnNodeTypeChange)
                         .pref(prefs.editorMaxTooltipLines)
                         .addComp(Comp.of(() -> {
                                     var field = new IntFieldComp(prefs.editorMaxTooltipLines)

@@ -97,7 +97,7 @@ public class GuiIncompatibleWarning {
 
     public static Optional<Boolean> showNoSavedModsWarning(Game game, List<GameMod> enabledMods) {
         var val = new SimpleObjectProperty<Boolean>();
-        var modal = ModalOverlay.of("modInfoTitle", Comp.of(() -> {
+        var modal = ModalOverlay.of(AppI18n.observable("modInfoTitle", game.getTranslatedFullName()), Comp.of(() -> {
             var header = AppI18n.get("modInfo", game.getTranslatedFullName());
             String builder = enabledMods.stream()
                     .map(m -> "- "
@@ -110,7 +110,7 @@ public class GuiIncompatibleWarning {
             text.setPrefHeight(200);
             text.setEditable(false);
             return text;
-        }));
+        }).prefWidth(600), null);
         modal.addButton(new ModalButton(
                 "launch",
                 () -> {
@@ -125,6 +125,7 @@ public class GuiIncompatibleWarning {
                 },
                 true,
                 false));
+        modal.showAndWait();
         return Optional.ofNullable(val.get());
     }
 }

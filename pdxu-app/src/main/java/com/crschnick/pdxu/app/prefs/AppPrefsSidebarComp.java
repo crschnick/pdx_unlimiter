@@ -54,9 +54,9 @@ public class AppPrefsSidebarComp extends SimpleComp {
         var restartButton = new ButtonComp(AppI18n.observable("restartApp"), new FontIcon("mdi2r-restart"), () -> {
             AppRestart.restart();
         });
+        restartButton.styleClass("restart-button");
         restartButton.maxWidth(2000);
         restartButton.visible(AppPrefs.get().getRequiresRestart());
-        restartButton.padding(new Insets(6, 10, 6, 6));
         buttons.add(Comp.vspacer());
         buttons.add(restartButton);
 

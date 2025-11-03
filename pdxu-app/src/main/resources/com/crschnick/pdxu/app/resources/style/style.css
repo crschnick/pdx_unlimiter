@@ -79,3 +79,18 @@
     -fx-opacity: 1.0;
     -fx-padding: 10;
 }
+
+.restart-button {
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-border-color: -color-accent-muted;
+    -fx-background-color: -color-neutral-muted;
+    -fx-background-radius: 4;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.restart-button:hover {
+    -fx-background-color: -color-neutral-subtle;
+    -fx-border-color: -color-neutral-emphasis;
+}

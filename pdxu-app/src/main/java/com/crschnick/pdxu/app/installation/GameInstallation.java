@@ -130,7 +130,7 @@ public final class GameInstallation {
 
         if (getInstallDir().startsWith(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
             throw new InvalidInstallationException(
-                    "installDirIsUserDir", g.getInstallationName(), g.getInstallationName(), dirsString);
+                    "installDirIsUserDir", dirsString);
         }
 
         if (!Files.isRegularFile(dist.getExecutable())) {

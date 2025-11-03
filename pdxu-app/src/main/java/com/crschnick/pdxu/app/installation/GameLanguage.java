@@ -18,10 +18,12 @@ public enum GameLanguage {
     FRENCH("l_french", SupportedLocale.FRENCH),
     SPANISH("l_spanish", SupportedLocale.SPANISH),
     POLISH("l_polish", SupportedLocale.POLISH),
-    CHINESE("l_chinese", SupportedLocale.CHINESE_SIMPLIFIED),
+    CHINESE("l_simp_chinese", SupportedLocale.CHINESE_SIMPLIFIED),
     JAPANESE("l_japanese", SupportedLocale.JAPANESE),
     RUSSIAN("l_russian", SupportedLocale.RUSSIAN),
-    PORTUGUESE("l_portuguese", SupportedLocale.PORTUGUESE);
+    KOREAN("l_korean", SupportedLocale.KOREAN),
+    TURKISH("l_turkish", SupportedLocale.TURKISH),
+    BRAZILIAN_PORTUGUESE("l_braz_por", SupportedLocale.PORTUGUESE);
 
     public static GameLanguage byId(String langId) {
         return Arrays.stream(values())

@@ -48,9 +48,6 @@ public final class AppPrefs {
 
     public static void reset() {
         INSTANCE.save();
-
-        // Keep instance as we might need some values on shutdown, e.g. on update with terminals
-        // INSTANCE = null;
     }
 
     public static AppPrefs get() {
@@ -213,12 +210,6 @@ public final class AppPrefs {
             .valueClass(Boolean.class)
             .requiresRestart(false)
             .build());
-    final BooleanProperty editorWarnOnNodeTypeChange = map(Mapping.builder()
-            .property(new GlobalBooleanProperty(true))
-            .key("editorWarnOnNodeTypeChange")
-            .valueClass(Boolean.class)
-            .requiresRestart(false)
-            .build());
     final Property<String> editorExternalProgram = map(Mapping.builder()
             .property(new GlobalObjectProperty<>(EditorProvider.get().getDefaultEditor()))
             .key("editorExternalProgram")
@@ -244,10 +235,6 @@ public final class AppPrefs {
 
     public ObservableValue<Boolean> editorEnableNodeJumps() {
         return editorEnableNodeJumps;
-    }
-
-    public ObservableValue<Boolean> editorWarnOnNodeTypeChange() {
-        return editorWarnOnNodeTypeChange;
     }
 
     public ObservableValue<String> editorExternalProgram() {
@@ -500,7 +487,7 @@ public final class AppPrefs {
             performanceMode.setValue(true);
         }
 
-        if (storageDirectory.getValue() == null) {
+        if (storageDirectory.getValue() == null || !Files.exists(storageDirectory.getValue())) {
             storageDirectory.setValue(AppProperties.get().getDataDir().resolve("storage"));
         }
     }
