@@ -136,14 +136,7 @@ public class PdxuApp extends Application {
     public void setupBasicWindowContent() {
         layout = new GuiLayout();
         layout.setup();
-        var title = "Pdx-Unlimiter (" + PdxuInstallation.getInstance().getVersion() + ")";
-        var l = PdxuInstallation.getInstance().getLatestVersion();
-        if (PdxuInstallation.getInstance().isProduction() &&
-                !PdxuInstallation.getInstance().isStandalone() &&
-                l != null &&
-                !l.equals(PdxuInstallation.getInstance().getVersion())) {
-            title = title + "     OUTDATED: " + l + " available";
-        }
+        var title = "Pdx-Unlimiter (2.13.18) [LEGACY]";
         stage.setTitle(title);
 
         var aa = Platform.isSupported(ConditionalFeature.SCENE3D) ?
