@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.UserReportComp;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.prefs.AppPrefsComp;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.PlatformThread;
@@ -14,10 +15,8 @@ import com.crschnick.pdxu.app.util.GlobalTimer;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,7 +40,7 @@ public class AppLayoutModel {
 
     private final List<Entry> entries;
 
-    private final Property<Entry> selected;
+    private final ObjectProperty<Entry> selected = new SimpleObjectProperty<>();
 
     private final ObservableList<QueueEntry> queueEntries;
 
@@ -50,7 +49,7 @@ public class AppLayoutModel {
     public AppLayoutModel(SavedState savedState) {
         this.savedState = savedState;
         this.entries = createEntryList();
-        this.selected = new SimpleObjectProperty<>(getInitialEntry());
+        this.selected.setValue(getInitialEntry());
         this.queueEntries = FXCollections.observableArrayList();
     }
 
@@ -228,7 +227,9 @@ public class AppLayoutModel {
                         pane.setMinHeight(24);
                         return pane;
                     }),
-                    new GuiLayoutComp(new SavegameManagerState<>(game)),
+                    new GuiLayoutComp(new SavegameManagerState<>(game, BindingsHelper.map(selected, s -> {
+                        return s instanceof GameEntry ge && ge.game.equals(game);
+                    }))),
                     null);
             this.game = game;
         }

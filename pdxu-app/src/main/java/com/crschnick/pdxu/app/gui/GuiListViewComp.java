@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.gui;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 
+import com.crschnick.pdxu.app.core.AppLayoutModel;
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.scene.Node;
@@ -37,6 +38,10 @@ public class GuiListViewComp<T> extends SimpleComp {
             ListView<Node> listView = new ListView<>();
             var newItems =
                     list.stream().map(li -> createForItem(li, nodeFactory)).toList();
+
+            AppLayoutModel.get().getSelected().addListener((observable, oldValue, newValue) -> {
+                listView.getSelectionModel().clearSelection();
+            });
 
             listView.prefWidthProperty().bind(pane.widthProperty());
             listView.prefHeightProperty().bind(pane.heightProperty());
@@ -82,6 +87,7 @@ public class GuiListViewComp<T> extends SimpleComp {
                 newItems.forEach(li -> listView.getItems().add(li));
             });
         });
+
         return pane;
     }
 }

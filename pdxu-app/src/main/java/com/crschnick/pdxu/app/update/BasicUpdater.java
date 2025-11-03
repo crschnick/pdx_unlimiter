@@ -21,6 +21,9 @@ public class BasicUpdater extends UpdateHandler {
 
     @Override
     public List<ModalButton> createActions() {
+        var canInstall = OsType.ofLocal() == OsType.WINDOWS
+                && AppDistributionType.get() == AppDistributionType.NATIVE_INSTALLATION;
+
         var list = new ArrayList<ModalButton>();
         list.add(new ModalButton("ignore", null, true, false));
         list.add(new ModalButton(
@@ -33,13 +36,12 @@ public class BasicUpdater extends UpdateHandler {
 
                     Hyperlinks.open(rel.getReleaseUrl());
                 },
-                false,
+                !canInstall,
                 true));
 
         // On Windows, we can implement a simple autoupdater
         // This is however very basic
-        if (OsType.ofLocal() == OsType.WINDOWS
-                && AppDistributionType.get() == AppDistributionType.NATIVE_INSTALLATION) {
+        if (canInstall) {
             list.add(new ModalButton(
                     "installUpdate",
                     () -> {

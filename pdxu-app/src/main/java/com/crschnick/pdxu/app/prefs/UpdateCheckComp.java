@@ -60,9 +60,6 @@ public class UpdateCheckComp extends SimpleComp {
         return new TileButtonComp(name, description, graphic, actionEvent -> {
                     ThreadHelper.runFailableAsync(() -> {
                         AppDistributionType.get().getUpdateHandler().refreshUpdateCheck();
-                        if (uh.getLastUpdateCheckResult().getValue() != null) {
-                            UpdateAvailableDialog.showIfNeeded(false);
-                        }
                     });
                     actionEvent.consume();
                 })

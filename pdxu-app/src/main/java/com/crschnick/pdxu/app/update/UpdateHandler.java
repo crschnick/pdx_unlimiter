@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.update;
 import com.crschnick.pdxu.app.comp.base.ModalButton;
 import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.core.AppVersion;
+import com.crschnick.pdxu.app.core.mode.AppOperationMode;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
@@ -35,6 +36,15 @@ public abstract class UpdateHandler {
         if (startBackgroundThread) {
             startBackgroundUpdater();
         }
+
+        lastUpdateCheckResult.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // Show available update in PTB more aggressively
+                if (!AppOperationMode.isInStartup()) {
+                    UpdateAvailableDialog.showIfNeeded(false);
+                }
+            }
+        });
     }
 
     private void startBackgroundUpdater() {

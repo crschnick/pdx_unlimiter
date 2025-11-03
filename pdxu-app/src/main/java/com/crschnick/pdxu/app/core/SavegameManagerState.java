@@ -11,6 +11,8 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 
 import javafx.beans.property.*;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;
 
@@ -34,9 +36,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     private final ListProperty<SavegameEntry<T, I>> shownEntries =
             new SimpleListProperty<>(FXCollections.observableList(new CopyOnWriteArrayList<>()));
     private final BooleanProperty storageEmpty = new SimpleBooleanProperty();
+    private final ObservableValue<Boolean> gameSelected;
 
-    public SavegameManagerState(Game game) {
+    public SavegameManagerState(Game game, ObservableValue<Boolean> gameSelected) {
         this.game = game;
+        this.gameSelected = gameSelected;
         addShownContentChangeListeners();
         updateShownCollections();
     }
@@ -58,6 +62,10 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             if (n != null) {
                 n.getSavegames().addListener(cl);
             }
+        });
+
+        gameSelected.addListener((observable, oldValue, newValue) -> {
+            unselectCollectionAndEntry();
         });
     }
 
