@@ -87,7 +87,7 @@ public enum Game {
                     "EU5",
                     "Europa Universalis V",
                     null,
-                    3527980,
+                    3450310,
                     "eu5",
                     null,
             List.of("Europa Universalis V", "Europa Universalis 5"),
