@@ -3,9 +3,9 @@
   <div>Pdx-Unlimiter</div>
 </h1>
 
-<div align="center">
+<h2 align="center">
   <a href="https://discord.gg/BVE4vxqFpU"><img alt="Discord" src="https://img.shields.io/discord/786465137191682088?logo=discord&logoColor=white"></a> <a href="https://github.com/crschnick/pdx_unlimiter/actions/workflows/gradle.yml"><img alt="CI" src="https://github.com/crschnick/pdx_unlimiter/actions/workflows/build.yml/badge.svg"></a>
-</div>
+</h2>
 
 The Pdx-Unlimiter is a tool for all major Paradox Grand Strategy games that provides a
 powerful and smart savegame manager to quickly organize and play all of your savegames with ease.

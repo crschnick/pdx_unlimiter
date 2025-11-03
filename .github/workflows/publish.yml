@@ -138,11 +138,11 @@ jobs:
             ${{ secrets.GPG_KEY }}
           GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
 
-      - name: Download legacy artifacts
-        run: |
-          curl -L --output "dist/build/dist/artifacts/changelog.txt" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/changelog.txt"
-          curl -L --output "dist/build/dist/artifacts/pdx_unlimiter-windows.zip" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/pdx_unlimiter-windows.zip"
-          curl -L --output "dist/build/dist/artifacts/pdx_unlimiter-linux.zip" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/pdx_unlimiter-linux.zip"
+#      - name: Download legacy artifacts
+#        run: |
+#          curl -L --output "dist/build/dist/artifacts/changelog.txt" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/changelog.txt"
+#          curl -L --output "dist/build/dist/artifacts/pdx_unlimiter-windows.zip" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/pdx_unlimiter-windows.zip"
+#          curl -L --output "dist/build/dist/artifacts/pdx_unlimiter-linux.zip" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/pdx_unlimiter-linux.zip"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
