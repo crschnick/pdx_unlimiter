@@ -182,6 +182,7 @@ public class ComponentManager {
             PdxuI18n.reset();
             CacheManager.reset();
             PdxToolsWebHelper.reset();
+            AppDataLock.reset();
         } catch (Throwable e) {
             ErrorHandler.handleTerminalException(e);
         }
