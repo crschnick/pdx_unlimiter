@@ -28,8 +28,8 @@ jobs:
       matrix:
         os: [
           ubuntu-latest,
-          macos-13,
-          macos-14,
+          macos-15-intel,
+          macos-15,
           windows-latest
         ]
       fail-fast: false

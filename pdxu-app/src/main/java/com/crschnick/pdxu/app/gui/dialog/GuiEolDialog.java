@@ -45,7 +45,7 @@ public class GuiEolDialog {
 
         Alert alert = GuiDialogHelper.createEmptyAlert();
         alert.setWidth(600);
-        alert.setHeight(730);
+        alert.setHeight(780);
         alert.initModality(Modality.WINDOW_MODAL);
         alert.setResizable(true);
         alert.setTitle("Update notice");
