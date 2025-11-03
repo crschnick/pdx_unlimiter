@@ -37,6 +37,8 @@ public class GuiEolDialog {
                 - Properly working file associations, without confusing various browsers thinking that pdxu can open zip files
                 
                 Updates to v3 are not distributed through the old updater anymore. You can choose to update to v3 from here, which will launch the installer. Your save data will transfer seamlessly to v3.
+                
+                You can have both Pdx-Unlimiter v2 and v3 installed side-by-side, so you don't have to fully switch to the new version yet if you install it.
 
                 You can also keep using your current v2 version, you will however no longer receive any updates for it. All future Pdx-Unlimiter updates are only available in the v3 version.
                 """;
