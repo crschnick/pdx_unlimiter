@@ -17,5 +17,5 @@ It comes with:
 - Fixes on Windows when pinning the executable to the taskbar
 - Properly working file associations, without confusing various browsers thinking that pdxu can open zip files
 
-Updates to v3 are not distributed through the old updater anymore. You can choose to update to v3 from within the old application. The v2 version will however no longer receive any updates. All future Pdx-Unlimiter updates are only available in the v3 version.
+Updates to v3 are not distributed through the old updater anymore. You can choose to update to v3 from within the old v2 application. The v2 version will however no longer receive any updates. All future Pdx-Unlimiter updates are only available in the v3 version.
 
