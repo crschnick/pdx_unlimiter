@@ -34,18 +34,6 @@ If you don't like installers, you can also use a portable version that is packag
 
 - [Windows .zip Portable (x86-64)](../../releases/latest/download/kickstartfx-portable-windows-x86_64.zip)
 
-### macOS
-
-Installers are the easiest way to get started:
-
-- [MacOS .pkg Installer (x86-64)](../../releases/latest/download/kickstartfx-installer-macos-x86_64.pkg)
-- [MacOS .pkg Installer (ARM 64)](../../releases/latest/download/kickstartfx-installer-macos-arm64.pkg)
-
-If you don't like installers, you can also use a portable version that is packaged as an archive:
-
-- [MacOS .dmg Portable (x86-64)](../../releases/latest/download/kickstartfx-portable-macos-x86_64.dmg)
-- [MacOS .dmg Portable (ARM 64)](../../releases/latest/download/kickstartfx-portable-macos-arm64.dmg)
-
 ### Linux
 
 #### Debian-based distros
@@ -74,6 +62,18 @@ In case you prefer to use an archive version that you can extract anywhere, you 
 Note that the portable version assumes that you have some basic packages for graphical systems already installed
 as it is not a perfect standalone version. It should however run on most systems.
 
+### macOS
+
+Installers are the easiest way to get started:
+
+- [MacOS .pkg Installer (x86-64)](../../releases/latest/download/kickstartfx-installer-macos-x86_64.pkg)
+- [MacOS .pkg Installer (ARM 64)](../../releases/latest/download/kickstartfx-installer-macos-arm64.pkg)
+
+If you don't like installers, you can also use a portable version that is packaged as an archive:
+
+- [MacOS .dmg Portable (x86-64)](../../releases/latest/download/kickstartfx-portable-macos-x86_64.dmg)
+- [MacOS .dmg Portable (ARM 64)](../../releases/latest/download/kickstartfx-portable-macos-arm64.dmg)
+
 ## Features
 
 The main components of the Pdx-Unlimiter are:
@@ -99,7 +99,9 @@ All types of savegames are supported, including Ironman and modded savegames.
 The smart launcher also allows you instantly continue a savegame
 without having to visit the Paradox Launcher or main menu.
 
-![Example](misc/screenshot.png)
+![ExampleEU5](misc/eu5_screenshot.png)
+
+![ExampleEU4](misc/screenshot.png)
 
 ![ExampleCK3](misc/ck3_screenshot.png)
 

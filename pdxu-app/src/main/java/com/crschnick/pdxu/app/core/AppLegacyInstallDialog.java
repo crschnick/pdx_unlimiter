@@ -6,7 +6,9 @@ import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,19 +37,31 @@ public class AppLegacyInstallDialog {
 
         var exe = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\pdxu\\DefaultIcon");
         if (exe.isEmpty()) {
+            deleteLegacyLauncherDataIfNeeded();
             return;
         }
 
         var loc = Path.of(exe.get()).getParent();
         if (!Files.exists(loc)) {
+            deleteLegacyLauncherDataIfNeeded();
             return;
         }
 
         var modal = ModalOverlay.of("legacyInstallTitle", AppDialog.dialogText(AppI18n.observable("legacyInstallContent")));
         modal.addButton(new ModalButton("keepLegacy", () -> {}, true, false));
         modal.addButton(new ModalButton("uninstallLegacy", () -> {
-            LocalExec.readStdoutIfPossible("cmd", "/c", "start \"\" msiexec /x {9D873C37-DCDA-3F50-A52A-DAB1F1A43DAE}");
+            ThreadHelper.runAsync(() -> {
+                LocalExec.readStdoutIfPossible("cmd", "/c", "start \"\" /wait msiexec /x {9D873C37-DCDA-3F50-A52A-DAB1F1A43DAE}");
+                deleteLegacyLauncherDataIfNeeded();
+            });
         }, true, true));
         modal.show();
+    }
+
+    private static void deleteLegacyLauncherDataIfNeeded() {
+        var path = AppSystemInfo.ofWindows().getLocalAppData().resolve("Programs").resolve("Pdx-Unlimiter");
+        if (Files.exists(path)) {
+            FileUtils.deleteQuietly(path.toFile());
+        }
     }
 }

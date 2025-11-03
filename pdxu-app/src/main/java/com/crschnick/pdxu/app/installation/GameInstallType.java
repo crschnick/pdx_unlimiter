@@ -564,7 +564,9 @@ public interface GameInstallType {
             if (OsType.ofLocal() == OsType.MACOS) {
                 return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Victoria II");
             } else {
-                return super.determineUserDir(p, name);
+                return FileSystemHelper.getUserDocumentsPath()
+                        .resolve("Paradox Interactive")
+                        .resolve("Victoria II");
             }
         }
 
