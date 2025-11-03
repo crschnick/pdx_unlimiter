@@ -270,6 +270,10 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
         Pane pane = new Pane();
         savegameManagerState.globalSelectedEntryProperty().addListener((c, o, n) -> {
             Platform.runLater(() -> {
+                if (n != null && n.getState() == SavegameEntry.State.LOAD_FAILED) {
+                    return;
+                }
+
                 if (n != null) {
                     select(pane, n);
                 } else {

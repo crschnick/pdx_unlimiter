@@ -262,7 +262,7 @@ public final class TextFormatParser {
                     var keyString = NodeWriter.writeToString(ArrayNode.array(List.of(key)), Integer.MAX_VALUE, "\t");
                     var value = parseNodeIfNotScalarValue(name, strict);
                     var valueString = NodeWriter.writeToString(ArrayNode.array(List.of(value)), Integer.MAX_VALUE, "\t");
-                    return new ValueNode(keyString.substring(0, keyString.length() - 1) + "=" + valueString, false);
+                    return new ValueNode(keyString.substring(0, keyString.length() - 1) + "=" + valueString.substring(0, valueString.length() - 1), false);
                 }
 
                 return builder.build();

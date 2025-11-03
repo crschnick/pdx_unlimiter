@@ -31,6 +31,10 @@ public class PathChoiceComp extends SimpleComp {
     protected Region createSimple() {
         var prop = new SimpleStringProperty();
         pathProperty.subscribe(s -> PlatformThread.runLaterIfNeeded(() -> {
+            if (s != null && prop.get() != null && s.equals(Path.of(prop.get()))) {
+                return;
+            }
+
             prop.set(s != null ? s.toString() : null);
         }));
         prop.addListener((observable, oldValue, newValue) -> {

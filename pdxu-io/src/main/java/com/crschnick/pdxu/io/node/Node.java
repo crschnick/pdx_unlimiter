@@ -17,49 +17,49 @@ public abstract class Node {
     }
 
     public void forEach(BiConsumer<String, Node> c, boolean includeNullKeys) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public boolean forEach(BiPredicate<String, Node> c, boolean includeNullKeys) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public abstract void write(NodeWriter writer) throws IOException;
 
     public TaggedNode getTaggedNode() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not tagged");
     }
 
     public ValueNode getValueNode() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not a value");
     }
 
     public ArrayNode getArrayNode() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public List<Node> getNodeArray() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public boolean getBoolean() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not a boolean value");
     }
 
     public String getString() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not a string value");
     }
 
     public int getInteger() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an integer value");
     }
 
     public long getLong() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not a long value");
     }
 
     public double getDouble() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not a double value");
     }
 
     public abstract boolean isValue();
@@ -71,11 +71,11 @@ public abstract class Node {
     public abstract boolean matches(NodeMatcher matcher);
 
     public boolean hasKey(String key) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public Node getNodeForKey(String key) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public Node getNodeForKeys(String... keys) {
@@ -94,13 +94,13 @@ public abstract class Node {
     }
 
     public Optional<Node> getNodeForKeyIfExistent(String key) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public abstract Node copy();
 
     public List<Node> getNodesForKey(String key) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Not an array");
     }
 
     public enum KeyType {

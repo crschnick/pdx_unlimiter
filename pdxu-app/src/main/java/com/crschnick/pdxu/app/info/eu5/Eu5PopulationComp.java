@@ -13,7 +13,7 @@ public class Eu5PopulationComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return String.valueOf(value);
+        return String.valueOf(value) + "k";
     }
 
     @Override

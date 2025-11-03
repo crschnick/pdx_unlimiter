@@ -296,6 +296,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                 ImageHelper.writePng(col.getImage(), imgFile);
             } catch (IOException e) {
                 ErrorEventFactory.fromThrowable("Couldn't write image " + imgFile, e)
+                        .expected()
                         .omit()
                         .handle();
             }
