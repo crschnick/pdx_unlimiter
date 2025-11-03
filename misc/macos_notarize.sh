@@ -19,7 +19,7 @@ java -jar "$TMPDIR/signpackage/SignPackage.jar" -r -d "$APP_DIR" -t -k "Develope
 codesign -vvv --deep --entitlements "$1/misc/Entitlements.plist" --options=runtime --force --strict --sign "Developer ID Application: Christopher Schnick (PF6V9HYACS)" "$APP_DIR/Contents/MacOS/Pdx-Unlimiter"
 
 echo "Create keychain profile"
-xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MAC_NOTARIZATION_APPLE_ID" --team-id "$MAC_NOTARIZATION_TEAM_ID" --password "$MAC_APP_SPECIFIC_PASSWORD"
+xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_APP_SPECIFIC_PASSWORD"
 
 # We can't notarize an app bundle directly, but we need to compress it as an archive.
 # Therefore, we create a zip file containing our app bundle, so that we can send it to the
