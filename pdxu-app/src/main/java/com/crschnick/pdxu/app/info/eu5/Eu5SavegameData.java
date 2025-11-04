@@ -73,7 +73,15 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
         mods = content.get().getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of()).stream()
                 .map(Node::getString)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        dlcs = null;
+        dlcs = content
+                .get()
+                .getNodeForKey("metadata")
+                .getNodeForKeyIfExistent("enabled_dlcs")
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getString)
+                .collect(Collectors.toList());
         name = content.get().getNodeForKeys("metadata").hasKey("player_country_name") ?
                 content.get().getNodeForKey("metadata").getNodeForKey("player_country_name").getString() :
                 content.get().getNodeForKey("metadata").getNodeForKey("playthrough_name").getString();

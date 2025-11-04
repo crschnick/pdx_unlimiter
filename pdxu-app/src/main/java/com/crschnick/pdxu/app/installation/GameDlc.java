@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.util.JacksonMapper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 
@@ -12,7 +13,6 @@ import java.util.Optional;
 public class GameDlc {
 
     private Path filePath;
-    private Path dataPath;
     private String name;
 
     @Getter
@@ -32,16 +32,14 @@ public class GameDlc {
         String dlcId = dlcName.split("_")[0];
         Path filePath =
                 Files.exists(p.resolve(dlcId + ".dlc")) ? p.resolve(dlcId + ".dlc") : p.resolve(dlcName + ".dlc");
-        Path dataPath = p.resolve(dlcId + ".zip");
 
         if (!Files.exists(filePath)) {
-            return Optional.empty();
+            return parseJsonDlc(p);
         }
 
         Node node = TextFormatParser.text().parse(filePath);
         GameDlc dlc = new GameDlc();
         dlc.filePath = filePath;
-        dlc.dataPath = dataPath;
         dlc.name = node.getNodeForKey("name").getString();
 
         // Notice the misspelled word "compatability"!
@@ -65,15 +63,26 @@ public class GameDlc {
         return Optional.of(dlc);
     }
 
+    private static Optional<GameDlc> parseJsonDlc(Path p) throws Exception {
+        String dlcName = p.getFileName().toString();
+        Path filePath = p.resolve(dlcName + ".dlc.json");
+        if (!Files.exists(filePath)) {
+            return Optional.empty();
+        }
+
+        var json = JacksonMapper.getDefault().readTree(filePath.toFile());
+        GameDlc dlc = new GameDlc();
+        dlc.filePath = filePath;
+        dlc.name = json.required("name").asText();
+        dlc.affectsCompatibility = json.required("affects_save_compatibility").asBoolean();
+        return Optional.of(dlc);
+    }
+
     public Path getInfoFilePath() {
         return filePath;
     }
 
     public String getName() {
         return name;
-    }
-
-    public Path getDataPath() {
-        return dataPath;
     }
 }

@@ -61,7 +61,11 @@ public class Ck3Title {
         CoatOfArms coatOfArms;
         if (n.hasKey("coat_of_arms_id")) {
             var coaId = n.getNodeForKey("coat_of_arms_id").getLong();
-            coatOfArms = CoatOfArms.fromNode(coaMap.get(coaId), null);
+            if (coaMap.containsKey(coaId)) {
+                coatOfArms = CoatOfArms.fromNode(coaMap.get(coaId), null);
+            } else {
+                coatOfArms = CoatOfArms.empty();
+            }
         } else {
             coatOfArms = CoatOfArms.empty();
         }

@@ -420,7 +420,7 @@ public interface GameInstallType {
         @Override
         public Path determineUserDir(Path p, String name) throws IOException {
             if (OsType.ofLocal() == OsType.MACOS) {
-                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Crusader Kings II");
+                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Paradox Interactive", "Crusader Kings II");
             } else {
                 return super.determineUserDir(p, name);
             }
@@ -562,7 +562,7 @@ public interface GameInstallType {
             }
 
             if (OsType.ofLocal() == OsType.MACOS) {
-                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Victoria II");
+                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Paradox Interactive", "Victoria II");
             } else {
                 return FileSystemHelper.getUserDocumentsPath()
                         .resolve("Paradox Interactive")

@@ -1,9 +1,6 @@
 package com.crschnick.pdxu.app.info.eu5;
 
-import com.crschnick.pdxu.app.info.ModComp;
-import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.info.SavegameInfo;
-import com.crschnick.pdxu.app.info.VersionComp;
+import com.crschnick.pdxu.app.info.*;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu5.Eu5Tag;
 
@@ -21,6 +18,7 @@ public class Eu5SavegameInfo extends SavegameInfo<Eu5Tag> {
     Eu5WarMultiComp wars;
     Eu5IronmanComp ironman;
     ModComp mods;
+    DlcComp dlcs;
     VersionComp version;
 
     public Eu5SavegameInfo() {}
