@@ -116,7 +116,7 @@ def getJvmArgs() {
     // GC config
     jvmRunArgs += ['-XX:+UseG1GC',
                    '-Xms300m',
-                   '-Xmx8G',
+                   '-Xmx16G',
                    '-XX:MinHeapFreeRatio=20',
                    '-XX:MaxHeapFreeRatio=30',
                    '-XX:GCTimeRatio=9',
