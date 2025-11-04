@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
+
 import javafx.scene.image.Image;
 
 public class Eu5ManpowerComp extends SimpleInfoComp {
@@ -19,17 +20,15 @@ public class Eu5ManpowerComp extends SimpleInfoComp {
                 .getNodeForKey("database")
                 .getNodeForKey(data.eu5().getTag().getId() + "")
                 .getNodeForKey("currency_data");
-        value = cd.hasKey("manpower") ? (int) (cd
-                        .getNodeForKey("manpower")
-                        .getDouble() * 1000.0) : 0;
+        value = cd.hasKey("manpower") ? (int) (cd.getNodeForKey("manpower").getDouble() * 1000.0) : 0;
 
         var tag = content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")
                 .getNodeForKey(data.eu5().getTag().getId() + "");
-        max = tag.hasKey("max_manpower") ? (int) (tag
-                .getNodeForKey("max_manpower")
-                .getDouble() * 1000.0) : 0;
+        max = tag.hasKey("max_manpower")
+                ? (int) (tag.getNodeForKey("max_manpower").getDouble() * 1000.0)
+                : 0;
     }
 
     @Override

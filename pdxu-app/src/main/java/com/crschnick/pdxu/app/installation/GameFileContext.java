@@ -5,7 +5,6 @@ import com.crschnick.pdxu.app.info.ck2.Ck2SavegameData;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameData;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameData;
 import com.crschnick.pdxu.app.info.eu5.Eu5SavegameData;
-import com.crschnick.pdxu.app.info.eu5.Eu5SavegameInfo;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;

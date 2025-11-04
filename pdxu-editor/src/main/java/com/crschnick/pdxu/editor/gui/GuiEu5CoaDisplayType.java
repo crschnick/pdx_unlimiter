@@ -1,10 +1,10 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.gui.game.Eu5TagRenderer;
-import com.crschnick.pdxu.app.gui.game.Vic3TagRenderer;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 

@@ -5,12 +5,13 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.info.SavegameInfoMultiComp;
-import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.War;
 import com.crschnick.pdxu.model.eu5.Eu5Tag;
+
 import javafx.scene.image.Image;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -63,7 +64,7 @@ public class Eu5WarMultiComp extends SavegameInfoMultiComp {
             for (Node allEntry : all.getNodeArray()) {
                 var countryId = allEntry.getNodeForKey("country").getLong();
 
-                var status =  allEntry.getNodeForKey("status").getString();
+                var status = allEntry.getNodeForKey("status").getString();
                 if (!status.equals("Active")) {
                     continue;
                 }
@@ -91,8 +92,12 @@ public class Eu5WarMultiComp extends SavegameInfoMultiComp {
                 }
             }
 
-            if (attackers.stream().anyMatch(eu5Tag -> eu5Tag.getId() == data.eu5().getTag().getId()) ||
-                    defenders.stream().anyMatch(eu5Tag -> eu5Tag.getId() == data.eu5().getTag().getId())) {
+            if (attackers.stream()
+                            .anyMatch(eu5Tag ->
+                                    eu5Tag.getId() == data.eu5().getTag().getId())
+                    || defenders.stream()
+                            .anyMatch(eu5Tag ->
+                                    eu5Tag.getId() == data.eu5().getTag().getId())) {
                 var name = node.getNodeForKeys("war_name", "name").getString();
                 wars.add(new War<>(name, attackers, defenders));
             }

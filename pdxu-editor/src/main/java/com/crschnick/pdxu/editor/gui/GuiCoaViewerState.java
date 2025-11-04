@@ -109,6 +109,7 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         public String getDocumentation() {
             return Hyperlinks.EU5_COA_WIKI;
         }
+
         @Override
         protected void setup(HBox box) {
             GuiEu5CoaDisplayType.init(this, box);
@@ -119,9 +120,9 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             var additional = state.isSavegame()
                     ? new ArrayNode[0]
                     : state.getRootNodes().values().stream()
-                    .map(editorRootNode ->
-                            editorRootNode.getBackingNode().copy().getArrayNode())
-                    .toArray(ArrayNode[]::new);
+                            .map(editorRootNode ->
+                                    editorRootNode.getBackingNode().copy().getArrayNode())
+                            .toArray(ArrayNode[]::new);
 
             var all = Eu5TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.EU5), additional);
             var allCopy = all.copy().getArrayNode();

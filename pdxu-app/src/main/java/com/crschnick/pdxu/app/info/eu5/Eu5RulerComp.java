@@ -7,7 +7,7 @@ import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
-import com.crschnick.pdxu.model.GameDateType;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -17,7 +17,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 import static com.crschnick.pdxu.app.gui.game.GameImage.*;
@@ -28,10 +27,8 @@ public class Eu5RulerComp extends SavegameInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        var countryId = NodePointer.builder()
-                .name("played_country")
-                .name("country")
-                .build();
+        var countryId =
+                NodePointer.builder().name("played_country").name("country").build();
         var country = NodePointer.builder()
                 .name("countries")
                 .name("database")
@@ -105,22 +102,39 @@ public class Eu5RulerComp extends SavegameInfoComp {
     public static record Ruler(String firstName, String nickname, double adm, double dip, double mil) {
 
         public static Optional<Ruler> fromCountryNode(String key, Node root, Node n) {
-            var rulerIdPointer = NodePointer.builder().name("government").name(key).build();
-            var rulerPointer = NodePointer.builder().name("character_db").name("database").supplier(() -> {
-                var idNode = rulerIdPointer.get(n);
-                return idNode != null ? idNode.getString() : null;
-            }).build();
+            var rulerIdPointer =
+                    NodePointer.builder().name("government").name(key).build();
+            var rulerPointer = NodePointer.builder()
+                    .name("character_db")
+                    .name("database")
+                    .supplier(() -> {
+                        var idNode = rulerIdPointer.get(n);
+                        return idNode != null ? idNode.getString() : null;
+                    })
+                    .build();
             var rulerNode = rulerPointer.get(root);
             if (rulerNode == null) {
                 return Optional.empty();
             }
 
-            var adm = rulerNode.getNodeForKeyIfExistent("adm").map(Node::getDouble).orElse(0.0);
-            var dip = rulerNode.getNodeForKeyIfExistent("dip").map(Node::getDouble).orElse(0.0);
-            var mil = rulerNode.getNodeForKeyIfExistent("mil").map(Node::getDouble).orElse(0.0);
+            var adm = rulerNode
+                    .getNodeForKeyIfExistent("adm")
+                    .map(Node::getDouble)
+                    .orElse(0.0);
+            var dip = rulerNode
+                    .getNodeForKeyIfExistent("dip")
+                    .map(Node::getDouble)
+                    .orElse(0.0);
+            var mil = rulerNode
+                    .getNodeForKeyIfExistent("mil")
+                    .map(Node::getDouble)
+                    .orElse(0.0);
 
             var name = rulerNode.getNodeForKey("first_name").getString();
-            var nickname = rulerNode.getNodeForKeyIfExistent("nickname").map(Node::getString).orElse(null);
+            var nickname = rulerNode
+                    .getNodeForKeyIfExistent("nickname")
+                    .map(Node::getString)
+                    .orElse(null);
             return Optional.of(new Ruler(name, nickname, adm, dip, mil));
         }
     }

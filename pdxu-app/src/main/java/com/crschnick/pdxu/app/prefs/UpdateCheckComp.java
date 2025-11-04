@@ -4,7 +4,6 @@ import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.comp.base.TileButtonComp;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.update.AppDistributionType;
-import com.crschnick.pdxu.app.update.UpdateAvailableDialog;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
 import javafx.beans.binding.Bindings;

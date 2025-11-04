@@ -37,7 +37,9 @@ public class GameLocalisation {
         }
 
         public void loadLocalisations(GameLanguage lang, GameFileContext ctx) {
-            var dir = ctx.getInstall().getInstallDir().resolve(ctx.getInstall().getType().getLocalisationsDirectory());
+            var dir = ctx.getInstall()
+                    .getInstallDir()
+                    .resolve(ctx.getInstall().getType().getLocalisationsDirectory());
             CascadeDirectoryHelper.traverseDirectory(dir, ctx, file -> {
                 if (!GameLocalisationHelper.isLanguage(file, lang)) {
                     return;

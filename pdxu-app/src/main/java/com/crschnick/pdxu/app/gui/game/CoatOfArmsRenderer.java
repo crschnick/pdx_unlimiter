@@ -169,7 +169,9 @@ public abstract class CoatOfArmsRenderer {
 
         double xF = (double) patternImage.getWidth() / emblemImage.getWidth();
         double yF = (double) patternImage.getHeight() / emblemImage.getHeight();
-        var maskRgb = (indices.contains(1) ? 0x00FF0000 : 0) | (indices.contains(2) ? 0x0000FF00 : 0) | (indices.contains(3) ? 0x000000FF : 0);
+        var maskRgb = (indices.contains(1) ? 0x00FF0000 : 0)
+                | (indices.contains(2) ? 0x0000FF00 : 0)
+                | (indices.contains(3) ? 0x000000FF : 0);
         for (int x = 0; x < emblemImage.getWidth(); x++) {
             for (int y = 0; y < emblemImage.getHeight(); y++) {
                 var cx = (int) Math.floor((xF * x - patternImage.getWidth() * sub.getX()) / sub.getScaleX());
@@ -179,12 +181,23 @@ public abstract class CoatOfArmsRenderer {
                 }
 
                 int patternArgb = patternImage.getRGB(cx, cy);
-                var mr = Math.clamp(ColorHelper.getRed(patternArgb) / 255.0 - ColorHelper.getGreen(patternArgb) / 255.0 - ColorHelper.getBlue(patternArgb) / 255.0, 0.0, 1.0);
-                var mg = Math.clamp(ColorHelper.getGreen(patternArgb) / 255.0 - ColorHelper.getBlue(patternArgb) / 255.0, 0.0, 1.0);
+                var mr = Math.clamp(
+                        ColorHelper.getRed(patternArgb) / 255.0
+                                - ColorHelper.getGreen(patternArgb) / 255.0
+                                - ColorHelper.getBlue(patternArgb) / 255.0,
+                        0.0,
+                        1.0);
+                var mg = Math.clamp(
+                        ColorHelper.getGreen(patternArgb) / 255.0 - ColorHelper.getBlue(patternArgb) / 255.0, 0.0, 1.0);
                 var mb = ColorHelper.getBlue(patternArgb) / 255.0;
                 int emblemArgb = emblemImage.getRGB(x, y);
 
-                var t = Math.clamp(mr * ColorHelper.getRed(maskRgb) / 255.0 + mg * ColorHelper.getGreen(maskRgb) / 255.0 + mb * ColorHelper.getBlue(maskRgb) / 255.0, 0.0, 1.0);
+                var t = Math.clamp(
+                        mr * ColorHelper.getRed(maskRgb) / 255.0
+                                + mg * ColorHelper.getGreen(maskRgb) / 255.0
+                                + mb * ColorHelper.getBlue(maskRgb) / 255.0,
+                        0.0,
+                        1.0);
                 var alpha = (int) Math.round(ColorHelper.getAlpha(emblemArgb) * t);
                 var r = (emblemArgb & 0x00FFFFFF) | (alpha << 24);
                 emblemImage.setRGB(x, y, r);
@@ -223,8 +236,7 @@ public abstract class CoatOfArmsRenderer {
                 int alpha = rgb & 0xFF000000;
                 return alpha + usedColor;
             };
-            var patternFile = CascadeDirectoryHelper.openFile(
-                    getPatternsDir().resolve(sub.getPatternFile()), ctx);
+            var patternFile = CascadeDirectoryHelper.openFile(getPatternsDir().resolve(sub.getPatternFile()), ctx);
             var image = patternFile
                     .map(p -> ImageHelper.loadAwtImage(p, patternFunction))
                     .orElse(ImageHelper.DEFAULT_AWT_IMAGE);
@@ -319,10 +331,7 @@ public abstract class CoatOfArmsRenderer {
             return;
         }
 
-        var path = CascadeDirectoryHelper.openFile(
-                getEmblemDir(!hasColor)
-                        .resolve(emblem.getFile()),
-                ctx);
+        var path = CascadeDirectoryHelper.openFile(getEmblemDir(!hasColor).resolve(emblem.getFile()), ctx);
         if (path.isEmpty()) {
             return;
         }
@@ -339,7 +348,6 @@ public abstract class CoatOfArmsRenderer {
         emblem.getInstances().stream()
                 .sorted(Comparator.comparingDouble(Emblem.Instance::getDepth))
                 .forEach(instance -> {
-
                     var scaleX = ((double) width / img.getWidth()) * instance.getScaleX() * sub.getScaleX();
                     var scaleY = ((double) height / img.getHeight()) * instance.getScaleY() * sub.getScaleY();
 
@@ -347,11 +355,12 @@ public abstract class CoatOfArmsRenderer {
                     var y = height * (sub.getY() + (sub.getScaleY() * instance.getY()));
 
                     AffineTransform trans = new AffineTransform();
-                    // when doing multiple transformations, they happen in reverse order, so this translate happens last and moves the emblem to its final position
+                    // when doing multiple transformations, they happen in reverse order, so this translate happens last
+                    // and moves the emblem to its final position
                     trans.translate(x, y);
 
                     // restore original aspect ratio
-                    trans.scale(((double)img.getWidth()) / ((double)img.getHeight()), 1.0);
+                    trans.scale(((double) img.getWidth()) / ((double) img.getHeight()), 1.0);
 
                     // Resize
                     trans.scale(Math.abs(scaleX), Math.abs(scaleY));
@@ -362,15 +371,15 @@ public abstract class CoatOfArmsRenderer {
                     }
 
                     // flip images with negative scale
-                    if(instance.getScaleX() < 0) {
+                    if (instance.getScaleX() < 0) {
                         trans.scale(-1.0, 1.0);
                     }
-                    if(instance.getScaleY() < 0) {
+                    if (instance.getScaleY() < 0) {
                         trans.scale(1.0, -1.0);
-                     }
+                    }
 
                     // scale image to make it square, because the game operates on [-1,1] and [0,1] coordinates
-                    trans.scale(((double)img.getHeight()) / ((double)img.getWidth()), 1.0);
+                    trans.scale(((double) img.getHeight()) / ((double) img.getWidth()), 1.0);
 
                     // move image so that 0,0 is in the center
                     trans.translate(-img.getWidth() / 2.0, -img.getHeight() / 2.0);

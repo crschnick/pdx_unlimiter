@@ -3,9 +3,7 @@ package com.crschnick.pdxu.model.coa;
 import com.crschnick.pdxu.io.node.Node;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public final class CoatOfArms {

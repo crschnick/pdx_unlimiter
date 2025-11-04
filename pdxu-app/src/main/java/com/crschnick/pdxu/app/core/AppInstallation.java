@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.util.OsType;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public abstract class AppInstallation {

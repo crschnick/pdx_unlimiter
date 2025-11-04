@@ -5,9 +5,6 @@ import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.OsType;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -25,7 +22,11 @@ public class GameDists {
             List.of(SteamDist::getDist, WindowsStoreDist::getDist);
 
     private static final List<BiFunction<Game, Path, Optional<GameDist>>> BASIC_DISTS = List.of(
-            ProtonPdxLauncherDist::getDist, ProtonNoLauncherDist::getDist, PdxLauncherDist::getDist, LegacyLauncherDist::getDist, NoLauncherDist::getDist);
+            ProtonPdxLauncherDist::getDist,
+            ProtonNoLauncherDist::getDist,
+            PdxLauncherDist::getDist,
+            LegacyLauncherDist::getDist,
+            NoLauncherDist::getDist);
 
     public static Optional<GameDist> detectDist(Game g, boolean checkXbox) {
         return getCompoundDistFromDirectory(g, null, checkXbox).or(() -> {

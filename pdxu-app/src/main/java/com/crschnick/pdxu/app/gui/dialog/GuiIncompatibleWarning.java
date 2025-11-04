@@ -97,20 +97,27 @@ public class GuiIncompatibleWarning {
 
     public static Optional<Boolean> showNoSavedModsWarning(Game game, List<GameMod> enabledMods) {
         var val = new SimpleObjectProperty<Boolean>();
-        var modal = ModalOverlay.of(AppI18n.observable("modInfoTitle", game.getTranslatedFullName()), Comp.of(() -> {
-            var header = AppI18n.get("modInfo", game.getTranslatedFullName());
-            String builder = enabledMods.stream()
-                    .map(m -> "- "
-                            + m.getName().orElse(m.getModFile().getFileName().toString()))
-                    .collect(Collectors.joining("\n"));
-            if (enabledMods.size() == 0) {
-                builder = builder + "<None>";
-            }
-            var text = new TextArea(header + builder);
-            text.setPrefHeight(200);
-            text.setEditable(false);
-            return text;
-        }).prefWidth(600), null);
+        var modal = ModalOverlay.of(
+                AppI18n.observable("modInfoTitle", game.getTranslatedFullName()),
+                Comp.of(() -> {
+                            var header = AppI18n.get("modInfo", game.getTranslatedFullName());
+                            String builder = enabledMods.stream()
+                                    .map(m -> "- "
+                                            + m.getName()
+                                                    .orElse(m.getModFile()
+                                                            .getFileName()
+                                                            .toString()))
+                                    .collect(Collectors.joining("\n"));
+                            if (enabledMods.size() == 0) {
+                                builder = builder + "<None>";
+                            }
+                            var text = new TextArea(header + builder);
+                            text.setPrefHeight(200);
+                            text.setEditable(false);
+                            return text;
+                        })
+                        .prefWidth(600),
+                null);
         modal.addButton(new ModalButton(
                 "launch",
                 () -> {

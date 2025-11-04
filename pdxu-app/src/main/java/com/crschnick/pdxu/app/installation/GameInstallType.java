@@ -420,7 +420,9 @@ public interface GameInstallType {
         @Override
         public Path determineUserDir(Path p, String name) throws IOException {
             if (OsType.ofLocal() == OsType.MACOS) {
-                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Paradox Interactive", "Crusader Kings II");
+                return AppSystemInfo.ofCurrent()
+                        .getUserHome()
+                        .resolve("Documents", "Paradox Interactive", "Crusader Kings II");
             } else {
                 return super.determineUserDir(p, name);
             }
@@ -562,7 +564,9 @@ public interface GameInstallType {
             }
 
             if (OsType.ofLocal() == OsType.MACOS) {
-                return AppSystemInfo.ofCurrent().getUserHome().resolve("Documents", "Paradox Interactive", "Victoria II");
+                return AppSystemInfo.ofCurrent()
+                        .getUserHome()
+                        .resolve("Documents", "Paradox Interactive", "Victoria II");
             } else {
                 return FileSystemHelper.getUserDocumentsPath()
                         .resolve("Paradox Interactive")
@@ -797,7 +801,6 @@ public interface GameInstallType {
         }
     };
 
-
     GameInstallType EU5 = new StandardInstallType("binaries/eu5") {
 
         @Override
@@ -822,7 +825,11 @@ public interface GameInstallType {
                 var ver = split[1].trim();
                 var m = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)").matcher(ver);
                 if (m.find()) {
-                    return Optional.of(new GameVersion(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), 0));
+                    return Optional.of(new GameVersion(
+                            Integer.parseInt(m.group(1)),
+                            Integer.parseInt(m.group(2)),
+                            Integer.parseInt(m.group(3)),
+                            0));
                 } else {
                     return Optional.empty();
                 }
@@ -844,9 +851,14 @@ public interface GameInstallType {
 
         @Override
         public Path chooseBackgroundImage(Path p) {
-            var def = p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loadingscreens").resolve("startscreen.dds");
+            var def = p.resolve("game")
+                    .resolve("loading_screen")
+                    .resolve("gfx")
+                    .resolve("loadingscreens")
+                    .resolve("startscreen.dds");
             var available = new ArrayList<Path>();
-            try (var stream = Files.list(p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loading_screen_assets"))) {
+            try (var stream = Files.list(
+                    p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("loading_screen_assets"))) {
                 var numberDirs = stream.toList();
                 for (Path numberDir : numberDirs) {
                     if (!numberDir.getFileName().toString().matches("\\d+")) {
@@ -854,7 +866,7 @@ public interface GameInstallType {
                     }
 
                     try (var imgStream = Files.list(numberDir.resolve("images"))) {
-                        var imgs =  imgStream.toList();
+                        var imgs = imgStream.toList();
                         for (Path img : imgs) {
                             if (img.getFileName().toString().matches(".+_00\\.dds")) {
                                 available.add(img);

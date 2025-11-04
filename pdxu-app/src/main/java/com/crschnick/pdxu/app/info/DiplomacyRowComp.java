@@ -32,8 +32,8 @@ public abstract class DiplomacyRowComp<T> extends SavegameInfoComp {
         }
 
         var imgView = GameImage.imageNode(getIcon(), CLASS_IMAGE_ICON);
-        var row =
-                TagRows.createTagRow(imgView, getIconTooltip(data), tags, (T t) -> mapTagTooltip(data, t), (T t) -> mapTag(data, t));
+        var row = TagRows.createTagRow(
+                imgView, getIconTooltip(data), tags, (T t) -> mapTagTooltip(data, t), (T t) -> mapTag(data, t));
         row.getStyleClass().add(CLASS_DIPLOMACY_ROW);
         row.getStyleClass().add(getStyleClass());
         return row;

@@ -116,21 +116,19 @@ public final class GameInstallation {
 
         var dirs =
                 switch (OsType.ofLocal()) {
-                    case OsType.Linux linux ->
-                            List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
+                    case OsType.Linux linux -> List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
                     case OsType.MacOs macOs ->
-                            List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName()
-                                    + ".app");
+                        List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName()
+                                + ".app");
                     case OsType.Windows windows ->
-                            List.of(
-                                    "C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
-                                    "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
+                        List.of(
+                                "C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
+                                "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
                 };
         var dirsString = dirs.stream().map(s -> "- " + s).collect(Collectors.joining("\n"));
 
         if (getInstallDir().startsWith(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
-            throw new InvalidInstallationException(
-                    "installDirIsUserDir", dirsString);
+            throw new InvalidInstallationException("installDirIsUserDir", dirsString);
         }
 
         if (!Files.isRegularFile(dist.getExecutable())) {

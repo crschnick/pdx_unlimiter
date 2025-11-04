@@ -2,8 +2,8 @@ package com.crschnick.pdxu.app.gui;
 
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
-
 import com.crschnick.pdxu.app.core.AppLayoutModel;
+
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.scene.Node;

@@ -48,8 +48,8 @@ public record ModernHeader(boolean unknown, int compressionType, boolean binary,
             return true;
         }
 
-        return Arrays.equals(input, 0, 9, "meta_data".getBytes(StandardCharsets.UTF_8), 0, 9) ||
-                Arrays.equals(input, 0, 8, "metadata".getBytes(StandardCharsets.UTF_8), 0, 8);
+        return Arrays.equals(input, 0, 9, "meta_data".getBytes(StandardCharsets.UTF_8), 0, 9)
+                || Arrays.equals(input, 0, 8, "metadata".getBytes(StandardCharsets.UTF_8), 0, 8);
     }
 
     public static ModernHeader determineHeaderForFile(byte[] data) {

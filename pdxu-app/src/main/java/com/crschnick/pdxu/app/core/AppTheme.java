@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
-import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.ColorHelper;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
@@ -17,7 +16,6 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
@@ -61,9 +59,11 @@ public class AppTheme {
         }
 
         stage.getScene().rootProperty().subscribe(parent -> {
-            applyClasses(parent, AppPrefs.get().theme().getValue(), AppPrefs.get().performanceMode().getValue());
+            applyClasses(
+                    parent,
+                    AppPrefs.get().theme().getValue(),
+                    AppPrefs.get().performanceMode().getValue());
         });
-
 
         // Allow for GC
         var ref = new WeakReference<>(stage);
@@ -96,8 +96,7 @@ public class AppTheme {
             return;
         }
 
-        r.pseudoClassStateChanged(
-                PseudoClass.getPseudoClass(OsType.ofLocal().getId()), true);
+        r.pseudoClassStateChanged(PseudoClass.getPseudoClass(OsType.ofLocal().getId()), true);
 
         Theme.ALL.forEach(theme -> {
             r.pseudoClassStateChanged(

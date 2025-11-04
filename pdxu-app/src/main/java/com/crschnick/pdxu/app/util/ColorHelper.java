@@ -11,9 +11,9 @@ import java.util.List;
 public class ColorHelper {
 
     public static double colorDistance(int input, int c) {
-        var dist = Math.sqrt(Math.pow(getRed(input) - getRed(c), 2.0) +
-                Math.pow(getGreen(input) - getGreen(c), 2.0) +
-                Math.pow(getBlue(input) - getBlue(c), 2.0));
+        var dist = Math.sqrt(Math.pow(getRed(input) - getRed(c), 2.0)
+                + Math.pow(getGreen(input) - getGreen(c), 2.0)
+                + Math.pow(getBlue(input) - getBlue(c), 2.0));
         return dist;
     }
 
@@ -22,9 +22,9 @@ public class ColorHelper {
         int cMin = -1;
         int counter = 0;
         for (int c : colors) {
-            var dist = Math.sqrt(Math.pow(getRed(input) - getRed(c), 2.0) +
-                    Math.pow(getGreen(input) - getGreen(c), 2.0) +
-                    Math.pow(getBlue(input) - getBlue(c), 2.0));
+            var dist = Math.sqrt(Math.pow(getRed(input) - getRed(c), 2.0)
+                    + Math.pow(getGreen(input) - getGreen(c), 2.0)
+                    + Math.pow(getBlue(input) - getBlue(c), 2.0));
             if (dist < minDist) {
                 minDist = dist;
                 cMin = counter;

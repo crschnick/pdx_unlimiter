@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.info.eu5;
 
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.IronmanComp;
+
 import javafx.scene.image.Image;
 
 public class Eu5IronmanComp extends IronmanComp {

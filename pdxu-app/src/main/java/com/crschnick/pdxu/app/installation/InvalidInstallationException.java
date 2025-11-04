@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.core.AppI18n;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public final class InvalidInstallationException extends Exception {

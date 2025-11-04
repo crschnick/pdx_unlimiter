@@ -58,9 +58,7 @@ public class AppArguments {
         }
     }
 
-    @CommandLine.Command(
-            subcommands = {RenderCommand.class}
-    )
+    @CommandLine.Command(subcommands = {RenderCommand.class})
     public static class LauncherCommand implements Callable<Integer> {
 
         @CommandLine.Parameters(paramLabel = "<input>")

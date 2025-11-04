@@ -10,8 +10,10 @@ import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
+
 import javafx.scene.control.Button;
 import javafx.scene.layout.Region;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.nio.file.Path;
@@ -73,8 +75,12 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
     private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(
             new CoaPreview(),
             new GuiEditorNodeTagFactory.CacheTagFactory(CACHED_KEYS),
-            new ImagePreview(Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
-            new ImagePreview(Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
+            new ImagePreview(
+                    Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
+            new ImagePreview(
+                    Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("colored_emblems"),
+                    "texture",
+                    "mdi-file"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory(
                     Set.of("metadata"),
                     "This node contains basic information and the meta data of this savegame that is shown in the main menu. "
@@ -88,10 +94,8 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public Map<String, NodePointer> createCommonJumps(EditorState state) {
-        var countryId = NodePointer.builder()
-                .name("played_country")
-                .name("country")
-                .build();
+        var countryId =
+                NodePointer.builder().name("played_country").name("country").build();
         var country = NodePointer.builder()
                 .name("countries")
                 .name("database")
@@ -100,25 +104,39 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
 
         var map = new LinkedHashMap<String, NodePointer>();
         map.put("Mods", NodePointer.builder().name("metadata").name("mods").build());
-        map.put("DLCs", NodePointer.builder().name("metadata").name("enabled_dlcs").build());
+        map.put(
+                "DLCs",
+                NodePointer.builder().name("metadata").name("enabled_dlcs").build());
         map.put(
                 "Settings",
                 NodePointer.builder().name("game_rules").name("setting").build());
-        map.put("Ironman Settings", NodePointer.builder().name("ironman_manager").build());
+        map.put(
+                "Ironman Settings",
+                NodePointer.builder().name("ironman_manager").build());
         map.put("Player country", country);
 
-        var rulerIdPointer = NodePointer.builder().name("government").name("ruler").build();
-        var rulerPointer = NodePointer.builder().name("character_db").name("database").pointerEvaluation(country, (cn) -> {
-            var idNode = rulerIdPointer.get(cn);
-            return idNode != null ? idNode.getString() : null;
-        }).build();
+        var rulerIdPointer =
+                NodePointer.builder().name("government").name("ruler").build();
+        var rulerPointer = NodePointer.builder()
+                .name("character_db")
+                .name("database")
+                .pointerEvaluation(country, (cn) -> {
+                    var idNode = rulerIdPointer.get(cn);
+                    return idNode != null ? idNode.getString() : null;
+                })
+                .build();
         map.put("Player country ruler", rulerPointer);
 
-        var heirIdPointer = NodePointer.builder().name("government").name("heir").build();
-        var heirPointer = NodePointer.builder().name("character_db").name("database").pointerEvaluation(country, (cn) -> {
-            var idNode = heirIdPointer.get(cn);
-            return idNode != null ? idNode.getString() : null;
-        }).build();
+        var heirIdPointer =
+                NodePointer.builder().name("government").name("heir").build();
+        var heirPointer = NodePointer.builder()
+                .name("character_db")
+                .name("database")
+                .pointerEvaluation(country, (cn) -> {
+                    var idNode = heirIdPointer.get(cn);
+                    return idNode != null ? idNode.getString() : null;
+                })
+                .build();
         map.put("Player country heir", heirPointer);
 
         return map;
@@ -154,17 +172,61 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
     }
 
     private static final List<String> STATE_KEYS = List.of("state");
-    private static final List<String> CULTURE_KEYS = List.of("culture", "primary_culture", "primary_cultures", "accepted_cultures", "tolerated_cultures");
-    private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "provinces", "original_capital", "birth", "cores", "home", "market_parent");
-    private static final List<String> COUNTRY_KEYS = List.of("curia", "military_order", "bishopric", "countries", "country", "owner", "controller", "previous_owner", "ruled", "all_members", "leader", "celestial_governor");
-    private static final List<String> CHARACTER_KEYS = List.of("founder", "head", "ruler", "heir", "actor", "father", "mother", "spouse", "heir_of", "children", "saints", "artist", "character", "borrower");
+    private static final List<String> CULTURE_KEYS =
+            List.of("culture", "primary_culture", "primary_cultures", "accepted_cultures", "tolerated_cultures");
+    private static final List<String> PROVINCE_KEYS = List.of(
+            "capital",
+            "origin",
+            "province",
+            "provinces",
+            "original_capital",
+            "birth",
+            "cores",
+            "home",
+            "market_parent");
+    private static final List<String> COUNTRY_KEYS = List.of(
+            "curia",
+            "military_order",
+            "bishopric",
+            "countries",
+            "country",
+            "owner",
+            "controller",
+            "previous_owner",
+            "ruled",
+            "all_members",
+            "leader",
+            "celestial_governor");
+    private static final List<String> CHARACTER_KEYS = List.of(
+            "founder",
+            "head",
+            "ruler",
+            "heir",
+            "actor",
+            "father",
+            "mother",
+            "spouse",
+            "heir_of",
+            "children",
+            "saints",
+            "artist",
+            "character",
+            "borrower");
     private static final List<String> CABINET_KEYS = List.of("cabinet_entries");
     private static final List<String> RULER_TERM_KEYS = List.of("ruler_term");
     private static final List<String> MARKET_KEYS = List.of("market", "second_best_market");
     private static final List<String> RELIGION_KEYS = List.of("religion", "primary_religion");
     private static final List<String> DYNASTY_KEYS = List.of("dynasty", "dynasties");
     private static final List<String> HOLY_SITE_KEYS = List.of("holy_site", "holy_sites");
-    private static final List<String> LOCATION_KEYS = List.of("location", "locations", "owned_locations", "controlled_locations", "core_locations", "locations_ever_affected", "from", "to");
+    private static final List<String> LOCATION_KEYS = List.of(
+            "location",
+            "locations",
+            "owned_locations",
+            "controlled_locations",
+            "core_locations",
+            "locations_ever_affected",
+            "from",
+            "to");
     private static final List<String> UNIT_KEYS = List.of("unit");
     private static final List<String> POPULATION_KEYS = List.of("pop", "pops");
 
@@ -184,7 +246,11 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                     .build();
         }
         if (PROVINCE_KEYS.contains(key)) {
-            return NodePointer.builder().name("provinces").name("database").name(val).build();
+            return NodePointer.builder()
+                    .name("provinces")
+                    .name("database")
+                    .name(val)
+                    .build();
         }
 
         if (COUNTRY_KEYS.contains(key)) {

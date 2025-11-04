@@ -10,7 +10,6 @@ import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.css.PseudoClass;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Region;

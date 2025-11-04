@@ -4,11 +4,9 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
-import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
-import javafx.scene.image.Image;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import javafx.scene.image.Image;
 
 public class Eu5DucatsComp extends SimpleInfoComp {
 
@@ -23,7 +21,8 @@ public class Eu5DucatsComp extends SimpleInfoComp {
                 .getNodeForKey(data.eu5().getTag().getId() + "")
                 .getNodeForKey("economy")
                 .getNodeForKeyIfExistent("total_debt")
-                .map(node -> (int) node.getDouble()).orElse(0);
+                .map(node -> (int) node.getDouble())
+                .orElse(0);
         value = (int) content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")

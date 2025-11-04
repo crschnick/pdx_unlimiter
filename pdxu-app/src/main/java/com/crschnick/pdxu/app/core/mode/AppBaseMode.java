@@ -72,9 +72,9 @@ public class AppBaseMode extends AppOperationMode {
         AppPrefs.get().initInstallations();
         AppLayoutModel.init();
 
-//        AppLayoutModel.get().getActiveGame().ifPresent(game -> {
-//            GameImage.loadGameImages(game);
-//        });
+        //        AppLayoutModel.get().getActiveGame().ifPresent(game -> {
+        //            GameImage.loadGameImages(game);
+        //        });
 
         GameCacheManager.init();
         AppFileWatcher.init();

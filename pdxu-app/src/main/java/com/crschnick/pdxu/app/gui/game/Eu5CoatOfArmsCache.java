@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.info.SavegameData;
-import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
 import com.crschnick.pdxu.app.installation.GameFileContext;
@@ -14,13 +13,13 @@ import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.eu5.Eu5Tag;
+
 import javafx.scene.image.Image;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -135,9 +134,9 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
                 }
 
                 return CoatOfArms.fromNode(found.get(), s -> {
-                            var parentFound = all.getNodesForKey(s);
-                            return !parentFound.isEmpty() ? parentFound.getLast() : null;
-                        });
+                    var parentFound = all.getNodesForKey(s);
+                    return !parentFound.isEmpty() ? parentFound.getLast() : null;
+                });
             };
             var img = Eu5TagRenderer.renderImage(coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
             var convertedImage = ImageHelper.toFXImage(img);

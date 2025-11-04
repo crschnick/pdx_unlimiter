@@ -117,9 +117,9 @@ public class Ck3Tag {
         });
 
         var coa = CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"), null);
-        var name = n.getNodeForKey("meta_data").hasKey("meta_player_name") ?
-                n.getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString() :
-                n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
+        var name = n.getNodeForKey("meta_data").hasKey("meta_player_name")
+                ? n.getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString()
+                : n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
         var landedNode = personNode.getNodeForKey("landed_data");
         var gv = landedNode.getNodeForKey("government").getString();

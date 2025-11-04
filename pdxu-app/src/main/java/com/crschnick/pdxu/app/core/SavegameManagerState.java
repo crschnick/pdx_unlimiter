@@ -11,7 +11,6 @@ import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.SetChangeListener;

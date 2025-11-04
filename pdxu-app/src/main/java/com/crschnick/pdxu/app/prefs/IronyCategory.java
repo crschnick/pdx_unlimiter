@@ -2,10 +2,8 @@ package com.crschnick.pdxu.app.prefs;
 
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.base.PathChoiceComp;
-import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.OptionsBuilder;
-import javafx.beans.binding.Bindings;
 
 public class IronyCategory extends AppPrefsCategory {
 

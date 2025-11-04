@@ -16,9 +16,6 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 
 import javafx.application.Platform;
 
-import lombok.SneakyThrows;
-import picocli.CommandLine;
-
 public class AppInit {
 
     private static void handleUncaught(Thread thread, Throwable ex) {

@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import atlantafx.base.theme.Styles;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;

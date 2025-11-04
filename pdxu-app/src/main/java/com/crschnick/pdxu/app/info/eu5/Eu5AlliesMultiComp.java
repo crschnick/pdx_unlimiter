@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu5.Eu5Tag;
+
 import javafx.scene.image.Image;
 
 import java.util.ArrayList;
@@ -43,11 +44,13 @@ public class Eu5AlliesMultiComp extends Eu5DiplomacyRowComp {
             }
 
             if (node.getNodeForKey("first").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
+                list.add(Eu5Tag.getTag(
+                        data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
             }
 
             if (node.getNodeForKey("second").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(data.eu5().getAllTags(), node.getNodeForKey("first").getLong()));
+                list.add(Eu5Tag.getTag(
+                        data.eu5().getAllTags(), node.getNodeForKey("first").getLong()));
             }
         });
         return list;

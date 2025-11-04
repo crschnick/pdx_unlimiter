@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.core.AppI18n;
-import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppModifiedStage;
 import com.crschnick.pdxu.app.core.window.AppWindowStyle;
 import com.crschnick.pdxu.app.util.Hyperlinks;
@@ -32,7 +31,9 @@ public class GuiCoaViewer<T extends GuiCoaDisplayType> {
 
     public void createStage() {
         Stage stage = new Stage();
-        stage.titleProperty().bind(AppI18n.observable("coaPreview", state.editorNode.getKeyName().orElse("?")));
+        stage.titleProperty()
+                .bind(AppI18n.observable(
+                        "coaPreview", state.editorNode.getKeyName().orElse("?")));
         var scene = new Scene(createLayout(), 800, 600);
         scene.setFill(Color.TRANSPARENT);
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F5), () -> state.refresh());

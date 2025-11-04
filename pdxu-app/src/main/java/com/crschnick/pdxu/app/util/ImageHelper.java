@@ -8,12 +8,8 @@ import javafx.scene.image.*;
 
 import com.realityinteractive.imageio.tga.TGAImageReaderSpi;
 
-import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_Profile;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.awt.image.ColorModel;
-import java.awt.image.DirectColorModel;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -24,8 +20,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 
 import static com.crschnick.pdxu.app.util.ColorHelper.*;
-import static java.awt.color.ColorSpace.CS_LINEAR_RGB;
-import static java.awt.color.ColorSpace.CS_sRGB;
 
 public class ImageHelper {
 
@@ -121,8 +115,10 @@ public class ImageHelper {
             BufferedImage image = ImageIO.read(input.toFile());
 
             // Fix eu5 images not being declared srgb even though they should
-            if (!(boolean) srgbField.get(image.getColorModel()) && ColorModel.getRGBdefault().isCompatibleRaster(image.getRaster())) {
-                image = new BufferedImage(ColorModel.getRGBdefault(), image.getRaster(), false, new Hashtable<>());;
+            if (!(boolean) srgbField.get(image.getColorModel())
+                    && ColorModel.getRGBdefault().isCompatibleRaster(image.getRaster())) {
+                image = new BufferedImage(ColorModel.getRGBdefault(), image.getRaster(), false, new Hashtable<>());
+                ;
             }
 
             if (pixelSelector != null) {

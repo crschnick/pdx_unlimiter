@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.eu5.Eu5Tag;
+
 import javafx.scene.image.Image;
 
 import java.util.ArrayList;
@@ -37,13 +38,16 @@ public class Eu5VassalMultiComp extends Eu5DiplomacyRowComp {
                 return;
             }
 
-            var type = node.getNodeForKeyIfExistent("subject_type").map(Node::getString).orElse(null);
+            var type = node.getNodeForKeyIfExistent("subject_type")
+                    .map(Node::getString)
+                    .orElse(null);
             if (!"vassal".equals(type)) {
                 // return;
             }
 
             if (node.getNodeForKey("first").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
+                list.add(Eu5Tag.getTag(
+                        data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
             }
         });
         return list;

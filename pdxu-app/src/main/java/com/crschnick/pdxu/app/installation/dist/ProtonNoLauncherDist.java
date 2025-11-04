@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.OsType;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

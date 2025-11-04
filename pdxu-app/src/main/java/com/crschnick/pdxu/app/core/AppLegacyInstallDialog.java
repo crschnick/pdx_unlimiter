@@ -8,6 +8,7 @@ import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -35,7 +36,8 @@ public class AppLegacyInstallDialog {
             return;
         }
 
-        var exe = WindowsRegistry.of().readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\pdxu\\DefaultIcon");
+        var exe = WindowsRegistry.of()
+                .readStringValueIfPresent(WindowsRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\pdxu\\DefaultIcon");
         if (exe.isEmpty()) {
             deleteLegacyLauncherDataIfNeeded();
             return;
@@ -47,19 +49,26 @@ public class AppLegacyInstallDialog {
             return;
         }
 
-        var modal = ModalOverlay.of("legacyInstallTitle", AppDialog.dialogText(AppI18n.observable("legacyInstallContent")));
+        var modal =
+                ModalOverlay.of("legacyInstallTitle", AppDialog.dialogText(AppI18n.observable("legacyInstallContent")));
         modal.addButton(new ModalButton("keepLegacy", () -> {}, true, false));
-        modal.addButton(new ModalButton("uninstallLegacy", () -> {
-            ThreadHelper.runAsync(() -> {
-                LocalExec.readStdoutIfPossible("cmd", "/c", "start \"\" /wait msiexec /x {9D873C37-DCDA-3F50-A52A-DAB1F1A43DAE}");
-                deleteLegacyLauncherDataIfNeeded();
-            });
-        }, true, true));
+        modal.addButton(new ModalButton(
+                "uninstallLegacy",
+                () -> {
+                    ThreadHelper.runAsync(() -> {
+                        LocalExec.readStdoutIfPossible(
+                                "cmd", "/c", "start \"\" /wait msiexec /x {9D873C37-DCDA-3F50-A52A-DAB1F1A43DAE}");
+                        deleteLegacyLauncherDataIfNeeded();
+                    });
+                },
+                true,
+                true));
         modal.show();
     }
 
     private static void deleteLegacyLauncherDataIfNeeded() {
-        var path = AppSystemInfo.ofWindows().getLocalAppData().resolve("Programs").resolve("Pdx-Unlimiter");
+        var path =
+                AppSystemInfo.ofWindows().getLocalAppData().resolve("Programs").resolve("Pdx-Unlimiter");
         if (Files.exists(path)) {
             FileUtils.deleteQuietly(path.toFile());
         }

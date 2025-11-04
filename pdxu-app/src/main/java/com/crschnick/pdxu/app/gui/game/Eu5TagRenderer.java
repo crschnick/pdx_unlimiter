@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
-import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.node.NodeEvaluator;

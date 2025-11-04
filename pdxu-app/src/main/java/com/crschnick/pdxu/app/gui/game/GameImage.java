@@ -179,7 +179,9 @@ public class GameImage {
         }
         if (g == Game.EU5) {
             img = ImageHelper.loadImage(iconFile, integer -> {
-                if (ColorHelper.getRed(integer) >= 0xF7 && ColorHelper.getGreen(integer) >= 0xF7 && ColorHelper.getBlue(integer) >= 0xF7) {
+                if (ColorHelper.getRed(integer) >= 0xF7
+                        && ColorHelper.getGreen(integer) >= 0xF7
+                        && ColorHelper.getBlue(integer) >= 0xF7) {
                     return 0;
                 } else {
                     return integer;
@@ -233,31 +235,38 @@ public class GameImage {
                 .resolve("coat_of_arms")
                 .resolve("title_86.dds"));
 
-        CK3_HOUSE_MASK = loadApplicable(installPath
-                .resolve("game")
-                .resolve("gfx")
-                .resolve("interface")
-                .resolve("coat_of_arms")
-                .resolve("house_mask.dds"), installPath
-                .resolve("game")
-                .resolve("gfx")
-                .resolve("interface")
-                .resolve("coat_of_arms")
-                .resolve("frames")
-                .resolve("house_mask.dds"));
-        CK3_HOUSE_FRAME = findApplicable(ImageHelper.cut(ImageHelper.loadImage(installPath
+        CK3_HOUSE_MASK = loadApplicable(
+                installPath
                         .resolve("game")
                         .resolve("gfx")
                         .resolve("interface")
                         .resolve("coat_of_arms")
-                        .resolve("house_115.dds")), new Rectangle2D(150, 0, 150, 150)),
-                ImageHelper.cut(ImageHelper.loadImage(installPath
-                .resolve("game")
-                .resolve("gfx")
-                .resolve("interface")
-                .resolve("coat_of_arms")
-                .resolve("frames")
-                .resolve("house.dds")), new Rectangle2D(148, 1, 174, 158)));
+                        .resolve("house_mask.dds"),
+                installPath
+                        .resolve("game")
+                        .resolve("gfx")
+                        .resolve("interface")
+                        .resolve("coat_of_arms")
+                        .resolve("frames")
+                        .resolve("house_mask.dds"));
+        CK3_HOUSE_FRAME = findApplicable(
+                ImageHelper.cut(
+                        ImageHelper.loadImage(installPath
+                                .resolve("game")
+                                .resolve("gfx")
+                                .resolve("interface")
+                                .resolve("coat_of_arms")
+                                .resolve("house_115.dds")),
+                        new Rectangle2D(150, 0, 150, 150)),
+                ImageHelper.cut(
+                        ImageHelper.loadImage(installPath
+                                .resolve("game")
+                                .resolve("gfx")
+                                .resolve("interface")
+                                .resolve("coat_of_arms")
+                                .resolve("frames")
+                                .resolve("house.dds")),
+                        new Rectangle2D(148, 1, 174, 158)));
 
         CK3_SKILL_DIPLOMACY = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_DIPLOMACY, new Rectangle2D(0, 0, 60, 60));
@@ -277,53 +286,42 @@ public class GameImage {
         CK3_SKILL_PROWESS = ImageHelper.loadImage(i.resolve("icon_skills.dds"));
         VIEWPORTS.put(CK3_SKILL_PROWESS, new Rectangle2D(300, 0, 60, 60));
 
-        CK3_ICON_RULER = ImageHelper.loadImage(
-                i.resolve("hegemony_crown.dds"));
+        CK3_ICON_RULER = ImageHelper.loadImage(i.resolve("hegemony_crown.dds"));
         CK3_ICON_HEIR = ImageHelper.loadImage(i.resolve("flat_icons").resolve("heir.dds"));
         CK3_ICON_TITLES = ImageHelper.loadImage(i.resolve("message_feed").resolve("titles.dds"));
         CK3_ICON_CLAIMS = ImageHelper.loadImage(i.resolve("casus_bellis").resolve("claim_cb.dds"));
 
         CK3_REALM_MASK = loadApplicable(
                 i.resolve("realm_masks").resolve("_default.dds"),
-                i.resolve("realm_frames").resolve("_default_mask.dds")
-        );
+                i.resolve("realm_frames").resolve("_default_mask.dds"));
         CK3_REALM_CLAN_MASK = loadApplicable(
                 i.resolve("realm_masks").resolve("clan_government.dds"),
-                i.resolve("realm_frames").resolve("clan_government_mask.dds")
-        );
+                i.resolve("realm_frames").resolve("clan_government_mask.dds"));
         CK3_REALM_REPUBLIC_MASK = loadApplicable(
                 i.resolve("realm_masks").resolve("republic_government.dds"),
-                i.resolve("realm_frames").resolve("republic_government_mask.dds")
-        );
+                i.resolve("realm_frames").resolve("republic_government_mask.dds"));
 
         CK3_REALM_THEOCRACY_MASK = loadApplicable(
                 i.resolve("realm_masks").resolve("theocracy_government.dds"),
-                i.resolve("realm_frames").resolve("theocracy_government_mask.dds")
-        );
+                i.resolve("realm_frames").resolve("theocracy_government_mask.dds"));
         CK3_REALM_TRIBAL_MASK = loadApplicable(
                 i.resolve("realm_masks").resolve("tribal_government.dds"),
-                i.resolve("realm_frames").resolve("tribal_government_mask.dds")
-        );
+                i.resolve("realm_frames").resolve("tribal_government_mask.dds"));
         CK3_REALM_FRAME = loadApplicable(
                 i.resolve("realm_frames").resolve("_default_115.dds"),
-                i.resolve("realm_frames").resolve("_default_115_frame.dds")
-        );
+                i.resolve("realm_frames").resolve("_default_115_frame.dds"));
         CK3_REALM_CLAN_FRAME = loadApplicable(
                 i.resolve("realm_frames").resolve("clan_government.dds"),
-                i.resolve("realm_frames").resolve("clan_government_115_frame.dds")
-        );
+                i.resolve("realm_frames").resolve("clan_government_115_frame.dds"));
         CK3_REALM_REPUBLIC_FRAME = loadApplicable(
                 i.resolve("realm_frames").resolve("republic_government.dds"),
-                i.resolve("realm_frames").resolve("republic_government_115_frame.dds")
-        );
+                i.resolve("realm_frames").resolve("republic_government_115_frame.dds"));
         CK3_REALM_THEOCRACY_FRAME = loadApplicable(
                 i.resolve("realm_frames").resolve("theocracy_government.dds"),
-                i.resolve("realm_frames").resolve("theocracy_government_115_frame.dds")
-        );
+                i.resolve("realm_frames").resolve("theocracy_government_115_frame.dds"));
         CK3_REALM_TRIBAL_FRAME = loadApplicable(
                 i.resolve("realm_frames").resolve("tribal_government.dds"),
-                i.resolve("realm_frames").resolve("tribal_government_115_frame.dds")
-        );
+                i.resolve("realm_frames").resolve("tribal_government_115_frame.dds"));
 
         CK3_COA_OVERLAY = ImageHelper.loadImage(installPath
                 .resolve("game")
@@ -337,17 +335,14 @@ public class GameImage {
         CK3_ICON_GOLD = ImageHelper.loadImage(i.resolve("icon_gold.dds"));
         CK3_ICON_PRESTIGE = loadApplicable(
                 i.resolve("currencies").resolve("icon_prestige_01.dds"),
-                i.resolve("modifiers").resolve("icon_prestige_01.dds")
-        );
+                i.resolve("modifiers").resolve("icon_prestige_01.dds"));
         CK3_ICON_PIETY = loadApplicable(
                 i.resolve("currencies").resolve("icon_piety_christian_01.dds"),
-                i.resolve("modifiers").resolve("icon_piety_christian_01.dds")
-        );
+                i.resolve("modifiers").resolve("icon_piety_christian_01.dds"));
         CK3_ICON_SOLDIERS = ImageHelper.loadImage(i.resolve("icon_soldier.dds"));
         CK3_ICON_RENOWN = loadApplicable(
                 i.resolve("currencies").resolve("icon_dynasty_prestige_01.dds"),
-                i.resolve("modifiers").resolve("icon_dynasty_prestige_01.dds")
-        );
+                i.resolve("modifiers").resolve("icon_dynasty_prestige_01.dds"));
         CK3_ICON_HEALTH = ImageHelper.loadImage(i.resolve("traits").resolve("_frame_health.dds"));
     }
 
@@ -417,7 +412,6 @@ public class GameImage {
 
         EU5_BACKGROUND = ImageHelper.loadImage(
                 GameInstallation.ALL.get(Game.EU5).getType().chooseBackgroundImage(installPath));
-
 
         EU5_ICON_VASSAL = ImageHelper.loadImage(i.resolve("subject_types", "vassal.dds"));
         EU5_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("diplomatic_status", "alliance.dds"));

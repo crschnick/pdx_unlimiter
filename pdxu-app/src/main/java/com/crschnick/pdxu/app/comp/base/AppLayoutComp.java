@@ -3,9 +3,9 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.core.AppLayoutModel;
-import com.crschnick.pdxu.app.prefs.AppPrefsComp;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.prefs.AppPrefsComp;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;

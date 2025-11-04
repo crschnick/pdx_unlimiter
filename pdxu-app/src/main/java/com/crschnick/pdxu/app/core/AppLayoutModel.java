@@ -8,14 +8,13 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.UserReportComp;
 import com.crschnick.pdxu.app.platform.BindingsHelper;
-import com.crschnick.pdxu.app.prefs.AppPrefsComp;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.PlatformThread;
+import com.crschnick.pdxu.app.prefs.AppPrefsComp;
 import com.crschnick.pdxu.app.util.GlobalTimer;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

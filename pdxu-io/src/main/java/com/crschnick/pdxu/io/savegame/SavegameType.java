@@ -423,7 +423,8 @@ public interface SavegameType {
         }
 
         public UUID getCampaignIdHeuristic(SavegameContent c) {
-            var seed = UUID.fromString(c.get().getNodeForKeys("metadata", "playthrough_id").getString());
+            var seed = UUID.fromString(
+                    c.get().getNodeForKeys("metadata", "playthrough_id").getString());
             return seed;
         }
 

@@ -2,7 +2,6 @@ package com.crschnick.pdxu.editor.gui;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.AppTheme;
-import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.core.window.AppModifiedStage;
 import com.crschnick.pdxu.app.core.window.AppSideWindow;
 import com.crschnick.pdxu.app.core.window.AppWindowStyle;
@@ -55,7 +54,6 @@ public class GuiEditor {
                 }
             });
         });
-
 
         var node = GuiEditor.create(state);
         // Disable focus on startup
@@ -294,8 +292,10 @@ public class GuiEditor {
                     Button edit = new Button(null, new FontIcon());
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-                    var disable = !state.isEditable() || (n instanceof EditorSimpleNode es &&
-                            es.getBackingNode().isValue() && es.getBackingNode().getString().contains("\n"));
+                    var disable = !state.isEditable()
+                            || (n instanceof EditorSimpleNode es
+                                    && es.getBackingNode().isValue()
+                                    && es.getBackingNode().getString().contains("\n"));
                     edit.setDisable(disable);
                     edit.setOnAction(e -> {
                         state.getExternalState().startEdit(state, (EditorRealNode) n);
