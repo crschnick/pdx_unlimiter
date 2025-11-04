@@ -89,6 +89,16 @@ public class OptionsBuilder {
         this.lastCompHeadReference = comp;
     }
 
+    public OptionsBuilder disable() {
+        lastCompHeadReference.disable(new SimpleBooleanProperty(true));
+        return this;
+    }
+
+    public OptionsBuilder disable(ObservableValue<Boolean> b) {
+        lastCompHeadReference.disable(b);
+        return this;
+    }
+
     public OptionsBuilder addToggle(Property<Boolean> prop) {
         var comp = new ToggleSwitchComp(prop, null, null);
         pushComp(comp);

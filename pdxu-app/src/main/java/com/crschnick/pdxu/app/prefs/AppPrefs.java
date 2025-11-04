@@ -206,7 +206,7 @@ public final class AppPrefs {
             .build());
     final BooleanProperty editorEnableNodeJumps = map(Mapping.builder()
             .property(new GlobalBooleanProperty(true))
-            .key("editorEnableNodeTags")
+            .key("editorEnableNodeJumps")
             .valueClass(Boolean.class)
             .requiresRestart(false)
             .build());

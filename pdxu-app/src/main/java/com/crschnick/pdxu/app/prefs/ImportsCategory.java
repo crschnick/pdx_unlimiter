@@ -39,9 +39,8 @@ public class ImportsCategory extends AppPrefsCategory {
                         .pref(prefs.timedImportsInterval)
                         .addComp(Comp.of(() -> {
                                     var field = new IntFieldComp(prefs.timedImportsInterval)
-                                            .disable(new ReadOnlyBooleanWrapper(true))
                                             .maxWidth(40);
-                                    field.apply(struc -> struc.get().setOpacity(1.0));
+                                    field.apply(struc -> struc.get().setEditable(false));
                                     field.apply(struc -> struc.get().setAlignment(Pos.CENTER));
                                     field.padding(new Insets(4, 8, 4, 8));
 
@@ -59,6 +58,7 @@ public class ImportsCategory extends AppPrefsCategory {
                                     return hbox;
                                 })
                                 .maxWidth(600))
+                        .disable(prefs.enableTimedImports.not())
                         .pref(prefs.importOnNormalGameExit)
                         .addToggle(prefs.importOnNormalGameExit)
                         .pref(prefs.deleteOnImport)
