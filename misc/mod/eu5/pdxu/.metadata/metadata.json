@@ -1,0 +1,11 @@
+{
+  "name" : "Pdx-Unlimiter",
+  "id" : "com.crschnick.pdxu",
+  "version" : "1.0",
+  "supported_game_version" : "1.*",
+  "short_description" : "[Not a mod] A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games.",
+  "tags" : [ "Utilities" ],
+  "relationships" : [],
+  "picture": "thumbnail.png",
+  "game_custom_data" : {}
+}
