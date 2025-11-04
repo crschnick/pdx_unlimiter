@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -62,8 +63,10 @@ public class GuiSavegameEntryListComp<T, I extends SavegameInfo<T>> extends Simp
         grid.setVisible(!savegameManagerState.isStorageEmpty());
         ncn.setVisible(savegameManagerState.isStorageEmpty());
         savegameManagerState.storageEmptyProperty().addListener((c, o, n) -> {
-            grid.setVisible(!n);
-            ncn.setVisible(n);
+            Platform.runLater(() -> {
+                grid.setVisible(!n);
+                ncn.setVisible(n);
+            });
         });
         grid.setAccessibleText("Campaign savegames");
         return pane;

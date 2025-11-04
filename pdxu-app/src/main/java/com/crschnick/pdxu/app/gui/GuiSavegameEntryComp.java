@@ -285,7 +285,9 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
                 }
                 if (add) {
                     Platform.runLater(() -> {
-                        dynamicButtons.getChildren().addFirst(edit);
+                        if (!dynamicButtons.getChildren().contains(edit)) {
+                            dynamicButtons.getChildren().addFirst(edit);
+                        }
                     });
                 } else {
                     Platform.runLater(() -> {
