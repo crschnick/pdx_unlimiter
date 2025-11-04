@@ -82,8 +82,6 @@ public abstract class GameDist {
             var pb = new ProcessBuilder().command(input);
             pb.environment().putAll(env);
             pb.start();
-        } else {
-            throw new UnsupportedOperationException();
         }
     }
 

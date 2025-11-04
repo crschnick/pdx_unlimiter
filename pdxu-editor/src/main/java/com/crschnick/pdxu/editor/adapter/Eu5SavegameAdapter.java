@@ -103,10 +103,6 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                 .build();
 
         var map = new LinkedHashMap<String, NodePointer>();
-        map.put("Mods", NodePointer.builder().name("metadata").name("mods").build());
-        map.put(
-                "DLCs",
-                NodePointer.builder().name("metadata").name("enabled_dlcs").build());
         map.put(
                 "Settings",
                 NodePointer.builder().name("game_rules").name("setting").build());
