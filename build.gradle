@@ -160,7 +160,8 @@ project.ext {
     // Check if in build pipeline
     ci = System.getenv('CI') != null
     // Create AOT cache for runtime image only in build pipeline
-    enableAot = ci
+    // TODO: This crashes the JVM on some systems. Why?
+    enableAot = false
 
     // Names of your app
     productName = 'Pdx-Unlimiter'
