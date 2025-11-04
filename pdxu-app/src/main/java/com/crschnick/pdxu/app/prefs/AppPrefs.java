@@ -488,7 +488,7 @@ public final class AppPrefs {
         }
 
         if (storageDirectory.getValue() == null || !Files.exists(storageDirectory.getValue())) {
-            storageDirectory.setValue(AppProperties.get().getDataDir().resolve("storage"));
+            storageDirectory.setValue(AppProperties.get().getDataDir().resolve("savegames"));
         }
     }
 
