@@ -946,93 +946,18 @@ public interface GameInstallType {
         }
 
         public List<String> getEnabledMods(Path dir, Path userDir) throws Exception {
-            var file = userDir.resolve("content_load.json");
-            if (!Files.exists(file)) {
-                return List.of();
-            }
-
-            var node = JacksonMapper.getDefault().readTree(file.toFile());
-            if (node.get("enabledMods") == null) {
-                return List.of();
-            }
-
-            return StreamSupport.stream(node.required("enabledMods").spliterator(), false)
-                    .map(n -> n.required("path").textValue())
-                    .collect(Collectors.toList());
+            return List.of();
         }
 
         public List<String> getDisabledDlcs(Path dir, Path userDir) throws Exception {
-            var file = userDir.resolve("content_load.json");
-            if (!Files.exists(file)) {
-                return List.of();
-            }
-
-            var node = JacksonMapper.getDefault().readTree(file.toFile());
-            if (node.get("disabledDLC") == null) {
-                return List.of();
-            }
-
-            return StreamSupport.stream(node.required("disabledDLC").spliterator(), false)
-                    .map(n -> n.required("paradoxAppId").textValue())
-                    .collect(Collectors.toList());
+            return List.of();
         }
 
         public void writeModAndDlcLoadFile(GameInstallation installation, List<GameMod> mods, List<GameDlc> dlcs)
-                throws Exception {
-            var file = installation.getUserDir().resolve("content_load.json");
-            ObjectNode n = JsonNodeFactory.instance.objectNode();
-
-            var modsToUse = mods;
-            n.putArray("enabledMods")
-                    .addAll(modsToUse.stream()
-                            .map(d -> d.getContentPath())
-                            .filter(path -> path.isPresent())
-                            .map(s -> JsonNodeFactory.instance
-                                    .objectNode()
-                                    .put("path", s.get().toString()))
-                            .toList());
-
-            var availableDlcs = installation.getDlcs();
-            var currentlyDisabledDlcs = installation.queryDisabledDlcs();
-            var dlcsToDisable = availableDlcs.stream()
-                    .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc))
-                            || (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
-                    .toList();
-
-            n.putArray("disabledDLC")
-                    .addAll(dlcsToDisable.stream()
-                            .map(dlc -> getDlcLauncherId(installation, dlc))
-                            .map(s -> JsonNodeFactory.instance.objectNode().put("paradoxAppId", s))
-                            .toList());
-            JacksonMapper.getDefault().writeValue(file.toFile(), n);
-        }
+                throws Exception {}
 
         public List<GameMod> loadMods(GameInstallation installation) throws IOException {
-            var modPaths = new ArrayList<Path>();
-
-            var workshop = installation.getDist().getWorkshopDir();
-            if (workshop.isPresent() && Files.isDirectory(workshop.get())) {
-                try (var list = Files.list(workshop.get())) {
-                    modPaths.addAll(list.toList());
-                }
-            }
-
-            var userDirMods = installation.getUserDir().resolve("mod");
-            if (Files.isDirectory(userDirMods)) {
-                try (var list = Files.list(userDirMods)) {
-                    modPaths.addAll(list.toList());
-                }
-            }
-
-            var mods = new ArrayList<GameMod>();
-            modPaths.forEach(f -> {
-                GameMod.fromVictoria3Directory(f).ifPresent(m -> {
-                    mods.add(m);
-                    TrackEvent.debug("Found mod " + m.getName().orElse("?") + " at "
-                            + m.getContentPath().orElse(null) + ".");
-                });
-            });
-            return mods;
+            return List.of();
         }
 
         public String getDlcLauncherId(GameInstallation installation, GameDlc dlc) {
