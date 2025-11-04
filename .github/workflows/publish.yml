@@ -117,7 +117,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '25'
+          java-version: '25.0.1'
           distribution: 'zulu'
           java-package: jdk
           cache: gradle
