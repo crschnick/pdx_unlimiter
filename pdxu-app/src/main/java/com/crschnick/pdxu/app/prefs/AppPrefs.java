@@ -132,7 +132,7 @@ public final class AppPrefs {
             .build());
     final Property<Path> storageDirectory = map(Mapping.builder()
             .property(
-                    new SimpleObjectProperty<>(AppProperties.get().getDataDir().resolve("storage")))
+                    new SimpleObjectProperty<>(AppProperties.get().getDataDir().resolve("savegames")))
             .key("storageDirectory")
             .valueClass(Path.class)
             .requiresRestart(true)
