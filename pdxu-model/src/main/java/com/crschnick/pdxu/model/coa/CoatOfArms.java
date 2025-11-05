@@ -23,8 +23,10 @@ public final class CoatOfArms {
     public static CoatOfArms fromNode(Node n, Function<String, Node> parentResolver) {
         List<Sub> subs = new ArrayList<>();
         subs.addAll(Sub.fromNode(n, parentResolver));
-        for (var subNode : n.getNodesForKey("sub")) {
-            subs.addAll(Sub.fromNode(subNode, parentResolver));
+        if (n.isArray()) {
+            for (var subNode : n.getNodesForKey("sub")) {
+                subs.addAll(Sub.fromNode(subNode, parentResolver));
+            }
         }
         return new CoatOfArms(subs);
     }
