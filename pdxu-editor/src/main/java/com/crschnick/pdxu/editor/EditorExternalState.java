@@ -10,6 +10,7 @@ import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 
+import com.crschnick.pdxu.io.parser.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -79,7 +80,13 @@ public class EditorExternalState {
                                     e.registerChange();
                                     // Use strict parsing rules!
                                     var name = e.editorNode.getNavigationName();
-                                    ArrayNode newNode = e.state.getParser().parse(name, changed, true);
+                                    ArrayNode newNode;
+                                    try {
+                                        newNode = e.state.getParser().parse(name, changed, true);
+                                    } catch (ParseException ex) {
+                                        ErrorEventFactory.expected(ex);
+                                        throw ex;
+                                    }
                                     boolean empty = newNode.size() == 0;
                                     if (!empty) {
                                         e.editorNode.update(newNode);
