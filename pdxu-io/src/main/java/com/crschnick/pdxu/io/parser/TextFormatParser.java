@@ -256,18 +256,31 @@ public final class TextFormatParser {
 
                 boolean isMultiKeyValue = index < tt.length - 1
                         && tt[index] == TextFormatTokenizer.EQUALS
-                        && tt[index + 1] == TextFormatTokenizer.OPEN_GROUP;
+                        && (tt[index + 1] == TextFormatTokenizer.OPEN_GROUP ||
+                            tt[index + 1] == TextFormatTokenizer.STRING_UNQUOTED ||
+                            tt[index + 1] == TextFormatTokenizer.STRING_QUOTED);
                 if (isMultiKeyValue) {
                     index++;
                     var key = builder.build();
                     var keyString = NodeWriter.writeToString(ArrayNode.array(List.of(key)), Integer.MAX_VALUE, "\t");
-                    var value = parseNodeIfNotScalarValue(name, strict);
-                    var valueString =
-                            NodeWriter.writeToString(ArrayNode.array(List.of(value)), Integer.MAX_VALUE, "\t");
-                    return new ValueNode(
-                            keyString.substring(0, keyString.length() - 1) + "="
-                                    + valueString.substring(0, valueString.length() - 1),
-                            false);
+
+                    var array = tt[index] == TextFormatTokenizer.OPEN_GROUP;
+                    if (array) {
+                        var value = parseNodeIfNotScalarValue(name, strict);
+                        var valueString = NodeWriter.writeToString(ArrayNode.array(List.of(value)), Integer.MAX_VALUE, "\t");
+                        return new ValueNode(
+                                keyString.substring(0, keyString.length() - 1) + "="
+                                        + valueString.substring(0, valueString.length() - 1),
+                                false);
+                    } else {
+                        var valueString = context.evaluate(slIndex);
+                        moveToNextScalar();
+                        index++;
+                        return new ValueNode(
+                                keyString.substring(0, keyString.length() - 1) + "="
+                                        + valueString,
+                                false);
+                    }
                 }
 
                 return builder.build();
