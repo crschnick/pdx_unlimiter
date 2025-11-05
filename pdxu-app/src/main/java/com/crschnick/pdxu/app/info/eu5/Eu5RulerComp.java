@@ -50,12 +50,15 @@ public class Eu5RulerComp extends SavegameInfoComp {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
         Label adm = new Label(admP + "  ", imageNode(EU5_ICON_ADM, CLASS_POWER_ICON));
+        adm.setEllipsisString("");
         box.getChildren().add(adm);
 
         Label dip = new Label(dipP + "  ", imageNode(EU5_ICON_DIP, CLASS_POWER_ICON));
+        dip.setEllipsisString("");
         box.getChildren().add(dip);
 
         Label mil = new Label(String.valueOf(milP), imageNode(EU5_ICON_MIL, CLASS_POWER_ICON));
+        mil.setEllipsisString("");
         box.getChildren().add(mil);
         return box;
     }
