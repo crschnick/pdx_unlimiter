@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.info.vic3;
 
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
@@ -53,21 +54,20 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
                 .map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null))
                 .orElse(CoatOfArms.empty());
 
-        var countryId = content.get()
-                .getNodeForKey("previous_played")
-                .getNodeArray()
-                .getFirst()
-                .getNodeForKey("idtype")
-                .getValueNode()
-                .getString();
-        var country = content.get()
-                .getNodeForKey("country_manager")
-                .getNodeForKey("database")
-                .getNodeForKeyIfExistent(countryId)
-                .orElse(null);
+        var countryIdPointer = NodePointer.builder()
+                .name("previous_played")
+                .index(0)
+                .name("idtype")
+                .build();
+        var countryPointer = NodePointer.builder()
+                .name("country_manager")
+                .name("database")
+                .pointerEvaluation(countryIdPointer)
+                .build();
+        var country = countryPointer.get(content.get());
         tag = country != null
                 ? new Vic3Tag(
-                        countryId,
+                        countryIdPointer.get(content.get()).getString(),
                         country.getNodeForKey("definition").getString(),
                         country.getNodeForKey("government").getString())
                 : null;
