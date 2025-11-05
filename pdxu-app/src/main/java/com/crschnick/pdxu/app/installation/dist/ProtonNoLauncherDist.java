@@ -55,7 +55,9 @@ public class ProtonNoLauncherDist extends GameDist {
     @Override
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         try {
-            var pgrep = new ProcessBuilder("pgrep", getGame().getInstallType().getProtonExecutableName())
+            // TODO: Bug in EU5? The name is MainThread
+            var name = getGame() == Game.EU5 ? "MainThread" : getGame().getInstallType().getProtonExecutableName();
+            var pgrep = new ProcessBuilder("pgrep", name)
                     .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             var id = pgrep.inputReader().readLine();
