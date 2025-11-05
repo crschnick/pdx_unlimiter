@@ -10,7 +10,6 @@ jobs:
     uses: ./.github/workflows/windows_build.yml
     secrets: inherit
     name: Windows Build
-    if: contains(github.event.head_commit.message, '[release]')
     permissions:
       actions: none
       attestations: none
@@ -30,7 +29,6 @@ jobs:
     uses: ./.github/workflows/linux_build.yml
     secrets: inherit
     name: Linux Build
-    if: contains(github.event.head_commit.message, '[release]')
     permissions:
       actions: none
       attestations: none
@@ -50,7 +48,6 @@ jobs:
     uses: ./.github/workflows/macos_build.yml
     secrets: inherit
     name: macOS Build
-    if: contains(github.event.head_commit.message, '[release]')
     permissions:
       actions: none
       attestations: none
@@ -112,7 +109,6 @@ jobs:
               ref: 'refs/tags/v${{ env.VERSION }}',
               sha: context.sha
             })
-        if: ${{ contains(github.event.head_commit.message, '[release]') }}
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -146,7 +142,6 @@ jobs:
 
       - name: Create release
         uses: softprops/action-gh-release@v2
-        if: ${{ contains(github.event.head_commit.message, '[release]') }}
         with:
           body_path: dist/build/dist/release/github-changelog.md
           token: ${{ secrets.GH_PAT }}
