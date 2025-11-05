@@ -27,15 +27,12 @@ public class ConfigHelper {
                 node = o.readTree(Files.readAllBytes(in));
             }
         } catch (IOException e) {
-            ErrorEventFactory.fromThrowable(e).handle();
+            ErrorEventFactory.fromThrowable("The config file " + in.toString() + " could not be read", e).expected().handle();
         }
         if (node != null && !node.isMissingNode()) {
             return node;
         }
 
-        ErrorEventFactory.fromMessage(
-                        "The config file " + in.toString() + " could not be read. Trying to revert to a backup")
-                .handle();
         var backupFile = in.resolveSibling(
                 FilenameUtils.getBaseName(in.toString()) + "_old." + FilenameUtils.getExtension(in.toString()));
         if (Files.exists(backupFile)) {
@@ -43,11 +40,9 @@ public class ConfigHelper {
             try {
                 node = o.readTree(Files.readAllBytes(backupFile));
             } catch (IOException e) {
-                ErrorEventFactory.fromThrowable(e).handle();
+                ErrorEventFactory.fromThrowable("The backup config file " + in.toString() + " could not be read as well", e).handle();
             }
         } else {
-            ErrorEventFactory.fromMessage("Backup config does not exist. Using blank config")
-                    .handle();
             return JsonNodeFactory.instance.objectNode();
         }
 
@@ -55,8 +50,6 @@ public class ConfigHelper {
             return node;
         }
 
-        ErrorEventFactory.fromMessage("The backup config file " + backupFile.toString() + " could also not be read.")
-                .handle();
         return JsonNodeFactory.instance.objectNode();
     }
 
