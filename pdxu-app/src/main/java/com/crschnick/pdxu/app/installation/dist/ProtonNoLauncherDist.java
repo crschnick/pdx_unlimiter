@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 
 import java.io.IOException;
@@ -55,14 +56,20 @@ public class ProtonNoLauncherDist extends GameDist {
     @Override
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         try {
-            // TODO: Bug in EU5? The name is MainThread
-            var name = getGame() == Game.EU5 ? "MainThread" : getGame().getInstallType().getProtonExecutableName();
-            var pgrep = new ProcessBuilder("pgrep", name)
-                    .redirectError(ProcessBuilder.Redirect.DISCARD)
-                    .start();
-            var id = pgrep.inputReader().readLine();
-            pgrep.waitFor();
-            return id != null && !id.trim().isEmpty() ? ProcessHandle.of(Long.parseLong(id.trim())) : Optional.empty();
+            var running = LocalExec.readStdoutIfPossible("pgrep", getGame().getInstallType().getProtonExecutableName());
+
+            if (getGame() == Game.EU5 && running.isEmpty()) {
+                running = LocalExec.readStdoutIfPossible("pgrep", "MainThread");
+            }
+
+            if (running.isPresent()) {
+                var pid = running.get();
+                if (!pid.isEmpty()) {
+                    return ProcessHandle.of(Long.parseLong(pid));
+                }
+            }
+
+            return Optional.empty();
         } catch (Exception ex) {
             return Optional.empty();
         }
