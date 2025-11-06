@@ -19,17 +19,18 @@ public class AppAotTrain {
             }
         }
 
-        if (OsType.ofLocal() == OsType.WINDOWS) {
-            var rootDir = AppInstallation.ofCurrent()
-                    .getBaseInstallationPath()
-                    .getParent()
-                    .getParent()
-                    .getParent()
-                    .getParent();
-            var save = rootDir.resolve("misc").resolve("train_save.eu5");
-            var bytes = RakalyHelper.toEquivalentPlaintext(save);
-            var parsed = TextFormatParser.eu5().parse("train_save", bytes, 0, true);
-            NodeEvaluator.evaluateArrayNode(parsed);
-        }
+        // TODO: This crashes the JVM on some systems. Why?
+//        if (OsType.ofLocal() == OsType.WINDOWS) {
+//            var rootDir = AppInstallation.ofCurrent()
+//                    .getBaseInstallationPath()
+//                    .getParent()
+//                    .getParent()
+//                    .getParent()
+//                    .getParent();
+//            var save = rootDir.resolve("misc").resolve("train_save.eu5");
+//            var bytes = RakalyHelper.toEquivalentPlaintext(save);
+//            var parsed = TextFormatParser.eu5().parse("train_save", bytes, 0, true);
+//            NodeEvaluator.evaluateArrayNode(parsed);
+//        }
     }
 }
