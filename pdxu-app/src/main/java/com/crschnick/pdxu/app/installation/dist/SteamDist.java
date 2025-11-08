@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.installation.dist;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
@@ -61,6 +62,14 @@ public class SteamDist extends GameDist {
                         var steamRealPath = steamPath.toRealPath();
                         steamDir =
                                 Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+                    } else {
+                        var flatpak = Path.of(System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share/Steam");
+                        if (Files.exists(flatpak)) {
+                            // Resolve symlink
+                            var steamRealPath = flatpak.toRealPath();
+                            steamDir =
+                                    Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+                        }
                     }
                 } catch (Exception ex) {
                     ErrorEventFactory.fromThrowable(ex).handle();
@@ -201,11 +210,11 @@ public class SteamDist extends GameDist {
                 TaskExecutor.getInstance()
                         .submitTask(
                                 () -> {
-                                    try {
-                                        var p = new ProcessBuilder("steam", uri).start();
-                                        p.getInputStream().readAllBytes();
-                                    } catch (Exception e) {
-                                        ErrorEventFactory.fromThrowable(e).handle();
+                                    var isFlatpak = getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
+                                    if (isFlatpak) {
+                                        LocalExec.executeAsync("flatpak", "run", "com.valvesoftware.Steam", uri);
+                                    } else {
+                                        LocalExec.executeAsync("steam", uri);
                                     }
                                 },
                                 true);
@@ -240,6 +249,12 @@ public class SteamDist extends GameDist {
 
     @Override
     public boolean supportsDirectLaunch() {
+        var isFlatpak = OsType.ofLocal() == OsType.LINUX &&
+                getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
+        if (isFlatpak) {
+            return false;
+        }
+
         return dist.supportsDirectLaunch();
     }
 
