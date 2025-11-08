@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 import javafx.scene.image.Image;
@@ -14,13 +15,15 @@ public class Eu5LegitimacyComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        value = (int) content.get()
+        value = content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")
                 .getNodeForKey(data.eu5().getTag().getId() + "")
                 .getNodeForKey("currency_data")
-                .getNodeForKey("government_power")
-                .getDouble();
+                .getNodeForKeyIfExistent("government_power")
+                .map(Node::getDouble)
+                .orElse(0.0)
+                .intValue();
     }
 
     @Override
