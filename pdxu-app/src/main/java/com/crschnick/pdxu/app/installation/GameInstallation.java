@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.installation.dist.GameDist;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.OsType;
@@ -128,17 +129,17 @@ public final class GameInstallation {
         var dirsString = dirs.stream().map(s -> "- " + s).collect(Collectors.joining("\n"));
 
         if (getInstallDir().startsWith(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
-            throw new InvalidInstallationException("installDirIsUserDir", dirsString);
+            throw ErrorEventFactory.expected(new InvalidInstallationException("installDirIsUserDir", dirsString));
         }
 
         if (!Files.isRegularFile(dist.getExecutable())) {
             var exec = getInstallDir().relativize(dist.getExecutable());
-            throw new InvalidInstallationException(
+            throw ErrorEventFactory.expected(new InvalidInstallationException(
                     "executableNotFound",
                     g.getInstallationName(),
                     exec.toString(),
                     getInstallDir().toString(),
-                    dirsString);
+                    dirsString));
         }
 
         TrackEvent.debug(g.getTranslatedAbbreviation() + " distribution type: " + this.dist.getName());
@@ -147,8 +148,8 @@ public final class GameInstallation {
             this.userDir = dist.determineUserDir();
             TrackEvent.debug(g.getTranslatedAbbreviation() + " user dir: " + this.userDir);
             if (!Files.exists(this.userDir)) {
-                throw new InvalidInstallationException(
-                        "gameDataPathDoesNotExist", g.getTranslatedAbbreviation(), this.userDir.toString());
+                throw ErrorEventFactory.expected(new InvalidInstallationException(
+                        "gameDataPathDoesNotExist", g.getTranslatedAbbreviation(), this.userDir.toString()));
             }
 
             this.version = dist.determineVersion()

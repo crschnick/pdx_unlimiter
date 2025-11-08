@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor.node;
 
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.Node;
@@ -99,8 +100,8 @@ public final class EditorSimpleNode extends EditorRealNode {
             return;
         }
 
-        throw new IllegalArgumentException(
-                "Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead.");
+        throw ErrorEventFactory.expected(new IllegalArgumentException(
+                "Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead."));
     }
 
     public boolean isValid() {
