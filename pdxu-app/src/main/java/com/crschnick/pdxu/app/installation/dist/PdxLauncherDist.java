@@ -108,7 +108,7 @@ public class PdxLauncherDist extends GameDist {
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
                 // Ugly fix for flatpak
-                var isFlatpak = getInstallLocation().toString().contains("com.valvesoftware.Steam");
+                var isFlatpak = SteamDist.getSteamPath().toString().contains("com.valvesoftware.Steam");
                 if (isFlatpak) {
                     var flatpak = Path.of(System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share");
                     value = value.replace(

@@ -188,13 +188,6 @@ public class SteamDist extends GameDist {
 
     @Override
     public Path determineUserDir() throws IOException {
-        var isFlatpak = getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
-        if (isFlatpak) {
-            return AppSystemInfo.ofCurrent().getUserHome()
-                    .resolve(".var/app/com.valvesoftware.Steam/.local/share/Paradox Interactive")
-                    .resolve(getGame().getInstallationName());
-        }
-
         return dist.determineUserDir();
     }
 
@@ -226,7 +219,8 @@ public class SteamDist extends GameDist {
                 TaskExecutor.getInstance()
                         .submitTask(
                                 () -> {
-                                    var isFlatpak = getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
+                                    var isFlatpak = OsType.ofLocal() == OsType.LINUX &&
+                                            getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
                                     if (isFlatpak) {
                                         LocalExec.executeAsync("flatpak", "run", "com.valvesoftware.Steam", uri);
                                     } else {
