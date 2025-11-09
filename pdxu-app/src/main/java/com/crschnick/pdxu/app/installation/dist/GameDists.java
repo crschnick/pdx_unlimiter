@@ -79,12 +79,7 @@ public class GameDists {
         var installDirSearchPaths = new ArrayList<Path>();
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
-                // Common manual install location
-                for (var name : g.getCommonInstallDirNames()) {
-                    installDirSearchPaths.add(FileSystemHelper.getUserDocumentsPath()
-                            .resolve("Paradox Interactive")
-                            .resolve(name));
-                }
+                // Paradox games on Linux without Steam? Ehhh ...
             }
             case OsType.MacOs ignored -> {
                 // Paradox games on macOS without Steam? Ehhh ...

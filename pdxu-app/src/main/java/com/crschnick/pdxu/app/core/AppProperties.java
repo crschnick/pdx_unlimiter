@@ -109,7 +109,7 @@ public class AppProperties {
         if (Files.exists(legacyDataDir)) {
             defaultDataDir = legacyDataDir;
         } else {
-            defaultDataDir = FileSystemHelper.getUserDocumentsPath().resolve("Pdx-Unlimiter");
+            defaultDataDir = FileSystemHelper.getUserDataBasePath().resolve("Pdx-Unlimiter");
         }
 
         dataDir = Optional.ofNullable(System.getProperty(AppNames.propertyName("dataDir")))

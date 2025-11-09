@@ -418,17 +418,6 @@ public interface GameInstallType {
     GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.MACOS ? "ck2" : "CK2game") {
 
         @Override
-        public Path determineUserDir(Path p, String name) throws IOException {
-            if (OsType.ofLocal() == OsType.MACOS) {
-                return AppSystemInfo.ofCurrent()
-                        .getUserHome()
-                        .resolve("Documents", "Paradox Interactive", "Crusader Kings II");
-            } else {
-                return super.determineUserDir(p, name);
-            }
-        }
-
-        @Override
         public Path getLocalisationsDirectory() {
             return Path.of("localisation");
         }
@@ -510,6 +499,22 @@ public interface GameInstallType {
     GameInstallType VIC2 = new StandardInstallType("v2game") {
 
         @Override
+        public Path determineUserDir(Path p, String name) throws IOException {
+            var userDirFile = p.resolve("userdir.txt");
+            if (Files.exists(userDirFile)) {
+                var s = Files.readString(userDirFile).trim();
+                if (!s.isEmpty()) {
+                    return Path.of(Files.readString(userDirFile));
+                }
+            }
+
+            // The data directory uses the roman numeral
+            return FileSystemHelper.getParadoxDocumentsPath()
+                    .resolve("Paradox Interactive")
+                    .resolve("Victoria II");
+        }
+
+        @Override
         public Path getLocalisationsDirectory() {
             return Path.of("localisation");
         }
@@ -552,27 +557,6 @@ public interface GameInstallType {
 
         @Override
         public void writeLaunchConfig(Path userDir, String name, Instant lastPlayed, Path path, GameVersion version) {}
-
-        @Override
-        public Path determineUserDir(Path p, String name) throws IOException {
-            var userDirFile = p.resolve("userdir.txt");
-            if (Files.exists(userDirFile)) {
-                var s = Files.readString(userDirFile).trim();
-                if (!s.isEmpty()) {
-                    return Path.of(Files.readString(userDirFile));
-                }
-            }
-
-            if (OsType.ofLocal() == OsType.MACOS) {
-                return AppSystemInfo.ofCurrent()
-                        .getUserHome()
-                        .resolve("Documents", "Paradox Interactive", "Victoria II");
-            } else {
-                return FileSystemHelper.getUserDocumentsPath()
-                        .resolve("Paradox Interactive")
-                        .resolve("Victoria II");
-            }
-        }
 
         @Override
         public Optional<GameLanguage> determineLanguage(Path dir, Path userDir) throws Exception {
@@ -1117,7 +1101,7 @@ public interface GameInstallType {
             }
         }
 
-        return FileSystemHelper.getUserDocumentsPath()
+        return FileSystemHelper.getParadoxDocumentsPath()
                 .resolve("Paradox Interactive")
                 .resolve(name);
     }

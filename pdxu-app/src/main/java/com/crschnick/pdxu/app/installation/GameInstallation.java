@@ -128,7 +128,7 @@ public final class GameInstallation {
                 };
         var dirsString = dirs.stream().map(s -> "- " + s).collect(Collectors.joining("\n"));
 
-        if (getInstallDir().startsWith(FileSystemHelper.getUserDocumentsPath().resolve("Paradox Interactive"))) {
+        if (getInstallDir().startsWith(FileSystemHelper.getParadoxDocumentsPath().resolve("Paradox Interactive"))) {
             throw ErrorEventFactory.expected(new InvalidInstallationException("installDirIsUserDir", dirsString));
         }
 

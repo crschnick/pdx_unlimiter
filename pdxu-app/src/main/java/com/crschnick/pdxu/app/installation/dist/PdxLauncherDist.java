@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation.dist;
 
+import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
 import com.crschnick.pdxu.app.util.JacksonMapper;
@@ -49,7 +50,8 @@ public class PdxLauncherDist extends GameDist {
                 launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
             }
             case OsType.MacOs ignored -> {
-                String s = FileSystemHelper.getUserDocumentsPath()
+                // The launcher is in Application Support
+                String s = AppSystemInfo.ofMacOs().getUserHome().resolve("Library", "Application Support")
                         .resolve("Paradox Interactive")
                         .toString();
                 launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
@@ -115,7 +117,7 @@ public class PdxLauncherDist extends GameDist {
                 } else {
                     value = value.replace(
                             "$LINUX_DATA_HOME",
-                            FileSystemHelper.getUserDocumentsPath().toString());
+                            FileSystemHelper.getParadoxDocumentsPath().toString());
                 }
             }
             case OsType.MacOs ignored -> {
@@ -124,7 +126,7 @@ public class PdxLauncherDist extends GameDist {
             case OsType.Windows ignored -> {
                 value = value.replace(
                         "%USER_DOCUMENTS%",
-                        FileSystemHelper.getUserDocumentsPath().toString());
+                        FileSystemHelper.getParadoxDocumentsPath().toString());
             }
         }
         return Path.of(value);

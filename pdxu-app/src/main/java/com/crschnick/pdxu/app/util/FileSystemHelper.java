@@ -6,20 +6,35 @@ import java.nio.file.Path;
 
 public class FileSystemHelper {
 
-    private static Path documentsPath;
+    private static Path paradoxDocumentsPath;
+    private static Path userDocumentsPath;
 
-    public static Path getUserDocumentsPath() {
-        if (documentsPath != null) {
-            return documentsPath;
+    public static Path getParadoxDocumentsPath() {
+        if (paradoxDocumentsPath != null) {
+            return paradoxDocumentsPath;
         }
 
-        documentsPath = switch (OsType.ofLocal()) {
+        paradoxDocumentsPath = switch (OsType.ofLocal()) {
+            case OsType.Linux linux -> AppSystemInfo.ofLinux().getUserHome().resolve(".local", "share");
+            case OsType.MacOs macOs -> AppSystemInfo.ofMacOs().getUserHome().resolve("Documents");
+            case OsType.Windows windows -> AppSystemInfo.ofWindows().getDocuments();
+        };
+
+        return paradoxDocumentsPath;
+    }
+
+    public static Path getUserDataBasePath() {
+        if (userDocumentsPath != null) {
+            return userDocumentsPath;
+        }
+
+        userDocumentsPath = switch (OsType.ofLocal()) {
             case OsType.Linux linux -> AppSystemInfo.ofLinux().getUserHome().resolve(".local", "share");
             case OsType.MacOs macOs -> AppSystemInfo.ofMacOs().getUserHome().resolve("Library", "Application Support");
             case OsType.Windows windows -> AppSystemInfo.ofWindows().getDocuments();
         };
 
-        return documentsPath;
+        return userDocumentsPath;
     }
 
     public static String getFileSystemCompatibleName(String name) {
