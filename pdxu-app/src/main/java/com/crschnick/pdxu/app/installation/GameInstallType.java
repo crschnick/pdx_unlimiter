@@ -804,6 +804,18 @@ public interface GameInstallType {
     GameInstallType EU5 = new StandardInstallType("binaries/eu5") {
 
         @Override
+        public Path getExecutable(Path p) {
+            if (OsType.ofLocal() == OsType.MACOS) {
+                var crossover = p.resolve("binaries", "eu5.exe");
+                if (Files.exists(crossover)) {
+                    return crossover;
+                }
+            }
+
+            return super.getExecutable(p);
+        }
+
+        @Override
         public Path getLocalisationsDirectory() {
             return Path.of("game", "main_menu", "localization");
         }
