@@ -86,7 +86,7 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
                     }
                 }));
                 if (l.isPresent()) {
-                    return l.get();
+                    return l.get().resolve("proton");
                 }
             }
         }

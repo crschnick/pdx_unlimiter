@@ -44,7 +44,7 @@ public class ProtonNoLauncherDist extends GameDist {
                     }
                 }));
                 if (l.isPresent()) {
-                    return l.get();
+                    return l.get().resolve("proton");
                 }
             }
         }
