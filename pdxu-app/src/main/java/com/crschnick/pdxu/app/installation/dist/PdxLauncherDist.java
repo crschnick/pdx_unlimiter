@@ -105,9 +105,18 @@ public class PdxLauncherDist extends GameDist {
     protected Path replaceVariablesInPath(String value) {
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
-                value = value.replace(
-                        "$LINUX_DATA_HOME",
-                        FileSystemHelper.getUserDocumentsPath().toString());
+                // Ugly fix for flatpak
+                var isFlatpak = getInstallLocation().toString().contains("com.valvesoftware.Steam");
+                if (isFlatpak) {
+                    var flatpak = Path.of(System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share");
+                    value = value.replace(
+                            "$LINUX_DATA_HOME",
+                            flatpak.toString());
+                } else {
+                    value = value.replace(
+                            "$LINUX_DATA_HOME",
+                            FileSystemHelper.getUserDocumentsPath().toString());
+                }
             }
             case OsType.MacOs ignored -> {
                 value = value.replace("~", System.getProperty("user.home"));
