@@ -122,7 +122,7 @@ public class SteamDist extends GameDist {
         }
     }
 
-    public static List<Path> getSteamLibraryPaths() {
+    public static List<Path> getSteamCommonLibraryPaths() {
         var p = getSteamPath();
         if (p.isEmpty()) {
             return List.of();
@@ -157,7 +157,7 @@ public class SteamDist extends GameDist {
         }
 
         Path finalDir = dir;
-        boolean inSteamLibraryDir = getSteamLibraryPaths().stream().anyMatch(ld -> finalDir.startsWith(ld));
+        boolean inSteamLibraryDir = getSteamCommonLibraryPaths().stream().anyMatch(ld -> finalDir.startsWith(ld));
         boolean looksLikeSteamLibDir = dir.getNameCount() > 3
                 && Files.exists(dir.getParent().getParent().getParent().resolve("libraryfolder.vdf"));
         return inSteamLibraryDir || looksLikeSteamLibDir;
@@ -165,7 +165,7 @@ public class SteamDist extends GameDist {
 
     public static Optional<GameDist> getDist(Game g, Path dir) {
         if (dir == null) {
-            for (var path : getSteamLibraryPaths()) {
+            for (var path : getSteamCommonLibraryPaths()) {
                 var installDir = path.resolve(g.getInstallationName());
                 var found = getDist(g, installDir);
                 if (found.isPresent()) {

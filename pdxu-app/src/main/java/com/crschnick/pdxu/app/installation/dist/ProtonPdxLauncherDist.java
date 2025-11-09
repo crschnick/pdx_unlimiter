@@ -76,11 +76,8 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
     }
 
     private Path getProtonExecutable() throws IOException {
-        for (Path steamLibraryPath : SteamDist.getSteamLibraryPaths()) {
-            var appDir = steamLibraryPath
-                    .resolve("steamapps")
-                    .resolve("common");
-            try (var stream = Files.list(appDir)) {
+        for (Path steamLibraryPath : SteamDist.getSteamCommonLibraryPaths()) {
+            try (var stream = Files.list(steamLibraryPath)) {
                 var l = stream.max(Comparator.comparing(path -> {
                     try {
                         return Files.getLastModifiedTime(path).toInstant();
