@@ -19,6 +19,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,13 @@ public class SteamDist extends GameDist {
         return dist.getGameInstance(processes);
     }
 
-    public static Optional<Path> getSteamPath() {
+    private static AtomicReference<Path> steamPath;
+
+    public static synchronized Optional<Path> getSteamPath() {
+        if (steamPath != null) {
+            return Optional.ofNullable(steamPath.get());
+        }
+
         Optional<String> steamDir = Optional.empty();
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
@@ -97,10 +104,11 @@ public class SteamDist extends GameDist {
         }
 
         try {
-            return steamDir.map(Path::of);
+            steamPath = new AtomicReference<>(steamDir.map(Path::of).orElse(null));
         } catch (Exception ex) {
-            return Optional.empty();
+            steamPath = new AtomicReference<>(null);
         }
+        return Optional.ofNullable(steamPath.get());
     }
 
     private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");
@@ -114,7 +122,7 @@ public class SteamDist extends GameDist {
         }
     }
 
-    private static List<Path> getSteamLibraryPaths() {
+    public static List<Path> getSteamLibraryPaths() {
         var p = getSteamPath();
         if (p.isEmpty()) {
             return List.of();
@@ -249,12 +257,6 @@ public class SteamDist extends GameDist {
 
     @Override
     public boolean supportsDirectLaunch() {
-        var isFlatpak = OsType.ofLocal() == OsType.LINUX &&
-                getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
-        if (isFlatpak) {
-            return false;
-        }
-
         return dist.supportsDirectLaunch();
     }
 
