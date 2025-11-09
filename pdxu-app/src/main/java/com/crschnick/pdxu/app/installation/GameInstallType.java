@@ -800,6 +800,18 @@ public interface GameInstallType {
         }
 
         @Override
+        public Path determineUserDir(Path p, String name) throws IOException {
+            if (OsType.ofLocal() == OsType.MACOS) {
+                var crossover = p.resolve("binaries", "eu5.exe");
+                if (Files.exists(crossover)) {
+                    return FileSystemHelper.getParadoxDocumentsPath().resolve(name);
+                }
+            }
+
+            return super.determineUserDir(p, name);
+        }
+
+        @Override
         public Path getLocalisationsDirectory() {
             return Path.of("game", "main_menu", "localization");
         }

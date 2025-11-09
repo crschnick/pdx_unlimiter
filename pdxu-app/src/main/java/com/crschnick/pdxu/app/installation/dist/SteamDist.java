@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation.dist;
 
+import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
@@ -187,6 +188,13 @@ public class SteamDist extends GameDist {
 
     @Override
     public Path determineUserDir() throws IOException {
+        var isFlatpak = getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
+        if (isFlatpak) {
+            return AppSystemInfo.ofCurrent().getUserHome()
+                    .resolve(".var/app/com.valvesoftware.Steam/.local/share/Paradox Interactive")
+                    .resolve(getGame().getInstallationName());
+        }
+
         return dist.determineUserDir();
     }
 
