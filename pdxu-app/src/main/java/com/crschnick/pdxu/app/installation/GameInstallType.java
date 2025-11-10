@@ -922,10 +922,6 @@ public interface GameInstallType {
             return null;
         }
 
-        public Path getLauncherDataPath(Path p) {
-            return p.resolve("launcher");
-        }
-
         @Override
         public Path getIcon(Path p) {
             return p.resolve("game").resolve("loading_screen").resolve("gfx").resolve("exe_icon.bmp");

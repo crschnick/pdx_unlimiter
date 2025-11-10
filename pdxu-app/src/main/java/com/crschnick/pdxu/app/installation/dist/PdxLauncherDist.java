@@ -44,10 +44,16 @@ public class PdxLauncherDist extends GameDist {
         Optional<String> launcherDir = Optional.empty();
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
-                String s = Path.of(System.getProperty("user.home"))
-                        .resolve(".paradoxlauncher")
-                        .toString();
-                launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
+                var home = Path.of(System.getProperty("user.home"))
+                        .resolve(".paradoxlauncher");
+                if (Files.isDirectory(home)) {
+                    launcherDir = Optional.of(home.toString());
+                } else {
+                    var flatpak = AppSystemInfo.ofCurrent().getUserHome().resolve(".var/app/com.valvesoftware.Steam/.paradoxlauncher");
+                    if (Files.isDirectory(flatpak)) {
+                        launcherDir = Optional.of(flatpak.toString());
+                    }
+                }
             }
             case OsType.MacOs ignored -> {
                 // The launcher is in Application Support
