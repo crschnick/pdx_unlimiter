@@ -36,7 +36,8 @@ public class ProtonNoLauncherDist extends GameDist {
     private Path getProtonExecutable() throws IOException {
         for (Path steamLibraryPath : SteamDist.getSteamCommonLibraryPaths()) {
             try (var stream = Files.list(steamLibraryPath)) {
-                var l = stream.max(Comparator.comparing(path -> {
+                var l = stream.filter(path -> path.toString().contains("Proton ") && Files.exists(path.resolve("proton")))
+                        .max(Comparator.comparing(path -> {
                     try {
                         return Files.getLastModifiedTime(path).toInstant();
                     } catch (IOException e) {
