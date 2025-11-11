@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.core.AppLayoutModel;
+import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
@@ -84,6 +85,8 @@ public abstract class FileImportTarget {
 
     private static final Pattern ID_MATCHER =
             Pattern.compile("\\s*\\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)");
+    private static final Pattern EU5_ID_MATCHER =
+            Pattern.compile(".*?_([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})");
 
     public String getName() {
         var raw = getRawName();
@@ -106,8 +109,36 @@ public abstract class FileImportTarget {
             }
         }
 
+        // EU5 does override file names
+        // So assign the save to the current matching open campaign in pdxu
+        var game = SavegameStorage.ALL.inverseBidiMap().get(getStorage());
+        if (game == Game.EU5) {
+            var playthroughIdMatcher = EU5_ID_MATCHER.matcher(raw);
+            if (playthroughIdMatcher.find()) {
+                UUID playthroughId;
+                try {
+                    playthroughId = UUID.fromString(playthroughIdMatcher.group(1));
+                } catch (Exception ignored) {
+                    playthroughId = null;
+                }
+                if (playthroughId != null) {
+                    var finalPlaythroughId = playthroughId;
+                    var loaded = getStorage().getCollections().stream().filter(savegameCampaign -> {
+                        return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
+                            return savegameEntry.isLoaded() && savegameEntry.getInfo().getData().getCampaignHeuristic().equals(finalPlaythroughId);
+                        });
+                    }).findFirst();
+                    if (loaded.isPresent()) {
+                        return Optional.of(loaded.get().getUuid());
+                    }
+                }
+            }
+        }
+
         return Optional.empty();
     }
+
+    protected abstract SavegameStorage<?, ?> getStorage();
 
     public abstract Path getPath();
 
@@ -195,6 +226,11 @@ public abstract class FileImportTarget {
         @Override
         public String getRawName() {
             return FilenameUtils.getBaseName(path.toString());
+        }
+
+        @Override
+        protected SavegameStorage<?, ?> getStorage() {
+            return savegameStorage;
         }
 
         public Path getPath() {
