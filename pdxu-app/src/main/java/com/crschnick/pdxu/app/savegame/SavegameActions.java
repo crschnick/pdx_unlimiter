@@ -75,7 +75,7 @@ public class SavegameActions {
     public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
         return SavegameContext.mapSavegame(entry, ctx -> {
             return ctx.getGuiFactory()
-                    .tagImage(entry.getInfo(), entry.getInfo().getData().getTag());
+                    .tagImage(ctx.getInfo(), ctx.getInfo().getData().getTag());
         });
     }
 
@@ -107,10 +107,11 @@ public class SavegameActions {
             @Override
             public void success(SavegameParseResult.Success s) {
                 try {
-                    var targetUuuid =
-                            savegames.getFirst().getCampaignIdOverride().orElse(type.getCampaignIdHeuristic(s.content));
+                    var first = savegames.size() > 0 ? savegames.getFirst() : null;
+                    var targetUuid = Optional.ofNullable(first != null ? first.getCampaignIdOverride().orElse(null) : null)
+                            .orElse(type.getCampaignIdHeuristic(s.content));
                     SavegameStorage.get(g)
-                            .getSavegameCampaign(targetUuuid)
+                            .getSavegameCampaign(targetUuid)
                             .flatMap(col -> col.entryStream().findFirst())
                             .ifPresent(entry -> {
                                 TaskExecutor.getInstance()

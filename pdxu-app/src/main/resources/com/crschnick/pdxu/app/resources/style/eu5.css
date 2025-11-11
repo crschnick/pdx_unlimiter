@@ -1,4 +1,6 @@
-
+.eu5 .diplomacy-row {
+    -fx-padding: 0;
+}
 
 .eu5 .tag-icon {
 -fx-min-width: 2.5em;

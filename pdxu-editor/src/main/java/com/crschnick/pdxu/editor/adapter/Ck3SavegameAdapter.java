@@ -247,11 +247,11 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             "father",
             "assumed_father");
     private static final List<String> PROVINCE_KEYS =
-            List.of("capital", "origin", "province", "location", "realm_capital", "diplo_centers");
+            List.of("origin", "province", "location", "realm_capital", "diplo_centers");
     private static final List<String> COUNTY_KEYS = List.of("county");
     private static final List<String> ARMY_KEYS = List.of("army");
     private static final List<String> TITLE_KEYS = List.of(
-            "targeted_titles", "title", "domain", "de_jure_liege", "de_facto_liege", "de_jure_vassals", "liege_title");
+            "capital", "targeted_titles", "title", "domain", "de_jure_liege", "de_facto_liege", "de_jure_vassals", "liege_title");
     private static final List<String> STORIES_KEYS = List.of("stories");
     private static final List<String> SCHEMES_KEYS = List.of("schemes");
     private static final List<String> REGIMENTS_KEYS = List.of("regiments");

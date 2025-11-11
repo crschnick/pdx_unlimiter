@@ -887,6 +887,10 @@ public interface GameInstallType {
                 return def;
             }
 
+            if (available.isEmpty()) {
+                return def;
+            }
+
             var rand = new Random();
             return available.get(rand.nextInt(available.size()));
         }
