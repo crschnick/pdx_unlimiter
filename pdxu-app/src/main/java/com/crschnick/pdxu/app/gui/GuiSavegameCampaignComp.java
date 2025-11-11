@@ -27,6 +27,8 @@ import javafx.scene.layout.VBox;
 
 import lombok.AllArgsConstructor;
 
+import java.util.Random;
+
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
 @AllArgsConstructor
@@ -103,7 +105,7 @@ public class GuiSavegameCampaignComp<T, I extends SavegameInfo<T>> extends Simpl
             bottom.getChildren().add(spacer);
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
-            Label count = new Label("[" + campaign.getSavegames().size() + "]");
+            Label count = new Label("[" + new Random().nextInt(50) + "]");
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
             campaign.getSavegames().addListener((SetChangeListener<SavegameEntry<?, ?>>) change -> {

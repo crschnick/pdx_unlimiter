@@ -104,6 +104,7 @@ public abstract class SavegameInfo<T> {
             try {
                 var region = comp.create(data);
                 if (region != null) {
+                    region.getStyleClass().add("savegame-comp");
                     addNode(container, region);
                 }
             } catch (Exception ex) {

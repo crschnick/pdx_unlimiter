@@ -1,3 +1,8 @@
+.savegame-comp {
+    -fx-border-color: -color-accent-emphasis;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4;
+}
 
 .war {
    -fx-background-color: #bf4540;
