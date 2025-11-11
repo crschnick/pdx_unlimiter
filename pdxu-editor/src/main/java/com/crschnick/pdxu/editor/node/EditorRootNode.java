@@ -33,6 +33,16 @@ public class EditorRootNode extends EditorRealNode {
     }
 
     @Override
+    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
+        this.root = root.replacePart(toInsert, beginIndex, length);
+    }
+
+    @Override
+    public void delete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index) {
         var replacement = toInsertKeyName != null
                 ? ArrayNode.singleKeyNode(toInsertKeyName, replacementValue)

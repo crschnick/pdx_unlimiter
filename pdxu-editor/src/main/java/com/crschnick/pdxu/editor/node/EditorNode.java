@@ -110,6 +110,10 @@ public abstract class EditorNode {
         return result;
     }
 
+    public abstract void replacePart(ArrayNode toInsert, int beginIndex, int length);
+
+    public abstract void delete();
+
     public abstract void updateNodeAtRawIndex(Node replacementValue, String toInsertKeyName, int index);
 
     public abstract boolean filterKey(Predicate<String> filter);

@@ -21,6 +21,19 @@ public final class EditorSimpleNode extends EditorRealNode {
         this.rawIndexInParentNode = rawIndexInParentNode;
     }
 
+    public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
+        ArrayNode ar = (ArrayNode) getBackingNode();
+        var updatedNode = ar.replacePart(toInsert, beginIndex, length);
+
+        // Update parent node to reflect change
+        getParent().updateNodeAtRawIndex(updatedNode, keyName, getRawIndexInParentNode());
+    }
+
+    @Override
+    public void delete() {
+        getParent().replacePart(ArrayNode.array(List.of()), getRawIndexInParentNode(), 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

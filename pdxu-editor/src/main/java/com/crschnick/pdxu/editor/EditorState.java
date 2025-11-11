@@ -79,6 +79,11 @@ public class EditorState {
         }
     }
 
+    public void onDelete() {
+        content.completeContentChange();
+        dirtyProperty().set(true);
+    }
+
     public void onFilterChange() {
         content.filterChange();
     }

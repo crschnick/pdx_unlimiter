@@ -16,6 +16,7 @@ import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
+import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -303,6 +304,16 @@ public class GuiEditor {
                     GuiTooltips.install(edit, AppI18n.get("editorOpenInExternalEditor"));
                     actions.getChildren().add(edit);
                     edit.prefHeightProperty().bind(actions.heightProperty());
+
+                    Button del = new Button();
+                    del.setGraphic(new FontIcon());
+                    del.getStyleClass().add(GuiStyle.CLASS_DELETE);
+                    del.setOnAction(e -> {
+                        n.delete();
+                        state.onDelete();
+                    });
+                    actions.getChildren().add(del);
+                    del.prefHeightProperty().bind(actions.heightProperty());
                 }
                 grid.add(createGridElement(actions, i, valueHighlight), 5, i);
 
