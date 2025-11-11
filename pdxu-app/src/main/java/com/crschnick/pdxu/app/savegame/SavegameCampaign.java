@@ -32,22 +32,10 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
         this.image = new SimpleObjectProperty<>(image);
     }
 
-    public void onSavegameLoad(SavegameEntry<T, I> entry) {
-        if (entry == getLatestEntry()) {
-            imageProperty().set(SavegameActions.createImageForEntry(entry));
-            updateDate();
-        }
-    }
-
-    public void onSavegamesChange() {
-        updateDate();
-    }
-
     private void updateDate() {
         getSavegames().stream()
-                .filter(s -> s.infoProperty().isNotNull().get())
-                .min(Comparator.naturalOrder())
-                .map(s -> s.getInfo().getData().getDate())
+                .map(SavegameEntry::getDate)
+                .max(Comparator.naturalOrder())
                 .ifPresent(d -> dateProperty().setValue(d));
     }
 
@@ -84,6 +72,23 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
 
     public void add(SavegameEntry<T, I> e) {
         this.savegames.add(e);
+        updateDate();
+    }
+
+    public void remove(SavegameEntry<T, I> e) {
+        var isFirst = e == getLatestEntry();
+        this.savegames.remove(e);
+        if (isFirst && !savegames.isEmpty()) {
+            imageProperty().set(SavegameActions.createImageForEntry(getLatestEntry()));
+        }
+        updateDate();
+    }
+
+    public void onSavegameLoad(SavegameEntry<T, I> entry) {
+        if (entry == getLatestEntry()) {
+            imageProperty().set(SavegameActions.createImageForEntry(entry));
+            updateDate();
+        }
     }
 
     public String getName() {

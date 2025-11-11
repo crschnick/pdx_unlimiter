@@ -344,7 +344,6 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         SavegameCampaign<T, I> c = this.getSavegameCampaign(campainUuid).get();
         TrackEvent.debug("Adding new entry " + e.getName());
         c.add(e);
-        c.onSavegamesChange();
     }
 
     private String getDefaultEntryName(I info) {
@@ -408,8 +407,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                     .handle();
         }
 
-        c.getSavegames().remove(e);
-        c.onSavegamesChange();
+        c.remove(e);
         if (c.getSavegames().size() == 0) {
             delete(c);
         }
