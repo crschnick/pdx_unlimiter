@@ -257,6 +257,7 @@ public class GuiEditor {
                 grid.add(createGridElement(valueDisplay, i, valueHighlight), 4, i);
 
                 HBox actions = new HBox();
+                actions.setSpacing(5);
                 actions.setFillHeight(true);
                 actions.setAlignment(Pos.CENTER_RIGHT);
                 if (n.isReal()) {
@@ -290,13 +291,14 @@ public class GuiEditor {
                         }
                     }
 
+                    var disable = !state.isEditable()
+                            || (n instanceof EditorSimpleNode es
+                            && es.getBackingNode().isValue()
+                            && es.getBackingNode().getString().contains("\n"));
+
                     Button edit = new Button(null, new FontIcon());
                     edit.setGraphic(new FontIcon());
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
-                    var disable = !state.isEditable()
-                            || (n instanceof EditorSimpleNode es
-                                    && es.getBackingNode().isValue()
-                                    && es.getBackingNode().getString().contains("\n"));
                     edit.setDisable(disable);
                     edit.setOnAction(e -> {
                         state.getExternalState().startEdit(state, (EditorRealNode) n);
@@ -305,15 +307,28 @@ public class GuiEditor {
                     actions.getChildren().add(edit);
                     edit.prefHeightProperty().bind(actions.heightProperty());
 
-                    Button del = new Button();
-                    del.setGraphic(new FontIcon());
-                    del.getStyleClass().add(GuiStyle.CLASS_DELETE);
-                    del.setOnAction(e -> {
-                        n.delete();
-                        state.onDelete();
-                    });
-                    actions.getChildren().add(del);
-                    del.prefHeightProperty().bind(actions.heightProperty());
+//                    Button del = new Button();
+//                    del.setDisable(disable);
+//                    GuiTooltips.install(del, AppI18n.get("deleteNode"));
+//                    del.setGraphic(new FontIcon());
+//                    del.getStyleClass().add(GuiStyle.CLASS_DELETE);
+//                    del.setOnAction(e -> {
+//                        var r = AppSideWindow.showBlockingAlert(alert -> {
+//                                    alert.setTitle(AppI18n.get("confirmNodeDeletionTitle"));
+//                                    alert.setHeaderText(AppI18n.get("confirmNodeDeletionContent"));
+//                                    alert.setAlertType(Alert.AlertType.WARNING);
+//                                    alert.getButtonTypes().clear();
+//                                    alert.getButtonTypes().add(ButtonType.YES);
+//                                    alert.getButtonTypes().add(ButtonType.NO);
+//                                })
+//                                .filter(b -> b.getButtonData().isDefaultButton());
+//                        if (r.isPresent()) {
+//                            n.delete();
+//                            state.onDelete();
+//                        }
+//                    });
+//                    actions.getChildren().add(del);
+//                    del.prefHeightProperty().bind(actions.heightProperty());
                 }
                 grid.add(createGridElement(actions, i, valueHighlight), 5, i);
 
