@@ -76,11 +76,7 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
     }
 
     public void remove(SavegameEntry<T, I> e) {
-        var isFirst = e == getLatestEntry();
         this.savegames.remove(e);
-        if (isFirst && !savegames.isEmpty()) {
-            imageProperty().set(SavegameActions.createImageForEntry(getLatestEntry()));
-        }
         updateDate();
     }
 

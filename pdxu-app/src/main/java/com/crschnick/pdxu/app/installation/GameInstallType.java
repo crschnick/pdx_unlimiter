@@ -1109,7 +1109,7 @@ public interface GameInstallType {
         if (Files.exists(userDirFile)) {
             var s = Files.readString(userDirFile).trim();
             if (!s.isEmpty()) {
-                return Path.of(Files.readString(userDirFile));
+                return Path.of(s);
             }
         }
 

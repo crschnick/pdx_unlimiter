@@ -70,7 +70,7 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
         Consumer<Path> loader = path -> {
             try {
                 Node node = TextFormatParser.text().parse(path);
-                node.getNodeForKeyIfExistent("colors").ifPresent(n -> {
+                node.getNodeForKeyIfExistent("colors").filter(Node::isArray).ifPresent(n -> {
                     n.forEach((k, v) -> {
                         try {
                             cache.colors.put(k, fromGameColor(GameColor.fromColorNode(v)));
