@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 
 import javafx.application.Platform;
@@ -53,9 +54,10 @@ public class FileImporter {
                                     .filter(e -> e.getValue() instanceof SavegameParseResult.Error)
                                     .findFirst()
                                     .ifPresent(e -> {
-                                        ErrorEventFactory.fromThrowable(
-                                                        ((SavegameParseResult.Error) e.getValue()).error)
-                                                .handle();
+                                            ErrorEventFactory.fromThrowable(
+                                                            ((SavegameParseResult.Error) e.getValue()).error)
+                                                    .omit()
+                                                    .handle();
                                     });
 
                             Platform.runLater(() -> GuiImporter.showResultDialog(statusMap));
