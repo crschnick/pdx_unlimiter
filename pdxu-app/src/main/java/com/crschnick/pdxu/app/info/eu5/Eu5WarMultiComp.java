@@ -52,7 +52,12 @@ public class Eu5WarMultiComp extends SavegameInfoMultiComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         List<War<Eu5Tag>> wars = new ArrayList<>();
-        content.get().getNodeForKeys("war_manager", "database").forEach((s, node) -> {
+        var db = content.get().getNodeForKeys("war_manager", "database");
+        if (db == null) {
+            return;
+        }
+
+        db.forEach((s, node) -> {
             if (node.isValue()) {
                 return;
             }
