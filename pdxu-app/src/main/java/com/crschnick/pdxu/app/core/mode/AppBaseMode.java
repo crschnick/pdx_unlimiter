@@ -79,7 +79,6 @@ public class AppBaseMode extends AppOperationMode {
         GameCacheManager.init();
         AppFileWatcher.init();
         SavegameWatcher.init();
-        GameAppManager.init();
         EditorProvider.get().init();
         AppNativeHook.registerNativeHook();
 
@@ -93,6 +92,7 @@ public class AppBaseMode extends AppOperationMode {
         AppLegacyInstallDialog.showIfNeeded();
         GuiNoGamesDialog.showIfNeeded();
 
+        GameAppManager.init();
         TrackEvent.info("Finished base components initialization");
         initialized = true;
     }
