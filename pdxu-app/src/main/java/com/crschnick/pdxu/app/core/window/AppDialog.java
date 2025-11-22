@@ -116,7 +116,7 @@ public class AppDialog {
                     text.wrappingWidthProperty().bind(sp.prefWidthProperty());
                     return sp;
                 })
-                .prefWidth(450);
+                .prefWidth(550);
     }
 
     public static Comp<?> dialogText(ObservableValue<String> s) {
@@ -128,7 +128,7 @@ public class AppDialog {
                     text.wrappingWidthProperty().bind(sp.prefWidthProperty());
                     return sp;
                 })
-                .prefWidth(450);
+                .prefWidth(550);
     }
 
     public static boolean confirm(String translationKey) {

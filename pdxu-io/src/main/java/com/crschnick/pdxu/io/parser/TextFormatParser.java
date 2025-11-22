@@ -302,6 +302,10 @@ public final class TextFormatParser {
                     // System.out.println("key: " + context.evaluate(keyIndex));
                     // System.out.println("val: " + context.evaluate(slIndex));
 
+                    if (builder.isFull()) {
+                        throw ParseException.createFromLiteralIndex(name, "encountered malformed array", slIndex - 1, context);
+                    }
+
                     builder.putKeyAndScalarValue(keyIndex, slIndex);
                     index++;
                     moveToNextScalar();
