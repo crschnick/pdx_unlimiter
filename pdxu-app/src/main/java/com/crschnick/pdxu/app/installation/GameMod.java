@@ -43,6 +43,7 @@ public class GameMod {
             // Don't report mod parsing errors
             ErrorEventFactory.fromThrowable("Could not parse malformed mod file " + p.toString(), ex)
                     .omit()
+                    .expected()
                     .handle();
         }
 
@@ -90,6 +91,7 @@ public class GameMod {
             // Don't report mod parsing errors
             ErrorEventFactory.fromThrowable("Could not parse malformed mod file " + p.toString(), ex)
                     .omit()
+                    .expected()
                     .handle();
         }
 
