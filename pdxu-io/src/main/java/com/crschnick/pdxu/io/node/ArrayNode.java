@@ -13,6 +13,10 @@ public abstract class ArrayNode extends Node {
     }
 
     public static ArrayNode sameKeyArray(String key, List<Node> values) {
+        if (values.isEmpty()) {
+            return array(List.of());
+        }
+
         var ctx = new NodeContext(key, false);
         var ki = new int[values.size()];
         Arrays.fill(ki, 0);

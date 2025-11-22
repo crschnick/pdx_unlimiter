@@ -307,28 +307,28 @@ public class GuiEditor {
                     actions.getChildren().add(edit);
                     edit.prefHeightProperty().bind(actions.heightProperty());
 
-//                    Button del = new Button();
-//                    del.setDisable(disable);
-//                    GuiTooltips.install(del, AppI18n.get("deleteNode"));
-//                    del.setGraphic(new FontIcon());
-//                    del.getStyleClass().add(GuiStyle.CLASS_DELETE);
-//                    del.setOnAction(e -> {
-//                        var r = AppSideWindow.showBlockingAlert(alert -> {
-//                                    alert.setTitle(AppI18n.get("confirmNodeDeletionTitle"));
-//                                    alert.setHeaderText(AppI18n.get("confirmNodeDeletionContent"));
-//                                    alert.setAlertType(Alert.AlertType.WARNING);
-//                                    alert.getButtonTypes().clear();
-//                                    alert.getButtonTypes().add(ButtonType.YES);
-//                                    alert.getButtonTypes().add(ButtonType.NO);
-//                                })
-//                                .filter(b -> b.getButtonData().isDefaultButton());
-//                        if (r.isPresent()) {
-//                            n.delete();
-//                            state.onDelete();
-//                        }
-//                    });
-//                    actions.getChildren().add(del);
-//                    del.prefHeightProperty().bind(actions.heightProperty());
+                    Button del = new Button();
+                    del.setDisable(disable);
+                    GuiTooltips.install(del, AppI18n.get("deleteNode"));
+                    del.setGraphic(new FontIcon());
+                    del.getStyleClass().add(GuiStyle.CLASS_DELETE);
+                    del.setOnAction(e -> {
+                        var r = AppSideWindow.showBlockingAlert(alert -> {
+                                    alert.setTitle(AppI18n.get("confirmNodeDeletionTitle"));
+                                    alert.setHeaderText(AppI18n.get("confirmNodeDeletionContent"));
+                                    alert.setAlertType(Alert.AlertType.WARNING);
+                                    alert.getButtonTypes().clear();
+                                    alert.getButtonTypes().add(ButtonType.YES);
+                                    alert.getButtonTypes().add(ButtonType.NO);
+                                })
+                                .filter(b -> b.getButtonData().isDefaultButton());
+                        if (r.isPresent()) {
+                            n.delete();
+                            state.onDelete();
+                        }
+                    });
+                    actions.getChildren().add(del);
+                    del.prefHeightProperty().bind(actions.heightProperty());
                 }
                 grid.add(createGridElement(actions, i, valueHighlight), 5, i);
 

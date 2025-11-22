@@ -80,7 +80,9 @@ public class EditorState {
     }
 
     public void onDelete() {
-        content.completeContentChange();
+        if (this.navigation.rebaseNavPathsToValid()) {
+            content.completeContentChange();
+        }
         dirtyProperty().set(true);
     }
 
@@ -99,7 +101,7 @@ public class EditorState {
     public void onFileChanged(EditorNode changed) {
         // Rebuild content if either an element in the currently selected nav path is changed
         // or if an editor node of the current nav path is no longer valid
-        if (navigation.affectsCurrent(changed) || this.navigation.rebaseNavPathsToValid()) {
+        if (navigation.affectsCurrent(changed) | this.navigation.rebaseNavPathsToValid()) {
             this.content.completeContentChange();
         }
         dirtyProperty().set(true);

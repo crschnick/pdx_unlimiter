@@ -85,6 +85,9 @@ public class EditorNavigation {
         var newLoc = !currentChanged ? current.get() : new EditorNavLocation(currentValid);
         this.current.set(newLoc);
         this.history.set(historyPos.get(), newLoc);
+        if (currentChanged) {
+            state.getContent().navigate(currentValid.getEditorNode(), 0, 0);
+        }
 
         // Rebase all history entries
         for (int i = 0; i < this.history.size(); i++) {
