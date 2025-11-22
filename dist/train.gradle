@@ -20,7 +20,7 @@ tasks.register('trainAot', DefaultTask) {
                 commandLine cl
                 workingDir "$imageDir"
                 environment "CDS_JVM_OPTS",
-                            "-XX:+AOTClassLinking -XX:AOTCacheOutput=./server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
+                            "-XX:UseAVX=0 -XX:+AOTClassLinking -XX:AOTCacheOutput=./server/cache.aot -Xlog:aot" + (graal ? " --add-modules jdk.internal.vm.ci" : "")
             }
 
             def cfg = file("$imageDir/app/${jpackageExecutableName}.cfg")
