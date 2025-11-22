@@ -60,11 +60,7 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
         if (SystemUtils.IS_OS_LINUX) {
             value = value.replace(
                     "%USER_DOCUMENTS%",
-                    SteamDist.getSteamPath()
-                            .orElseThrow()
-                            .resolve("steamapps")
-                            .resolve("compatdata")
-                            .resolve(String.valueOf(getGame().getSteamAppId()))
+                    SteamDist.getSteamAppsCompatDir(getGame())
                             .resolve("pfx")
                             .resolve("drive_c")
                             .resolve("users")
@@ -105,10 +101,7 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
         pb.environment().putAll(env);
         var steamDir = SteamDist.getSteamPath().orElseThrow();
         pb.environment().put("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamDir.toString());
-        pb.environment().put("STEAM_COMPAT_DATA_PATH", steamDir
-                .resolve("steamapps")
-                .resolve("compatdata")
-                .resolve(String.valueOf(getGame().getSteamAppId())).toString());
+        pb.environment().put("STEAM_COMPAT_DATA_PATH", SteamDist.getSteamAppsCompatDir(getGame()).toString());
         pb.start();
     }
 

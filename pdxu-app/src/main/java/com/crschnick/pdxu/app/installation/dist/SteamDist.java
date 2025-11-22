@@ -151,6 +151,15 @@ public class SteamDist extends GameDist {
         return list;
     }
 
+    public static Path getSteamAppsCompatDir(Game g) {
+        var libs = getSteamCommonLibraryPaths();
+        var paths = libs.stream()
+                .map(path -> path.resolve("steamapps", "compatdata", g.getSteamAppId() + ""))
+                .filter(path -> Files.exists(path))
+                .toList();
+        return paths.stream().filter(path -> Files.isDirectory(path)).findFirst().orElse(paths.getFirst());
+    }
+
     private static boolean isInSteamLibraryDir(Path dir) {
         try {
             dir = dir.toRealPath();

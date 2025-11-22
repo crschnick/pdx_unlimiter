@@ -73,11 +73,7 @@ public class ProtonNoLauncherDist extends GameDist {
 
     @Override
     public Path determineUserDir() throws IOException {
-        return SteamDist.getSteamPath()
-                .orElseThrow()
-                .resolve("steamapps")
-                .resolve("compatdata")
-                .resolve(String.valueOf(getGame().getSteamAppId()))
+        return SteamDist.getSteamAppsCompatDir(getGame())
                 .resolve("pfx")
                 .resolve("drive_c")
                 .resolve("users")
