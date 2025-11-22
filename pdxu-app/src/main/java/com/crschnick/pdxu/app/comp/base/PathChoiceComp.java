@@ -60,8 +60,6 @@ public class PathChoiceComp extends SimpleComp {
                 File file = directoryChooser.showDialog(AppMainWindow.get().getStage());
                 if (file != null) {
                     pathProperty.setValue(file.toPath());
-                } else {
-                    pathProperty.setValue(null);
                 }
             } else {
                 FileChooser fileChooser = new FileChooser();
@@ -69,8 +67,6 @@ public class PathChoiceComp extends SimpleComp {
                 File file = fileChooser.showOpenDialog(AppMainWindow.get().getStage());
                 if (file != null) {
                     pathProperty.setValue(file.toPath());
-                } else {
-                    pathProperty.setValue(null);
                 }
             }
         });
