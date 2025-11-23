@@ -25,8 +25,8 @@ public final class TaggedNode extends Node {
             return null;
         }
 
-        var begin = ctx.getLiteralsBegin()[index];
-        var length = ctx.getLiteralsLength()[index];
+        var begin = ctx.getLiteralBegin(index);
+        var length = ctx.getLiteralLength(index);
 
         // Make lookup as fast as possible
         if (possible == COLORS) {

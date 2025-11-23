@@ -43,10 +43,10 @@ public abstract class NodeMatcher {
                 updateBytes();
             }
 
-            return contains(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index]);
+            return contains(ctx.getData(), ctx.getLiteralBegin(index), ctx.getLiteralLength(index));
         }
 
-        private boolean contains(byte[] array, int start, short length) {
+        private boolean contains(byte[] array, int start, int length) {
             for (int i = start; i <= start + length - byteSize; ++i) {
                 boolean found = true;
 
@@ -79,7 +79,7 @@ public abstract class NodeMatcher {
             super(matchString);
         }
 
-        private boolean contains(byte[] array, int start, short length) {
+        private boolean contains(byte[] array, int start, int length) {
             for (int i = start; i <= start + length - matchBytes.length; ++i) {
                 boolean found = true;
                 for (int j = 0; j < matchBytes.length; ++j) {
@@ -101,7 +101,7 @@ public abstract class NodeMatcher {
                 currentCharset = ctx.getCharset();
             }
 
-            return contains(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index]);
+            return contains(ctx.getData(), ctx.getLiteralBegin(index), ctx.getLiteralLength(index));
         }
     }
 }

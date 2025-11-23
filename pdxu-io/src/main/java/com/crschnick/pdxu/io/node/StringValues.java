@@ -9,8 +9,8 @@ public class StringValues {
     private static final Pattern UNESCAPE_PATTERN = Pattern.compile("\\\\([\"\\\\])");
 
     public static String unescapeScalarValue(NodeContext context, int index) {
-        var b = context.getLiteralsBegin()[index];
-        var l = context.getLiteralsLength()[index];
+        var b = context.getLiteralBegin(index);
+        var l = context.getLiteralLength(index);
         var s = new String(context.getData(), b, l, context.getCharset());
         if (l < 2) {
             return s;

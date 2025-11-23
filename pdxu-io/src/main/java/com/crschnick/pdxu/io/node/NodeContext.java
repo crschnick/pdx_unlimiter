@@ -51,12 +51,17 @@ public final class NodeContext {
         return charset;
     }
 
-    public int[] getLiteralsBegin() {
-        return literalsBegin;
+    public int getLiteralBegin(int literalIndex) {
+        return literalsBegin[literalIndex];
     }
 
-    public short[] getLiteralsLength() {
-        return literalsLength;
+    public int getLiteralLength(int literalIndex) {
+        // Prevent short overflow for inline values
+        if (literalsCount == 1) {
+            return data.length;
+        }
+
+        return literalsLength[literalIndex];
     }
 
     public int getLiteralsCount() {

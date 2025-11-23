@@ -94,7 +94,7 @@ public class ParseException extends Exception {
     }
 
     public static ParseException createFromLiteralIndex(String fileName, String s, int lIndex, NodeContext ctx) {
-        var offset = ctx.getLiteralsBegin()[Math.max(0, Math.min(ctx.getLiteralsCount() - 1, lIndex))];
+        var offset = ctx.getLiteralBegin(Math.max(0, Math.min(ctx.getLiteralsCount() - 1, lIndex)));
         return createFromOffset(fileName, s, offset, ctx.getData());
     }
 

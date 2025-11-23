@@ -39,9 +39,9 @@ public final class ValueNode extends Node {
             return false;
         }
 
-        var b = context.getLiteralsBegin()[scalarIndex];
+        var b = context.getLiteralBegin(scalarIndex);
         return context.getData()[b] == DOUBLE_QUOTE_CHAR
-                && context.getData()[b + context.getLiteralsLength()[scalarIndex] - 1] == DOUBLE_QUOTE_CHAR;
+                && context.getData()[b + context.getLiteralLength(scalarIndex) - 1] == DOUBLE_QUOTE_CHAR;
     }
 
     @Override

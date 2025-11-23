@@ -159,7 +159,7 @@ public final class TextFormatParser {
     }
 
     private void updateLastKnownOffset() {
-        this.lastKnownOffset = context.getLiteralsBegin()[slIndex] + context.getLiteralsLength()[slIndex];
+        this.lastKnownOffset = context.getLiteralBegin(slIndex) + context.getLiteralLength(slIndex);
     }
 
     private Node parseNodeIfNotScalarValue(String name, boolean strict) throws ParseException {

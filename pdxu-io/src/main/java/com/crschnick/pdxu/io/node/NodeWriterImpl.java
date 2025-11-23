@@ -50,7 +50,7 @@ public final class NodeWriterImpl implements NodeWriter {
         }
 
         if (ctx.getCharset().equals(charset)) {
-            out.write(ctx.getData(), ctx.getLiteralsBegin()[index], ctx.getLiteralsLength()[index]);
+            out.write(ctx.getData(), ctx.getLiteralBegin(index), ctx.getLiteralLength(index));
         } else {
             out.write(ctx.evaluateRaw(index).getBytes(charset));
         }

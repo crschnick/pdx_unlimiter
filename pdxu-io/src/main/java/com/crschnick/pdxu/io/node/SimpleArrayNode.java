@@ -252,12 +252,12 @@ public final class SimpleArrayNode extends ArrayNode {
         }
 
         int keyScalarIndex = keyScalars[index];
-        if (context.getLiteralsLength()[keyScalarIndex] != b.length) {
+        if (context.getLiteralLength(keyScalarIndex) != b.length) {
             return false;
         }
 
-        int start = context.getLiteralsBegin()[keyScalarIndex];
-        for (int i = 0; i < context.getLiteralsLength()[keyScalarIndex]; i++) {
+        int start = context.getLiteralBegin(keyScalarIndex);
+        for (int i = 0; i < context.getLiteralLength(keyScalarIndex); i++) {
             if (context.getData()[start + i] != b[i]) {
                 return false;
             }
