@@ -80,9 +80,8 @@ public class EditorState {
     }
 
     public void onDelete() {
-        if (this.navigation.rebaseNavPathsToValid()) {
-            content.completeContentChange();
-        }
+        this.navigation.rebaseNavPathsToValid();
+        content.completeContentChange();
         dirtyProperty().set(true);
     }
 
