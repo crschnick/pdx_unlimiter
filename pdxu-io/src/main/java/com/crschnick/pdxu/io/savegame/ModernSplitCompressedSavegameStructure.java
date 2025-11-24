@@ -48,7 +48,7 @@ public class ModernSplitCompressedSavegameStructure extends ZipSavegameStructure
 
         try (var out = Files.newOutputStream(file)) {
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(true, 2, false, 0).toString();
+            String header = new ModernHeader(1, 2, false, 0).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             try (var zout = new ZipOutputStream(out)) {
                 zout.putNextEntry(new ZipEntry("gamestate"));

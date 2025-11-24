@@ -52,7 +52,7 @@ public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructur
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
 
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(true, 1, false, metaBytes.length).toString();
+            String header = new ModernHeader(1, 1, false, metaBytes.length).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {

@@ -26,7 +26,7 @@ public class ModernPlaintextSavegameStructure implements SavegameStructure {
         try (var gsOut = Files.newOutputStream(out)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(true, 0, false, metaBytes.length - 1).toString();
+            String header = new ModernHeader(1, 0, false, metaBytes.length - 1).toString();
             gsOut.write((header + "\n").getBytes(StandardCharsets.UTF_8));
 
             NodeWriter.write(gsOut, StandardCharsets.UTF_8, gamestate, "\t", 0);

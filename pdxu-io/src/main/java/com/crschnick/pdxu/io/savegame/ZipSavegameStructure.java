@@ -14,18 +14,6 @@ import java.util.zip.ZipInputStream;
 
 public class ZipSavegameStructure implements SavegameStructure {
 
-    public static byte[] getFirstHeader(byte[] input, int maxLength) {
-        try {
-            var zipIn = new ZipInputStream(new ByteArrayInputStream(input));
-            if (zipIn.getNextEntry() != null) {
-                return Arrays.copyOfRange(zipIn.readAllBytes(), 0, maxLength);
-            }
-        } catch (IOException ignored) {
-        }
-
-        return Arrays.copyOfRange(input, 0, maxLength);
-    }
-
     private final byte[] header;
     private final SavegameType type;
     private final Set<SavegamePart> parts;
