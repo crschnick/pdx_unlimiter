@@ -4,6 +4,7 @@ import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
 
 import lombok.Value;
+import lombok.experimental.NonFinal;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,9 +13,14 @@ import java.nio.file.Path;
 import java.util.Map;
 
 @Value
+@NonFinal
 public class ModernPlaintextSavegameStructure implements SavegameStructure {
 
     SavegameType type;
+
+    protected int determineHeaderVersion(SavegameContent content) {
+        return 1;
+    }
 
     @Override
     public void write(Path out, SavegameContent content) throws IOException {
@@ -22,11 +28,12 @@ public class ModernPlaintextSavegameStructure implements SavegameStructure {
         var key = gamestate.hasKey("meta_data") ? "meta_data" : "metadata";
         ArrayNode meta = (ArrayNode) gamestate.getNodeForKey(key);
         var metaHeaderNode = ArrayNode.singleKeyNode(key, meta);
+        var headerVersion = determineHeaderVersion(content);
 
         try (var gsOut = Files.newOutputStream(out)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(1, 0, false, metaBytes.length - 1).toString();
+            String header = new ModernHeader(headerVersion, 0, false, metaBytes.length - 1).toString();
             gsOut.write((header + "\n").getBytes(StandardCharsets.UTF_8));
 
             NodeWriter.write(gsOut, StandardCharsets.UTF_8, gamestate, "\t", 0);

@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public interface SavegameStructure {
 
@@ -73,8 +74,40 @@ public interface SavegameStructure {
         }
     };
 
-    SavegameStructure EU5_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.EU5);
-    SavegameStructure EU5_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.EU5);
+    SavegameStructure EU5_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.EU5) {
+        @Override
+        protected int determineHeaderVersion(SavegameContent content) {
+            var gamestate = content.get("gamestate");
+            var version = gamestate.getNodeForKeys("metadata", "version");
+            var p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+            var matcher = p.matcher(version.getString());
+            if (matcher.matches()) {
+                var requiresV2 = Integer.parseInt(matcher.group(1)) > 1 ||
+                        Integer.parseInt(matcher.group(2)) > 0 ||
+                        Integer.parseInt(matcher.group(3)) >= 8;
+                return requiresV2 ? 2 : 1;
+            } else {
+                return 1;
+            }
+        }
+    };
+    SavegameStructure EU5_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.EU5) {
+        @Override
+        protected int determineHeaderVersion(SavegameContent content) {
+            var gamestate = content.get("gamestate");
+            var version = gamestate.getNodeForKeys("metadata", "version");
+            var p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+            var matcher = p.matcher(version.getString());
+            if (matcher.matches()) {
+                var requiresV2 = Integer.parseInt(matcher.group(1)) > 1 ||
+                        Integer.parseInt(matcher.group(2)) > 0 ||
+                        Integer.parseInt(matcher.group(3)) >= 8;
+                return requiresV2 ? 2 : 1;
+            } else {
+                return 1;
+            }
+        }
+    };
 
     static boolean validateHeader(byte[] header, byte[] content) {
         if (content.length < header.length) {

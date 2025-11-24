@@ -42,17 +42,23 @@ public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructur
         return -1;
     }
 
+    protected int determineHeaderVersion(SavegameContent content) {
+        return 1;
+    }
+
     @Override
     public void write(Path file, SavegameContent content) throws IOException {
         var gamestate = content.get("gamestate");
-        ArrayNode meta = (ArrayNode) gamestate.getNodeForKey("meta_data");
-        var metaHeaderNode = ArrayNode.singleKeyNode("meta_data", meta);
+        var key = gamestate.hasKey("meta_data") ? "meta_data" : "metadata";
+        ArrayNode meta = (ArrayNode) gamestate.getNodeForKey(key);
+        var metaHeaderNode = ArrayNode.singleKeyNode(key, meta);
+        var headerVersion = determineHeaderVersion(content);
 
         try (var out = Files.newOutputStream(file)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
 
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(1, 1, false, metaBytes.length).toString();
+            String header = new ModernHeader(headerVersion, 1, false, metaBytes.length).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
