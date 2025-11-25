@@ -80,8 +80,8 @@ public class GuiSavegameCampaignComp<T, I extends SavegameInfo<T>> extends Simpl
                             SavegameActions.delete(campaign);
                         }
                     })
+                    .tooltipKey("delete")
                     .createRegion();
-            del.setAccessibleText("Delete campaign");
             top.getChildren().add(del);
 
             info.getChildren().add(top);

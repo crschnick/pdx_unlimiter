@@ -32,6 +32,7 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
         var b = new IconButtonComp("mdi2c-comment-edit-outline", () -> {
             EditorProvider.get().browseExternalFile(savegameManagerState.getGame());
         });
+        b.tooltipKey("openEditor");
         b.apply(struc -> {
             struc.get().getStyleClass().remove(Styles.FLAT);
             struc.get().minWidthProperty().bind(struc.get().heightProperty());
@@ -43,6 +44,7 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
         var b = new IconButtonComp("mdi-play", () -> {
             GameDistLauncher.startLauncher(savegameManagerState.getGame());
         });
+        b.tooltipKey("launch");
         b.apply(struc -> {
             struc.get().getStyleClass().remove(Styles.FLAT);
             struc.get().minWidthProperty().bind(struc.get().heightProperty());
@@ -54,6 +56,7 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
         var b = new IconButtonComp("mdi-import", () -> {
             GuiImporter.createImporterDialog(savegameManagerState.getGame());
         });
+        b.tooltipKey("import");
         b.apply(struc -> {
             struc.get().getStyleClass().remove(Styles.FLAT);
             struc.get().minWidthProperty().bind(struc.get().heightProperty());
