@@ -14,10 +14,6 @@ public class DesktopHelper {
             return;
         }
 
-        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            return;
-        }
-
         URI parsed;
         try {
             parsed = URI.create(uri);
@@ -28,8 +24,21 @@ public class DesktopHelper {
         }
 
         // This can be a blocking operation
-        ThreadHelper.runFailableAsync(() -> {
-            Desktop.getDesktop().browse(parsed);
+        ThreadHelper.runAsync(() -> {
+            try {
+                Desktop.getDesktop().browse(parsed);
+                return;
+            } catch (Exception e) {
+                // Some basic linux systems have trouble with the API call
+                ErrorEventFactory.fromThrowable(e)
+                        .expected()
+                        .omitted(OsType.ofLocal() == OsType.LINUX)
+                        .handle();
+            }
+
+            if (OsType.ofLocal() == OsType.LINUX) {
+                LocalExec.readStdoutIfPossible("xdg-open", parsed.toString());
+            }
         });
     }
 
@@ -38,19 +47,29 @@ public class DesktopHelper {
             return;
         }
 
+        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            if (OsType.ofLocal() == OsType.LINUX) {
+                LocalExec.readStdoutIfPossible("xdg-open", file.toString());
+                return;
+            }
+        }
+
         // This can be a blocking operation
         ThreadHelper.runAsync(() -> {
-            var xdg = OsType.ofLocal() == OsType.LINUX;
             if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 try {
                     Desktop.getDesktop().browse(file.toFile().toURI());
                     return;
                 } catch (Exception e) {
-                    ErrorEventFactory.fromThrowable(e).expected().omitted(xdg).handle();
+                    // Some basic linux systems have trouble with the API call
+                    ErrorEventFactory.fromThrowable(e)
+                            .expected()
+                            .omitted(OsType.ofLocal() == OsType.LINUX)
+                            .handle();
                 }
             }
 
-            if (xdg) {
+            if (OsType.ofLocal() == OsType.LINUX) {
                 LocalExec.readStdoutIfPossible("xdg-open", file.toString());
             }
         });
