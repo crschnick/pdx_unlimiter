@@ -71,3 +71,12 @@ jobs:
           compression-level: 1
           path: |
             dist/build/dist/artifacts/*
+
+
+      - name: Upload portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-portable
+          retention-days: 1
+          compression-level: 1
+          path: dist/build/dist/portable

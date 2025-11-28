@@ -87,3 +87,11 @@ jobs:
           path: |
             dist/build/dist/artifacts/*
           compression-level: 1
+
+      - name: Upload portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ contains(matrix.os, 'macos-15-intel') && 'macos-intel' || 'macos-arm' }}-portable
+          retention-days: 1
+          compression-level: 1
+          path: dist/build/dist/portable
