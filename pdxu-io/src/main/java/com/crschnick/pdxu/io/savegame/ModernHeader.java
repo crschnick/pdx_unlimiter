@@ -7,17 +7,17 @@ import java.util.Random;
 /**
  * CK3, VIC3, EU5 header format:
  * <p>
- * SAV0 <version> 0 <type> <8 hex digits of randomness> <8 hex digits of meta data size> [<8 hex digits of padding>]
+ * SAV <version> <type> <8 hex digits of randomness> <8 hex digits of meta data size> [<8 hex digits of padding>]
  * <p>
  * version:
- * Can either be 0, 1, 2
+ * Can either be 00, 01, 02
  * type:
- * 5: Split Compressed + Binary
- * 4: Split Compressed + Plaintext
- * 3: Unified Compressed + Binary
- * 2: Unified Compressed + Plaintext
- * 1: Uncompressed + Binary
- * 0: Uncompressed + Plaintext
+ * 05: Split Compressed + Binary
+ * 04: Split Compressed + Plaintext
+ * 03: Unified Compressed + Binary
+ * 02: Unified Compressed + Plaintext
+ * 01: Uncompressed + Binary
+ * 00: Uncompressed + Plaintext
  * <p>
  * meta data size:
  * Length of meta data block at the beginning of the file in bytes, or alternatively the amount of bytes to skip until gamestate data is read.

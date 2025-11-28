@@ -69,6 +69,7 @@ jobs:
           name: windows-artifacts
           retention-days: 1
           compression-level: 1
+          include-hidden-files: true
           path: |
             dist/build/dist/artifacts/*
 
@@ -78,4 +79,5 @@ jobs:
           name: windows-steam
           retention-days: 1
           compression-level: 1
+          include-hidden-files: true
           path: dist/build/dist/portable

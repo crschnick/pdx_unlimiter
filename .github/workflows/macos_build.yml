@@ -84,6 +84,7 @@ jobs:
         with:
           name: ${{ matrix.os }}-artifacts
           retention-days: 1
+          include-hidden-files: true
           path: |
             dist/build/dist/artifacts/*
           compression-level: 1
@@ -101,5 +102,6 @@ jobs:
           name: macos-arm-steam
           retention-days: 1
           compression-level: 1
+          include-hidden-files: true
           path: dist/build/dist/portable
 

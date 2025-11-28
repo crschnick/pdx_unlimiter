@@ -48,6 +48,7 @@ jobs:
           name: ${{ matrix.os }}-artifacts
           retention-days: 1
           compression-level: 1
+          include-hidden-files: true
           path: dist/build/dist/artifacts/*
 
       - name: Upload Steam build
@@ -56,4 +57,5 @@ jobs:
           name: linux-steam
           retention-days: 1
           compression-level: 1
+          include-hidden-files: true
           path: dist/build/dist/portable
