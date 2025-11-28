@@ -96,8 +96,9 @@ jobs:
 
       - name: Upload Steam build
         uses: actions/upload-artifact@v4
+        if: ${{ contains(matrix.os, 'macos-15-intel') == false }}
         with:
-          name: ${{ contains(matrix.os, 'macos-15-intel') && 'macos-intel' || 'macos-arm' }}-steam
+          name: macos-arm-steam
           retention-days: 1
           compression-level: 1
           path: dist/build/dist/portable

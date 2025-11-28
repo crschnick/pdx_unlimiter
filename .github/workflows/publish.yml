@@ -199,13 +199,6 @@ jobs:
           merge-multiple: true
           path: dist/build/dist/depots/linux
 
-      - name: Download macOS Intel
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "macos-intel-steam"
-          merge-multiple: true
-          path: dist/build/dist/depots/macos-intel
-
       - name: Download macOS ARM
         uses: actions/download-artifact@v4
         with:
@@ -222,6 +215,5 @@ jobs:
           rootPath: dist/build/dist/depots
           depot1Path: windows
           depot2Path: linux
-          depot3Path: macos-intel
           depot4Path: macos-arm
           releaseBranch: prerelease
