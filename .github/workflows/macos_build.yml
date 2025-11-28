@@ -88,9 +88,9 @@ jobs:
             dist/build/dist/artifacts/*
           compression-level: 1
 
-      - name: Install create-dmg
-        run: brew install create-dmg
-        shell: |
+      - name: Copy Steam app
+        shell: bash
+        run: |
           mkdir -p "dist/build/dist/portable"
           cp -r "dist/build/dist/Pdx-Unlimiter.app" "dist/build/dist/portable"
 
