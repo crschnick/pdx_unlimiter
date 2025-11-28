@@ -72,11 +72,10 @@ jobs:
           path: |
             dist/build/dist/artifacts/*
 
-
-      - name: Upload portable
+      - name: Upload Steam build
         uses: actions/upload-artifact@v4
         with:
-          name: windows-portable
+          name: windows-steam
           retention-days: 1
           compression-level: 1
           path: dist/build/dist/portable

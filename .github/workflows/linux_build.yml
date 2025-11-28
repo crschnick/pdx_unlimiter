@@ -50,10 +50,10 @@ jobs:
           compression-level: 1
           path: dist/build/dist/artifacts/*
 
-      - name: Upload portable
+      - name: Upload Steam build
         uses: actions/upload-artifact@v4
         with:
-          name: linux-portable
+          name: linux-steam
           retention-days: 1
           compression-level: 1
           path: dist/build/dist/portable

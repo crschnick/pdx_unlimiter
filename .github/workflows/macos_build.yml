@@ -88,10 +88,17 @@ jobs:
             dist/build/dist/artifacts/*
           compression-level: 1
 
-      - name: Upload portable
+      - name: Install create-dmg
+        run: brew install create-dmg
+        shell: |
+          mkdir -p "dist/build/dist/portable"
+          cp -r "dist/build/dist/Pdx-Unlimiter.app" "dist/build/dist/portable"
+
+      - name: Upload Steam build
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ contains(matrix.os, 'macos-15-intel') && 'macos-intel' || 'macos-arm' }}-portable
+          name: ${{ contains(matrix.os, 'macos-15-intel') && 'macos-intel' || 'macos-arm' }}-steam
           retention-days: 1
           compression-level: 1
           path: dist/build/dist/portable
+

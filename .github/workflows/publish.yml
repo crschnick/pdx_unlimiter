@@ -185,31 +185,31 @@ jobs:
           VER=$(cat "version")
           echo "VERSION=$VER" >> $GITHUB_ENV
 
-      - name: Download Windows portable
+      - name: Download Windows
         uses: actions/download-artifact@v4
         with:
-          pattern: "windows-portable"
+          pattern: "windows-steam"
           merge-multiple: true
           path: dist/build/dist/depots/windows
 
-      - name: Download Linux portable
+      - name: Download Linux
         uses: actions/download-artifact@v4
         with:
-          pattern: "linux-portable"
+          pattern: "linux-steam"
           merge-multiple: true
           path: dist/build/dist/depots/linux
 
-      - name: Download macOS Intel portable
+      - name: Download macOS Intel
         uses: actions/download-artifact@v4
         with:
-          pattern: "macos-intel-portable"
+          pattern: "macos-intel-steam"
           merge-multiple: true
           path: dist/build/dist/depots/macos-intel
 
-      - name: Download macOS ARM portable
+      - name: Download macOS ARM
         uses: actions/download-artifact@v4
         with:
-          pattern: "macos-arm-portable"
+          pattern: "macos-arm-steam"
           merge-multiple: true
           path: dist/build/dist/depots/macos-arm
 
