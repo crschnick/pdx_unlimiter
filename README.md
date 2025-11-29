@@ -53,6 +53,10 @@ The following rpm installers are available:
 
 The same applies here, you should use a package manager that supports resolving and installing required dependencies if needed.
 
+#### Arch + SteamOS
+
+There is an official [AUR package](https://aur.archlinux.org/packages/pdx-unlimiter) available that you can either install manually or via an AUR helper such as with `yay -S pdx-unlimiter`.
+
 #### Portable
 
 In case you prefer to use an archive version that you can extract anywhere, you can use these:
