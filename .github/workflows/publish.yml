@@ -151,3 +151,70 @@ jobs:
           tag_name: ${{ env.VERSION }}
           files: |
             dist/build/dist/github-release/*
+
+  publish-steam:
+    needs: [
+      build-windows,
+      build-linux,
+      build-macos
+    ]
+    name: Publish Steam
+    if: ${{ contains(github.event.head_commit.message, '[release]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: none
+      attestations: none
+      checks: none
+      contents: write
+      deployments: none
+      id-token: none
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set variables
+        run: |
+          VER=$(cat "version")
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Download Windows
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "windows-steam"
+          merge-multiple: true
+          path: dist/build/dist/depots/windows
+
+      - name: Download Linux
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "linux-steam"
+          merge-multiple: true
+          path: dist/build/dist/depots/linux
+
+      - name: Download macOS ARM
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "macos-arm-steam"
+          merge-multiple: true
+          path: dist/build/dist/depots/macos-arm
+
+      - uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF}}
+          appId: 4170030
+          buildDescription: ${{ env.VERSION }}
+          rootPath: dist/build/dist/depots
+          depot1Path: windows
+          depot2Path: linux
+          depot4Path: macos-arm
+          releaseBranch: prerelease
+        continue-on-error: true
