@@ -20,6 +20,7 @@ public enum AppDistributionType implements Translatable {
     UNKNOWN("unknown", false, () -> new BasicUpdater(false)),
     DEVELOPMENT("development", true, () -> new BasicUpdater(false)),
     PORTABLE("portable", false, () -> new BasicUpdater(true)),
+    STEAM("steam", false, () -> new BasicUpdater(false)),
     NATIVE_INSTALLATION("install", true, () -> new BasicUpdater(true));
 
     private static AppDistributionType type;
@@ -117,6 +118,11 @@ public enum AppDistributionType implements Translatable {
         } else {
             var file = base.resolve("installation");
             if (!Files.exists(file)) {
+                var steam = "4170030".equals(System.getenv("SteamAppId"));
+                if (steam) {
+                    return STEAM;
+                }
+
                 return PORTABLE;
             }
         }
