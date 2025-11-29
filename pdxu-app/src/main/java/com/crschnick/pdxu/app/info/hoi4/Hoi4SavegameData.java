@@ -55,7 +55,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
     }
 
     private void initVersion(Node n) {
-        Pattern p = Pattern.compile("([\\w ]+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\w+))?\\s+.*");
+        Pattern p = Pattern.compile("([\\w ]+)\\s+v(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\d{1,2}))?(?:\\.(\\w+))?\\s+.*");
         var string = n.getNodeForKey("version").getString();
         Matcher m = p.matcher(string);
         if (m.matches()) {
@@ -63,7 +63,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
                     Integer.parseInt(m.group(2)),
                     Integer.parseInt(m.group(3)),
                     Integer.parseInt(m.group(4)),
-                    0,
+                    m.group(5) != null ? Integer.parseInt(m.group(5)) : 0,
                     m.group(1));
         } else {
             throw new IllegalArgumentException("Could not parse HOI4 version string: " + string);

@@ -154,6 +154,12 @@ public class SteamDist extends GameDist {
     public static Path getSteamAppsCompatDir(Game g) {
         // This returns the common paths
         var libs = getSteamCommonLibraryPaths().stream().map(path -> path.getParent().getParent()).toList();
+
+        // What if Steam was not detected
+        if (libs.isEmpty()) {
+            return AppSystemInfo.ofCurrent().getUserHome();
+        }
+
         var paths = libs.stream()
                 .map(path -> path.resolve("steamapps", "compatdata", g.getSteamAppId() + ""))
                 .filter(path -> Files.exists(path))
