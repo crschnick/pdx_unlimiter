@@ -94,7 +94,7 @@ jobs:
         run: |
           mkdir -p "dist/build/dist/portable"
           cp -r "dist/build/dist/Pdx-Unlimiter.app" "dist/build/dist/portable"
-          echo "open -a ./Pdx-Unlimiter.app" > "dist/build/dist/portable/launch.sh"
+          echo "open -n ./Pdx-Unlimiter.app" > "dist/build/dist/portable/launch.sh"
           chmod +x "dist/build/dist/portable/launch.sh"
 
       - name: Upload Steam build
