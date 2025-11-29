@@ -118,7 +118,7 @@ public enum AppDistributionType implements Translatable {
         } else {
             var file = base.resolve("installation");
             if (!Files.exists(file)) {
-                var steam = "4170030".equals(System.getenv("SteamAppId"));
+                var steam = AppInstallation.ofCurrent().getBaseInstallationPath().getParent().getFileName().toString().equals("common");
                 if (steam) {
                     return STEAM;
                 }
