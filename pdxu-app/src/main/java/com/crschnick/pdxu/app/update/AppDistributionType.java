@@ -100,7 +100,8 @@ public enum AppDistributionType implements Translatable {
 
         if (OsType.ofLocal() == OsType.MACOS) {
             if (!base.equals(AppInstallation.ofDefault().getBaseInstallationPath())) {
-                var steam = base.getParent().getParent().getFileName().toString().equals("common");
+                var steam = base.getParent().getFileName().toString().equals(AppNames.ofCurrent().getName()) &&
+                        Files.exists(base.getParent().resolve("launch.sh"));
                 if (steam) {
                     return STEAM;
                 }
