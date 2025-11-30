@@ -159,7 +159,7 @@ jobs:
       build-macos
     ]
     name: Publish Steam
-    # if: ${{ contains(github.event.head_commit.message, '[release]') }}
+    if: ${{ contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
     permissions:
       actions: none

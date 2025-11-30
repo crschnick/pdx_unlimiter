@@ -109,7 +109,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         ALL.put(Game.HOI4, new SavegameStorage<>("hoi4", GameDateType.HOI4, SavegameType.HOI4, Hoi4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
-                return "Unknown";
+                return GameLocalisation.getLocalisedValue(
+                        info.getData().getTag().getTag(), info);
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>("ck3", GameDateType.CK3, SavegameType.CK3, Ck3SavegameInfo.class) {

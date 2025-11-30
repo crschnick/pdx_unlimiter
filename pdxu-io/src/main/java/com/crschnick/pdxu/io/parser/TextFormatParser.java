@@ -198,10 +198,10 @@ public final class TextFormatParser {
             }
         } else {
             if (tt[index] == TextFormatTokenizer.EQUALS) {
-                throw ParseException.createFromLiteralIndex(name, "encountered unexpected =", slIndex - 1, context);
+                throw ParseException.createFromLiteralIndex(name, "encountered unexpected token =", slIndex - 1, context);
             }
             if (tt[index] == TextFormatTokenizer.CLOSE_GROUP) {
-                throw ParseException.createFromLiteralIndex(name, "encountered unexpected }", slIndex - 1, context);
+                throw ParseException.createFromLiteralIndex(name, "encountered unexpected token }", slIndex - 1, context);
             }
             if (tt[index] == TextFormatTokenizer.OPEN_GROUP) {
                 return parseComplexNode(name, strict);
@@ -242,6 +242,13 @@ public final class TextFormatParser {
             if (!strict && isMissingKey) {
                 // Move over =
                 index++;
+
+                // HOI4 1.17 saves are broken and have invalid syntax
+                if ("\"ita_missiolinis_fielded_manpower_goal_repeatable\"".equals(context.evaluateRaw(slIndex))) {
+                    index += 3;
+                    slIndex += 2;
+                    continue;
+                }
 
                 // Discard next node if there is one!
                 if (tt[index] != TextFormatTokenizer.CLOSE_GROUP) {
