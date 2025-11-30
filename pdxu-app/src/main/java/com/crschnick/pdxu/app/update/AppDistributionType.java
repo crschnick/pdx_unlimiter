@@ -98,13 +98,13 @@ public enum AppDistributionType implements Translatable {
     public static AppDistributionType determine() {
         var base = AppInstallation.ofCurrent().getBaseInstallationPath();
 
-        var steam = base.getParent().getFileName().toString().equals("common");
-        if (steam) {
-            return STEAM;
-        }
-
         if (OsType.ofLocal() == OsType.MACOS) {
             if (!base.equals(AppInstallation.ofDefault().getBaseInstallationPath())) {
+                var steam = base.getParent().getParent().getFileName().toString().equals("common");
+                if (steam) {
+                    return STEAM;
+                }
+
                 return PORTABLE;
             }
 
@@ -124,6 +124,11 @@ public enum AppDistributionType implements Translatable {
         } else {
             var file = base.resolve("installation");
             if (!Files.exists(file)) {
+                var steam = base.getParent().getFileName().toString().equals("common");
+                if (steam) {
+                    return STEAM;
+                }
+
                 return PORTABLE;
             }
         }
