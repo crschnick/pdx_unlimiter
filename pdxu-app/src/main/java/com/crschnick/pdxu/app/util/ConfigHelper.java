@@ -46,7 +46,7 @@ public class ConfigHelper {
             return JsonNodeFactory.instance.objectNode();
         }
 
-        if (node != null) {
+        if (node != null && !node.isMissingNode()) {
             return node;
         }
 

@@ -1,6 +1,8 @@
 package com.crschnick.pdxu.editor.target;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.issue.ErrorEvent;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodeWriter;
@@ -35,8 +37,8 @@ public class DataFileEditTarget extends EditTarget {
     public SavegameContent parse() throws Exception {
         // Prevent users from opening non text files
         if (EXCLUDED_EXTENSIONS.stream().anyMatch(end -> file.toString().endsWith("." + end))) {
-            throw new IllegalArgumentException("Files of type ." + FilenameUtils.getExtension(file.toString())
-                    + " are not supported by the editor");
+            throw ErrorEventFactory.expected(new IllegalArgumentException("Files of type ." + FilenameUtils.getExtension(file.toString())
+                    + " are not supported by the editor"));
         }
 
         return new SavegameContent(Map.of(getName(), getParser().parse(file)));
