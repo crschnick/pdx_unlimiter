@@ -73,7 +73,11 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
                 node.getNodeForKeyIfExistent("colors").filter(Node::isArray).ifPresent(n -> {
                     n.forEach((k, v) -> {
                         try {
-                            cache.colors.put(k, fromGameColor(GameColor.fromColorNode(v)));
+                            if (v.isArray()) {
+                                cache.colors.put(k, fromGameColor(GameColor.fromRgbArray(v)));
+                            } else if (v.isTagged()) {
+                                cache.colors.put(k, fromGameColor(GameColor.fromColorNode(v)));
+                            }
                         } catch (Exception ignored) {
                         }
                     });
