@@ -146,7 +146,7 @@ jobs:
           body_path: dist/build/dist/release/github-changelog.md
           token: ${{ secrets.GH_PAT }}
           preserve_order: true
-          prerelease: false
+          prerelease: true
           make_latest: true
           tag_name: ${{ env.VERSION }}
           files: |

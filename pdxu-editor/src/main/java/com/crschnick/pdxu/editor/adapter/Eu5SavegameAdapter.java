@@ -194,6 +194,7 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
             "leader",
             "celestial_governor");
     private static final List<String> CHARACTER_KEYS = List.of(
+            "active_regent",
             "founder",
             "head",
             "ruler",

@@ -4,11 +4,13 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 
 import javafx.scene.image.Image;
 
+import java.util.List;
+
 public class Eu5HeirComp extends Eu5RulerComp {
 
     @Override
-    protected String getKey() {
-        return "heir";
+    protected List<String> getKeys() {
+        return List.of("heir");
     }
 
     @Override

@@ -16,6 +16,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
@@ -34,12 +35,20 @@ public class Eu5RulerComp extends SavegameInfoComp {
                 .name("database")
                 .pointerEvaluation(countryId)
                 .build();
-        ruler = Ruler.fromCountryNode(getKey(), content.get(), country.get(content.get()))
-                .orElse(getDefault());
+        for (String key : getKeys()) {
+            var found = Ruler.fromCountryNode(key, content.get(), country.get(content.get()));
+            if (found.isPresent()) {
+                ruler = found.get();
+                break;
+            }
+        }
+        if (ruler == null) {
+            ruler = getDefault();
+        }
     }
 
-    protected String getKey() {
-        return "ruler";
+    protected List<String> getKeys() {
+        return List.of("ruler", "active_regent");
     }
 
     private static Region createRulerStatsNode(Ruler ruler) {
