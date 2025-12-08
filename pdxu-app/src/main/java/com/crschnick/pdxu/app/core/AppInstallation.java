@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.util.OsType;
 
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public abstract class AppInstallation {
@@ -125,7 +126,18 @@ public abstract class AppInstallation {
 
     public abstract Path getDebugScriptPath();
 
-    public abstract Path getRakalyExecutable();
+    public final Path getRakalyExecutable() {
+        var env = System.getenv("RAKALY_EXECUTABLE");
+        if (env != null) {
+            try {
+                return Path.of(env);
+            } catch (InvalidPathException ignored) {}
+        }
+
+        return getDefaultRakalyExecutable();
+    }
+
+    protected abstract Path getDefaultRakalyExecutable();
 
     public abstract Path getLangPath();
 
@@ -146,7 +158,7 @@ public abstract class AppInstallation {
         }
 
         @Override
-        public Path getRakalyExecutable() {
+        protected Path getDefaultRakalyExecutable() {
             return getBaseInstallationPath().resolve("rakaly", "rakaly.exe");
         }
 
@@ -176,7 +188,7 @@ public abstract class AppInstallation {
         }
 
         @Override
-        public Path getRakalyExecutable() {
+        protected Path getDefaultRakalyExecutable() {
             return devBase.resolve("rakaly", "rakaly_windows.exe");
         }
 
@@ -204,7 +216,7 @@ public abstract class AppInstallation {
         }
 
         @Override
-        public Path getRakalyExecutable() {
+        protected Path getDefaultRakalyExecutable() {
             return getBaseInstallationPath().resolve("rakaly", "rakaly");
         }
 
@@ -238,7 +250,7 @@ public abstract class AppInstallation {
         }
 
         @Override
-        public Path getRakalyExecutable() {
+        protected Path getDefaultRakalyExecutable() {
             return devBase.resolve("rakaly", "rakaly_linux");
         }
 
@@ -265,7 +277,7 @@ public abstract class AppInstallation {
         }
 
         @Override
-        public Path getRakalyExecutable() {
+        protected Path getDefaultRakalyExecutable() {
             return getBaseInstallationPath().resolve("Contents", "MacOS", "rakaly");
         }
 
@@ -299,7 +311,7 @@ public abstract class AppInstallation {
         }
 
         @Override
-        public Path getRakalyExecutable() {
+        protected Path getDefaultRakalyExecutable() {
             return devBase.resolve("rakaly", "rakaly_mac");
         }
 
