@@ -66,6 +66,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     private final Path path;
     private final SavegameType type;
     private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
+    private boolean loadFailed;
 
     public SavegameStorage(String name, GameDateType dateType, SavegameType type, Class<I> infoClass) {
         this.infoFactory = (content, melted) -> {
@@ -173,7 +174,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             try {
                 s.loadData();
             } catch (Exception e) {
-                ErrorEventFactory.fromThrowable(e).term().handle();
+                s.loadFailed = true;
+                ErrorEventFactory.fromThrowable(e).handle();
             }
         }
     }
@@ -190,13 +192,16 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
         JsonNode node;
         if (Files.exists(getDataFile())) {
-            node = ConfigHelper.readConfig(getDataFile());
+            node = ConfigHelper.readConfig(getDataFile(), true);
         } else {
             return;
         }
 
         {
-            JsonNode c = node.required("campaigns");
+            JsonNode c = node.get("campaigns");
+            if (c == null) {
+                c = JsonNodeFactory.instance.objectNode();
+            }
             for (int i = 0; i < c.size(); i++) {
                 String name = c.get(i).required("name").textValue();
                 GameDate date = dateType.fromString(c.get(i).required("date").textValue());
@@ -242,8 +247,12 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                 continue;
             }
 
-            JsonNode campaignNode = JacksonMapper.getDefault().readTree(colFile.toFile());
-            StreamSupport.stream(campaignNode.required("entries").spliterator(), false)
+            JsonNode campaignNode = ConfigHelper.readConfig(colFile, false);
+            var e = campaignNode.get("entries");
+            if (e == null) {
+                e = JsonNodeFactory.instance.objectNode();
+            }
+            StreamSupport.stream(e.spliterator(), false)
                     .forEach(entryNode -> {
                         UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
                         String name = Optional.ofNullable(entryNode.get("name"))
@@ -264,6 +273,10 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     }
 
     private synchronized void saveData() {
+        if (loadFailed) {
+            return;
+        }
+
         ObjectNode n = JsonNodeFactory.instance.objectNode();
 
         ArrayNode c = n.putArray("campaigns");
@@ -314,7 +327,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         ConfigHelper.writeConfig(getDataFile(), n);
     }
 
-    public synchronized void addNewEntryToCampaign(
+    private synchronized void addNewEntryToCampaign(
             UUID campainUuid,
             UUID entryUuid,
             String checksum,
@@ -593,6 +606,10 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
     protected Optional<SavegameParseResult> importSavegame(
             Path file, boolean checkDuplicate, String sourceFileChecksum, UUID customCampaignId) {
+        if (loadFailed) {
+            return Optional.empty();
+        }
+
         var status = importSavegameData(file, checkDuplicate, sourceFileChecksum, customCampaignId);
         saveData();
         return status;

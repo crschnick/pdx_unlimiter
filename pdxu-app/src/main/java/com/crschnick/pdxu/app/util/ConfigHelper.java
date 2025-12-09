@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.util;
 
+import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -19,7 +21,7 @@ import java.nio.file.Path;
 
 public class ConfigHelper {
 
-    public static JsonNode readConfig(Path in) {
+    public static JsonNode readConfig(Path in, boolean promptForDeletion) throws IOException {
         JsonNode node = null;
         try {
             if (Files.exists(in)) {
@@ -42,12 +44,19 @@ public class ConfigHelper {
             } catch (IOException e) {
                 ErrorEventFactory.fromThrowable("The backup config file " + in.toString() + " could not be read as well", e).handle();
             }
-        } else {
-            return JsonNodeFactory.instance.objectNode();
         }
 
         if (node != null && !node.isMissingNode()) {
             return node;
+        }
+
+        if (promptForDeletion) {
+            var discard = AppDialog.confirm("configReadErrorTitle", AppI18n.observable("configReadErrorContent", in.toString()));
+            if (!discard) {
+                var ex = new IOException("Unable to read config file " + in + " even though it is required");
+                ErrorEventFactory.preconfigure(ErrorEventFactory.fromThrowable(ex).discard());
+                throw ex;
+            }
         }
 
         return JsonNodeFactory.instance.objectNode();
