@@ -57,7 +57,7 @@ public final class NodeContext {
 
     public int getLiteralLength(int literalIndex) {
         // Prevent short overflow for inline values
-        if (literalsCount == 1) {
+        if (literalsCount == 1 && literalsBegin[0] == 0) {
             return data.length;
         }
 
