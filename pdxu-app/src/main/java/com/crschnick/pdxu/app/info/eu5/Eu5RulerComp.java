@@ -143,9 +143,11 @@ public class Eu5RulerComp extends SavegameInfoComp {
                     .orElse(0.0);
 
             var nameNode = rulerNode.getNodeForKey("first_name");
-            var name = nameNode.isArray() ?
-                    nameNode.getNodeForKeyIfExistent("custom_name").orElse(nameNode.getNodeForKey("name")).getString() :
-                    nameNode.getString();
+            var name = nameNode.isArray()
+                    ? nameNode.getNodeForKeyIfExistent("custom_name")
+                            .orElse(nameNode.getNodeForKey("name"))
+                            .getString()
+                    : nameNode.getString();
             var nickname = rulerNode
                     .getNodeForKeyIfExistent("nickname")
                     .map(Node::getString)

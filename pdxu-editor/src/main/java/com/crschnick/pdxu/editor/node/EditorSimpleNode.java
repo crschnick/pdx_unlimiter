@@ -113,8 +113,9 @@ public final class EditorSimpleNode extends EditorRealNode {
             return;
         }
 
-        throw ErrorEventFactory.expected(new IllegalArgumentException(
-                "Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead."));
+        throw ErrorEventFactory.expected(
+                new IllegalArgumentException(
+                        "Unable to assign multiple values to a singular value node. If you want to convert this node to an array, edit the parent node instead."));
     }
 
     public boolean isValid() {

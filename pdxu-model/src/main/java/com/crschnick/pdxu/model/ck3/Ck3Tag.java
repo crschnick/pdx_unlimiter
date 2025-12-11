@@ -122,7 +122,10 @@ public class Ck3Tag {
                 : n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
 
         var landedNode = personNode.getNodeForKey("landed_data");
-        var gv = landedNode.getNodeForKeyIfExistent("government").map(Node::getString).orElse("?");
+        var gv = landedNode
+                .getNodeForKeyIfExistent("government")
+                .map(Node::getString)
+                .orElse("?");
         var existingTag = allTags.stream().filter(t -> t.id == id).findAny();
         if (existingTag.isEmpty()) {
             return Optional.empty();

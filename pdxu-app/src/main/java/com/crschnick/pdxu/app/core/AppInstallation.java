@@ -131,7 +131,8 @@ public abstract class AppInstallation {
         if (env != null) {
             try {
                 return Path.of(env);
-            } catch (InvalidPathException ignored) {}
+            } catch (InvalidPathException ignored) {
+            }
         }
 
         return getDefaultRakalyExecutable();

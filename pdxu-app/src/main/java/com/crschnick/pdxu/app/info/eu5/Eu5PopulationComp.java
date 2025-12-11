@@ -26,7 +26,8 @@ public class Eu5PopulationComp extends SimpleInfoComp {
                 .getNodeForKey(data.eu5().getTag().getId() + "")
                 .getNodeForKeyIfExistent("last_months_population")
                 .map(Node::getDouble)
-                .orElse(0.0).intValue();
+                .orElse(0.0)
+                .intValue();
     }
 
     @Override

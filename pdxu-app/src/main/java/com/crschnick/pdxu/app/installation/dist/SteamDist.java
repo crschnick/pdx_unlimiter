@@ -42,10 +42,11 @@ public class SteamDist extends GameDist {
     public Optional<Path> getWorkshopDir() {
         return getSteamCommonLibraryPaths().stream()
                 .map(p -> p.getParent()
-                .resolve("workshop")
-                .resolve("content")
-                .resolve(String.valueOf(getGame().getSteamAppId())))
-                .filter(Files::exists).findFirst();
+                        .resolve("workshop")
+                        .resolve("content")
+                        .resolve(String.valueOf(getGame().getSteamAppId())))
+                .filter(Files::exists)
+                .findFirst();
     }
 
     @Override
@@ -71,12 +72,13 @@ public class SteamDist extends GameDist {
                         steamDir =
                                 Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
                     } else {
-                        var flatpak = Path.of(System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share/Steam");
+                        var flatpak = Path.of(
+                                System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share/Steam");
                         if (Files.exists(flatpak)) {
                             // Resolve symlink
                             var steamRealPath = flatpak.toRealPath();
-                            steamDir =
-                                    Optional.ofNullable(Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
+                            steamDir = Optional.ofNullable(
+                                    Files.isDirectory(steamRealPath) ? steamRealPath.toString() : null);
                         }
                     }
                 } catch (Exception ex) {
@@ -153,7 +155,9 @@ public class SteamDist extends GameDist {
 
     public static Path getSteamAppsCompatDir(Game g) {
         // This returns the common paths
-        var libs = getSteamCommonLibraryPaths().stream().map(path -> path.getParent().getParent()).toList();
+        var libs = getSteamCommonLibraryPaths().stream()
+                .map(path -> path.getParent().getParent())
+                .toList();
 
         // What if Steam was not detected
         if (libs.isEmpty()) {
@@ -164,7 +168,10 @@ public class SteamDist extends GameDist {
                 .map(path -> path.resolve("steamapps", "compatdata", g.getSteamAppId() + ""))
                 .filter(path -> Files.exists(path))
                 .toList();
-        return paths.stream().filter(path -> Files.isDirectory(path)).findFirst().orElse(paths.getFirst());
+        return paths.stream()
+                .filter(path -> Files.isDirectory(path))
+                .findFirst()
+                .orElse(paths.getFirst());
     }
 
     private static boolean isInSteamLibraryDir(Path dir) {
@@ -235,8 +242,10 @@ public class SteamDist extends GameDist {
                 TaskExecutor.getInstance()
                         .submitTask(
                                 () -> {
-                                    var isFlatpak = OsType.ofLocal() == OsType.LINUX &&
-                                            getSteamPath().map(path -> path.toString().contains("com.valvesoftware.Steam")).orElse(false);
+                                    var isFlatpak = OsType.ofLocal() == OsType.LINUX
+                                            && getSteamPath()
+                                                    .map(path -> path.toString().contains("com.valvesoftware.Steam"))
+                                                    .orElse(false);
                                     if (isFlatpak) {
                                         LocalExec.executeAsync("flatpak", "run", "com.valvesoftware.Steam", uri);
                                     } else {

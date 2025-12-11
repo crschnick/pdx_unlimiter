@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.installation;
 
-import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
@@ -804,7 +803,9 @@ public interface GameInstallType {
             if (OsType.ofLocal() == OsType.MACOS) {
                 var crossover = p.resolve("binaries", "eu5.exe");
                 if (Files.exists(crossover)) {
-                    return FileSystemHelper.getParadoxDocumentsPath().resolve("Paradox Interactive").resolve(name);
+                    return FileSystemHelper.getParadoxDocumentsPath()
+                            .resolve("Paradox Interactive")
+                            .resolve(name);
                 }
             }
 
@@ -1162,7 +1163,9 @@ public interface GameInstallType {
             }
 
             var node = TextFormatParser.text().parse(sf);
-            var langId = node.getNodeForKeyIfExistent("language").map(Node::getString).orElse(null);
+            var langId = node.getNodeForKeyIfExistent("language")
+                    .map(Node::getString)
+                    .orElse(null);
             return Optional.ofNullable(GameLanguage.byId(langId));
         }
 

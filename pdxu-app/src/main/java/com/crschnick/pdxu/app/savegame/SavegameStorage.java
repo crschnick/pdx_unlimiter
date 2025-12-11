@@ -252,23 +252,21 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             if (e == null) {
                 e = JsonNodeFactory.instance.objectNode();
             }
-            StreamSupport.stream(e.spliterator(), false)
-                    .forEach(entryNode -> {
-                        UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
-                        String name = Optional.ofNullable(entryNode.get("name"))
+            StreamSupport.stream(e.spliterator(), false).forEach(entryNode -> {
+                UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
+                String name = Optional.ofNullable(entryNode.get("name"))
+                        .map(JsonNode::textValue)
+                        .orElse(null);
+                GameDate date = dateType.fromString(entryNode.required("date").textValue());
+                String checksum = entryNode.required("checksum").textValue();
+                SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
+                List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
+                        .map(n -> StreamSupport.stream(n.spliterator(), false)
                                 .map(JsonNode::textValue)
-                                .orElse(null);
-                        GameDate date =
-                                dateType.fromString(entryNode.required("date").textValue());
-                        String checksum = entryNode.required("checksum").textValue();
-                        SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
-                        List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
-                                .map(n -> StreamSupport.stream(n.spliterator(), false)
-                                        .map(JsonNode::textValue)
-                                        .collect(Collectors.toList()))
-                                .orElse(List.of());
-                        collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
-                    });
+                                .collect(Collectors.toList()))
+                        .orElse(List.of());
+                collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
+            });
         }
     }
 

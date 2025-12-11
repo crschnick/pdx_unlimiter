@@ -29,7 +29,9 @@ public class ConfigHelper {
                 node = o.readTree(Files.readAllBytes(in));
             }
         } catch (IOException e) {
-            ErrorEventFactory.fromThrowable("The config file " + in.toString() + " could not be read", e).expected().handle();
+            ErrorEventFactory.fromThrowable("The config file " + in.toString() + " could not be read", e)
+                    .expected()
+                    .handle();
         }
         if (node != null && !node.isMissingNode()) {
             return node;
@@ -42,7 +44,9 @@ public class ConfigHelper {
             try {
                 node = o.readTree(Files.readAllBytes(backupFile));
             } catch (IOException e) {
-                ErrorEventFactory.fromThrowable("The backup config file " + in.toString() + " could not be read as well", e).handle();
+                ErrorEventFactory.fromThrowable(
+                                "The backup config file " + in.toString() + " could not be read as well", e)
+                        .handle();
             }
         }
 
@@ -51,10 +55,12 @@ public class ConfigHelper {
         }
 
         if (promptForDeletion) {
-            var discard = AppDialog.confirm("configReadErrorTitle", AppI18n.observable("configReadErrorContent", in.toString()));
+            var discard = AppDialog.confirm(
+                    "configReadErrorTitle", AppI18n.observable("configReadErrorContent", in.toString()));
             if (!discard) {
                 var ex = new IOException("Unable to read config file " + in + " even though it is required");
-                ErrorEventFactory.preconfigure(ErrorEventFactory.fromThrowable(ex).discard());
+                ErrorEventFactory.preconfigure(
+                        ErrorEventFactory.fromThrowable(ex).discard());
                 throw ex;
             }
         }

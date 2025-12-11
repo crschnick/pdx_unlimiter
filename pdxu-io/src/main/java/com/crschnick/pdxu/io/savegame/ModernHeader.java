@@ -104,7 +104,7 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
     @Override
     public String toString() {
         int type = (compressionType * 2) + (binary ? 1 : 0);
-        return "SAV0" + version + "0" + type + String.format("%08x", randomness)
-                + String.format("%08x", metaLength) + (version == 2 ? "0".repeat(8) : "");
+        return "SAV0" + version + "0" + type + String.format("%08x", randomness) + String.format("%08x", metaLength)
+                + (version == 2 ? "0".repeat(8) : "");
     }
 }

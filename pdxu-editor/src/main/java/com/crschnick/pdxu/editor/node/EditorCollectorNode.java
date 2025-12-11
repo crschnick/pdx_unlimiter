@@ -36,18 +36,14 @@ public final class EditorCollectorNode extends EditorNode {
 
     @Override
     public void replacePart(ArrayNode toInsert, int beginIndex, int length) {
-        getParent().replacePart(
-                ArrayNode.sameKeyArray(keyName, toInsert.getNodeArray()),
-                firstNodeIndex + beginIndex,
-                length);
+        getParent()
+                .replacePart(
+                        ArrayNode.sameKeyArray(keyName, toInsert.getNodeArray()), firstNodeIndex + beginIndex, length);
     }
 
     @Override
     public void delete() {
-        getParent().replacePart(
-                ArrayNode.array(List.of()),
-                firstNodeIndex,
-                getRawSize());
+        getParent().replacePart(ArrayNode.array(List.of()), firstNodeIndex, getRawSize());
     }
 
     @Override

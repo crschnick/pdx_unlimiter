@@ -5,7 +5,6 @@ import com.crschnick.pdxu.app.comp.base.IntFieldComp;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.OptionsBuilder;
 
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Slider;
@@ -38,8 +37,7 @@ public class ImportsCategory extends AppPrefsCategory {
                         .addToggle(prefs.enableTimedImports)
                         .pref(prefs.timedImportsInterval)
                         .addComp(Comp.of(() -> {
-                                    var field = new IntFieldComp(prefs.timedImportsInterval)
-                                            .maxWidth(40);
+                                    var field = new IntFieldComp(prefs.timedImportsInterval).maxWidth(40);
                                     field.apply(struc -> struc.get().setEditable(false));
                                     field.apply(struc -> struc.get().setAlignment(Pos.CENTER));
                                     field.padding(new Insets(4, 8, 4, 8));

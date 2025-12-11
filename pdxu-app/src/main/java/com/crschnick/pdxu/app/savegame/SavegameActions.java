@@ -108,7 +108,10 @@ public class SavegameActions {
             public void success(SavegameParseResult.Success s) {
                 try {
                     var first = savegames.size() > 0 ? savegames.getFirst() : null;
-                    var targetUuid = Optional.ofNullable(first != null ? first.getCampaignIdOverride().orElse(null) : null)
+                    var targetUuid = Optional.ofNullable(
+                                    first != null
+                                            ? first.getCampaignIdOverride().orElse(null)
+                                            : null)
                             .orElse(type.getCampaignIdHeuristic(s.content));
                     SavegameStorage.get(g)
                             .getSavegameCampaign(targetUuid)

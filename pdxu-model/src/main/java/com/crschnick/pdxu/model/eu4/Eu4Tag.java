@@ -58,7 +58,9 @@ public final class Eu4Tag {
             colonialFlagData =
                     new ColonialFlagData(n.getNodeForKey("colonial_parent").getString());
 
-        } else if (n.getNodeForKeyIfExistent("colors").map(c -> c.hasKey("custom_colors")).orElse(false)) {
+        } else if (n.getNodeForKeyIfExistent("colors")
+                .map(c -> c.hasKey("custom_colors"))
+                .orElse(false)) {
             t = FlagType.CUSTOM_FLAG;
             var col = n.getNodeForKey("colors").getNodeForKey("custom_colors");
             customFlagData = new CustomFlagData(

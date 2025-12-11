@@ -36,14 +36,15 @@ public class ProtonNoLauncherDist extends GameDist {
     private Path getProtonExecutable() throws IOException {
         for (Path steamLibraryPath : SteamDist.getSteamCommonLibraryPaths()) {
             try (var stream = Files.list(steamLibraryPath)) {
-                var l = stream.filter(path -> path.toString().contains("Proton ") && Files.exists(path.resolve("proton")))
+                var l = stream.filter(
+                                path -> path.toString().contains("Proton ") && Files.exists(path.resolve("proton")))
                         .max(Comparator.comparing(path -> {
-                    try {
-                        return Files.getLastModifiedTime(path).toInstant();
-                    } catch (IOException e) {
-                        return Instant.MIN;
-                    }
-                }));
+                            try {
+                                return Files.getLastModifiedTime(path).toInstant();
+                            } catch (IOException e) {
+                                return Instant.MIN;
+                            }
+                        }));
                 if (l.isPresent()) {
                     return l.get().resolve("proton");
                 }
@@ -64,10 +65,13 @@ public class ProtonNoLauncherDist extends GameDist {
         pb.environment().putAll(env);
         var steamDir = SteamDist.getSteamPath().orElseThrow();
         pb.environment().put("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamDir.toString());
-        pb.environment().put("STEAM_COMPAT_DATA_PATH", steamDir
-                .resolve("steamapps")
-                .resolve("compatdata")
-                .resolve(String.valueOf(getGame().getSteamAppId())).toString());
+        pb.environment()
+                .put(
+                        "STEAM_COMPAT_DATA_PATH",
+                        steamDir.resolve("steamapps")
+                                .resolve("compatdata")
+                                .resolve(String.valueOf(getGame().getSteamAppId()))
+                                .toString());
         pb.start();
     }
 
@@ -90,7 +94,8 @@ public class ProtonNoLauncherDist extends GameDist {
     @Override
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         try {
-            var running = LocalExec.readStdoutIfPossible("pgrep", getGame().getInstallType().getProtonExecutableName());
+            var running = LocalExec.readStdoutIfPossible(
+                    "pgrep", getGame().getInstallType().getProtonExecutableName());
 
             if (getGame() == Game.EU5 && running.isEmpty()) {
                 running = LocalExec.readStdoutIfPossible("pgrep", "MainThread");

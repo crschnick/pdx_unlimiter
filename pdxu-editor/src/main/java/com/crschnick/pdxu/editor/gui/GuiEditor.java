@@ -16,7 +16,6 @@ import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
-import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -293,8 +292,8 @@ public class GuiEditor {
 
                     var disable = !state.isEditable()
                             || (n instanceof EditorSimpleNode es
-                            && es.getBackingNode().isValue()
-                            && es.getBackingNode().getString().contains("\n"));
+                                    && es.getBackingNode().isValue()
+                                    && es.getBackingNode().getString().contains("\n"));
 
                     Button edit = new Button(null, new FontIcon());
                     edit.setGraphic(new FontIcon());

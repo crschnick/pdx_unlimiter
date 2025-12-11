@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.savegame;
 
 import com.crschnick.pdxu.app.core.AppLayoutModel;
-import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
@@ -123,11 +122,18 @@ public abstract class FileImportTarget {
                 }
                 if (playthroughId != null) {
                     var finalPlaythroughId = playthroughId;
-                    var loaded = getStorage().getCollections().stream().filter(savegameCampaign -> {
-                        return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
-                            return savegameEntry.isLoaded() && savegameEntry.getInfo().getData().getCampaignHeuristic().equals(finalPlaythroughId);
-                        });
-                    }).findFirst();
+                    var loaded = getStorage().getCollections().stream()
+                            .filter(savegameCampaign -> {
+                                return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
+                                    return savegameEntry.isLoaded()
+                                            && savegameEntry
+                                                    .getInfo()
+                                                    .getData()
+                                                    .getCampaignHeuristic()
+                                                    .equals(finalPlaythroughId);
+                                });
+                            })
+                            .findFirst();
                     if (loaded.isPresent()) {
                         return Optional.of(loaded.get().getUuid());
                     }

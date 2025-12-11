@@ -4,9 +4,8 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.base.MarkdownComp;
 import com.crschnick.pdxu.app.comp.base.ModalOverlay;
 import com.crschnick.pdxu.app.issue.TrackEvent;
-import javafx.beans.property.BooleanProperty;
+
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class UpdateAvailableDialog {

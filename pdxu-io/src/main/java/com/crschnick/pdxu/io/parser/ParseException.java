@@ -69,28 +69,28 @@ public class ParseException extends Exception {
         var end = getDataEnd(offset, data);
         var length = Math.max(end - start + 1, 0);
         var snippet = new String(data, start, length);
-        var msg = "Parser failed for file " + fileName + " at line " + getLineNumber(offset, data) + " / offset " + offset
-                + ": " + s + "\nProblematic snippet:\n\n" + formatSnippet(snippet);
+        var msg = "Parser failed for file " + fileName + " at line " + getLineNumber(offset, data) + " / offset "
+                + offset + ": " + s + "\nProblematic snippet:\n\n" + formatSnippet(snippet);
         return new ParseException(msg);
     }
 
     private static String formatSnippet(String snippet) {
-        var maxIndent = snippet.lines().mapToInt(s -> {
-            int i = 0;
-            for (char c : s.toCharArray()) {
-                if (Character.isWhitespace(c)) {
-                    i++;
-                } else {
-                    break;
-                }
-            }
-            return i;
-        }).min().orElse(0);
-        var trimmed = snippet.lines()
-                .map(s -> s.substring(maxIndent))
-                .collect(Collectors.joining("\n"));
+        var maxIndent = snippet.lines()
+                .mapToInt(s -> {
+                    int i = 0;
+                    for (char c : s.toCharArray()) {
+                        if (Character.isWhitespace(c)) {
+                            i++;
+                        } else {
+                            break;
+                        }
+                    }
+                    return i;
+                })
+                .min()
+                .orElse(0);
+        var trimmed = snippet.lines().map(s -> s.substring(maxIndent)).collect(Collectors.joining("\n"));
         return trimmed;
-
     }
 
     public static ParseException createFromLiteralIndex(String fileName, String s, int lIndex, NodeContext ctx) {

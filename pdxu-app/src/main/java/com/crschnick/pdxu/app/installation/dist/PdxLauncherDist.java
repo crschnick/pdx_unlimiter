@@ -44,12 +44,13 @@ public class PdxLauncherDist extends GameDist {
         Optional<String> launcherDir = Optional.empty();
         switch (OsType.ofLocal()) {
             case OsType.Linux ignored -> {
-                var home = Path.of(System.getProperty("user.home"))
-                        .resolve(".paradoxlauncher");
+                var home = Path.of(System.getProperty("user.home")).resolve(".paradoxlauncher");
                 if (Files.isDirectory(home)) {
                     launcherDir = Optional.of(home.toString());
                 } else {
-                    var flatpak = AppSystemInfo.ofCurrent().getUserHome().resolve(".var/app/com.valvesoftware.Steam/.paradoxlauncher");
+                    var flatpak = AppSystemInfo.ofCurrent()
+                            .getUserHome()
+                            .resolve(".var/app/com.valvesoftware.Steam/.paradoxlauncher");
                     if (Files.isDirectory(flatpak)) {
                         launcherDir = Optional.of(flatpak.toString());
                     }
@@ -57,7 +58,9 @@ public class PdxLauncherDist extends GameDist {
             }
             case OsType.MacOs ignored -> {
                 // The launcher is in Application Support
-                String s = AppSystemInfo.ofMacOs().getUserHome().resolve("Library", "Application Support")
+                String s = AppSystemInfo.ofMacOs()
+                        .getUserHome()
+                        .resolve("Library", "Application Support")
                         .resolve("Paradox Interactive")
                         .toString();
                 launcherDir = Optional.ofNullable(Files.isDirectory(Path.of(s)) ? s : null);
@@ -116,10 +119,9 @@ public class PdxLauncherDist extends GameDist {
                 // Ugly fix for flatpak
                 var isFlatpak = getInstallLocation().toString().contains("com.valvesoftware.Steam");
                 if (isFlatpak) {
-                    var flatpak = Path.of(System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share");
-                    value = value.replace(
-                            "$LINUX_DATA_HOME",
-                            flatpak.toString());
+                    var flatpak =
+                            Path.of(System.getProperty("user.home"), ".var/app/com.valvesoftware.Steam/.local/share");
+                    value = value.replace("$LINUX_DATA_HOME", flatpak.toString());
                 } else {
                     value = value.replace(
                             "$LINUX_DATA_HOME",

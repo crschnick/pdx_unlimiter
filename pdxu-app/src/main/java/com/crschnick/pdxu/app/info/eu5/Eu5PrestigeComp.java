@@ -21,7 +21,9 @@ public class Eu5PrestigeComp extends SimpleInfoComp {
                 .getNodeForKey(data.eu5().getTag().getId() + "")
                 .getNodeForKey("currency_data")
                 .getNodeForKeyIfExistent("prestige")
-                .map(Node::getDouble).orElse(0.0).intValue();
+                .map(Node::getDouble)
+                .orElse(0.0)
+                .intValue();
     }
 
     @Override

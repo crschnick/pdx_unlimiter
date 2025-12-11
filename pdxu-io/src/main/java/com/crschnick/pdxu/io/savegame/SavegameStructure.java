@@ -82,9 +82,9 @@ public interface SavegameStructure {
             var p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
             var matcher = p.matcher(version.getString());
             if (matcher.matches()) {
-                var requiresV2 = Integer.parseInt(matcher.group(1)) > 1 ||
-                        Integer.parseInt(matcher.group(2)) > 0 ||
-                        Integer.parseInt(matcher.group(3)) >= 8;
+                var requiresV2 = Integer.parseInt(matcher.group(1)) > 1
+                        || Integer.parseInt(matcher.group(2)) > 0
+                        || Integer.parseInt(matcher.group(3)) >= 8;
                 return requiresV2 ? 2 : 1;
             } else {
                 return 1;
@@ -99,9 +99,9 @@ public interface SavegameStructure {
             var p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
             var matcher = p.matcher(version.getString());
             if (matcher.matches()) {
-                var requiresV2 = Integer.parseInt(matcher.group(1)) > 1 ||
-                        Integer.parseInt(matcher.group(2)) > 0 ||
-                        Integer.parseInt(matcher.group(3)) >= 8;
+                var requiresV2 = Integer.parseInt(matcher.group(1)) > 1
+                        || Integer.parseInt(matcher.group(2)) > 0
+                        || Integer.parseInt(matcher.group(3)) >= 8;
                 return requiresV2 ? 2 : 1;
             } else {
                 return 1;
