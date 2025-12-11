@@ -1,6 +1,9 @@
 package com.crschnick.pdxu.editor;
 
+import com.crschnick.pdxu.app.core.AppCache;
+import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
@@ -70,6 +73,14 @@ public class EditorState {
         saveFunc.accept(rootNodes.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toWritableNode())));
         dirtyProperty().set(false);
+
+        var shownNotice = AppCache.getBoolean("shownEditNotice", false);
+        if (!shownNotice) {
+            AppCache.update("shownEditNotice", true);
+            ThreadHelper.runAsync(() -> {
+                AppDialog.confirm("firstEditExportNotice");
+            });
+        }
     }
 
     public void init() {
