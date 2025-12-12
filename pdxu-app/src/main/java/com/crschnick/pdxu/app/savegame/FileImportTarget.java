@@ -141,6 +141,28 @@ public abstract class FileImportTarget {
             }
         }
 
+
+        // VIC3 does override file names
+        // So assign the save to the current matching open campaign in pdxu
+        if (game == Game.VIC3) {
+            var baseName = FilenameUtils.getBaseName(getPath().getFileName().toString());
+            var loaded = getStorage().getCollections().stream()
+                    .filter(savegameCampaign -> {
+                        return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
+                            return savegameEntry.isLoaded()
+                                    && baseName.equals(savegameEntry
+                                    .getInfo()
+                                    .getData()
+                                    .vic3()
+                                    .getIronmanName());
+                        });
+                    })
+                    .findFirst();
+            if (loaded.isPresent()) {
+                return Optional.of(loaded.get().getUuid());
+            }
+        }
+
         return Optional.empty();
     }
 

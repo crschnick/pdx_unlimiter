@@ -28,6 +28,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     private Vic3Tag tag;
     private List<Vic3Tag> allTags;
     private CoatOfArms coatOfArms;
+    private String ironmanName;
 
     public Vic3SavegameData() {}
 
@@ -49,6 +50,7 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         ironman = meta.getNodeForKeyIfExistent("ironman").map(Node::getBoolean).orElse(false);
         date = GameDateType.VIC3.fromString(
                 content.get().getNodeForKeys("meta_data", "game_date").getString());
+        ironmanName = content.get().getNodeForKeysIfExistent("ironman", "save_game").map(Node::getString).filter(s -> !s.isEmpty()).orElse(null);
 
         coatOfArms = meta.getNodeForKeyIfExistent("flag")
                 .map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null))
