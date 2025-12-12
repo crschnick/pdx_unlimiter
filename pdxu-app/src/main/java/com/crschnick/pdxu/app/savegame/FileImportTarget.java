@@ -86,6 +86,8 @@ public abstract class FileImportTarget {
             Pattern.compile("\\s*\\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)");
     private static final Pattern EU5_ID_MATCHER =
             Pattern.compile(".*?_([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})");
+    private static final Pattern VIC3_NORMAL_MATCHER =
+            Pattern.compile(".*?_\\d+_\\d+_\\d+");
 
     public String getName() {
         var raw = getRawName();
@@ -146,7 +148,7 @@ public abstract class FileImportTarget {
         // So assign the save to the current matching open campaign in pdxu
         if (game == Game.VIC3) {
             var baseName = FilenameUtils.getBaseName(getPath().getFileName().toString());
-            var loaded = getStorage().getCollections().stream()
+            var loadedIronman = getStorage().getCollections().stream()
                     .filter(savegameCampaign -> {
                         return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
                             return savegameEntry.isLoaded()
@@ -158,8 +160,23 @@ public abstract class FileImportTarget {
                         });
                     })
                     .findFirst();
-            if (loaded.isPresent()) {
-                return Optional.of(loaded.get().getUuid());
+            if (loadedIronman.isPresent()) {
+                return Optional.of(loadedIronman.get().getUuid());
+            }
+
+            var normalMatcher = VIC3_NORMAL_MATCHER.matcher(baseName);
+            if (normalMatcher.matches()) {
+                var loadedNormalBranch = getStorage().getCollections().stream()
+                        .filter(savegameCampaign -> {
+                            return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
+                                return savegameEntry.isLoaded() &&
+                                        !savegameEntry.getInfo().getData().vic3().getCampaignHeuristic().equals(savegameCampaign.getUuid());
+                            });
+                        })
+                        .findFirst();
+                if (loadedNormalBranch.isPresent()) {
+                    return Optional.of(loadedNormalBranch.get().getUuid());
+                }
             }
         }
 
