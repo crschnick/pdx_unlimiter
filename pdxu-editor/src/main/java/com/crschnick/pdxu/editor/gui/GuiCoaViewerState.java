@@ -29,7 +29,10 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
 
@@ -156,6 +159,8 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
         createExportButton(box);
     }
 
+    private static final Set<Path> openedDirs = new HashSet<>();
+
     private void createExportButton(HBox box) {
         Button refresh = new Button();
         refresh.setOnAction(e -> {
@@ -167,9 +172,15 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
                 return;
             }
 
+            var path = file.toPath();
+            var dir = path.getParent();
+            if (!openedDirs.add(dir)) {
+                return;
+            }
+
             try {
-                ImageHelper.writePng(image.get(), file.toPath());
-                DesktopHelper.browseFileInDirectory(file.toPath());
+                ImageHelper.writePng(image.get(), path);
+                DesktopHelper.browseFileInDirectory(path);
             } catch (IOException ex) {
                 ErrorEventFactory.fromThrowable(ex).handle();
             }
