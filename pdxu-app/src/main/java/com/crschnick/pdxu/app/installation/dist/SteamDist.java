@@ -159,7 +159,7 @@ public class SteamDist extends GameDist {
                 .map(path -> path.getParent().getParent())
                 .toList();
 
-        // What if Steam was not detected
+        // Check if Steam was not detected
         if (libs.isEmpty()) {
             return AppSystemInfo.ofCurrent().getUserHome();
         }
@@ -168,6 +168,10 @@ public class SteamDist extends GameDist {
                 .map(path -> path.resolve("steamapps", "compatdata", g.getSteamAppId() + ""))
                 .filter(path -> Files.exists(path))
                 .toList();
+        if (paths.isEmpty()) {
+            return AppSystemInfo.ofCurrent().getUserHome();
+        }
+
         return paths.stream()
                 .filter(path -> Files.isDirectory(path))
                 .findFirst()

@@ -102,10 +102,6 @@ public class ParseException extends Exception {
         super(message);
     }
 
-    public ParseException(Throwable t) {
-        super("Parser failed because: " + t.getMessage(), t);
-    }
-
     public ParseException(String message, Throwable cause) {
         super(message, cause);
     }

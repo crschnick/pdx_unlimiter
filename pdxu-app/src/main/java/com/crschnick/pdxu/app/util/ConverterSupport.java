@@ -199,6 +199,10 @@ public class ConverterSupport {
             String line;
             while ((line = reader.readLine()) != null) {
                 var split = line.split(" = ");
+                if (split.length != 2) {
+                    continue;
+                }
+
                 map.put(split[0], split[1].replace("\"", ""));
             }
         } catch (IOException e) {

@@ -151,7 +151,8 @@ public final class TextFormatParser {
                         ooe);
             }
 
-            throw new ParseException(t);
+            var msg = t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName();
+            throw new ParseException("Parser failed because: " + msg, t);
         } finally {
             // Always reset!
             reset();

@@ -13,6 +13,7 @@ import com.jfoenix.controls.JFXMasonryPane;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
@@ -93,7 +94,12 @@ public abstract class SavegameInfo<T> {
                         continue;
                     }
 
-                    comps.addAll(c.create(data));
+                    var created = c.create(data);
+                    if (created == null) {
+                        continue;
+                    }
+
+                    comps.addAll(created);
                 } catch (Exception ex) {
                     ErrorEventFactory.fromThrowable(ex).handle();
                 }
