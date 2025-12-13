@@ -173,14 +173,13 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
             }
 
             var path = file.toPath();
-            var dir = path.getParent();
-            if (!openedDirs.add(dir)) {
-                return;
-            }
-
             try {
                 ImageHelper.writePng(image.get(), path);
-                DesktopHelper.browseFileInDirectory(path);
+
+                var dir = path.getParent();
+                if (openedDirs.add(dir)) {
+                    DesktopHelper.browseFileInDirectory(path);
+                }
             } catch (IOException ex) {
                 ErrorEventFactory.fromThrowable(ex).handle();
             }
