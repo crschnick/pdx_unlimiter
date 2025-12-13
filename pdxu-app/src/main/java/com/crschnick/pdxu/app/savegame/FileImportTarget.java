@@ -86,8 +86,7 @@ public abstract class FileImportTarget {
             Pattern.compile("\\s*\\(([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})\\)");
     private static final Pattern EU5_ID_MATCHER =
             Pattern.compile(".*?_([\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12})");
-    private static final Pattern VIC3_NORMAL_MATCHER =
-            Pattern.compile(".*?_\\d+_\\d+_\\d+");
+    private static final Pattern VIC3_NORMAL_MATCHER = Pattern.compile(".*?_\\d+_\\d+_\\d+");
 
     public String getName() {
         var raw = getRawName();
@@ -143,7 +142,6 @@ public abstract class FileImportTarget {
             }
         }
 
-
         // VIC3 does override file names
         // So assign the save to the current matching open campaign in pdxu
         if (game == Game.VIC3) {
@@ -153,10 +151,10 @@ public abstract class FileImportTarget {
                         return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
                             return savegameEntry.isLoaded()
                                     && baseName.equals(savegameEntry
-                                    .getInfo()
-                                    .getData()
-                                    .vic3()
-                                    .getIronmanName());
+                                            .getInfo()
+                                            .getData()
+                                            .vic3()
+                                            .getIronmanName());
                         });
                     })
                     .findFirst();
@@ -169,8 +167,13 @@ public abstract class FileImportTarget {
                 var loadedNormalBranch = getStorage().getCollections().stream()
                         .filter(savegameCampaign -> {
                             return savegameCampaign.getSavegames().stream().anyMatch(savegameEntry -> {
-                                return savegameEntry.isLoaded() &&
-                                        !savegameEntry.getInfo().getData().vic3().getCampaignHeuristic().equals(savegameCampaign.getUuid());
+                                return savegameEntry.isLoaded()
+                                        && !savegameEntry
+                                                .getInfo()
+                                                .getData()
+                                                .vic3()
+                                                .getCampaignHeuristic()
+                                                .equals(savegameCampaign.getUuid());
                             });
                         })
                         .findFirst();

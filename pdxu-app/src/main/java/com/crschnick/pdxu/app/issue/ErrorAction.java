@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.issue;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.util.FailableSupplier;
 import com.crschnick.pdxu.app.util.Hyperlinks;
-import org.apache.commons.io.IOExceptionList;
 
 import java.io.IOException;
 
@@ -62,9 +61,11 @@ public interface ErrorAction {
                 return true;
             }
 
-            var handle = !(event.getThrowable() instanceof IOException) &&
-                    (event.getThrowable() == null || !(event.getThrowable().getCause() instanceof IOException)) &&
-                    (event.getThrowable() == null || event.getThrowable().getMessage() == null || !event.getThrowable().getMessage().contains("Not enough free RAM available"));
+            var handle = !(event.getThrowable() instanceof IOException)
+                    && (event.getThrowable() == null || !(event.getThrowable().getCause() instanceof IOException))
+                    && (event.getThrowable() == null
+                            || event.getThrowable().getMessage() == null
+                            || !event.getThrowable().getMessage().contains("Not enough free RAM available"));
             if (handle || event.isShouldSendDiagnostics()) {
                 SentryErrorHandler.getInstance().handle(event);
             }

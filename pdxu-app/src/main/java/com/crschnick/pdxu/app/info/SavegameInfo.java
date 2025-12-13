@@ -13,7 +13,6 @@ import com.jfoenix.controls.JFXMasonryPane;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
