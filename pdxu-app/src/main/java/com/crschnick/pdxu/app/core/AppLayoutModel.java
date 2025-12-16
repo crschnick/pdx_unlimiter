@@ -50,6 +50,12 @@ public class AppLayoutModel {
         this.entries = createEntryList();
         this.selected.setValue(getInitialEntry());
         this.queueEntries = FXCollections.observableArrayList();
+
+        selected.addListener((observable, oldValue, newValue) -> {
+            if (newValue instanceof GameEntry ge) {
+                AppCache.update("activeGame", ge.getGame().getId());
+            }
+        });
     }
 
     private Entry getInitialEntry() {
