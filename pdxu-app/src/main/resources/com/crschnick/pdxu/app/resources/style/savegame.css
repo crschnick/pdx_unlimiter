@@ -79,6 +79,14 @@ t.entry-list .list-view {
     -fx-padding: 0.17em 0.35em 0.17em 0.35em;
 }
 
+.root:light .entry-bar .button-bar .button:hover .ikonli-font-icon {
+    -fx-icon-color: -color-fg-muted;
+}
+
+.root:dark .entry-bar .button-bar .button:hover .ikonli-font-icon {
+    -fx-opacity: 0.85;
+}
+
 .entry-loading {
 -fx-max-width: 2.15em;
 -fx-max-height: 2.15em;
