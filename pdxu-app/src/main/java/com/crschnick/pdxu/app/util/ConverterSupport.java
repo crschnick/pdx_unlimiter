@@ -114,9 +114,8 @@ public class ConverterSupport {
                                     .toString());
                     writeLine(
                             writer,
-                            "sourceGameModPath",
-                            GameInstallation.ALL.get(getFromGame()).getUserDir().resolve("mod"));
-                    writeLine(writer, "targetGameModPath", getTargetModDir());
+                            "sourceGameModPath", getFromModDir());
+                    writeLine(writer, "targetGameModPath", getToModDir());
                     writeLine(
                             writer,
                             "SaveGame",
@@ -162,6 +161,14 @@ public class ConverterSupport {
         } catch (Exception ex) {
             return Optional.empty();
         }
+    }
+
+    public Path getFromModDir() {
+        return GameInstallation.ALL.get(getFromGame()).getUserDir().resolve("mod");
+    }
+
+    public Path getToModDir() {
+        return GameInstallation.ALL.get(getToGame()).getUserDir().resolve("mod");
     }
 
     public String getToConfigurationName() {
@@ -228,10 +235,6 @@ public class ConverterSupport {
         return name;
     }
 
-    public String getTargetModDir() {
-        return GameInstallation.ALL.get(toGame).getUserDir().resolve("mod").toString();
-    }
-
     public String getGeneratedModOutputPath(SavegameEntry<?, ?> entry) {
         return directorySetting
                 .get()
@@ -248,6 +251,10 @@ public class ConverterSupport {
     public void writeConfig(SavegameEntry<?, ?> entry, Map<String, String> values) throws IOException {
         var config = directorySetting.get().resolve(getName()).resolve("configuration.txt");
         FileUtils.forceMkdirParent(config.toFile());
+
+        // These might not exist yet
+        FileUtils.forceMkdir(getFromModDir().toFile());
+        FileUtils.forceMkdir(getToModDir().toFile());
 
         var writer = Files.newBufferedWriter(config);
         writePaths(writer, entry);
@@ -270,7 +277,7 @@ public class ConverterSupport {
                 writer,
                 getToConfigurationName() + "directory",
                 GameInstallation.ALL.get(toGame).getInstallDir().toString());
-        writeLine(writer, "targetGameModPath", getTargetModDir());
+        writeLine(writer, "targetGameModPath", getToModDir());
         writeLine(
                 writer,
                 "SaveGame",
@@ -333,7 +340,7 @@ public class ConverterSupport {
                                         }
 
                                         if (latestDir.isPresent() && (!hasModFile || latestFile.isPresent())) {
-                                            var outDir = Path.of(getTargetModDir())
+                                            var outDir = getToModDir()
                                                     .resolve(latestDir.get().getFileName());
                                             if (Files.exists(outDir)) {
                                                 FileUtils.deleteDirectory(outDir.toFile());
@@ -342,7 +349,7 @@ public class ConverterSupport {
                                                     latestDir.get().toFile(), outDir.toFile());
 
                                             if (hasModFile) {
-                                                var outFile = Path.of(getTargetModDir())
+                                                var outFile = getToModDir()
                                                         .resolve(
                                                                 latestFile.get().getFileName());
                                                 Files.deleteIfExists(outFile);

@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor;
 
+import com.crschnick.pdxu.app.core.AppSystemInfo;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Files;
@@ -9,7 +10,17 @@ public class EditorProgram {
 
     public static String getDefaultEditor() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            var npp = Path.of("C:\\Program Files\\Notepad++\\notepad++.exe");
+            var vsCodeUser = AppSystemInfo.ofWindows().getLocalAppData().resolve("Programs", "Microsoft VS Code", "Code.exe");
+            if (Files.exists(vsCodeUser)) {
+                return vsCodeUser.toString();
+            }
+
+            var vsCodeSystem = AppSystemInfo.ofWindows().getProgramFiles().resolve("Microsoft VS Code", "Code.exe");
+            if (Files.exists(vsCodeSystem)) {
+                return vsCodeSystem.toString();
+            }
+
+            var npp = AppSystemInfo.ofWindows().getProgramFiles().resolve("Notepad++", "notepad++.exe");
             if (Files.exists(npp)) {
                 return npp.toString();
             }

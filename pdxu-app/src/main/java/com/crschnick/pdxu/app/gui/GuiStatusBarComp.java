@@ -118,6 +118,10 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
         barPane.setRight(buttons);
 
         SavegameContext.withSavegameContext(e, ctx -> {
+            if (ctx.getInfo() == null) {
+                return;
+            }
+
             Label text = new Label(
                     ctx.getStorage().getEntryName(e), ctx.getGuiFactory().createIcon());
             AppFontSizes.xl(text);

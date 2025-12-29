@@ -20,6 +20,7 @@ public class AppNativeHook {
 
                     Restart the Pdx-Unlimiter once the permission issues are fixed to enable in-game shortcuts.""",
                             ex)
+                    .expected()
                     .handle();
         }
     }
@@ -34,6 +35,7 @@ public class AppNativeHook {
                             "Unable to unregister native hook.\n"
                                     + "This might be a permissions issue with your system.",
                             ex)
+                    .expected()
                     .handle();
         }
     }
