@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.editor.adapter;
 
 import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.gui.game.Eu5TagRenderer;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.editor.EditorState;
@@ -9,13 +10,19 @@ import com.crschnick.pdxu.editor.gui.GuiCoaViewerState;
 import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
+import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.node.NodePointer;
 
+import com.crschnick.pdxu.io.parser.TextFormatParser;
+import com.crschnick.pdxu.model.coa.CoatOfArms;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Region;
 
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -49,6 +56,44 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
         }
     }
 
+    static class MetaCoaPreview extends GuiEditorNodeTagFactory {
+        @Override
+        public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
+            if (!state.isContextGameEnabled()) {
+                return false;
+            }
+
+            return node.getKeyName().map(s -> s.equals("flag")).orElse(false) &&
+                    node.getParent() != null &&
+                    node.getParent().getKeyName().map(s -> s.equals("metadata")).orElse(false);
+        }
+
+        @Override
+        public javafx.scene.Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
+            var b = new Button(null, new FontIcon());
+            b.setGraphic(new FontIcon());
+            b.getStyleClass().add("coa-button");
+            GuiTooltips.install(b, "Open in coat of arms preview window");
+            b.setOnAction(e -> {
+                var viewer = new GuiCoaViewer<>(new GuiCoaViewerState.Eu5GuiCoaViewerState(state, node) {
+                    @Override
+                    protected CoatOfArms createCoatOfArms() {
+                        try {
+                            var s = node.getBackingNode().getString();
+                            var parsed = TextFormatParser.eu5().parse(node.getKeyName().orElse("?"), s.getBytes(StandardCharsets.UTF_8), 0);
+                            var coaNode = parsed.getNodeArray().getFirst().getArrayNode();
+                            return Eu5TagRenderer.getCoatOfArms(coaNode, ArrayNode.array(List.of()));
+                        } catch (Exception ex) {
+                            return CoatOfArms.empty();
+                        }
+                    }
+                });
+                viewer.createStage();
+            });
+            return b;
+        }
+    }
+
     static class ImagePreview extends GuiEditorNodeTagFactory.ImagePreviewNodeTagFactory {
 
         private final String nodeName;
@@ -74,6 +119,7 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
 
     private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(
             new CoaPreview(),
+            new MetaCoaPreview(),
             new GuiEditorNodeTagFactory.CacheTagFactory(CACHED_KEYS),
             new ImagePreview(
                     Path.of("main_menu", "gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
