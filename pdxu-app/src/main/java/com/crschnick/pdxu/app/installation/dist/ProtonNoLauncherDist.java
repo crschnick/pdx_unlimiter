@@ -104,7 +104,14 @@ public class ProtonNoLauncherDist extends GameDist {
             if (running.isPresent()) {
                 var pid = running.get();
                 if (!pid.isEmpty()) {
-                    return ProcessHandle.of(Long.parseLong(pid));
+                    var handle = ProcessHandle.of(Long.parseLong(pid));
+                    // Other applications might also use MainThread as their name
+                    if (handle.isPresent() && getGame() == Game.EU5 && handle.get().info().command()
+                            .map(s -> !s.toLowerCase().contains("proton")).orElse(true)) {
+                        return Optional.empty();
+                    }
+
+                    return handle;
                 }
             }
 
