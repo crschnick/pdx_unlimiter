@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.installation.dist;
 
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 
 import org.apache.commons.lang3.SystemUtils;
@@ -45,12 +46,16 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
     @Override
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         try {
-            var pgrep = new ProcessBuilder("pgrep", getGame().getInstallType().getProtonExecutableName())
-                    .redirectError(ProcessBuilder.Redirect.DISCARD)
-                    .start();
-            var id = pgrep.inputReader().readLine();
-            pgrep.waitFor();
-            return id != null && !id.trim().isEmpty() ? ProcessHandle.of(Long.parseLong(id.trim())) : Optional.empty();
+            var running = LocalExec.readStdoutIfPossible(
+                    "pgrep", "-f", getGame().getInstallType().getProtonExecutableName());
+            if (running.isPresent()) {
+                var pid = running.get();
+                if (!pid.isEmpty()) {
+                    return ProcessHandle.of(Long.parseLong(pid));
+                }
+            }
+
+            return Optional.empty();
         } catch (Exception ex) {
             return Optional.empty();
         }

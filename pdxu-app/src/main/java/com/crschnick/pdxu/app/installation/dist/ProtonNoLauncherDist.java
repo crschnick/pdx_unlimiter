@@ -95,23 +95,11 @@ public class ProtonNoLauncherDist extends GameDist {
     public Optional<ProcessHandle> getGameInstance(List<ProcessHandle> processes) {
         try {
             var running = LocalExec.readStdoutIfPossible(
-                    "pgrep", getGame().getInstallType().getProtonExecutableName());
-
-            if (getGame() == Game.EU5 && running.isEmpty()) {
-                running = LocalExec.readStdoutIfPossible("pgrep", "MainThread");
-            }
-
+                    "pgrep", "-f", getGame().getInstallType().getProtonExecutableName());
             if (running.isPresent()) {
                 var pid = running.get();
                 if (!pid.isEmpty()) {
-                    var handle = ProcessHandle.of(Long.parseLong(pid));
-                    // Other applications might also use MainThread as their name
-                    if (handle.isPresent() && getGame() == Game.EU5 && handle.get().info().command()
-                            .map(s -> !s.toLowerCase().contains("proton")).orElse(true)) {
-                        return Optional.empty();
-                    }
-
-                    return handle;
+                    return ProcessHandle.of(Long.parseLong(pid));
                 }
             }
 
