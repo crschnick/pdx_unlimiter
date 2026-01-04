@@ -23,6 +23,11 @@
 			Property="APPLICATIONFOLDER"
 			Value="[WixPerMachineFolder]"
 			Execute="immediate" />
+		<CustomAction
+			Id="Overwrite_ReinstallMode"
+			Property="REINSTALLMODE"
+			Value="amus"
+			Execute="immediate" />
 
 		<!-- Important: takeown does not like trailing slashes, so append a . to it -->
 		<SetProperty
@@ -40,6 +45,7 @@
 			Return="ignore" />
 
 		<InstallExecuteSequence>
+			<Custom Action="Overwrite_ReinstallMode" Before="FindRelatedProducts" Condition="NOT REINSTALLMODE" />
 			<Custom Action="Overwrite_WixSetDefaultPerUserFolder" Before="CostFinalize" />
 			<Custom Action="Overwrite_WixSetDefaultPerMachineFolder" After="Overwrite_WixSetDefaultPerUserFolder" />
 			<Custom Action="Overwrite_WixSetPerUserFolder" After="Overwrite_WixSetDefaultPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />

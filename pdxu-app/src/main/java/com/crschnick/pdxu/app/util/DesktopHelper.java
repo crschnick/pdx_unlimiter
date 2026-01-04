@@ -25,7 +25,7 @@ public class DesktopHelper {
 
         if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             if (OsType.ofLocal() == OsType.LINUX) {
-                LocalExec.readStdoutIfPossible("xdg-open", parsed.toString());
+                LocalExec.executeAsync("xdg-open", parsed.toString());
                 return;
             }
         }
@@ -44,7 +44,7 @@ public class DesktopHelper {
             }
 
             if (OsType.ofLocal() == OsType.LINUX) {
-                LocalExec.readStdoutIfPossible("xdg-open", parsed.toString());
+                LocalExec.executeAsync("xdg-open", parsed.toString());
             }
         });
     }
@@ -56,7 +56,7 @@ public class DesktopHelper {
 
         if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             if (OsType.ofLocal() == OsType.LINUX) {
-                LocalExec.readStdoutIfPossible("xdg-open", file.toString());
+                LocalExec.executeAsync("xdg-open", file.toString());
                 return;
             }
         }
@@ -77,7 +77,7 @@ public class DesktopHelper {
             }
 
             if (OsType.ofLocal() == OsType.LINUX) {
-                LocalExec.readStdoutIfPossible("xdg-open", file.toString());
+                LocalExec.executeAsync("xdg-open", file.toString());
             }
         });
     }
@@ -116,7 +116,7 @@ public class DesktopHelper {
             // Some basic linux systems have trouble with the API call
             // As a fallback, use xdg-open
             if (xdg) {
-                LocalExec.readStdoutIfPossible("xdg-open", file.getParent().toString());
+                LocalExec.executeAsync("xdg-open", file.getParent().toString());
             }
         });
     }

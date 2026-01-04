@@ -134,6 +134,12 @@ def getJvmArgs() {
         jvmRunArgs += "-Xdock:name=$productName"
     }
 
+    // Why is this not on by default? ...
+    // https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/doc-files/net-properties.html
+    jvmRunArgs += [
+            '-Djava.net.useSystemProxies=true'
+    ]
+
     return jvmRunArgs
 }
 
