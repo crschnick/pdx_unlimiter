@@ -1152,7 +1152,7 @@ public interface GameInstallType {
 
         @Override
         public String getProtonExecutableName() {
-            return executableName + ".exe";
+            return executableName.replace("/", "\\\\") + ".exe";
         }
 
         @Override

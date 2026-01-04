@@ -51,7 +51,8 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
             if (running.isPresent()) {
                 var pid = running.get();
                 if (!pid.isEmpty()) {
-                    return ProcessHandle.of(Long.parseLong(pid));
+                    var first = pid.lines().findFirst().orElseThrow();
+                    return ProcessHandle.of(Long.parseLong(first));
                 }
             }
 
