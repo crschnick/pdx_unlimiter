@@ -124,6 +124,12 @@ public final class AppPrefs {
             .valueClass(Boolean.class)
             .requiresRestart(false)
             .build());
+    final BooleanProperty enableKeyboardShortcuts = map(Mapping.builder()
+            .property(new GlobalBooleanProperty(OsType.ofLocal() != OsType.MACOS))
+            .key("enableKeyboardShortcuts")
+            .valueClass(Boolean.class)
+            .requiresRestart(true)
+            .build());
     final BooleanProperty launchIrony = map(Mapping.builder()
             .property(new GlobalBooleanProperty(false))
             .key("launchIrony")
@@ -239,6 +245,10 @@ public final class AppPrefs {
 
     public ObservableValue<String> editorExternalProgram() {
         return editorExternalProgram;
+    }
+
+    public ObservableValue<Boolean> enableKeyboardShortcuts() {
+        return enableKeyboardShortcuts;
     }
 
     public ObservableValue<Path> ck3toeu4Directory() {

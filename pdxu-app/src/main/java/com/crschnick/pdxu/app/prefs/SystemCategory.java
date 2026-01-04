@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.base.ChoiceComp;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.OptionsBuilder;
+import com.crschnick.pdxu.app.util.OsType;
 
 public class SystemCategory extends AppPrefsCategory {
 
@@ -33,7 +34,10 @@ public class SystemCategory extends AppPrefsCategory {
                                         prefs.closeBehaviour,
                                         PrefsChoiceValue.getSupported(CloseBehaviour.class),
                                         false)
-                                .maxWidth(300.0)));
+                                .maxWidth(300.0))
+                        .name(OsType.ofLocal() == OsType.MACOS ? "enableKeyboardShortcutsUnsupported" : "enableKeyboardShortcuts")
+                        .description("enableKeyboardShortcutsDescription")
+                        .addToggle(prefs.enableKeyboardShortcuts));
         return builder.buildComp();
     }
 }

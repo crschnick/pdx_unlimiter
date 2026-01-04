@@ -2,13 +2,20 @@ package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
+import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.util.OsType;
 import com.github.kwhat.jnativehook.GlobalScreen;
+import lombok.Getter;
 import org.apache.commons.lang3.SystemUtils;
 
 public class AppNativeHook {
+
+    @Getter
+    private static final boolean enabled = AppProperties.get().isNativeHookEnabled() && AppPrefs.get().enableKeyboardShortcuts().getValue() && OsType.ofLocal() != OsType.MACOS;
+
     public static void registerNativeHook() {
         try {
-            if (AppProperties.get().isNativeHookEnabled() && !SystemUtils.IS_OS_MAC) {
+            if (enabled) {
                 GlobalScreen.registerNativeHook();
             }
         } catch (Throwable ex) {
@@ -27,7 +34,7 @@ public class AppNativeHook {
 
     public static void unregisterNativeHook() {
         try {
-            if (AppProperties.get().isNativeHookEnabled() && !SystemUtils.IS_OS_MAC) {
+            if (enabled) {
                 GlobalScreen.unregisterNativeHook();
             }
         } catch (Throwable ex) {
