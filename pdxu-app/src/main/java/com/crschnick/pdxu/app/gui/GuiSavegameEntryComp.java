@@ -14,6 +14,7 @@ import com.crschnick.pdxu.app.savegame.SavegameBranches;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ConverterSupport;
+import com.crschnick.pdxu.app.util.GlobalTimer;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.RakalyHelper;
 
@@ -42,6 +43,7 @@ import com.jfoenix.controls.JFXSpinner;
 import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.time.Duration;
 import java.util.List;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
@@ -139,9 +141,15 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         {
             Button export = new Button(null, new FontIcon());
             export.setGraphic(new FontIcon());
-            export.setOnMouseClicked((m) -> {
+            export.setOnAction((m) -> {
                 SavegameActions.exportSavegame(e);
                 savegameManagerState.selectEntry(null);
+                export.setDisable(true);
+                GlobalTimer.delay(() -> {
+                    Platform.runLater(() -> {
+                        export.setDisable(false);
+                    });
+                }, Duration.ofSeconds(3));
             });
             export.getStyleClass().add(CLASS_EXPORT);
             export.setAccessibleText("Export");
