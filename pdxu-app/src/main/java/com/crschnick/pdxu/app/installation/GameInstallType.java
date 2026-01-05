@@ -414,7 +414,7 @@ public interface GameInstallType {
         }
     };
 
-    GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.MACOS ? "ck2" : "CK2game") {
+    GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.WINDOWS ? "CK2game" : "ck2") {
 
         @Override
         public Path getLocalisationsDirectory() {
