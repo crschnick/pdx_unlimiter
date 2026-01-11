@@ -148,6 +148,12 @@ public class RenderCommand implements Runnable {
                 .map(s -> GameInstallation.ALL
                         .get(Game.CK3)
                         .getModForSavegameId(s)
+                        .or(() -> {
+                            // Ck3 save mods use mod/ugc_ names. Allow plain names as well
+                            return GameInstallation.ALL
+                                    .get(Game.CK3).getMods().stream().filter(mod ->
+                                            mod.getName().isPresent() && mod.getName().get().equalsIgnoreCase(s)).findFirst();
+                        })
                         .orElseThrow(() -> new IllegalArgumentException("Mod not found: " + s)))
                 .toList();
 
