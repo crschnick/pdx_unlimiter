@@ -7,10 +7,6 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 public class AppJavaOptionsCheck {
 
     public static void check() {
-        if (AppCache.getBoolean("javaOptionsWarningShown", false)) {
-            return;
-        }
-
         var env = System.getenv("_JAVA_OPTIONS");
         if (env == null || env.isBlank()) {
             return;
@@ -21,7 +17,7 @@ public class AppJavaOptionsCheck {
                                         .formatted(env)
                                 + " This will forcefully apply all custom JVM options to "
                                 + AppNames.ofCurrent().getName() + " and can cause a variety of different issues."
-                                + " Please remove this global environment variable and use local configuration instead for your other JVM programs.")
+                                + " Please remove this global environment variable from your system and use a more local configuration instead for your other JVM programs if needed.")
                 .expected()
                 .handle();
         AppCache.update("javaOptionsWarningShown", true);

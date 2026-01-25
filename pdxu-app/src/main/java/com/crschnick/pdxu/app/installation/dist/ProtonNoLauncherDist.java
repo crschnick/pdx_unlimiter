@@ -77,6 +77,8 @@ public class ProtonNoLauncherDist extends GameDist {
 
     @Override
     public Path determineUserDir() throws IOException {
+        // Ugly fix for Vic2 using inconsistent directory names
+        var name = getGame() == Game.VIC2 ? "Victoria II" : getGame().getInstallationName();
         return SteamDist.getSteamAppsCompatDir(getGame())
                 .resolve("pfx")
                 .resolve("drive_c")
@@ -84,7 +86,7 @@ public class ProtonNoLauncherDist extends GameDist {
                 .resolve("steamuser")
                 .resolve("Documents")
                 .resolve("Paradox Interactive")
-                .resolve(getGame().getInstallationName());
+                .resolve(name);
     }
 
     public Path getExecutable() {

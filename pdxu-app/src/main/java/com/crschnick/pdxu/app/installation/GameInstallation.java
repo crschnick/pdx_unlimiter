@@ -59,7 +59,7 @@ public final class GameInstallation {
 
     public List<Path> getAllSavegameDirectories() {
         List<Path> savegameDirs = new ArrayList<>();
-        savegameDirs.add(getSavegamesDir());
+        savegameDirs.add(getSavegamesWatchDir());
         savegameDirs.addAll(dist.getAdditionalSavegamePaths());
         return savegameDirs;
     }
@@ -133,7 +133,7 @@ public final class GameInstallation {
             throw ErrorEventFactory.expected(new InvalidInstallationException("installDirIsUserDir", dirsString));
         }
 
-        if (!Files.isRegularFile(dist.getExecutable())) {
+        if (!Files.exists(dist.getExecutable())) {
             var exec = getInstallDir().relativize(dist.getExecutable());
             throw ErrorEventFactory.expected(new InvalidInstallationException(
                     "executableNotFound",
@@ -178,7 +178,11 @@ public final class GameInstallation {
         return userDir;
     }
 
-    public Path getSavegamesDir() {
+    public Path getSavegamesWatchDir() {
+        return getType().getSavegamesWatchDir(this);
+    }
+
+    public Path getSavegamesExportDir() {
         return getUserDir().resolve("save games");
     }
 

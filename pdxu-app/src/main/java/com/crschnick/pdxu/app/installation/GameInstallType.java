@@ -417,6 +417,11 @@ public interface GameInstallType {
     GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.WINDOWS ? "CK2game" : "ck2") {
 
         @Override
+        public Path getSavegamesWatchDir(GameInstallation installation) {
+            return installation.getUserDir();
+        }
+
+        @Override
         public Path getLocalisationsDirectory() {
             return Path.of("localisation");
         }
@@ -496,6 +501,11 @@ public interface GameInstallType {
     }
 
     GameInstallType VIC2 = new StandardInstallType("v2game") {
+
+        @Override
+        public Path getSavegamesWatchDir(GameInstallation installation) {
+            return installation.getUserDir();
+        }
 
         @Override
         public Path determineUserDir(Path p, String name) throws IOException {
@@ -1001,6 +1011,10 @@ public interface GameInstallType {
         return p.resolve("dlc");
     }
 
+    default Path getSavegamesWatchDir(GameInstallation installation) {
+        return installation.getUserDir().resolve("save games");
+    }
+
     default List<GameDlc> loadDlcs(Path p) throws IOException {
         var dlcs = new ArrayList<GameDlc>();
         loadDlcsFromDirectory(getDlcPath(p), dlcs);
@@ -1137,10 +1151,23 @@ public interface GameInstallType {
                     return p.resolve(executableName);
                 }
                 case OsType.MacOs ignored -> {
-                    return p.resolve(p.resolve(executableName + ".app")
+                    var exec = p.resolve(p.resolve(executableName + ".app")
                             .resolve("Contents")
                             .resolve("MacOS")
                             .resolve(Path.of(executableName).getFileName()));
+                    if (Files.exists(exec)) {
+                        return exec;
+                    }
+
+                    var alt = p.resolve(p.resolve(executableName + ".app")
+                            .resolve("Contents")
+                            .resolve("MacOS")
+                            .resolve("load"));
+                    if (Files.exists(alt)) {
+                        return alt;
+                    }
+
+                    return exec;
                 }
             }
         }

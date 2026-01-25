@@ -807,7 +807,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         }
 
         var sourceName = getSavegameCampaign(e).getName();
-        var newName = sourceName + " (" + AppI18n.get("newBranch") + ")";
+        var suffix = " (" + AppI18n.get("newBranch") + ")";
+        var newName = sourceName.endsWith(suffix) ? sourceName : sourceName + suffix;
         addEntryToCollection(targetId, writer, checksum, info, null, newName);
         saveData();
     }

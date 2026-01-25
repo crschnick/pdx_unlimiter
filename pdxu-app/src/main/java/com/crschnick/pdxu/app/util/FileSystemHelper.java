@@ -38,6 +38,6 @@ public class FileSystemHelper {
     }
 
     public static String getFileSystemCompatibleName(String name) {
-        return name.replaceAll("[\\\\/:*?\"<>|]", "_");
+        return name.replaceAll("[\\\\/:*?\"<>|]", "_").strip();
     }
 }
