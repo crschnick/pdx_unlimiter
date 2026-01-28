@@ -3,6 +3,7 @@ build/
 .idea/*
 !.idea/codeStyles
 !.idea/inspectionProfiles
+.idea/inspectionProfiles/Project_Default.xml
 lib/
 dev.properties
 dev_storage

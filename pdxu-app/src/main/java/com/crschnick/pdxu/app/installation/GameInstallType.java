@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.FileSystemHelper;
@@ -415,6 +416,15 @@ public interface GameInstallType {
     };
 
     GameInstallType CK2 = new StandardInstallType(OsType.ofLocal() == OsType.WINDOWS ? "CK2game" : "ck2") {
+
+        @Override
+        public Path determineUserDir(Path p, String name) throws IOException {
+            if (OsType.ofLocal() == OsType.LINUX) {
+                return AppSystemInfo.ofCurrent().getUserHome().resolve(".paradoxinteractive").resolve("Crusader Kings II");
+            }
+
+            return super.determineUserDir(p, name);
+        }
 
         @Override
         public Path getSavegamesWatchDir(GameInstallation installation) {

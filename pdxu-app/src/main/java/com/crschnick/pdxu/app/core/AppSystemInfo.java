@@ -163,32 +163,26 @@ public abstract class AppSystemInfo {
         }
 
         public Path getUserHome() {
-            if (userHome != null) {
-                return userHome;
+            var env = System.getenv("HOME");
+            if (env != null) {
+                try {
+                    return Path.of(env);
+                } catch (InvalidPathException ignored) {}
             }
 
-            var dir = AppSystemInfo.parsePath(System.getenv("USERPROFILE"));
-            if (dir == null) {
-                dir = AppSystemInfo.parsePath(System.getProperty("user.home"));
-            }
-            if (dir == null) {
-                var username = System.getenv("USERNAME");
-                if (username == null) {
-                    username = System.getProperty("user.name");
-                }
-                if (username == null) {
-                    username = "User";
-                }
-                dir = Path.of("C:\\Users\\" + username);
-            }
-
+            // This can actually fail and return ?
+            // See https://stackoverflow.com/questions/70010648/system-getpropertyuser-name-returns
+            // The env variable is actually better
+            var dir = System.getProperty("user.home");
             try {
-                // Replace 8.3 filename
-                userHome = dir.toRealPath();
-            } catch (Exception ignored) {
-                userHome = dir;
+                Path.of(dir);
+            } catch (InvalidPathException ignored) {
+                dir = null;
             }
-            return dir;
+            if (dir == null || dir.equals("?")) {
+                dir = "/";
+            }
+            return Path.of(dir);
         }
 
         @Override
