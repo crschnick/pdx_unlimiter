@@ -63,6 +63,9 @@ jobs:
           AZURE_CERT_NAME: ${{ secrets.AZURE_CERT_NAME}}
           RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
 
+      - name: Stop gradle daemon
+        run: ./gradlew.bat --stop
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

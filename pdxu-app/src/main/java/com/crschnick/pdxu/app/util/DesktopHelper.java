@@ -54,7 +54,7 @@ public class DesktopHelper {
             return;
         }
 
-        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
             if (OsType.ofLocal() == OsType.LINUX) {
                 LocalExec.executeAsync("xdg-open", file.toString());
                 return;
@@ -63,9 +63,9 @@ public class DesktopHelper {
 
         // This can be a blocking operation
         ThreadHelper.runAsync(() -> {
-            if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            if (Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
                 try {
-                    Desktop.getDesktop().browse(file.toFile().toURI());
+                    Desktop.getDesktop().open(file.toFile());
                     return;
                 } catch (Exception e) {
                     // Some basic linux systems have trouble with the API call

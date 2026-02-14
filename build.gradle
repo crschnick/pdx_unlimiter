@@ -221,8 +221,8 @@ project.ext {
     // Development and production javafx versions can be different
     // Dev uses the maven dependencies and production uses jmods
     // unless jdkHasBundledJavaFx is set to true
-    devJavafxVersion = '26-ea+3'
-    productionJavafxVersion = '26-ea+3'
+    devJavafxVersion = '27-ea+4'
+    productionJavafxVersion = '27-ea+4'
     jdkHasBundledJavaFx = ModuleFinder.ofSystem().find("javafx.base").isPresent()
     // Define a custom JavaFX SDK location to use custom JavaFX jars instead of the default one
     customJavaFxPath = null
