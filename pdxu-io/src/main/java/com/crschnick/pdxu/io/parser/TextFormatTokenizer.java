@@ -316,8 +316,25 @@ public class TextFormatTokenizer {
         return false;
     }
 
-    private void checkForNewControlToken(byte controlToken) throws ParseException {
+    private void checkForNewControlToken(char c) throws ParseException {
+        byte controlToken = 0;
+        if (c == '{') {
+            controlToken = OPEN_GROUP;
+        } else if (c == '}') {
+            controlToken = CLOSE_GROUP;
+        } else if (c == '=') {
+            controlToken = EQUALS;
+        }
+
         if (controlToken == 0) {
+            return;
+        }
+
+        // Account for case where control tokens are used as scalars
+        var isControlTokenScalar = (controlToken == CLOSE_GROUP || controlToken== EQUALS) && i > 0 && bytes[i - 1] == EQUALS_CHAR;
+        if (isControlTokenScalar) {
+            finishCurrentToken(i + 1);
+            moveScalarStartToNext();
             return;
         }
 
@@ -365,11 +382,18 @@ public class TextFormatTokenizer {
         tokenTypes[tokenCounter++] = controlToken;
     }
 
-    private void checkWhitespace(char c) throws ParseException {
-        boolean isWhitespace = (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+    private boolean isWhitespaceChar(char c) {
+        return (c == '\n' || c == '\r' || c == ' ' || c == '\t');
+    }
+
+    private boolean checkWhitespace(char c) throws ParseException {
+        boolean isWhitespace = isWhitespaceChar(c);
         if (isWhitespace) {
             finishCurrentToken();
             moveScalarStartToNext();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -392,17 +416,11 @@ public class TextFormatTokenizer {
 
         checkResize();
 
-        byte controlToken = 0;
-        if (c == '{') {
-            controlToken = OPEN_GROUP;
-        } else if (c == '}') {
-            controlToken = CLOSE_GROUP;
-        } else if (c == '=') {
-            controlToken = EQUALS;
+        if (checkWhitespace(c)) {
+            return;
         }
 
-        checkForNewControlToken(controlToken);
-        checkWhitespace(c);
+        checkForNewControlToken(c);
     }
 
     public byte[] getTokenTypes() {
