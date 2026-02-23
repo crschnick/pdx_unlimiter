@@ -41,7 +41,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.20.0'
     implementation "com.fasterxml.jackson.core:jackson-databind:2.20.0"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.20"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1"
     implementation "org.kordamp.ikonli:ikonli-material2-pack:12.4.0"
     implementation "org.kordamp.ikonli:ikonli-materialdesign-pack:12.4.0"
     implementation "org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0"
