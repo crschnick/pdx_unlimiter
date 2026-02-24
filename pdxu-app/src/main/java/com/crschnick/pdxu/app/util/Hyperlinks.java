@@ -17,6 +17,6 @@ public class Hyperlinks {
     public static final String EU5_COA_WIKI = "https://eu5.paradoxwikis.com/Flag_modding";
 
     public static void open(String uri) {
-        DesktopHelper.openUrl(uri);
+        DesktopHelper.openUrlInBrowser(uri);
     }
 }

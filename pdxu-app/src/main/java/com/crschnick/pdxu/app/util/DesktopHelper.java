@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 public class DesktopHelper {
 
-    public static void openUrl(String uri) {
+    public static void openUrlInBrowser(String uri) {
         if (uri == null) {
             return;
         }
