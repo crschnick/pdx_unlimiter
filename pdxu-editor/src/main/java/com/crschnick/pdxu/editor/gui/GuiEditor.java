@@ -114,7 +114,7 @@ public class GuiEditor {
         v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
 
         var graphic = new StackPane(new FontIcon("mdi-information-outline"));
-        var melterInformation = new Label(AppI18n.get("savegameEditorTips"), graphic);
+        var melterInformation = new Button(AppI18n.get("savegameEditorTips"), graphic);
         melterInformation.setGraphicTextGap(8);
         melterInformation.setAlignment(Pos.CENTER);
         melterInformation.getStyleClass().add("melter-information");

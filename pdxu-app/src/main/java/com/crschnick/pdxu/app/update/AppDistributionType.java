@@ -128,9 +128,12 @@ public enum AppDistributionType implements Translatable {
         } else {
             var file = base.resolve("installation");
             if (!Files.exists(file)) {
-                var steam = base.getParent().getFileName().toString().equals("common");
-                if (steam) {
-                    return STEAM;
+                var parent = base.getParent().getFileName();
+                if (parent != null) {
+                    var steam = parent.toString().equals("common");
+                    if (steam) {
+                        return STEAM;
+                    }
                 }
 
                 return PORTABLE;
