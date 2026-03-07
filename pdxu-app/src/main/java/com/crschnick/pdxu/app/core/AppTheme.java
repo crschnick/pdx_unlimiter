@@ -261,9 +261,10 @@ public class AppTheme {
             var scene = stage.getScene();
             Pane root = (Pane) scene.getRoot();
             Image snapshot = scene.snapshot(null);
+
+            newTheme.apply();
             ImageView imageView = new ImageView(snapshot);
             root.getChildren().add(imageView);
-            newTheme.apply();
 
             Platform.runLater(() -> {
                 // Animate!
@@ -278,6 +279,13 @@ public class AppTheme {
                     root.getChildren().remove(imageView);
                 });
                 transition.play();
+            });
+            
+            // Force mark dirty the root node
+            // This ensures that the stylesheets are applied properly to the nodes in case no layout change is done
+            root.getStyleClass().add("theme-update-notification");
+            Platform.runLater(() -> {
+                root.getStyleClass().remove("theme-update-notification");
             });
         });
     }
