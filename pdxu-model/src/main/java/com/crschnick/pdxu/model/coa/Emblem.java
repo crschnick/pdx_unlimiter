@@ -105,7 +105,7 @@ public class Emblem {
                 .map(i -> {
                     Instance instance = new Instance();
                     i.getNodeForKeyIfExistent("position").ifPresent(p -> {
-                        if (p.isArray()) {
+                        if (p.isArray() && !p.getNodeArray().isEmpty()) {
                             instance.x = p.getNodeArray().get(0).getDouble();
                             instance.y = p.getNodeArray().get(1).getDouble();
                         }
