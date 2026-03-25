@@ -24,6 +24,10 @@ public class Eu5Tag {
 
     public static List<Eu5Tag> allFromNode(Node n) {
         var countries = n.getNodeForKeys("countries", "database");
+        if (countries == null) {
+            return List.of();
+        }
+
         var allTags = new ArrayList<Eu5Tag>();
         countries.forEach((s, node) -> {
             allTags.add(fromNode(s, node));

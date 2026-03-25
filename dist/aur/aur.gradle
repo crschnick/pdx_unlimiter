@@ -1,0 +1,175 @@
+import java.security.MessageDigest
+import java.util.stream.Collectors
+
+static def getChecksum(File input) {
+    byte[] buffer= new byte[8192]
+    int count
+    MessageDigest digest = MessageDigest.getInstance("SHA-256")
+    try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(input))) {
+        while ((count = bis.read(buffer)) > 0) {
+            digest.update(buffer, 0, count)
+        }
+    }
+    byte[] hash = digest.digest()
+    return HexFormat.of().formatHex(hash).toUpperCase()
+}
+
+tasks.register('publishAUR', DefaultTask) {
+    def aurBuildDir = file("$projectDir/build/aur")
+
+    doLast {
+        aurBuildDir.deleteDir()
+        aurBuildDir.mkdirs()
+
+        execOps.exec {
+            commandLine 'git', 'init'
+            workingDir aurBuildDir
+        }
+
+        execOps.exec {
+            commandLine 'chmod', '400', "../aur_key"
+            workingDir aurBuildDir
+        }
+
+        execOps.exec {
+            commandLine 'git', 'remote', 'add', 'origin', "ssh://aur@aur.archlinux.org/${kebapProductName}.git"
+            workingDir aurBuildDir
+            environment 'GIT_SSH_COMMAND', "ssh -i ../aur_key -oStrictHostKeyChecking=no"
+        }
+
+        execOps.exec {
+            commandLine 'git', 'pull', 'origin', 'master'
+            workingDir aurBuildDir
+            environment 'GIT_SSH_COMMAND', "ssh -i ../aur_key -oStrictHostKeyChecking=no"
+        }
+
+        copy {
+            from replaceVariablesInFile("$projectDir/linux_packages/app.desktop",
+                                        Map.of('__NAME__',
+                                               productName,
+                                               '__TARGET__',
+                                               "/opt/$kebapProductName",
+                                               '__DESCRIPTION__',
+                                               shortDescription,
+                                               '__ICON__', kebapProductName)).toString()
+            into aurBuildDir
+            rename 'app.desktop', "${productName}.desktop"
+            filePermissions {
+                unix '644'
+            }
+        }
+
+        List<String> sources = []
+        List<String> checksums = []
+        sources += "${productName}.desktop"
+        checksums += getChecksum(file("$aurBuildDir/${productName}.desktop"))
+
+        execOps.exec {
+            commandLine 'git',
+                        'add',
+                        "${productName}.desktop"
+            workingDir aurBuildDir
+        }
+
+        def fileList = Arrays.stream(file("$projectDir/logo/hicolor").listFiles())
+                .sorted()
+                .sorted(Comparator.comparingInt(f -> f.getName().length()))
+                .toList()
+        for (def logoDir : fileList) {
+            def logoFile = file("$logoDir/apps/logo.png")
+
+            // AUR has a limit of 500Kb per file
+            if (logoFile.size() > 490_000) {
+                continue
+            }
+
+            checksums += getChecksum(logoFile)
+
+            sources += "logo_${logoDir.name}.png"
+
+            copy {
+                from logoFile
+                into aurBuildDir
+                rename 'logo.png', "logo_${logoDir.name}.png"
+            }
+
+            execOps.exec {
+                commandLine 'git',
+                            'add',
+                            "logo_${logoDir.name}.png"
+                workingDir aurBuildDir
+            }
+        }
+
+        var desc = "A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games."
+        var x8664Checksum = getArtifactChecksumSha256Hex('pdx-unlimiter-portable-linux-x86_64.tar.gz')
+
+        var variables = new HashMap<String, String>()
+        variables.put('__PACKAGE__',
+                      kebapProductName)
+        variables.put('__RELEASE__',
+                      versionReleaseNumber.toString())
+        variables.put('__DESCRIPTION__',
+                      desc)
+        variables.put('__CANONICAL_VERSION__',
+                      canonicalVersionString)
+        variables.put('__VERSION__',
+                      versionString)
+        variables.put('__X86_64_CHECKSUM__',
+                      x8664Checksum)
+        variables.put('__SOURCES__', sources.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(" ")))
+        variables.put('__CHECKSUMS__', checksums.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(" ")))
+
+        var pkgbuild = replaceVariablesInFileAsString("$projectDir/aur/PKGBUILD",
+                                                      variables)
+        file("$aurBuildDir/PKGBUILD").text = pkgbuild
+        file("$aurBuildDir/${kebapProductName}.changelog").text = changelog
+
+
+        execOps.exec {
+            commandLine 'makepkg', '--printsrcinfo'
+            workingDir aurBuildDir
+            standardOutput = new FileOutputStream(file("$aurBuildDir/.SRCINFO"))
+        }
+
+        execOps.exec {
+            commandLine 'git',
+                        'add',
+                        'PKGBUILD',
+                        '.SRCINFO',
+                        "${kebapProductName}.changelog"
+            workingDir aurBuildDir
+        }
+
+        execOps.exec {
+            commandLine 'git', 'config', '--global', 'user.email', 'crschnick@xpipe.io'
+            workingDir aurBuildDir
+        }
+
+        execOps.exec {
+            commandLine 'git', 'config', '--global', 'user.name', 'Christopher Schnick'
+            workingDir aurBuildDir
+        }
+
+        execOps.exec {
+            commandLine 'git', 'commit', '-m', "Update to version $versionString"
+            workingDir aurBuildDir
+        }
+
+        for (int i = 0; i < 5; i++) {
+            def r = execOps.exec {
+                commandLine 'git', 'push', 'origin', 'master'
+                workingDir aurBuildDir
+                environment 'GIT_SSH_COMMAND', "ssh -i ../aur_key -oStrictHostKeyChecking=no"
+                ignoreExitValue = true
+            }.getExitValue()
+            if (r == 0) {
+                break
+            }
+
+            if (i == 4) {
+                throw new IllegalStateException("Failed to publish to AUR")
+            }
+        }
+    }
+}

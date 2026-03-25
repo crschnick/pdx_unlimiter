@@ -67,6 +67,7 @@ if (file("i18n.gradle").exists()) {
 }
 
 if (os.isLinux()) {
+    apply from: 'aur/aur.gradle'
     apply from: 'linux_packages.gradle'
 } else if (os.isWindows()) {
     apply from: 'msi/msi.gradle'

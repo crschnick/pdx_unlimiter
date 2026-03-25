@@ -152,6 +152,79 @@ jobs:
           files: |
             dist/build/dist/github-release/*
 
+  publish-aur:
+    name: Publish AUR
+    permissions:
+      actions: none
+      attestations: none
+      checks: none
+      contents: read
+      deployments: none
+      id-token: none
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: none
+    if: ${{ contains(github.event.head_commit.message, '[release]') }}
+    runs-on: ubuntu-latest
+    needs: [
+      publish
+    ]
+    container:
+      image: archlinux:base-devel
+      env:
+        RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
+        AUR_SSH_KEY: |
+          ${{ secrets.AUR_SSH_KEY }}
+      volumes:
+        - .:/mnt/pdx_unlimiter
+      options: -u root
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25.0.2'
+          distribution: 'zulu'
+          java-package: jdk
+          cache: gradle
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-artifacts"
+          merge-multiple: true
+          path: dist/build/dist/artifacts
+
+      - name: Create checksums
+        run: ./gradlew createChecksums
+
+      - name: Create signatures
+        run: ./gradlew signArtifacts signChecksums
+        env:
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_KEY: |
+            ${{ secrets.GPG_KEY }}
+          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
+
+      - name: Create key
+        run: |
+          mkdir -p dist/build
+          echo "$AUR_SSH_KEY" > dist/build/aur_key
+
+      - name: Run AUR publish
+        run: |
+          useradd -d /builder -m builder
+          pacman -Sy --noconfirm --needed zip unzip git openssh
+          chown -R builder /mnt/pdx_unlimiter/
+          su builder -c "cd /mnt/pdx_unlimiter/; ./gradlew publishAUR"
+
   publish-steam:
     needs: [
       build-windows,
