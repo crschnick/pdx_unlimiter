@@ -51,7 +51,10 @@ tasks.register('publishAUR', DefaultTask) {
                                                "/opt/$kebapProductName",
                                                '__DESCRIPTION__',
                                                 "A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games.",
-                                               '__ICON__', kebapProductName)).toString()
+                                               '__ICON__', kebapProductName,
+                                                '__EXECUTABLE_NAME__', jpackageExecutableName
+
+                                        )).toString()
             into aurBuildDir
             rename 'app.desktop', "${productName}.desktop"
             filePermissions {
