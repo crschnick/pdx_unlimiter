@@ -6,6 +6,8 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
+import com.crschnick.pdxu.editor.target.EditTarget;
+import com.crschnick.pdxu.editor.target.SavegameEditTarget;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class EditorState {
 
+    private final EditTarget target;
     private final String fileName;
     private final TextFormatParser parser;
     private final BooleanProperty dirty;
@@ -38,6 +41,7 @@ public class EditorState {
     private final boolean editable;
 
     public EditorState(
+            EditTarget target,
             String fileName,
             GameFileContext fileContext,
             SavegameContent nodes,
@@ -45,6 +49,7 @@ public class EditorState {
             Consumer<Map<String, ArrayNode>> saveFunc,
             boolean savegame,
             boolean editable) {
+        this.target = target;
         this.parser = parser;
         this.fileName = fileName;
         this.saveFunc = saveFunc;
@@ -170,5 +175,9 @@ public class EditorState {
     public boolean isContextGameEnabled() {
         return fileContext.get().getGame() == null
                 || fileContext.get().getGame().isEnabled();
+    }
+
+    public EditTarget getTarget() {
+        return target;
     }
 }

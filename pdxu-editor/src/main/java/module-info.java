@@ -20,6 +20,7 @@ module com.crschnick.pdxu.editor {
 
     exports com.crschnick.pdxu.editor;
     exports com.crschnick.pdxu.editor.node;
+    exports com.crschnick.pdxu.editor.target;
 
     requires javafx.base;
     requires javafx.graphics;

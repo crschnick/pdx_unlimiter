@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor.gui;
 
+import com.crschnick.pdxu.app.comp.base.ButtonComp;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.AppTheme;
 import com.crschnick.pdxu.app.core.window.AppModifiedStage;
@@ -9,11 +10,13 @@ import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.editor.EditorFilter;
 import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.adapter.EditorSavegameAdapter;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.editor.node.EditorSimpleNode;
+import com.crschnick.pdxu.editor.target.StorageEditTarget;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import javafx.application.Platform;
@@ -55,7 +58,7 @@ public class GuiEditor {
             });
         });
 
-        var node = GuiEditor.create(state);
+        var node = GuiEditor.create(stage, state);
         // Disable focus on startup
         node.requestFocus();
         Scene scene = new Scene(node, 720, 600);
@@ -104,7 +107,7 @@ public class GuiEditor {
         }
     }
 
-    private static Region create(EditorState state) {
+    private static Region create(Stage stage, EditorState state) {
         BorderPane layout = new BorderPane();
         layout.getStyleClass().add("editor");
         var v = new VBox();
@@ -114,16 +117,30 @@ public class GuiEditor {
         v.getChildren().add(GuiEditorNavBar.createNavigationBar(state));
 
         var graphic = new StackPane(new FontIcon("mdi-information-outline"));
-        var melterInformation = new Button(AppI18n.get("savegameEditorTips"), graphic);
+
+        var melterInformation = new Label(AppI18n.get("savegameEditorTips"), graphic);
         melterInformation.setGraphicTextGap(8);
         melterInformation.setAlignment(Pos.CENTER);
         melterInformation.getStyleClass().add("melter-information");
+
+        var meltButton = new ButtonComp(AppI18n.observable("convert"), () -> {
+            if (state.getTarget() instanceof StorageEditTarget<?, ?> set) {
+                stage.close();
+                SavegameActions.meltSavegame(set.getSavegameEntry());
+            }
+        });
+        meltButton.apply(struc -> struc.get().setDefaultButton(true));
+
+        var melterHbox = new HBox(melterInformation, meltButton.createRegion());
+        melterHbox.setSpacing(10);
+        melterHbox.setAlignment(Pos.CENTER);
+
         var topBars = new VBox(GuiEditorMenuBar.createMenuBar(state), v);
         if (!state.isEditable()) {
-            topBars.getChildren().addFirst(melterInformation);
+            topBars.getChildren().addFirst(melterHbox);
         }
         topBars.setFillWidth(true);
-        melterInformation.prefWidthProperty().bind(topBars.widthProperty());
+        melterHbox.prefWidthProperty().bind(topBars.widthProperty());
         layout.setTop(topBars);
         createNodeList(layout, state);
         layout.setBottom(createFilterBar(state.getFilter()));

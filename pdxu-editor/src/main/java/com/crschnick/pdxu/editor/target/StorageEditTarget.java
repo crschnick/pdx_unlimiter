@@ -77,4 +77,8 @@ public class StorageEditTarget<T, I extends SavegameInfo<T>> extends EditTarget 
     public GameFileContext getFileContext() {
         return context;
     }
+
+    public SavegameEntry<T, I> getSavegameEntry() {
+        return entry;
+    }
 }

@@ -10,9 +10,6 @@
 
 .melter-information {
     -fx-padding: 7;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-color: -color-border-default;
-    -fx-background-color: -color-bg-inset;
 }
 
 .editor-grid .even {

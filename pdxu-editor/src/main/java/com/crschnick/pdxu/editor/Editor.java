@@ -92,6 +92,7 @@ public class Editor implements EditorProvider {
                                 return;
                             }
                             EditorState state = new EditorState(
+                                    target,
                                     target.getName(),
                                     target.getFileContext(),
                                     nodes,
