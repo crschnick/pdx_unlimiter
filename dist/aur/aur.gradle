@@ -50,7 +50,7 @@ tasks.register('publishAUR', DefaultTask) {
                                                '__TARGET__',
                                                "/opt/$kebapProductName",
                                                '__DESCRIPTION__',
-                                               shortDescription,
+                                                "A smart savegame manager, editor, and toolbox for all current major Paradox Grand Strategy games.",
                                                '__ICON__', kebapProductName)).toString()
             into aurBuildDir
             rename 'app.desktop', "${productName}.desktop"
@@ -113,17 +113,13 @@ tasks.register('publishAUR', DefaultTask) {
                       desc)
         variables.put('__CANONICAL_VERSION__',
                       canonicalVersionString)
-        variables.put('__VERSION__',
-                      versionString)
         variables.put('__X86_64_CHECKSUM__',
                       x8664Checksum)
         variables.put('__SOURCES__', sources.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(" ")))
         variables.put('__CHECKSUMS__', checksums.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(" ")))
 
-        var pkgbuild = replaceVariablesInFileAsString("$projectDir/aur/PKGBUILD",
-                                                      variables)
+        var pkgbuild = replaceVariablesInFile("$projectDir/aur/PKGBUILD", variables).text
         file("$aurBuildDir/PKGBUILD").text = pkgbuild
-        file("$aurBuildDir/${kebapProductName}.changelog").text = changelog
 
 
         execOps.exec {
@@ -136,8 +132,7 @@ tasks.register('publishAUR', DefaultTask) {
             commandLine 'git',
                         'add',
                         'PKGBUILD',
-                        '.SRCINFO',
-                        "${kebapProductName}.changelog"
+                        '.SRCINFO'
             workingDir aurBuildDir
         }
 

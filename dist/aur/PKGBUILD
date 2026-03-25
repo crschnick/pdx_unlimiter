@@ -1,6 +1,5 @@
 # Maintainer: Christopher Schnick <crschnick@xpipe.io>
 
-_fullver="__VERSION__"
 pkgname="__PACKAGE__"
 pkgver="__CANONICAL_VERSION__"
 pkgrel="__RELEASE__"
@@ -33,16 +32,16 @@ replaces=()
 backup=()
 options=(!debug !strip)
 install=
-changelog="${pkgname}.changelog"
+changelog=
 source=(__SOURCES__)
-source_x86_64=("${pkgname}-${_fullver}-x86_64.tar.gz::https://github.com/crschnick/pdx_unlimiter/releases/download/${_fullver}/pdx-unlimiter-portable-linux-x86_64.tar.gz")
+source_x86_64=("${pkgname}-${pkgver}-x86_64.tar.gz::https://github.com/crschnick/pdx_unlimiter/releases/download/${pkgver}/pdx-unlimiter-portable-linux-x86_64.tar.gz")
 noextract=()
 sha256sums=(__CHECKSUMS__)
 sha256sums_x86_64=("__X86_64_CHECKSUM__")
 
 package() {
 	install -dm0755 "$pkgdir/opt"
-	cp -a "$srcdir/pdx-unlimiter-${_fullver}" "$pkgdir/opt/$pkgname"
+	cp -a "$srcdir/pdx-unlimiter-${pkgver}" "$pkgdir/opt/$pkgname"
 	install -Dm0644 -t "$pkgdir/usr/share/applications/" "$srcdir/Pdx-Unlimiter.desktop"
 
     for logoFile in $srcdir/*.png; do
