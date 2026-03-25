@@ -4,10 +4,7 @@ import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
-import com.crschnick.pdxu.app.util.LocalExec;
-import com.crschnick.pdxu.app.util.OsType;
-import com.crschnick.pdxu.app.util.ThreadHelper;
-import com.crschnick.pdxu.app.util.WindowsRegistry;
+import com.crschnick.pdxu.app.util.*;
 
 import org.apache.commons.lang3.ArchUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -259,9 +256,7 @@ public class SteamDist extends GameDist {
                                 true);
             }
         } else {
-            ThreadHelper.runFailableAsync(() -> {
-                Desktop.getDesktop().browse(URI.create(uri));
-            });
+            DesktopHelper.openAssociatedApplication(uri);
         }
     }
 

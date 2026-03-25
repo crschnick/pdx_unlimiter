@@ -49,6 +49,30 @@ public class DesktopHelper {
         });
     }
 
+    public static void openAssociatedApplication(String uri) {
+        if (uri == null) {
+            return;
+        }
+
+        URI parsed;
+        try {
+            parsed = URI.create(uri);
+        } catch (IllegalArgumentException e) {
+            ErrorEventFactory.fromThrowable("Invalid URI: " + uri, e.getCause() != null ? e.getCause() : e)
+                    .handle();
+            return;
+        }
+
+        // Windows URL open always uses browser
+        if (OsType.ofLocal() == OsType.WINDOWS) {
+            LocalExec.executeAsync("rundll32", "url.dll,FileProtocolHandler", parsed.toString());
+            return;
+        }
+
+        // Other OS use associated app
+        openUrlInBrowser(uri);
+    }
+
     public static void browseFile(Path file) {
         if (file == null || !Files.exists(file)) {
             return;

@@ -94,3 +94,7 @@
     -fx-background-color: -color-neutral-subtle;
     -fx-border-color: -color-neutral-emphasis;
 }
+
+.text-field:focused {
+    -fx-prompt-text-fill: -color-fg-subtle;
+}

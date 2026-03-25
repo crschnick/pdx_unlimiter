@@ -98,11 +98,13 @@ public class AppTheme {
 
         r.pseudoClassStateChanged(PseudoClass.getPseudoClass(OsType.ofLocal().getId()), true);
 
-        Theme.ALL.forEach(theme -> {
-            r.pseudoClassStateChanged(
-                    PseudoClass.getPseudoClass(theme.getCssId()),
-                    theme.getCssId().equals(t.getCssId()));
-        });
+        if (t != null) {
+            Theme.ALL.forEach(theme -> {
+                r.pseudoClassStateChanged(
+                        PseudoClass.getPseudoClass(theme.getCssId()),
+                        theme.getCssId().equals(t.getCssId()));
+            });
+        }
 
         if (t != null) {
             r.pseudoClassStateChanged(LIGHT, !t.isDark());
@@ -280,7 +282,7 @@ public class AppTheme {
                 });
                 transition.play();
             });
-            
+
             // Force mark dirty the root node
             // This ensures that the stylesheets are applied properly to the nodes in case no layout change is done
             root.getStyleClass().add("theme-update-notification");
