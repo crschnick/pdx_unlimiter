@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
+import com.crschnick.pdxu.app.core.AppLayoutModel;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 
@@ -13,6 +14,10 @@ public class GameCacheManager {
 
     public static void init() {
         INSTANCE = new GameCacheManager();
+
+        AppLayoutModel.get().getSelected().addListener((observable, oldValue, newValue) -> {
+            INSTANCE.onGameChange();
+        });
     }
 
     public static void reset() {
@@ -27,6 +32,11 @@ public class GameCacheManager {
     public void onSelectedSavegameCollectionChange() {
         TrackEvent.debug("Clearing savegame collection caches");
         caches.entrySet().removeIf(e -> e.getValue().scope.equals(Scope.SAVEGAME_CAMPAIGN_SPECIFIC));
+    }
+
+    public void onGameChange() {
+        TrackEvent.debug("Clearing game-specific caches");
+        caches.clear();
     }
 
     @SuppressWarnings("unchecked")
