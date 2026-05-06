@@ -103,12 +103,12 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
     }
 
     private void initVersion(Node n) {
-        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
         var string = n.getNodeForKeys("metadata", "version").getString();
         Matcher m = p.matcher(string);
         if (m.matches()) {
             version = new GameVersion(
-                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), 0);
+                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), m.groupCount() > 2 ? Integer.parseInt(m.group(3)) : 0, 0);
         } else {
             throw new IllegalArgumentException("Could not parse EU5 version string: " + string);
         }
