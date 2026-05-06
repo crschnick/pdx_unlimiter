@@ -42,6 +42,11 @@ public interface GameInstallType {
 
     GameInstallType EU4 = new StandardInstallType("eu4") {
 
+        public String getCompatibleSavegameName(String name) {
+            return Normalizer.normalize(super.getCompatibleSavegameName(name), Normalizer.Form.NFC)
+                    .replaceAll("[^\\p{ASCII}]", "");
+        }
+
         @Override
         public List<GameDlc> loadDlcs(Path directory) throws IOException {
             // Prefer builtin_dlcs in case of duplicates
