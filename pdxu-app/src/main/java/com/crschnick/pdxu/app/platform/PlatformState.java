@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.platform;
 
 import com.crschnick.pdxu.app.core.AppProperties;
+import com.crschnick.pdxu.app.core.AppRestart;
 import com.crschnick.pdxu.app.core.check.AppSystemFontCheck;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
@@ -16,6 +17,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public enum PlatformState {
@@ -59,6 +61,24 @@ public enum PlatformState {
         var header = message != null ? message + "\n\n" : "Failed to load graphics support\n\n";
         var msg = header + "Please note that this is a desktop application that should be run on your local desktop.";
         return msg;
+    }
+
+    public static void handleStderrMessage(String msg) {
+        // Quantum pipeline graphics driver issues are swallowed and only logged to stderr
+        // We can still detect them by looking for them in the stderr output
+        var l = List.of(
+                "java.lang.InternalError: Error loading stock shader",
+                "java.lang.RuntimeException: Error creating vertex shader",
+                "java.lang.RuntimeException: Error creating fragment shader",
+                "java.lang.RuntimeException: Error creating shader program"
+        );
+        if (AppPrefs.get() != null && AppPrefs.get().canSaveLocal() &&
+                !AppPrefs.get().disableHardwareAcceleration().get() && l.stream().anyMatch(msg::contains)) {
+            reset();
+            AppPrefs.get().setFromExternal(AppPrefs.get().disableHardwareAcceleration(), true);
+            AppPrefs.get().save();
+            AppRestart.restart();
+        }
     }
 
     private static void initPlatform() {
@@ -108,7 +128,7 @@ public enum PlatformState {
 
         // This issue is now fixed in 27-ea+4
         // The bellsoft JavaFX build for ARM does not contain the fix yet
-        if (SystemUtils.IS_OS_WINDOWS && AppProperties.get().getArch().equals("x86_64")) {
+        if (OsType.ofLocal() == OsType.WINDOWS && !AppProperties.get().getArch().equals("x86_64")) {
             // This is primarily intended to fix Windows unified stage transparency issues
             // (https://bugs.openjdk.org/browse/JDK-8329382)
             // But apparently it can also occur without a custom stage on Windows

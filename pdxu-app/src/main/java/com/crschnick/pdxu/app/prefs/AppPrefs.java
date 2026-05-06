@@ -384,6 +384,10 @@ public final class AppPrefs {
 
     private AppPrefs() {}
 
+    public boolean canSaveLocal() {
+        return globalStorageHandler.isInitialized();
+    }
+
     public ObservableBooleanValue disableHardwareAcceleration() {
         return disableHardwareAcceleration;
     }

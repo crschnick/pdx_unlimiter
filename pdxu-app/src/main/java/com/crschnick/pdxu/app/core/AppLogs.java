@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 
+import com.crschnick.pdxu.app.platform.PlatformState;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -199,6 +200,8 @@ public class AppLogs {
                     if (line.length() == 0) {
                         return;
                     }
+
+                    PlatformState.handleStderrMessage(line);
 
                     TrackEvent.builder().type("error").message(line).build().handle();
                     baos.reset();

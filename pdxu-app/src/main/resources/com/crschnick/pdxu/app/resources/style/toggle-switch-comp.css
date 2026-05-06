@@ -1,5 +1,5 @@
 .root:key-navigation .toggle-switch-comp:focused > .thumb-area {
-    -fx-background-color: -color-neutral-emphasis;
+    -fx-border-color: -color-accent-emphasis;
 }
 
 .toggle-switch-comp:has-graphic .label {
@@ -18,6 +18,10 @@
     -fx-padding: -0.05em 0 0 0;
 }
 
+.root:linux:nord .toggle-switch-comp > .thumb {
+    -fx-background-insets: 0.15em 0.2em 0.15em 0.2em;
+}
+
 .root:windows .toggle-switch-comp > .thumb-area {
     -fx-padding: 0.65em 1.5em;
     -fx-background-insets: 0, 1;
@@ -27,14 +31,6 @@
     -fx-background-insets: 0.2em;
     -fx-background-radius: 1em;
     -fx-padding: 0.7em;
-}
-
-.root:windows:nord .toggle-switch-comp > .thumb {
-    -fx-background-radius: 0em;
-}
-
-.root:windows:nord .toggle-switch-comp > .thumb-area {
-    -fx-border-radius: 0;
 }
 
 .root:light .toggle-switch-comp > .thumb {
@@ -66,16 +62,20 @@
     -fx-border-color: transparent;
 }
 
+.root:linux .toggle-switch-comp > .thumb {
+    -fx-background-insets: 0.12em;
+}
+
 .root:macos .toggle-switch-comp > .thumb {
     -fx-background-insets: 0.15em;
     -fx-background-radius: 1em;
     -fx-padding: 0.7em 1.0em 0.7em 1.0em;
 }
 
-.root:macos:nord .toggle-switch-comp > .thumb {
+.root:light:nord .toggle-switch-comp > .thumb, .root:dark:nord .toggle-switch-comp > .thumb {
     -fx-background-radius: 0em;
 }
 
-.root:macos:nord .toggle-switch-comp > .thumb-area {
+.root:light:nord .toggle-switch-comp > .thumb-area, .root:dark:nord .toggle-switch-comp > .thumb-area {
     -fx-border-radius: 0;
 }
