@@ -865,7 +865,8 @@ public interface GameInstallType {
                             Integer.parseInt(m.group(3)),
                             0));
                 } else {
-                    return Optional.empty();
+                    // TODO: Find a solution for EU5 version parsing for 1.2+
+                    return Optional.of(new GameVersion(1, 2, 0, 0));
                 }
             } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(e).handle();
