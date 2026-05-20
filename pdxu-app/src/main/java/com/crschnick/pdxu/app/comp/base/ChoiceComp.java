@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.util.Translatable;
 
+import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -17,9 +18,11 @@ import javafx.util.StringConverter;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -46,7 +49,8 @@ public class ChoiceComp<T> extends Comp<CompStructure<ComboBox<T>>> {
     @Override
     public CompStructure<ComboBox<T>> createBase() {
         var cb = new ComboBox<T>();
-        cb.setConverter(new StringConverter<>() {
+
+        Supplier<StringConverter<T>> converter = () -> new StringConverter<>() {
             @Override
             public String toString(T object) {
                 if (object == null) {
@@ -65,7 +69,21 @@ public class ChoiceComp<T> extends Comp<CompStructure<ComboBox<T>>> {
             public T fromString(String string) {
                 throw new UnsupportedOperationException();
             }
+        };
+        cb.setConverter(converter.get());
+
+        // Reset converter on language change to force an update
+        // This does not work properly in older JFX versions, see JDK-8384006
+        var ref = new WeakReference<>(cb);
+        AppI18n.activeLanguage().subscribe((v) -> {
+            var refValue = ref.get();
+            if (refValue != null) {
+                Platform.runLater(() -> {
+                    refValue.setConverter(converter.get());
+                });
+            }
         });
+
         range.subscribe(c -> {
             var list = FXCollections.observableArrayList(c.keySet());
             if (!list.contains(null) && includeNone) {
