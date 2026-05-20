@@ -7,5 +7,5 @@ Exec=__TARGET__/bin/__EXECUTABLE_NAME__ %U
 Path=__TARGET__
 Icon=__ICON__
 Terminal=false
-Categories=Utility;Development;
+Categories=Utility;Game;
 StartupNotify=true
