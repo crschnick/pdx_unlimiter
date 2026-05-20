@@ -44,9 +44,10 @@ public class Eu5Tag {
                 .map(GameColor::fromColorNode)
                 .orElse(GameColor.BLACK);
         var flagTag = n.getNodeForKey("flag").getString();
-        var nameTag = n.getNodeForKey("country_name").isValue()
-                ? n.getNodeForKey("country_name").getString()
-                : n.getNodeForKey("country_name").getNodeForKey("name").getString();
+        var cn = n.getNodeForKey("country_name");
+        var nameTag = cn.isValue()
+                ? cn.getString()
+                : cn.hasKey("name") ? cn.getNodeForKey("name").getString() : cn.getNodeForKeys("key", "\"Custom_Name\"").getString();
         return new Eu5Tag(Long.parseLong(key), flagTag, nameTag, color);
     }
 
