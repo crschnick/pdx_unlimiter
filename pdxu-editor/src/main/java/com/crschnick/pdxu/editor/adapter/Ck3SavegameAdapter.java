@@ -228,6 +228,7 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
             "child",
             "heir",
             "succession",
+            "concubine",
             "claim",
             "currently_played_characters",
             "knights",
