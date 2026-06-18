@@ -866,7 +866,8 @@ public interface GameInstallType {
                             0));
                 } else {
                     // TODO: Find a solution for EU5 version parsing for 1.2+
-                    return Optional.of(new GameVersion(1, 2, 0, 0));
+                    var romagnolFile = p.resolve("game/in_game/common/advances/culture_romagnol.txt");
+                    return Optional.of(new GameVersion(1, Files.exists(romagnolFile) ? 3 : 2, 0, 0));
                 }
             } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(e).handle();
