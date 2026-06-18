@@ -149,6 +149,11 @@ public class PdxLauncherDist extends GameDist {
 
     @Override
     public Path determineUserDir() throws IOException {
+        var customUserDirFile = getInstallLocation().resolve("userdir.txt");
+        if (Files.exists(customUserDirFile)) {
+            return super.determineUserDir();
+        }
+
         JsonNode node =
                 JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
         return Optional.ofNullable(node.get("gameDataPath"))
