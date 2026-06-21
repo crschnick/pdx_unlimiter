@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.18.0'
     implementation 'io.sentry:sentry:8.20.0'
     implementation 'commons-io:commons-io:2.20.0'
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.20.0"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.20.1"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.20"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0"
     implementation "org.kordamp.ikonli:ikonli-material2-pack:12.4.0"
