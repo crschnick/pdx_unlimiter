@@ -43,7 +43,7 @@ jobs:
           RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.os }}-artifacts
           retention-days: 1
