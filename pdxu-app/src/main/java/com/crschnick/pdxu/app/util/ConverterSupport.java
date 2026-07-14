@@ -101,7 +101,7 @@ public class ConverterSupport {
                     writeLine(
                             writer,
                             getFromConfigurationName() + "SteamModDirectory",
-                            ((SteamDist) GameInstallation.ALL.get(getFromGame()).getDist())
+                            GameInstallation.ALL.get(getFromGame()).getDist()
                                     .getWorkshopDir()
                                     .orElseThrow()
                                     .toString());
