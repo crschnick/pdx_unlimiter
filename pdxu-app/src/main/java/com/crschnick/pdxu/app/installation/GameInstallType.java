@@ -483,8 +483,8 @@ public interface GameInstallType {
             }
 
             var node = TextFormatParser.text().parse(sf);
-            var langId = node.getNodeForKey("gui").getNodeForKey("language").getString();
-            return Optional.ofNullable(GameLanguage.byId(langId));
+            var langId = node.getNodeForKeysIfExistent("gui", "language");
+            return langId.map(value -> GameLanguage.byId(value.getString()));
         }
 
         @Override

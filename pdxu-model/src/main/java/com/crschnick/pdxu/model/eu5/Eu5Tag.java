@@ -47,7 +47,8 @@ public class Eu5Tag {
         var cn = n.getNodeForKey("country_name");
         var nameTag = cn.isValue()
                 ? cn.getString()
-                : cn.hasKey("name") ? cn.getNodeForKey("name").getString() : cn.getNodeForKeys("key", "\"Custom_Name\"").getString();
+                : cn.hasKey("name") ? cn.getNodeForKey("name").getString() :
+                  cn.getNodeForKeys("key", "\"Custom_Name\"") != null ? cn.getNodeForKeys("key", "\"Custom_Name\"").getString() : INVALID_TAG_ID;
         return new Eu5Tag(Long.parseLong(key), flagTag, nameTag, color);
     }
 
