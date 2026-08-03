@@ -844,31 +844,29 @@ public interface GameInstallType {
 
         @Override
         public Optional<GameVersion> determineVersionFromInstallation(Path p) {
-            var file = p.resolve("caesar_branch.txt");
-            if (!Files.exists(file)) {
-                return Optional.empty();
-            }
-
             try {
-                var s = Files.readString(file);
-                var split = s.split("/", 2);
-                if (split.length != 2) {
-                    return Optional.empty();
+                var branchFile = p.resolve("caesar_branch.txt");
+                if (Files.exists(branchFile)) {
+                    var s = Files.readString(branchFile);
+                    var split = s.split("/", 2);
+                    if (split.length != 2) {
+                        return Optional.empty();
+                    }
+
+                    var ver = split[1].trim();
+                    var m = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)").matcher(ver);
+                    if (m.find()) {
+                        return Optional.of(new GameVersion(
+                                Integer.parseInt(m.group(1)),
+                                Integer.parseInt(m.group(2)),
+                                Integer.parseInt(m.group(3)),
+                                0));
+                    }
                 }
 
-                var ver = split[1].trim();
-                var m = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)").matcher(ver);
-                if (m.find()) {
-                    return Optional.of(new GameVersion(
-                            Integer.parseInt(m.group(1)),
-                            Integer.parseInt(m.group(2)),
-                            Integer.parseInt(m.group(3)),
-                            0));
-                } else {
-                    // TODO: Find a solution for EU5 version parsing for 1.2+
-                    var romagnolFile = p.resolve("game/in_game/common/advances/culture_romagnol.txt");
-                    return Optional.of(new GameVersion(1, Files.exists(romagnolFile) ? 3 : 2, 0, 0));
-                }
+                // TODO: Find a solution for EU5 version parsing for 1.2+
+                var romagnolFile = p.resolve("game/in_game/common/advances/culture_romagnol.txt");
+                return Optional.of(new GameVersion(1, Files.exists(romagnolFile) ? 3 : 2, 0, 0));
             } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(e).handle();
                 return Optional.empty();

@@ -48,6 +48,10 @@ public class ImageHelper {
             return DEFAULT_IMAGE;
         }
 
+        if ((int) r.getMaxX() > img.getWidth() || (int) r.getMaxY() > img.getHeight()) {
+            return DEFAULT_IMAGE;
+        }
+
         PixelReader reader = img.getPixelReader();
         try {
             return new WritableImage(
