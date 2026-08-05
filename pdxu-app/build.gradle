@@ -36,7 +36,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-toc:0.64.8'
 
     implementation 'info.picocli:picocli:4.7.7'
-    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
     implementation 'io.sentry:sentry:8.20.0'
     implementation 'commons-io:commons-io:2.20.0'
     implementation "com.fasterxml.jackson.core:jackson-databind:2.20.0"
