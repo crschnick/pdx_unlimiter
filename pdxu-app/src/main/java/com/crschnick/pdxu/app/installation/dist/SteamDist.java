@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.*;
 
 import org.apache.commons.lang3.ArchUtils;
@@ -11,13 +12,13 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.awt.*;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.LongConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -109,6 +110,26 @@ public class SteamDist extends GameDist {
             steamPath = new AtomicReference<>(null);
         }
         return Optional.ofNullable(steamPath.get());
+    }
+
+    public static OptionalLong determineSteamUserId(LongConsumer mostRecentUserSelected) {
+        var steamPath = getSteamPath();
+        if (steamPath.isEmpty()) {
+            TrackEvent.warn("Unable to determine Steam user ID because the Steam installation was not found");
+            return OptionalLong.empty();
+        }
+
+        var loginUsersFile = steamPath.get().resolve("config").resolve("loginusers.vdf");
+        try {
+            var userId = SteamLoginUsers.determineUserId(Files.readString(loginUsersFile), mostRecentUserSelected);
+            if (userId.isEmpty()) {
+                TrackEvent.warn("Unable to determine a unique Steam user ID from " + loginUsersFile);
+            }
+            return userId;
+        } catch (Exception e) {
+            TrackEvent.warn("Unable to read Steam users from " + loginUsersFile + ": " + e.getMessage());
+            return OptionalLong.empty();
+        }
     }
 
     private static final Pattern STEAM_LIBRARY_DIR_NEW = Pattern.compile("\\s+\"path\"\\s+\"(.+)\"");

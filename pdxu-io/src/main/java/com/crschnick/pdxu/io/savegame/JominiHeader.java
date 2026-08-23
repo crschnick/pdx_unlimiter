@@ -2,12 +2,11 @@ package com.crschnick.pdxu.io.savegame;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * CK3, VIC3, EU5 header format:
  * <p>
- * SAV <version> <type> <8 hex digits of randomness> <8 hex digits of meta data size> [<8 hex digits of padding>]
+ * SAV <version> <type> <8 hex digits of checksum> <8 hex digits of meta data size> [<8 hex digits of padding>]
  * <p>
  * version:
  * Can either be 00, 01, 02
@@ -25,7 +24,7 @@ import java.util.Random;
  * padding:
  * in v2, there is padding at the end. In v1, there is no padding
  */
-public record ModernHeader(int version, int compressionType, boolean binary, long randomness, long metaLength) {
+public record JominiHeader(int version, int compressionType, boolean binary, long checksum, long metaLength) {
 
     public boolean isCompressed() {
         return compressionType > 0;
@@ -42,8 +41,8 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
     public static final int V1_LENGTH = 23;
     public static final int V2_LENGTH = V1_LENGTH + 8;
 
-    public ModernHeader(int version, int compressionType, boolean binary, int metaLength) {
-        this(version, compressionType, binary, (new Random().nextLong() >>> 1) % 0xFFFFFFFFL + 1, metaLength);
+    public JominiHeader(int version, int compressionType, boolean binary, int metaLength) {
+        this(version, compressionType, binary, 0, metaLength);
     }
 
     public static boolean skipsHeader(byte[] input) {
@@ -55,12 +54,12 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
                 || Arrays.equals(input, 0, 8, "metadata".getBytes(StandardCharsets.UTF_8), 0, 8);
     }
 
-    public static ModernHeader determineHeaderForFile(byte[] data) {
+    public static JominiHeader determine(byte[] data) {
         if (data.length < 5) {
             throw new SavegameFormatException("File is too short");
         }
 
-        if (Arrays.equals(data, 0, 4, ModernHeaderCompressedSavegameStructure.ZIP_HEADER, 0, 4)) {
+        if (Arrays.equals(data, 0, 4, JominiCompressedSavegameStructure.ZIP_HEADER, 0, 4)) {
             throw new SavegameFormatException("Missing Header. File is just a .zip file");
         }
 
@@ -78,7 +77,7 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
         return fromString(new String(data, 0, v2 ? V2_LENGTH : V1_LENGTH));
     }
 
-    public static ModernHeader fromString(String header) {
+    public static JominiHeader fromString(String header) {
         if (!header.startsWith("SAV000") && !header.startsWith("SAV010") && !header.startsWith("SAV020")) {
             throw new SavegameFormatException(
                     "Invalid header start: " + header.substring(0, Math.min(6, header.length())));
@@ -88,7 +87,7 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
         int type = Integer.parseInt(header.substring(6, 7));
         int compressedType = (type / 2);
         boolean binary = (type % 2) != 0;
-        long randomness = Long.parseLong(header.substring(7, 15).toUpperCase(), 16);
+        long checksum = Long.parseLong(header.substring(7, 15).toUpperCase(), 16);
         long metaLength = Long.parseLong(header.substring(15, 23).toUpperCase(), 16);
 
         if (version == 2) {
@@ -98,13 +97,13 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
             }
         }
 
-        return new ModernHeader(version, compressedType, binary, randomness, metaLength);
+        return new JominiHeader(version, compressedType, binary, checksum, metaLength);
     }
 
     @Override
     public String toString() {
         int type = (compressionType * 2) + (binary ? 1 : 0);
-        return "SAV0" + version + "0" + type + String.format("%08x", randomness) + String.format("%08x", metaLength)
+        return "SAV0" + version + "0" + type + String.format("%08x", checksum) + String.format("%08x", metaLength)
                 + (version == 2 ? "0".repeat(8) : "");
     }
 }

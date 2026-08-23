@@ -37,7 +37,7 @@ public class SavegameEditTarget extends EditTarget {
     public SavegameContent parse() throws Exception {
         var bytes = Files.readAllBytes(file);
         binary = type.isBinary(bytes);
-        if (type.isBinary(bytes)) {
+        if (binary) {
             bytes = RakalyHelper.toEquivalentPlaintext(file);
         }
 

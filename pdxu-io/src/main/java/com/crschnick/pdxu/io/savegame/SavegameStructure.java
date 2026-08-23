@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public interface SavegameStructure {
 
     SavegameStructure EU4_PLAINTEXT =
-            new PlaintextSavegameStructure("EU4txt".getBytes(), "gamestate", SavegameType.EU4);
+            new PreJominiPlaintextSavegameStructure("EU4txt".getBytes(), "gamestate", SavegameType.EU4);
 
     SavegameStructure EU4_COMPRESSED = new ZipSavegameStructure(
             "EU4txt".getBytes(),
@@ -24,14 +24,15 @@ public interface SavegameStructure {
                     new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")),
             "rnw.zip");
 
-    SavegameStructure CK3_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.CK3);
-    SavegameStructure CK3_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.CK3);
+    SavegameStructure CK3_PLAINTEXT = new JominiPlaintextSavegameStructure(SavegameType.CK3);
+    SavegameStructure CK3_COMPRESSED = new JominiUnifiedCompressedSavegameStructure(SavegameType.CK3);
 
-    SavegameStructure VIC3_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.VIC3);
-    SavegameStructure VIC3_UNIFIED_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.VIC3);
-    SavegameStructure VIC3_SPLIT_COMPRESSED = new ModernSplitCompressedSavegameStructure(SavegameType.VIC3);
+    SavegameStructure VIC3_PLAINTEXT = new JominiPlaintextSavegameStructure(SavegameType.VIC3);
+    SavegameStructure VIC3_UNIFIED_COMPRESSED = new JominiUnifiedCompressedSavegameStructure(SavegameType.VIC3);
+    SavegameStructure VIC3_SPLIT_COMPRESSED = new JominiSplitCompressedSavegameStructure(SavegameType.VIC3);
 
-    SavegameStructure HOI4 = new PlaintextSavegameStructure("HOI4txt".getBytes(), "gamestate", SavegameType.HOI4);
+    SavegameStructure HOI4 =
+            new PreJominiPlaintextSavegameStructure("HOI4txt".getBytes(), "gamestate", SavegameType.HOI4);
 
     SavegameStructure STELLARIS = new ZipSavegameStructure(
             null,
@@ -41,7 +42,7 @@ public interface SavegameStructure {
                     new ZipSavegameStructure.SavegamePart("gamestate", "gamestate")));
 
     SavegameStructure CK2_PLAINTEXT =
-            new PlaintextSavegameStructure("CK2txt".getBytes(), "gamestate", SavegameType.CK2) {
+            new PreJominiPlaintextSavegameStructure("CK2txt".getBytes(), "gamestate", SavegameType.CK2) {
 
                 @Override
                 public void writeData(OutputStream out, ArrayNode node) throws IOException {
@@ -65,7 +66,7 @@ public interface SavegameStructure {
                 }
             };
 
-    SavegameStructure VIC2 = new PlaintextSavegameStructure(null, "gamestate", SavegameType.VIC2) {
+    SavegameStructure VIC2 = new PreJominiPlaintextSavegameStructure(null, "gamestate", SavegameType.VIC2) {
 
         @Override
         public void writeData(OutputStream out, ArrayNode node) throws IOException {
@@ -74,7 +75,7 @@ public interface SavegameStructure {
         }
     };
 
-    SavegameStructure EU5_PLAINTEXT = new ModernPlaintextSavegameStructure(SavegameType.EU5) {
+    SavegameStructure EU5_PLAINTEXT = new JominiPlaintextSavegameStructure(SavegameType.EU5) {
         @Override
         protected int determineHeaderVersion(SavegameContent content) {
             var gamestate = content.get("gamestate");
@@ -91,7 +92,7 @@ public interface SavegameStructure {
             }
         }
     };
-    SavegameStructure EU5_COMPRESSED = new ModernHeaderCompressedSavegameStructure(SavegameType.EU5) {
+    SavegameStructure EU5_COMPRESSED = new JominiUnifiedCompressedSavegameStructure(SavegameType.EU5) {
         @Override
         protected int determineHeaderVersion(SavegameContent content) {
             var gamestate = content.get("gamestate");

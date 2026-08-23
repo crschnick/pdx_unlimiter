@@ -49,6 +49,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -568,12 +569,32 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return Path.of("invalid-name" + (suffix != null ? suffix : "") + "." + type.getFileEnding());
     }
 
-    public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
-        Path srcPath = getSavegameFile(e);
+    public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path target) throws IOException {
+        Path source = getSavegameFile(e);
 
-        FileUtils.forceMkdirParent(destPath.toFile());
-        FileUtils.copyFile(srcPath.toFile(), destPath.toFile(), false);
-        destPath.toFile().setLastModified(Instant.now().toEpochMilli());
+        FileUtils.forceMkdirParent(target.toFile());
+        FileUtils.copyFile(source.toFile(), target.toFile(), false);
+        target.toFile().setLastModified(Instant.now().toEpochMilli());
+    }
+
+    public synchronized void exportSavegameTo(SavegameEntry<T, I> e, Path target) throws IOException {
+        var source = getSavegameFile(e);
+        FileUtils.forceMkdirParent(target.toFile());
+
+        target = target.toAbsolutePath();
+        if (Files.isSymbolicLink(target)) {
+            target = target.toRealPath();
+        }
+
+        var staging = Files.createTempFile(target.getParent(), ".pdxu-", ".tmp");
+        try {
+            type.writeExport(source, staging, SteamUserIdResolver::resolveOrRandom);
+
+            Files.move(staging, target, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(staging);
+        }
+        target.toFile().setLastModified(Instant.now().toEpochMilli());
     }
 
     public synchronized void melt(SavegameEntry<T, I> e) {

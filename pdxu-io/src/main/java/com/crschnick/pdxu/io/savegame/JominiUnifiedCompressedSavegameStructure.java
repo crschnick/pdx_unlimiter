@@ -12,34 +12,10 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructure {
+public class JominiUnifiedCompressedSavegameStructure extends JominiCompressedSavegameStructure {
 
-    public ModernHeaderCompressedSavegameStructure(SavegameType type) {
-        super(null, type, Set.of(new SavegamePart("gamestate", "gamestate")));
-    }
-
-    private static final int MAX_SEARCH = 150000;
-    public static final byte[] ZIP_HEADER = new byte[] {0x50, 0x4B, 0x03, 0x04};
-
-    public static int indexOfCompressedGamestateStart(byte[] array) {
-        if (array.length < ZIP_HEADER.length) {
-            return -1;
-        }
-
-        int end = Math.min(array.length, MAX_SEARCH - ZIP_HEADER.length);
-        for (int i = 0; i < end; ++i) {
-            boolean found = true;
-            for (int j = 0; j < ZIP_HEADER.length; ++j) {
-                if (array[i + j] != ZIP_HEADER[j]) {
-                    found = false;
-                    break;
-                }
-            }
-            if (found) {
-                return i;
-            }
-        }
-        return -1;
+    public JominiUnifiedCompressedSavegameStructure(SavegameType type) {
+        super(type, Set.of(new SavegamePart("gamestate", "gamestate")));
     }
 
     protected int determineHeaderVersion(SavegameContent content) {
@@ -58,7 +34,7 @@ public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructur
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
 
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(headerVersion, 1, false, metaBytes.length).toString();
+            String header = new JominiHeader(headerVersion, 1, false, metaBytes.length).toString();
             out.write((header + "\n").getBytes(StandardCharsets.UTF_8));
             out.write(metaBytes);
             try (var zout = new ZipOutputStream(out)) {
@@ -72,10 +48,10 @@ public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructur
     @Override
     public SavegameParseResult parse(byte[] input) {
         int contentStart;
-        if (ModernHeader.skipsHeader(input)) {
-            contentStart = indexOfCompressedGamestateStart(input);
+        if (JominiHeader.skipsHeader(input)) {
+            contentStart = JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input);
         } else {
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             if (header.binary()) {
                 throw new IllegalArgumentException("Binary savegames are not supported");
             }
@@ -89,7 +65,7 @@ public class ModernHeaderCompressedSavegameStructure extends ZipSavegameStructur
 
         // Check if the header meta length is actually right. If not, manually search for the zip header start
         if (!Arrays.equals(input, contentStart, contentStart + 4, ZIP_HEADER, 0, 4)) {
-            contentStart = indexOfCompressedGamestateStart(input);
+            contentStart = JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input);
         }
 
         return parseInput(input, contentStart);
