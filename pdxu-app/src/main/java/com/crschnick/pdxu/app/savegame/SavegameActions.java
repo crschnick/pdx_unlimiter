@@ -48,17 +48,22 @@ public class SavegameActions {
     }
 
     public static <T, I extends SavegameInfo<T>> void exportSavegame(SavegameEntry<T, I> e) {
-        SavegameContext.withSavegameContext(e, ctx -> {
-            if (ctx.getInfo() == null) {
-                return;
-            }
+        TaskExecutor.getInstance()
+                .submitTask(
+                        () -> {
+                            SavegameContext.withSavegameContext(e, ctx -> {
+                                if (ctx.getInfo() == null) {
+                                    return;
+                                }
 
-            try {
-                FileExportTarget.createExportTarget(e).export();
-            } catch (Exception ex) {
-                ErrorEventFactory.fromThrowable(ex).handle();
-            }
-        });
+                                try {
+                                    FileExportTarget.createExportTarget(e).export();
+                                } catch (Exception ex) {
+                                    ErrorEventFactory.fromThrowable(ex).handle();
+                                }
+                            });
+                        },
+                        true);
     }
 
     public static <T, I extends SavegameInfo<T>> void branch(SavegameEntry<T, I> entry) {
