@@ -7,13 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class PlaintextSavegameStructure implements SavegameStructure {
+public class PreJominiPlaintextSavegameStructure implements SavegameStructure {
 
     protected final byte[] header;
     private final String name;
     private final SavegameType type;
 
-    public PlaintextSavegameStructure(byte[] header, String name, SavegameType type) {
+    public PreJominiPlaintextSavegameStructure(byte[] header, String name, SavegameType type) {
         this.header = header;
         this.name = name;
         this.type = type;

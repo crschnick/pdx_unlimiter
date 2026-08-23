@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Value
 @NonFinal
-public class ModernPlaintextSavegameStructure implements SavegameStructure {
+public class JominiPlaintextSavegameStructure implements SavegameStructure {
 
     SavegameType type;
 
@@ -33,7 +33,7 @@ public class ModernPlaintextSavegameStructure implements SavegameStructure {
         try (var gsOut = Files.newOutputStream(out)) {
             var metaBytes = NodeWriter.writeToBytes(metaHeaderNode, Integer.MAX_VALUE, "\t");
             // Exclude trailing new line in meta length!
-            String header = new ModernHeader(headerVersion, 0, false, metaBytes.length - 1).toString();
+            String header = new JominiHeader(headerVersion, 0, false, metaBytes.length - 1).toString();
             gsOut.write((header + "\n").getBytes(StandardCharsets.UTF_8));
 
             NodeWriter.write(gsOut, StandardCharsets.UTF_8, gamestate, "\t", 0);
@@ -43,10 +43,10 @@ public class ModernPlaintextSavegameStructure implements SavegameStructure {
     @Override
     public SavegameParseResult parse(byte[] input) {
         int metaStart;
-        if (ModernHeader.skipsHeader(input)) {
+        if (JominiHeader.skipsHeader(input)) {
             metaStart = 0;
         } else {
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             if (header.binary()) {
                 throw new IllegalArgumentException("Binary savegames are not supported");
             }

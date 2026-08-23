@@ -7,10 +7,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.LongSupplier;
 import java.util.zip.ZipInputStream;
 
 public interface SavegameType {
@@ -63,6 +66,11 @@ public interface SavegameType {
             return TextFormatParser.eu4();
         }
 
+        @Override
+        public void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+            PreJominiChecksum.writeExport(source, target, steamUserId.getAsLong(), "EU4");
+        }
+
         public UUID getCampaignIdHeuristic(SavegameContent c) {
             return UUID.nameUUIDFromBytes(c.get()
                     .getNodeForKey("countries")
@@ -112,6 +120,11 @@ public interface SavegameType {
             return TextFormatParser.hoi4();
         }
 
+        @Override
+        public void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+            PreJominiChecksum.writeExport(source, target, steamUserId.getAsLong(), "HOI4");
+        }
+
         public UUID getCampaignIdHeuristic(SavegameContent c) {
             return UUID.fromString(c.get().getNodeForKey("game_unique_id").getString());
         }
@@ -140,29 +153,29 @@ public interface SavegameType {
 
         @Override
         public boolean isCompressed(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
-                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            if (JominiHeader.skipsHeader(input)) {
+                return JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
             }
 
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             return header.isCompressed();
         }
 
         public boolean isUnifiedCompressed(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
-                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            if (JominiHeader.skipsHeader(input)) {
+                return JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
             }
 
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             return header.isUnifiedCompressed();
         }
 
         public boolean isSplitCompressed(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
-                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            if (JominiHeader.skipsHeader(input)) {
+                return JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
             }
 
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             return header.isSplitCompressed();
         }
 
@@ -173,16 +186,21 @@ public interface SavegameType {
 
         @Override
         public boolean isBinary(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
+            if (JominiHeader.skipsHeader(input)) {
                 return false;
             }
 
-            return ModernHeader.determineHeaderForFile(input).binary();
+            return JominiHeader.determine(input).binary();
         }
 
         @Override
         public TextFormatParser getParser() {
             return TextFormatParser.vic3();
+        }
+
+        @Override
+        public void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+            JominiChecksum.writeExport(source, target, steamUserId.getAsLong());
         }
 
         public UUID getCampaignIdHeuristic(SavegameContent c) {
@@ -212,11 +230,11 @@ public interface SavegameType {
 
         @Override
         public boolean isCompressed(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
-                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            if (JominiHeader.skipsHeader(input)) {
+                return JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
             }
 
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             return header.isCompressed();
         }
 
@@ -227,16 +245,21 @@ public interface SavegameType {
 
         @Override
         public boolean isBinary(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
+            if (JominiHeader.skipsHeader(input)) {
                 return false;
             }
 
-            return ModernHeader.determineHeaderForFile(input).binary();
+            return JominiHeader.determine(input).binary();
         }
 
         @Override
         public TextFormatParser getParser() {
             return TextFormatParser.ck3();
+        }
+
+        @Override
+        public void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+            JominiChecksum.writeExport(source, target, steamUserId.getAsLong());
         }
 
         @Override
@@ -330,6 +353,11 @@ public interface SavegameType {
             return TextFormatParser.ck2();
         }
 
+        @Override
+        public void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+            PreJominiChecksum.writeExport(source, target, steamUserId.getAsLong(), "CK2");
+        }
+
         public UUID getCampaignIdHeuristic(SavegameContent c) {
             long seed = c.get().getNodeForKey("playthrough_id").getLong();
             byte[] b = new byte[20];
@@ -395,11 +423,11 @@ public interface SavegameType {
 
         @Override
         public boolean isCompressed(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
-                return ModernHeaderCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
+            if (JominiHeader.skipsHeader(input)) {
+                return JominiCompressedSavegameStructure.indexOfCompressedGamestateStart(input) != -1;
             }
 
-            var header = ModernHeader.determineHeaderForFile(input);
+            var header = JominiHeader.determine(input);
             return header.isCompressed();
         }
 
@@ -410,16 +438,21 @@ public interface SavegameType {
 
         @Override
         public boolean isBinary(byte[] input) {
-            if (ModernHeader.skipsHeader(input)) {
+            if (JominiHeader.skipsHeader(input)) {
                 return false;
             }
 
-            return ModernHeader.determineHeaderForFile(input).binary();
+            return JominiHeader.determine(input).binary();
         }
 
         @Override
         public TextFormatParser getParser() {
             return TextFormatParser.eu5();
+        }
+
+        @Override
+        public void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+            JominiChecksum.writeExport(source, target, steamUserId.getAsLong());
         }
 
         public UUID getCampaignIdHeuristic(SavegameContent c) {
@@ -458,6 +491,10 @@ public interface SavegameType {
     String getFileEnding();
 
     boolean isBinary(byte[] input);
+
+    default void writeExport(Path source, Path target, LongSupplier steamUserId) throws IOException {
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+    }
 
     TextFormatParser getParser();
 
