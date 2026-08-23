@@ -80,9 +80,9 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
         @Override
         public Path export() throws Exception {
-            var out = getOutputFile();
-            storage.copySavegameTo(entry, out);
-            return out;
+            var target = getOutputFile();
+            storage.exportSavegameTo(entry, target);
+            return target;
         }
     }
 
@@ -106,9 +106,9 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
 
         @Override
         public Path export() throws Exception {
-            var out = getOutputFile();
-            storage.copySavegameTo(entry, out);
-            return out;
+            var target = getOutputFile();
+            storage.exportSavegameTo(entry, target);
+            return target;
         }
     }
 
@@ -129,15 +129,13 @@ public abstract class FileExportTarget<T, I extends SavegameInfo<T>> {
             var customId = storage.getSavegameCampaign(entry).getUuid();
             var suffix = " (" + customId + ")";
 
-            Path file;
+            Path target;
             Path dir = targetDir.resolve(baseName + suffix);
-            if (entry.getInfo().getData().isIronman()) {
-                file = dir.resolve("ironman.sav");
-            } else {
-                file = dir.resolve(entry.getDate().toString() + ".sav");
-            }
-            storage.copySavegameTo(entry, file);
-            return file;
+            target = dir.resolve(entry.getInfo().getData().isIronman()
+                    ? "ironman.sav"
+                    : entry.getDate().toString() + ".sav");
+            storage.exportSavegameTo(entry, target);
+            return target;
         }
     }
 }
