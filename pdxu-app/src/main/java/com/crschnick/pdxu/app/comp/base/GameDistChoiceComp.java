@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.comp.base;
 
+import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.AppFontSizes;
 import com.crschnick.pdxu.app.core.AppI18n;
@@ -14,6 +15,7 @@ import com.crschnick.pdxu.app.installation.dist.WindowsStoreDist;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 
+import com.crschnick.pdxu.app.util.OsType;
 import javafx.beans.property.*;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
@@ -23,6 +25,7 @@ import lombok.AllArgsConstructor;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,6 +95,17 @@ public class GameDistChoiceComp extends SimpleComp {
                 if (isValid(newDist)) {
                     setDist.set(newDist);
                 }
+
+                // On macOS, we can't select a wrapped .app game directory from non-Steam installs
+                if (OsType.ofLocal() == OsType.MACOS) {
+                    var appDir = path.resolve(game.getId() + ".app", "Contents", "Game");
+                    if (Files.isDirectory(appDir)) {
+                        var appDist = GameDists.detectDistFromDirectory(game, appDir);
+                        if (isValid(appDist)) {
+                            setDist.set(appDist);
+                        }
+                    }
+                }
             }
         });
         browse.tooltipKey("browseDist");
@@ -146,7 +160,15 @@ public class GameDistChoiceComp extends SimpleComp {
         });
         setDist.setValue(gameDist.getValue());
 
-        var hbox = new InputGroupComp(List.of(typeLabel, locationLabel, browse, xbox, del));
+        List<Comp<?>> l = new ArrayList<>();
+        l.add(typeLabel);
+        l.add(locationLabel);
+        l.add(browse);
+        if (OsType.ofLocal() == OsType.WINDOWS) {
+            l.add(xbox);
+        }
+        l.add(del);
+        var hbox = new InputGroupComp(l);
         hbox.styleClass("game-dist-choice-comp");
         hbox.setHeightReference(locationLabel);
         return hbox.createRegion();

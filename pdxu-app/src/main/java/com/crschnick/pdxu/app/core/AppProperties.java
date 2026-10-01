@@ -77,7 +77,7 @@ public class AppProperties {
                 .map(UUID::fromString)
                 .orElse(UUID.randomUUID());
         sentryUrl = System.getProperty(AppNames.propertyName("sentryUrl"));
-        arch = System.getProperty("os.arch").equals("amd64") ? "x86_64" : "arm64";
+        arch = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64") ? "x86_64" : "arm64";
         useVirtualThreads = Optional.ofNullable(System.getProperty(AppNames.propertyName("useVirtualThreads")))
                 .map(Boolean::parseBoolean)
                 .orElse(true);
