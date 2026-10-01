@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class ConfigHelper {
 
@@ -25,8 +26,21 @@ public class ConfigHelper {
         JsonNode node = null;
         try {
             if (Files.exists(in)) {
+                byte[] bytes = Files.readAllBytes(in);
+                var valid = false;
+                for (byte b : bytes) {
+                    if (b != 0) {
+                        valid = true;
+                        break;
+                    }
+                }
+
+                if (!valid) {
+                    throw new IOException("Corrupted file contents");
+                }
+
                 ObjectMapper o = new ObjectMapper();
-                node = o.readTree(Files.readAllBytes(in));
+                node = o.readTree(bytes);
             }
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable("The config file " + in.toString() + " could not be read", e)
@@ -42,7 +56,20 @@ public class ConfigHelper {
         if (Files.exists(backupFile)) {
             ObjectMapper o = new ObjectMapper();
             try {
-                node = o.readTree(Files.readAllBytes(backupFile));
+                byte[] bytes = Files.readAllBytes(backupFile);
+                var valid = false;
+                for (byte b : bytes) {
+                    if (b != 0) {
+                        valid = true;
+                        break;
+                    }
+                }
+
+                if (!valid) {
+                    throw new IOException("Corrupted file contents");
+                }
+
+                node = o.readTree(bytes);
             } catch (IOException e) {
                 ErrorEventFactory.fromThrowable(
                                 "The backup config file " + in.toString() + " could not be read as well", e)
@@ -85,6 +112,14 @@ public class ConfigHelper {
             }
         }
 
+        var currentValid = false;
+        for (char c : currentContent.toCharArray()) {
+            if (c != 0) {
+                currentValid = true;
+                break;
+            }
+        }
+
         JsonFactory f = new JsonFactory();
         var writer = new StringWriter();
         try (JsonGenerator g = f.createGenerator(writer).setPrettyPrinter(new DefaultPrettyPrinter())) {
@@ -99,7 +134,9 @@ public class ConfigHelper {
             if (!newContent.equals(currentContent)) {
                 var backupFile = out.resolveSibling(FilenameUtils.getBaseName(out.toString()) + "_old."
                         + FilenameUtils.getExtension(out.toString()));
-                Files.writeString(backupFile, currentContent);
+                if (currentValid) {
+                    Files.writeString(backupFile, currentContent);
+                }
                 Files.writeString(out, newContent);
             }
         } catch (IOException e) {
