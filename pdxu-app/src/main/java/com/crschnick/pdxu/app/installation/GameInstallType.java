@@ -865,8 +865,18 @@ public interface GameInstallType {
                 }
 
                 // TODO: Find a solution for EU5 version parsing for 1.2+
+
+                var expeditionsDir = p.resolve("game/in_game/common/expedition_types");
+                if (Files.exists(expeditionsDir)) {
+                    return Optional.of(new GameVersion(1, 4, 0, 0));
+                }
+
                 var romagnolFile = p.resolve("game/in_game/common/advances/culture_romagnol.txt");
-                return Optional.of(new GameVersion(1, Files.exists(romagnolFile) ? 3 : 2, 0, 0));
+                if (Files.exists(romagnolFile)) {
+                    return Optional.of(new GameVersion(1, 3, 0, 0));
+                }
+
+                return Optional.of(new GameVersion(1, 2, 0, 0));
             } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(e).handle();
                 return Optional.empty();

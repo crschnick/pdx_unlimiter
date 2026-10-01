@@ -7,10 +7,10 @@ import java.util.Random;
 /**
  * CK3, VIC3, EU5 header format:
  * <p>
- * SAV <version> <type> <8 hex digits of randomness> <8 hex digits of meta data size> [<8 hex digits of padding>]
+ * SAV <version> <type> <8 hex digits of some checksum> <8 hex digits of meta data size> [<8 hex digits of padding>]
  * <p>
  * version:
- * Can either be 00, 01, 02
+ * Can either be 00, 01, 02, 03
  * type:
  * 05: Split Compressed + Binary
  * 04: Split Compressed + Plaintext
@@ -23,7 +23,9 @@ import java.util.Random;
  * Length of meta data block at the beginning of the file in bytes, or alternatively the amount of bytes to skip until gamestate data is read.
  * If the meta data is contained in a separate file, i.e. not embedded into the gamestate file, this value will be zero.
  * padding:
- * in v2, there is padding at the end. In v1, there is no padding
+ * in v2+, there is padding at the end. In v1, there is no padding
+ *
+ * Currently, there are no visible differences between v2 and v3
  */
 public record ModernHeader(int version, int compressionType, boolean binary, long randomness, long metaLength) {
 
@@ -79,7 +81,7 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
     }
 
     public static ModernHeader fromString(String header) {
-        if (!header.startsWith("SAV000") && !header.startsWith("SAV010") && !header.startsWith("SAV020")) {
+        if (!header.startsWith("SAV000") && !header.startsWith("SAV010") && !header.startsWith("SAV020") && !header.startsWith("SAV030")) {
             throw new SavegameFormatException(
                     "Invalid header start: " + header.substring(0, Math.min(6, header.length())));
         }
