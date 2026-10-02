@@ -95,17 +95,6 @@ public class GameDistChoiceComp extends SimpleComp {
                 if (isValid(newDist)) {
                     setDist.set(newDist);
                 }
-
-                // On macOS, we can't select a wrapped .app game directory from non-Steam installs
-                if (OsType.ofLocal() == OsType.MACOS) {
-                    var appDir = path.resolve(game.getId() + ".app", "Contents", "Game");
-                    if (Files.isDirectory(appDir)) {
-                        var appDist = GameDists.detectDistFromDirectory(game, appDir);
-                        if (isValid(appDist)) {
-                            setDist.set(appDist);
-                        }
-                    }
-                }
             }
         });
         browse.tooltipKey("browseDist");

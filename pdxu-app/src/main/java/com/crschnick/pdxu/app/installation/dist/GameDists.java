@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.OsType;
 
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,21 @@ public class GameDists {
 
     public static GameDist detectDistFromDirectory(Game g, Path dir) {
         Objects.requireNonNull(dir);
+
+        // On macOS, a non-Steam install is a wrapped .app that can't be selected directly.
+        // If the user selected the outer game folder instead, prefer the wrapped app dir,
+        // but only if it actually resolves to a known distribution, so we don't discard a
+        // valid outer-directory match for a non-functional inner folder
+        if (OsType.ofLocal() == OsType.MACOS) {
+            var appDir = dir.resolve(g.getId() + ".app", "Contents", "Game");
+            if (Files.isDirectory(appDir)) {
+                var appDist = getCompoundDistFromDirectory(g, appDir, true)
+                        .or(() -> GameDists.getBasicDistFromDirectory(g, appDir));
+                if (appDist.isPresent()) {
+                    return appDist.get();
+                }
+            }
+        }
 
         return getCompoundDistFromDirectory(g, dir, true)
                 .or(() -> GameDists.getBasicDistFromDirectory(g, dir))

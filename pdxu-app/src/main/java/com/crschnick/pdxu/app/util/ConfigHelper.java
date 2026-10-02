@@ -18,24 +18,33 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 public class ConfigHelper {
+
+    private static boolean isAllZero(byte[] bytes) {
+        for (byte b : bytes) {
+            if (b != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isAllZero(char[] chars) {
+        for (char c : chars) {
+            if (c != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static JsonNode readConfig(Path in, boolean promptForDeletion) throws IOException {
         JsonNode node = null;
         try {
             if (Files.exists(in)) {
                 byte[] bytes = Files.readAllBytes(in);
-                var valid = false;
-                for (byte b : bytes) {
-                    if (b != 0) {
-                        valid = true;
-                        break;
-                    }
-                }
-
-                if (!valid) {
+                if (bytes.length > 0 && isAllZero(bytes)) {
                     throw new IOException("Corrupted file contents");
                 }
 
@@ -57,15 +66,7 @@ public class ConfigHelper {
             ObjectMapper o = new ObjectMapper();
             try {
                 byte[] bytes = Files.readAllBytes(backupFile);
-                var valid = false;
-                for (byte b : bytes) {
-                    if (b != 0) {
-                        valid = true;
-                        break;
-                    }
-                }
-
-                if (!valid) {
+                if (bytes.length > 0 && isAllZero(bytes)) {
                     throw new IOException("Corrupted file contents");
                 }
 
@@ -112,13 +113,7 @@ public class ConfigHelper {
             }
         }
 
-        var currentValid = false;
-        for (char c : currentContent.toCharArray()) {
-            if (c != 0) {
-                currentValid = true;
-                break;
-            }
-        }
+        var currentValid = !isAllZero(currentContent.toCharArray());
 
         JsonFactory f = new JsonFactory();
         var writer = new StringWriter();

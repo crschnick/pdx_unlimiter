@@ -72,12 +72,12 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
         }
 
         var version = Integer.parseInt(new String(data, 4, 1));
-        var v2 = version == 2;
-        if ((v2 && data.length < V2_LENGTH) || (!v2 && data.length < V1_LENGTH)) {
+        var hasPadding = hasPadding(version);
+        if ((hasPadding && data.length < V2_LENGTH) || (!hasPadding && data.length < V1_LENGTH)) {
             throw new SavegameFormatException("File is too short");
         }
 
-        return fromString(new String(data, 0, v2 ? V2_LENGTH : V1_LENGTH));
+        return fromString(new String(data, 0, hasPadding ? V2_LENGTH : V1_LENGTH));
     }
 
     public static ModernHeader fromString(String header) {
@@ -93,7 +93,7 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
         long randomness = Long.parseLong(header.substring(7, 15).toUpperCase(), 16);
         long metaLength = Long.parseLong(header.substring(15, 23).toUpperCase(), 16);
 
-        if (version == 2) {
+        if (hasPadding(version)) {
             long padding = Long.parseLong(header.substring(23, 31).toUpperCase(), 16);
             if (padding != 0) {
                 throw new SavegameFormatException("Invalid header padding: " + padding);
@@ -103,10 +103,14 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
         return new ModernHeader(version, compressedType, binary, randomness, metaLength);
     }
 
+    private static boolean hasPadding(int version) {
+        return version >= 2;
+    }
+
     @Override
     public String toString() {
         int type = (compressionType * 2) + (binary ? 1 : 0);
         return "SAV0" + version + "0" + type + String.format("%08x", randomness) + String.format("%08x", metaLength)
-                + (version == 2 ? "0".repeat(8) : "");
+                + (hasPadding(version) ? "0".repeat(8) : "");
     }
 }
