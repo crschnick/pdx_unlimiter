@@ -35,22 +35,24 @@ fi
 VERSION="${RESOLVED_TAG#v}"
 echo "Resolved release: $RESOLVED_TAG"
 
-declare -A TARGETS=(
-    [windows]="rakaly-$VERSION-x86_64-pc-windows-msvc.zip"
-    [linux]="rakaly-$VERSION-x86_64-unknown-linux-musl.tar.gz"
-    [mac]="rakaly-$VERSION-x86_64-apple-darwin.tar.gz"
-)
-
-declare -A OUTPUT_NAMES=(
-    [windows]="rakaly_windows.exe"
-    [linux]="rakaly_linux"
-    [mac]="rakaly_mac"
-)
-
 BASE_URL="https://github.com/$REPO/releases/download/$RESOLVED_TAG"
 
 for platform in windows linux mac; do
-    asset="${TARGETS[$platform]}"
+    case "$platform" in
+        windows)
+            asset="rakaly-$VERSION-x86_64-pc-windows-msvc.zip"
+            output_name="rakaly_windows.exe"
+            ;;
+        linux)
+            asset="rakaly-$VERSION-x86_64-unknown-linux-musl.tar.gz"
+            output_name="rakaly_linux"
+            ;;
+        mac)
+            asset="rakaly-$VERSION-x86_64-apple-darwin.tar.gz"
+            output_name="rakaly_mac"
+            ;;
+    esac
+
     url="$BASE_URL/$asset"
     archive="$WORK_DIR/$asset"
 
@@ -80,7 +82,7 @@ for platform in windows linux mac; do
         exit 1
     fi
 
-    dest="$RAKALY_DIR/${OUTPUT_NAMES[$platform]}"
+    dest="$RAKALY_DIR/$output_name"
     cp "$extracted_bin" "$dest"
     chmod +x "$dest"
     echo "Updated $dest"
