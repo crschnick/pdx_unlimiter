@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -66,23 +65,20 @@ public class AppFileWatcher {
             while (active) {
                 WatchKey key;
                 try {
-                    key = AppFileWatcher.this.watchService.poll(10, TimeUnit.MILLISECONDS);
-                    if (key == null) {
-                        continue;
-                    }
+                    // Block until an actual event arrives instead of busy-polling. Closing
+                    // watchService on shutdown wakes this up via ClosedWatchServiceException
+                    key = AppFileWatcher.this.watchService.take();
 
                     for (var wd : new HashSet<>(watchedDirectories)) {
                         wd.update(key);
                     }
-                } catch (ClosedWatchServiceException ex) {
+                } catch (ClosedWatchServiceException | InterruptedException ex) {
                     // Exit loop if watch service is closed
                     break;
                 } catch (Exception ex) {
                     // Catch all other exceptions to not terminate this thread if an error occurs!
                     ErrorEventFactory.fromThrowable(ex).handle();
                 }
-
-                // Don't sleep, since polling the directories always sleeps for some ms
             }
         });
         watcherThread.start();

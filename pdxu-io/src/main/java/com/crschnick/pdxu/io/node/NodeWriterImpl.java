@@ -11,6 +11,7 @@ public final class NodeWriterImpl implements NodeWriter {
     private final Charset charset;
     private final int maxLines;
     private final byte[] indentValue;
+    private final byte[] spaceValue;
     private int currentLines;
     private boolean hitMaxLines;
     private int indent;
@@ -20,6 +21,7 @@ public final class NodeWriterImpl implements NodeWriter {
         this.charset = charset;
         this.maxLines = maxLines;
         this.indentValue = indentValue.getBytes();
+        this.spaceValue = " ".getBytes(charset);
     }
 
     @Override
@@ -71,7 +73,7 @@ public final class NodeWriterImpl implements NodeWriter {
             return;
         }
 
-        out.write(" ".getBytes(charset));
+        out.write(spaceValue);
     }
 
     @Override

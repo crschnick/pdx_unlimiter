@@ -13,6 +13,11 @@ public final class SimpleArrayNode extends ArrayNode {
     private final int[] valueScalars;
     private final List<Node> values;
 
+    // Caches the byte encoding of the last queried key since isKeyAt is
+    // typically called repeatedly with the same key across every index of a loop
+    private String lastKeyAtKey;
+    private byte[] lastKeyAtBytes;
+
     SimpleArrayNode(NodeContext context, int[] keyScalars, int[] valueScalars, List<Node> values) {
         this.context = Objects.requireNonNull(context);
         this.keyScalars = keyScalars;
@@ -60,7 +65,11 @@ public final class SimpleArrayNode extends ArrayNode {
 
     @Override
     public boolean isKeyAt(String key, int index) {
-        return isKeyAt(index, key.getBytes(context.getCharset()));
+        if (!key.equals(lastKeyAtKey)) {
+            lastKeyAtKey = key;
+            lastKeyAtBytes = key.getBytes(context.getCharset());
+        }
+        return isKeyAt(index, lastKeyAtBytes);
     }
 
     public ArrayNode splice(int begin, int length) {

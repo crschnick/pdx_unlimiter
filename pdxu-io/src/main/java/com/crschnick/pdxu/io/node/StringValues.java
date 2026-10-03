@@ -21,6 +21,10 @@ public class StringValues {
             return s;
         }
 
+        if (s.indexOf('\\') == -1) {
+            return s;
+        }
+
         var matcher = UNESCAPE_PATTERN.matcher(s);
         matcher.region(1, s.length() - 1);
         return matcher.replaceAll(r -> "$1");

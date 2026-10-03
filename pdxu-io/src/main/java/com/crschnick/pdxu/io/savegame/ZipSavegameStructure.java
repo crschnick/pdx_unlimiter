@@ -51,7 +51,11 @@ public class ZipSavegameStructure implements SavegameStructure {
                         continue;
                     }
 
-                    var bytes = zipIn.readAllBytes();
+                    // Use known size if possible to prevent buffer resizes
+                    var size = finalZipEntry.getSize();
+                    var bytes = size >= 0 && size <= Integer.MAX_VALUE
+                            ? zipIn.readNBytes((int) size)
+                            : zipIn.readAllBytes();
                     if (header != null && !SavegameStructure.validateHeader(header, bytes)) {
                         return new SavegameParseResult.Invalid(
                                 "File " + part.get().identifier() + " has an invalid header");
