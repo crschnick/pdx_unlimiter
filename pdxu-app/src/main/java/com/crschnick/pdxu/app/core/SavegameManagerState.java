@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.model.GameDate;
 
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
@@ -19,7 +20,9 @@ import lombok.Getter;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
@@ -150,29 +153,24 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 newEntries.remove(entry);
             }
         });
-        newEntries.sort(
-                new Comparator<SavegameEntry<T, I>>() {
-                    @Override
-                    public int compare(SavegameEntry<T, I> o1, SavegameEntry<T, I> o2) {
-                        var date = o1.getDate().compareTo(o2.getDate());
-                        if (date != 0) {
-                            return date;
-                        }
-
-                        try {
-                            var mod = Files.getLastModifiedTime(
-                                            SavegameStorage.get(game).getSavegameFile(o1))
-                                    .compareTo(Files.getLastModifiedTime(
-                                            SavegameStorage.get(game).getSavegameFile(o2)));
-                            return mod;
-                        } catch (IOException e) {
-                            ErrorEventFactory.fromThrowable(e).handle();
-                            return 0;
-                        }
+        // Only query modification times when needed and at most once per entry
+        var modTimes = new HashMap<SavegameEntry<T, I>, FileTime>();
+        var storage = SavegameStorage.get(game);
+        newEntries.sort(Comparator.<SavegameEntry<T, I>, GameDate>comparing(SavegameEntry::getDate)
+                .thenComparing(entry -> modTimes.computeIfAbsent(entry, e -> {
+                    try {
+                        return Files.getLastModifiedTime(storage.getSavegameFile(col, e));
+                    } catch (IOException ex) {
+                        ErrorEventFactory.fromThrowable(ex).handle();
+                        return FileTime.fromMillis(0);
                     }
-                }.reversed());
+                }))
+                .reversed());
 
-        shownEntries.set(newEntries);
+        // Avoid list updates if nothing changed
+        if (!newEntries.equals(shownEntries.get())) {
+            shownEntries.set(newEntries);
+        }
 
         if (globalSelectedEntry.isNotNull().get()) {
             if (!shownEntries.contains(globalSelectedEntry.get())) {
@@ -207,7 +205,9 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             }
         });
         newCollections.sort(Comparator.comparing(SavegameCampaign::getLastPlayed, Comparator.reverseOrder()));
-        shownCollections.set(newCollections);
+        if (!newCollections.equals(shownCollections.get())) {
+            shownCollections.set(newCollections);
+        }
 
         updateStorageEmptyProperty();
     }
