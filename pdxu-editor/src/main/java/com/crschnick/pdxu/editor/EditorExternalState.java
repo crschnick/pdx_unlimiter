@@ -89,8 +89,19 @@ public class EditorExternalState {
                                     }
                                     boolean empty = newNode.size() == 0;
                                     if (!empty) {
-                                        e.editorNode.update(newNode);
-                                        e.state.onFileChanged(e.editorNode);
+                                        // Modify the node tree while the content is fixed, so the GUI
+                                        // never renders editor nodes that point into an already changed tree
+                                        e.state.getContent().withFixedContent(ignored -> {
+                                            // The tree might have changed while parsing
+                                            if (!e.editorNode.isValid()) {
+                                                logger.trace("Editor node " + e.editorNode.getNavigationName()
+                                                        + " is no longer valid. Ignoring change ...");
+                                                return;
+                                            }
+
+                                            e.editorNode.update(newNode);
+                                            e.state.onFileChanged(e.editorNode);
+                                        });
                                     }
                                 }
                             }
