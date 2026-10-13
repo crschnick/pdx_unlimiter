@@ -96,12 +96,12 @@ public class ConfigHelper {
         return JsonNodeFactory.instance.objectNode();
     }
 
-    public static void writeConfig(Path out, JsonNode node) {
+    public static boolean writeConfig(Path out, JsonNode node) {
         try {
             FileUtils.forceMkdirParent(out.toFile());
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable(e).handle();
-            return;
+            return false;
         }
 
         String currentContent = "";
@@ -121,7 +121,7 @@ public class ConfigHelper {
             new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeTree(g, node);
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable(e).handle();
-            return;
+            return false;
         }
 
         var newContent = writer.toString();
@@ -134,8 +134,10 @@ public class ConfigHelper {
                 }
                 Files.writeString(out, newContent);
             }
+            return true;
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable(e).handle();
+            return false;
         }
     }
 }

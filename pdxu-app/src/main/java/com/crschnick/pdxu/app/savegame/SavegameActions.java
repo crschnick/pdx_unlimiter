@@ -13,7 +13,6 @@ import com.crschnick.pdxu.app.util.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
-import javafx.scene.image.Image;
 
 import org.apache.commons.io.FileUtils;
 
@@ -75,13 +74,6 @@ public class SavegameActions {
                             });
                         },
                         true);
-    }
-
-    public static <T, I extends SavegameInfo<T>> Image createImageForEntry(SavegameEntry<T, I> entry) {
-        return SavegameContext.mapSavegame(entry, ctx -> {
-            return ctx.getGuiFactory()
-                    .tagImage(ctx.getInfo(), ctx.getInfo().getData().getTag());
-        });
     }
 
     public static void loadLatestSavegameCheckpoint(Game g) {

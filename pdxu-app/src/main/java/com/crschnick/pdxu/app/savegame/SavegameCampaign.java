@@ -82,7 +82,6 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
 
     public void onSavegameLoad(SavegameEntry<T, I> entry) {
         if (entry == getLatestEntry()) {
-            imageProperty().set(SavegameActions.createImageForEntry(entry));
             updateDate();
         }
     }

@@ -160,14 +160,12 @@ public class ImageHelper {
     }
 
     public static BufferedImage fromFXImage(Image fxImage) {
-        BufferedImage img =
-                new BufferedImage((int) fxImage.getWidth(), (int) fxImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        for (int x = 0; x < fxImage.getWidth(); x++) {
-            for (int y = 0; y < fxImage.getHeight(); y++) {
-                int rgb = fxImage.getPixelReader().getArgb(x, y);
-                img.setRGB(x, y, rgb);
-            }
-        }
+        int w = (int) fxImage.getWidth();
+        int h = (int) fxImage.getHeight();
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        int[] pixels = new int[w * h];
+        fxImage.getPixelReader().getPixels(0, 0, w, h, PixelFormat.getIntArgbInstance(), pixels, 0, w);
+        img.setRGB(0, 0, w, h, pixels, 0, w);
         return img;
     }
 
@@ -182,16 +180,7 @@ public class ImageHelper {
             }
         }
 
-        BufferedImage swingImage =
-                new BufferedImage((int) image.getWidth(), (int) image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                swingImage.setRGB(x, y, image.getPixelReader().getArgb(x, y));
-            }
-        }
-
-        ImageIO.write(swingImage, "png", out.toFile());
+        ImageIO.write(fromFXImage(image), "png", out.toFile());
     }
 
     public static void applyAlphaMask(BufferedImage awtImage, Image mask) {

@@ -66,6 +66,12 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     private final Path path;
     private final SavegameType type;
     private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
+    // Last campaign file contents written to disk, used to skip unchanged campaigns
+    private final Map<UUID, JsonNode> writtenCampaignNodes = new HashMap<>();
+    // Lookup indices, kept in sync with the campaign contents
+    private final Map<UUID, SavegameCampaign<T, I>> entryCampaigns = new HashMap<>();
+    private final Map<String, SavegameEntry<T, I>> contentChecksumEntries = new HashMap<>();
+    private final Map<String, SavegameEntry<T, I>> sourceFileChecksumEntries = new HashMap<>();
     private boolean loadFailed;
 
     public SavegameStorage(String name, GameDateType dateType, SavegameType type, Class<I> infoClass) {
@@ -265,7 +271,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                                 .map(JsonNode::textValue)
                                 .collect(Collectors.toList()))
                         .orElse(List.of());
-                collection.add(new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
+                addEntry(collection, new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
             });
         }
     }
@@ -298,19 +304,13 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
-            ConfigHelper.writeConfig(
-                    getSavegameDataDirectory().resolve(col.getUuid().toString()).resolve("campaign.json"),
-                    campaignFileNode);
-
-            var imgFile =
-                    getSavegameDataDirectory().resolve(col.getUuid().toString()).resolve("campaign.png");
-            try {
-                ImageHelper.writePng(col.getImage(), imgFile);
-            } catch (IOException e) {
-                ErrorEventFactory.fromThrowable("Couldn't write image " + imgFile, e)
-                        .expected()
-                        .omit()
-                        .handle();
+            if (!campaignFileNode.equals(writtenCampaignNodes.get(col.getUuid()))) {
+                var written = ConfigHelper.writeConfig(
+                        getSavegameDataDirectory().resolve(col.getUuid().toString()).resolve("campaign.json"),
+                        campaignFileNode);
+                if (written) {
+                    writtenCampaignNodes.put(col.getUuid(), campaignFileNode);
+                }
             }
 
             ObjectNode campaignNode = JsonNodeFactory.instance
@@ -351,11 +351,59 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                     e.getDate(),
                     img);
             this.collections.add(newCampaign);
+
+            // Campaign images don't change afterwards, so they only have to be written once
+            var imgFile = getSavegameDataDirectory().resolve(campainUuid.toString()).resolve("campaign.png");
+            try {
+                ImageHelper.writePng(img, imgFile);
+            } catch (IOException ex) {
+                ErrorEventFactory.fromThrowable("Couldn't write image " + imgFile, ex)
+                        .expected()
+                        .omit()
+                        .handle();
+            }
         }
 
         SavegameCampaign<T, I> c = this.getSavegameCampaign(campainUuid).get();
         TrackEvent.debug("Adding new entry " + e.getName());
+        addEntry(c, e);
+    }
+
+    private void addEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {
         c.add(e);
+        indexEntry(c, e);
+    }
+
+    private void removeEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {
+        c.remove(e);
+        rebuildIndices();
+    }
+
+    private void indexEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {
+        entryCampaigns.put(e.getUuid(), c);
+        if (e.getContentChecksum() != null) {
+            contentChecksumEntries.putIfAbsent(e.getContentChecksum(), e);
+        }
+        for (var cs : e.getSourceFileChecksums()) {
+            sourceFileChecksumEntries.putIfAbsent(cs, e);
+        }
+    }
+
+    // Removals are rare, so a full rebuild is simpler than handling entries that share a checksum
+    private void rebuildIndices() {
+        entryCampaigns.clear();
+        contentChecksumEntries.clear();
+        sourceFileChecksumEntries.clear();
+        for (var c : collections) {
+            for (var e : c.getSavegames()) {
+                indexEntry(c, e);
+            }
+        }
+    }
+
+    private synchronized void addSourceFileChecksum(SavegameEntry<T, I> e, String sourceFileChecksum) {
+        e.addSourceFileChecksum(sourceFileChecksum);
+        sourceFileChecksumEntries.putIfAbsent(sourceFileChecksum, e);
     }
 
     private String getDefaultEntryName(I info) {
@@ -367,17 +415,15 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     protected abstract String getDefaultCampaignName(I info);
 
     public synchronized boolean contains(SavegameEntry<?, ?> e) {
-        return collections.stream().anyMatch(c -> c.getSavegames().stream()
-                .anyMatch(ce -> ce.getUuid().equals(e.getUuid())));
+        return entryCampaigns.containsKey(e.getUuid());
     }
 
     public synchronized SavegameCampaign<T, I> getSavegameCampaign(SavegameEntry<?, ?> e) {
-        var campaign = collections.stream()
-                .filter(c ->
-                        c.getSavegames().stream().anyMatch(ce -> ce.getUuid().equals(e.getUuid())))
-                .findAny();
-        return campaign.orElseThrow(
-                () -> new IllegalArgumentException("Could not find savegame collection for entry " + e.getName()));
+        var campaign = entryCampaigns.get(e.getUuid());
+        if (campaign == null) {
+            throw new IllegalArgumentException("Could not find savegame collection for entry " + e.getName());
+        }
+        return campaign;
     }
 
     synchronized void delete(SavegameCampaign<T, I> c) {
@@ -397,6 +443,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         }
 
         this.collections.remove(c);
+        writtenCampaignNodes.remove(c.getUuid());
+        rebuildIndices();
 
         saveData();
     }
@@ -419,7 +467,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                     .handle();
         }
 
-        c.remove(e);
+        removeEntry(c, e);
         if (c.getSavegames().size() == 0) {
             delete(c);
         }
@@ -667,7 +715,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                 if (exists.isPresent()) {
                     TrackEvent.debug("Entry " + exists.get().getName() + " with checksum already in storage");
                     if (sourceFileChecksum != null) {
-                        exists.get().addSourceFileChecksum(sourceFileChecksum);
+                        addSourceFileChecksum(exists.get(), sourceFileChecksum);
                     }
                     return Optional.empty();
                 } else {
@@ -814,11 +862,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getSavegameForChecksum(String cs) {
-        return getCollections().stream()
-                .flatMap(SavegameCampaign::entryStream)
-                .filter(ch -> ch.getContentChecksum() != null
-                        && ch.getContentChecksum().equals(cs))
-                .findAny();
+        return Optional.ofNullable(contentChecksumEntries.get(cs));
     }
 
     public synchronized String getEntryName(SavegameEntry<T, I> e) {
@@ -828,16 +872,11 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     }
 
     public synchronized Optional<SavegameEntry<T, I>> getEntryForSourceFileChecksum(String sourceFileChecksum) {
-        return getCollections().stream()
-                .flatMap(SavegameCampaign::entryStream)
-                .filter(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum))
-                .findAny();
+        return Optional.ofNullable(sourceFileChecksumEntries.get(sourceFileChecksum));
     }
 
     public synchronized boolean hasImportedSourceFile(String sourceFileChecksum) {
-        return getCollections().stream()
-                .flatMap(SavegameCampaign::entryStream)
-                .anyMatch(ch -> ch.getSourceFileChecksums().contains(sourceFileChecksum));
+        return sourceFileChecksumEntries.containsKey(sourceFileChecksum);
     }
 
     public Path getSavegameDataDirectory() {
