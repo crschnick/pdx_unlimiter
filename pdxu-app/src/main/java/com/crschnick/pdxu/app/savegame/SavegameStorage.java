@@ -564,7 +564,11 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     }
 
     public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
-        return getSavegameDataDirectory(e).resolve("savegame." + type.getFileEnding());
+        return getSavegameDataDirectory(e).resolve(getSaveFileName());
+    }
+
+    public Path getSavegameFile(SavegameCampaign<?, ?> c, SavegameEntry<?, ?> e) {
+        return path.resolve(c.getUuid().toString()).resolve(e.getUuid().toString()).resolve(getSaveFileName());
     }
 
     public synchronized Path getSavegameInfoFile(SavegameEntry<T, I> e) {

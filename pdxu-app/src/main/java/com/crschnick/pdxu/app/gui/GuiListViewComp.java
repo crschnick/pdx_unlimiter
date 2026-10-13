@@ -6,15 +6,17 @@ import com.crschnick.pdxu.app.core.AppLayoutModel;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
-import javafx.scene.Node;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 import lombok.AllArgsConstructor;
 
-import java.util.HashMap;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 public class GuiListViewComp<T> extends SimpleComp {
@@ -22,72 +24,106 @@ public class GuiListViewComp<T> extends SimpleComp {
     private final ListProperty<T> list;
     private final Function<T, Comp<?>> nodeFactory;
     private final boolean fixSize;
-
-    private Region createForItem(T li, Function<T, Comp<?>> nodeFactory) {
-        var node = nodeFactory.apply(li).createRegion();
-        node.getProperties().put("list-item", li);
-        return node;
-    }
+    private final Supplier<Collection<T>> allItems;
 
     @Override
-    @SuppressWarnings("unchecked")
     protected Region createSimple() {
         Pane pane = new Pane();
+        ListView<T> listView = new ListView<>();
+        listView.prefWidthProperty().bind(pane.widthProperty());
+        listView.prefHeightProperty().bind(pane.heightProperty());
+        pane.getChildren().add(listView);
 
-        Platform.runLater(() -> {
-            ListView<Node> listView = new ListView<>();
-            var newItems =
-                    list.stream().map(li -> createForItem(li, nodeFactory)).toList();
+        // Nodes are created lazily once an item is first displayed.
+        // Only accessed from the platform thread
+        Map<T, Region> nodes = new HashMap<>();
+        Function<T, Region> getNode = item -> nodes.computeIfAbsent(
+                item, li -> nodeFactory.apply(li).createRegion());
 
-            AppLayoutModel.get().getSelected().addListener((observable, oldValue, newValue) -> {
-                listView.getSelectionModel().clearSelection();
-            });
-
-            listView.prefWidthProperty().bind(pane.widthProperty());
-            listView.prefHeightProperty().bind(pane.heightProperty());
-
-            pane.getChildren().setAll(listView);
-
-            if (fixSize && newItems.size() > 0) {
-                listView.fixedCellSizeProperty().bind(((Region) newItems.getFirst()).heightProperty());
+        listView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(T item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty || item == null ? null : getNode.apply(item));
             }
-            newItems.forEach(li -> listView.getItems().add(li));
+        });
+
+        AppLayoutModel.get().getSelected().addListener((observable, oldValue, newValue) -> {
+            listView.getSelectionModel().clearSelection();
+        });
+
+        Runnable updateFixedSize = () -> {
+            if (!fixSize || listView.getItems().isEmpty() || listView.fixedCellSizeProperty().isBound()) {
+                return;
+            }
+
+            // All cells have the same size, so binding once is enough.
+            // Don't rebind later on as the new node might not be laid out yet and still have a height of 0
+            listView.fixedCellSizeProperty()
+                    .bind(getNode.apply(listView.getItems().getFirst()).heightProperty());
+        };
+
+        var initialItems = List.copyOf(list);
+        Platform.runLater(() -> {
+            setContent(listView.getItems(), initialItems);
+            updateFixedSize.run();
         });
 
         list.addListener((c, o, n) -> {
+            // Take snapshots now, as the lists might already have changed by the time the update runs
+            var newItems = List.copyOf(n);
+            var retained = new HashSet<>(allItems.get());
             Platform.runLater(() -> {
-                var map = new HashMap<T, Region>();
-                ((ListView<Node>) pane.getChildren().getFirst())
-                        .getItems()
-                        .forEach(node -> map.put((T) node.getProperties().get("list-item"), (Region) node));
-
-                ListView<Node> listView = new ListView<>();
-                var newItems = n.stream()
-                        .map(li -> {
-                            var def = map.get(li);
-                            if (def == null) {
-                                def = createForItem(li, nodeFactory);
-                            }
-                            return def;
-                        })
-                        .toList();
-
-                map.clear();
-
-                listView.prefWidthProperty().bind(pane.widthProperty());
-                listView.prefHeightProperty().bind(pane.heightProperty());
-
-                var old = (ListView<?>) pane.getChildren().getFirst();
-                old.getItems().clear();
-                pane.getChildren().setAll(listView);
-
-                if (fixSize && newItems.size() > 0) {
-                    listView.fixedCellSizeProperty().bind(((Region) newItems.getFirst()).heightProperty());
-                }
-                newItems.forEach(li -> listView.getItems().add(li));
+                nodes.keySet().removeIf(item -> !retained.contains(item));
+                setContent(listView.getItems(), newItems);
+                updateFixedSize.run();
             });
         });
 
         return pane;
+    }
+
+    private static <T> void setContent(ObservableList<T> list, List<T> newList) {
+        if (list.equals(newList)) {
+            return;
+        }
+
+        if (list.isEmpty() || newList.isEmpty()) {
+            list.setAll(newList);
+            return;
+        }
+
+        var newSet = new HashSet<>(newList);
+        var listSet = new HashSet<>(list);
+
+        // Only additions
+        if (newSet.containsAll(listSet)) {
+            var retained = new ArrayList<>(newList);
+            retained.removeIf(t -> !listSet.contains(t));
+            // Reordering occurred
+            if (!retained.equals(list)) {
+                list.setAll(newList);
+                return;
+            }
+
+            for (int i = 0; i < newList.size(); i++) {
+                if (!listSet.contains(newList.get(i))) {
+                    list.add(i, newList.get(i));
+                }
+            }
+            return;
+        }
+
+        // Only removals
+        if (listSet.containsAll(newSet)) {
+            list.removeIf(t -> !newSet.contains(t));
+            // Reordering occurred
+            if (!list.equals(newList)) {
+                list.setAll(newList);
+            }
+            return;
+        }
+
+        list.setAll(newList);
     }
 }

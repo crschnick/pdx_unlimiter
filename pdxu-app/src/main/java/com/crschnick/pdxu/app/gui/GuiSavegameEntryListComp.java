@@ -17,6 +17,8 @@ import javafx.scene.layout.VBox;
 import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.List;
+
 @AllArgsConstructor
 public class GuiSavegameEntryListComp<T, I extends SavegameInfo<T>> extends SimpleComp {
 
@@ -48,7 +50,13 @@ public class GuiSavegameEntryListComp<T, I extends SavegameInfo<T>> extends Simp
         Region grid = new GuiListViewComp<>(
                         savegameManagerState.getShownEntries(),
                         savegameEntry -> new GuiSavegameEntryComp<>(savegameEntry, savegameManagerState),
-                        true)
+                        true,
+                        () -> {
+                            var selected = savegameManagerState
+                                    .globalSelectedCollectionProperty()
+                                    .get();
+                            return selected != null ? selected.getSavegames() : List.of();
+                        })
                 .createRegion();
         grid.setOpacity(0.9);
         grid.getStyleClass().add(GuiStyle.CLASS_ENTRY_LIST);

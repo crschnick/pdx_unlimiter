@@ -8,6 +8,7 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.gui.dialog.GuiImporter;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
+import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.EditorProvider;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
@@ -91,7 +92,9 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
         Region list = new GuiListViewComp<>(
                         savegameManagerState.getShownCollections(),
                         c -> new GuiSavegameCampaignComp<>(c, () -> savegameManagerState.selectCollectionAsync(c)),
-                        false)
+                        false,
+                        () -> SavegameStorage.<T, I>get(savegameManagerState.getGame())
+                                .getCollections())
                 .createRegion();
         list.getStyleClass().add(CLASS_CAMPAIGN_LIST);
         list.setAccessibleText("Campaign list");
