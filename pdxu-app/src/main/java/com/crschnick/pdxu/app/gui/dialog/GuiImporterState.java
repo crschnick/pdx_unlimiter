@@ -8,8 +8,10 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -55,27 +57,22 @@ public class GuiImporterState {
     }
 
     private void updateShownTargets() {
-        // Work on copy to reduce list updates
-        var newShownTargets = FXCollections.observableArrayList(shownTargets.get());
-
-        // Remove not contained entries
-        newShownTargets.removeIf(entry -> !allTargets.contains(entry));
-
-        allTargets.forEach(entry -> {
-            if (!newShownTargets.contains(entry) && shouldShow(entry)) {
+        var lowerFilter = filter.get().toLowerCase();
+        var previouslyShown = new HashSet<>(shownTargets.get());
+        var newShownTargets = new ArrayList<ImportEntry>();
+        for (var entry : allTargets) {
+            if (shouldShow(entry, lowerFilter)) {
                 newShownTargets.add(entry);
-                return;
-            }
-
-            if (newShownTargets.contains(entry) && !shouldShow(entry)) {
+            } else if (previouslyShown.contains(entry)) {
                 // Unselect when not showing it anymore
                 entry.selected.set(false);
-                newShownTargets.remove(entry);
             }
-        });
+        }
         newShownTargets.sort(Comparator.comparing(e -> e.target(), Comparator.reverseOrder()));
 
-        shownTargets.set(newShownTargets);
+        if (!newShownTargets.equals(shownTargets.get())) {
+            shownTargets.set(FXCollections.observableArrayList(newShownTargets));
+        }
     }
 
     public Collection<FileImportTarget.StandardImportTarget> getSelectedTargets() {
@@ -85,8 +82,8 @@ public class GuiImporterState {
                 .collect(Collectors.toList());
     }
 
-    private boolean shouldShow(ImportEntry entry) {
-        return entry.target().getName().toLowerCase().contains(filter.get().toLowerCase())
+    private boolean shouldShow(ImportEntry entry, String lowerFilter) {
+        return entry.target().getName().toLowerCase().contains(lowerFilter)
                 && !entry.target.hasImportedSourceFile();
     }
 
@@ -100,6 +97,10 @@ public class GuiImporterState {
 
     public StringProperty filterProperty() {
         return filter;
+    }
+
+    public List<ImportEntry> getAllTargets() {
+        return allTargets;
     }
 
     public ObservableList<ImportEntry> getShownTargets() {

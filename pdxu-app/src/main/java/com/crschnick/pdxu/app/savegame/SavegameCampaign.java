@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
@@ -22,7 +23,8 @@ public final class SavegameCampaign<T, I extends SavegameInfo<T>> {
     private final ObjectProperty<Instant> lastPlayed;
     private final StringProperty name;
     private final UUID uuid;
-    private final ObservableSet<SavegameEntry<T, I>> savegames = FXCollections.observableSet(new HashSet<>());
+    private final ObservableSet<SavegameEntry<T, I>> savegames =
+            FXCollections.observableSet(ConcurrentHashMap.newKeySet());
 
     public SavegameCampaign(Instant lastPlayed, String name, UUID campaignId, GameDate date, Image image) {
         this.lastPlayed = new SimpleObjectProperty<>(lastPlayed);

@@ -86,10 +86,9 @@ public class SavegameActions {
         SavegameParseResult r = null;
         try {
             var file = savegames.getFirst().path;
-            var bytes = Files.readAllBytes(file);
-            if (type.isBinary(bytes)) {
-                bytes = RakalyHelper.toEquivalentPlaintext(file);
-            }
+            var bytes = type.isBinary(file)
+                    ? RakalyHelper.toEquivalentPlaintext(file)
+                    : Files.readAllBytes(file);
             var struc = type.determineStructure(bytes);
             r = struc.parse(bytes);
         } catch (Exception e) {

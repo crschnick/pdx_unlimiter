@@ -53,12 +53,12 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
     private void addShownContentChangeListeners() {
         var colListener = (SetChangeListener<? super SavegameCampaign<Object, SavegameInfo<Object>>>) c -> {
-            updateShownCollections();
+            updateShownCollections(c.wasRemoved());
             updateShownEntries();
         };
         SavegameStorage.get(game).getCollections().addListener(colListener);
 
-        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries();
+        var cl = (SetChangeListener<? super SavegameEntry<T, I>>) ch -> updateShownEntries(ch.wasRemoved());
         globalSelectedCollection.addListener((c, o, n) -> {
             if (o != null) {
                 o.getSavegames().removeListener(cl);
@@ -122,7 +122,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                         false);
     }
 
-    private synchronized void updateShownEntries() {
+    private void updateShownEntries() {
+        updateShownEntries(false);
+    }
+
+    private synchronized void updateShownEntries(boolean removed) {
         var col = globalSelectedCollection.get();
 
         // No campaign selected means no entries are shown
@@ -167,7 +171,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                 .reversed());
 
         // Avoid list updates if nothing changed
-        if (!newEntries.equals(shownEntries.get())) {
+        if (removed || !newEntries.equals(shownEntries.get())) {
             shownEntries.set(FXCollections.observableList(new CopyOnWriteArrayList<>(newEntries)));
         }
 
@@ -177,7 +181,11 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
     }
 
-    private synchronized void updateShownCollections() {
+    private void updateShownCollections() {
+        updateShownCollections(false);
+    }
+
+    private synchronized void updateShownCollections(boolean removed) {
         var collections = SavegameStorage.<T, I>get(game).getCollections();
 
         var selected = globalSelectedCollection.get();
@@ -194,7 +202,7 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         }
         newCollections.sort(Comparator.comparing(SavegameCampaign::getLastPlayed, Comparator.reverseOrder()));
 
-        if (!newCollections.equals(shownCollections.get())) {
+        if (removed || !newCollections.equals(shownCollections.get())) {
             shownCollections.set(FXCollections.observableList(new CopyOnWriteArrayList<>(newCollections)));
         }
 

@@ -66,7 +66,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     private final GameDateType dateType;
     private final Path path;
     private final SavegameType type;
-    private final ObservableSet<SavegameCampaign<T, I>> collections = FXCollections.observableSet(new HashSet<>());
+    private final ObservableSet<SavegameCampaign<T, I>> collections =
+            FXCollections.observableSet(ConcurrentHashMap.newKeySet());
     // Last campaign file contents written to disk, used to skip unchanged campaigns
     private final Map<UUID, JsonNode> writtenCampaignNodes = new HashMap<>();
     // Lookup indices, kept in sync with the campaign contents
@@ -512,11 +513,12 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         SavegameParseResult result;
         boolean melted;
         try {
-            var bytes = Files.readAllBytes(file);
-            if (type.isBinary(bytes)) {
+            byte[] bytes;
+            if (type.isBinary(file)) {
                 bytes = RakalyHelper.toEquivalentPlaintext(file);
                 melted = true;
             } else {
+                bytes = Files.readAllBytes(file);
                 melted = false;
             }
             var struc = type.determineStructure(bytes);
@@ -827,6 +829,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             checksum = checksum(bytes);
             if (type.isBinary(bytes)) {
                 melted = true;
+                bytes = null;
                 bytes = RakalyHelper.toEquivalentPlaintext(getSavegameFile(e));
             }
         } catch (Exception ex) {

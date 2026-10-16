@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.comp.base.ModalOverlay;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
@@ -13,13 +14,18 @@ import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class GuiImporter {
 
@@ -107,25 +113,21 @@ public class GuiImporter {
 
         var emptyLabel = new Label("There are no savegames available to import!");
 
-        for (var e : state.getShownTargets()) {
-            var n = createTargetNode(e);
-            targets.getChildren().add(n);
-        }
-        if (state.getShownTargets().size() == 0) {
-            targets.getChildren().add(emptyLabel);
-        }
+        var targetNodes = new HashMap<GuiImporterState.ImportEntry, Region>();
+        Consumer<List<GuiImporterState.ImportEntry>> updateTargets = shown -> {
+            targetNodes.keySet().retainAll(new HashSet<>(state.getAllTargets()));
+            List<Node> children = shown.isEmpty()
+                    ? List.of(emptyLabel)
+                    : shown.stream()
+                            .<Node>map(e -> targetNodes.computeIfAbsent(e, GuiImporter::createTargetNode))
+                            .toList();
+            BindingsHelper.setContent(targets.getChildren(), children);
+        };
+        updateTargets.accept(List.copyOf(state.getShownTargets()));
 
         state.shownTargetsProperty().addListener((c, o, n) -> {
-            Platform.runLater(() -> {
-                targets.getChildren().clear();
-                n.forEach(e -> {
-                    var tn = createTargetNode(e);
-                    targets.getChildren().add(tn);
-                });
-                if (n.size() == 0) {
-                    targets.getChildren().add(emptyLabel);
-                }
-            });
+            var shown = List.copyOf(n);
+            Platform.runLater(() -> updateTargets.accept(shown));
         });
 
         VBox layout = new VBox();

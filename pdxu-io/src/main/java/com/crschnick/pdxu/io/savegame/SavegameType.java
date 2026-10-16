@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Random;
@@ -458,6 +459,13 @@ public interface SavegameType {
     String getFileEnding();
 
     boolean isBinary(byte[] input);
+
+    default boolean isBinary(Path file) throws IOException {
+        // The binary check only requires the header at the start of the file
+        try (var in = Files.newInputStream(file)) {
+            return isBinary(in.readNBytes(64 * 1024));
+        }
+    }
 
     TextFormatParser getParser();
 

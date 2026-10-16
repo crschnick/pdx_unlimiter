@@ -95,11 +95,13 @@ public class Ck3Tag {
             return Optional.empty();
         }
 
-        var house = new Ck3House(
+        var hasHouse = n.getNodeForKey("meta_data")
+                .getNodeForKeyIfExistent("meta_house_name").isPresent();
+        var house = hasHouse ? new Ck3House(
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data")
                         .getNodeForKey("meta_house_name")
                         .getString()),
-                CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null));
+                CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null)) : null;
         var person = Ck3Person.fromNode(personNode, house);
         var titles = Ck3Title.createTitleMap(n, coaMap);
 
