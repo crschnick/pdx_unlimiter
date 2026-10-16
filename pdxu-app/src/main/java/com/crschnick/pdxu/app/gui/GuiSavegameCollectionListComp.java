@@ -10,7 +10,6 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
 import com.crschnick.pdxu.app.util.EditorProvider;
-import com.crschnick.pdxu.app.util.ThreadHelper;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -68,9 +67,7 @@ public class GuiSavegameCollectionListComp<T, I extends SavegameInfo<T>> extends
     private Region createTopBar() {
         var filterProperty = new SimpleStringProperty();
         filterProperty.addListener((observable, oldValue, newValue) -> {
-            ThreadHelper.runAsync(() -> {
-                savegameManagerState.getFilter().filterProperty().set(newValue);
-            });
+            savegameManagerState.getFilter().filterProperty().set(newValue);
         });
         var filter = new GuiFilterComp(filterProperty).hgrow();
         var launchButton = createLaunchButton();

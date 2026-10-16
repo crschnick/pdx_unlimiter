@@ -53,6 +53,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -69,9 +70,9 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     // Last campaign file contents written to disk, used to skip unchanged campaigns
     private final Map<UUID, JsonNode> writtenCampaignNodes = new HashMap<>();
     // Lookup indices, kept in sync with the campaign contents
-    private final Map<UUID, SavegameCampaign<T, I>> entryCampaigns = new HashMap<>();
+    private final Map<UUID, SavegameCampaign<T, I>> entryCampaigns = new ConcurrentHashMap<>();
     private final Map<String, SavegameEntry<T, I>> contentChecksumEntries = new HashMap<>();
-    private final Map<String, SavegameEntry<T, I>> sourceFileChecksumEntries = new HashMap<>();
+    private final Map<String, SavegameEntry<T, I>> sourceFileChecksumEntries = new ConcurrentHashMap<>();
     private boolean loadFailed;
 
     public SavegameStorage(String name, GameDateType dateType, SavegameType type, Class<I> infoClass) {
@@ -376,11 +377,16 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
     private void removeEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {
         c.remove(e);
-        rebuildIndices();
+        entryCampaigns.remove(e.getUuid());
+        rebuildChecksumIndices();
     }
 
     private void indexEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {
         entryCampaigns.put(e.getUuid(), c);
+        indexChecksums(e);
+    }
+
+    private void indexChecksums(SavegameEntry<T, I> e) {
         if (e.getContentChecksum() != null) {
             contentChecksumEntries.putIfAbsent(e.getContentChecksum(), e);
         }
@@ -389,14 +395,12 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         }
     }
 
-    // Removals are rare, so a full rebuild is simpler than handling entries that share a checksum
-    private void rebuildIndices() {
-        entryCampaigns.clear();
+    private void rebuildChecksumIndices() {
         contentChecksumEntries.clear();
         sourceFileChecksumEntries.clear();
         for (var c : collections) {
             for (var e : c.getSavegames()) {
-                indexEntry(c, e);
+                indexChecksums(e);
             }
         }
     }
@@ -414,11 +418,11 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
     protected abstract String getDefaultCampaignName(I info);
 
-    public synchronized boolean contains(SavegameEntry<?, ?> e) {
+    public boolean contains(SavegameEntry<?, ?> e) {
         return entryCampaigns.containsKey(e.getUuid());
     }
 
-    public synchronized SavegameCampaign<T, I> getSavegameCampaign(SavegameEntry<?, ?> e) {
+    public SavegameCampaign<T, I> getSavegameCampaign(SavegameEntry<?, ?> e) {
         var campaign = entryCampaigns.get(e.getUuid());
         if (campaign == null) {
             throw new IllegalArgumentException("Could not find savegame collection for entry " + e.getName());
@@ -444,7 +448,10 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
         this.collections.remove(c);
         writtenCampaignNodes.remove(c.getUuid());
-        rebuildIndices();
+        for (var e : c.getSavegames()) {
+            entryCampaigns.remove(e.getUuid());
+        }
+        rebuildChecksumIndices();
 
         saveData();
     }
@@ -563,7 +570,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         });
     }
 
-    public synchronized Path getSavegameFile(SavegameEntry<?, ?> e) {
+    public Path getSavegameFile(SavegameEntry<?, ?> e) {
         return getSavegameDataDirectory(e).resolve(getSaveFileName());
     }
 
@@ -571,11 +578,11 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return path.resolve(c.getUuid().toString()).resolve(e.getUuid().toString()).resolve(getSaveFileName());
     }
 
-    public synchronized Path getSavegameInfoFile(SavegameEntry<T, I> e) {
+    public Path getSavegameInfoFile(SavegameEntry<T, I> e) {
         return getSavegameDataDirectory(e).resolve(getInfoFileName());
     }
 
-    public synchronized Path getSavegameDataDirectory(SavegameEntry<?, ?> e) {
+    public Path getSavegameDataDirectory(SavegameEntry<?, ?> e) {
         Path campaignPath = path.resolve(getSavegameCampaign(e).getUuid().toString());
         return campaignPath.resolve(e.getUuid().toString());
     }
@@ -599,7 +606,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return savegameCampaignId.equals(storageCampaignId) ? Optional.empty() : Optional.of(storageCampaignId);
     }
 
-    public synchronized Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName, String suffix) {
+    public Path getValidOutputFileName(SavegameEntry<?, ?> e, boolean includeEntryName, String suffix) {
         var name = getSavegameCampaign(e).getName().trim()
                 + (includeEntryName ? " (" + e.getName().trim() + ")" : "")
                 + (suffix != null ? suffix : "");
@@ -620,7 +627,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return Path.of("invalid-name" + (suffix != null ? suffix : "") + "." + type.getFileEnding());
     }
 
-    public synchronized void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
+    public void copySavegameTo(SavegameEntry<T, I> e, Path destPath) throws IOException {
         Path srcPath = getSavegameFile(e);
 
         FileUtils.forceMkdirParent(destPath.toFile());
@@ -869,7 +876,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return Optional.ofNullable(contentChecksumEntries.get(cs));
     }
 
-    public synchronized String getEntryName(SavegameEntry<T, I> e) {
+    public String getEntryName(SavegameEntry<T, I> e) {
         String cn = getSavegameCampaign(e).getName();
         String en = e.getName();
         return cn + " (" + en + ")";
@@ -879,7 +886,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return Optional.ofNullable(sourceFileChecksumEntries.get(sourceFileChecksum));
     }
 
-    public synchronized boolean hasImportedSourceFile(String sourceFileChecksum) {
+    public boolean hasImportedSourceFile(String sourceFileChecksum) {
         return sourceFileChecksumEntries.containsKey(sourceFileChecksum);
     }
 

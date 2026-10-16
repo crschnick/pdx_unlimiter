@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.savegame.SavegameStorage;
+import com.crschnick.pdxu.app.util.GlobalTimer;
 import com.crschnick.pdxu.model.GameDate;
 
 import javafx.beans.property.*;
@@ -21,9 +22,12 @@ import lombok.Getter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
@@ -118,41 +122,36 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
                         false);
     }
 
-    private void updateShownEntries() {
+    private synchronized void updateShownEntries() {
+        var col = globalSelectedCollection.get();
+
         // No campaign selected means no entries are shown
-        if (globalSelectedCollection.get() == null) {
-            shownEntries.clear();
+        if (col == null) {
+            if (!shownEntries.isEmpty()) {
+                shownEntries.set(FXCollections.observableList(new CopyOnWriteArrayList<>()));
+            }
             globalSelectedEntry.setValue(null);
             return;
         }
 
-        // Work on copy to reduce list updates
-        var newEntries = FXCollections.observableArrayList(shownEntries.get());
-
-        // Remove not contained entries
-        newEntries.removeIf(entry -> {
-            var remove = !globalSelectedCollection.get().getSavegames().contains(entry);
-            if (remove) {
+        for (var entry : shownEntries.get()) {
+            if (!col.getSavegames().contains(entry)) {
                 entry.setInactive();
             }
-            return remove;
-        });
+        }
 
-        var col = globalSelectedCollection.get();
-        col.getSavegames().forEach(entry -> {
-            if (!newEntries.contains(entry) && entry.getState() == SavegameEntry.State.INACTIVE) {
+        var lowerFilter = filter.getLowerCaseFilter();
+        var newEntries = new ArrayList<SavegameEntry<T, I>>();
+        for (var entry : col.getSavegames()) {
+            if (entry.getState() == SavegameEntry.State.INACTIVE) {
                 entry.setActive();
             }
 
-            if (!newEntries.contains(entry) && filter.shouldShow(entry)) {
+            if (filter.shouldShow(entry, lowerFilter)) {
                 newEntries.add(entry);
-                return;
             }
+        }
 
-            if (newEntries.contains(entry) && !filter.shouldShow(entry)) {
-                newEntries.remove(entry);
-            }
-        });
         // Only query modification times when needed and at most once per entry
         var modTimes = new HashMap<SavegameEntry<T, I>, FileTime>();
         var storage = SavegameStorage.get(game);
@@ -169,44 +168,34 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
 
         // Avoid list updates if nothing changed
         if (!newEntries.equals(shownEntries.get())) {
-            shownEntries.set(newEntries);
+            shownEntries.set(FXCollections.observableList(new CopyOnWriteArrayList<>(newEntries)));
         }
 
-        if (globalSelectedEntry.isNotNull().get()) {
-            if (!shownEntries.contains(globalSelectedEntry.get())) {
-                globalSelectedEntryPropertyInternal().set(null);
-            }
+        var selected = globalSelectedEntry.get();
+        if (selected != null && !newEntries.contains(selected)) {
+            globalSelectedEntryPropertyInternal().set(null);
         }
     }
 
-    private void updateShownCollections() {
-        // Work on copy to reduce list updates
-        var newCollections = FXCollections.observableArrayList(shownCollections.get());
+    private synchronized void updateShownCollections() {
+        var collections = SavegameStorage.<T, I>get(game).getCollections();
 
-        newCollections.removeIf(col -> {
-            var remove = !SavegameStorage.get(game).getCollections().contains(col);
-            if (remove) {
-                if (globalSelectedCollection.get() != null
-                        && globalSelectedCollection.get().equals(col)) {
-                    globalSelectedCollection.set(null);
-                }
-            }
-            return remove;
-        });
+        var selected = globalSelectedCollection.get();
+        if (selected != null && !collections.contains(selected)) {
+            globalSelectedCollection.set(null);
+        }
 
-        SavegameStorage.<T, I>get(game).getCollections().forEach(col -> {
-            if (!newCollections.contains(col) && filter.shouldShow(col)) {
+        var lowerFilter = filter.getLowerCaseFilter();
+        var newCollections = new ArrayList<SavegameCampaign<T, I>>();
+        for (var col : collections) {
+            if (filter.shouldShow(col, lowerFilter)) {
                 newCollections.add(col);
-                return;
             }
-
-            if (newCollections.contains(col) && !filter.shouldShow(col)) {
-                newCollections.remove(col);
-            }
-        });
+        }
         newCollections.sort(Comparator.comparing(SavegameCampaign::getLastPlayed, Comparator.reverseOrder()));
+
         if (!newCollections.equals(shownCollections.get())) {
-            shownCollections.set(newCollections);
+            shownCollections.set(FXCollections.observableList(new CopyOnWriteArrayList<>(newCollections)));
         }
 
         updateStorageEmptyProperty();
@@ -296,12 +285,24 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
     }
 
     public class Filter {
+        private static final Duration UPDATE_DELAY = Duration.ofMillis(150);
+
         private final StringProperty filter = new SimpleStringProperty("");
+        private final AtomicLong updateCounter = new AtomicLong();
 
         private Filter() {
             filter.addListener((c, o, n) -> {
-                SavegameManagerState.this.updateShownEntries();
-                SavegameManagerState.this.updateShownCollections();
+                var id = updateCounter.incrementAndGet();
+                GlobalTimer.delayAsync(
+                        () -> {
+                            if (updateCounter.get() != id) {
+                                return;
+                            }
+
+                            SavegameManagerState.this.updateShownEntries();
+                            SavegameManagerState.this.updateShownCollections();
+                        },
+                        UPDATE_DELAY);
             });
         }
 
@@ -313,26 +314,29 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
             return filter;
         }
 
-        public boolean shouldShow(SavegameCampaign<T, I> col) {
-            if (filter.get() == null) {
-                return true;
-            }
-
-            if (col.getName().toLowerCase().contains(filter.get().toLowerCase())) {
-                return true;
-            }
-
-            return col.getSavegames().stream()
-                    .anyMatch(
-                            e -> e.getName().toLowerCase().contains(filter.get().toLowerCase()));
+        private String getLowerCaseFilter() {
+            var f = filter.get();
+            return f != null ? f.toLowerCase() : null;
         }
 
-        public boolean shouldShow(SavegameEntry<?, ?> entry) {
-            if (filter.get() == null) {
+        private boolean shouldShow(SavegameCampaign<T, I> col, String lowerFilter) {
+            if (lowerFilter == null || lowerFilter.isEmpty()) {
                 return true;
             }
 
-            return entry.getName().toLowerCase().contains(filter.get().toLowerCase());
+            if (col.getName().toLowerCase().contains(lowerFilter)) {
+                return true;
+            }
+
+            return col.getSavegames().stream().anyMatch(e -> shouldShow(e, lowerFilter));
+        }
+
+        private boolean shouldShow(SavegameEntry<?, ?> entry, String lowerFilter) {
+            if (lowerFilter == null || lowerFilter.isEmpty()) {
+                return true;
+            }
+
+            return entry.getName().toLowerCase().contains(lowerFilter);
         }
     }
 }

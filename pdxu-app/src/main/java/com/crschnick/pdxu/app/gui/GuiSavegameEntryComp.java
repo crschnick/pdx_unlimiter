@@ -44,7 +44,9 @@ import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
@@ -56,10 +58,13 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
     private final SavegameEntry<T, I> e;
     private final SavegameManagerState<T, I> savegameManagerState;
 
-    private Region setupTopBar(SavegameEntry<T, I> e) {
+    private Region setupTopBar(
+            SavegameEntry<T, I> e,
+            SavegameContext<T, I> context,
+            List<Consumer<SavegameContext<T, I>>> infoActions) {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
-        SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+        infoActions.add(ctx -> {
             Platform.runLater(() -> {
                 var bg = ctx.getGuiFactory().createEntryInfoBackground(ctx.getInfo());
                 if (bg != null) {
@@ -76,8 +81,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             Label l = new Label(dateString);
             l.getStyleClass().add(CLASS_DATE);
 
-            var tagImage =
-                    SavegameContext.mapSavegame(e, ctx -> ctx.getGuiFactory().createImage(e));
+            var tagImage = context.getGuiFactory().createImage(e);
             HBox tagBar = new HBox(tagImage.getValue(), l);
             tagImage.addListener((c, o, n) -> {
                 Platform.runLater(() -> {
@@ -109,7 +113,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             name.textProperty().addListener(nameChange);
         }
         {
-            HBox buttonBar = createButtonBar(e);
+            HBox buttonBar = createButtonBar(e, context, infoActions);
             topBar.setRight(buttonBar);
         }
         return topBar;
@@ -134,7 +138,10 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         });
     }
 
-    private HBox createButtonBar(SavegameEntry<T, I> e) {
+    private HBox createButtonBar(
+            SavegameEntry<T, I> e,
+            SavegameContext<T, I> context,
+            List<Consumer<SavegameContext<T, I>>> infoActions) {
         HBox staticButtons = new HBox();
         staticButtons.setAlignment(Pos.CENTER);
         staticButtons.getStyleClass().add(CLASS_BUTTON_BAR);
@@ -156,8 +163,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             GuiTooltips.install(
                     export,
                     AppI18n.get(
-                            "exportSavegame",
-                            SavegameContext.getContext(e).getGame().getTranslatedFullName()));
+                            "exportSavegame", context.getGame().getTranslatedFullName()));
             staticButtons.getChildren().add(export);
         }
         {
@@ -217,7 +223,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             melt.getStyleClass().add(CLASS_MELT);
             melt.setAccessibleText("Melt");
             GuiTooltips.install(melt, AppI18n.get("meltSavegame"));
-            SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+            infoActions.add(ctx -> {
                 if (ctx.getInfo().getData().isBinary() && RakalyHelper.shouldShowButton(ctx)) {
                     Platform.runLater(() -> {
                         dynamicButtons.getChildren().add(melt);
@@ -226,7 +232,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             });
         }
 
-        SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+        infoActions.add(ctx -> {
             if (!SavegameBranches.supportsBranching(e)) {
                 return;
             }
@@ -245,7 +251,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         });
 
         if (OsType.ofLocal() == OsType.WINDOWS) {
-            SavegameContext.withSavegameInfoContextAsync(e, ctx -> {
+            infoActions.add(ctx -> {
                 ConverterSupport.ALL.forEach(converterSupport -> {
                     if (converterSupport.getFromGame().equals(ctx.getGame())
                             && GameInstallation.ALL.get(converterSupport.getToGame()) != null) {
@@ -420,7 +426,9 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
         setupDragAndDrop(entryNode, e);
 
-        var topBar = setupTopBar(e);
+        var context = SavegameContext.getContext(e);
+        var infoActions = new ArrayList<Consumer<SavegameContext<T, I>>>();
+        var topBar = setupTopBar(e, context, infoActions);
         entryNode.getChildren().add(topBar);
         // Important!
         // Set view order to force top bar to be in front of the savegame info node
@@ -429,6 +437,8 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
         Node content = createSavegameInfoNode(e);
         entryNode.getChildren().add(content);
+
+        SavegameContext.withSavegameInfoContextAsync(e, ctx -> infoActions.forEach(a -> a.accept(ctx)));
 
         // For debugging memory leaks
         //        for (int i = 0; i < 1000; i++) {

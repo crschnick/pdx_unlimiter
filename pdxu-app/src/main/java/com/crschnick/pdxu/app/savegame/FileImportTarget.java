@@ -195,6 +195,7 @@ public abstract class FileImportTarget {
         private final SavegameStorage<?, ?> savegameStorage;
         protected Path path;
         private Instant timestamp;
+        private volatile String cachedSourceFileChecksum;
 
         public StandardImportTarget(SavegameStorage<?, ?> savegameStorage, Path path) {
             this.savegameStorage = savegameStorage;
@@ -210,7 +211,12 @@ public abstract class FileImportTarget {
         }
 
         public final boolean hasImportedSourceFile() {
-            var cs = getSourceFileChecksum();
+            var cs = cachedSourceFileChecksum;
+            if (cs == null) {
+                cs = getSourceFileChecksum();
+                cachedSourceFileChecksum = cs;
+            }
+
             if (cs == null) {
                 return false;
             }
