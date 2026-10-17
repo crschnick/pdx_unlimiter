@@ -51,7 +51,7 @@ public class GameLocalisationHelper {
         }
     }
 
-    private static final Pattern PATTERN = Pattern.compile("^\\s+([A-Za-z0-9_.]+):(\\d*) \"(.+)\"$");
+    private static final Pattern PATTERN = Pattern.compile("^\\s*([^\\s:#\"]+):(\\d*)\\s*\"(.+)\"\\s*(?:#[^\"]*)?$");
 
     public static Map<String, String> loadTranslations(Path file) {
         Map<String, String> map = new HashMap<>();

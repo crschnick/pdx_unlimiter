@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.core.mode.AppOperationMode;
 import com.crschnick.pdxu.app.update.AppDistributionType;
 
 import io.sentry.*;
+import io.sentry.protocol.Feedback;
 import io.sentry.protocol.Geo;
 import io.sentry.protocol.SentryId;
 import io.sentry.protocol.User;
@@ -158,16 +159,12 @@ public class SentryErrorHandler implements ErrorHandler {
         var hasEmail = email != null && !email.isBlank();
         var text = ee.getUserReport();
         if (hasUserReport(ee)) {
-            var fb = new UserFeedback(id);
+            var fb = new Feedback(doesExceedCommentSize(text) ? "<Attachment>" : text);
+            fb.setAssociatedEventId(id);
             if (hasEmail) {
-                fb.setEmail(email);
+                fb.setContactEmail(email);
             }
-            if (doesExceedCommentSize(text)) {
-                fb.setComments("<Attachment>");
-            } else {
-                fb.setComments(text);
-            }
-            Sentry.captureUserFeedback(fb);
+            Sentry.feedback().capture(fb);
         }
         Sentry.flush(3000);
     }

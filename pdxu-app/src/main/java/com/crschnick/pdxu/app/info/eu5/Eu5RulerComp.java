@@ -94,7 +94,10 @@ public class Eu5RulerComp extends SavegameInfoComp {
             firstNames.add(GameLocalisation.getLocalisedValue(s, data));
         }
 
-        var name = String.join(" ", firstNames) + (ruler.nickname() != null ? " (" + ruler.nickname() + ")" : "");
+        var name = String.join(" ", firstNames)
+                + (ruler.nickname() != null
+                        ? " (" + GameLocalisation.getLocalisedValue(ruler.nickname(), data) + ")"
+                        : "");
         var label = new Label(name);
         label.setMinWidth(Region.USE_PREF_SIZE);
         label.setEllipsisString("");
@@ -107,7 +110,7 @@ public class Eu5RulerComp extends SavegameInfoComp {
         box.alignmentProperty().set(Pos.CENTER);
         box.getChildren().add(createRulerStatsNode(ruler));
         box.getStyleClass().add(CLASS_RULER);
-        GuiTooltips.install(box, ruler.firstName());
+        GuiTooltips.install(box, name);
         return box;
     }
 

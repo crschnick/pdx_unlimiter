@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.installation.GameLocalisation;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.model.ck3.Ck3Title;
 
@@ -17,6 +18,10 @@ import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_TITLES;
 
 public class Ck3TitlesComp extends DiplomacyRowComp<Ck3Title> {
 
+    public static String getTitleName(SavegameData<?> data, Ck3Title title) {
+        return title.getName().orElseGet(() -> GameLocalisation.getLocalisedValue(title.getKey(), data));
+    }
+
     @Override
     protected Region mapTag(SavegameData<?> data, Ck3Title tag) {
         return GameImage.imageNode(Ck3CoatOfArmsCache.titleImage(tag, GameFileContext.fromData(data)), CLASS_TAG_ICON);
@@ -24,7 +29,7 @@ public class Ck3TitlesComp extends DiplomacyRowComp<Ck3Title> {
 
     @Override
     protected String mapTagTooltip(SavegameData<?> data, Ck3Title tag) {
-        return tag.getKey();
+        return getTitleName(data, tag);
     }
 
     @Override

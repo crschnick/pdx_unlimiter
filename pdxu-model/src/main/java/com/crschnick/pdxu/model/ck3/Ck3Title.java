@@ -10,15 +10,17 @@ public class Ck3Title {
 
     private long id;
     private String key;
+    private String name;
     private GameColor color;
     private CoatOfArms coatOfArms;
     private Type type;
 
     public Ck3Title() {}
 
-    public Ck3Title(long id, String key, GameColor color, CoatOfArms coatOfArms, Type type) {
+    public Ck3Title(long id, String key, String name, GameColor color, CoatOfArms coatOfArms, Type type) {
         this.id = id;
         this.key = key;
+        this.name = name;
         this.color = color;
         this.coatOfArms = coatOfArms;
         this.type = type;
@@ -75,7 +77,12 @@ public class Ck3Title {
                 .map(GameColor::fromColorNode)
                 .orElse(null);
 
-        return Optional.of(new Ck3Title(id, key, color, coatOfArms, type));
+        var name = n.getNodeForKeyIfExistent("title_name_data")
+                .flatMap(d -> d.getNodeForKeyIfExistent("name"))
+                .map(Node::getString)
+                .orElse(null);
+
+        return Optional.of(new Ck3Title(id, key, name, color, coatOfArms, type));
     }
 
     public Type getType() {
@@ -105,6 +112,10 @@ public class Ck3Title {
 
     public String getKey() {
         return key;
+    }
+
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
     }
 
     public long getId() {

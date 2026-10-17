@@ -24,7 +24,7 @@ public class Ck3ClaimsComp extends DiplomacyRowComp<Ck3Title> {
 
     @Override
     protected String mapTagTooltip(SavegameData<?> data, Ck3Title tag) {
-        return tag.getKey();
+        return Ck3TitlesComp.getTitleName(data, tag);
     }
 
     @Override

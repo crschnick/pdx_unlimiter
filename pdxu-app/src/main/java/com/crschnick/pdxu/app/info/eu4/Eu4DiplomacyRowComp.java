@@ -24,6 +24,10 @@ public abstract class Eu4DiplomacyRowComp extends DiplomacyRowComp<Eu4Tag> {
 
     @Override
     protected String mapTagTooltip(SavegameData<?> data, Eu4Tag tag) {
+        if (tag.isCustom()) {
+            return tag.getName();
+        }
+
         var ctx = GameFileContext.fromData(data);
         return GameLocalisation.getLocalisedValue(tag.getTag(), ctx);
     }

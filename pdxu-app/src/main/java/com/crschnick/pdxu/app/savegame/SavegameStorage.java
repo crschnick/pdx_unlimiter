@@ -111,15 +111,27 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         ALL.put(Game.EU4, new SavegameStorage<>("eu4", GameDateType.EU4, SavegameType.EU4, Eu4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Eu4SavegameInfo info) {
-                return GameLocalisation.getLocalisedValue(
-                        info.getData().getTag().getTag(), info);
+                var tag = info.getData().getTag();
+                if (tag.isCustom()) {
+                    return tag.getName();
+                }
+
+                return GameLocalisation.getLocalisedValue(tag.getTag(), info);
             }
         });
         ALL.put(Game.HOI4, new SavegameStorage<>("hoi4", GameDateType.HOI4, SavegameType.HOI4, Hoi4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
-                return GameLocalisation.getLocalisedValue(
-                        info.getData().getTag().getTag(), info);
+                var tag = info.getData().getTag();
+                if (tag.getIdeology() != null) {
+                    var ideologyKey = tag.getTag() + "_" + tag.getIdeology();
+                    var ideologyName = GameLocalisation.getLocalisedValue(ideologyKey, info);
+                    if (!ideologyName.equals(ideologyKey)) {
+                        return ideologyName;
+                    }
+                }
+
+                return GameLocalisation.getLocalisedValue(tag.getTag(), info);
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>("ck3", GameDateType.CK3, SavegameType.CK3, Ck3SavegameInfo.class) {

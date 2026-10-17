@@ -10,8 +10,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 public class SavegameStorageIO {
 
@@ -36,20 +37,18 @@ public class SavegameStorageIO {
 
     private static <T, I extends SavegameInfo<T>> void exportSavegameDirectory(SavegameStorage<T, I> storage, Path out)
             throws IOException {
-        var writtenCollections = new ArrayList<String>();
+        var writtenCollections = new HashSet<String>();
         for (SavegameCampaign<T, I> c : storage.getCollections()) {
             var colName = getUniqueName(FileSystemHelper.getFileSystemCompatibleName(c.getName()), writtenCollections);
-            writtenCollections.add(colName);
 
             Path colDir = out.resolve(colName);
             FileUtils.forceMkdir(colDir.toFile());
-            var writtenEntries = new ArrayList<String>();
+            var writtenEntries = new HashSet<String>();
             for (SavegameEntry<T, I> e : c.entryStream().toList()) {
                 var branchSuffix = " (" + c.getUuid() + ")";
                 var eName = FileSystemHelper.getFileSystemCompatibleName(e.getName());
                 var outName = getUniqueName(eName, writtenEntries) + branchSuffix + "."
                         + storage.getType().getFileEnding();
-                writtenEntries.add(eName);
 
                 Path fileOut = colDir.resolve(outName);
                 storage.copySavegameTo(e, fileOut);
@@ -57,18 +56,13 @@ public class SavegameStorageIO {
         }
     }
 
-    private static String getUniqueName(String start, List<String> written) {
-        if (!written.contains(start)) {
-            return start;
-        }
-
+    private static String getUniqueName(String start, Set<String> written) {
+        var name = start;
         int counter = 1;
-        while (true) {
-            var newName = start + "(" + counter + ")";
-            if (!written.contains(newName)) {
-                return newName;
-            }
+        while (!written.add(name.toLowerCase(Locale.ROOT))) {
+            name = start + "(" + counter + ")";
             counter++;
         }
+        return name;
     }
 }

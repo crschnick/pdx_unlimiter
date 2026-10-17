@@ -324,7 +324,7 @@ public class GuiEditor {
                     edit.prefHeightProperty().bind(actions.heightProperty());
 
                     Button del = new Button();
-                    del.setDisable(disable);
+                    del.setDisable(disable || ((EditorRealNode) n).isRoot());
                     GuiTooltips.install(del, AppI18n.get("deleteNode"));
                     del.setGraphic(new FontIcon());
                     del.getStyleClass().add(GuiStyle.CLASS_DELETE);

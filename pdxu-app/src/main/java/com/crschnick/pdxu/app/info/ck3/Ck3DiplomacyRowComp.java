@@ -26,7 +26,9 @@ public abstract class Ck3DiplomacyRowComp extends DiplomacyRowComp<Ck3Tag> {
 
     @Override
     protected String mapTagTooltip(SavegameData<?> data, Ck3Tag tag) {
-        return tag.getName();
+        var name = tag.getName();
+        var title = tag.getPrimaryTitle();
+        return name.equals(title.getKey()) ? Ck3TitlesComp.getTitleName(data, title) : name;
     }
 
     @Override
